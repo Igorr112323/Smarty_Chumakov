@@ -51,11 +51,18 @@ jobs:
 
       - name: Воспроизводимость обучения (один seed → один результат)
         run: |
-          python -m spanverify train --dataset data/demo_pairs.jsonl --out /tmp/run1/weights.json --seed 42 --folds 5 > /tmp/train1.log
-          python -m spanverify train --dataset data/demo_pairs.jsonl --out /tmp/run2/weights.json --seed 42 --folds 5 > /tmp/train2.log
-          sha256sum /tmp/run1/weights.json /tmp/run2/weights.json
-          test "$(sha256sum < /tmp/run1/weights.json | cut -d' ' -f1)" = "$(sha256sum < /tmp/run2/weights.json | cut -d' ' -f1)"
-          echo "Обучение воспроизводимо при одинаковом seed"
+          python -m spanverify train --dataset data/demo_pairs.jsonl --out /tmp/run1/train/weights.json --seed 42 --folds 5 > /tmp/train1.log
+          python -m spanverify train --dataset data/demo_pairs.jsonl --out /tmp/run2/train/weights.json --seed 42 --folds 5 > /tmp/train2.log
+          # Сверяем все три артефакта обучения: weights.json, head.json и participation.json.
+          # Голова хранится как head.json (не .npz) — формат зафиксирован в отчёте.
+          sha256sum /tmp/run1/train/weights.json /tmp/run2/train/weights.json \
+                    /tmp/run1/config/head.json /tmp/run2/config/head.json \
+                    /tmp/run1/config/participation.json /tmp/run2/config/participation.json
+          for name in train/weights.json config/head.json config/participation.json; do
+            test "$(sha256sum < /tmp/run1/$name | cut -d' ' -f1)" = "$(sha256sum < /tmp/run2/$name | cut -d' ' -f1)" \
+              || { echo "::error title=воспроизводимость::$name различается между запусками"; exit 1; }
+          done
+          echo "Обучение воспроизводимо при одинаковом seed (weights.json, head.json, participation.json)"
 
       - name: Метрики на отложенной части (числа в лог)
         run: python -m spanverify evaluate --dataset data/demo_pairs.jsonl
@@ -81,7 +88,9 @@ jobs:
           name: training-report
           path: |
             /tmp/train1.log
-            /tmp/run1/weights.json
+            /tmp/run1/train/weights.json
+            /tmp/run1/config/head.json
+            /tmp/run1/config/participation.json
           retention-days: 30
 
   tests:

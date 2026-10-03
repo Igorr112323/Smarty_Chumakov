@@ -4,7 +4,7 @@
 [![build-and-release-exe](https://github.com/Igorr112323/Smarty_Chumakov/actions/workflows/build-and-release-exe.yml/badge.svg)](https://github.com/Igorr112323/Smarty_Chumakov/actions/workflows/build-and-release-exe.yml)
 [![release](https://img.shields.io/github/v/release/Igorr112323/Smarty_Chumakov)](https://github.com/Igorr112323/Smarty_Chumakov/releases/latest)
 [![python](https://img.shields.io/badge/python-3.10%20%7C%203.11%20%7C%203.12-blue)](spanverify-module/pyproject.toml)
-[![tests](https://img.shields.io/badge/tests-233%20passed-brightgreen)](spanverify-module/tests)
+[![tests](https://img.shields.io/badge/tests-234%20passed-brightgreen)](spanverify-module/tests)
 [![coverage](https://img.shields.io/badge/coverage-86%25-brightgreen)](spanverify-module/pyproject.toml)
 
 Программа берёт **документ-источник** и **ответ** (языковой модели или
@@ -36,7 +36,7 @@ python -m spanverify train --dataset data/demo_pairs.jsonl --out config/weights.
 python -m spanverify evaluate --dataset data/demo_pairs.jsonl   # метрики и критерий качества
 python -m spanverify selftest                                   # само-проверка конвейера
 python -m spanverify server --port 8765                         # API + веб-интерфейс
-python -m pytest -q                                             # 233 тестов
+python -m pytest -q                                             # 234 тестов
 ```
 
 Коды возврата `verify`: `0` — ответ подтверждён, `1` — найдены спорные
@@ -69,7 +69,7 @@ curl -X POST http://localhost:8765/v1/verify -H "Content-Type: application/json"
   0.283 (весь корпус — 0.315; конвейер расширяет найденный токен до границы
   предложения, ширина ×24) и полнота накрытия 1.000. Актуальные числа — в
   `spanverify-module/reports/METRICS.json` (единый файл чисел, сверяется в CI).
-* Пилот на реальной модели `rugpt3small` (CPU, 24 контрастные пары) показал
+* Пилот на малой модели `ruGPT3-small` (CPU, 24 контрастные пары на синтетических промтах) показал
   **отрицательный результат**: признаки внимания не отличают подставленное число
   от правильного. Числа из аннотаций CI прогона `37118455503` (job «Пилот», после
   исправления сопоставления подслов): AUC по слоям и признакам 0.405–0.700,
@@ -92,7 +92,14 @@ curl -X POST http://localhost:8765/v1/verify -H "Content-Type: application/json"
 AUC 0.996 на отложенной части) доказывают работоспособность и
 самосогласованность конвейера, а не качество на реальных документах. Научные
 выводы требует режим `hf` и своя разметка — это делает пилот
-(`scripts/pilot_rugpt3small.py`) на реальной модели в CI.
+(`scripts/pilot_rugpt3small.py`) — пилот на малой модели (`ruGPT3-small`) на синтетических промтах в CI.
+
+
+**Кросс-корпусный тест:** обучение на демо-корпусе, оценка на корпусе другого
+генератора (другие клише, числа прописью, перефразировки). Числа: внутри
+корпуса token F1 0.953 / FPR 0.002, кросс-корпус token F1 0.731 / FPR 0.144.
+Кросс-корпусный тест показывает переносимость метода на другой генератор,
+а не на реальные регламенты; для реальных нужны 1200 пар.
 
 ## Что лежит в репозитории
 
