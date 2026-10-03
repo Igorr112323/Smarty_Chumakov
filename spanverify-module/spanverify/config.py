@@ -36,20 +36,44 @@ def packaged_text(relative_path: str) -> str | None:
         return None
 
 
-def default_config_path() -> Path | None:
-    """Найти конфиг по умолчанию.
+def runtime_roots() -> list[Path]:
+    """Каталоги, где искать файлы поставки (config/, data/).
 
-    Порядок поиска: папка запуска (``config/config.json``), папка рядом с
-    исполняемым файлом (важно для собранного .exe), папка рядом с пакетом.
+    Порядок: распакованный бандл PyInstaller (``sys._MEIPASS``), папка рядом
+    с исполняемым файлом, текущая папка, корень репозитория/пакета.
+    Позволяет одному и тому же коду работать из исходников, из ``.exe`` в
+    режиме onefile и из zipapp.
     """
-    candidates = [
-        Path.cwd() / "config" / "config.json",
-        Path(sys.executable).resolve().parent / "config" / "config.json",
-        Path(__file__).resolve().parent.parent / "config" / "config.json",
-    ]
-    if getattr(sys, "frozen", False):  # PyInstaller
-        candidates.insert(0, Path(sys.executable).resolve().parent / "config" / "config.json")
-    for candidate in candidates:
+    roots: list[Path] = []
+    meipass = getattr(sys, "_MEIPASS", None)
+    if meipass:
+        roots.append(Path(meipass))
+    if getattr(sys, "frozen", False):
+        roots.append(Path(sys.executable).resolve().parent)
+        roots.append(Path.cwd())
+    else:
+        roots.append(Path.cwd())
+        roots.append(Path(__file__).resolve().parent.parent)
+    unique: list[Path] = []
+    for root in roots:
+        if root not in unique:
+            unique.append(root)
+    return unique
+
+
+def resolve_runtime_path(relative: str) -> Path:
+    """Найти файл поставки по относительному пути (для *.exe и zipapp)."""
+    for root in runtime_roots():
+        candidate = root / relative
+        if candidate.is_file():
+            return candidate
+    return Path(runtime_roots()[-1] / relative)
+
+
+def default_config_path() -> Path | None:
+    """Путь к ``config/config.json`` в поставке (если он есть)."""
+    for root in runtime_roots():
+        candidate = root / "config" / "config.json"
         if candidate.is_file():
             return candidate
     return None

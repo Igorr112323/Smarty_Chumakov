@@ -8,7 +8,7 @@ from typing import Any, Sequence
 
 from .backends import Backend, get_backend
 from .calibration import IsotonicCalibrator
-from .config import Config
+from .config import Config, resolve_runtime_path
 from .text import Token, sentences, tokenize
 from .vectors import knn_density
 
@@ -133,7 +133,9 @@ class Detector:
             max_tokens=self.config.hf_max_tokens,
         )
         if calibrator is None:
-            self.calibrator = IsotonicCalibrator.load(self.config.calibration_path)
+            self.calibrator = IsotonicCalibrator.load(
+                resolve_runtime_path(self.config.calibration_path)
+            )
         elif calibrator is False:
             self.calibrator = None
         else:
