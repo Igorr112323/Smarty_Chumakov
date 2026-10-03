@@ -389,6 +389,16 @@ jobs:
         working-directory: spanverify-module
         run: python scripts/probe_npa_text.py --out reports/npa_text_probe.json
 
+      # pypdf нужен для извлечения текста из официальных PDF (разведка и загрузчик корпуса A3).
+      - name: Поставить pypdf для разбора PDF
+        working-directory: spanverify-module
+        run: python -m pip install --disable-pip-version-check "pypdf~=6.1"
+
+      # Пятая разведка: извлекается ли текст из официальных PDF и какие фильтры есть у API.
+      - name: Разведать извлечение текста и фильтры API
+        working-directory: spanverify-module
+        run: python scripts/probe_npa_extract.py --out reports/npa_extract_probe.json
+
       # Результат разведки коммитится: артефакты GitHub не читаются из окружения
       # разработки, а факты об API нужны в репозитории. [skip ci] не даёт запустить
       # новый прогон от этого коммита.
@@ -397,7 +407,7 @@ jobs:
         run: |
           git config user.name "spanverify-bot"
           git config user.email "actions@users.noreply.github.com"
-          git add -f spanverify-module/reports/probe_sources.json spanverify-module/reports/npa_probe.json spanverify-module/reports/npa_probe2.json spanverify-module/reports/npa_probe3.json spanverify-module/reports/npa_text_probe.json || true
+          git add -f spanverify-module/reports/probe_sources.json spanverify-module/reports/npa_probe.json spanverify-module/reports/npa_probe2.json spanverify-module/reports/npa_probe3.json spanverify-module/reports/npa_text_probe.json spanverify-module/reports/npa_extract_probe.json || true
           if git diff --cached --quiet; then
             echo "нечего коммитить"
           else
@@ -416,4 +426,5 @@ jobs:
             spanverify-module/reports/npa_probe2.json
             spanverify-module/reports/npa_probe3.json
             spanverify-module/reports/npa_text_probe.json
+            spanverify-module/reports/npa_extract_probe.json
           retention-days: 30
