@@ -1,0 +1,13 @@
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.venv/
+venv/
+build/
+dist/
+release/
+*.egg-info/
+*.spec.bak
+.DS_Store
+data/*.jsonl
+!data/demo_dataset.jsonl

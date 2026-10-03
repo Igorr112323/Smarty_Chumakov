@@ -1,0 +1,424 @@
+name: build-and-release-exe
+
+# Сборка, проверка и публикация Windows-приложения SpanVerify.
+#
+# Запуск:
+#   * автоматически по тегу: git tag v1.0.1 && git push origin v1.0.1
+#   * вручную: Actions → build-and-release-exe → Run workflow
+#
+# Порядок (Приложения А, Б, В мастер-промта):
+#   1) тесты на трёх версиях Python;
+#   2) сборка .exe на windows-latest (onefile + onedir + zipapp);
+#   3) СМОУК-ТЕСТ собранного .exe: запуск, GET /health, POST /v1/verify с
+#      русским текстом, проверка полей контракта и фрагментов;
+#   4) контрольные суммы;
+#   5) публикация релиза — только если смоук-тест прошёл.
+#
+# Постоянная ссылка на последнюю версию:
+#   https://github.com/<owner>/<repo>/releases/latest/download/spanverify.exe
+
+on:
+  workflow_dispatch:
+    inputs:
+      publish_release:
+        description: "Публиковать релиз (ссылка /releases/latest/download/spanverify.exe)"
+        type: boolean
+        default: true
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+
+env:
+  PYTHONUTF8: "1"
+  PYTHONIOENCODING: "utf-8"
+
+jobs:
+  test:
+    name: Тесты (Python ${{ matrix.python }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python: ["3.10", "3.11", "3.12"]
+    defaults:
+      run:
+        working-directory: spanverify-module
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
+          cache: pip
+          cache-dependency-path: spanverify-module/requirements.txt
+
+      - name: Зависимости (пины из requirements.txt)
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements.txt
+
+      - name: Тесты
+        run: python -m pytest -q
+
+      - name: Само-проверка конвейера
+        run: python -m spanverify selftest
+
+  windows-exe:
+    name: Сборка и проверка .exe
+    needs: test
+    runs-on: windows-latest
+    env:
+      # Русские сообщения в консоли раннера: без UTF-8 вывод .exe падал
+      # с UnicodeEncodeError (Приложение А мастер-промта).
+      PYTHONUTF8: "1"
+      PYTHONIOENCODING: "utf-8"
+    defaults:
+      run:
+        working-directory: spanverify-module
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+          cache-dependency-path: spanverify-module/requirements.txt
+
+      - name: Зависимости сборки
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements.txt
+
+      - name: Версия пакета совпадает с тегом
+        shell: pwsh
+        run: |
+          $tag = "${{ github.ref_name }}"
+          $version = python -c "import spanverify; print(spanverify.__version__)"
+          if ("${{ github.ref }}".StartsWith("refs/tags/")) {
+            $expected = $tag.TrimStart("v")
+            if ($version.Trim() -ne $expected) {
+              Write-Host "::error title=версия::тег $tag не совпадает с версией пакета $version"
+              exit 1
+            }
+            Write-Host "Версия $version совпадает с тегом $tag"
+          } else {
+            Write-Host "Не тег: версия пакета $version (проверка пропущена)"
+          }
+
+      - name: Убедиться, что веса обучены (обучить, если нет)
+        shell: pwsh
+        run: |
+          if (-not (Test-Path "config/weights.json")) {
+            python -m spanverify train --dataset data/demo_pairs.jsonl --out config/weights.json --seed 42 --folds 5
+          }
+          python -m spanverify config
+
+      - name: Сборка onefile spanverify.exe
+        run: python -m PyInstaller spanverify.spec --noconfirm --clean
+
+      - name: "Диагностика: сверить Python DLL внутри .exe с исходной"
+        shell: pwsh
+        run: |
+          $code = @'
+          import hashlib, sys
+          from pathlib import Path
+          try:
+              from PyInstaller.archive.readers import CArchiveReader
+          except Exception as error:
+              print(f"::warning title=диагностика::нет CArchiveReader: {error}")
+              raise SystemExit(0)
+          name = f"python{sys.version_info.major}{sys.version_info.minor}.dll"
+          source = Path(sys.base_prefix) / "DLLs" / name
+          if not source.exists():
+              source = Path(sys.base_prefix) / name
+          reader = CArchiveReader("dist/spanverify.exe")
+          inside = {n: v for n, v in reader.toc.items() if n.lower().endswith(".dll")}
+          if name not in inside:
+              print(f"::warning title=диагностика::в бандле нет {name}; список: {sorted(inside)[:10]}")
+              raise SystemExit(0)
+          data = reader.extract(name)
+          bundled = hashlib.sha256(data).hexdigest()
+          original = hashlib.sha256(source.read_bytes()).hexdigest() if source.exists() else "нет файла"
+          print(f"::notice title=DLL в бандле::{name} размер={len(data)} sha256={bundled} | исходная sha256={original} | совпадают={bundled == original}")
+          for dll in sorted(inside):
+              payload = reader.extract(dll)
+              print(f"::notice title=библиотека в бандле::{dll} размер={len(payload)}")
+          '@
+          $code | Out-File -Encoding utf8 dll_check.py
+          python dll_check.py
+
+      - name: Сборка onedir (вариант для строгих антивирусов)
+        run: >
+          python -m PyInstaller --noconfirm --clean --onedir --name spanverify_onedir
+          --add-data "config;config" --add-data "data;data"
+          --hidden-import spanverify.server --hidden-import spanverify.cli
+          --exclude-module torch --exclude-module transformers --exclude-module streamlit
+          --exclude-module numpy --exclude-module pandas --exclude-module matplotlib
+          --exclude-module tkinter --exclude-module pytest
+          scripts/exe_launcher.py
+
+      - name: Сборка переносимого zipapp
+        run: python scripts/make_zipapp.py --out release
+
+      - name: Комплектация release/
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force -Path release | Out-Null
+          Copy-Item dist/spanverify.exe release/spanverify.exe -Force
+          Copy-Item dist/spanverify_onedir release/spanverify-win -Recurse -Force
+          Copy-Item config release/config -Recurse -Force
+          Copy-Item data release/data -Recurse -Force
+          Copy-Item README.md release/README.md -Force
+
+      - name: Смоук-тест собранного .exe (Приложение Б)
+        shell: pwsh
+        working-directory: spanverify-module/release
+        run: |
+          $ErrorActionPreference = "Stop"
+          Remove-Item exe-out.log, exe-err.log, exe-port.txt -ErrorAction SilentlyContinue
+          $proc = Start-Process -FilePath ".\spanverify.exe" `
+            -ArgumentList "--port", "8765", "--no-browser", "--port-file", "exe-port.txt" -PassThru `
+            -RedirectStandardOutput exe-out.log -RedirectStandardError exe-err.log
+          try {
+            $port = $null
+            $ready = $false
+            for ($i = 0; $i -lt 60; $i++) {
+              Start-Sleep -Seconds 2
+              if (-not $port -and (Test-Path exe-port.txt)) {
+                $port = [int](Get-Content exe-port.txt -Raw).Trim()
+                Write-Host ("фактический порт: $port")
+              }
+              if ($port) {
+                try {
+                  $health = Invoke-RestMethod -Uri "http://127.0.0.1:$port/health" -TimeoutSec 3
+                  if ($health.status -eq "ok") { $ready = $true; break }
+                } catch { }
+              }
+              if ($proc.HasExited) { throw "процесс .exe завершился с кодом $($proc.ExitCode)" }
+            }
+            if (-not $ready) { throw "сервис из .exe не поднялся за 120 секунд" }
+            Write-Host ("::notice title=health::$($health | ConvertTo-Json -Compress)")
+            Write-Host ("health: " + ($health | ConvertTo-Json -Compress))
+            if (-not $health.calibrated) {
+              throw "калибровка не загрузилась из бандла — проверьте упаковку config/"
+            }
+
+            # 1. Подмена факта должна быть найдена.
+            $bad = @{
+              answer  = "Срок хранения первичных документов составляет 3 года."
+              context = "Регламент 343: срок хранения первичных документов составляет 10 лет."
+            } | ConvertTo-Json -Compress
+            $response = Invoke-RestMethod -Uri "http://127.0.0.1:$port/v1/verify" `
+              -Method Post -Body ([System.Text.Encoding]::UTF8.GetBytes($bad)) `
+              -ContentType "application/json; charset=utf-8" -TimeoutSec 60
+            Write-Host ("подмена: " + ($response | ConvertTo-Json -Compress -Depth 4))
+            foreach ($field in @("score","is_hallucination","ai_share","ai_share_hard","threshold","spans","latency_ms","mode","stats")) {
+              if ($null -eq $response.$field) { throw "в ответе нет поля контракта '$field'" }
+            }
+            if ($response.spans.Count -lt 1) { throw "подмена числа не найдена" }
+            if ($response.spans[0].label -notin @("doubtful","likely_hallucination")) {
+              throw "неверная метка фрагмента: '$($response.spans[0].label)'"
+            }
+
+            # 2. Подтверждённый ответ не должен обвиняться.
+            $good = @{
+              answer  = "Срок хранения первичных документов составляет 10 лет."
+              context = "Регламент 343: срок хранения первичных документов составляет 10 лет."
+            } | ConvertTo-Json -Compress
+            $ok = Invoke-RestMethod -Uri "http://127.0.0.1:$port/v1/verify" `
+              -Method Post -Body ([System.Text.Encoding]::UTF8.GetBytes($good)) `
+              -ContentType "application/json; charset=utf-8" -TimeoutSec 60
+            Write-Host ("достоверный: " + ($ok | ConvertTo-Json -Compress -Depth 4))
+            if ($ok.verdict -ne "grounded") { throw "подтверждённый ответ получил вердикт '$($ok.verdict)'" }
+
+            # 3. Интерфейс и справочные маршруты отвечают.
+            $model = Invoke-RestMethod -Uri "http://127.0.0.1:$port/v1/model" -TimeoutSec 10
+            $config = Invoke-RestMethod -Uri "http://127.0.0.1:$port/v1/config" -TimeoutSec 10
+            $page = Invoke-WebRequest -Uri "http://127.0.0.1:$port/" -TimeoutSec 10
+            if ($page.StatusCode -ne 200) { throw "интерфейс не отдаётся" }
+            Write-Host ("модель: " + ($model | ConvertTo-Json -Compress -Depth 3))
+            Write-Host ("веса: " + ($config.weights | ConvertTo-Json -Compress))
+            Write-Host "СМОУК-ТЕСТ ПРОЙДЕН"
+          } catch {
+            # Диагностика уходит и в лог, и в аннотации: их видно через API даже
+            # тогда, когда загрузка логов сборки недоступна.
+            foreach ($name in @("exe-out.log", "exe-err.log")) {
+              if (Test-Path $name) {
+                Write-Host ("--- $name ---")
+                Get-Content $name -Encoding utf8 | Select-Object -Last 30 | ForEach-Object {
+                  Write-Host "::error title=$name::$_"
+                }
+              }
+            }
+            Write-Host ("::error title=сбой смоук-теста::$($_.Exception.Message)")
+            throw
+          } finally {
+            if ($proc -and -not $proc.HasExited) { Stop-Process -Id $proc.Id -Force }
+            Start-Sleep -Seconds 1
+            Write-Host "--- содержимое release/ ---"
+            Get-ChildItem | Select-Object Name, Length
+          }
+
+      - name: Проверка автономности .exe (config внутри файла)
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = "Stop"
+          $sandbox = Join-Path $env:RUNNER_TEMP "spanverify-solo"
+          Remove-Item $sandbox -Recurse -Force -ErrorAction SilentlyContinue
+          New-Item -ItemType Directory -Force -Path $sandbox | Out-Null
+          Copy-Item "release/spanverify.exe" (Join-Path $sandbox "spanverify.exe") -Force
+          $portFile = Join-Path $sandbox "port.txt"
+          $proc = Start-Process -FilePath (Join-Path $sandbox "spanverify.exe") `
+            -ArgumentList "--port", "8788", "--no-browser", "--port-file", $portFile -PassThru `
+            -RedirectStandardOutput (Join-Path $sandbox "out.log") `
+            -RedirectStandardError (Join-Path $sandbox "err.log")
+          try {
+            $port = $null
+            $ready = $false
+            for ($i = 0; $i -lt 45; $i++) {
+              Start-Sleep -Seconds 2
+              if (-not $port -and (Test-Path $portFile)) {
+                $port = [int](Get-Content $portFile -Raw).Trim()
+              }
+              if ($port) {
+                try {
+                  $health = Invoke-RestMethod -Uri "http://127.0.0.1:$port/health" -TimeoutSec 3
+                  if ($health.status -eq "ok") { $ready = $true; break }
+                } catch { }
+              }
+              if ($proc.HasExited) { throw "автономный .exe завершился с кодом $($proc.ExitCode)" }
+            }
+            if (-not $ready) { throw "автономный .exe не поднялся без папки config" }
+            Write-Host ("::notice title=автономность::$($health | ConvertTo-Json -Compress)")
+            Write-Host ("health без config рядом: " + ($health | ConvertTo-Json -Compress))
+            if (-not $health.calibrated) { throw "во встроенном бандле нет обученных весов" }
+            if ($health.weights_source -ne "embedded") {
+              throw "во встроенном бандле не оказалось весов: источник '$($health.weights_source)'"
+            }
+            $payload = @{
+              answer  = "Срок хранения первичных документов составляет 3 года."
+              context = "Регламент 343: срок хранения первичных документов составляет 10 лет."
+            } | ConvertTo-Json -Compress
+            $bad = Invoke-RestMethod -Uri "http://127.0.0.1:$port/v1/verify" `
+              -Method Post -Body ([System.Text.Encoding]::UTF8.GetBytes($payload)) `
+              -ContentType "application/json; charset=utf-8" -TimeoutSec 60
+            if ($bad.spans.Count -lt 1) { throw "автономный .exe не нашёл подмену" }
+            Write-Host "АВТОНОМНОСТЬ ПОДТВЕРЖДЕНА"
+          } catch {
+            foreach ($name in @("out.log", "err.log")) {
+              $file = Join-Path $sandbox $name
+              if (Test-Path $file) {
+                Get-Content $file -Encoding utf8 | Select-Object -Last 25 | ForEach-Object {
+                  Write-Host "::error title=$name::$_"
+                }
+              }
+            }
+            Write-Host ("::error title=сбой проверки автономности::$($_.Exception.Message)")
+            throw
+          } finally {
+            if ($proc -and -not $proc.HasExited) { Stop-Process -Id $proc.Id -Force }
+          }
+
+      - name: Смоук-тест zipapp (Python-версия)
+        shell: pwsh
+        run: |
+          # Контракт кодов возврата: 0 — чисто, 1 — есть сомнительные фрагменты,
+          # 2 — отказ (ошибка входа или формата). Actions завершает шаг кодом
+          # последней проверки $LASTEXITCODE, поэтому код проверяем явно, а не
+          # полагаемся на «ноль по умолчанию».
+          python release/spanverify.pyz selftest
+          if ($LASTEXITCODE -ne 0) { throw "selftest zipapp вернул код $LASTEXITCODE" }
+
+          python release/spanverify.pyz verify --answer "Срок хранения первичных документов составляет 3 года." --context "Регламент 343: срок хранения первичных документов составляет 10 лет." --json | Out-File -Encoding utf8 release/pyz-verify.json
+          $verifyCode = $LASTEXITCODE
+          if ($verifyCode -ne 1) { throw "verify: ожидался код 1 (есть сомнительные фрагменты), получен $verifyCode" }
+          $payload = Get-Content release/pyz-verify.json -Encoding utf8 -Raw | ConvertFrom-Json
+          if ($payload.verdict -ne "likely_hallucination") { throw "verify: неожиданный вердикт $($payload.verdict)" }
+          Write-Host ("zipapp verify: код $verifyCode, вердикт $($payload.verdict), фрагментов $(@($payload.spans).Count)")
+
+          # Отказ на чужом формате: код 2 и понятное сообщение (дефект E).
+          '{"id":"x1","question":"тест","answer":"тест","label":1}' | Set-Content -Encoding utf8 release/pyz-foreign.jsonl
+          python release/spanverify.pyz evaluate --dataset release/pyz-foreign.jsonl 2> release/pyz-foreign.err | Out-Null
+          $formatCode = $LASTEXITCODE
+          if ($formatCode -ne 2) { throw "evaluate на чужом формате: ожидался код 2, получен $formatCode" }
+          $message = Get-Content release/pyz-foreign.err -Encoding utf8 -Raw
+          if ($message -notmatch "строка 1") { throw "сообщение об отказе не указывает строку: $message" }
+          Write-Host "zipapp evaluate: чужой формат отвергнут с кодом 2"
+
+          # Подтверждённый ответ обязан дать код 0.
+          python release/spanverify.pyz verify --answer "Срок хранения первичных документов составляет 10 лет." --context "Регламент 343: срок хранения первичных документов составляет 10 лет." | Out-Null
+          if ($LASTEXITCODE -ne 0) { throw "подтверждённый ответ: ожидался код 0, получен $LASTEXITCODE" }
+          Write-Host "zipapp verify (подтверждённый ответ): код 0"
+
+      - name: Контрольные суммы
+        shell: pwsh
+        working-directory: spanverify-module/release
+        run: |
+          Compress-Archive -Path "spanverify-win/*" -DestinationPath "spanverify-win.zip" -Force
+          $files = @("spanverify.exe", "spanverify-win.zip", "spanverify.pyz")
+          $lines = foreach ($f in $files) {
+            $hash = (Get-FileHash $f -Algorithm SHA256).Hash.ToLower()
+            "{0}  {1}" -f $hash, $f
+          }
+          $lines | Set-Content -Encoding ASCII SHA256SUMS.txt
+          Get-Content SHA256SUMS.txt
+          $size = (Get-Item spanverify.exe).Length
+          Write-Host ("размер spanverify.exe: {0} байт" -f $size)
+          "Размер spanverify.exe: $size байт" | Out-File -Encoding utf8 size.txt
+
+      - name: Артефакты сборки
+        uses: actions/upload-artifact@v4
+        with:
+          name: spanverify-windows-x64
+          path: |
+            spanverify-module/release/spanverify.exe
+            spanverify-module/release/spanverify-win.zip
+            spanverify-module/release/spanverify.pyz
+            spanverify-module/release/SHA256SUMS.txt
+            spanverify-module/release/pyz-verify.json
+            spanverify-module/release/size.txt
+            spanverify-module/release/README.md
+          retention-days: 90
+
+      - name: Публикация релиза (только после успешного смоук-теста)
+        if: startsWith(github.ref, 'refs/tags/') || inputs.publish_release
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        working-directory: spanverify-module/release
+        run: |
+          $tag = if ("${{ github.ref }}".StartsWith("refs/tags/")) { "${{ github.ref_name }}" } else { "v1.0.1" }
+          $title = "SpanVerify $tag"
+          $notes = @"
+          Проверка ответа по документу: находит фрагменты ответа, которые контекст не подтверждает, и оценивает риск недостоверности.
+
+          ## Файлы
+          * ``spanverify.exe`` — основной вариант (Windows x64, один файл, Python не нужен). Запуск двойным кликом откроет браузер с интерфейсом.
+          * ``spanverify-win.zip`` — распаковать и запустить ``spanverify-win\spanverify.exe`` (вариант для антивирусов, не любящих onefile).
+          * ``spanverify.pyz`` — страховка: нужен Python 3.10+ (``python spanverify.pyz server --port 8765``).
+          * ``SHA256SUMS.txt`` — контрольные суммы.
+
+          ## Как проверить за минуту
+          1. Скачать ``spanverify.exe`` (в браузере может появиться предупреждение SmartScreen — «Подробнее» → «Выполнить в любом случае»: файл не подписан сертификатом).
+          2. Запустить двойным кликом; откроется страница ``http://localhost:8765``.
+          3. Нажать «Пример: подмена факта» → «Проверить»: строка с неверным числом подсветится, появится риск и порог.
+          4. Для сравнения нажать «Пример: подтверждённый» → «Проверить»: вердикт «Ответ подтверждается документом».
+
+          ## Что проверено автоматически перед публикацией
+          Смоук-тест на windows-раннере: запуск ``.exe``, ``GET /health`` (калибровка загрузилась из бандла), ``POST /v1/verify`` с подменой числа (найден фрагмент с меткой ``doubtful``/``likely_hallucination``), ``POST /v1/verify`` с подтверждённым ответом (вердикт ``grounded``), ``GET /v1/model``, ``GET /v1/config``, отдача интерфейса, отдельный смоук-тест ``spanverify.pyz``, тесты на Python 3.10–3.12.
+
+          ## Ограничение (важно)
+          В поставке — режим ``demo``: признаки считаются лексическими суррогатами без весов языковой модели, а веса обучены на синтетическом корпусе. Это проверяет конвейер и интерфейс, а не даёт научный вывод о достоверности. Для реальной работы нужен режим ``hf`` (torch + transformers) и калибровка на ваших размеченных парах — см. ``docs/РУКОВОДСТВО.md``.
+          "@
+          $notes = $notes -replace '(?m)^\s+', ''
+          if (gh release view $tag --repo "${{ github.repository }}") {
+            gh release upload $tag spanverify.exe spanverify-win.zip spanverify.pyz SHA256SUMS.txt --clobber --repo "${{ github.repository }}"
+            gh release edit $tag --title $title --notes $notes --latest --repo "${{ github.repository }}"
+          } else {
+            gh release create $tag spanverify.exe spanverify-win.zip spanverify.pyz SHA256SUMS.txt `
+              --repo "${{ github.repository }}" --title $title --notes $notes --latest
+          }
+          gh release view $tag --repo "${{ github.repository }}" --json url,assets

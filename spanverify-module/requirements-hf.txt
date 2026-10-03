@@ -1,0 +1,9 @@
+# SpanVerify — зависимости режима hf (реальные веса языковой модели).
+#
+# Ставятся только там, где нужен режим hf: пилот в CI, эксперименты, боевая
+# калибровка на размеченных парах. В поставку (.exe, .pyz) они не попадают —
+# это осознанно: без torch .exe в разы меньше и стартует без DLL.
+
+torch~=2.14           # CPU-колёса: --index-url https://download.pytorch.org/whl/cpu
+transformers~=5.18    # ai-forever/rugpt3small_based_on_gpt2 (и другие модели)
+sentencepiece~=0.2    # токенизатор ruGPT3

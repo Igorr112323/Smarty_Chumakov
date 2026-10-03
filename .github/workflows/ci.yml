@@ -1,0 +1,352 @@
+name: ci
+
+# Непрерывная проверка качества: тесты на трёх версиях Python и двух системах,
+# линтер и форматирование, порог покрытия, воспроизводимость обучения и пилот на
+# реальной русскоязычной модели (CPU).
+#
+# Запускается на каждый push и pull request; вручную — через Run workflow.
+
+on:
+  push:
+    branches: [main, "arena/**"]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  PYTHONUTF8: "1"
+  PYTHONIOENCODING: "utf-8"
+
+jobs:
+  quality:
+    name: Линтер, форматирование, покрытие
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: spanverify-module
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+          cache-dependency-path: spanverify-module/requirements.txt
+
+      - name: Зависимости проверки
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements.txt
+
+      - name: Линтер (ruff)
+        run: python -m ruff check .
+
+      - name: Форматирование (black --check)
+        run: python -m black --check .
+
+      - name: Тесты с порогом покрытия 85 %
+        run: python -m pytest --cov=spanverify --cov-report=term --cov-report=json:reports/coverage.json --cov-fail-under=85
+
+      - name: Воспроизводимость обучения (один seed → один результат)
+        run: |
+          python -m spanverify train --dataset data/demo_pairs.jsonl --out /tmp/run1/train/weights.json --seed 42 --folds 5 > /tmp/train1.log
+          python -m spanverify train --dataset data/demo_pairs.jsonl --out /tmp/run2/train/weights.json --seed 42 --folds 5 > /tmp/train2.log
+          # Сверяем все три артефакта обучения: weights.json, head.json и participation.json.
+          # Голова хранится как head.json (не .npz) — формат зафиксирован в отчёте.
+          sha256sum /tmp/run1/train/weights.json /tmp/run2/train/weights.json \
+                    /tmp/run1/config/head.json /tmp/run2/config/head.json \
+                    /tmp/run1/config/participation.json /tmp/run2/config/participation.json
+          for name in train/weights.json config/head.json config/participation.json; do
+            test "$(sha256sum < /tmp/run1/$name | cut -d' ' -f1)" = "$(sha256sum < /tmp/run2/$name | cut -d' ' -f1)" \
+              || { echo "::error title=воспроизводимость::$name различается между запусками"; exit 1; }
+          done
+          echo "Обучение воспроизводимо при одинаковом seed (weights.json, head.json, participation.json)"
+
+      - name: Метрики на отложенной части (числа в лог)
+        run: python -m spanverify evaluate --dataset data/demo_pairs.jsonl
+
+      - name: Чистая установка в отдельном venv (пины из requirements.txt)
+        run: |
+          python -m venv /tmp/venv-clean
+          /tmp/venv-clean/bin/python -m pip install --upgrade pip > /dev/null
+          /tmp/venv-clean/bin/python -m pip install -q -r requirements.txt
+          /tmp/venv-clean/bin/python -m spanverify selftest
+
+      - name: Отчёт покрытия для единого файла чисел
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-json
+          path: spanverify-module/reports/coverage.json
+          retention-days: 30
+
+      - name: Сохранить отчёт обучения
+        uses: actions/upload-artifact@v4
+        with:
+          name: training-report
+          path: |
+            /tmp/train1.log
+            /tmp/run1/train/weights.json
+            /tmp/run1/config/head.json
+            /tmp/run1/config/participation.json
+          retention-days: 30
+
+  tests:
+    name: Тесты (Python ${{ matrix.python }}, ${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+        python: ["3.10", "3.11", "3.12"]
+    defaults:
+      run:
+        working-directory: spanverify-module
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
+          cache: pip
+          cache-dependency-path: spanverify-module/requirements.txt
+
+      - name: Зависимости тестов
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install pytest
+
+      - name: Тесты
+        run: python -m pytest -q
+
+      - name: Само-проверка конвейера
+        run: python -m spanverify selftest
+
+      - name: Проверка HTTP-контракта (реальный запрос к сервису)
+        shell: pwsh
+        run: |
+          $proc = Start-Process -FilePath "python" -ArgumentList "-m","spanverify","server","--host","127.0.0.1","--port","8765","--no-browser","--quiet" -PassThru
+          try {
+            $ready = $false
+            for ($i = 0; $i -lt 30; $i++) {
+              Start-Sleep -Milliseconds 700
+              try {
+                $health = Invoke-RestMethod -Uri "http://127.0.0.1:8765/health" -TimeoutSec 3
+                if ($health.status -eq "ok") { $ready = $true; break }
+              } catch { }
+            }
+            if (-not $ready) { throw "сервис не поднялся" }
+            $payload = @{
+              answer  = "Срок хранения первичных документов составляет 3 года."
+              context = "Регламент 343: срок хранения первичных документов составляет 10 лет."
+            } | ConvertTo-Json -Compress
+            $body = [System.Text.Encoding]::UTF8.GetBytes($payload)
+            $result = Invoke-RestMethod -Uri "http://127.0.0.1:8765/v1/verify" -Method Post -Body $body -ContentType "application/json; charset=utf-8" -TimeoutSec 60
+            Write-Host ("verdict={0} score={1} spans={2}" -f $result.verdict, $result.score, $result.spans.Count)
+            if ($result.spans.Count -lt 1) { throw "подмена числа не найдена" }
+            if ($result.spans[0].label -notin @("doubtful","likely_hallucination")) { throw "неверная метка фрагмента" }
+          } finally {
+            if ($proc -and -not $proc.HasExited) { Stop-Process -Id $proc.Id -Force }
+          }
+
+  pilot:
+    name: Пилот на реальной модели (rugpt3small, CPU)
+    runs-on: ubuntu-latest
+    needs: quality
+    defaults:
+      run:
+        working-directory: spanverify-module
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+          cache-dependency-path: spanverify-module/requirements-hf.txt
+
+      - name: Кэш весов модели
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/huggingface
+          key: hf-${{ runner.os }}-rugpt3small-v1
+
+      - name: Зависимости режима hf (torch CPU + transformers)
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install "torch~=2.14" --index-url https://download.pytorch.org/whl/cpu
+          python -m pip install "transformers~=5.18" "sentencepiece~=0.2"  # пины: requirements-hf.txt
+
+      - name: "Пилот: AUC признаков по слоям внимания"
+        run: python scripts/pilot_rugpt3small.py --pairs 24 --bootstrap 5000 --out reports/pilot
+
+      - name: Показать отчёт
+        if: always()
+        run: cat reports/pilot/pilot.md
+
+      - name: Ключевые числа пилота в аннотации
+        if: always()
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          report = Path("reports/pilot/pilot.json")
+          if not report.exists():
+              print("::error title=пилот::отчёт pilot.json не найден")
+              raise SystemExit(0)
+          data = json.loads(report.read_text(encoding="utf-8"))
+          print("::notice title=пилот статус::status={status} "
+                .format(status=data.get("status"))
+                + f"модель={data.get('environment', {}).get('model', data.get('model'))} "
+                f"пар={data.get('pairs')} токенов={data.get('tokens')} "
+                f"бутстрэп={data.get('bootstrap_iterations')} сек={data.get('duration_s')}")
+          contrast = data.get("contrast") or {}
+          print("::notice title=контраст::" + json.dumps(contrast, ensure_ascii=False))
+          for layer, features in (data.get("auc") or {}).items():
+              line = ", ".join(
+                  f"{name}={values.get('auc_oriented'):.3f} [{values.get('ci_low'):.3f}; {values.get('ci_high'):.3f}]"
+                  for name, values in features.items()
+              )
+              print(f"::notice title=слой {layer}::{line}")
+              paired = ", ".join(
+                  f"{name}: AUC={values.get('auc_fact'):.3f} "
+                  f"[{values.get('ci_fact_low'):.3f}; {values.get('ci_fact_high'):.3f}] "
+                  f"с опорой={values.get('fact_mean_grounded'):.6f} "
+                  f"без опоры={values.get('fact_mean_unsupported'):.6f} "
+                  f"delta={values.get('delta_mean'):+.6f} "
+                  f"[{values.get('delta_ci_low'):+.6f}; {values.get('delta_ci_high'):+.6f}] "
+                  f"значимо={'да' if values.get('delta_significant') else 'нет'}"
+                  for name, values in features.items()
+              )
+              print(f"::notice title=токен значения, слой {layer}::{paired}")
+          PY
+
+      - name: Артефакт пилота
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: pilot-report
+          path: |
+            spanverify-module/reports/pilot/pilot.md
+            spanverify-module/reports/pilot/pilot.json
+            spanverify-module/reports/pilot/pilot.png
+          retention-days: 90
+
+  metrics:
+    name: Единый файл чисел (METRICS.json) и сверка документов
+    runs-on: ubuntu-latest
+    needs: [quality, pilot, external]
+    defaults:
+      run:
+        working-directory: spanverify-module
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+          cache-dependency-path: spanverify-module/requirements.txt
+
+      - name: Зависимости
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements.txt
+
+      - name: Скачать отчёт покрытия
+        uses: actions/download-artifact@v4
+        with:
+          name: coverage-json
+          path: spanverify-module/reports
+
+      - name: Скачать отчёт пилота (JSON + PNG)
+        uses: actions/download-artifact@v4
+        with:
+          name: pilot-report
+          path: spanverify-module/reports/pilot
+
+      - name: Скачать результаты внешних наборов
+        uses: actions/download-artifact@v4
+        with:
+          name: external-tests
+          path: spanverify-module/reports
+
+      - name: Кросс-корпусный тест (обучение на A, оценка на B)
+        run: python scripts/cross_corpus.py --out reports/cross_corpus.json
+
+      - name: Собрать единый файл чисел
+        run: python scripts/collect_metrics.py --out reports/METRICS.json --coverage-json reports/coverage.json
+
+      - name: Ключевые числа в аннотации (чтобы их можно было прочитать без скачивания)
+        run: python scripts/print_metrics_annotation.py --metrics reports/METRICS.json
+
+      - name: Сверить числа в документах с METRICS.json
+        run: python scripts/check_numbers.py --metrics reports/METRICS.json
+
+      - name: Артефакт чисел
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: metrics
+          path: |
+            spanverify-module/reports/METRICS.json
+            spanverify-module/reports/cross_corpus.json
+          retention-days: 90
+
+  external:
+    name: Внешние размеченные наборы (скачивание, контрольные числа, оценка)
+    runs-on: ubuntu-latest
+    needs: quality
+    defaults:
+      run:
+        working-directory: spanverify-module
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+          cache-dependency-path: spanverify-module/requirements.txt
+
+      - name: Зависимости
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements.txt
+
+      # Наборы скачиваются с закреплённых ревизий и сверяются по SHA256. Это
+      # проверка чужой разметки, а не наших выводов: числа должны совпасть с
+      # контрольными (RAGTruth 17790/2965/14289, test QA 875/150/160/235;
+      # RusHallu-RAG 1000/667/333/423).
+      - name: Скачать внешние наборы и проверить контрольные числа
+        run: python scripts/fetch_external_tests.py --all --out data/external --verify --adapt
+
+      - name: Оценка на RAGTruth QA (внешний английский набор)
+        run: python scripts/external_eval.py --dataset ragtruth --task qa --split test --mode demo --json reports/ext_ragtruth_qa.json
+
+      - name: Оценка на RusHallu-RAG (внешний русский набор)
+        run: python scripts/external_eval.py --dataset rushallu --mode demo --json reports/ext_rushallu.json
+
+      - name: Ключевые числа в аннотации (читаются без скачивания артефактов)
+        run: python scripts/print_external_annotation.py
+
+      - name: Отчёт по внешним наборам
+        run: |
+          # Числа отчёта берутся из external_tests.json и не правятся руками; сверку
+          # текстов с числами выполняет job «Единый файл чисел» (check_numbers.py).
+          python scripts/make_external_report.py
+
+      - name: Артефакт отчётов по внешним наборам
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: external-tests
+          path: |
+            spanverify-module/reports/external_tests.json
+            spanverify-module/reports/EXTERNAL_TESTS.md
+            spanverify-module/reports/ext_ragtruth_qa.json
+            spanverify-module/reports/ext_rushallu.json
+          retention-days: 90
