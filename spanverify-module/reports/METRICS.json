@@ -8,8 +8,8 @@
   },
   "meta": {
     "version": "1.2.1",
-    "commit": "c68ebd3b2feb7e926f9cb7d09c7a5a3547cc1c22",
-    "generated_at": "2026-10-03T15:01:48Z",
+    "commit": "0fa53428409c63d675fc0788577a9ff2174af563",
+    "generated_at": "2026-10-03T15:34:44Z",
     "seed": 42,
     "dataset": "data/demo_pairs.jsonl"
   },
@@ -155,9 +155,9 @@
   },
   "cross_corpus": {
     "in_corpus_f1": 0.9532,
-    "cross_corpus_f1": 0.7306,
-    "drop": 0.2226,
-    "cross_fpr": 0.1438,
+    "cross_corpus_f1": 0.7173,
+    "drop": 0.2359,
+    "cross_fpr": 0.1571,
     "corpus_b": {
       "name": "alt-generator 1.0 (числа словами, другие шаблоны)",
       "pairs": 240,
@@ -175,5 +175,5 @@
       }
     ]
   },
-  "duration_s": 27.8
+  "duration_s": 24.6
 }
