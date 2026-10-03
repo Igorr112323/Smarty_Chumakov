@@ -6,7 +6,7 @@
       "size_hint": 4096,
       "content_type": "text/html; charset=utf-8",
       "looks_like_pdf": false,
-      "seconds": 0.45,
+      "seconds": 1.26,
       "error": null,
       "name": "publication.pravo.gov.ru"
     },
@@ -16,7 +16,7 @@
       "size_hint": 4096,
       "content_type": "text/html; charset=UTF-8",
       "looks_like_pdf": false,
-      "seconds": 1.15,
+      "seconds": 0.85,
       "error": null,
       "name": "pravo.gov.ru"
     },
@@ -26,7 +26,7 @@
       "size_hint": 4096,
       "content_type": "application/json; charset=utf-8",
       "looks_like_pdf": false,
-      "seconds": 1.01,
+      "seconds": 1.15,
       "error": null,
       "name": "pravo.gov.ru API"
     },
@@ -66,7 +66,7 @@
       "size_hint": 4096,
       "content_type": "text/html; charset=UTF-8",
       "looks_like_pdf": false,
-      "seconds": 2.34,
+      "seconds": 2.67,
       "error": null,
       "name": "eec.eaeunion.org"
     },
@@ -96,7 +96,7 @@
       "size_hint": 4096,
       "content_type": "application/pdf",
       "looks_like_pdf": true,
-      "seconds": 0.75,
+      "seconds": 1.07,
       "error": null,
       "name": "статья RusHallu-RAG (PDF)"
     }
