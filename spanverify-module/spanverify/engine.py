@@ -50,6 +50,7 @@ from .features import (
     extract_features,
     is_scored_token,
 )
+from .participation import PARTICIPATION_FILENAME, ParticipationModel
 
 WEIGHTS_FILENAME = "config/weights.json"
 HALLUCINATION_LABEL_RISK = 0.75
@@ -202,8 +203,22 @@ class Verifier:
         self.mode = (mode or self.bundle.mode or self.config.backend or "demo").lower()
         self.model_name = model_name or getattr(self.config, "hf_model", "ai-forever/rugpt3small_based_on_gpt2")
         self._detector = detector
+        # Оценка доли участия ИИ (требование заявки) — отдельная голова; если
+        # файла нет, поле остаётся нулевым и это видно в stats.
+        self.participation = self._load_participation()
 
     # ---------------------------------------------------------------- доступ
+
+    def _load_participation(self) -> ParticipationModel | None:
+        """Прочитать оценку доли участия ИИ из ``config/participation.json``."""
+        for root in runtime_roots():
+            path = root / PARTICIPATION_FILENAME
+            if path.is_file():
+                try:
+                    return ParticipationModel.load(path)
+                except (OSError, ValueError, KeyError):
+                    return None
+        return None
 
     @property
     def detector(self) -> Detector:
@@ -279,6 +294,7 @@ class Verifier:
         score = self._calibrate(raw_score)
         threshold = self.bundle.threshold
         ai_share_soft, ai_share_hard = self._shares(tokens, smoothed, scored_indices)
+        ai_participation = self.participation.estimate(answer, features) if self.participation is not None else 0.0
 
         tokens_payload = _token_payload(tokens, features, smoothed, span_threshold)
         stats = {
@@ -292,6 +308,10 @@ class Verifier:
             "span_floor": self.bundle.span_floor,
             "weights": {name: round(self.bundle.weights.get(name, 0.0), 3) for name in FEATURE_NAMES},
             "features": features.meta,
+            "ai_participation": round(ai_participation, 4),
+            "ai_participation_calibrated_on": (
+                self.participation.calibrated_on if self.participation is not None else None
+            ),
             "warning": self.warning,
         }
 
@@ -300,6 +320,7 @@ class Verifier:
             is_hallucination=score >= threshold,
             ai_share=ai_share_soft,
             ai_share_hard=ai_share_hard,
+            ai_participation=ai_participation,
             threshold=threshold,
             spans=spans,
             tokens=tokens_payload if with_tokens else [],

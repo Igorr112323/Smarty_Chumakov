@@ -353,6 +353,62 @@ def environment_info(model_name: str) -> dict:
     return info
 
 
+def write_auc_png(payload: dict, path: Path, width: int = 640, height: int = 360) -> Path:
+    """Нарисовать столбцы AUC по слоям и записать PNG (без matplotlib).
+
+    Картинка — приложение к отчёту пилота: три признака на каждый слой, высота
+    столбца = AUC (ориентированная, то есть 0.5 = случайное угадывание).
+    """
+    import struct  # noqa: PLC0415
+    import zlib  # noqa: PLC0415
+
+    layers = list(payload.get("auc", {}))
+    features = ["attention_entropy", "ctx_attention_mass", "embedding_density"]
+    colors = [(214, 96, 77), (77, 132, 214), (110, 168, 96)]
+    pixels = [[(255, 255, 255) for _ in range(width)] for _ in range(height)]
+
+    def line(x0: int, y0: int, x1: int, y1: int, color: tuple[int, int, int]) -> None:
+        steps = max(abs(x1 - x0), abs(y1 - y0), 1)
+        for step in range(steps + 1):
+            x = x0 + (x1 - x0) * step // steps
+            y = y0 + (y1 - y0) * step // steps
+            if 0 <= x < width and 0 <= y < height:
+                pixels[y][x] = color
+
+    def bar(x: int, top: int, color: tuple[int, int, int], bar_width: int) -> None:
+        for column in range(max(0, x), min(width, x + bar_width)):
+            for row in range(max(0, top), height - 30):
+                pixels[row][column] = color
+
+    left, bottom = 50, height - 30
+    line(left, 20, left, bottom, (120, 120, 120))
+    line(left, bottom, width - 10, bottom, (120, 120, 120))
+    for tick in range(5):
+        y = bottom - int((bottom - 20) * tick / 4)
+        line(left, y, width - 10, y, (232, 232, 232))
+    if not layers:
+        layers = ["last"]
+    slot = (width - left - 30) // max(1, len(layers) * len(features))
+    for layer_index, layer in enumerate(layers):
+        for feature_index, feature in enumerate(features):
+            value = float((payload.get("auc", {}).get(layer, {}).get(feature, {}) or {}).get("auc_oriented") or 0.0)
+            value = max(0.0, min(1.0, value))
+            x = left + 20 + (layer_index * len(features) + feature_index) * slot
+            top = bottom - int((bottom - 20) * value)
+            bar(x, top, colors[feature_index], max(4, slot - 6))
+
+    raw = b"".join(b"\x00" + bytes(channel for pixel in row for channel in pixel) for row in pixels)
+
+    def chunk(tag: bytes, data: bytes) -> bytes:
+        return struct.pack(">I", len(data)) + tag + data + struct.pack(">I", zlib.crc32(tag + data) & 0xFFFFFFFF)
+
+    header = struct.pack(">IIBBBBB", width, height, 8, 2, 0, 0, 0)
+    body = chunk(b"IHDR", header) + chunk(b"IDAT", zlib.compress(raw, 9)) + chunk(b"IEND", b"")
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_bytes(b"\x89PNG\r\n\x1a\n" + body)
+    return path
+
+
 def render_markdown(payload: dict) -> str:
     """Отчёт в Markdown: таблица AUC по слоям и выводы без прикрас."""
     lines = [
@@ -553,6 +609,20 @@ def main(argv: list[str] | None = None) -> int:
     contrast_ok = bool(contrast.get("contrast_ok"))
     payload = {
         "status": "ok" if contrast_ok else "contrast_not_met",
+        "published": bool(contrast_ok),
+        "wording": (
+            "пилот на малой модели (ruGPT3-small) на синтетических промтах: "
+            "модель реальная, корпус промтов синтетический"
+        ),
+        "control": {
+            "grounded_copy_min": 0.8,
+            "unsupported_copy_max": 0.3,
+            "grounded_copy_rate": contrast.get("grounded_value_copy_rate", 0.0),
+            "unsupported_copy_rate": contrast.get("unsupported_value_copy_rate", 0.0),
+            "grounded_ok": contrast.get("grounded_value_copy_rate", 0.0) >= 0.8,
+            "unsupported_ok": contrast.get("unsupported_value_copy_rate", 1.0) <= 0.3,
+            "contrast_ok": bool(contrast_ok),
+        },
         "environment": environment_info(args.model),
         "pairs": len(pairs),
         "tokens": len(rows),
@@ -563,8 +633,9 @@ def main(argv: list[str] | None = None) -> int:
         "auc": auc_table,
         "duration_s": round(time.time() - started, 1),
         "notice": (
-            "Пары синтетические и сгенерированы по шаблонам; объём малый. "
-            "Отчёт описывает пилот, а не итоговое качество продукта."
+            "Корпус промтов синтетический (два стиля, числа подставляются контролируемо), "
+            "объём малый. Отчёт описывает пилот на малой модели ruGPT3-small, "
+            "а не итоговое качество продукта."
         ),
     }
 
@@ -572,7 +643,8 @@ def main(argv: list[str] | None = None) -> int:
     out_dir.mkdir(parents=True, exist_ok=True)
     (out_dir / "pilot.json").write_text(json.dumps(payload, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     (out_dir / "pilot.md").write_text(render_markdown(payload), encoding="utf-8")
-    print(f"Отчёт: {out_dir / 'pilot.md'} и {out_dir / 'pilot.json'}")
+    png_path = write_auc_png(payload, out_dir / "pilot.png")
+    print(f"Отчёт: {out_dir / 'pilot.md'}, {out_dir / 'pilot.json'}, {png_path}")
     print(f"Длительность: {payload['duration_s']} с; токенов: {payload['tokens']}")
     print(f"Статус контраста: {payload['status']} ({json.dumps(contrast, ensure_ascii=False)})")
     for layer, features in auc_table.items():

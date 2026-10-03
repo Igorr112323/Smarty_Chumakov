@@ -27,6 +27,7 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
 
+from ._version import __version__
 from .calibration import IsotonicCalibrator, choose_threshold, metrics_at
 from .core import tokenize_with_offsets
 from .engine import (
@@ -38,9 +39,20 @@ from .engine import (
     span_threshold_for,
 )
 from .features import DEFAULT_WEIGHTS, combine, is_scored_token
+from .logreg import (
+    probabilities as _head_probabilities,
+)
+from .logreg import (
+    standardize as _standardize,
+)
+from .logreg import (
+    train_logreg as _train_logreg,
+)
+from .participation import ParticipationModel, build_participation_corpus, corpus_rows_and_labels
 
 __all__ = [
     "TrainReport",
+    "shared_groups",
     "TokenSample",
     "collect_samples",
     "auc_score",
@@ -177,6 +189,7 @@ class TrainReport:
     validation: dict[str, Any] = field(default_factory=dict)
     folds: list[dict[str, Any]] = field(default_factory=list)
     head: dict[str, Any] = field(default_factory=dict)
+    participation: dict[str, Any] = field(default_factory=dict)
     stats: dict[str, Any] = field(default_factory=dict)
     dataset: str = ""
     seed: int = 42
@@ -191,7 +204,9 @@ class TrainReport:
             f"порог_ответа={self.bundle.threshold:.4f} "
             f"token F1={validation.get('f1', 0):.3f} FPR={validation.get('fpr', 0):.3f} "
             f"AUC={validation.get('auc', 0):.3f} сигнал={validation.get('selection', {}).get('signal')} "
-            f"| сквозной F1={served.get('f1', 0):.3f} FPR={served.get('fpr', 0):.3f}"
+            f"| сквозной F1={served.get('f1', 0):.3f} FPR={served.get('fpr', 0):.3f} "
+            f"| участие ИИ: AUC={self.participation.get('auc_out_of_fold', 0):.3f} "
+            f"(калибровка: {self.participation.get('calibrated_on', '—')})"
         )
 
 
@@ -211,11 +226,47 @@ def _weight_grid(step: float = WEIGHT_GRID_STEP) -> list[dict[str, float]]:
     return grid
 
 
-def _split_pairs(pairs: Sequence[dict], test_size: float, seed: int) -> tuple[list, list]:
+def _group_key(pair: dict) -> tuple[str, str]:
+    """Ключ группы для честного разделения: субъект + шаблон/вопрос.
+
+    Без группировки один и тот же субъект (и тот же шаблон вопроса) попадает и в
+    обучение, и в «отложенную» часть, и метрика перестаёт быть отложенной.
+    """
+    meta = pair.get("meta") or {}
+    subject = str(meta.get("subject") or "")
+    template = str(meta.get("question") or meta.get("template") or "")
+    return (subject, template)
+
+
+def _split_pairs(pairs: Sequence[dict], test_size: float, seed: int, group: bool = True) -> tuple[list, list]:
+    """Разделить пары на обучающую и отложенную части.
+
+    По умолчанию — групповое разделение по ``(subject, шаблон)``: ни один субъект
+    и ни один шаблон не встречаются в обеих частях. ``group=False`` оставлен для
+    сравнения и старых сценариев (построчный шаффл).
+    """
     ordered = list(pairs)
-    random.Random(seed).shuffle(ordered)
+    rng = random.Random(seed)
+    if group:
+        groups: dict[tuple[str, str], list[dict]] = {}
+        for pair in ordered:
+            groups.setdefault(_group_key(pair), []).append(pair)
+        keys = sorted(groups)
+        rng.shuffle(keys)
+        cut = max(1, int(round(len(keys) * (1 - test_size))))
+        train_keys = set(keys[:cut])
+        train = [pair for pair in ordered if _group_key(pair) in train_keys]
+        test = [pair for pair in ordered if _group_key(pair) not in train_keys]
+        if train and test:
+            return train, test
+    rng.shuffle(ordered)
     cut = max(1, int(len(ordered) * (1 - test_size)))
     return ordered[:cut], ordered[cut:]
+
+
+def shared_groups(train_pairs: Sequence[dict], test_pairs: Sequence[dict]) -> int:
+    """Сколько групп встречается и в обучении, и в отложенной части (для отчёта)."""
+    return len({_group_key(pair) for pair in train_pairs} & {_group_key(pair) for pair in test_pairs})
 
 
 def _risk_for(samples: Sequence[TokenSample], weights: dict[str, float]) -> list[float]:
@@ -318,19 +369,6 @@ def _span_f1_from_indices(
 # ---------------------------------------------------------------- голова
 
 
-def _standardize(rows: Sequence[Sequence[float]]) -> tuple[list[list[float]], list[float], list[float]]:
-    if not rows:
-        return [], [], []
-    width = len(rows[0])
-    means = [sum(row[j] for row in rows) / len(rows) for j in range(width)]
-    scales = []
-    for j in range(width):
-        variance = sum((row[j] - means[j]) ** 2 for row in rows) / len(rows)
-        scales.append(variance**0.5 or 1.0)
-    normalized = [[(row[j] - means[j]) / scales[j] for j in range(width)] for row in rows]
-    return normalized, means, scales
-
-
 def _head_rows(samples: Sequence[TokenSample], risks: Sequence[float], with_label: bool = True):
     rows: list[list[float]] = []
     labels: list[int] = []
@@ -347,42 +385,6 @@ def _head_rows(samples: Sequence[TokenSample], risks: Sequence[float], with_labe
         )
         labels.append(sample.label)
     return (rows, labels) if with_label else rows
-
-
-def _train_logreg(
-    rows: Sequence[Sequence[float]],
-    labels: Sequence[int],
-    epochs: int = 400,
-    learning_rate: float = 0.5,
-    l2: float = 1e-3,
-) -> dict[str, Any]:
-    """Логистическая регрессия одним батчем (без внешних зависимостей)."""
-    width = len(rows[0]) if rows else 0
-    weights = [0.0] * width
-    bias = 0.0
-    count = max(1, len(rows))
-    for _ in range(epochs):
-        gradient = [0.0] * width
-        bias_gradient = 0.0
-        for row, label in zip(rows, labels, strict=False):
-            score = bias + sum(w * x for w, x in zip(weights, row, strict=False))
-            probability = 1.0 / (1.0 + math.exp(-max(-30.0, min(30.0, score))))
-            error = probability - label
-            for j in range(width):
-                gradient[j] += error * row[j]
-            bias_gradient += error
-        for j in range(width):
-            weights[j] -= learning_rate * (gradient[j] / count + l2 * weights[j])
-        bias -= learning_rate * bias_gradient / count
-    return {"weights": weights, "bias": bias}
-
-
-def _head_probabilities(model: dict[str, Any], rows: Sequence[Sequence[float]]) -> list[float]:
-    out: list[float] = []
-    for row in rows:
-        score = model["bias"] + sum(w * x for w, x in zip(model["weights"], row, strict=False))
-        out.append(1.0 / (1.0 + math.exp(-max(-30.0, min(30.0, score)))))
-    return out
 
 
 # ---------------------------------------------------------------- основной вход
@@ -511,13 +513,14 @@ def train(
     folds: int = 5,
     dataset_name: str = "",
     verifier: Verifier | None = None,
-    version: str = "1.1.0",
+    version: str = __version__,
+    group_split: bool = True,
 ) -> TrainReport:
     """Обучить веса, пороги, голову и калибровку; вернуть отчёт."""
     verifier = verifier or Verifier(
         mode=mode, weights=WeightsBundle(weights=dict(DEFAULT_WEIGHTS), threshold=0.5, mode=mode)
     )
-    train_pairs, test_pairs = _split_pairs(pairs, test_size=test_size, seed=seed)
+    train_pairs, test_pairs = _split_pairs(pairs, test_size=test_size, seed=seed, group=group_split)
 
     train_samples, train_stats = collect_samples(verifier, train_pairs)
     test_samples, test_stats = collect_samples(verifier, test_pairs)
@@ -617,7 +620,16 @@ def train(
         },
     )
 
-    # 5. Сквозная проверка: те же параметры, но через публичный verify() — то, что
+    # 5. Оценка доли участия ИИ (требование заявки): отдельная голова на том же
+    #    сигнале. Корпус синтетический — это фиксируется в calibrated_on.
+    participation = _fit_participation(verifier, seed=seed, version=version)
+    bundle.meta["participation"] = {
+        "type": "participation-logreg",
+        "auc_out_of_fold": participation.get("auc_out_of_fold", 0.0),
+        "calibrated_on": participation.get("calibrated_on", ""),
+    }
+
+    # 6. Сквозная проверка: те же параметры, но через публичный verify() — то, что
     #    реально увидит пользователь API. Числа берутся из настоящего пути.
     end_to_end = Verifier(mode=mode, weights=bundle).evaluate(test_pairs)
 
@@ -650,9 +662,16 @@ def train(
         },
         folds=head_report.get("folds", []),
         head=head_report,
+        participation=participation,
         stats={
             "train": train_stats,
             "test": test_stats,
+            "split": {
+                "grouped": group_split,
+                "train_pairs": len(train_pairs),
+                "test_pairs": len(test_pairs),
+                "shared_groups": shared_groups(train_pairs, test_pairs),
+            },
             "weights_table": sorted(weight_table, key=lambda row: -row["auc"])[:10],
         },
         dataset=dataset_name,
@@ -754,6 +773,22 @@ def _train_and_compare_head(
     }
 
 
+def _fit_participation(verifier: Verifier, seed: int, version: str) -> dict[str, Any]:
+    """Обучить оценку доли участия ИИ на синтетическом корпусе двух стилей."""
+    samples = build_participation_corpus(count=240, seed=seed + 1985)
+    rows, labels = corpus_rows_and_labels(verifier, samples)
+    if not rows or len(set(labels)) < 2:
+        return {"type": "none", "payload": None, "auc_out_of_fold": 0.0, "calibrated_on": ""}
+    model = ParticipationModel.fit(rows, labels, seed=seed, version=version)
+    return {
+        "type": "participation-logreg",
+        "payload": model.to_dict(),
+        "auc_out_of_fold": model.auc_out_of_fold,
+        "calibrated_on": model.calibrated_on,
+        "rows": len(rows),
+    }
+
+
 def save_training_artifacts(report: TrainReport, weights_path: str | Path, root: str | Path = ".") -> dict[str, Path]:
     """Сохранить weights.json (и head.json, если голова победила)."""
     weights_path = Path(weights_path)
@@ -771,6 +806,17 @@ def save_training_artifacts(report: TrainReport, weights_path: str | Path, root:
         }
         head_path.write_text(json.dumps(payload, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
         written["head"] = head_path
+    participation = report.participation
+    if participation.get("payload"):
+        part_path = Path(root) / "config" / "participation.json"
+        part_path.parent.mkdir(parents=True, exist_ok=True)
+        part_payload = {
+            **participation["payload"],
+            "version": report.bundle.version,
+            "seed": report.seed,
+        }
+        part_path.write_text(json.dumps(part_payload, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+        written["participation"] = part_path
     return written
 
 

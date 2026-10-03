@@ -16,11 +16,11 @@
 HTTP-сервис — ``spanverify server`` (порт по умолчанию 8765).
 """
 
+from ._version import __version__
 from .config import Config
 from .detector import Detector, Span, VerifyResult
 from .engine import WEIGHTS_FILENAME, VerificationResult, Verifier, WeightsBundle
 
-__version__ = "1.1.0"
 __all__ = [
     "Config",
     "Detector",

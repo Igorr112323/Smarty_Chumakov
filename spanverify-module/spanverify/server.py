@@ -114,6 +114,21 @@ class Service:
             "seed": verifier.bundle.seed,
             "version": verifier.bundle.version,
             "synthetic": bool((verifier.bundle.meta or {}).get("synthetic")),
+            "measures": {
+                "ai_participation": (
+                    "оценка доли участия ИИ [0..1]: средняя вероятность машинного стиля "
+                    "по содержательным токенам; калибровка на синтетическом корпусе"
+                ),
+                "ai_share": "доля спорного (недостоверного) текста, мягкая оценка",
+                "ai_share_hard": "доля содержательных токенов выше порога маски",
+                "score": "оценка недостоверности ответа по документу-контексту",
+            },
+            "participation": {
+                "loaded": verifier.participation is not None,
+                "auc_out_of_fold": getattr(verifier.participation, "auc_out_of_fold", None),
+                "calibrated_on": getattr(verifier.participation, "calibrated_on", None),
+                "features": list(getattr(verifier.participation, "features", [])),
+            },
             "warning": verifier.warning,
         }
 

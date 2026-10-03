@@ -1,6 +1,14 @@
 # Настройки качества кода SpanVerify: тесты, покрытие, линтер, форматирование.
 # Здесь только инструменты; сам продукт работает без сторонних зависимостей.
 
+[project]
+name = "spanverify"
+version = "1.2.0"
+description = "Проверка достоверности ответа относительно документа-контекста (У-640148, АС «Фонд-М»)"
+requires-python = ">=3.10"
+license = {text = "MIT"}
+readme = "README.md"
+
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 addopts = "-q"

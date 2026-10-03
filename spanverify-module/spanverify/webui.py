@@ -93,6 +93,7 @@ INDEX_HTML = """<!doctype html>
         <div class="stat"><b id="score">—</b><span>оценка недостоверности</span></div>
         <div class="stat"><b id="thr">—</b><span>порог решения</span></div>
         <div class="stat"><b id="share">—</b><span>доля спорного текста</span></div>
+        <div class="stat"><b id="participation">—</b><span>оценка участия ИИ</span></div>
         <div class="stat"><b id="nspans">—</b><span>фрагментов</span></div>
       </div>
     </div>
@@ -190,6 +191,7 @@ function render(data, answer) {
   $("score").textContent = Number(data.score).toFixed(3);
   $("thr").textContent = Number(data.threshold).toFixed(3);
   $("share").textContent = pct(data.ai_share) + " / " + pct(data.ai_share_hard);
+  $("participation").textContent = pct(data.ai_participation);
   $("nspans").textContent = String((data.spans || []).length);
   $("marked").innerHTML = markup(answer, data.spans || []);
   $("warning").innerHTML = "";

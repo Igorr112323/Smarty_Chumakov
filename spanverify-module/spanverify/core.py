@@ -233,7 +233,8 @@ class VerificationResult:
     is_hallucination: bool
     ai_share: float
     ai_share_hard: float
-    threshold: float
+    ai_participation: float = 0.0
+    threshold: float = 0.0
     spans: list[SpanResult] = field(default_factory=list)
     tokens: list[dict[str, Any]] = field(default_factory=list)
     stats: dict[str, Any] = field(default_factory=dict)
@@ -249,6 +250,7 @@ class VerificationResult:
             "ai_share": round(self.ai_share, 4),
             "ai_share_soft": round(self.ai_share, 4),
             "ai_share_hard": round(self.ai_share_hard, 4),
+            "ai_participation": round(self.ai_participation, 4),
             "threshold": round(self.threshold, 4),
             "verdict": self.verdict,
             "spans": [span.to_dict() for span in self.spans],
@@ -270,6 +272,7 @@ class VerificationResult:
             is_hallucination=bool(data.get("is_hallucination", False)),
             ai_share=float(data.get("ai_share", 0.0)),
             ai_share_hard=float(data.get("ai_share_hard", 0.0)),
+            ai_participation=float(data.get("ai_participation", 0.0)),
             threshold=float(data.get("threshold", 0.0)),
             spans=[
                 SpanResult(

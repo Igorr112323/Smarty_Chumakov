@@ -1,0 +1,137 @@
+{
+  "commands": {
+    "train": "python -m spanverify train --dataset data/demo_pairs.jsonl --out config/weights.json --seed 42",
+    "evaluate": "python -m spanverify evaluate --dataset data/demo_pairs.jsonl",
+    "cross_corpus": "python scripts/cross_corpus.py --out reports/cross_corpus.json",
+    "tests": "python -m pytest -q",
+    "coverage": "python -m pytest --cov=spanverify --cov-fail-under=85"
+  },
+  "meta": {
+    "version": "1.2.0",
+    "commit": "d5227d423834fcb41a5aee6a2710a3ecf1f14cb6",
+    "generated_at": "2026-10-03T11:02:34Z",
+    "seed": 42,
+    "dataset": "data/demo_pairs.jsonl"
+  },
+  "disclaimer": "Демонстрационные метрики получены на синтетическом корпусе и научным результатом не являются. Для подтверждения требуются 1200 пар «вопрос–ответ» с экспертной разметкой на реальных регламентах организации.",
+  "tests": {
+    "collected": 233,
+    "coverage_percent": 86.09,
+    "coverage_gate_percent": 85
+  },
+  "demo": {
+    "split": {
+      "grouped": true,
+      "train_pairs": 168,
+      "test_pairs": 72,
+      "shared_groups": 0
+    },
+    "in_corpus": {
+      "tokens": {
+        "precision": 0.9912,
+        "recall": 0.918,
+        "f1": 0.9532,
+        "fpr": 0.0021,
+        "auc": 0.998,
+        "n": 594
+      },
+      "spans": {
+        "strict_f1": 0.2826,
+        "coverage": 1.0,
+        "soft_f1": 1.0,
+        "width_ratio": 23.63
+      },
+      "answers": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "fpr": 0.0,
+        "auc": 1.0,
+        "threshold": 1.0
+      }
+    },
+    "validation": {
+      "precision": 0.9912,
+      "recall": 0.918,
+      "f1": 0.9532,
+      "fpr": 0.0021,
+      "auc": 0.9963,
+      "signal": "logreg"
+    },
+    "bundle": {
+      "threshold": 1.0,
+      "weights": {
+        "attention_entropy": 0.1,
+        "ctx_attention_mass": 0.9,
+        "embedding_density": 0.0
+      },
+      "span_z": 0.0,
+      "span_floor": 0.3,
+      "span_cap": 0.5
+    },
+    "participation": {
+      "auc_out_of_fold": 1.0,
+      "calibrated_on": "synthetic-participation-corpus 1.0 (два стиля, доля смеси известна)",
+      "rows": 8179,
+      "features": [
+        "attention_entropy",
+        "ctx_attention_mass",
+        "embedding_density",
+        "cliche_rate",
+        "len_norm"
+      ]
+    },
+    "whole_corpus": {
+      "tokens": {
+        "precision": 0.9758,
+        "recall": 0.9282,
+        "f1": 0.9514,
+        "fpr": 0.0048,
+        "auc": 0.9974,
+        "n": 2001
+      },
+      "spans": {
+        "strict_f1": 0.3145,
+        "coverage": 1.0,
+        "soft_f1": 1.0,
+        "width_ratio": 24.17
+      },
+      "answers": {
+        "precision": 1.0,
+        "recall": 0.9919,
+        "f1": 0.996,
+        "fpr": 0.0,
+        "auc": 0.996,
+        "threshold": 1.0
+      }
+    },
+    "demo_answer_example": {
+      "answer": "Срок хранения первичных документов составляет 5 лет.",
+      "context": "Регламент: срок хранения первичных документов составляет 10 лет.",
+      "verdict": "likely_hallucination"
+    }
+  },
+  "cross_corpus": {
+    "in_corpus_f1": 0.9532,
+    "cross_corpus_f1": 0.7306,
+    "drop": 0.2226,
+    "cross_fpr": 0.1438,
+    "corpus_b": {
+      "name": "alt-generator 1.0 (числа словами, другие шаблоны)",
+      "pairs": 240,
+      "seed": 4242
+    }
+  },
+  "pilot": null,
+  "release": {
+    "dir": "release",
+    "artifacts": [
+      {
+        "name": "spanverify.pyz",
+        "size_bytes": 1289707,
+        "sha256": "1873c4cef9b5171e6fc3199233ce0fa46ae785eebe74244d8afaa156d8369cb4"
+      }
+    ]
+  },
+  "duration_s": 37.8
+}
