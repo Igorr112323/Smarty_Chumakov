@@ -1,0 +1,69 @@
+{
+  "base": "http://publication.pravo.gov.ru",
+  "counters": {
+    "pages": 6,
+    "documents": 600,
+    "has_svg_true": 0
+  },
+  "svg_true_examples": [],
+  "svg_probe": {
+    "candidates": [],
+    "view_page": null
+  },
+  "ips": [
+    {
+      "name": "ips-root",
+      "url": "http://pravo.gov.ru/proxy/ips/",
+      "status": 200,
+      "content_type": "text/html",
+      "bytes": 142593,
+      "visible_chars": 23631,
+      "visible_head": "���������������� ������. ����������� ����� function rus_unescape(str) { str = unescape(str); var res = ''; var s0 = \"\\xB9\\xC0\\xC1\\xC2\\xC3\\xC4\\xC5\\xC6\\xC7\\xC8\\xC9\\xCA\\xCB\\xCC\\xCD\\xCE\\xCF\\xD0\\xD1\\xD2\\xD3\\xD4\\xD5\\xD6\\xD7\\xD8\\xD9\\xDA\\xDB\\xDC\\xDD\\xDE\\xDF\\xE0\\xE1\\xE2\\xE3\\xE4\\xE5\\xE6\\xE7\\xE8\\xE9\\xEA\\xEB\\xE",
+      "error": null
+    },
+    {
+      "name": "ips-docbody",
+      "url": "http://pravo.gov.ru/proxy/ips/?docbody=&nd=102078782",
+      "status": 200,
+      "content_type": "text/html",
+      "bytes": 27948,
+      "visible_chars": 9062,
+      "visible_head": "� ����������� ������ \"� ����������� ���������� ����� �������������� ���������� ��������� � �������������� ���������� ���������� � ��������� �������� ��������� ������� �� �������� ��������\" (������ N 235390-3) .sh1, .sh2 { color:#ffffff; font-weight:bold; font-size:1.3em; } table.global_header td.doc",
+      "error": null
+    },
+    {
+      "name": "ips-search",
+      "url": "http://pravo.gov.ru/proxy/ips/?searchP=%D0%BF%D0%B5%D1%80%D1%81%D0%BE%D0%BD%D0%B0%D0%BB%D1%8C%D0%BD%D1%8B%D0%B5%20%D0%B4%D0%B0%D0%BD%D0%BD%D1%8B%D0%B5",
+      "status": 200,
+      "content_type": "text/html",
+      "bytes": 142593,
+      "visible_chars": 23631,
+      "visible_head": "���������������� ������. ����������� ����� function rus_unescape(str) { str = unescape(str); var res = ''; var s0 = \"\\xB9\\xC0\\xC1\\xC2\\xC3\\xC4\\xC5\\xC6\\xC7\\xC8\\xC9\\xCA\\xCB\\xCC\\xCD\\xCE\\xCF\\xD0\\xD1\\xD2\\xD3\\xD4\\xD5\\xD6\\xD7\\xD8\\xD9\\xDA\\xDB\\xDC\\xDD\\xDE\\xDF\\xE0\\xE1\\xE2\\xE3\\xE4\\xE5\\xE6\\xE7\\xE8\\xE9\\xEA\\xEB\\xE",
+      "error": null
+    },
+    {
+      "name": "ips-start",
+      "url": "http://pravo.gov.ru/proxy/ips/?start=0&nd=102078782&rdk=0",
+      "status": 200,
+      "content_type": "text/html",
+      "bytes": 4394,
+      "visible_chars": 3199,
+      "visible_head": "/******************************************************/ /* ������� ����� */ /* �� �������� */ /******************************************************/ * { font-family: Tahoma, Arial; } table.root td { font-size: 70%; } /* ������ */ .inv { display: none; } .vis { display: block; } p { margin-top: 0;",
+      "error": null
+    }
+  ],
+  "ocr": {
+    "available": true,
+    "tools": {
+      "pdftoppm": "/usr/bin/pdftoppm",
+      "tesseract": "/usr/bin/tesseract"
+    },
+    "chars": 2468,
+    "seconds": 3.15,
+    "text_head": "ПРАВИТЕЛЬСТВО РОССИЙСКОЙ ФЕДЕРАЦИИ ПОСТАНОВЛЕНИЕ от 2 октября 2026 г. № 1296 МОСКВА Об утверждении Правил формирования и изменения перечня государственных учреждений, которым разрешается заготовка древесины в соответствии с частью 6 статьи 291 Лесного кодекса Российской Федерации В соответствии с частью 7 статьи 29' Лесного кодекса Российской Федерации Правительство Российской — Федерации постанов",
+    "pages_recognized": 2,
+    "eoNumber": "0001202610030023",
+    "act_number": "1296",
+    "act_number_found": true
+  }
+}

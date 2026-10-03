@@ -19,7 +19,7 @@
         "weight"
       ],
       "body_head": "[{\"weight\":100,\"name\":\"Конституция\",\"id\":\"8fb60238-9fee-4a1b-9534-6d99ad0ceff0\"},{\"weight\":99,\"name\":\"Закон Российской Федерации о поправке к Конституции Российской Федерации\",\"id\":\"e0c56da5-17f1-40ac-a10f-8a9a1cee0c4e\"},{\"weight\":98,\"name\":\"Федеральный конституционный закон\",\"id\":\"93273da3-3133-4acf-96c2-4adc1ae70e19\"},{\"weight\":97,\"name\":\"Федеральный закон\",\"id\":\"82a8bf1c-3bc7-47ed-827f-7affd43a7f27\"},{\"weight\":96,\"name\":\"Указ\",\"id\":\"0790e34b-784b-4372-884e-3282622a24bd\"},{\"weight\":95,\"name\":\"Постановление\",\"id\":\"fd5a8766-f6fd-4ac2-8fd9-66f414d314ac\"},{\"weight\":95,\"name\":\"Постановление Правления\",\"id\":\"49a1ee72-097d-44e6-985d-f0cb7b036150\"},{\"weight\":94,\"name\":\"Распоряжение\",\"id\":\"7ff5b3b5-3757-44f1-bb76-3766cabe3593\"},{\"weight\":93,\"name\":\"Резолюция\",\"id\":\"397f9cc4-dc88-41a1-b009-802c99f9d9fd\"},{\"weight\":93,\"name\":\"Соглашение\",\"id\":\"7732b2a0-c522-436f-8172-a251912e2fc9\"},{\"weight\":92,\"name\":\"Конвенция\",\"id\":\"7c112925-ceaf-4bb4-93b4-16618b5dbdba\"},{\"weight\":91,\"name\":\"Международный договор\",\"id\":\"7ccde0f1-39b0-49b9-9a61-2fee55402189\"},{\"weight\":91,\"name\":\"Договор\",\"id\":\"63c6ff4f-ed74-45b3-86e2-8a76b75d674d\"},{\"weight\":90,\"name\":\"Апелляционное определение\",\"id\":\"a4719334-d2b8-4965-9c0e-95675800e1e5\"},{\"weight\":90,\"name\":\"Кассационное определение\",\"id\":\"b3078722-e63a-48cc-9458-5496a982b286\"},{\"weight\":90,\"name\":\"Определение\",\"id\":\"7a766fb3-5104-4579-a777-25bc88c0ddc9\"},{\"weight\":89,\"name\":\"Протокол\",\"id\":\"ac9e6a29-59cd-4c3d-8c14-ceb9843ef2da\"},{\"weight\":88,\"name\":\"Поправки\",\"i",
-      "seconds": 0.27,
+      "seconds": 0.77,
       "error": null,
       "name": "document-types-first"
     },
@@ -58,7 +58,7 @@
         "zipFileLength"
       ],
       "body_head": "{\"items\":[{\"eoNumber\":\"0001202610030023\",\"hasSvg\":false,\"zipFileLength\":null,\"publishDateShort\":\"2026-10-03T00:00:00\",\"complexName\":\"Постановление Правительства Российской Федерации от 02.10.2026 № 1296\\n \\\"Об утверждении Правил формирования и изменения перечня государственных учреждений, которым разрешается заготовка древесины в соответствии с частью 6 статьи 29-1 Лесного кодекса Российской Федерации\\\"\",\"pagesCount\":8,\"pdfFileLength\":1741311,\"jdRegNumber\":null,\"jdRegDate\":null,\"name\":\"Об утверждении Правил формирования и изменения перечня государственных учреждений, которым разрешается заготовка древесины в соответствии с частью 6 статьи 29-1 Лесного кодекса Российской Федерации\\r\\n\",\"number\":\"1296\",\"documentDate\":\"2026-10-02T00:00:00\",\"signatoryAuthorityId\":\"8005d8c9-4b6d-48d3-861a-2a37e69fccb3\",\"documentTypeId\":\"fd5a8766-f6fd-4ac2-8fd9-66f414d314ac\",\"title\":\"Постановление Правительства Российской Федерации от 02.10.2026 № 1296<br /> \\\"Об утверждении Правил формирования и изменения перечня государственных учреждений, которым разрешается заготовка древесины в соответствии с частью 6 статьи 29-1 Лесного кодекса Российской Федерации\\\"\",\"viewDate\":\"03.10.2026\",\"id\":\"d64fa3b3-aa3a-47ce-94a3-96194f0f743b\"},{\"eoNumber\":\"0001202610030003\",\"hasSvg\":false,\"zipFileLength\":null,\"publishDateShort\":\"2026-10-03T00:00:00\",\"complexName\":\"Постановление Правительства Российской Федерации от 02.10.2026 № 1295\\n \\\"О внесении изменений в постановление Правительства Российской Федерации от 29 авг",
-      "seconds": 0.71,
+      "seconds": 1.07,
       "error": null,
       "name": "documents-bare"
     },
@@ -97,7 +97,7 @@
         "zipFileLength"
       ],
       "body_head": "{\"items\":[{\"eoNumber\":\"0001202610030023\",\"hasSvg\":false,\"zipFileLength\":null,\"publishDateShort\":\"2026-10-03T00:00:00\",\"complexName\":\"Постановление Правительства Российской Федерации от 02.10.2026 № 1296\\n \\\"Об утверждении Правил формирования и изменения перечня государственных учреждений, которым разрешается заготовка древесины в соответствии с частью 6 статьи 29-1 Лесного кодекса Российской Федерации\\\"\",\"pagesCount\":8,\"pdfFileLength\":1741311,\"jdRegNumber\":null,\"jdRegDate\":null,\"name\":\"Об утверждении Правил формирования и изменения перечня государственных учреждений, которым разрешается заготовка древесины в соответствии с частью 6 статьи 29-1 Лесного кодекса Российской Федерации\\r\\n\",\"number\":\"1296\",\"documentDate\":\"2026-10-02T00:00:00\",\"signatoryAuthorityId\":\"8005d8c9-4b6d-48d3-861a-2a37e69fccb3\",\"documentTypeId\":\"fd5a8766-f6fd-4ac2-8fd9-66f414d314ac\",\"title\":\"Постановление Правительства Российской Федерации от 02.10.2026 № 1296<br /> \\\"Об утверждении Правил формирования и изменения перечня государственных учреждений, которым разрешается заготовка древесины в соответствии с частью 6 статьи 29-1 Лесного кодекса Российской Федерации\\\"\",\"viewDate\":\"03.10.2026\",\"id\":\"d64fa3b3-aa3a-47ce-94a3-96194f0f743b\"},{\"eoNumber\":\"0001202610030003\",\"hasSvg\":false,\"zipFileLength\":null,\"publishDateShort\":\"2026-10-03T00:00:00\",\"complexName\":\"Постановление Правительства Российской Федерации от 02.10.2026 № 1295\\n \\\"О внесении изменений в постановление Правительства Российской Федерации от 29 авг",
-      "seconds": 0.31,
+      "seconds": 0.27,
       "error": null,
       "name": "documents-pagesize"
     },
@@ -136,7 +136,7 @@
         "zipFileLength"
       ],
       "body_head": "{\"items\":[{\"eoNumber\":\"0001202610030023\",\"hasSvg\":false,\"zipFileLength\":null,\"publishDateShort\":\"2026-10-03T00:00:00\",\"complexName\":\"Постановление Правительства Российской Федерации от 02.10.2026 № 1296\\n \\\"Об утверждении Правил формирования и изменения перечня государственных учреждений, которым разрешается заготовка древесины в соответствии с частью 6 статьи 29-1 Лесного кодекса Российской Федерации\\\"\",\"pagesCount\":8,\"pdfFileLength\":1741311,\"jdRegNumber\":null,\"jdRegDate\":null,\"name\":\"Об утверждении Правил формирования и изменения перечня государственных учреждений, которым разрешается заготовка древесины в соответствии с частью 6 статьи 29-1 Лесного кодекса Российской Федерации\\r\\n\",\"number\":\"1296\",\"documentDate\":\"2026-10-02T00:00:00\",\"signatoryAuthorityId\":\"8005d8c9-4b6d-48d3-861a-2a37e69fccb3\",\"documentTypeId\":\"fd5a8766-f6fd-4ac2-8fd9-66f414d314ac\",\"title\":\"Постановление Правительства Российской Федерации от 02.10.2026 № 1296<br /> \\\"Об утверждении Правил формирования и изменения перечня государственных учреждений, которым разрешается заготовка древесины в соответствии с частью 6 статьи 29-1 Лесного кодекса Российской Федерации\\\"\",\"viewDate\":\"03.10.2026\",\"id\":\"d64fa3b3-aa3a-47ce-94a3-96194f0f743b\"},{\"eoNumber\":\"0001202610030003\",\"hasSvg\":false,\"zipFileLength\":null,\"publishDateShort\":\"2026-10-03T00:00:00\",\"complexName\":\"Постановление Правительства Российской Федерации от 02.10.2026 № 1295\\n \\\"О внесении изменений в постановление Правительства Российской Федерации от 29 авг",
-      "seconds": 0.43,
+      "seconds": 0.53,
       "error": null,
       "name": "documents-pagesize-index"
     },
@@ -175,7 +175,7 @@
         "zipFileLength"
       ],
       "body_head": "{\"items\":[{\"eoNumber\":\"0001202610030023\",\"hasSvg\":false,\"zipFileLength\":null,\"publishDateShort\":\"2026-10-03T00:00:00\",\"complexName\":\"Постановление Правительства Российской Федерации от 02.10.2026 № 1296\\n \\\"Об утверждении Правил формирования и изменения перечня государственных учреждений, которым разрешается заготовка древесины в соответствии с частью 6 статьи 29-1 Лесного кодекса Российской Федерации\\\"\",\"pagesCount\":8,\"pdfFileLength\":1741311,\"jdRegNumber\":null,\"jdRegDate\":null,\"name\":\"Об утверждении Правил формирования и изменения перечня государственных учреждений, которым разрешается заготовка древесины в соответствии с частью 6 статьи 29-1 Лесного кодекса Российской Федерации\\r\\n\",\"number\":\"1296\",\"documentDate\":\"2026-10-02T00:00:00\",\"signatoryAuthorityId\":\"8005d8c9-4b6d-48d3-861a-2a37e69fccb3\",\"documentTypeId\":\"fd5a8766-f6fd-4ac2-8fd9-66f414d314ac\",\"title\":\"Постановление Правительства Российской Федерации от 02.10.2026 № 1296<br /> \\\"Об утверждении Правил формирования и изменения перечня государственных учреждений, которым разрешается заготовка древесины в соответствии с частью 6 статьи 29-1 Лесного кодекса Российской Федерации\\\"\",\"viewDate\":\"03.10.2026\",\"id\":\"d64fa3b3-aa3a-47ce-94a3-96194f0f743b\"},{\"eoNumber\":\"0001202610030003\",\"hasSvg\":false,\"zipFileLength\":null,\"publishDateShort\":\"2026-10-03T00:00:00\",\"complexName\":\"Постановление Правительства Российской Федерации от 02.10.2026 № 1295\\n \\\"О внесении изменений в постановление Правительства Российской Федерации от 29 авг",
-      "seconds": 0.7,
+      "seconds": 0.27,
       "error": null,
       "name": "documents-PageSize-Index"
     },
@@ -214,7 +214,7 @@
         "zipFileLength"
       ],
       "body_head": "{\"items\":[{\"eoNumber\":\"0001202610030023\",\"hasSvg\":false,\"zipFileLength\":null,\"publishDateShort\":\"2026-10-03T00:00:00\",\"complexName\":\"Постановление Правительства Российской Федерации от 02.10.2026 № 1296\\n \\\"Об утверждении Правил формирования и изменения перечня государственных учреждений, которым разрешается заготовка древесины в соответствии с частью 6 статьи 29-1 Лесного кодекса Российской Федерации\\\"\",\"pagesCount\":8,\"pdfFileLength\":1741311,\"jdRegNumber\":null,\"jdRegDate\":null,\"name\":\"Об утверждении Правил формирования и изменения перечня государственных учреждений, которым разрешается заготовка древесины в соответствии с частью 6 статьи 29-1 Лесного кодекса Российской Федерации\\r\\n\",\"number\":\"1296\",\"documentDate\":\"2026-10-02T00:00:00\",\"signatoryAuthorityId\":\"8005d8c9-4b6d-48d3-861a-2a37e69fccb3\",\"documentTypeId\":\"fd5a8766-f6fd-4ac2-8fd9-66f414d314ac\",\"title\":\"Постановление Правительства Российской Федерации от 02.10.2026 № 1296<br /> \\\"Об утверждении Правил формирования и изменения перечня государственных учреждений, которым разрешается заготовка древесины в соответствии с частью 6 статьи 29-1 Лесного кодекса Российской Федерации\\\"\",\"viewDate\":\"03.10.2026\",\"id\":\"d64fa3b3-aa3a-47ce-94a3-96194f0f743b\"},{\"eoNumber\":\"0001202610030003\",\"hasSvg\":false,\"zipFileLength\":null,\"publishDateShort\":\"2026-10-03T00:00:00\",\"complexName\":\"Постановление Правительства Российской Федерации от 02.10.2026 № 1295\\n \\\"О внесении изменений в постановление Правительства Российской Федерации от 29 авг",
-      "seconds": 0.69,
+      "seconds": 0.61,
       "error": null,
       "name": "documents-page-size"
     },
@@ -253,7 +253,7 @@
         "zipFileLength"
       ],
       "body_head": "{\"items\":[{\"eoNumber\":\"0001202610030023\",\"hasSvg\":false,\"zipFileLength\":null,\"publishDateShort\":\"2026-10-03T00:00:00\",\"complexName\":\"Постановление Правительства Российской Федерации от 02.10.2026 № 1296\\n \\\"Об утверждении Правил формирования и изменения перечня государственных учреждений, которым разрешается заготовка древесины в соответствии с частью 6 статьи 29-1 Лесного кодекса Российской Федерации\\\"\",\"pagesCount\":8,\"pdfFileLength\":1741311,\"jdRegNumber\":null,\"jdRegDate\":null,\"name\":\"Об утверждении Правил формирования и изменения перечня государственных учреждений, которым разрешается заготовка древесины в соответствии с частью 6 статьи 29-1 Лесного кодекса Российской Федерации\\r\\n\",\"number\":\"1296\",\"documentDate\":\"2026-10-02T00:00:00\",\"signatoryAuthorityId\":\"8005d8c9-4b6d-48d3-861a-2a37e69fccb3\",\"documentTypeId\":\"fd5a8766-f6fd-4ac2-8fd9-66f414d314ac\",\"title\":\"Постановление Правительства Российской Федерации от 02.10.2026 № 1296<br /> \\\"Об утверждении Правил формирования и изменения перечня государственных учреждений, которым разрешается заготовка древесины в соответствии с частью 6 статьи 29-1 Лесного кодекса Российской Федерации\\\"\",\"viewDate\":\"03.10.2026\",\"id\":\"d64fa3b3-aa3a-47ce-94a3-96194f0f743b\"},{\"eoNumber\":\"0001202610030003\",\"hasSvg\":false,\"zipFileLength\":null,\"publishDateShort\":\"2026-10-03T00:00:00\",\"complexName\":\"Постановление Правительства Российской Федерации от 02.10.2026 № 1295\\n \\\"О внесении изменений в постановление Правительства Российской Федерации от 29 авг",
-      "seconds": 0.67,
+      "seconds": 1.03,
       "error": null,
       "name": "documents-limit-offset"
     },
@@ -292,7 +292,7 @@
         "zipFileLength"
       ],
       "body_head": "{\"items\":[{\"eoNumber\":\"0001202610030023\",\"hasSvg\":false,\"zipFileLength\":null,\"publishDateShort\":\"2026-10-03T00:00:00\",\"complexName\":\"Постановление Правительства Российской Федерации от 02.10.2026 № 1296\\n \\\"Об утверждении Правил формирования и изменения перечня государственных учреждений, которым разрешается заготовка древесины в соответствии с частью 6 статьи 29-1 Лесного кодекса Российской Федерации\\\"\",\"pagesCount\":8,\"pdfFileLength\":1741311,\"jdRegNumber\":null,\"jdRegDate\":null,\"name\":\"Об утверждении Правил формирования и изменения перечня государственных учреждений, которым разрешается заготовка древесины в соответствии с частью 6 статьи 29-1 Лесного кодекса Российской Федерации\\r\\n\",\"number\":\"1296\",\"documentDate\":\"2026-10-02T00:00:00\",\"signatoryAuthorityId\":\"8005d8c9-4b6d-48d3-861a-2a37e69fccb3\",\"documentTypeId\":\"fd5a8766-f6fd-4ac2-8fd9-66f414d314ac\",\"title\":\"Постановление Правительства Российской Федерации от 02.10.2026 № 1296<br /> \\\"Об утверждении Правил формирования и изменения перечня государственных учреждений, которым разрешается заготовка древесины в соответствии с частью 6 статьи 29-1 Лесного кодекса Российской Федерации\\\"\",\"viewDate\":\"03.10.2026\",\"id\":\"d64fa3b3-aa3a-47ce-94a3-96194f0f743b\"},{\"eoNumber\":\"0001202610030003\",\"hasSvg\":false,\"zipFileLength\":null,\"publishDateShort\":\"2026-10-03T00:00:00\",\"complexName\":\"Постановление Правительства Российской Федерации от 02.10.2026 № 1295\\n \\\"О внесении изменений в постановление Правительства Российской Федерации от 29 авг",
-      "seconds": 1.25,
+      "seconds": 0.9,
       "error": null,
       "name": "documents-count"
     },
@@ -331,7 +331,7 @@
         "zipFileLength"
       ],
       "body_head": "{\"items\":[{\"eoNumber\":\"0001202610030023\",\"hasSvg\":false,\"zipFileLength\":null,\"publishDateShort\":\"2026-10-03T00:00:00\",\"complexName\":\"Постановление Правительства Российской Федерации от 02.10.2026 № 1296\\n \\\"Об утверждении Правил формирования и изменения перечня государственных учреждений, которым разрешается заготовка древесины в соответствии с частью 6 статьи 29-1 Лесного кодекса Российской Федерации\\\"\",\"pagesCount\":8,\"pdfFileLength\":1741311,\"jdRegNumber\":null,\"jdRegDate\":null,\"name\":\"Об утверждении Правил формирования и изменения перечня государственных учреждений, которым разрешается заготовка древесины в соответствии с частью 6 статьи 29-1 Лесного кодекса Российской Федерации\\r\\n\",\"number\":\"1296\",\"documentDate\":\"2026-10-02T00:00:00\",\"signatoryAuthorityId\":\"8005d8c9-4b6d-48d3-861a-2a37e69fccb3\",\"documentTypeId\":\"fd5a8766-f6fd-4ac2-8fd9-66f414d314ac\",\"title\":\"Постановление Правительства Российской Федерации от 02.10.2026 № 1296<br /> \\\"Об утверждении Правил формирования и изменения перечня государственных учреждений, которым разрешается заготовка древесины в соответствии с частью 6 статьи 29-1 Лесного кодекса Российской Федерации\\\"\",\"viewDate\":\"03.10.2026\",\"id\":\"d64fa3b3-aa3a-47ce-94a3-96194f0f743b\"},{\"eoNumber\":\"0001202610030003\",\"hasSvg\":false,\"zipFileLength\":null,\"publishDateShort\":\"2026-10-03T00:00:00\",\"complexName\":\"Постановление Правительства Российской Федерации от 02.10.2026 № 1295\\n \\\"О внесении изменений в постановление Правительства Российской Федерации от 29 авг",
-      "seconds": 0.31,
+      "seconds": 0.4,
       "error": null,
       "name": "documents-year-param"
     },
@@ -366,8 +366,8 @@
       ],
       "items_count": null,
       "first_item_keys": null,
-      "body_head": "{\"type\":\"https://tools.ietf.org/html/rfc7231#section-6.5.1\",\"title\":\"One or more validation errors occurred.\",\"status\":400,\"traceId\":\"|bea04ee6-44ad5327a88edceb.\",\"errors\":{\"PageSize\":[\"The value '5' is invalid.\"]}}",
-      "seconds": 0.59,
+      "body_head": "{\"type\":\"https://tools.ietf.org/html/rfc7231#section-6.5.1\",\"title\":\"One or more validation errors occurred.\",\"status\":400,\"traceId\":\"|f8bfdfd6-4b5e1c095be14f9f.\",\"errors\":{\"PageSize\":[\"The value '5' is invalid.\"]}}",
+      "seconds": 0.69,
       "error": "HTTP 400",
       "name": "documents-searchterm"
     },
@@ -387,8 +387,8 @@
       ],
       "items_count": null,
       "first_item_keys": null,
-      "body_head": "{\"type\":\"https://tools.ietf.org/html/rfc7231#section-6.5.1\",\"title\":\"One or more validation errors occurred.\",\"status\":400,\"traceId\":\"|f8bf9890-4b5e1c095be14f9f.\",\"errors\":{\"PageSize\":[\"The value '5' is invalid.\"],\"DocumentTypes\":[\"The value '82a8bf1c-3bc7-47ed-827f-7affd43a' is not valid.\"]}}",
-      "seconds": 0.46,
+      "body_head": "{\"type\":\"https://tools.ietf.org/html/rfc7231#section-6.5.1\",\"title\":\"One or more validation errors occurred.\",\"status\":400,\"traceId\":\"|f8bfe008-4b5e1c095be14f9f.\",\"errors\":{\"PageSize\":[\"The value '5' is invalid.\"],\"DocumentTypes\":[\"The value '82a8bf1c-3bc7-47ed-827f-7affd43a' is not valid.\"]}}",
+      "seconds": 0.27,
       "error": "HTTP 400",
       "name": "documents-type-filter"
     },
@@ -403,7 +403,7 @@
       "items_count": null,
       "first_item_keys": null,
       "body_head": "<!DOCTYPE html>\r\n<html lang=\"ru\">\r\n<head>\r\n    <meta charset=\"utf-8\" />\r\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\" />\r\n    <meta http-equiv=\"X-UA-Compatible\" content=\"IE=edge\">\r\n    <meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\">\r\n    <title></title>\r\n\r\n    <link rel=\"shortcut icon\" href=\"/favicon/favicon.ico\" />\r\n    <link rel=\"icon\" sizes=\"16x16 32x32 64x64\" href=\"/favicon/favicon.ico\" />\r\n    <link rel=\"icon\" type=\"image/png\" sizes=\"196x196\" href=\"/favicon/favicon-192.png\" />\r\n    <link rel=\"icon\" type=\"image/png\" sizes=\"160x160\" href=\"/favicon/favicon-160.png\" />\r\n    <link rel=\"icon\" type=\"image/png\" sizes=\"96x96\" href=\"/favicon/favicon-96.png\" />\r\n    <link rel=\"icon\" type=\"image/png\" sizes=\"64x64\" href=\"/favicon/favicon-64.png\" />\r\n    <link rel=\"icon\" type=\"image/png\" sizes=\"32x32\" href=\"/favicon/favicon-32.png\" />\r\n    <link rel=\"icon\" type=\"image/png\" sizes=\"16x16\" href=\"/favicon/favicon-16.png\" />\r\n    <link rel=\"apple-touch-icon-precomposed\" href=\"/favicon/favicon-57.png\" />\r\n    <link rel=\"apple-touch-icon-precomposed\" sizes=\"60x60\" href=\"/favicon/favicon-60.png\" />\r\n    <link rel=\"apple-touch-icon-precomposed\" sizes=\"72x72\" href=\"/favicon/favicon-72.png\" />\r\n    <link rel=\"apple-touch-icon-precomposed\" sizes=\"76x76\" href=\"/favicon/favicon-76.png\" />\r\n    <link rel=\"apple-touch-icon-precomposed\" sizes=\"114x114\" href=\"/favicon/favicon-114.png\" />\r\n    <link rel=\"apple-touch-icon-precomposed\" sizes=\"120x120\" href=",
-      "seconds": 0.26,
+      "seconds": 0.39,
       "error": "HTTP 404",
       "name": "api-description"
     },
@@ -418,7 +418,7 @@
       "items_count": null,
       "first_item_keys": null,
       "body_head": "<!DOCTYPE html>\r\n<html lang=\"ru\">\r\n<head>\r\n    <meta charset=\"utf-8\" />\r\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\" />\r\n    <meta http-equiv=\"X-UA-Compatible\" content=\"IE=edge\">\r\n    <meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\">\r\n    <title></title>\r\n\r\n    <link rel=\"shortcut icon\" href=\"/favicon/favicon.ico\" />\r\n    <link rel=\"icon\" sizes=\"16x16 32x32 64x64\" href=\"/favicon/favicon.ico\" />\r\n    <link rel=\"icon\" type=\"image/png\" sizes=\"196x196\" href=\"/favicon/favicon-192.png\" />\r\n    <link rel=\"icon\" type=\"image/png\" sizes=\"160x160\" href=\"/favicon/favicon-160.png\" />\r\n    <link rel=\"icon\" type=\"image/png\" sizes=\"96x96\" href=\"/favicon/favicon-96.png\" />\r\n    <link rel=\"icon\" type=\"image/png\" sizes=\"64x64\" href=\"/favicon/favicon-64.png\" />\r\n    <link rel=\"icon\" type=\"image/png\" sizes=\"32x32\" href=\"/favicon/favicon-32.png\" />\r\n    <link rel=\"icon\" type=\"image/png\" sizes=\"16x16\" href=\"/favicon/favicon-16.png\" />\r\n    <link rel=\"apple-touch-icon-precomposed\" href=\"/favicon/favicon-57.png\" />\r\n    <link rel=\"apple-touch-icon-precomposed\" sizes=\"60x60\" href=\"/favicon/favicon-60.png\" />\r\n    <link rel=\"apple-touch-icon-precomposed\" sizes=\"72x72\" href=\"/favicon/favicon-72.png\" />\r\n    <link rel=\"apple-touch-icon-precomposed\" sizes=\"76x76\" href=\"/favicon/favicon-76.png\" />\r\n    <link rel=\"apple-touch-icon-precomposed\" sizes=\"114x114\" href=\"/favicon/favicon-114.png\" />\r\n    <link rel=\"apple-touch-icon-precomposed\" sizes=\"120x120\" href=",
-      "seconds": 0.5,
+      "seconds": 0.81,
       "error": "HTTP 404",
       "name": "api-help"
     },
@@ -433,7 +433,7 @@
       "items_count": null,
       "first_item_keys": null,
       "body_head": "User-agent: *\r\nDisallow: /Error\r\nDisallow: /Rss\r\nDisallow: /app\r\nDisallow: /js\r\nDisallow: /images\r\nDisallow: /lib\r\nDisallow: /css\r\nDisallow: /Svg\r\nDisallow: /webfonts\r\nDisallow: /HtmlConstructor\r\nDisallow: /Search\r\nDisallow: /File\r\nSitemap: http://publication.pravo.gov.ru/sitemap.xml\r\n",
-      "seconds": 0.46,
+      "seconds": 0.47,
       "error": null,
       "name": "robots-publication"
     },
@@ -448,7 +448,7 @@
       "items_count": null,
       "first_item_keys": null,
       "body_head": "User-Agent: *\nDisallow:",
-      "seconds": 0.48,
+      "seconds": 0.6,
       "error": null,
       "name": "robots-pravo"
     }
@@ -465,7 +465,7 @@
       "items_count": null,
       "first_item_keys": null,
       "body_head": "<!DOCTYPE html>\r\n<html lang=\"ru\">\r\n<head>\r\n    <meta charset=\"utf-8\" />\r\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\" />\r\n    <meta http-equiv=\"X-UA-Compatible\" content=\"IE=edge\">\r\n    <meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\">\r\n    <title></title>\r\n\r\n    <link rel=\"shortcut icon\" href=\"/favicon/favicon.ico\" />\r\n    <link rel=\"icon\" sizes=\"16x16 32x32 64x64\" href=\"/favicon/favicon.ico\" />\r\n    <link rel=\"icon\" type=\"image/png\" sizes=\"196x196\" href=\"/favicon/favicon-192.png\" />\r\n    <link rel=\"icon\" type=\"image/png\" sizes=\"160x160\" href=\"/favicon/favicon-160.png\" />\r\n    <link rel=\"icon\" type=\"image/png\" sizes=\"96x96\" href=\"/favicon/favicon-96.png\" />\r\n    <link rel=\"icon\" type=\"image/png\" sizes=\"64x64\" href=\"/favicon/favicon-64.png\" />\r\n    <link rel=\"icon\" type=\"image/png\" sizes=\"32x32\" href=\"/favicon/favicon-32.png\" />\r\n    <link rel=\"icon\" type=\"image/png\" sizes=\"16x16\" href=\"/favicon/favicon-16.png\" />\r\n    <link rel=\"apple-touch-icon-precomposed\" href=\"/favicon/favicon-57.png\" />\r\n    <link rel=\"apple-touch-icon-precomposed\" sizes=\"60x60\" href=\"/favicon/favicon-60.png\" />\r\n    <link rel=\"apple-touch-icon-precomposed\" sizes=\"72x72\" href=\"/favicon/favicon-72.png\" />\r\n    <link rel=\"apple-touch-icon-precomposed\" sizes=\"76x76\" href=\"/favicon/favicon-76.png\" />\r\n    <link rel=\"apple-touch-icon-precomposed\" sizes=\"114x114\" href=\"/favicon/favicon-114.png\" />\r\n    <link rel=\"apple-touch-icon-precomposed\" sizes=\"120x120\" href=",
-      "seconds": 0.25,
+      "seconds": 0.76,
       "error": "HTTP 404",
       "name": "document-card"
     },
@@ -480,7 +480,7 @@
       "items_count": null,
       "first_item_keys": null,
       "body_head": "<!DOCTYPE html>\r\n<html lang=\"ru\">\r\n<head>\r\n    <meta charset=\"utf-8\" />\r\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\" />\r\n    <meta http-equiv=\"X-UA-Compatible\" content=\"IE=edge\">\r\n    <meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\">\r\n    <title></title>\r\n\r\n    <link rel=\"shortcut icon\" href=\"/favicon/favicon.ico\" />\r\n    <link rel=\"icon\" sizes=\"16x16 32x32 64x64\" href=\"/favicon/favicon.ico\" />\r\n    <link rel=\"icon\" type=\"image/png\" sizes=\"196x196\" href=\"/favicon/favicon-192.png\" />\r\n    <link rel=\"icon\" type=\"image/png\" sizes=\"160x160\" href=\"/favicon/favicon-160.png\" />\r\n    <link rel=\"icon\" type=\"image/png\" sizes=\"96x96\" href=\"/favicon/favicon-96.png\" />\r\n    <link rel=\"icon\" type=\"image/png\" sizes=\"64x64\" href=\"/favicon/favicon-64.png\" />\r\n    <link rel=\"icon\" type=\"image/png\" sizes=\"32x32\" href=\"/favicon/favicon-32.png\" />\r\n    <link rel=\"icon\" type=\"image/png\" sizes=\"16x16\" href=\"/favicon/favicon-16.png\" />\r\n    <link rel=\"apple-touch-icon-precomposed\" href=\"/favicon/favicon-57.png\" />\r\n    <link rel=\"apple-touch-icon-precomposed\" sizes=\"60x60\" href=\"/favicon/favicon-60.png\" />\r\n    <link rel=\"apple-touch-icon-precomposed\" sizes=\"72x72\" href=\"/favicon/favicon-72.png\" />\r\n    <link rel=\"apple-touch-icon-precomposed\" sizes=\"76x76\" href=\"/favicon/favicon-76.png\" />\r\n    <link rel=\"apple-touch-icon-precomposed\" sizes=\"114x114\" href=\"/favicon/favicon-114.png\" />\r\n    <link rel=\"apple-touch-icon-precomposed\" sizes=\"120x120\" href=",
-      "seconds": 0.42,
+      "seconds": 0.89,
       "error": "HTTP 404",
       "name": "document-file"
     },
@@ -495,7 +495,7 @@
       "items_count": null,
       "first_item_keys": null,
       "body_head": "<!DOCTYPE html>\r\n<html lang=\"ru\">\r\n<head>\r\n    <meta charset=\"utf-8\" />\r\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\" />\r\n    <meta http-equiv=\"X-UA-Compatible\" content=\"IE=edge\">\r\n    <meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\">\r\n    <title></title>\r\n\r\n    <link rel=\"shortcut icon\" href=\"/favicon/favicon.ico\" />\r\n    <link rel=\"icon\" sizes=\"16x16 32x32 64x64\" href=\"/favicon/favicon.ico\" />\r\n    <link rel=\"icon\" type=\"image/png\" sizes=\"196x196\" href=\"/favicon/favicon-192.png\" />\r\n    <link rel=\"icon\" type=\"image/png\" sizes=\"160x160\" href=\"/favicon/favicon-160.png\" />\r\n    <link rel=\"icon\" type=\"image/png\" sizes=\"96x96\" href=\"/favicon/favicon-96.png\" />\r\n    <link rel=\"icon\" type=\"image/png\" sizes=\"64x64\" href=\"/favicon/favicon-64.png\" />\r\n    <link rel=\"icon\" type=\"image/png\" sizes=\"32x32\" href=\"/favicon/favicon-32.png\" />\r\n    <link rel=\"icon\" type=\"image/png\" sizes=\"16x16\" href=\"/favicon/favicon-16.png\" />\r\n    <link rel=\"apple-touch-icon-precomposed\" href=\"/favicon/favicon-57.png\" />\r\n    <link rel=\"apple-touch-icon-precomposed\" sizes=\"60x60\" href=\"/favicon/favicon-60.png\" />\r\n    <link rel=\"apple-touch-icon-precomposed\" sizes=\"72x72\" href=\"/favicon/favicon-72.png\" />\r\n    <link rel=\"apple-touch-icon-precomposed\" sizes=\"76x76\" href=\"/favicon/favicon-76.png\" />\r\n    <link rel=\"apple-touch-icon-precomposed\" sizes=\"114x114\" href=\"/favicon/favicon-114.png\" />\r\n    <link rel=\"apple-touch-icon-precomposed\" sizes=\"120x120\" href=",
-      "seconds": 0.58,
+      "seconds": 0.48,
       "error": "HTTP 404",
       "name": "document-file-alt"
     },
@@ -510,7 +510,7 @@
       "items_count": null,
       "first_item_keys": null,
       "body_head": "<!DOCTYPE html>\r\n<html lang=\"ru\">\r\n<head>\r\n    <meta charset=\"utf-8\" />\r\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\" />\r\n    <meta http-equiv=\"X-UA-Compatible\" content=\"IE=edge\">\r\n    <meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\">\r\n    <title></title>\r\n\r\n    <link rel=\"shortcut icon\" href=\"/favicon/favicon.ico\" />\r\n    <link rel=\"icon\" sizes=\"16x16 32x32 64x64\" href=\"/favicon/favicon.ico\" />\r\n    <link rel=\"icon\" type=\"image/png\" sizes=\"196x196\" href=\"/favicon/favicon-192.png\" />\r\n    <link rel=\"icon\" type=\"image/png\" sizes=\"160x160\" href=\"/favicon/favicon-160.png\" />\r\n    <link rel=\"icon\" type=\"image/png\" sizes=\"96x96\" href=\"/favicon/favicon-96.png\" />\r\n    <link rel=\"icon\" type=\"image/png\" sizes=\"64x64\" href=\"/favicon/favicon-64.png\" />\r\n    <link rel=\"icon\" type=\"image/png\" sizes=\"32x32\" href=\"/favicon/favicon-32.png\" />\r\n    <link rel=\"icon\" type=\"image/png\" sizes=\"16x16\" href=\"/favicon/favicon-16.png\" />\r\n    <link rel=\"apple-touch-icon-precomposed\" href=\"/favicon/favicon-57.png\" />\r\n    <link rel=\"apple-touch-icon-precomposed\" sizes=\"60x60\" href=\"/favicon/favicon-60.png\" />\r\n    <link rel=\"apple-touch-icon-precomposed\" sizes=\"72x72\" href=\"/favicon/favicon-72.png\" />\r\n    <link rel=\"apple-touch-icon-precomposed\" sizes=\"76x76\" href=\"/favicon/favicon-76.png\" />\r\n    <link rel=\"apple-touch-icon-precomposed\" sizes=\"114x114\" href=\"/favicon/favicon-114.png\" />\r\n    <link rel=\"apple-touch-icon-precomposed\" sizes=\"120x120\" href=",
-      "seconds": 0.25,
+      "seconds": 0.44,
       "error": "HTTP 404",
       "name": "document-view-html"
     }
