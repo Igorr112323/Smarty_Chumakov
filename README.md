@@ -4,8 +4,8 @@
 [![build-and-release-exe](https://github.com/Igorr112323/Smarty_Chumakov/actions/workflows/build-and-release-exe.yml/badge.svg)](https://github.com/Igorr112323/Smarty_Chumakov/actions/workflows/build-and-release-exe.yml)
 [![release](https://img.shields.io/github/v/release/Igorr112323/Smarty_Chumakov)](https://github.com/Igorr112323/Smarty_Chumakov/releases/latest)
 [![python](https://img.shields.io/badge/python-3.10%20%7C%203.11%20%7C%203.12-blue)](spanverify-module/pyproject.toml)
-[![tests](https://img.shields.io/badge/tests-210%20passed-brightgreen)](spanverify-module/tests)
-[![coverage](https://img.shields.io/badge/coverage-87%25-brightgreen)](spanverify-module/pyproject.toml)
+[![tests](https://img.shields.io/badge/tests-233%20passed-brightgreen)](spanverify-module/tests)
+[![coverage](https://img.shields.io/badge/coverage-86%25-brightgreen)](spanverify-module/pyproject.toml)
 
 Программа берёт **документ-источник** и **ответ** (языковой модели или
 сотрудника) и показывает, какие места ответа документ не подтверждает: подмену
@@ -36,7 +36,7 @@ python -m spanverify train --dataset data/demo_pairs.jsonl --out config/weights.
 python -m spanverify evaluate --dataset data/demo_pairs.jsonl   # метрики и критерий качества
 python -m spanverify selftest                                   # само-проверка конвейера
 python -m spanverify server --port 8765                         # API + веб-интерфейс
-python -m pytest -q                                             # 210 тестов
+python -m pytest -q                                             # 233 тестов
 ```
 
 Коды возврата `verify`: `0` — ответ подтверждён, `1` — найдены спорные
@@ -58,12 +58,21 @@ curl -X POST http://localhost:8765/v1/verify -H "Content-Type: application/json"
 
 ## Честно о результатах
 
-* Демонстрационный корпус **синтетический**: token F1 0.959 при FPR 0.002
+* Демонстрационный корпус **синтетический**: token F1 0.953 при FPR 0.002
   (отложенная часть) подтверждает работоспособность и самосогласованность
   конвейера, а не качество на реальных документах.
+* **Перенос между генераторами проверен и даёт падение**: на корпусе другого
+  генератора (числа словами, другие шаблоны) тот же метод даёт token F1 0.731 при
+  FPR 0.144 — критерий F1 ≥ 0.90 при FPR ≤ 0.10 там **не выполняется**. Числа:
+  `spanverify-module/reports/cross_corpus.json`.
+* **Качество фрагментов показано с двух сторон**: строгий F1 по узкой разметке
+  0.283 (весь корпус — 0.315; конвейер расширяет найденный токен до границы
+  предложения, ширина ×24) и полнота накрытия 1.000. Актуальные числа — в
+  `spanverify-module/reports/METRICS.json` (единый файл чисел, сверяется в CI).
 * Пилот на реальной модели `rugpt3small` (CPU, 24 контрастные пары) показал
   **отрицательный результат**: признаки внимания не отличают подставленное число
-  от правильного (AUC 0.50, парные разницы неотличимы от нуля). Это зафиксировано
+  от правильного (AUC 0.50 — устарело после исправления сопоставления подслов,
+  перепроверка в CI; парные разницы неотличимы от нуля). Это зафиксировано
   честно — см. [`docs/ОТЧЁТ_о_НИР_шаблон.md`](docs/ОТЧЁТ_о_НИР_шаблон.md), раздел 7.2.
 * Порог решения никогда не подбирается по тестовой части; при недостижении
   критерия дорабатываются признаки, а не порог.
@@ -75,7 +84,7 @@ curl -X POST http://localhost:8765/v1/verify -H "Content-Type: application/json"
 | `demo` (по умолчанию в `.exe`) | лексические суррогаты, без весов модели | демонстрация работы, интерфейс, обучение на своих данных |
 | `hf` | внимание и скрытые состояния реальной модели (`torch` + `transformers`) | рабочие выводы, научные результаты |
 
-Демонстрационный корпус синтетический: метрики на нём (token F1 0.959, FPR 0.002,
+Демонстрационный корпус синтетический: метрики на нём (token F1 0.953, FPR 0.002,
 AUC 0.996 на отложенной части) доказывают работоспособность и
 самосогласованность конвейера, а не качество на реальных документах. Научные
 выводы требует режим `hf` и своя разметка — это делает пилот

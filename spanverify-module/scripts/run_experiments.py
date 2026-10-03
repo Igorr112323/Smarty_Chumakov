@@ -33,7 +33,7 @@ REPORT_TEMPLATE = """# Эксперимент: {dataset}
 Режим: `{mode}`. Seed: {seed}. Дата запуска: {timestamp}.
 Корпус: {pairs_line}.
 
-## Метрики на отложенной части (сквозной путь `verify()`)
+## Метрики по всему корпусу (сквозной путь `verify()`; `evaluate`)
 
 | Показатель | Значение |
 | --- | --- |
@@ -43,6 +43,7 @@ REPORT_TEMPLATE = """# Эксперимент: {dataset}
 | FPR по токенам | {fpr:.3f} |
 | AUC по токенам | {auc:.3f} |
 | F1 по ответам (порог {answer_threshold:.3f}) | {answer_f1:.3f} |
+| строгий F1 фрагментов (IoU ≥ 0.5, узкая разметка) | {strict_span_f1:.3f} |
 | полнота накрытия фрагментов | {containment:.3f} |
 | F1 при расширенной разметке | {expanded:.3f} |
 
@@ -131,6 +132,7 @@ def main(argv: list[str] | None = None) -> int:
         answer_threshold=answers["threshold"],
         containment=spans["recall_containment"],
         expanded=spans["f1_expanded_labels"],
+        strict_span_f1=spans["f1"],
         gate=gate,
         weights={k: round(v, 3) for k, v in bundle.weights.items()},
         span_z=bundle.span_z,

@@ -70,6 +70,11 @@ def _print_result(result: Any, as_json: bool, tokens: bool) -> int:
         print(f"Вердикт: {verdicts.get(result.verdict, result.verdict)}")
         print(f"Оценка недостоверности: {result.score:.3f} (порог {result.threshold:.3f})")
         print(f"Доля спорного текста: мягко {result.ai_share:.3f}, жёстко {result.ai_share_hard:.3f}")
+        print(
+            "Оценка доли участия ИИ: "
+            f"{result.ai_participation:.3f} "
+            "(калибровка на синтетическом корпусе; см. /v1/model)"
+        )
         print(f"Режим: {result.mode}; время: {result.latency_ms:.1f} мс")
         if result.warning:
             print(f"ВНИМАНИЕ: {result.warning}")
