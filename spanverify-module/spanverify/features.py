@@ -365,6 +365,11 @@ def hf_features(
         ) from exc
 
     model.eval()
+    # Скрытые состояния нужны третьему признаку (плотность представлений), а
+    # карты внимания — первым двум. Флаги ставим в конфиге: так одинаково
+    # работают и старые, и новые версии transformers.
+    model.config.output_attentions = True
+    model.config.output_hidden_states = True
     torch_device = device or ("cuda" if torch.cuda.is_available() else "cpu")
     model.to(torch_device)
 
@@ -380,10 +385,21 @@ def hf_features(
         hidden = outputs.hidden_states[min(layer_index + 1, len(outputs.hidden_states) - 1)][0]
 
     # Позиции токенов ответа (по смещениям быстрого токенизатора).
-    offsets = tokenizer(prompt, return_offsets_mapping=True, truncation=True, max_length=max_length)["offset_mapping"]
+    # Разные версии transformers отдают смещения то как тензор/`BatchEncoding`
+    # (с методом ``tolist``), то как обычный список списков — приводим к списку
+    # кортежей, иначе на свежих версиях падало бы AttributeError.
+    raw_offsets = tokenizer(prompt, return_offsets_mapping=True, truncation=True, max_length=max_length)[
+        "offset_mapping"
+    ]
+    if hasattr(raw_offsets, "tolist"):
+        raw_offsets = raw_offsets.tolist()
+    offsets = list(raw_offsets)
+    if offsets and isinstance(offsets[0], (list, tuple)) and offsets[0] and isinstance(offsets[0][0], (list, tuple)):
+        offsets = list(offsets[0])
+    offsets = [(int(start), int(end)) for start, end in offsets]
     seq_len = int(attention_mask.sum().item())
     answer_positions = [
-        i for i, (start, end) in enumerate(offsets.tolist()) if end > start and start >= answer_start and i < seq_len
+        i for i, (start, end) in enumerate(offsets) if end > start and start >= answer_start and i < seq_len
     ]
     answer_start_token = min(answer_positions) if answer_positions else seq_len
     context_positions = [i for i in range(seq_len) if i < answer_start_token]

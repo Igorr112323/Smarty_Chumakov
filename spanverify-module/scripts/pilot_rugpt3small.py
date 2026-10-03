@@ -385,6 +385,11 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--model", default=MODEL_DEFAULT)
     parser.add_argument("--max-length", type=int, default=768)
     parser.add_argument("--out", default="reports/pilot")
+    parser.add_argument(
+        "--fail-on-contrast",
+        action="store_true",
+        help="вернуть код 2, если контраст групп не выдержан (по умолчанию — честно отметить и продолжить)",
+    )
     args = parser.parse_args(argv)
 
     started = time.time()
@@ -395,14 +400,41 @@ def main(argv: list[str] | None = None) -> int:
     try:
         rows = collect_rows(pairs, model_name=args.model, max_length=args.max_length)
     except Exception as error:  # noqa: BLE001 - причины: нет весов, нет torch, нет интернета
+        import traceback  # noqa: PLC0415
+
+        report = {
+            "status": "model_unavailable",
+            "model": args.model,
+            "pairs": len(pairs),
+            "contrast": contrast,
+            "error": f"{type(error).__name__}: {error}",
+            "traceback": traceback.format_exc(),
+            "environment": environment_info(args.model),
+            "seed": args.seed,
+        }
+        out_dir = Path(args.out)
+        out_dir.mkdir(parents=True, exist_ok=True)
+        (out_dir / "pilot.json").write_text(json.dumps(report, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+        (out_dir / "pilot.md").write_text(
+            "# Пилот не выполнен: признаки модели недоступны\n\n"
+            f"Модель: `{args.model}`\n\n"
+            f"Причина: `{type(error).__name__}: {error}`\n\n"
+            "Это честный отказ: числа не подставляются и не выдумываются. "
+            "Черновик отчёта с трассировкой сохранён рядом (`pilot.json`).\n",
+            encoding="utf-8",
+        )
         print(
-            "Пилот не выполнен: не удалось получить признаки модели. " f"Причина: {type(error).__name__}: {error}",
+            f"Пилот не выполнен: не удалось получить признаки модели ({type(error).__name__}). "
+            f"Отчёт-черновик: {out_dir / 'pilot.md'}",
             file=sys.stderr,
         )
+        print(traceback.format_exc(), file=sys.stderr)
         return 2
 
     auc_table = analyse(rows, iterations=args.bootstrap)
+    contrast_ok = bool(contrast.get("contrast_ok"))
     payload = {
+        "status": "ok" if contrast_ok else "contrast_not_met",
         "environment": environment_info(args.model),
         "pairs": len(pairs),
         "tokens": len(rows),
@@ -424,9 +456,12 @@ def main(argv: list[str] | None = None) -> int:
     (out_dir / "pilot.md").write_text(render_markdown(payload), encoding="utf-8")
     print(f"Отчёт: {out_dir / 'pilot.md'} и {out_dir / 'pilot.json'}")
     print(f"Длительность: {payload['duration_s']} с; токенов: {payload['tokens']}")
+    print(f"Статус контраста: {payload['status']} ({json.dumps(contrast, ensure_ascii=False)})")
     for layer, features in auc_table.items():
         summary = ", ".join(f"{name}={values['auc_oriented']:.3f}" for name, values in features.items())
         print(f"  слой {layer}: {summary}")
+    if not contrast_ok and args.fail_on_contrast:
+        return 2
     return 0
 
 

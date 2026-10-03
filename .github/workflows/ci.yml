@@ -159,9 +159,11 @@ jobs:
         run: python scripts/pilot_rugpt3small.py --pairs 24 --bootstrap 5000 --out reports/pilot
 
       - name: Показать отчёт
+        if: always()
         run: cat reports/pilot/pilot.md
 
       - name: Артефакт пилота
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: pilot-report
