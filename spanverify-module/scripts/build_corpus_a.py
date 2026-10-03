@@ -373,6 +373,182 @@ def build_corpus(documents: list[dict], target: int, seed: int, mode_mix: dict[s
     return pairs
 
 
+# ---------------------------------------------------------------------------
+# Корпус A3: те же режимы и сплиты, но контексты — дословные фрагменты реальных актов
+# ---------------------------------------------------------------------------
+
+# Смесь режимов для A3: как у A1, но с гарантией не меньше 40 пар на каждый тип ошибки.
+REAL_MODE_MIX = {
+    "faithful": 0.45,
+    "contradiction": 0.12,
+    "number_attribution": 0.11,
+    "partial": 0.09,
+    "unconfirmed": 0.07,
+    "missing": 0.06,
+    "oversight": 0.05,
+    "excess": 0.05,
+}
+
+
+def plan_modes(
+    target: int,
+    mix: dict[str, float],
+    min_per_mode: int = 40,
+    min_clean_share: float = 0.40,
+) -> list[str]:
+    """План режимов ровно на ``target`` пар: ≥ ``min_per_mode`` на тип ошибки, ≥40 % чистых.
+
+    Чистые пары — это режим ``faithful``; его доля неприкосновенна: сначала резервируется
+    минимум под чистые (``min_clean_share``), а остаток делится между типами ошибок
+    пропорционально смеси с гарантией ``min_per_mode`` на каждый тип. План задаёт только
+    количество; порядок задаёт вызывающая сторона.
+    """
+    errors = [mode for mode in mix if mode != "faithful"]
+    clean_min = min(target, round(target * min_clean_share))
+    budget = target - clean_min
+    weights = {mode: mix[mode] for mode in errors}
+    total_weight = sum(weights.values()) or 1.0
+
+    if budget >= min_per_mode * len(errors):
+        quotas = {mode: max(min_per_mode, round(target * mix[mode])) for mode in errors}
+        while sum(quotas.values()) > budget:
+            # Урезаем тот режим, у которого наибольшее превышение над обязательным минимумом.
+            victim = max(quotas, key=lambda mode: quotas[mode] - min_per_mode)
+            if quotas[victim] <= min_per_mode:  # pragma: no cover - бюджет проверен выше
+                break
+            quotas[victim] -= 1
+    else:  # маленькая цель: делим бюджет пропорционально, без гарантии min_per_mode
+        quotas = {mode: max(1, int(budget * weights[mode] / total_weight)) for mode in errors}
+        while sum(quotas.values()) > budget:
+            victim = max(quotas, key=lambda mode: quotas[mode])
+            quotas[victim] -= 1
+
+    clean = target - sum(quotas.values())
+    plan = ["faithful"] * clean
+    for mode in errors:
+        plan.extend([mode] * quotas[mode])
+    return plan
+
+
+def build_corpus_real(
+    documents: list[dict],
+    target: int,
+    seed: int,
+    mode_mix: dict[str, float] | None = None,
+    min_per_mode: int = 40,
+) -> tuple[list[dict], dict]:
+    """Собрать пары A3 на реальных документах тем же генератором, что и A1.
+
+    Документы обязаны быть настоящими текстами (``synthetic == False``) с непустыми
+    метаданными источника. Возвращает ``(пары, отчёт)``: отчёт содержит фактическое
+    число пар по режимам и причины, по которым план не выполнен (например, в документе
+    нет придаточной части для ``partial``). Одинаковые пары не повторяются: ключ
+    уникальности — «документ + предложение-факт + ответ».
+    """
+    rng = random.Random(seed)
+    mix = mode_mix or REAL_MODE_MIX
+    plan = plan_modes(target, mix, min_per_mode)
+    rng.shuffle(plan)
+
+    texts: dict[str, str] = {}
+    facts_by_doc: dict[str, list[RealFact]] = {}
+    donors_by_kind: dict[str, list[tuple[str, str]]] = {}
+    for document in documents:
+        text = document["text"]
+        texts[document["id"]] = text
+        facts = extract_facts(document["id"], text)
+        facts_by_doc[document["id"]] = facts
+        for fact in facts:
+            donors_by_kind.setdefault(fact.value_kind, []).append((document["id"], fact.value))
+
+    eligible = [document["id"] for document in documents if facts_by_doc[document["id"]]]
+    skipped: dict[str, int] = {}
+    if not eligible:
+        return [], {"eligible_documents": 0, "mode_counts": {}, "skipped": {}, "problems": ["нет документов с фактами"]}
+    documents_by_id = {document["id"]: document for document in documents}
+
+    pairs: list[dict] = []
+    mode_counts: dict[str, int] = {mode: 0 for mode in mix}
+    used: set[tuple[str, int, int, str]] = set()
+    cursor = 0
+    for mode in plan:
+        placed = False
+        for _attempt in range(len(eligible) * 12):
+            doc_id = eligible[cursor % len(eligible)]
+            cursor += 1
+            facts = facts_by_doc[doc_id]
+            if not facts:
+                continue
+            fact = rng.choice(facts)
+            same_kind = [value for donor_doc, value in donors_by_kind.get(fact.value_kind, []) if donor_doc != doc_id]
+            # Для «атрибуции числа» donor сначала ищется среди значений того же вида в
+            # других предложениях документа (правдоподобнее), и лишь затем — среди прочих.
+            same_kind_here = [
+                other.value
+                for other in facts
+                if other.sentence_index != fact.sentence_index and other.value_kind == fact.value_kind
+            ]
+            any_here = [other.value for other in facts if other.sentence_index != fact.sentence_index]
+            other_place = same_kind_here or any_here
+            variant = build_real_variant(fact, mode, rng, same_kind, other_place)
+            if variant is None:
+                continue
+            key = (doc_id, fact.fact_start, fact.fact_end, variant["answer"])
+            if key in used:
+                continue
+            context = build_context(texts[doc_id], fact)
+            span_start = texts[doc_id].find(context)
+            if span_start < 0:  # pragma: no cover - защита от расхождения нормализации
+                continue
+            used.add(key)
+            document = documents_by_id[doc_id]
+            meta = {
+                "kind": "corpus_a3_real",
+                "mode": mode,
+                "taxonomy": TAXONOMY[mode],
+                "clean": mode == "faithful",
+                "group": doc_id,
+                "doc_id": doc_id,
+                "value": fact.value,
+                "value_kind": fact.value_kind,
+                "fact_span": [fact.fact_start, fact.fact_end],
+                "context_span": [span_start, span_start + len(context)],
+                "source_url": document.get("meta", {}).get("source_url"),
+                "act_type": document.get("meta", {}).get("act_type"),
+                "act_number": document.get("meta", {}).get("act_number"),
+                "act_date": document.get("meta", {}).get("act_date"),
+                "span_texts": variant["spans_text"],
+                "dataset_version": DATASET_VERSION_A3,
+                "synthetic_document": False,
+            }
+            pairs.append(
+                {
+                    "id": f"corpus-a3-{len(pairs) + 1:05d}",
+                    "context": context,
+                    "answer": variant["answer"],
+                    "labels": variant["labels"],
+                    "meta": meta,
+                }
+            )
+            mode_counts[mode] += 1
+            placed = True
+            break
+        if not placed:
+            skipped[mode] = skipped.get(mode, 0) + 1
+
+    wanted = plan_modes(target, mix, min_per_mode)
+    problems: list[str] = []
+    for mode in mix:
+        if mode_counts.get(mode, 0) < wanted.count(mode):
+            problems.append(f"режим {mode}: {mode_counts.get(mode, 0)} пар вместо {wanted.count(mode)}")
+    return pairs, {
+        "eligible_documents": len(eligible),
+        "mode_counts": mode_counts,
+        "skipped": skipped,
+        "problems": problems,
+    }
+
+
 def split_pairs(pairs: list[dict], seed: int, ratios: tuple[float, float, float] = (0.7, 0.15, 0.15)) -> dict:
     """Разбить пары по группам (документам) так, чтобы группы не пересекались."""
     groups: dict[str, list[dict]] = {}
@@ -469,22 +645,46 @@ def check_spans(pairs: list[dict]) -> dict:
     return {"checked": checked, "problems": problems}
 
 
-def build(docs_dir: Path, out_dir: Path, target: int, seed: int, gen_docs: int = 0) -> dict:
-    """Полный цикл: документы → пары → сплиты → манифест."""
+def build(
+    docs_dir: Path,
+    out_dir: Path,
+    target: int,
+    seed: int,
+    gen_docs: int = 0,
+    real: bool = False,
+    mode_mix: dict[str, float] | None = None,
+) -> dict:
+    """Полный цикл: документы → пары → сплиты → манифест.
+
+    ``real=False`` — корпус A1 (документы синтетические, при пустом каталоге генератор
+    создаёт их сам). ``real=True`` — корпус A3: документы обязаны быть настоящими
+    текстами в ``docs_dir`` вместе с ``sources.json``; синтетика не подмешивается
+    ни при каких условиях.
+    """
     docs_dir.mkdir(parents=True, exist_ok=True)
     documents = load_documents(docs_dir)
     generated = False
-    if not documents:
-        documents = generate_documents(max(gen_docs, 60), random.Random(seed))
-        generated_dir = docs_dir / "generated"
-        generated_dir.mkdir(parents=True, exist_ok=True)
-        for document in documents:
-            (generated_dir / f"{document['id']}.md").write_text(document["text"] + "\n", encoding="utf-8")
-        generated = True
+    real_report: dict = {}
+    if real:
+        if not documents:
+            raise ValueError(f"для корпуса A3 нужны реальные документы в {docs_dir}, а каталог пуст")
+        if any(document.get("synthetic") for document in documents):
+            raise ValueError("в каталоге реальных документов найдены файлы из подкаталога generated")
+        pairs, real_report = build_corpus_real(documents, target=target, seed=seed, mode_mix=mode_mix)
+    else:
+        if not documents:
+            documents = generate_documents(max(gen_docs, 60), random.Random(seed))
+            generated_dir = docs_dir / "generated"
+            generated_dir.mkdir(parents=True, exist_ok=True)
+            for document in documents:
+                (generated_dir / f"{document['id']}.md").write_text(document["text"] + "\n", encoding="utf-8")
+            generated = True
 
-    pairs = build_corpus(documents, target=target, seed=seed)
+        pairs = build_corpus(documents, target=target, seed=seed)
+
+    prefix = "corpus-a3" if real else "corpus-a"
     for index, pair in enumerate(pairs, start=1):
-        pair["id"] = f"corpus-a-{index:05d}"
+        pair["id"] = f"{prefix}-{index:05d}"
 
     # Пересобираем span_texts по фактическим срезам, чтобы манифест не зависел от генератора.
     for pair in pairs:
@@ -505,9 +705,10 @@ def build(docs_dir: Path, out_dir: Path, target: int, seed: int, gen_docs: int =
     spans = check_spans(pairs)
 
     manifest = {
-        "dataset_version": DATASET_VERSION,
+        "dataset_version": DATASET_VERSION_A3 if real else DATASET_VERSION,
         "target": target,
         "seed": seed,
+        "real_documents": bool(real),
         "documents": {
             "count": len(documents),
             "generated": generated,
@@ -527,6 +728,22 @@ def build(docs_dir: Path, out_dir: Path, target: int, seed: int, gen_docs: int =
             **{f"splits/{name}.jsonl": sha256_file(path) for name, path in split_paths.items()},
         },
     }
+    if real:
+        contexts = check_contexts_in_sources(pairs, docs_dir)
+        attribution = check_number_attribution(pairs, docs_dir)
+        manifest["documents"]["sources_dir"] = str(docs_dir)
+        manifest["documents"]["meta"] = {
+            document["id"]: document.get("meta", {}) for document in documents if document.get("meta")
+        }
+        manifest["pairs_by_mode"] = real_report.get("mode_counts", {})
+        manifest["plan_problems"] = real_report.get("problems", [])
+        manifest["contexts_checked"] = contexts["checked"]
+        manifest["contexts_problems"] = contexts["problems"]
+        manifest["number_attribution_checked"] = attribution["checked"]
+        manifest["number_attribution_problems"] = attribution["problems"]
+        manifest["pair_sha256"] = {pair["id"]: pair_sha256(pair) for pair in pairs}
+        manifest["sources_sha256"] = {path.name: sha256_file(path) for path in sorted(docs_dir.glob("*.txt"))}
+
     (out_dir / "manifest.json").write_text(json.dumps(manifest, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     return manifest
 
@@ -538,16 +755,38 @@ def main() -> int:
     parser.add_argument("--target", type=int, default=1200)
     parser.add_argument("--seed", type=int, default=42)
     parser.add_argument("--gen-docs", type=int, default=60, help="сколько документов сгенерировать, если каталог пуст")
+    parser.add_argument(
+        "--real",
+        action="store_true",
+        help="корпус A3: контексты — дословные фрагменты реальных документов из --docs (без генерации)",
+    )
     args = parser.parse_args()
 
-    manifest = build(args.docs, args.out, args.target, args.seed, gen_docs=args.gen_docs)
+    manifest = build(args.docs, args.out, args.target, args.seed, gen_docs=args.gen_docs, real=args.real)
     balance = manifest["balance"]
-    print(f"Пар: {manifest['pairs']} (документов {manifest['documents']['count']}, цель {manifest['target']})")
+    kind = "A3 (реальные документы)" if args.real else "A1 (синтетический)"
+    print(
+        f"Корпус {kind}: пар {manifest['pairs']} (документов {manifest['documents']['count']}, цель {manifest['target']})"
+    )
     print("Режимы: " + ", ".join(f"{mode}={count}" for mode, count in balance["counts"].items() if count))
     print(f"Чистых: {balance['clean']} ({balance['clean_share']:.1%})")
     print(f"Сплиты: {manifest['splits']} | общих групп: {manifest['shared_groups']}")
-    if manifest["spans_problems"]:
-        print("Проблемы разметки:", manifest["spans_problems"][:3], file=sys.stderr)
+    if args.real:
+        print(
+            f"Контексты дословно в источниках: проверено {manifest['contexts_checked']}, "
+            f"проблем {len(manifest['contexts_problems'])}"
+        )
+        print(
+            f"Атрибуция числа (число из другого места документа): проверено "
+            f"{manifest['number_attribution_checked']}, проблем {len(manifest['number_attribution_problems'])}"
+        )
+    failures = list(manifest["spans_problems"])
+    if args.real:
+        failures += list(manifest.get("contexts_problems", []))
+        failures += list(manifest.get("number_attribution_problems", []))
+        failures += list(manifest.get("plan_problems", []))
+    if failures:
+        print("Проблемы сборки:", failures[:3], file=sys.stderr)
         return 2
     if balance["problems"]:
         print("Не выполнены требования состава:", balance["problems"], file=sys.stderr)
