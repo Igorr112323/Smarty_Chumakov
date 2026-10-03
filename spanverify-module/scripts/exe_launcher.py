@@ -29,11 +29,13 @@ if __package__ in (None, "") and not getattr(sys, "frozen", False):
     os.chdir(_root) if (_root / "config").is_dir() else None
 
 from spanverify import __version__  # noqa: E402
+from spanverify.core import configure_stdio  # noqa: E402
 from spanverify.server import DEFAULT_PORT, free_port, serve  # noqa: E402
 
 
 def main(argv: list[str] | None = None) -> int:
     """Разобрать аргументы и запустить сервис (блокирующий вызов)."""
+    configure_stdio()
     parser = argparse.ArgumentParser(prog="spanverify", description=f"SpanVerify {__version__}")
     parser.add_argument("--port", type=int, default=DEFAULT_PORT)
     parser.add_argument("--host", default="0.0.0.0")

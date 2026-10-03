@@ -28,6 +28,7 @@ from pathlib import Path
 from typing import Any
 
 from . import __version__
+from .core import configure_stdio
 from .dataset import (
     DATASET_VERSION,
     corpus_statistics,
@@ -484,6 +485,7 @@ def build_parser() -> argparse.ArgumentParser:
 
 def main(argv: Sequence[str] | None = None) -> int:
     """Точка входа CLI: возвращает код возврата 0/1/2."""
+    configure_stdio()
     parser = build_parser()
     args = parser.parse_args(argv)
     if not getattr(args, "func", None):
