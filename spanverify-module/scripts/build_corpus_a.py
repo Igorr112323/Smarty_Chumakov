@@ -54,8 +54,22 @@ from dataclasses import dataclass
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
+
+from scripts.corpus_real import (  # noqa: E402 - импорт после правки sys.path
+    RealFact,
+    build_context,
+    build_real_variant,
+    check_contexts_in_sources,
+    check_number_attribution,
+    extract_facts,
+    normalize_text,
+    pair_sha256,
+)
 
 DATASET_VERSION = "corpus-a1.0"
+DATASET_VERSION_A3 = "corpus-a3.0"
 CONTEXT_SEPARATOR = "\n\n"
 
 MODES = (
@@ -174,27 +188,50 @@ def generate_documents(count: int, rng: random.Random) -> list[dict]:
     return documents
 
 
+def load_sources_meta(docs_dir: Path) -> dict[str, dict]:
+    """Прочитать ``sources.json`` загрузчика: ``{doc_id: метаданные источника}``.
+
+    Файл пишет ``scripts/fetch_npa_corpus.py`` (URL, вид акта, номер, дата, хеши). Если
+    его нет — это корпус A1, и метаданные не нужны.
+    """
+    path = docs_dir / "sources.json"
+    if not path.exists():
+        return {}
+    try:
+        payload = json.loads(path.read_text(encoding="utf-8"))
+    except json.JSONDecodeError:
+        return {}
+    documents = payload.get("documents")
+    return documents if isinstance(documents, dict) else {}
+
+
 def load_documents(docs_dir: Path) -> list[dict]:
     """Прочитать документы из каталога (рекурсивно).
 
     Файлы из подкаталога ``generated`` помечаются синтетическими: так признак не
     теряется при повторном запуске, когда генератор уже не создаёт документы заново.
+    Рядом с файлами может лежать ``sources.json`` загрузчика — тогда метаданные
+    источника (URL, вид, номер, дата, хеш) попадают в ``document["meta"]``, а текст
+    нормализуется той же функцией, что и в проверках A3.
     """
     documents: list[dict] = []
+    sources_meta = load_sources_meta(docs_dir)
     for path in sorted(docs_dir.rglob("*")):
         if path.suffix.lower() not in {".md", ".txt"}:
             continue
         text = path.read_text(encoding="utf-8").strip()
         if not text:
             continue
-        documents.append(
-            {
-                "id": path.stem,
-                "title": path.stem,
-                "text": text,
-                "synthetic": "generated" in path.relative_to(docs_dir).parts,
-            }
-        )
+        synthetic = "generated" in path.relative_to(docs_dir).parts
+        document = {
+            "id": path.stem,
+            "title": path.stem,
+            "text": text if synthetic else normalize_text(text),
+            "synthetic": synthetic,
+        }
+        if not synthetic and path.stem in sources_meta:
+            document["meta"] = dict(sources_meta[path.stem])
+        documents.append(document)
     return documents
 
 

@@ -16,7 +16,7 @@
   найден в файле источника» сравнивает именно нормализованные строки, поэтому одна и
   та же функция применяется и при сборке, и в проверке;
 * ``split_sentences`` / ``find_values`` — разбор реального текста на предложения и
-  поиск в них значений (даты, сроки, суммы, проценты, количества);
+  поиск в них значений (даты, сроки, суммы, проценты, количества, единицы измерения);
 * ``extract_facts`` — «факт» реального документа: предложение (дословно), значение в
   нём и его смещения (``answer[start:end] == span`` выполняется по построению);
 * ``build_real_variant`` — ответ по режиму и разметка (метка — смещения в **ответе**);
@@ -25,7 +25,7 @@
   число при «атрибуции числа» — в другом месте того же документа.
 
 Ничего не выдумывается: если подходящего места в документе нет, факт или режим
-пропускается (``ValueError``/``None``), а не подменяется шаблоном.
+пропускается (``None``), а не подменяется шаблоном.
 """
 
 from __future__ import annotations
@@ -57,6 +57,12 @@ _UNITS = (
     "календарных дней|рабочих дней|рабочих дня|календарных дня|суток|сутки|"
     "дней|дня|день|недель|недели|неделю|месяцев|месяца|месяц|лет|года|год|часов|часа|час|минут|минуты|минуту"
 )
+# Единицы измерения и объекты: нужны, чтобы значение было осмысленным («25 мегабайт», а не «25»).
+_MEASURES = (
+    "мегабайт(?:а|ов)?|гигабайт(?:а|ов)?|килобайт(?:а|ов)?|терабайт(?:а|ов)?|байт(?:а|ов)?|"
+    "знаков|символов|страниц(?:ы)?|листов|экземпляр(?:а|ов)?|томов|дел|документов|сотрудников|"
+    "человек|должностей|единиц|штук|комплект(?:а|ов)?|процента|процентов"
+)
 
 # Порядок важен: более специфичные образцы проверяются раньше общих.
 VALUE_PATTERNS: tuple[tuple[str, str], ...] = (
@@ -68,6 +74,7 @@ VALUE_PATTERNS: tuple[tuple[str, str], ...] = (
     ("percent", r"\d+(?:[,.]\d+)?\s*(?:процент(?:ов|а)?|%)"),
     ("word_term", rf"(?:{_WORD_NUMBERS})\s+(?:{_UNITS})"),
     ("digit_term", rf"\d[\d\s]*\s*(?:{_UNITS})"),
+    ("digit_measure", rf"\d[\d\s]*(?:,\d+)?\s+(?:{_MEASURES})"),
     ("word_count", rf"(?:{_WORD_NUMBERS})\s+(?:документов|документа|человек|сотрудников|дней|раза|раз)"),
     ("count", r"\d[\d\s]{0,12}\d"),
     ("single_number", r"\d"),
@@ -82,6 +89,31 @@ CONDITION_MARKERS = (
     "кроме случаев",
     "по согласованию",
     "в порядке, установленном",
+)
+
+# Слова и обороты, которые вводят значение: по ним ищется граница «предмет — значение».
+VALUE_INTRODUCERS = (
+    "не должен превышать",
+    "не должна превышать",
+    "не должно превышать",
+    "не превышает",
+    "не превышать",
+    "вступает в силу с",
+    "устанавливается в",
+    "определяется в",
+    "продолжительностью",
+    "не позднее чем за",
+    "не позднее",
+    "не ранее чем через",
+    "не ранее",
+    "в течение",
+    "в размере",
+    "сроком",
+    "составляет",
+    "составляют",
+    "равен",
+    "равна",
+    "равно",
 )
 
 
@@ -140,7 +172,7 @@ def find_values(sentence: str) -> list[tuple[int, int, str, str]]:
     for order, (kind, pattern) in enumerate(VALUE_PATTERNS):
         for found in re.finditer(pattern, sentence, flags=re.IGNORECASE):
             text = found.group(0).strip()
-            if not text or not text[0].isalnum() and not text[0].isdigit():
+            if not text:
                 continue
             matches.append((found.start(), found.end(), text, kind, order))
     matches.sort(key=lambda item: (item[0], item[4], -(item[1] - item[0])))
@@ -192,7 +224,6 @@ def extract_facts(doc_id: str, text: str, min_words: int = 8, max_facts: int = 2
         # Берём значение «покрупнее»: описательные виды (даты, сроки, суммы) полезнее голых чисел.
         detailed = [item for item in values if item[3] not in {"count", "single_number"}]
         value_start, value_end, value_text, value_kind = (detailed or values)[0]
-        # Абсолютные смещения предложения в документе нужны для проверки «число есть в другом месте».
         absolute_start, absolute_end = start, start + len(sentence)
         facts.append(
             RealFact(
@@ -245,12 +276,12 @@ EXTRA_DETAILS = (
     "реестр передачи в архив",
 )
 
-MISSING_CLAIM = "Значение не приведено"
-OVERSIGHT_CLAIM = "Точное значение приведено в документе"
+MISSING_CLAIM = "значение не приведено"
+OVERSIGHT_CLAIM = "точное значение приведено в документе"
 
 
 def _condition_clause(sentence: str) -> tuple[int, int] | None:
-    """Найти придаточную часть с условием (её можно отбросить в режиме ``partial``).
+    """Найти придаточную часть с условием (её отбрасывает режим ``partial``).
 
     Ищется ближайшая запятая перед маркером условия; границей считается конец
     предложения. Если маркер стоит в начале предложения, часть не отбрасывается —
@@ -269,35 +300,25 @@ def _condition_clause(sentence: str) -> tuple[int, int] | None:
     return None
 
 
-def _clauses(sentence: str) -> list[tuple[int, int]]:
-    """Разбить предложение на части по запятым и точкам с запятой: ``(начало, конец)``."""
-    parts: list[tuple[int, int]] = []
-    start = 0
-    for found in re.finditer(r"[,;]", sentence):
-        parts.append((start, found.start()))
-        start = found.end()
-    parts.append((start, len(sentence)))
-    return [(item[0], item[1]) for item in parts if sentence[item[0] : item[1]].strip()]
+def _subject_prefix(sentence: str, value_start: int) -> str | None:
+    """Часть предложения до значения: «предмет» без самого значения.
 
-
-def _without_value_clause(sentence: str, value_start: int, value_end: int) -> str | None:
-    """Убрать из предложения часть, несущую значение; вернуть остаток (дословный).
-
-    Возвращает ``None``, если предложение состоит из одной части: тогда убрать значение
-    без искажения смысла нельзя, и факт пропускается (никаких шаблонов вместо текста).
+    Граница ищется по словам-вводным (``составляет``, ``в течение``, ``не позднее`` и
+    т. п.). Если такого слова нет, вернуть ``None``: тогда ответ вида «предмет — значение
+    не приведено» построить нельзя, и режим пропускается, а не подменяется шаблоном.
     """
-    parts = _clauses(sentence)
-    target = next((item for item in parts if item[0] <= value_start < item[1] or item[0] < value_end <= item[1]), None)
-    if target is None or len(parts) < 2:
+    lowered = sentence.lower()
+    best: int | None = None
+    for marker in VALUE_INTRODUCERS:
+        position = lowered.rfind(marker, 0, value_start)
+        if position > 0 and (best is None or position > best):
+            best = position
+    if best is None:
         return None
-    kept = [sentence[item[0] : item[1]].strip(" ,;") for item in parts if item != target]
-    kept = [item for item in kept if item]
-    if not kept:
+    prefix = sentence[:best].strip(" ,;:—-")
+    if len(prefix.split()) < 3:
         return None
-    remainder = ", ".join(kept)
-    if not remainder.endswith((".", "!", "?")):
-        remainder += "."
-    return remainder
+    return prefix
 
 
 def _mark(answer: str, fragment: str) -> list[list[int]]:
@@ -320,7 +341,8 @@ def build_real_variant(
     ``same_kind_donors`` — значения того же вида из других документов корпуса (для
     ``contradiction``: подставляется значение, которого в этом документе нет),
     ``other_place_donors`` — значения из других предложений **того же** документа
-    (для ``number_attribution``).
+    (для ``number_attribution``; проверка №3 подтверждает, что новое число есть в
+    другом месте документа).
 
     Возвращает ``None``, если для режима нет подходящего материала: лучше пропустить
     факт, чем подставить шаблон и выдать его за реальный документ.
@@ -350,6 +372,8 @@ def build_real_variant(
             return None
         answer = (fact.sentence[: clause[0]] + fact.sentence[clause[1] :]).strip()
         answer = re.sub(r"\s+", " ", answer)
+        if not answer.endswith((".", "!", "?")):
+            answer += "."
         if fact.value not in answer:
             # Условие оказалось раньше значения — тогда отбрасывать нечего.
             return None
@@ -366,17 +390,17 @@ def build_real_variant(
         return {"answer": answer, "labels": [_mark(answer, detail)], "spans_text": [detail]}
 
     if mode == "missing":
-        remainder = _without_value_clause(fact.sentence, fact.value_start, fact.value_end)
-        if remainder is None:
+        prefix = _subject_prefix(fact.sentence, fact.value_start)
+        if prefix is None:
             return None
-        answer = f"{remainder} {MISSING_CLAIM}."
+        answer = f"{prefix} — {MISSING_CLAIM}."
         return {"answer": answer, "labels": [_mark(answer, MISSING_CLAIM)], "spans_text": [MISSING_CLAIM]}
 
     if mode == "oversight":
-        remainder = _without_value_clause(fact.sentence, fact.value_start, fact.value_end)
-        if remainder is None:
+        prefix = _subject_prefix(fact.sentence, fact.value_start)
+        if prefix is None:
             return None
-        answer = f"{remainder} {OVERSIGHT_CLAIM}."
+        answer = f"{prefix} — {OVERSIGHT_CLAIM}."
         return {"answer": answer, "labels": [_mark(answer, OVERSIGHT_CLAIM)], "spans_text": [OVERSIGHT_CLAIM]}
 
     raise ValueError(f"неизвестный режим: {mode}")
@@ -444,8 +468,13 @@ def check_number_attribution(pairs: list[dict], sources_dir: Path) -> dict:
             problems.append(f"{pair['id']}: нет размеченного фрагмента")
             continue
         fragment = spans[0]
-        fact_sentence = pair["meta"].get("fact_sentence", "")
-        outside = source.replace(fact_sentence, " ", 1) if fact_sentence else source
+        # Предложение-факт вычитается по записанным смещениям (или по тексту, если смещений нет).
+        span = pair["meta"].get("fact_span")
+        if isinstance(span, list) and len(span) == 2 and 0 <= int(span[0]) < int(span[1]) <= len(source):
+            outside = source[: int(span[0])] + " " + source[int(span[1]) :]
+        else:
+            fact_sentence = pair["meta"].get("fact_sentence", "")
+            outside = source.replace(fact_sentence, " ", 1) if fact_sentence else source
         if fragment not in outside:
             problems.append(f"{pair['id']}: значение {fragment!r} не найдено в другом месте документа {doc_id}")
     return {"checked": checked, "problems": problems}
