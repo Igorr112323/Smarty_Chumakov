@@ -13,7 +13,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
 
 env:
   PYTHONUTF8: "1"
@@ -369,10 +369,33 @@ jobs:
         working-directory: spanverify-module
         run: python scripts/probe_sources.py --json reports/probe_sources.json
 
+      # Разведка API нужна, чтобы писать загрузчик по фактам, а не по догадкам.
+      - name: Разведать API официальной публикации
+        working-directory: spanverify-module
+        run: python scripts/probe_npa_api.py --out reports/npa_probe.json
+
+      # Результат разведки коммитится: артефакты GitHub не читаются из окружения
+      # разработки, а факты об API нужны в репозитории. [skip ci] не даёт запустить
+      # новый прогон от этого коммита.
+      - name: Закоммитить результат разведки
+        if: always()
+        run: |
+          git config user.name "spanverify-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add -f spanverify-module/reports/probe_sources.json spanverify-module/reports/npa_probe.json || true
+          if git diff --cached --quiet; then
+            echo "нечего коммитить"
+          else
+            git commit -m "разведка источников: факты доступности и API [skip ci]"
+            git push
+          fi
+
       - name: Артефакт разведки
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: probe-sources
-          path: spanverify-module/reports/probe_sources.json
+          path: |
+            spanverify-module/reports/probe_sources.json
+            spanverify-module/reports/npa_probe.json
           retention-days: 30
