@@ -1,0 +1,68 @@
+{
+  "weights": {
+    "attention_entropy": 0.1,
+    "ctx_attention_mass": 0.9,
+    "embedding_density": 0.0
+  },
+  "threshold": 1.0,
+  "target_fpr": 0.1,
+  "span_z": 0.0,
+  "span_floor": 0.3,
+  "isotonic": {
+    "x": [
+      0.006197,
+      0.249206,
+      0.763593
+    ],
+    "y": [
+      0.0,
+      1.0,
+      1.0
+    ]
+  },
+  "head": {
+    "type": "logreg",
+    "file": "config/head.json"
+  },
+  "folds": [
+    {
+      "fold": 0,
+      "n_train": 1164,
+      "n_test": 291,
+      "auc": 0.9949308014161571
+    },
+    {
+      "fold": 1,
+      "n_train": 1164,
+      "n_test": 291,
+      "auc": 0.997907949790795
+    },
+    {
+      "fold": 2,
+      "n_train": 1164,
+      "n_test": 291,
+      "auc": 0.996390243902439
+    },
+    {
+      "fold": 3,
+      "n_train": 1164,
+      "n_test": 291,
+      "auc": 0.9924276503223871
+    },
+    {
+      "fold": 4,
+      "n_train": 1164,
+      "n_test": 291,
+      "auc": 0.98808642888856
+    }
+  ],
+  "seed": 42,
+  "version": "1.1.0",
+  "mode": "demo",
+  "meta": {
+    "dataset": "data/demo_pairs.jsonl",
+    "synthetic": true,
+    "signal": "logreg",
+    "note": "Демонстрационный корпус: параметры проверяют конвейер, а не качество на реальных документах. Для боевой калибровки используйте размеченные реальные пары в режиме hf."
+  }
+}
