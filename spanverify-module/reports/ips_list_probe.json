@@ -5,7 +5,7 @@
   "search_page": {
     "url": "http://pravo.gov.ru/proxy/ips/?searchlist=1&a0=%EF%E5%F0%F1%EE%ED%E0%EB%FC%ED%FB%E5%20%E4%E0%ED%ED%FB%E5",
     "status": 200,
-    "bytes": 24174,
+    "bytes": 24725,
     "addresses": [
       "?style.css",
       "?layout.css",
@@ -63,7 +63,7 @@
     "snippets_json": [
       "; } table.menu_workspace td.dsc { padding: 2px 0px; } </style> <script type=\"text/javascript\" src=\"?json.js\" charset=\"windows-1251\"></script> <script type=\"text/javascript\" src=\"?script.js\" charset=\"windows-"
     ],
-    "html_head": "<html>\n<head>\n<title>Поиск: Контекст: \"персональные данные\" </title>\n<meta http-equiv=\"Content-Type\" content=\"text/html; charset=windows-1251\" />\n<link rel=\"stylesheet\" type=\"text/css\" href=\"?style.css\" />\n<link rel=\"stylesheet\" type=\"text/css\" href=\"?layout.css\" />\n<link rel=\"icon\" href=\"?favicon.ico\" type=\"image/x-icon\" />\n<link rel=\"shortcut icon\" href=\"?favicon.ico\" type=\"image/x-icon\">\n<style type=\"text/css\">\ntable.menu_workspace { width: 100%; }\ntable.menu_workspace td { vertical-align: top; }\ntable.menu_workspace tr.cur { background-color: #fff4b7; }\ntable.menu_workspace td.hdr { padding: 2px 5px; }\ntable.menu_workspace td.chk { width: 1px; padding-right: 5px; }\ntable.menu_workspace td.dsc { padding: 2px 0px; }\n</style>\n<script type=\"text/javascript\" src=\"?json.js\" charset=\"windows-1251\"></script>\n<script type=\"text/javascript\" src=\"?script.js\" charset=\"windows-1251\"></script>\n<script type=\"text/javascript\">\n\ttop.pname = new Array();\n\ttop.pvalue = new Array();\n\ttop.poldvalue = new Array();\n\ttop.dataselect = 1;\n\tdocument.pPath='?';\n\ttop.pname[0] = \"a0\";\n\ttop.pvalue[0] = \"персональные данные\";\n\ttop.plen =1;\n</script>\n</head>\n\n<body style=\"overflow:hidden; overflow-x:auto\">\n<iframe id=\"temp_iframe\" name=\"save_settings_iframe\" src=\"?stub\" style=\"position:absolute; top: -500px; left: -500px; visibility: hidden\"></iframe>\n<table class=\"root\">\n<tr>\n<td class=\"header\">\n\n<!-- BEGIN шапка -->\n\n\t<table class=\"global_header\">\n\t<tr>\n\t<td class=\"text\">\n<span class=\"sh1\">Результаты&nbsp;поиска:</span>\n\t</td>\n\t<td class=\"pics\">\n<div id=\"res_pic_frame_maximize\" class=\"vis\"><a href=\"javascript:void(0);\" onClick=\"maximizeFrame()\"><img src=\"?pic_hide2right.gif\" alt=\"Развернуть панель\" title=\"Развернуть панель\" /></a></div>\n<div id=\"res_pic_frame_minimize\" class=\"inv\"><a href=\"javascript:void(0);\" onClick=\"restoreFrame()\"><img src=\"?pic_hide2left.gif\" alt=\"Свернуть панель\" title=\"Свернуть панель\" /></a></div>\n\t</td>\n\t</tr>\n\t</table>\n\n\n\n</td>\n</tr>\n\n<tr>\n<td class=\"search_results\">\n\n<div class=\"search_results_root\">\n\n\n<!-- BEGIN блок с \"выпадающими\" меню -->\n\n\n\t<table class=\"clps search_results_content\">\n\n\t<tr>\n\t<td>\n\n\t\t<table class=\"block_head\">\n\t\t<tr>\n\t\t<td><img src=\"?pic_print.gif\" alt=\"Печать списка\" title=\"Печать списка\" class=\"pic_n\" onClick=\"printChecked(null, '','empire=', 'collection=')\" /><img src=\"?pic_rtf.gif\" alt=\"Экспорт списка в RTF\" title=\"Экспорт списка в RTF\" class=\"pic_n\" onClick=\"printChecked('rtf', '','empire=', 'collection=');\" />\n<form method=\"GET\" id=\"changeQueryForm\" target=\"_top\" action=\"?\" style=\"display:none\">\n<input type=\"hidden\" name=\"start_search\"><input type=\"hidden\" name=\"fattrib\" value=\"1\" /> <!-- ___ --> <INPUT TYPE=\"HIDDEN\" NAME=\"a0\" VALUE=\"персональные данные\" >   \n <INPUT TYPE=\"HIDDEN\" NAME=\"a1\" VALUE=\"\" >   \n <INPUT TYPE=\"HIDDEN\" NAME=\"a15\" VALUE=\"\" >   \n <INPUT TYPE=\"HIDDEN\" NAME=\"a16\" VALUE=\"\" >   \n <INPUT TYPE=\"HIDDEN\" NAME=\"a17\" VALUE=\"\" >   \n <INPUT TYPE=\"HIDDEN\" NAME=\"a23\" VALUE=\"\" >   \n <INPUT TYPE=\"HIDDEN\" NAME=\"a2"
+    "html_head": "<html>\n<head>\n<title>Поиск: Контекст: \"персональные данные\" </title>\n<meta http-equiv=\"Content-Type\" content=\"text/html; charset=windows-1251\" />\n<link rel=\"stylesheet\" type=\"text/css\" href=\"?style.css\" />\n<link rel=\"stylesheet\" type=\"text/css\" href=\"?layout.css\" />\n<link rel=\"icon\" href=\"?favicon.ico\" type=\"image/x-icon\" />\n<link rel=\"shortcut icon\" href=\"?favicon.ico\" type=\"image/x-icon\">\n<style type=\"text/css\">\ntable.menu_workspace { width: 100%; }\ntable.menu_workspace td { vertical-align: top; }\ntable.menu_workspace tr.cur { background-color: #fff4b7; }\ntable.menu_workspace td.hdr { padding: 2px 5px; }\ntable.menu_workspace td.chk { width: 1px; padding-right: 5px; }\ntable.menu_workspace td.dsc { padding: 2px 0px; }\n</style>\n<script type=\"text/javascript\" src=\"?json.js\" charset=\"windows-1251\"></script>\n<script type=\"text/javascript\" src=\"?script.js\" charset=\"windows-1251\"></script>\n<script type=\"text/javascript\">\n\ttop.pname = new Array();\n\ttop.pvalue = new Array();\n\ttop.poldvalue = new Array();\n\ttop.dataselect = 1;\n\tdocument.pPath='?';\n\ttop.pname[0] = \"a0\";\n\ttop.pvalue[0] = \"персональные данные\";\n\ttop.plen =1;\n</script>\n</head>\n\n<body style=\"overflow:hidden; overflow-x:auto\">\n<iframe id=\"temp_iframe\" name=\"save_settings_iframe\" src=\"?stub\" style=\"position:absolute; top: -500px; left: -500px; visibility: hidden\"></iframe>\n<table class=\"root\">\n<tr>\n<td class=\"header\">\n\n<!-- BEGIN шапка -->\n\n\t<table class=\"global_header\">\n\t<tr>\n\t<td class=\"text\">\n<span class=\"sh1\">Результаты&nbsp;поиска:</span>\n\t</td>\n\t<td class=\"pics\">\n<div id=\"res_pic_frame_maximize\" class=\"vis\"><a href=\"javascript:void(0);\" onClick=\"maximizeFrame()\"><img src=\"?pic_hide2right.gif\" alt=\"Развернуть панель\" title=\"Развернуть панель\" /></a></div>\n<div id=\"res_pic_frame_minimize\" class=\"inv\"><a href=\"javascript:void(0);\" onClick=\"restoreFrame()\"><img src=\"?pic_hide2left.gif\" alt=\"Свернуть панель\" title=\"Свернуть панель\" /></a></div>\n\t</td>\n\t</tr>\n\t</table>\n\n\n\n</td>\n</tr>\n\n<tr>\n<td class=\"search_results\">\n\n<div class=\"search_results_root\">\n\n\n<!-- BEGIN блок с \"выпадающими\" меню -->\n\n\n\t<table class=\"clps search_results_content\">\n\n\t<tr>\n\t<td>\n\n\t\t<table class=\"block_head\">\n\t\t<tr>\n\t\t<td><img src=\"?pic_print.gif\" alt=\"Печать списка\" title=\"Печать списка\" class=\"pic_n\" onClick=\"printChecked(null, '','empire=', 'collection=')\" /><img src=\"?pic_rtf.gif\" alt=\"Экспорт списка в RTF\" title=\"Экспорт списка в RTF\" class=\"pic_n\" onClick=\"printChecked('rtf', '','empire=', 'collection=');\" />\n<form method=\"GET\" id=\"changeQueryForm\" target=\"_top\" action=\"?\" style=\"display:none\">\n<input type=\"hidden\" name=\"start_search\"><input type=\"hidden\" name=\"fattrib\" value=\"1\" /> <!-- ___ --> <INPUT TYPE=\"HIDDEN\" NAME=\"a0\" VALUE=\"персональные данные\" >   \n <INPUT TYPE=\"HIDDEN\" NAME=\"a1\" VALUE=\"\" >   \n <INPUT TYPE=\"HIDDEN\" NAME=\"a15\" VALUE=\"\" >   \n <INPUT TYPE=\"HIDDEN\" NAME=\"a15label\" VALUE=\"\" >   \n <INPUT TYPE=\"HIDDEN\" NAME=\"a16\" VALUE=\"\" >   \n <INPUT TYPE=\"HIDDEN\" NAME=\"a16label\" VALUE=\"\" >   \n <INPUT TYPE=\"HIDDEN"
   },
   "exports": [
     {
@@ -94,7 +94,7 @@
       "name": "list-lst",
       "url": "http://pravo.gov.ru/proxy/ips/?searchlist=1&a0=%EF%E5%F0%F1%EE%ED%E0%EB%FC%ED%FB%E5%20%E4%E0%ED%ED%FB%E5&lst=1",
       "status": 200,
-      "bytes": 24357,
+      "bytes": 24908,
       "nd_count": 0,
       "nd_examples": [],
       "content_type": "text/html; CHARSET=windows-1251",
@@ -116,7 +116,7 @@
       "name": "list-first",
       "url": "http://pravo.gov.ru/proxy/ips/?searchlist=1&a0=%EF%E5%F0%F1%EE%ED%E0%EB%FC%ED%FB%E5%20%E4%E0%ED%ED%FB%E5&first=1",
       "status": 200,
-      "bytes": 24405,
+      "bytes": 24956,
       "nd_count": 0,
       "nd_examples": [],
       "content_type": "text/html; CHARSET=windows-1251",
@@ -192,13 +192,13 @@
     {
       "name": "searchlist-a1",
       "url": "http://pravo.gov.ru/proxy/ips/?searchlist=1&a0=%EF%E5%F0%F1%EE%ED%E0%EB%FC%ED%FB%E5%20%E4%E0%ED%ED%FB%E5&a1=1",
-      "status": null,
-      "bytes": 0,
+      "status": 200,
+      "bytes": 24932,
       "nd_count": 0,
       "nd_examples": [],
-      "content_type": "",
-      "visible_head": "",
-      "error": "timed out"
+      "content_type": "text/html; CHARSET=windows-1251",
+      "visible_head": " Поиск: Контекст: \"персональные данные\" Наименование: 1 table.menu_workspace { width: 100%; } table.menu_workspace td { vertical-align: top; } table.menu_workspace tr.cur { background-color: #fff4b7; ",
+      "error": null
     }
   ]
 }
