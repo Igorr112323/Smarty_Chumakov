@@ -98,6 +98,37 @@ jobs:
       - name: Сборка onefile spanverify.exe
         run: python -m PyInstaller spanverify.spec --noconfirm --clean
 
+      - name: "Диагностика: сверить Python DLL внутри .exe с исходной"
+        shell: pwsh
+        run: |
+          $code = @'
+          import hashlib, sys
+          from pathlib import Path
+          try:
+              from PyInstaller.archive.readers import CArchiveReader
+          except Exception as error:
+              print(f"::warning title=диагностика::нет CArchiveReader: {error}")
+              raise SystemExit(0)
+          name = f"python{sys.version_info.major}{sys.version_info.minor}.dll"
+          source = Path(sys.base_prefix) / "DLLs" / name
+          if not source.exists():
+              source = Path(sys.base_prefix) / name
+          reader = CArchiveReader("dist/spanverify.exe")
+          inside = {n: v for n, v in reader.toc.items() if n.lower().endswith(".dll")}
+          if name not in inside:
+              print(f"::warning title=диагностика::в бандле нет {name}; список: {sorted(inside)[:10]}")
+              raise SystemExit(0)
+          data = reader.extract(name)
+          bundled = hashlib.sha256(data).hexdigest()
+          original = hashlib.sha256(source.read_bytes()).hexdigest() if source.exists() else "нет файла"
+          print(f"::notice title=DLL в бандле::{name} размер={len(data)} sha256={bundled} | исходная sha256={original} | совпадают={bundled == original}")
+          for dll in sorted(inside):
+              payload = reader.extract(dll)
+              print(f"::notice title=библиотека в бандле::{dll} размер={len(payload)}")
+          '@
+          $code | Out-File -Encoding utf8 dll_check.py
+          python dll_check.py
+
       - name: Сборка onedir (вариант для строгих антивирусов)
         run: >
           python -m PyInstaller --noconfirm --clean --onedir --name spanverify_onedir

@@ -7,7 +7,10 @@
 
 Что важно в этой сборке (Приложение В мастер-промта):
 
-* ``console=True`` и ``strip=True`` — виден лог запуска, бинарник компактнее;
+* ``console=True`` — виден лог запуска; ``strip`` включён только вне Windows:
+  стрип PE-файлов на Windows приводил к отказу загрузки Python DLL
+  (``Invalid access to memory location``) на сборочном раннере, поэтому там
+  стрип отключён — размером жертвуем ради работоспособности;
 * ``name="spanverify"`` — имя файла совпадает с именем в релизе;
 * ``datas`` включает ``config/`` и ``data/`` — обученные веса, калибратор и
   демонстрационный корпус едут внутри файла, поэтому .exe работает сам по себе
@@ -79,7 +82,7 @@ exe = EXE(
     name="spanverify",
     debug=False,
     bootloader_ignore_signals=False,
-    strip=True,
+    strip=sys.platform != "win32",
     upx=False,
     upx_exclude=[],
     runtime_tmpdir=None,
