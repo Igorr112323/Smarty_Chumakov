@@ -330,6 +330,9 @@ jobs:
       - name: Оценка на RusHallu-RAG (внешний русский набор)
         run: python scripts/external_eval.py --dataset rushallu --mode demo --json reports/ext_rushallu.json
 
+      - name: Ключевые числа в аннотации (читаются без скачивания артефактов)
+        run: python scripts/print_external_annotation.py
+
       - name: Отчёт по внешним наборам
         run: |
           # Числа отчёта берутся из external_tests.json и не правятся руками; сверку

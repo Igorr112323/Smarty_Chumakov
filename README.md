@@ -4,7 +4,7 @@
 [![build-and-release-exe](https://github.com/Igorr112323/Smarty_Chumakov/actions/workflows/build-and-release-exe.yml/badge.svg)](https://github.com/Igorr112323/Smarty_Chumakov/actions/workflows/build-and-release-exe.yml)
 [![release](https://img.shields.io/github/v/release/Igorr112323/Smarty_Chumakov)](https://github.com/Igorr112323/Smarty_Chumakov/releases/latest)
 [![python](https://img.shields.io/badge/python-3.10%20%7C%203.11%20%7C%203.12-blue)](spanverify-module/pyproject.toml)
-[![tests](https://img.shields.io/badge/tests-331%20passed-brightgreen)](spanverify-module/tests)
+[![tests](https://img.shields.io/badge/tests-333%20passed-brightgreen)](spanverify-module/tests)
 [![coverage](https://img.shields.io/badge/coverage-88%25-brightgreen)](spanverify-module/pyproject.toml)
 
 Программа берёт **документ-источник** и **ответ** (языковой модели или
@@ -36,7 +36,7 @@ python -m spanverify train --dataset data/demo_pairs.jsonl --out config/weights.
 python -m spanverify evaluate --dataset data/demo_pairs.jsonl   # метрики и критерий качества
 python -m spanverify selftest                                   # само-проверка конвейера
 python -m spanverify server --port 8765                         # API + веб-интерфейс
-python -m pytest -q                                             # 331 тестов
+python -m pytest -q                                             # 333 тестов
 ```
 
 Коды возврата `verify`: `0` — ответ подтверждён, `1` — найдены спорные

@@ -260,3 +260,93 @@ def test_report_without_runs_is_honest(tmp_path: Path) -> None:
     text = render({"runs": {}}, None)
     assert "Прогонов нет" in text
     assert "0.0." not in text
+
+
+# ------------------------------------------------------- аннотации CI
+
+
+def test_annotation_prints_control_numbers_and_metrics(tmp_path: Path, capsys: pytest.CaptureFixture) -> None:
+    """Аннотации содержат контрольные числа и метрики: их видно без скачивания артефактов."""
+    import subprocess
+    import sys
+
+    manifest = tmp_path / "MANIFEST.json"
+    manifest.write_text(
+        json.dumps(
+            {
+                "datasets": {
+                    "ragtruth": {
+                        "revision": "c103204b9ce2",
+                        "files": {"response.jsonl": {"verified": True}},
+                        "totals": {"responses": 17790, "sources": 2965, "spans": 14289, "verified_spans": 14289},
+                    },
+                    "rushallu": {
+                        "revision": "345907f983da",
+                        "files": {"sberquad-rag.csv": {"verified": True}},
+                        "totals": {"responses": 1000, "clean": 667, "with_hallucination": 333, "spans": 423},
+                    },
+                }
+            },
+            ensure_ascii=False,
+        ),
+        encoding="utf-8",
+    )
+    combined = tmp_path / "external_tests.json"
+    combined.write_text(
+        json.dumps(
+            {
+                "runs": {
+                    "ragtruth_qa_test_demo": {
+                        "pairs": 875,
+                        "mode": "demo",
+                        "label_origin": {"human": 875},
+                        "our_metrics": {"tokens": {"f1": 0.2045, "fpr": 0.1685, "auc": 0.7167}},
+                        "their_metrics": {"accuracy": 0.0103, "rougeL": 0.0718},
+                    }
+                }
+            },
+            ensure_ascii=False,
+        ),
+        encoding="utf-8",
+    )
+    result = subprocess.run(
+        [
+            sys.executable,
+            str(Path(__file__).resolve().parents[1] / "scripts" / "print_external_annotation.py"),
+            "--manifest",
+            str(manifest),
+            "--combined",
+            str(combined),
+        ],
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    assert result.returncode == 0, result.stderr
+    assert "ответов=17790" in result.stdout
+    assert "спанов=14289" in result.stdout
+    assert "sha256=совпали" in result.stdout
+    assert "token_F1=0.2045" in result.stdout
+    assert "разметка=human" in result.stdout
+
+
+def test_annotation_warns_without_files(tmp_path: Path) -> None:
+    """Если манифеста и прогонов нет — предупреждения, а не выдуманные нули."""
+    import subprocess
+    import sys
+
+    result = subprocess.run(
+        [
+            sys.executable,
+            str(Path(__file__).resolve().parents[1] / "scripts" / "print_external_annotation.py"),
+            "--manifest",
+            str(tmp_path / "нет.json"),
+            "--combined",
+            str(tmp_path / "нет2.json"),
+        ],
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    assert result.returncode == 0
+    assert "::warning" in result.stdout
