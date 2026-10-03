@@ -17,7 +17,10 @@ import zipapp
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-INCLUDE = ("spanverify", "config", "data")
+# В архив идёт только то, что нужно приложению: код, конфигурация и демонстрационный
+# корпус. Корпуса A/A2/B и внешние данные в .pyz не попадают: пользователю они не
+# нужны, а внешние ещё и нельзя распространять (лицензия не подтверждена).
+INCLUDE = ("spanverify", "config", "data/demo_pairs.jsonl")
 
 
 def build(out_dir: Path, name: str = "spanverify.pyz") -> Path:
@@ -40,6 +43,7 @@ def build(out_dir: Path, name: str = "spanverify.pyz") -> Path:
                     ignore=shutil.ignore_patterns("__pycache__", "*.pyc"),
                 )
             else:
+                (stage / item).parent.mkdir(parents=True, exist_ok=True)
                 shutil.copy2(source, stage / item)
         # Точка входа — ``cli:run``: она поднимает SystemExit с кодом команды.
         # С ``cli:main`` zipapp печатал результат, но всегда возвращал код 0,
