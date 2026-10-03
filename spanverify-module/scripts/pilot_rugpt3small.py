@@ -262,6 +262,8 @@ def analyse(rows: list[TokenRow], iterations: int) -> dict:
             fact_scores = [row.features[name] for row in fact_rows]
             fact_auc = auc(fact_labels, fact_scores)
             fact_low, fact_high = bootstrap_ci(fact_labels, fact_scores, iterations=iterations)
+            grounded_values = [row.features[name] for row in fact_rows if row.label == 0]
+            unsupported_values = [row.features[name] for row in fact_rows if row.label == 1]
             deltas = paired_deltas(layer_rows, name)
             delta_mean = statistics.fmean(deltas) if deltas else 0.0
             delta_low, delta_high = bootstrap_mean_ci(deltas, iterations=iterations)
@@ -280,6 +282,8 @@ def analyse(rows: list[TokenRow], iterations: int) -> dict:
                 "delta_ci_low": delta_low,
                 "delta_ci_high": delta_high,
                 "delta_significant": bool(delta_low * delta_high > 0),
+                "fact_mean_grounded": statistics.fmean(grounded_values) if grounded_values else 0.0,
+                "fact_mean_unsupported": statistics.fmean(unsupported_values) if unsupported_values else 0.0,
             }
     return report
 
@@ -396,8 +400,8 @@ def render_markdown(payload: dict) -> str:
         "Агрегат по всем токенам размывает эффект одного числа, поэтому основной",
         "анализ — парный, по токену значения:",
         "",
-        "| Слой | Признак | AUC (токен значения) | 95 % ДИ | Δ «без опоры − с опорой» | 95 % ДИ Δ | Значимо |",
-        "| --- | --- | --- | --- | --- | --- | --- |",
+        "| Слой | Признак | Значение с опорой | Значение без опоры | Δ «без опоры − с опорой» | 95 % ДИ Δ | AUC (токен значения) | Значимо |",
+        "| --- | --- | --- | --- | --- | --- | --- | --- |",
     ]
     significant: list[tuple[str, str, float, float, float]] = []
     for layer, features in payload["auc"].items():
@@ -405,10 +409,10 @@ def render_markdown(payload: dict) -> str:
             delta_significant = bool(values.get("delta_significant"))
             marker = "да" if delta_significant else "нет"
             lines.append(
-                f"| {layer} | {name} | {values['auc_fact']:.3f} | "
-                f"[{values['ci_fact_low']:.3f}; {values['ci_fact_high']:.3f}] | "
-                f"{values['delta_mean']:+.6f} | "
-                f"[{values['delta_ci_low']:+.6f}; {values['delta_ci_high']:+.6f}] | {marker} |"
+                f"| {layer} | {name} | {values['fact_mean_grounded']:.6f} | "
+                f"{values['fact_mean_unsupported']:.6f} | {values['delta_mean']:+.6f} | "
+                f"[{values['delta_ci_low']:+.6f}; {values['delta_ci_high']:+.6f}] | "
+                f"{values['auc_fact']:.3f} | {marker} |"
             )
             if delta_significant:
                 significant.append((layer, name, values["delta_mean"], values["delta_ci_low"], values["delta_ci_high"]))
