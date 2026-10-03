@@ -7,15 +7,15 @@
     "coverage": "python -m pytest --cov=spanverify --cov-fail-under=85"
   },
   "meta": {
-    "version": "1.2.1",
-    "commit": "47976b56b3d1f75a2630e265502c4f437ad53798",
-    "generated_at": "2026-10-03T15:57:48Z",
+    "version": "1.3.0",
+    "commit": "c21d293650fd2f2d47402bbf8c22ba4d8c748339",
+    "generated_at": "2026-10-03T16:57:49Z",
     "seed": 42,
     "dataset": "data/demo_pairs.jsonl"
   },
   "disclaimer": "Демонстрационные метрики получены на синтетическом корпусе и научным результатом не являются. Для подтверждения требуются 1200 пар «вопрос–ответ» с экспертной разметкой на реальных регламентах организации.",
   "tests": {
-    "collected": 289,
+    "collected": 304,
     "coverage_percent": 87.13,
     "coverage_gate_percent": 85
   },
@@ -394,10 +394,10 @@
     "artifacts": [
       {
         "name": "spanverify.pyz",
-        "size_bytes": 1354245,
-        "sha256": "5ebf16561b9b6494cd0a1a2ecdb1ba7913cafb54915ca3cff8614bbfe8021716"
+        "size_bytes": 530813,
+        "sha256": "9458ce9bd547d5c87ec7bd713b4dd121c8877fa47b63e7771a3d39430712764b"
       }
     ]
   },
-  "duration_s": 26.1
+  "duration_s": 25.1
 }

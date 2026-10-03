@@ -4,7 +4,7 @@
 [![build-and-release-exe](https://github.com/Igorr112323/Smarty_Chumakov/actions/workflows/build-and-release-exe.yml/badge.svg)](https://github.com/Igorr112323/Smarty_Chumakov/actions/workflows/build-and-release-exe.yml)
 [![release](https://img.shields.io/github/v/release/Igorr112323/Smarty_Chumakov)](https://github.com/Igorr112323/Smarty_Chumakov/releases/latest)
 [![python](https://img.shields.io/badge/python-3.10%20%7C%203.11%20%7C%203.12-blue)](spanverify-module/pyproject.toml)
-[![tests](https://img.shields.io/badge/tests-289%20passed-brightgreen)](spanverify-module/tests)
+[![tests](https://img.shields.io/badge/tests-304%20passed-brightgreen)](spanverify-module/tests)
 [![coverage](https://img.shields.io/badge/coverage-87%25-brightgreen)](spanverify-module/pyproject.toml)
 
 Программа берёт **документ-источник** и **ответ** (языковой модели или
@@ -36,7 +36,7 @@ python -m spanverify train --dataset data/demo_pairs.jsonl --out config/weights.
 python -m spanverify evaluate --dataset data/demo_pairs.jsonl   # метрики и критерий качества
 python -m spanverify selftest                                   # само-проверка конвейера
 python -m spanverify server --port 8765                         # API + веб-интерфейс
-python -m pytest -q                                             # 289 тестов
+python -m pytest -q                                             # 304 тестов
 ```
 
 Коды возврата `verify`: `0` — ответ подтверждён, `1` — найдены спорные
@@ -80,7 +80,7 @@ curl -X POST http://localhost:8765/v1/verify -H "Content-Type: application/json"
   [`docs/ОТЧЁТ_о_НИР_шаблон.md`](docs/ОТЧЁТ_о_НИР_шаблон.md), раздел 7.2.
 * Порог решения никогда не подбирается по тестовой части; при недостижении
   критерия дорабатываются признаки, а не порог.
-* **Число привязывается к своему объекту** (исправление D, релиз 1.2.1): если ответ
+* **Число привязывается к своему объекту** (исправление D, см. `AUDIT.md` §15): если ответ
   берёт число из другого факта того же документа («первичные — пять лет»,
   «вторичные — десять лет», ответ про первичные говорит «десять»), фрагмент
   помечается `doubtful`. Правило текстовое и работает поверх обученной головы;
@@ -108,6 +108,29 @@ AUC 0.996 на отложенной части) доказывают работ�
 корпуса token F1 0.953 / FPR 0.002, кросс-корпус token F1 0.717 / FPR 0.157.
 Кросс-корпусный тест показывает переносимость метода на другой генератор,
 а не на реальные регламенты; для реальных нужны 1200 пар.
+
+## Корпуса: свой и внешний (v1.3.0)
+
+* **Корпус A1 — свой, управляемые подмены.** 1200 пар, собран скриптом
+  (`scripts/build_corpus_a.py`), чистых 47.2 %, каждый тип ошибки — не меньше 40 пар,
+  разбиение по документам 840 / 180 / 180 (`shared_groups: 0`), манифест с SHA256.
+  На отложенной части: token F1 **0.734**, F1 вердикта **0.798**. Честно: тип
+  `missing` не ловится вообще, `partial` — на 27 %, на чистых парах корпуса бывает
+  14 % ложных замечаний (на демо-корпусе — 0 из 116).
+* **Корпус A2 — естественные ответы модели.** Нужен GPU; в песочнице выполнен только
+  сухой прогон (200 заданий, `scripts/build_corpus_a2.py --dry-run`). Числа не
+  измерялись и в отчётах не приводятся.
+* **Корпус B — внешний RusHallu-RAG (только тест).** 1000 пар с человеческой
+  разметкой; загрузка по закреплённому коммиту со сверкой SHA256
+  (`scripts/fetch_rushallu.py`), оценка нашими и их метриками
+  (`scripts/rus_hallu_eval.py`). Наш demo-режим даёт token F1 **0.127**, их accuracy
+  0.424, ROUGE-L 0.533. Сравнение с числами статьи не выполнено (значения таблиц не
+  извлечены), поэтому в отчёте стоит `null`, а не выдуманные цифры.
+
+Сырые данные бенчмарка в репозиторий не попадают: лицензия не подтверждена,
+`data/external/` в `.gitignore`, скачивание — по закреплённому коммиту и хешам.
+Подробности и команды: `spanverify-module/docs/КОРПУС_v1.md`,
+`spanverify-module/reports/CORPUS_REPORT.md`.
 
 ## Что лежит в репозитории
 

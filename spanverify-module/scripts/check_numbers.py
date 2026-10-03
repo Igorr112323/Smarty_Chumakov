@@ -121,6 +121,57 @@ def _allowed(metrics: dict) -> dict[str, set[str]]:
         f1_values.append(cross["in_corpus_f1"])
         f1_values.append(cross["cross_corpus_f1"])
         fpr_values.append(cross["cross_fpr"])
+    # Корпуса A (управляемые подмены) и B (внешний тест): их числа тоже законные,
+    # документы ссылаются на них (reports/CORPUS_REPORT.md и METRICS.json).
+    corpus_a = metrics.get("corpus_a") or {}
+    if corpus_a.get("available"):
+        for block in corpus_a.get("by_split", {}).values():
+            tokens = block.get("tokens") or {}
+            verdicts = block.get("verdicts") or {}
+            for value in (tokens.get("f1"), tokens.get("precision"), tokens.get("recall")):
+                if isinstance(value, (int, float)):
+                    f1_values.append(float(value))
+            if isinstance(tokens.get("fpr"), (int, float)):
+                fpr_values.append(float(tokens["fpr"]))
+            if isinstance(tokens.get("auc"), (int, float)):
+                auc_values.append(float(tokens["auc"]))
+            for value in (verdicts.get("f1"), verdicts.get("precision"), verdicts.get("recall")):
+                if isinstance(value, (int, float)):
+                    f1_values.append(float(value))
+            if isinstance(verdicts.get("fpr"), (int, float)):
+                fpr_values.append(float(verdicts["fpr"]))
+            if isinstance(tokens.get("n"), int):
+                token_values.append(tokens["n"])
+        for block in corpus_a.get("by_mode", {}).values():
+            if isinstance(block.get("token_f1"), (int, float)):
+                f1_values.append(float(block["token_f1"]))
+            if isinstance(block.get("verdict_recall"), (int, float)):
+                f1_values.append(float(block["verdict_recall"]))
+            if isinstance(block.get("verdict_fpr"), (int, float)):
+                fpr_values.append(float(block["verdict_fpr"]))
+            if isinstance(block.get("span_coverage"), (int, float)):
+                f1_values.append(float(block["span_coverage"]))
+    corpus_b = metrics.get("corpus_b") or {}
+    if corpus_b.get("available"):
+        ours = corpus_b.get("our_metrics") or {}
+        theirs = corpus_b.get("their_metrics") or {}
+        for group in ("tokens", "answers"):
+            block = ours.get(group) or {}
+            for value in (block.get("f1"), block.get("precision"), block.get("recall")):
+                if isinstance(value, (int, float)):
+                    f1_values.append(float(value))
+            if isinstance(block.get("fpr"), (int, float)):
+                fpr_values.append(float(block["fpr"]))
+            if isinstance(block.get("auc"), (int, float)):
+                auc_values.append(float(block["auc"]))
+        spans = ours.get("spans") or {}
+        for value in (spans.get("strict_f1_iou_0_5"), spans.get("coverage"), spans.get("soft_f1_expanded")):
+            if isinstance(value, (int, float)):
+                f1_values.append(float(value))
+        for key in ("rouge1", "rouge2", "rougeL", "accuracy", "jaccard_score", "hamming_loss"):
+            if isinstance(theirs.get(key), (int, float)):
+                f1_values.append(float(theirs[key]))
+
     for layer in (pilot.get("auc") or {}).values():
         for values in layer.values():
             for key in ("auc_oriented", "auc_fact_oriented"):
