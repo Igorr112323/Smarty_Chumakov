@@ -1,0 +1,88 @@
+{
+  "base": "http://pravo.gov.ru",
+  "query": "персональные данные",
+  "known_nd": "102078782",
+  "card": {
+    "url": "http://pravo.gov.ru/proxy/ips/?docbody=&nd=102078782",
+    "status": 200,
+    "bytes": 27948,
+    "addresses_total": 50,
+    "nd_addresses": [
+      "?savertf=&nd=102078782&page=all",
+      "?doc_itself=&nd=102078782&page=1&rdk=0"
+    ],
+    "addresses_tail": [
+      "?but_close.gif",
+      "javascript:void(0)",
+      "?pic_next.gif",
+      "javascript:void(0)",
+      "?pic_prev.gif",
+      "javascript:void(0)",
+      "?pic_markall.gif",
+      "blank.html",
+      "about:blank",
+      "about:blank",
+      "?warnpic.gif",
+      "?pic_button_close.gif",
+      "?spinner.gif",
+      "?doc_itself=&nd=102078782&page=1&rdk=0",
+      "?but_back2link.gif"
+    ]
+  },
+  "scripts": [
+    {
+      "name": "json.js",
+      "status": 200,
+      "bytes": 4055,
+      "lines": [],
+      "head": "/*\r\n    json.js\r\n    2006-10-05\r\n\r\n    This file adds these methods to JavaScript:\r\n\r\n        object.toJSONString()\r\n\r\n            This method produces a JSON text from an object. The\r\n            object must not contain any cyclical references.\r\n\r\n        array.toJSONString()\r\n\r\n            This me"
+    },
+    {
+      "name": "script.js",
+      "status": 200,
+      "bytes": 100400,
+      "lines": [
+        "win = window.open(top.location.href.replace('?searchres=','?window_filter='),",
+        "window.open(window.location.href.replace(\"?searchlist\", \"?find\") + \"&print=1\");",
+        "window.location.href = \"?docbody=&nd=\" + rr[1] + \"&rdk=\" + rr[0] + (params || \"\");",
+        "window.location.href = \"?docbody=&nd=\" + rr[1] + \"&rdk=\" + rr[0] + (params || \"\");",
+        "window.open(pPath() + \"searchres=&set=\" + togo + \"&posSt=\" + posSt + \"&posEnd=\" + posEnd + \"&sort=1\");",
+        "top.location.assign(pPath() + \"searchres=&set=\" + workSet.docs.join(\"/\") + \"&setid=\" + setId + \"&sort=1\" + \"&setname=\" + workSet.name);",
+        "url = pPath() + \"searchres=&set=\" + setid + \"&sort=1\" + setName",
+        "url = pPath() + \"searchres=&set=\" + docset + \"&setid=\" + setid + \"&sort=1\" + setName;",
+        "url = pPath() + \"searchres=&set=\" + setid + \"&sort=1\" + setName",
+        "url = pPath() + \"searchres=&set=\" + docset + \"&setid=\" + setid + \"&sort=1\" + setName;",
+        "//url = pPath() + \"searchres=&set=\" + setNum + \"&sort=1\" + setName;",
+        "/*var postfix = 'selStart=' + win.getSelStart() + '&selEnd=' + win.getSelEnd();"
+      ],
+      "head": "\r\n\r\n\r\n///длина текста в браузереы\r\n\tfunction inlineSize(text) {\r\n\t  // дополнительные стили для клона, что бы мир не заметил чуда, и размеры отображались корректно\r\n\t  var hiddenStyle = \"left:-10000px;top:-10000px;height:auto;width:auto;position:absolute;font-size: 10.0pt;\";\r\n\r\n\t  // создаем box эле"
+    },
+    {
+      "name": "listsel.js",
+      "status": 200,
+      "bytes": 3851,
+      "lines": [],
+      "head": "//\n// ListSel ScriptLibrary.ks\n\nfunction InitCurrentListSelection(query) {\r\n\tvar listIdent = new QueryListIdentifier(query);\r\n\ttop.CurrentListSelection = new ListSelection(listIdent);\r\n}\r\n\r\nfunction ListSelection(listIdent) {\r\n\tthis.ListIdent = listIdent;\r\n\tthis.Selected = null;\r\n\tthis.All = null;\r\n"
+    }
+  ],
+  "listing": {
+    "url": "http://pravo.gov.ru/proxy/ips/?searchlist=1&a0=%EF%E5%F0%F1%EE%ED%E0%EB%FC%ED%FB%E5%20%E4%E0%ED%ED%FB%E5",
+    "status": 200,
+    "bytes": 24725,
+    "docbody_occurrences": 0,
+    "nd_occurrences": 0,
+    "results_area": "small\">Мелкий</span> </div> <div class=\"font_cur\" onClick=\"changeListFont('t_normal');killBlock('dd_sets1')\" onMouseOver = \"this.style.borderColor='#fff4b7';try{this.style.cursor='pointer'}catch(e){this.style.cursor='hand'}\" onMouseOut=\"this.style.borderColor='#fff';this.style.cursor=''\" id=\"font_menu_t_normal\"> <span class=\"t_normal\">Средний</span> </div> <div class=\"font\" onClick=\"changeListFont('t_standart');killBlock('dd_sets1')\" onMouseOver = \"this.style.borderColor='#fff4b7';try{this.style.cursor='pointer'}catch(e){this.style.cursor='hand'}\" onMouseOut=\"this.style.borderColor='#fff';this.style.cursor=''\" id=\"font_menu_t_standart\"> <span class=\"t_standart\">Стандарт</span> </div> <div class=\"font\" onClick=\"changeListFont('t_large');killBlock('dd_sets1')\" onMouseOver = \"this.style.borderColor='#fff4b7';try{this.style.cursor='pointer'}catch(e){this.style.cursor='hand'}\" onMouseOut=\"this.style.borderColor='#fff';this.style.cursor=''\" id=\"font_menu_t_large\"> <span class=\"t_large\">Крупный</span> </div> <div class=\"font\" onClick=\"changeListFont('t_huge');killBlock('dd_sets1')\" onMouseOver = \"this.style.borderColor='#fff4b7';try{this.style.cursor='pointer'}catch(e){this.style.cursor='hand'}\" onMouseOut=\"this.style.borderColor='#fff';this.style.cursor=''\" id=\"font_menu_t_huge\"> <span class=\"t_huge\">Очень крупный</span> </div> </td> </tr> </table> </td> </tr> </table> </div> </td> </tr> </table> </div> <div style=\"z-index: 1500; position: relative; top: -100%; height: 100%; width: 100%;\"> <iframe frameborder=\"0\" scrolling=\"no\" src=\"about:blank\" style=\"height: 100%; width: 100%;\"></iframe> </div> </td> </tr> </table> </div> </div> </td> </tr> </table> </td> </tr> </table> </div> <table class=\"clps search_params\"> <tr> <td class=\"inset\" style=\"padding:2px 5px;\"> <div id=\"search_results_list_params_short\" class=\"search_results_list_params_short\" style=\"display:none\"> <table class=\"clps\"> <tr> <td> <span class=\"tiny\"><nobr>cортировать:</nobr></span> <select name=\"sort\" onchange=\"changeSortOrder(,options[selectedIndex].value)\"> <option value=\"1\">По наименованию</option> <option value=\"7\">По убыванию даты</option> <option value=\"-7\">По возрастанию даты</option> <option value=\"8\">По номеру документа</option> <option value=\"3\">По виду документа</option> </select> </td> <td style=\"padding-left:15px;\"> <span class=\"tiny\"><nobr>выводить по:</nobr></span> <select name=\"docs_per_page\" onchange=\"changeListSize(this.value);\"> <option value=\"5\" >5</option> <option value=\"10\" >10</option> <option value=\"20\" selected='selected'>20</option> <option value=\"50\" >50</option> <option value=\"100\" >100</option> <option value=\"200\" >200</option> </select> </td> </tr> </table> <div style=\"padding:5px 2px;\"> <span class=\"bold\">Страницы:&nbsp;</span> <div class=\"pager\"> <nobr><span>1</span><a href=\"?searchlist=1&a0=%EF%E5%F0%F1%EE%ED%E0%EB%FC%ED%FB%E5%20%E4%E0%ED%ED%FB%E5&start=20\">2</a><a href=\"?searchlist=1&a0=%EF%E5%F0%F1%EE%ED%E0%EB%FC%ED%FB%E5%20%E4%E0%ED%ED%FB%E5&start=40\">3</a><a href=\"?searchlist=1&a0=%EF%E5%F0%F1%EE%ED%E0%EB%FC%ED%FB%E5%20%E4%E0%ED%ED%FB%E5&start=60\">4</a><a href=\"?searchlist=1&a0=%EF%E5%F0%F1%EE%ED%E0%EB%FC%ED%FB%E5%20%E4%E0%ED%ED%FB%E5&start=80\">5</a><a href=\"?searchlist=1&a0=%EF%E5%F0%F1%EE%ED%E0%EB%FC%ED%FB%E5%20%E4%E0%ED%ED%FB%E5&start=100\">6</a><a href=\"?searchlist=1&a0=%EF%E5%F0%F1%EE%ED%E0%EB%FC%ED%FB%E5%20%E4%E0%ED%ED%FB%E5&start=120\">7</a><a href=\"?searchlist=1&a0=%EF%E5%F0%F1%EE%ED%E0%EB%FC%ED%FB%E5%20%E4%E0%ED%ED%FB%E5&start=140\">8</a><a href=\"?searchlist=1&a0=%EF%E5%F0%F1%EE%ED%E0%EB%FC%ED%FB%E5%20%E4%E0%ED%ED%FB%E5&start=160\">9</a><a href=\"?searchlist=1&a0=%EF%E5%F0%F1%EE%ED%E0%EB%FC%ED%FB%E5%20%E4%E0%ED%ED%FB%E5&start=180\">10</a><a href=\"?searchlist=1&a0=%EF%E5%F0%F1%EE%ED%E0%EB%FC%ED%FB%E5%20%E4%E0%ED%ED%FB%E5&start=20\" id=\"nextPage\"><img src=\"?ars_right.gif\" alt=\"Далее\" title=\"Следующая\"></a><a href=\"?searchlist=1&a0=%EF%E5%F0%F1%EE%ED%E0%EB%FC%ED%FB%E5%20%E4%E0%ED%ED%FB%E5&start=328560\"><img src=\"?ars_right_lim.gif\" "
+  },
+  "export": {
+    "url": "http://pravo.gov.ru/proxy/ips/?savertf=&nd=102078782&page=all",
+    "status": 200,
+    "content_type": "application/x-download; filename=Ï-3278-III_ÃÄ-13_11_2002.rtf",
+    "disposition": "attachment; filename=Ï-3278-III_ÃÄ-13_11_2002.rtf",
+    "bytes": 2239,
+    "is_zip": false,
+    "is_rtf": false,
+    "header_latin1": "MIME-Version: 1.0\r\nContent-Type: multipart/related; boundary=\"----=_NextPart_01CAD650.0093E2A0\"\r\n\r\nÄàííûé äîêóìåíò ÿâëÿåòñÿ âåá-ñòðàíèöåé â îäíîì ôàéëå, òàêæå íàçûâàåìîé ôàéëîì âåá-àðõèâà.  Åñëè âû âè",
+    "header_cp1251": "MIME-Version: 1.0\r\nContent-Type: multipart/related; boundary=\"----=_NextPart_01CAD650.0093E2A0\"\r\n\r\nДанный документ является веб-страницей в одном файле, также называемой файлом веб-архива.  Если вы ви",
+    "error": null
+  }
+}

@@ -845,7 +845,7 @@
       "current_page": 1,
       "first_eo_number": "0001202610030023",
       "body_head": "{\"items\":[{\"eoNumber\":\"0001202610030023\",\"hasSvg\":false,\"zipFileLength\":null,\"publishDateShort\":\"2026-10-03T00:00:00\",\"complexName\":\"Постановление Правительства Российской Федерации от 02.10.2026 № 1296\\n \\\"Об утверждении Правил формирования и изменения перечня государственных учреждений, которым разрешается заготовка древесины в соответствии с частью 6 статьи 29-1 Лесного кодекса Российской Федерации\\\"\",\"pagesCount\":8,\"pdfFileLength\":1741311,\"jdRegNumber\":null,\"jdRegDate\":null,\"name\":\"Об утверждении Правил формирования и изменения перечня государственных учреждений, которым разрешается заготовка древесины в соответствии с частью 6 статьи 29-1 Лесного кодекса Российской Федерации\\r\\n\",\"number\":\"1296\",\"documentDate\":\"2026-10-02T00:00:00\",\"signatoryAuthorityId\":\"8005d8c9-4b6d-48d3-861a-2a37e69fccb3\",\"documentTypeId\":\"fd5a8766-f6fd-4ac2-8fd9-66f414d314ac\",\"title\":\"Постановление Правительства Российской Федерации от 02.10.2026 № 1296<br /> \\\"Об утверждении Правил формирования и изменения перечня государственных учреждений, которым разрешается заготовка древесины в соответствии с частью 6 статьи 29-1 Лесного кодекса Российской Федерации\\\"\",\"viewDate\":\"03.10.2026\",\"id\":\"d64fa3b3-aa3a-47ce-94a3-96194f0f743b\"},{\"eoNumber\":\"0001202610030003\",\"hasSvg\":false,\"zipFileLength\":null,\"publishDateShort\":\"2026-10-03T00:00:00\",\"complexName\":\"Постановление Правительства Российской Федерации от 02.10.2026 № 1295\\n \\\"О внесении изменений в постановление Правительства Российской Федерации от 29 авг",
-      "seconds": 0.56,
+      "seconds": 0.48,
       "error": null,
       "name": "documents-page1-size30"
     },
@@ -858,7 +858,7 @@
         "type": "https://tools.ietf.org/html/rfc7231#section-6.5.1",
         "title": "One or more validation errors occurred.",
         "status": 400,
-        "traceId": "|f8c12da1-4b5e1c095be14f9f.",
+        "traceId": "|bea1171f-44ad5327a88edceb.",
         "errors": {
           "PageSize": [
             "The value '5' is invalid."
@@ -870,8 +870,8 @@
       "items_total_count": null,
       "current_page": null,
       "first_eo_number": null,
-      "body_head": "{\"type\":\"https://tools.ietf.org/html/rfc7231#section-6.5.1\",\"title\":\"One or more validation errors occurred.\",\"status\":400,\"traceId\":\"|f8c12da1-4b5e1c095be14f9f.\",\"errors\":{\"PageSize\":[\"The value '5' is invalid.\"]}}",
-      "seconds": 0.34,
+      "body_head": "{\"type\":\"https://tools.ietf.org/html/rfc7231#section-6.5.1\",\"title\":\"One or more validation errors occurred.\",\"status\":400,\"traceId\":\"|bea1171f-44ad5327a88edceb.\",\"errors\":{\"PageSize\":[\"The value '5' is invalid.\"]}}",
+      "seconds": 0.69,
       "error": "HTTP 400",
       "name": "documents-size-5"
     },
@@ -1097,7 +1097,7 @@
         "type": "https://tools.ietf.org/html/rfc7231#section-6.5.1",
         "title": "One or more validation errors occurred.",
         "status": 400,
-        "traceId": "|f8c12e2c-4b5e1c095be14f9f.",
+        "traceId": "|4dee0d80-4e9eb50a4262021d.",
         "errors": {
           "PageSize": [
             "The value '20' is invalid."
@@ -1109,8 +1109,8 @@
       "items_total_count": null,
       "current_page": null,
       "first_eo_number": null,
-      "body_head": "{\"type\":\"https://tools.ietf.org/html/rfc7231#section-6.5.1\",\"title\":\"One or more validation errors occurred.\",\"status\":400,\"traceId\":\"|f8c12e2c-4b5e1c095be14f9f.\",\"errors\":{\"PageSize\":[\"The value '20' is invalid.\"]}}",
-      "seconds": 0.34,
+      "body_head": "{\"type\":\"https://tools.ietf.org/html/rfc7231#section-6.5.1\",\"title\":\"One or more validation errors occurred.\",\"status\":400,\"traceId\":\"|4dee0d80-4e9eb50a4262021d.\",\"errors\":{\"PageSize\":[\"The value '20' is invalid.\"]}}",
+      "seconds": 0.33,
       "error": "HTTP 400",
       "name": "documents-size-20"
     },
@@ -1123,7 +1123,7 @@
         "type": "https://tools.ietf.org/html/rfc7231#section-6.5.1",
         "title": "One or more validation errors occurred.",
         "status": 400,
-        "traceId": "|4ded8170-4e9eb50a4262021d.",
+        "traceId": "|bea11794-44ad5327a88edceb.",
         "errors": {
           "PageSize": [
             "The value '50' is invalid."
@@ -1135,8 +1135,8 @@
       "items_total_count": null,
       "current_page": null,
       "first_eo_number": null,
-      "body_head": "{\"type\":\"https://tools.ietf.org/html/rfc7231#section-6.5.1\",\"title\":\"One or more validation errors occurred.\",\"status\":400,\"traceId\":\"|4ded8170-4e9eb50a4262021d.\",\"errors\":{\"PageSize\":[\"The value '50' is invalid.\"]}}",
-      "seconds": 0.34,
+      "body_head": "{\"type\":\"https://tools.ietf.org/html/rfc7231#section-6.5.1\",\"title\":\"One or more validation errors occurred.\",\"status\":400,\"traceId\":\"|bea11794-44ad5327a88edceb.\",\"errors\":{\"PageSize\":[\"The value '50' is invalid.\"]}}",
+      "seconds": 0.51,
       "error": "HTTP 400",
       "name": "documents-size-50"
     },
@@ -3059,7 +3059,7 @@
       "current_page": 1,
       "first_eo_number": "0001202610030023",
       "body_head": "{\"items\":[{\"eoNumber\":\"0001202610030023\",\"hasSvg\":false,\"zipFileLength\":null,\"publishDateShort\":\"2026-10-03T00:00:00\",\"complexName\":\"Постановление Правительства Российской Федерации от 02.10.2026 № 1296\\n \\\"Об утверждении Правил формирования и изменения перечня государственных учреждений, которым разрешается заготовка древесины в соответствии с частью 6 статьи 29-1 Лесного кодекса Российской Федерации\\\"\",\"pagesCount\":8,\"pdfFileLength\":1741311,\"jdRegNumber\":null,\"jdRegDate\":null,\"name\":\"Об утверждении Правил формирования и изменения перечня государственных учреждений, которым разрешается заготовка древесины в соответствии с частью 6 статьи 29-1 Лесного кодекса Российской Федерации\\r\\n\",\"number\":\"1296\",\"documentDate\":\"2026-10-02T00:00:00\",\"signatoryAuthorityId\":\"8005d8c9-4b6d-48d3-861a-2a37e69fccb3\",\"documentTypeId\":\"fd5a8766-f6fd-4ac2-8fd9-66f414d314ac\",\"title\":\"Постановление Правительства Российской Федерации от 02.10.2026 № 1296<br /> \\\"Об утверждении Правил формирования и изменения перечня государственных учреждений, которым разрешается заготовка древесины в соответствии с частью 6 статьи 29-1 Лесного кодекса Российской Федерации\\\"\",\"viewDate\":\"03.10.2026\",\"id\":\"d64fa3b3-aa3a-47ce-94a3-96194f0f743b\"},{\"eoNumber\":\"0001202610030003\",\"hasSvg\":false,\"zipFileLength\":null,\"publishDateShort\":\"2026-10-03T00:00:00\",\"complexName\":\"Постановление Правительства Российской Федерации от 02.10.2026 № 1295\\n \\\"О внесении изменений в постановление Правительства Российской Федерации от 29 авг",
-      "seconds": 0.79,
+      "seconds": 1.45,
       "error": null,
       "name": "documents-size-100"
     },
@@ -3272,7 +3272,7 @@
       "current_page": 2,
       "first_eo_number": "0001202610030010",
       "body_head": "{\"items\":[{\"eoNumber\":\"0001202610030010\",\"hasSvg\":false,\"zipFileLength\":null,\"publishDateShort\":\"2026-10-03T00:00:00\",\"complexName\":\"Распоряжение Правительства Российской Федерации от 02.10.2026 № 2772-р\",\"pagesCount\":1,\"pdfFileLength\":109922,\"jdRegNumber\":null,\"jdRegDate\":null,\"name\":\"\",\"number\":\"2772-р\",\"documentDate\":\"2026-10-02T00:00:00\",\"signatoryAuthorityId\":\"8005d8c9-4b6d-48d3-861a-2a37e69fccb3\",\"documentTypeId\":\"7ff5b3b5-3757-44f1-bb76-3766cabe3593\",\"title\":\"Распоряжение Правительства Российской Федерации от 02.10.2026 № 2772-р\",\"viewDate\":\"03.10.2026\",\"id\":\"a087d8d6-1818-421e-a540-872013a53004\"},{\"eoNumber\":\"0001202610030006\",\"hasSvg\":false,\"zipFileLength\":null,\"publishDateShort\":\"2026-10-03T00:00:00\",\"complexName\":\"Распоряжение Правительства Российской Федерации от 02.10.2026 № 2771-р\",\"pagesCount\":1,\"pdfFileLength\":110318,\"jdRegNumber\":null,\"jdRegDate\":null,\"name\":\"\",\"number\":\"2771-р\",\"documentDate\":\"2026-10-02T00:00:00\",\"signatoryAuthorityId\":\"8005d8c9-4b6d-48d3-861a-2a37e69fccb3\",\"documentTypeId\":\"7ff5b3b5-3757-44f1-bb76-3766cabe3593\",\"title\":\"Распоряжение Правительства Российской Федерации от 02.10.2026 № 2771-р\",\"viewDate\":\"03.10.2026\",\"id\":\"d80abb78-1b18-4d3e-9070-67a9eb1d4a82\"},{\"eoNumber\":\"0001202610030001\",\"hasSvg\":false,\"zipFileLength\":null,\"publishDateShort\":\"2026-10-03T00:00:00\",\"complexName\":\"Распоряжение Правительства Российской Федерации от 02.10.2026 № 2770-р\",\"pagesCount\":4,\"pdfFileLength\":352847,\"jdRegNumber\":null,\"jdRegDate\":null,\"name\":\"\",\"number",
-      "seconds": 0.52,
+      "seconds": 0.68,
       "error": null,
       "name": "documents-page2-size10"
     },
@@ -3485,7 +3485,7 @@
       "current_page": 1,
       "first_eo_number": "0001202610030023",
       "body_head": "{\"items\":[{\"eoNumber\":\"0001202610030023\",\"hasSvg\":false,\"zipFileLength\":null,\"publishDateShort\":\"2026-10-03T00:00:00\",\"complexName\":\"Постановление Правительства Российской Федерации от 02.10.2026 № 1296\\n \\\"Об утверждении Правил формирования и изменения перечня государственных учреждений, которым разрешается заготовка древесины в соответствии с частью 6 статьи 29-1 Лесного кодекса Российской Федерации\\\"\",\"pagesCount\":8,\"pdfFileLength\":1741311,\"jdRegNumber\":null,\"jdRegDate\":null,\"name\":\"Об утверждении Правил формирования и изменения перечня государственных учреждений, которым разрешается заготовка древесины в соответствии с частью 6 статьи 29-1 Лесного кодекса Российской Федерации\\r\\n\",\"number\":\"1296\",\"documentDate\":\"2026-10-02T00:00:00\",\"signatoryAuthorityId\":\"8005d8c9-4b6d-48d3-861a-2a37e69fccb3\",\"documentTypeId\":\"fd5a8766-f6fd-4ac2-8fd9-66f414d314ac\",\"title\":\"Постановление Правительства Российской Федерации от 02.10.2026 № 1296<br /> \\\"Об утверждении Правил формирования и изменения перечня государственных учреждений, которым разрешается заготовка древесины в соответствии с частью 6 статьи 29-1 Лесного кодекса Российской Федерации\\\"\",\"viewDate\":\"03.10.2026\",\"id\":\"d64fa3b3-aa3a-47ce-94a3-96194f0f743b\"},{\"eoNumber\":\"0001202610030003\",\"hasSvg\":false,\"zipFileLength\":null,\"publishDateShort\":\"2026-10-03T00:00:00\",\"complexName\":\"Постановление Правительства Российской Федерации от 02.10.2026 № 1295\\n \\\"О внесении изменений в постановление Правительства Российской Федерации от 29 авг",
-      "seconds": 0.53,
+      "seconds": 0.31,
       "error": null,
       "name": "documents-pascal"
     },
@@ -3714,7 +3714,7 @@
       "current_page": null,
       "first_eo_number": null,
       "body_head": "<urlset xmlns=\"http://www.sitemaps.org/schemas/sitemap/0.9\">\r\n  <url>\r\n    <loc>http://publication.pravo.gov.ru/documents/president/daily</loc>\r\n    <priority>1.0</priority>\r\n  </url>\r\n  <url>\r\n    <loc>http://publication.pravo.gov.ru/documents/president/monthly</loc>\r\n    <priority>1.0</priority>\r\n  </url>\r\n  <url>\r\n    <loc>http://publication.pravo.gov.ru/documents/president/weekly</loc>\r\n    <priority>1.0</priority>\r\n  </url>\r\n  <url>\r\n    <loc>http://publication.pravo.gov.ru/calendar/president</loc>\r\n    <priority>1.0</priority>\r\n  </url>\r\n  <url>\r\n    <loc>http://publication.pravo.gov.ru/documents/block/president</loc>\r\n    <priority>1.0</priority>\r\n  </url>\r\n  <url>\r\n    <loc>http://publication.pravo.gov.ru/documents/government/daily</loc>\r\n    <priority>1.0</priority>\r\n  </url>\r\n  <url>\r\n    <loc>http://publication.pravo.gov.ru/documents/government/monthly</loc>\r\n    <priority>1.0</priority>\r\n  </url>\r\n  <url>\r\n    <loc>http://publication.pravo.gov.ru/documents/government/weekly</loc>\r\n    <priority>1.0</priority>\r\n  </url>\r\n  <url>\r\n    <loc>http://publication.pravo.gov.ru/calendar/government</loc>\r\n    <priority>1.0</priority>\r\n  </url>\r\n  <url>\r\n    <loc>http://publication.pravo.gov.ru/documents/block/government</loc>\r\n    <priority>1.0</priority>\r\n  </url>\r\n  <url>\r\n    <loc>http://publication.pravo.gov.ru/documents/federal_authorities/daily</loc>\r\n    <priority>1.0</priority>\r\n  </url>\r\n  <url>\r\n    <loc>http://publication.pravo.gov.ru/documents/federal_authoritie",
-      "seconds": 0.81,
+      "seconds": 0.79,
       "error": null,
       "name": "sitemap"
     },
@@ -3730,7 +3730,7 @@
       "current_page": null,
       "first_eo_number": null,
       "body_head": "<!DOCTYPE html>\r\n<html lang=\"ru\">\r\n<head>\r\n    <meta charset=\"utf-8\" />\r\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\" />\r\n    <meta http-equiv=\"X-UA-Compatible\" content=\"IE=edge\">\r\n    <meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\">\r\n    <title>&#x41F;&#x43E;&#x441;&#x442;&#x430;&#x43D;&#x43E;&#x432;&#x43B;&#x435;&#x43D;&#x438;&#x435; &#x41F;&#x440;&#x430;&#x432;&#x438;&#x442;&#x435;&#x43B;&#x44C;&#x441;&#x442;&#x432;&#x430; &#x420;&#x43E;&#x441;&#x441;&#x438;&#x439;&#x441;&#x43A;&#x43E;&#x439; &#x424;&#x435;&#x434;&#x435;&#x440;&#x430;&#x446;&#x438;&#x438; &#x43E;&#x442; 02.10.2026 &#x2116; 1296 &#x2219; &#x41E;&#x444;&#x438;&#x446;&#x438;&#x430;&#x43B;&#x44C;&#x43D;&#x43E;&#x435; &#x43E;&#x43F;&#x443;&#x431;&#x43B;&#x438;&#x43A;&#x43E;&#x432;&#x430;&#x43D;&#x438;&#x435; &#x43F;&#x440;&#x430;&#x432;&#x43E;&#x432;&#x44B;&#x445; &#x430;&#x43A;&#x442;&#x43E;&#x432;</title>\r\n\r\n    <link rel=\"shortcut icon\" href=\"/favicon/favicon.ico\" />\r\n    <link rel=\"icon\" sizes=\"16x16 32x32 64x64\" href=\"/favicon/favicon.ico\" />\r\n    <link rel=\"icon\" type=\"image/png\" sizes=\"196x196\" href=\"/favicon/favicon-192.png\" />\r\n    <link rel=\"icon\" type=\"image/png\" sizes=\"160x160\" href=\"/favicon/favicon-160.png\" />\r\n    <link rel=\"icon\" type=\"image/png\" sizes=\"96x96\" href=\"/favicon/favicon-96.png\" />\r\n    <link rel=\"icon\" type=\"image/png\" sizes=\"64x64\" href=\"/favicon/favicon-64.png\" />\r\n    <link rel=\"icon\" type=\"image/png\" sizes=\"32x32\" href=\"/favicon/fa",
-      "seconds": 1.37,
+      "seconds": 0.54,
       "error": null,
       "name": "document-view-by-eo"
     },
@@ -3746,7 +3746,7 @@
       "current_page": null,
       "first_eo_number": null,
       "body_head": "<!DOCTYPE html>\r\n<html lang=\"ru\">\r\n<head>\r\n    <meta charset=\"utf-8\" />\r\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\" />\r\n    <meta http-equiv=\"X-UA-Compatible\" content=\"IE=edge\">\r\n    <meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\">\r\n    <title></title>\r\n\r\n    <link rel=\"shortcut icon\" href=\"/favicon/favicon.ico\" />\r\n    <link rel=\"icon\" sizes=\"16x16 32x32 64x64\" href=\"/favicon/favicon.ico\" />\r\n    <link rel=\"icon\" type=\"image/png\" sizes=\"196x196\" href=\"/favicon/favicon-192.png\" />\r\n    <link rel=\"icon\" type=\"image/png\" sizes=\"160x160\" href=\"/favicon/favicon-160.png\" />\r\n    <link rel=\"icon\" type=\"image/png\" sizes=\"96x96\" href=\"/favicon/favicon-96.png\" />\r\n    <link rel=\"icon\" type=\"image/png\" sizes=\"64x64\" href=\"/favicon/favicon-64.png\" />\r\n    <link rel=\"icon\" type=\"image/png\" sizes=\"32x32\" href=\"/favicon/favicon-32.png\" />\r\n    <link rel=\"icon\" type=\"image/png\" sizes=\"16x16\" href=\"/favicon/favicon-16.png\" />\r\n    <link rel=\"apple-touch-icon-precomposed\" href=\"/favicon/favicon-57.png\" />\r\n    <link rel=\"apple-touch-icon-precomposed\" sizes=\"60x60\" href=\"/favicon/favicon-60.png\" />\r\n    <link rel=\"apple-touch-icon-precomposed\" sizes=\"72x72\" href=\"/favicon/favicon-72.png\" />\r\n    <link rel=\"apple-touch-icon-precomposed\" sizes=\"76x76\" href=\"/favicon/favicon-76.png\" />\r\n    <link rel=\"apple-touch-icon-precomposed\" sizes=\"114x114\" href=\"/favicon/favicon-114.png\" />\r\n    <link rel=\"apple-touch-icon-precomposed\" sizes=\"120x120\" href=",
-      "seconds": 0.37,
+      "seconds": 0.38,
       "error": "HTTP 404",
       "name": "document-card-by-guid"
     }
