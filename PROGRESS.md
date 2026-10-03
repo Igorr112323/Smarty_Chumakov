@@ -464,3 +464,21 @@ $ python scripts/check_numbers.py
   компьютере без Python (пункт 3 чек-листа приёмки). Автоматически это
   проверяется только на раннере GitHub, где Python установлен.
 
+### Шаг 10-4. Релиз 1.2.0 из CI и приёмка
+
+* CI на коммите `ea76131`: прогон `37121579629` — **9 заданий из 9 зелёные**
+  (линтер/покрытие, тесты на Python 3.10–3.12 в Linux и Windows, пилот, job чисел).
+* Тег `v1.2.0` → сборка `37123137285`: тесты на трёх Python и job «Сборка и проверка
+  .exe» — success; релиз **v1.2.0** опубликован (Latest, не черновик).
+* Файлы релиза (`gh release view v1.2.0`): `spanverify.exe` 8 901 104 Б,
+  `spanverify-win.zip` 9 053 847 Б, `spanverify.pyz` 1 339 572 Б, `SHA256SUMS.txt` 250 Б.
+* Постоянная ссылка
+  `https://github.com/Igorr112323/Smarty_Chumakov/releases/latest/download/spanverify.exe`
+  отвечает `HTTP/2 302`.
+* Артефакты прогона: `pilot-report` (5 911 Б, включает `pilot.png`), `metrics`
+  (3 818 Б, `METRICS.json` + `cross_corpus.json`), `coverage-json`, `training-report`.
+  Скачать их в песочнице нельзя (EOF) — содержимое проверено только по числам
+  в аннотациях и по локальным прогонам.
+* В workflow сборки добавлена проверка «версия пакета = тег» (на `v1.2.0` версия
+  1.2.0 совпала), тесты сборки ставят зависимости из `requirements.txt` (пины).
+
