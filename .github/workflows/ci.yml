@@ -384,6 +384,11 @@ jobs:
         working-directory: spanverify-module
         run: python scripts/probe_npa_api3.py --out reports/npa_probe3.json
 
+      # Четвёртая разведка: откуда берётся полный текст документа.
+      - name: Разведать источник текста документа
+        working-directory: spanverify-module
+        run: python scripts/probe_npa_text.py --out reports/npa_text_probe.json
+
       # Результат разведки коммитится: артефакты GitHub не читаются из окружения
       # разработки, а факты об API нужны в репозитории. [skip ci] не даёт запустить
       # новый прогон от этого коммита.
@@ -392,7 +397,7 @@ jobs:
         run: |
           git config user.name "spanverify-bot"
           git config user.email "actions@users.noreply.github.com"
-          git add -f spanverify-module/reports/probe_sources.json spanverify-module/reports/npa_probe.json spanverify-module/reports/npa_probe2.json spanverify-module/reports/npa_probe3.json || true
+          git add -f spanverify-module/reports/probe_sources.json spanverify-module/reports/npa_probe.json spanverify-module/reports/npa_probe2.json spanverify-module/reports/npa_probe3.json spanverify-module/reports/npa_text_probe.json || true
           if git diff --cached --quiet; then
             echo "нечего коммитить"
           else
@@ -410,4 +415,5 @@ jobs:
             spanverify-module/reports/npa_probe.json
             spanverify-module/reports/npa_probe2.json
             spanverify-module/reports/npa_probe3.json
+            spanverify-module/reports/npa_text_probe.json
           retention-days: 30
