@@ -36,6 +36,16 @@ def packaged_text(relative_path: str) -> str | None:
         return None
 
 
+def read_runtime_text(relative_path: str) -> str | None:
+    """Прочитать файл поставки с диска (ядра запуска) или из архива zipapp."""
+    relative = str(relative_path).replace("\\", "/").lstrip("./")
+    for root in runtime_roots():
+        candidate = root / relative
+        if candidate.is_file():
+            return candidate.read_text(encoding="utf-8")
+    return packaged_text(relative)
+
+
 def runtime_roots() -> list[Path]:
     """Каталоги, где искать файлы поставки (config/, data/).
 
@@ -166,7 +176,7 @@ class Config:
             with resolved.open("r", encoding="utf-8") as fh:
                 data.update(json.load(fh))
         elif path is None:
-            embedded = packaged_text("config/config.json")
+            embedded = read_runtime_text("config/config.json")
             if embedded:
                 data.update(json.loads(embedded))
         for key, value in DEFAULTS.items():

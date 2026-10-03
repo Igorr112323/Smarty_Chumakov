@@ -197,8 +197,17 @@ bash scripts/build.sh            # release/spanverify
 ```
 
 **Без Windows-машины** — GitHub Actions: workflow
-`.github/workflows/build-windows-exe.yml` (запуск вручную или по тегу `v*`)
-публикует `spanverify.exe` артефактом и в Releases.
+`.github/workflows/build-and-release-exe.yml` (запуск вручную или по тегу `v*`)
+прогоняет тесты на Python 3.10–3.12, собирает onefile `.exe`, onedir-вариант и
+zipapp, **сам запускает собранный `.exe`** на раннере (проверяет `/health` и
+делает реальный `POST /v1/verify` с русским текстом), считает контрольные
+суммы и публикует релиз.
+
+Готовый файл после публикации:
+
+```
+https://github.com/Igorr112323/Smarty_Chumakov/releases/latest/download/spanverify.exe
+```
 
 Скрипты сами прогоняют тесты, при отсутствии калибратора обучают его на
 демо-корпусе и проверяют собранный файл командой `selftest`.

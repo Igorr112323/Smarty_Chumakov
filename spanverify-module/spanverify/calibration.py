@@ -139,22 +139,18 @@ class IsotonicCalibrator:
 
     @classmethod
     def load(cls, path: str | Path) -> "IsotonicCalibrator | None":
+        """Загрузить калибратор с диска или из бандла приложения."""
         p = Path(path)
-        if not p.is_absolute():
-            from .config import resolve_runtime_path
-
-            p = resolve_runtime_path(str(p))
         if p.is_file():
             with p.open("r", encoding="utf-8") as fh:
                 return cls.from_dict(json.load(fh))
+        if p.is_absolute():
+            return None
 
-        # Однофайловая сборка: калибратор лежит внутри архива приложения.
-        from .config import packaged_text
+        from .config import read_runtime_text
 
-        embedded = packaged_text(str(p).replace("\\", "/"))
-        if embedded:
-            return cls.from_dict(json.loads(embedded))
-        return None
+        embedded = read_runtime_text(str(p))
+        return cls.from_dict(json.loads(embedded)) if embedded else None
 
 
 def metrics_at(probs: Sequence[float], labels: Sequence[int], threshold: float) -> dict[str, float]:

@@ -100,6 +100,37 @@ def test_runtime_roots_include_frozen_bundle(monkeypatch, tmp_path):
     assert resolve_runtime_path("config/config.json") == bundle / "config" / "config.json"
 
 
+def test_read_runtime_text_reads_pyz_archive(monkeypatch, tmp_path):
+    """Конфиг и калибратор читаются изнутри собранного .pyz."""
+    import sys as _sys
+    import zipfile
+
+    from spanverify.calibration import IsotonicCalibrator
+    from spanverify.config import read_runtime_text
+
+    # Имена уникальны, чтобы файлы из репозитория не перекрыли архив.
+    calibrator = IsotonicCalibrator.fit([0.1, 0.5, 0.9], [0, 0, 1])
+    archive = tmp_path / "spanverify.pyz"
+    with zipfile.ZipFile(archive, "w") as zf:
+        zf.writestr("config/__zip_calibration__.json", json.dumps(calibrator.to_dict()))
+        zf.writestr("config/__zip_config__.json", json.dumps({"threshold": 0.4242}))
+
+    monkeypatch.setattr(_sys, "argv", [str(archive)], raising=False)
+    monkeypatch.chdir(tmp_path)
+    payload = json.loads(read_runtime_text("config/__zip_config__.json"))
+    assert payload["threshold"] == pytest.approx(0.4242)
+    assert read_runtime_text("config/__zip_absent__.json") is None
+    loaded = IsotonicCalibrator.load("config/__zip_calibration__.json")
+    assert loaded is not None and loaded.transform([0.9]) == calibrator.transform([0.9])
+
+    # Файл на диске имеет приоритет над архивом.
+    on_disk = tmp_path / "config"
+    on_disk.mkdir(exist_ok=True)
+    (on_disk / "__zip_config__.json").write_text(json.dumps({"threshold": 0.7777}), encoding="utf-8")
+    monkeypatch.chdir(tmp_path)
+    assert json.loads(read_runtime_text("config/__zip_config__.json"))["threshold"] == pytest.approx(0.7777)
+
+
 def test_resolve_runtime_path_falls_back(monkeypatch, tmp_path):
     import sys as _sys
 
