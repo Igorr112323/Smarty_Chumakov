@@ -127,8 +127,10 @@ jobs:
         run: |
           $ErrorActionPreference = "Stop"
           $port = 8765
+          Remove-Item exe-out.log, exe-err.log -ErrorAction SilentlyContinue
           $proc = Start-Process -FilePath ".\spanverify.exe" `
-            -ArgumentList "--port", $port, "--no-browser", "--quiet" -PassThru
+            -ArgumentList "--port", $port, "--no-browser" -PassThru `
+            -RedirectStandardOutput exe-out.log -RedirectStandardError exe-err.log
           try {
             $ready = $false
             for ($i = 0; $i -lt 60; $i++) {
@@ -183,6 +185,60 @@ jobs:
             Write-Host "СМОУК-ТЕСТ ПРОЙДЕН"
           } finally {
             if ($proc -and -not $proc.HasExited) { Stop-Process -Id $proc.Id -Force }
+            Start-Sleep -Seconds 1
+            Write-Host "--- вывод .exe (stdout) ---"
+            if (Test-Path exe-out.log) { Get-Content exe-out.log -Encoding utf8 | Select-Object -Last 40 }
+            Write-Host "--- вывод .exe (stderr) ---"
+            if (Test-Path exe-err.log) { Get-Content exe-err.log -Encoding utf8 | Select-Object -Last 40 }
+            Write-Host "--- содержимое release/ ---"
+            Get-ChildItem | Select-Object Name, Length
+          }
+
+      - name: Проверка автономности .exe (config внутри файла)
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = "Stop"
+          $sandbox = Join-Path $env:RUNNER_TEMP "spanverify-solo"
+          Remove-Item $sandbox -Recurse -Force -ErrorAction SilentlyContinue
+          New-Item -ItemType Directory -Force -Path $sandbox | Out-Null
+          Copy-Item "release/spanverify.exe" (Join-Path $sandbox "spanverify.exe") -Force
+          $port = 8788
+          $proc = Start-Process -FilePath (Join-Path $sandbox "spanverify.exe") `
+            -ArgumentList "--port", $port, "--no-browser" -PassThru `
+            -RedirectStandardOutput (Join-Path $sandbox "out.log") `
+            -RedirectStandardError (Join-Path $sandbox "err.log")
+          try {
+            $ready = $false
+            for ($i = 0; $i -lt 45; $i++) {
+              Start-Sleep -Seconds 2
+              try {
+                $health = Invoke-RestMethod -Uri "http://127.0.0.1:$port/health" -TimeoutSec 3
+                if ($health.status -eq "ok") { $ready = $true; break }
+              } catch { }
+              if ($proc.HasExited) { throw "автономный .exe завершился с кодом $($proc.ExitCode)" }
+            }
+            if (-not $ready) { throw "автономный .exe не поднялся без папки config" }
+            Write-Host ("health без config рядом: " + ($health | ConvertTo-Json -Compress))
+            if (-not $health.calibrated) { throw "во встроенном бандле нет обученных весов" }
+            if ($health.weights_source -ne "embedded") {
+              Write-Host ("источник весов: " + $health.weights_source + " (ожидался embedded)")
+            }
+            $payload = @{
+              answer  = "Срок хранения первичных документов составляет 3 года."
+              context = "Регламент 343: срок хранения первичных документов составляет 10 лет."
+            } | ConvertTo-Json -Compress
+            $bad = Invoke-RestMethod -Uri "http://127.0.0.1:$port/v1/verify" `
+              -Method Post -Body ([System.Text.Encoding]::UTF8.GetBytes($payload)) `
+              -ContentType "application/json; charset=utf-8" -TimeoutSec 60
+            if ($bad.spans.Count -lt 1) { throw "автономный .exe не нашёл подмену" }
+            Write-Host "АВТОНОМНОСТЬ ПОДТВЕРЖДЕНА"
+          } finally {
+            if ($proc -and -not $proc.HasExited) { Stop-Process -Id $proc.Id -Force }
+            Start-Sleep -Seconds 1
+            foreach ($name in @("out.log", "err.log")) {
+              $file = Join-Path $sandbox $name
+              if (Test-Path $file) { Write-Host "--- $name ---"; Get-Content $file -Encoding utf8 | Select-Object -Last 30 }
+            }
           }
 
       - name: Смоук-тест zipapp (Python-версия)
