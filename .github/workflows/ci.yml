@@ -350,3 +350,29 @@ jobs:
             spanverify-module/reports/ext_ragtruth_qa.json
             spanverify-module/reports/ext_rushallu.json
           retention-days: 90
+
+  probe-sources:
+    name: Разведка официальных источников (не блокирует CI)
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      # Разведка печатает только факты (код ответа, размер, тип). Она не должна
+      # валить сборку: недоступность госсайта из зарубежной сети — ожидаемая
+      # ситуация, и решать её должен человек, а не красный CI.
+      - name: Проверить доступность источников
+        working-directory: spanverify-module
+        run: python scripts/probe_sources.py --json reports/probe_sources.json
+
+      - name: Артефакт разведки
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: probe-sources
+          path: spanverify-module/reports/probe_sources.json
+          retention-days: 30
