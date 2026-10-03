@@ -55,10 +55,10 @@ jobs:
           cache: pip
           cache-dependency-path: spanverify-module/requirements.txt
 
-      - name: Зависимости
+      - name: Зависимости (пины из requirements.txt)
         run: |
           python -m pip install --upgrade pip
-          python -m pip install pytest
+          python -m pip install -r requirements.txt
 
       - name: Тесты
         run: python -m pytest -q
@@ -91,6 +91,22 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           python -m pip install -r requirements.txt
+
+      - name: Версия пакета совпадает с тегом
+        shell: pwsh
+        run: |
+          $tag = "${{ github.ref_name }}"
+          $version = python -c "import spanverify; print(spanverify.__version__)"
+          if ("${{ github.ref }}".StartsWith("refs/tags/")) {
+            $expected = $tag.TrimStart("v")
+            if ($version.Trim() -ne $expected) {
+              Write-Host "::error title=версия::тег $tag не совпадает с версией пакета $version"
+              exit 1
+            }
+            Write-Host "Версия $version совпадает с тегом $tag"
+          } else {
+            Write-Host "Не тег: версия пакета $version (проверка пропущена)"
+          }
 
       - name: Убедиться, что веса обучены (обучить, если нет)
         shell: pwsh
