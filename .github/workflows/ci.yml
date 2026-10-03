@@ -351,6 +351,70 @@ jobs:
             spanverify-module/reports/ext_rushallu.json
           retention-days: 90
 
+  # Корпус A3: реальные документы. Работает долго (скачивание PDF + OCR), поэтому в
+  # отдельном job'е с большим таймаутом. Результат коммитится: источники, пары,
+  # манифест и отчёт. Повторный запуск сначала проверяет хеши и не скачивает заново.
+  corpus-a3:
+    name: "Корпус A3 (реальные акты — скачивание, OCR, сборка)"
+    runs-on: ubuntu-latest
+    timeout-minutes: 150
+    steps:
+      - name: Забрать код
+        uses: actions/checkout@v4
+
+      - name: Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Поставить OCR (poppler + tesseract с русским)
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq poppler-utils tesseract-ocr tesseract-ocr-rus
+
+      - name: Скачать источники (или проверить хеши уже скачанных)
+        working-directory: spanverify-module
+        run: |
+          if [ -f data/corpus_a3/sources/sources.json ]; then
+            echo "источники уже скачаны — проверяем хеши"
+            python scripts/fetch_npa_corpus.py --out data/corpus_a3 --verify
+          else
+            python scripts/fetch_npa_corpus.py --out data/corpus_a3 --target-docs 130 --pause 1.5 --workers 4
+          fi
+
+      - name: Собрать корпус A3 (пары на реальных текстах)
+        id: build_a3
+        continue-on-error: true
+        working-directory: spanverify-module
+        run: python scripts/build_corpus_a.py --docs data/corpus_a3/sources --out data/corpus_a3 --target 1200 --seed 43 --real
+
+      - name: Отчёт по корпусу A3
+        if: always()
+        working-directory: spanverify-module
+        run: python scripts/make_corpus_a3_report.py
+
+      - name: Закоммитить источники, пары и отчёты
+        if: always()
+        working-directory: spanverify-module
+        run: |
+          git config user.name "spanverify-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add -f data/corpus_a3 reports/CORPUS_A3.md reports/CORPUS_REPORT.md || true
+          if git diff --cached --quiet; then
+            echo "нечего коммитить"
+            exit 0
+          fi
+          git commit -m "корпус A3: источники и пары на реальных актах"
+          for attempt in 1 2 3; do
+            if git pull --rebase --autostash -q origin "${GITHUB_REF_NAME}" && git push; then
+              echo "корпус закоммичен (попытка $attempt)"
+              exit 0
+            fi
+            sleep 5
+          done
+          echo "::warning title=A3::не удалось закоммитить корпус за 3 попытки"
+          exit 0
+
   probe-sources:
     name: Разведка официальных источников (не блокирует CI)
     runs-on: ubuntu-latest
@@ -447,10 +511,19 @@ jobs:
           git add -f spanverify-module/reports/probe_sources.json spanverify-module/reports/npa_probe.json spanverify-module/reports/npa_probe2.json spanverify-module/reports/npa_probe3.json spanverify-module/reports/npa_text_probe.json spanverify-module/reports/npa_extract_probe.json spanverify-module/reports/npa_svg_probe.json spanverify-module/reports/ips_probe.json spanverify-module/reports/ips_text_probe.json spanverify-module/reports/ips_export_probe.json spanverify-module/reports/ips_list_probe.json spanverify-module/reports/ips_final_probe.json || true
           if git diff --cached --quiet; then
             echo "нечего коммитить"
-          else
-            git commit -m "разведка источников: факты доступности и API [skip ci]"
-            git push
+            exit 0
           fi
+          git commit -m "разведка источников: факты доступности и API [skip ci]"
+          # Ветка main может уйти вперёд (параллельные прогоны): перебазируемся и повторяем push.
+          for attempt in 1 2 3; do
+            if git pull --rebase --autostash -q origin "${GITHUB_REF_NAME}" && git push; then
+              echo "разведка закоммичена (попытка $attempt)"
+              exit 0
+            fi
+            sleep 5
+          done
+          echo "::warning title=Разведка::не удалось закоммитить результат за 3 попытки"
+          exit 0
 
       - name: Артефакт разведки
         if: always()

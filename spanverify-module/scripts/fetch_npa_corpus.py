@@ -254,6 +254,7 @@ def collect_candidates(
                 candidates.append(
                     {
                         "doc_id": f"eo-{eo}",
+                        "source_host": "publication.pravo.gov.ru",
                         "eo_number": eo,
                         "document_id": item.get("id"),
                         "act_type": type_name,
@@ -337,26 +338,42 @@ def write_sources(out_dir: Path, documents: list[dict], manifest: dict) -> None:
         manifest["documents"][document["doc_id"]] = {key: value for key, value in document.items() if key != "text"}
         manifest["documents"][document["doc_id"]]["text_file"] = f"sources/{document['doc_id']}.txt"
         manifest["documents"][document["doc_id"]]["text_chars"] = len(document["text"])
-        manifest["documents"][document["doc_id"]]["text_sha256"] = sha256_bytes(document["text"].encode("utf-8"))
+        # Хеш считается по фактическим байтам файла (а не по строке), поэтому проверка
+        # `--verify` сравнивает одно и то же.
+        manifest["documents"][document["doc_id"]]["text_sha256"] = sha256_bytes(path.read_bytes())
     (sources_dir / "sources.json").write_text(
         json.dumps(manifest, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
     )
 
 
 def verify_sources(sources_dir: Path) -> dict:
-    """Проверить хеши уже скачанных источников (``--verify``): факты, без скачивания."""
+    """Проверить хеши уже скачанных источников (``--verify``): факты, без скачивания.
+
+    Манифест ищется и в самом каталоге, и в подкаталоге ``sources`` — загрузчик пишет
+    его рядом с файлами источников, а вызывать проверку можно с любого из двух путей.
+    """
     manifest_path = sources_dir / "sources.json"
+    if not manifest_path.exists() and (sources_dir / "sources" / "sources.json").exists():
+        sources_dir = sources_dir / "sources"
+        manifest_path = sources_dir / "sources.json"
     if not manifest_path.exists():
         return {"checked": 0, "mismatches": ["нет sources.json"], "documents": 0}
     manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
     mismatches: list[str] = []
     checked = 0
     for doc_id, meta in manifest.get("documents", {}).items():
-        path = sources_dir / meta.get("text_file", f"sources/{doc_id}.txt")
+        relative = meta.get("text_file", f"sources/{doc_id}.txt")
+        # «text_file» записан относительно каталога корпуса, а не подкаталога sources.
+        candidates = [
+            manifest_path.parent / relative,
+            manifest_path.parent.parent / relative,
+            sources_dir / f"{doc_id}.txt",
+        ]
+        path = next((item for item in candidates if item.exists()), candidates[0])
         if not path.exists():
             mismatches.append(f"{doc_id}: файл {path} отсутствует")
             continue
-        actual = sha256_bytes(path.read_text(encoding="utf-8").encode("utf-8"))
+        actual = sha256_bytes(path.read_bytes())
         checked += 1
         if actual != meta.get("text_sha256"):
             mismatches.append(f"{doc_id}: sha256 текста {actual} != {meta.get('text_sha256')}")
@@ -383,7 +400,7 @@ def main() -> int:
 
     out_dir: Path = args.out
     if args.verify:
-        report = verify_sources(out_dir)
+        report = verify_sources(out_dir / "sources")
         print(json.dumps(report, ensure_ascii=False, indent=2))
         return 0 if not report["mismatches"] else 2
 
