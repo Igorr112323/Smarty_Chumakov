@@ -325,9 +325,33 @@ jobs:
       - name: Смоук-тест zipapp (Python-версия)
         shell: pwsh
         run: |
+          # Контракт кодов возврата: 0 — чисто, 1 — есть сомнительные фрагменты,
+          # 2 — отказ (ошибка входа или формата). Actions завершает шаг кодом
+          # последней проверки $LASTEXITCODE, поэтому код проверяем явно, а не
+          # полагаемся на «ноль по умолчанию».
           python release/spanverify.pyz selftest
+          if ($LASTEXITCODE -ne 0) { throw "selftest zipapp вернул код $LASTEXITCODE" }
+
           python release/spanverify.pyz verify --answer "Срок хранения первичных документов составляет 3 года." --context "Регламент 343: срок хранения первичных документов составляет 10 лет." --json | Out-File -Encoding utf8 release/pyz-verify.json
-          Get-Content release/pyz-verify.json -Encoding utf8 | Select-Object -First 5
+          $verifyCode = $LASTEXITCODE
+          if ($verifyCode -ne 1) { throw "verify: ожидался код 1 (есть сомнительные фрагменты), получен $verifyCode" }
+          $payload = Get-Content release/pyz-verify.json -Encoding utf8 -Raw | ConvertFrom-Json
+          if ($payload.verdict -ne "likely_hallucination") { throw "verify: неожиданный вердикт $($payload.verdict)" }
+          Write-Host ("zipapp verify: код $verifyCode, вердикт $($payload.verdict), фрагментов $(@($payload.spans).Count)")
+
+          # Отказ на чужом формате: код 2 и понятное сообщение (дефект E).
+          '{"id":"x1","question":"тест","answer":"тест","label":1}' | Set-Content -Encoding utf8 release/pyz-foreign.jsonl
+          python release/spanverify.pyz evaluate --dataset release/pyz-foreign.jsonl 2> release/pyz-foreign.err | Out-Null
+          $formatCode = $LASTEXITCODE
+          if ($formatCode -ne 2) { throw "evaluate на чужом формате: ожидался код 2, получен $formatCode" }
+          $message = Get-Content release/pyz-foreign.err -Encoding utf8 -Raw
+          if ($message -notmatch "строка 1") { throw "сообщение об отказе не указывает строку: $message" }
+          Write-Host "zipapp evaluate: чужой формат отвергнут с кодом 2"
+
+          # Подтверждённый ответ обязан дать код 0.
+          python release/spanverify.pyz verify --answer "Срок хранения первичных документов составляет 10 лет." --context "Регламент 343: срок хранения первичных документов составляет 10 лет." | Out-Null
+          if ($LASTEXITCODE -ne 0) { throw "подтверждённый ответ: ожидался код 0, получен $LASTEXITCODE" }
+          Write-Host "zipapp verify (подтверждённый ответ): код 0"
 
       - name: Контрольные суммы
         shell: pwsh
