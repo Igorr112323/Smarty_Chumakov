@@ -162,6 +162,32 @@ jobs:
         if: always()
         run: cat reports/pilot/pilot.md
 
+      - name: Ключевые числа пилота в аннотации
+        if: always()
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          report = Path("reports/pilot/pilot.json")
+          if not report.exists():
+              print("::error title=пилот::отчёт pilot.json не найден")
+              raise SystemExit(0)
+          data = json.loads(report.read_text(encoding="utf-8"))
+          print(f"::notice title=пилот статус::status={data.get('status')} "
+                f"модель={data.get('environment', {}).get('model', data.get('model'))} "
+                f"пар={data.get('pairs')} токенов={data.get('tokens')} "
+                f"бутстрэп={data.get('bootstrap_iterations')} сек={data.get('duration_s')}")
+          contrast = data.get("contrast") or {}
+          print("::notice title=контраст::" + json.dumps(contrast, ensure_ascii=False))
+          for layer, features in (data.get("auc") or {}).items():
+              line = ", ".join(
+                  f"{name}={values.get('auc_oriented'):.3f} [{values.get('ci_low'):.3f}; {values.get('ci_high'):.3f}]"
+                  for name, values in features.items()
+              )
+              print(f"::notice title=слой {layer}::{line}")
+          PY
+
       - name: Артефакт пилота
         if: always()
         uses: actions/upload-artifact@v4

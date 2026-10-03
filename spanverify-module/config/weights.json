@@ -8,6 +8,7 @@
   "target_fpr": 0.1,
   "span_z": 0.0,
   "span_floor": 0.3,
+  "span_cap": 0.5,
   "isotonic": {
     "x": [
       0.006197,

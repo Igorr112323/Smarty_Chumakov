@@ -82,6 +82,7 @@ class WeightsBundle:
             "target_fpr": self.target_fpr,
             "span_z": self.span_z,
             "span_floor": self.span_floor,
+            "span_cap": self.span_cap,
             "isotonic": {
                 "x": [round(v, 6) for v in (self.isotonic.thresholds if self.isotonic else [])],
                 "y": [round(v, 6) for v in (self.isotonic.values if self.isotonic else [])],
