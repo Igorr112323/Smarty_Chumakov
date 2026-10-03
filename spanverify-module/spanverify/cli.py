@@ -223,14 +223,23 @@ def build_parser() -> argparse.ArgumentParser:
         description="SpanVerify — локализация фрагментов, написанных ИИ, и оценка доли участия модели.",
     )
     parser.add_argument("--version", action="version", version=f"spanverify {__version__}")
-    parser.add_argument("--config", help="путь к JSON-конфигу")
-    parser.add_argument("--backend", choices=["surrogate", "hf"], help="бэкенд признаков")
-    parser.add_argument("--threshold", type=float, help="порог срабатывания (0..1)")
-    parser.add_argument("--calibration", help="путь к файлу калибратора")
+
+    # Общие параметры доступны и до, и после имени команды
+    # (spanverify --backend hf analyze ... и spanverify analyze --backend hf ...).
+    common = argparse.ArgumentParser(add_help=False)
+    common.add_argument("--config", help="путь к JSON-конфигу", default=argparse.SUPPRESS)
+    common.add_argument("--backend", choices=["surrogate", "hf"], help="бэкенд признаков",
+                        default=argparse.SUPPRESS)
+    common.add_argument("--threshold", type=float, help="порог срабатывания (0..1)",
+                        default=argparse.SUPPRESS)
+    common.add_argument("--calibration", help="путь к файлу калибратора",
+                        default=argparse.SUPPRESS)
+    for action in common._actions:
+        parser._add_action(action)
 
     sub = parser.add_subparsers(dest="command", required=True)
 
-    p = sub.add_parser("analyze", help="проверить текст")
+    p = sub.add_parser("analyze", help="проверить текст", parents=[common])
     p.add_argument("--text")
     p.add_argument("--file")
     p.add_argument("--json", action="store_true", help="вывод в JSON")
@@ -239,28 +248,28 @@ def build_parser() -> argparse.ArgumentParser:
     p.add_argument("--time", action="store_true", help="замер времени")
     p.set_defaults(func=cmd_analyze)
 
-    p = sub.add_parser("demo", help="демонстрация + генерация корпуса")
+    p = sub.add_parser("demo", parents=[common], help="демонстрация + генерация корпуса")
     p.add_argument("--n", type=int, default=240)
     p.add_argument("--seed", type=int, default=1312)
     p.add_argument("--out", help="куда записать корпус JSONL")
     p.set_defaults(func=cmd_demo)
 
-    p = sub.add_parser("calibrate", help="обучить калибратор и подобрать порог")
+    p = sub.add_parser("calibrate", parents=[common], help="обучить калибратор и подобрать порог")
     p.add_argument("--dataset", default="data/demo_dataset.jsonl")
     p.add_argument("--out", default="config/calibration.json")
     p.set_defaults(func=cmd_calibrate)
 
-    p = sub.add_parser("serve", help="запустить API и веб-интерфейс")
+    p = sub.add_parser("serve", help="запустить API и веб-интерфейс", parents=[common])
     p.add_argument("--host", default=None)
     p.add_argument("--port", type=int, default=None)
     p.add_argument("--open-browser", action="store_true")
     p.add_argument("--quiet", action="store_true")
     p.set_defaults(func=cmd_serve)
 
-    p = sub.add_parser("selftest", help="проверка работоспособности сборки")
+    p = sub.add_parser("selftest", parents=[common], help="проверка работоспособности сборки")
     p.set_defaults(func=cmd_selftest)
 
-    p = sub.add_parser("config", help="показать действующий конфиг")
+    p = sub.add_parser("config", parents=[common], help="показать действующий конфиг")
     p.set_defaults(func=cmd_config)
 
     return parser
