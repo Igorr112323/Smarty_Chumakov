@@ -470,7 +470,7 @@ def build_corpus_real(
 
     pairs: list[dict] = []
     mode_counts: dict[str, int] = {mode: 0 for mode in mix}
-    used: set[tuple[str, int, int, str]] = set()
+    used: set[tuple[str, int, int]] = set()
     cursor = 0
     for mode in plan:
         placed = False
@@ -497,7 +497,10 @@ def build_corpus_real(
             variant = build_real_variant(fact, mode, rng, same_kind, other_place)
             if variant is None:
                 continue
-            key = (doc_id, fact.fact_start, fact.fact_end, variant["answer"])
+            # Один факт — одна пара: так в корпусе нет ни дублей, ни пар с одинаковым
+            # контекстом и разными ответами (для проверяющего это выглядело бы как
+            # искусственное размножение одного и того же места документа).
+            key = (doc_id, fact.fact_start, fact.fact_end)
             if key in used:
                 continue
             context = build_context(texts[doc_id], fact)

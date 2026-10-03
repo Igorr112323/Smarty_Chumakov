@@ -173,6 +173,32 @@ def _allowed(metrics: dict) -> dict[str, set[str]]:
                 fpr_values.append(float(block["verdict_fpr"]))
             if isinstance(block.get("span_coverage"), (int, float)):
                 f1_values.append(float(block["span_coverage"]))
+    corpus_a3 = metrics.get("corpus_a3_real") or {}
+    if corpus_a3.get("available"):
+        # Числа A3 (реальные документы) — отдельный корпус; они никогда не суммируются
+        # с A1, но документы на них ссылаются, поэтому они должны быть законными.
+        for block in corpus_a3.get("by_split", {}).values():
+            tokens = block.get("tokens") or {}
+            verdicts = block.get("verdicts") or {}
+            for value in (tokens.get("f1"), tokens.get("precision"), tokens.get("recall")):
+                if isinstance(value, (int, float)):
+                    f1_values.append(float(value))
+            if isinstance(tokens.get("fpr"), (int, float)):
+                fpr_values.append(float(tokens["fpr"]))
+            if isinstance(tokens.get("auc"), (int, float)):
+                auc_values.append(float(tokens["auc"]))
+            for value in (verdicts.get("f1"), verdicts.get("precision"), verdicts.get("recall")):
+                if isinstance(value, (int, float)):
+                    f1_values.append(float(value))
+            if isinstance(verdicts.get("fpr"), (int, float)):
+                fpr_values.append(float(verdicts["fpr"]))
+            if isinstance(tokens.get("n"), int):
+                token_values.append(tokens["n"])
+        for block in corpus_a3.get("by_mode", {}).values():
+            for key in ("token_f1", "verdict_recall", "verdict_fpr", "span_coverage"):
+                if isinstance(block.get(key), (int, float)):
+                    f1_values.append(float(block[key]))
+
     corpus_b = metrics.get("corpus_b") or {}
     if corpus_b.get("available"):
         ours = corpus_b.get("our_metrics") or {}
