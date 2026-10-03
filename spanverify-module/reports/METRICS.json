@@ -8,15 +8,15 @@
   },
   "meta": {
     "version": "1.3.0",
-    "commit": "c21d293650fd2f2d47402bbf8c22ba4d8c748339",
-    "generated_at": "2026-10-03T16:57:49Z",
+    "commit": "a031852f064ee09864215c074ed501a5c76303b0",
+    "generated_at": "2026-10-03T19:22:07Z",
     "seed": 42,
     "dataset": "data/demo_pairs.jsonl"
   },
   "disclaimer": "Демонстрационные метрики получены на синтетическом корпусе и научным результатом не являются. Для подтверждения требуются 1200 пар «вопрос–ответ» с экспертной разметкой на реальных регламентах организации.",
   "tests": {
-    "collected": 304,
-    "coverage_percent": 87.13,
+    "collected": 331,
+    "coverage_percent": 87.61,
     "coverage_gate_percent": 85
   },
   "demo": {
@@ -377,6 +377,186 @@
     "disclaimer": "RusHallu-RAG — внешний тест с человеческой разметкой спанов. Числа режима demo получены лексическими суррогатами признаков и научным результатом не являются: научный вывод требует режима hf на GPU, который в этой среде не запускался.",
     "role": "только тест: обучение и калибровка на корпусе B запрещены"
   },
+  "external_tests": {
+    "available": true,
+    "runs": {
+      "ragtruth_qa_test_demo": {
+        "dataset": "ragtruth",
+        "task": "qa",
+        "split": "test",
+        "mode": "demo",
+        "label_origin": {
+          "human": 875
+        },
+        "pairs": 875,
+        "limit": null,
+        "tokens": {
+          "precision": 0.1322,
+          "recall": 0.4512,
+          "f1": 0.2045,
+          "fpr": 0.1685,
+          "auc": 0.7167
+        },
+        "answers": {
+          "tp": 160,
+          "fp": 706,
+          "fn": 0,
+          "tn": 9,
+          "precision": 0.1848,
+          "recall": 1.0,
+          "f1": 0.3119,
+          "fpr": 0.9874
+        },
+        "spans": {
+          "strict_f1_iou_0_5": 0.0197,
+          "coverage": 0.966,
+          "soft_f1_expanded": 0.0723,
+          "mean_width_ratio": 12.54
+        },
+        "their": {
+          "accuracy": 0.0103,
+          "jaccard_score": 0.0103,
+          "hamming_loss": 0.1829,
+          "rouge1": 0.0777,
+          "rouge2": 0.0716,
+          "rougeL": 0.0718
+        },
+        "baseline_extracted": false
+      },
+      "ragtruth_summary_test_demo": {
+        "dataset": "ragtruth",
+        "task": "summary",
+        "split": "test",
+        "mode": "demo",
+        "label_origin": {
+          "human": 900
+        },
+        "pairs": 900,
+        "limit": null,
+        "tokens": {
+          "precision": 0.0724,
+          "recall": 0.2596,
+          "f1": 0.1133,
+          "fpr": 0.1023,
+          "auc": 0.644
+        },
+        "answers": {
+          "tp": 204,
+          "fp": 683,
+          "fn": 0,
+          "tn": 13,
+          "precision": 0.23,
+          "recall": 1.0,
+          "f1": 0.374,
+          "fpr": 0.9813
+        },
+        "spans": {
+          "strict_f1_iou_0_5": 0.021,
+          "coverage": 0.873,
+          "soft_f1_expanded": 0.0605,
+          "mean_width_ratio": 14.24
+        },
+        "their": {
+          "accuracy": 0.0167,
+          "jaccard_score": 0.0167,
+          "hamming_loss": 0.2244,
+          "rouge1": 0.0869,
+          "rouge2": 0.076,
+          "rougeL": 0.0786
+        },
+        "baseline_extracted": false
+      },
+      "ragtruth_data2txt_test_demo": {
+        "dataset": "ragtruth",
+        "task": "data2txt",
+        "split": "test",
+        "mode": "demo",
+        "label_origin": {
+          "human": 900
+        },
+        "pairs": 900,
+        "limit": null,
+        "tokens": {
+          "precision": 0.0571,
+          "recall": 0.4454,
+          "f1": 0.1013,
+          "fpr": 0.3293,
+          "auc": 0.591
+        },
+        "answers": {
+          "tp": 579,
+          "fp": 321,
+          "fn": 0,
+          "tn": 0,
+          "precision": 0.6433,
+          "recall": 1.0,
+          "f1": 0.783,
+          "fpr": 1.0
+        },
+        "spans": {
+          "strict_f1_iou_0_5": 0.0,
+          "coverage": 0.9829,
+          "soft_f1_expanded": 0.0106,
+          "mean_width_ratio": 56.78
+        },
+        "their": {
+          "accuracy": 0.0,
+          "jaccard_score": 0.0,
+          "hamming_loss": 0.6433,
+          "rouge1": 0.0657,
+          "rouge2": 0.06,
+          "rougeL": 0.063
+        },
+        "baseline_extracted": false
+      },
+      "rushallu_all_test_demo": {
+        "dataset": "rushallu",
+        "task": "all",
+        "split": "test",
+        "mode": "demo",
+        "label_origin": {
+          "human": 1000
+        },
+        "pairs": 1000,
+        "limit": null,
+        "tokens": {
+          "precision": 0.3616,
+          "recall": 0.0769,
+          "f1": 0.1269,
+          "fpr": 0.0642,
+          "auc": 0.5293
+        },
+        "answers": {
+          "tp": 259,
+          "fp": 307,
+          "fn": 74,
+          "tn": 360,
+          "precision": 0.4576,
+          "recall": 0.7778,
+          "f1": 0.5762,
+          "fpr": 0.4603
+        },
+        "spans": {
+          "strict_f1_iou_0_5": 0.2649,
+          "coverage": 0.5343,
+          "soft_f1_expanded": 0.3563,
+          "mean_width_ratio": 4.35
+        },
+        "their": {
+          "accuracy": 0.424,
+          "jaccard_score": 0.4352,
+          "hamming_loss": 0.2561,
+          "rouge1": 0.5409,
+          "rouge2": 0.5334,
+          "rougeL": 0.5333
+        },
+        "baseline_extracted": false
+      }
+    },
+    "total_pairs": 3675,
+    "demo_runs": 4,
+    "hf_runs": 0
+  },
   "cross_corpus": {
     "in_corpus_f1": 0.9532,
     "cross_corpus_f1": 0.7173,
@@ -389,15 +569,6 @@
     }
   },
   "pilot": null,
-  "release": {
-    "dir": "release",
-    "artifacts": [
-      {
-        "name": "spanverify.pyz",
-        "size_bytes": 530813,
-        "sha256": "9458ce9bd547d5c87ec7bd713b4dd121c8877fa47b63e7771a3d39430712764b"
-      }
-    ]
-  },
-  "duration_s": 25.1
+  "release": null,
+  "duration_s": 45.2
 }

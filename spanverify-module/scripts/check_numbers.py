@@ -43,6 +43,7 @@ DEFAULT_DOCS = (
     "docs/ОТЧЁТ_о_НИР_шаблон.md",
     "docs/РУКОВОДСТВО.md",
     "spanverify-module/README.md",
+    "spanverify-module/reports/EXTERNAL_TESTS.md",
 )
 
 REQUIRED_IN_ITOG = (
@@ -123,6 +124,27 @@ def _allowed(metrics: dict) -> dict[str, set[str]]:
         fpr_values.append(cross["cross_fpr"])
     # Корпуса A (управляемые подмены) и B (внешний тест): их числа тоже законные,
     # документы ссылаются на них (reports/CORPUS_REPORT.md и METRICS.json).
+    external = metrics.get("external_tests") or {}
+    if external.get("available"):
+        for run in (external.get("runs") or {}).values():
+            for group in ("tokens", "answers"):
+                block = run.get(group) or {}
+                for key in ("f1", "precision", "recall"):
+                    if isinstance(block.get(key), (int, float)):
+                        f1_values.append(float(block[key]))
+                if isinstance(block.get("fpr"), (int, float)):
+                    fpr_values.append(float(block["fpr"]))
+                if isinstance(block.get("auc"), (int, float)):
+                    auc_values.append(float(block["auc"]))
+            spans = run.get("spans") or {}
+            for key in ("strict_f1_iou_0_5", "coverage", "soft_f1_expanded"):
+                if isinstance(spans.get(key), (int, float)):
+                    f1_values.append(float(spans[key]))
+            their = run.get("their") or {}
+            for key in ("accuracy", "jaccard_score", "hamming_loss", "rouge1", "rouge2", "rougeL"):
+                if isinstance(their.get(key), (int, float)):
+                    f1_values.append(float(their[key]))
+
     corpus_a = metrics.get("corpus_a") or {}
     if corpus_a.get("available"):
         for block in corpus_a.get("by_split", {}).values():

@@ -4,8 +4,8 @@
 [![build-and-release-exe](https://github.com/Igorr112323/Smarty_Chumakov/actions/workflows/build-and-release-exe.yml/badge.svg)](https://github.com/Igorr112323/Smarty_Chumakov/actions/workflows/build-and-release-exe.yml)
 [![release](https://img.shields.io/github/v/release/Igorr112323/Smarty_Chumakov)](https://github.com/Igorr112323/Smarty_Chumakov/releases/latest)
 [![python](https://img.shields.io/badge/python-3.10%20%7C%203.11%20%7C%203.12-blue)](spanverify-module/pyproject.toml)
-[![tests](https://img.shields.io/badge/tests-304%20passed-brightgreen)](spanverify-module/tests)
-[![coverage](https://img.shields.io/badge/coverage-87%25-brightgreen)](spanverify-module/pyproject.toml)
+[![tests](https://img.shields.io/badge/tests-331%20passed-brightgreen)](spanverify-module/tests)
+[![coverage](https://img.shields.io/badge/coverage-88%25-brightgreen)](spanverify-module/pyproject.toml)
 
 Программа берёт **документ-источник** и **ответ** (языковой модели или
 сотрудника) и показывает, какие места ответа документ не подтверждает: подмену
@@ -36,7 +36,7 @@ python -m spanverify train --dataset data/demo_pairs.jsonl --out config/weights.
 python -m spanverify evaluate --dataset data/demo_pairs.jsonl   # метрики и критерий качества
 python -m spanverify selftest                                   # само-проверка конвейера
 python -m spanverify server --port 8765                         # API + веб-интерфейс
-python -m pytest -q                                             # 304 тестов
+python -m pytest -q                                             # 331 тестов
 ```
 
 Коды возврата `verify`: `0` — ответ подтверждён, `1` — найдены спорные
@@ -131,6 +131,32 @@ AUC 0.996 на отложенной части) доказывают работ�
 `data/external/` в `.gitignore`, скачивание — по закреплённому коммиту и хешам.
 Подробности и команды: `spanverify-module/docs/КОРПУС_v1.md`,
 `spanverify-module/reports/CORPUS_REPORT.md`.
+
+## Внешние размеченные наборы (v1.3.1)
+
+Метод проверен на **чужих размеченных наборах** — там, где разметку делал не наш
+генератор. Правило: внешние наборы только тестируют, обучение и калибровка идут на
+нашем корпусе A.
+
+| Набор | Язык | Разметка | Лицензия | Объём |
+|---|---|---|---|---|
+| RAGTruth (`ParticleMedia/RAGTruth`) | en | human (спан-уровень) | MIT | 17 790 ответов, 2965 источников, 14 289 спанов |
+| RusHallu-RAG (`feudor2/RusHallu-RAG`) | ru | human (спан-уровень) | не подтверждена | 1000 пар, 423 спана |
+
+Что получилось в режиме `demo` (лексические признаки, без весов модели — это не
+научный результат): RAGTruth QA token F1 **0.204**, FPR 0.169, AUC 0.717;
+Summary token F1 0.113; Data2txt token F1 0.101; RusHallu-RAG token F1 0.127.
+Их метрики на наших предсказаниях: RAGTruth QA accuracy 0.010, RusHallu-RAG
+accuracy 0.424 / ROUGE-L 0.533.
+
+Честный вывод: на внешних данных лексические суррогаты почти не работают (0.10–0.20
+против 0.95 на своём корпусе). Причина не в пороге: признакам нужно почти дословное
+совпадение, а внешние ответы — свободные пересказы. Режим `hf` на GPU не выполнялся,
+числа `hf` в отчётах отсутствуют; baseline из статей не извлечён (PDF недоступен).
+
+Команды: `scripts/fetch_external_tests.py --all --verify --adapt` (скачивание с
+закреплёнными ревизиями и SHA256), `scripts/external_eval.py`, отчёт —
+`spanverify-module/reports/EXTERNAL_TESTS.md`.
 
 ## Что лежит в репозитории
 

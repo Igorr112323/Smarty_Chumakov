@@ -303,6 +303,52 @@ def _corpus_b_block() -> dict:
     }
 
 
+def _external_tests_block() -> dict:
+    """Числа внешних размеченных наборов из ``reports/external_tests.json``.
+
+    Файл собирает ``scripts/external_eval.py``; здесь он только читается, чтобы
+    документы сверялись с фактическими прогонами, а не с текстом отчёта.
+    """
+    path = ROOT / "reports" / "external_tests.json"
+    if not path.is_file():
+        return {
+            "available": False,
+            "note": (
+                "прогонов нет: scripts/fetch_external_tests.py --all --out data/external --verify --adapt "
+                "и scripts/external_eval.py --dataset ragtruth --task qa --split test --mode demo"
+            ),
+        }
+    data = json.loads(path.read_text(encoding="utf-8"))
+    runs = data.get("runs") or {}
+    summary: dict = {"available": True, "runs": {}}
+    for key, run in runs.items():
+        tokens = run["our_metrics"]["tokens"]
+        answers = run["our_metrics"]["verdicts"]
+        spans = run["our_metrics"]["spans"]
+        theirs = run["their_metrics"]
+        summary["runs"][key] = {
+            "dataset": run["dataset"],
+            "task": run["task"],
+            "split": run["split"],
+            "mode": run["mode"],
+            "label_origin": run["label_origin"],
+            "pairs": run["pairs"],
+            "limit": run.get("limit"),
+            "tokens": tokens,
+            "answers": answers,
+            "spans": spans,
+            "their": {
+                name: theirs.get(name)
+                for name in ("accuracy", "jaccard_score", "hamming_loss", "rouge1", "rouge2", "rougeL")
+            },
+            "baseline_extracted": bool(run["baseline"]["extracted"]),
+        }
+    summary["total_pairs"] = sum(item["pairs"] for item in summary["runs"].values())
+    summary["demo_runs"] = sum(1 for item in summary["runs"].values() if item["mode"] == "demo")
+    summary["hf_runs"] = sum(1 for item in summary["runs"].values() if item["mode"] == "hf")
+    return summary
+
+
 def collect(dataset: str, seed: int, release_dir: Path, coverage_json: Path) -> dict:
     """Собрать METRICS.json целиком (каждое число — из прогона, а не из памяти)."""
     started = time.time()
@@ -375,6 +421,7 @@ def collect(dataset: str, seed: int, release_dir: Path, coverage_json: Path) -> 
         },
         "corpus_a": _corpus_a_block(verifier),
         "corpus_b": _corpus_b_block(),
+        "external_tests": _external_tests_block(),
         "cross_corpus": None,
         "pilot": None,
         "release": _release_info(release_dir),
@@ -462,6 +509,14 @@ def main() -> int:
         )
     else:
         print(f"  корпус B: {corpus_b['note']}")
+    external = payload["external_tests"]
+    if external.get("available"):
+        print(
+            f"  внешние наборы: прогонов {len(external['runs'])} "
+            f"(demo {external['demo_runs']}, hf {external['hf_runs']}), пар всего {external['total_pairs']}"
+        )
+    else:
+        print(f"  внешние наборы: {external['note']}")
     if payload["cross_corpus"]:
         cross = payload["cross_corpus"]
         print(
