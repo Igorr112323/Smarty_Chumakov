@@ -1,0 +1,14 @@
+# Режим реальной модели: энтропия внимания последнего слоя + контекстные
+# эмбеддинги. Ставить на машину с достаточным объёмом памяти.
+#
+#   pip install -r requirements-hf.txt
+#   python -m spanverify analyze --backend hf --file document.txt
+#
+# По умолчанию используется rubert-tiny2 (~120 МБ): он даёт настоящие
+# attention-карты и работает на CPU. Для качества можно заменить модель
+# в конфиге (поле hf_model) на rubert-base-cased или любую другую,
+# поддерживающую output_attentions.
+
+torch>=2.0
+transformers>=4.38
+sentencepiece>=0.1.99

@@ -1,0 +1,78 @@
+name: build-windows-exe
+
+# Сборка Windows-исполняемого файла без Windows-машины: запускается вручную
+# (Actions → build-windows-exe → Run workflow) или при теге v*.
+# Готовый spanverify.exe публикуется артефактом; при теге — ещё и в Releases.
+
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+
+jobs:
+  windows-exe:
+    runs-on: windows-latest
+    defaults:
+      run:
+        working-directory: spanverify-module
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Установка Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+          cache-dependency-path: spanverify-module/requirements.txt
+
+      - name: Зависимости
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements.txt
+
+      - name: Тесты
+        run: python -m pytest -q
+
+      - name: Калибрация (если файла нет в репозитории)
+        shell: pwsh
+        run: |
+          if (-not (Test-Path "config/calibration.json")) {
+            python -m spanverify demo --n 240 --seed 1312 --out data/demo_dataset.jsonl
+            python -m spanverify calibrate --dataset data/demo_dataset.jsonl --out config/calibration.json
+          }
+
+      - name: Сборка .exe
+        run: python -m PyInstaller spanverify.spec --noconfirm --clean
+
+      - name: Комплектация и проверка запуска
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force -Path release | Out-Null
+          Copy-Item dist/spanverify.exe release/spanverify.exe
+          Copy-Item config release/config -Recurse
+          Copy-Item data release/data -Recurse
+          Copy-Item README.md release/README.md -ErrorAction SilentlyContinue
+          & "./release/spanverify.exe" selftest
+
+      - name: Артефакт
+        uses: actions/upload-artifact@v4
+        with:
+          name: spanverify-windows-x64
+          path: spanverify-module/release/
+          retention-days: 90
+
+      - name: Публикация в Releases (при теге)
+        if: startsWith(github.ref, 'refs/tags/')
+        shell: pwsh
+        run: |
+          Compress-Archive -Path spanverify-module/release/* -DestinationPath spanverify-windows-x64.zip
+      - name: Загрузка в Release
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: spanverify-windows-x64.zip
