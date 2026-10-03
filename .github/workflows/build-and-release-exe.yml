@@ -126,22 +126,29 @@ jobs:
         working-directory: spanverify-module/release
         run: |
           $ErrorActionPreference = "Stop"
-          $port = 8765
-          Remove-Item exe-out.log, exe-err.log -ErrorAction SilentlyContinue
+          Remove-Item exe-out.log, exe-err.log, exe-port.txt -ErrorAction SilentlyContinue
           $proc = Start-Process -FilePath ".\spanverify.exe" `
-            -ArgumentList "--port", $port, "--no-browser" -PassThru `
+            -ArgumentList "--port", "8765", "--no-browser", "--port-file", "exe-port.txt" -PassThru `
             -RedirectStandardOutput exe-out.log -RedirectStandardError exe-err.log
           try {
+            $port = $null
             $ready = $false
             for ($i = 0; $i -lt 60; $i++) {
               Start-Sleep -Seconds 2
-              try {
-                $health = Invoke-RestMethod -Uri "http://127.0.0.1:$port/health" -TimeoutSec 3
-                if ($health.status -eq "ok") { $ready = $true; break }
-              } catch { }
+              if (-not $port -and (Test-Path exe-port.txt)) {
+                $port = [int](Get-Content exe-port.txt -Raw).Trim()
+                Write-Host ("фактический порт: $port")
+              }
+              if ($port) {
+                try {
+                  $health = Invoke-RestMethod -Uri "http://127.0.0.1:$port/health" -TimeoutSec 3
+                  if ($health.status -eq "ok") { $ready = $true; break }
+                } catch { }
+              }
               if ($proc.HasExited) { throw "процесс .exe завершился с кодом $($proc.ExitCode)" }
             }
             if (-not $ready) { throw "сервис из .exe не поднялся за 120 секунд" }
+            Write-Host ("::notice title=health::$($health | ConvertTo-Json -Compress)")
             Write-Host ("health: " + ($health | ConvertTo-Json -Compress))
             if (-not $health.calibrated) {
               throw "калибровка не загрузилась из бандла — проверьте упаковку config/"
@@ -183,13 +190,22 @@ jobs:
             Write-Host ("модель: " + ($model | ConvertTo-Json -Compress -Depth 3))
             Write-Host ("веса: " + ($config.weights | ConvertTo-Json -Compress))
             Write-Host "СМОУК-ТЕСТ ПРОЙДЕН"
+          } catch {
+            # Диагностика уходит и в лог, и в аннотации: их видно через API даже
+            # тогда, когда загрузка логов сборки недоступна.
+            foreach ($name in @("exe-out.log", "exe-err.log")) {
+              if (Test-Path $name) {
+                Write-Host ("--- $name ---")
+                Get-Content $name -Encoding utf8 | Select-Object -Last 30 | ForEach-Object {
+                  Write-Host "::error title=$name::$_"
+                }
+              }
+            }
+            Write-Host ("::error title=сбой смоук-теста::$($_.Exception.Message)")
+            throw
           } finally {
             if ($proc -and -not $proc.HasExited) { Stop-Process -Id $proc.Id -Force }
             Start-Sleep -Seconds 1
-            Write-Host "--- вывод .exe (stdout) ---"
-            if (Test-Path exe-out.log) { Get-Content exe-out.log -Encoding utf8 | Select-Object -Last 40 }
-            Write-Host "--- вывод .exe (stderr) ---"
-            if (Test-Path exe-err.log) { Get-Content exe-err.log -Encoding utf8 | Select-Object -Last 40 }
             Write-Host "--- содержимое release/ ---"
             Get-ChildItem | Select-Object Name, Length
           }
@@ -202,26 +218,33 @@ jobs:
           Remove-Item $sandbox -Recurse -Force -ErrorAction SilentlyContinue
           New-Item -ItemType Directory -Force -Path $sandbox | Out-Null
           Copy-Item "release/spanverify.exe" (Join-Path $sandbox "spanverify.exe") -Force
-          $port = 8788
+          $portFile = Join-Path $sandbox "port.txt"
           $proc = Start-Process -FilePath (Join-Path $sandbox "spanverify.exe") `
-            -ArgumentList "--port", $port, "--no-browser" -PassThru `
+            -ArgumentList "--port", "8788", "--no-browser", "--port-file", $portFile -PassThru `
             -RedirectStandardOutput (Join-Path $sandbox "out.log") `
             -RedirectStandardError (Join-Path $sandbox "err.log")
           try {
+            $port = $null
             $ready = $false
             for ($i = 0; $i -lt 45; $i++) {
               Start-Sleep -Seconds 2
-              try {
-                $health = Invoke-RestMethod -Uri "http://127.0.0.1:$port/health" -TimeoutSec 3
-                if ($health.status -eq "ok") { $ready = $true; break }
-              } catch { }
+              if (-not $port -and (Test-Path $portFile)) {
+                $port = [int](Get-Content $portFile -Raw).Trim()
+              }
+              if ($port) {
+                try {
+                  $health = Invoke-RestMethod -Uri "http://127.0.0.1:$port/health" -TimeoutSec 3
+                  if ($health.status -eq "ok") { $ready = $true; break }
+                } catch { }
+              }
               if ($proc.HasExited) { throw "автономный .exe завершился с кодом $($proc.ExitCode)" }
             }
             if (-not $ready) { throw "автономный .exe не поднялся без папки config" }
+            Write-Host ("::notice title=автономность::$($health | ConvertTo-Json -Compress)")
             Write-Host ("health без config рядом: " + ($health | ConvertTo-Json -Compress))
             if (-not $health.calibrated) { throw "во встроенном бандле нет обученных весов" }
             if ($health.weights_source -ne "embedded") {
-              Write-Host ("источник весов: " + $health.weights_source + " (ожидался embedded)")
+              throw "во встроенном бандле не оказалось весов: источник '$($health.weights_source)'"
             }
             $payload = @{
               answer  = "Срок хранения первичных документов составляет 3 года."
@@ -232,13 +255,19 @@ jobs:
               -ContentType "application/json; charset=utf-8" -TimeoutSec 60
             if ($bad.spans.Count -lt 1) { throw "автономный .exe не нашёл подмену" }
             Write-Host "АВТОНОМНОСТЬ ПОДТВЕРЖДЕНА"
-          } finally {
-            if ($proc -and -not $proc.HasExited) { Stop-Process -Id $proc.Id -Force }
-            Start-Sleep -Seconds 1
+          } catch {
             foreach ($name in @("out.log", "err.log")) {
               $file = Join-Path $sandbox $name
-              if (Test-Path $file) { Write-Host "--- $name ---"; Get-Content $file -Encoding utf8 | Select-Object -Last 30 }
+              if (Test-Path $file) {
+                Get-Content $file -Encoding utf8 | Select-Object -Last 25 | ForEach-Object {
+                  Write-Host "::error title=$name::$_"
+                }
+              }
             }
+            Write-Host ("::error title=сбой проверки автономности::$($_.Exception.Message)")
+            throw
+          } finally {
+            if ($proc -and -not $proc.HasExited) { Stop-Process -Id $proc.Id -Force }
           }
 
       - name: Смоук-тест zipapp (Python-версия)

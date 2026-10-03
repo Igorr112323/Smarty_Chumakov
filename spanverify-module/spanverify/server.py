@@ -83,6 +83,7 @@ class Service:
             "head": (verifier.bundle.head or {}).get("type", "none"),
             "synthetic": bool((verifier.bundle.meta or {}).get("synthetic")),
             "uptime_s": round(time.time() - self.started_at, 1),
+            "weights_source": self.verifier.bundle.source,
             "warning": verifier.warning,
         }
 
