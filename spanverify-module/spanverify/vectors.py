@@ -8,8 +8,8 @@
 
 from __future__ import annotations
 
+from collections.abc import Iterable, Sequence
 from hashlib import blake2b
-from typing import Iterable, Sequence
 
 __all__ = [
     "hash_index",
@@ -21,9 +21,9 @@ __all__ = [
 ]
 
 # Веса компонент вектора токена.
-W_TOKEN = 1.0       # сам токен (лемма не нужна — берём нормализованную форму)
-W_CHARGRAM = 0.35   # символьные 3-граммы: устойчивость к словоформам
-W_CONTEXT = 0.25    # соседние слова: контекст употребления
+W_TOKEN = 1.0  # сам токен (лемма не нужна — берём нормализованную форму)
+W_CHARGRAM = 0.35  # символьные 3-граммы: устойчивость к словоформам
+W_CONTEXT = 0.25  # соседние слова: контекст употребления
 
 
 def hash_index(feature: str, dim: int) -> int:

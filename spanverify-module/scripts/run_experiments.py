@@ -34,8 +34,7 @@ sys.path.insert(0, str(ROOT))
 
 from spanverify import Config, Detector  # noqa: E402
 from spanverify.calibration import metrics_at  # noqa: E402
-from spanverify.demo_data import generate_dataset, read_dataset, write_dataset  # noqa: E402
-from spanverify.detector import _moving_average  # noqa: E402
+from spanverify.demo_data import generate_dataset, read_dataset  # noqa: E402
 from spanverify.text import tokenize  # noqa: E402
 from spanverify.training import token_labels, train_calibrator  # noqa: E402
 
@@ -43,6 +42,7 @@ VERDICTS = ("likely_ai", "mixed", "likely_human")
 
 
 # ---------- метрики ----------
+
 
 def span_metrics(predicted: list[tuple[int, int]], truth: list[tuple[int, int]], iou_min: float = 0.5) -> dict:
     """Сопоставление найденных фрагментов с истинными по пересечению (IoU)."""
@@ -67,13 +67,19 @@ def span_metrics(predicted: list[tuple[int, int]], truth: list[tuple[int, int]],
     recall = tp / (tp + fn) if tp + fn else 0.0
     f1 = 2 * precision * recall / (precision + recall) if precision + recall else 0.0
     return {
-        "precision": precision, "recall": recall, "f1": f1,
-        "tp": tp, "fp": fp, "fn": fn, "iou_min": iou_min,
+        "precision": precision,
+        "recall": recall,
+        "f1": f1,
+        "tp": tp,
+        "fp": fp,
+        "fn": fn,
+        "iou_min": iou_min,
     }
 
 
 def char_level_metrics(predicted: list[tuple[int, int]], truth: list[tuple[int, int]]) -> dict:
     """Точность локализации на уровне символов (не зависит от дробления фрагментов)."""
+
     def mask(spans: list[tuple[int, int]]) -> set[int]:
         out: set[int] = set()
         for start, end in spans:
@@ -102,6 +108,7 @@ def char_iou(predicted: list[tuple[int, int]], truth: list[tuple[int, int]]) -> 
 
 # ---------- прогон ----------
 
+
 @dataclass
 class DatasetEntry:
     doc_id: str
@@ -111,9 +118,7 @@ class DatasetEntry:
 
 
 def load_entries(path: Path | None, n_synthetic: int, seed: int) -> list[DatasetEntry]:
-    documents = (
-        list(read_dataset(path)) if path else generate_dataset(n_synthetic, seed=seed)
-    )
+    documents = list(read_dataset(path)) if path else generate_dataset(n_synthetic, seed=seed)
     entries: list[DatasetEntry] = []
     for doc in documents:
         text = doc["text"]
@@ -164,21 +169,27 @@ def evaluate(
             if result.verdict == expected:
                 verdict_counts[bucket]["correct_docs"] += 1
 
-    tp = sum(1 for t, p in zip(token_true, token_pred) if t == 1 and p == 1)
-    fp = sum(1 for t, p in zip(token_true, token_pred) if t == 0 and p == 1)
-    fn = sum(1 for t, p in zip(token_true, token_pred) if t == 1 and p == 0)
-    tn = sum(1 for t, p in zip(token_true, token_pred) if t == 0 and p == 0)
+    tp = sum(1 for t, p in zip(token_true, token_pred, strict=False) if t == 1 and p == 1)
+    fp = sum(1 for t, p in zip(token_true, token_pred, strict=False) if t == 0 and p == 1)
+    fn = sum(1 for t, p in zip(token_true, token_pred, strict=False) if t == 1 and p == 0)
+    tn = sum(1 for t, p in zip(token_true, token_pred, strict=False) if t == 0 and p == 0)
     token_metrics = {
-        "tp": tp, "fp": fp, "fn": fn, "tn": tn,
+        "tp": tp,
+        "fp": fp,
+        "fn": fn,
+        "tn": tn,
         "precision": tp / (tp + fp) if tp + fp else 0.0,
         "recall": tp / (tp + fn) if tp + fn else 0.0,
         "fpr": fp / (fp + tn) if fp + tn else 0.0,
         "hdr": tn / (tn + fp) if tn + fp else 0.0,
     }
     token_metrics["f1"] = (
-        2 * token_metrics["precision"] * token_metrics["recall"]
+        2
+        * token_metrics["precision"]
+        * token_metrics["recall"]
         / (token_metrics["precision"] + token_metrics["recall"])
-        if token_metrics["precision"] + token_metrics["recall"] else 0.0
+        if token_metrics["precision"] + token_metrics["recall"]
+        else 0.0
     )
 
     n = len(span_matches)
@@ -188,23 +199,18 @@ def evaluate(
         "tokens_ai_share": sum(token_true) / len(token_true) if token_true else 0.0,
         "threshold": threshold,
         "token_metrics": token_metrics,
-        "span_metrics": {
-            key: sum(m[key] for m in span_matches) / n for key in ("precision", "recall", "f1")
-        },
+        "span_metrics": {key: sum(m[key] for m in span_matches) / n for key in ("precision", "recall", "f1")},
         "span_metrics_iou025": {
-            key: sum(m[key] for m in span_matches_loose) / n
-            for key in ("precision", "recall", "f1")
+            key: sum(m[key] for m in span_matches_loose) / n for key in ("precision", "recall", "f1")
         },
-        "char_metrics": {
-            key: sum(m[key] for m in char_metrics) / n for key in ("precision", "recall", "f1")
-        },
+        "char_metrics": {key: sum(m[key] for m in char_metrics) / n for key in ("precision", "recall", "f1")},
         "char_iou_mean": sum(ious) / len(ious) if ious else 0.0,
         "share_mae": sum(share_errors) / len(share_errors) if share_errors else 0.0,
         "share_max_error": max(share_errors) if share_errors else 0.0,
         "document_verdicts": verdict_counts,
         "probability_samples": {
-            "ai": [round(p, 4) for t, p in zip(token_true, token_prob) if t == 1][:5000],
-            "human": [round(p, 4) for t, p in zip(token_true, token_prob) if t == 0][:5000],
+            "ai": [round(p, 4) for t, p in zip(token_true, token_prob, strict=False) if t == 1][:5000],
+            "human": [round(p, 4) for t, p in zip(token_true, token_prob, strict=False) if t == 0][:5000],
         },
     }
 
@@ -239,6 +245,7 @@ def threshold_sweep(detector: Detector, entries: list[DatasetEntry]) -> list[dic
 
 
 # ---------- вывод ----------
+
 
 def histogram_svg(ai: list[float], human: list[float], path: Path, bins: int = 20) -> None:
     """Гистограмма калиброванных вероятностей по классам (чистый SVG)."""
@@ -352,8 +359,9 @@ def markdown_report(report: dict, sweep: list[dict], backend: str, dataset: str)
 
 def main() -> int:
     parser = argparse.ArgumentParser(description="Эксперименты SpanVerify")
-    parser.add_argument("--dataset", type=Path, default=None,
-                        help="JSONL с разметкой; если не указан — синтетический корпус")
+    parser.add_argument(
+        "--dataset", type=Path, default=None, help="JSONL с разметкой; если не указан — синтетический корпус"
+    )
     parser.add_argument("--n", type=int, default=240, help="размер синтетического корпуса")
     parser.add_argument("--seed", type=int, default=1312)
     parser.add_argument("--backend", choices=["surrogate", "hf"], default="surrogate")
@@ -377,14 +385,19 @@ def main() -> int:
 
     print(f"Корпус: {len(entries)} документов (обучение {len(train)}, отложенная {len(test)})")
     report = train_calibrator(
-        detector, [{"id": e.doc_id, "text": e.text, "labels": [
-            [s, end, 1] for s, end in e.truth_spans] + [
-            [s, end, 0] for s, end in _complement(e)]} for e in train],
-        config=config, dataset_name=str(args.dataset or "synthetic"),
+        detector,
+        [
+            {
+                "id": e.doc_id,
+                "text": e.text,
+                "labels": [[s, end, 1] for s, end in e.truth_spans] + [[s, end, 0] for s, end in _complement(e)],
+            }
+            for e in train
+        ],
+        config=config,
+        dataset_name=str(args.dataset or "synthetic"),
     )
-    evaluation_detector = Detector(
-        config.with_overrides(threshold=report.threshold), calibrator=report.calibrator
-    )
+    evaluation_detector = Detector(config.with_overrides(threshold=report.threshold), calibrator=report.calibrator)
 
     print(f"Калибратор обучен: {report.summary()}")
     evaluation = evaluate(evaluation_detector, test, report.threshold)
@@ -392,10 +405,15 @@ def main() -> int:
 
     args.out.mkdir(parents=True, exist_ok=True)
     (args.out / "report.json").write_text(
-        json.dumps({"evaluation": evaluation, "threshold_sweep": sweep,
-                    "training": {"stats": report.stats,
-                                 "cross_validation": report.cross_validation.get("mean", {})}},
-                   ensure_ascii=False, indent=2),
+        json.dumps(
+            {
+                "evaluation": evaluation,
+                "threshold_sweep": sweep,
+                "training": {"stats": report.stats, "cross_validation": report.cross_validation.get("mean", {})},
+            },
+            ensure_ascii=False,
+            indent=2,
+        ),
         encoding="utf-8",
     )
     (args.out / "report.md").write_text(
@@ -409,17 +427,22 @@ def main() -> int:
     )
 
     tm = evaluation["token_metrics"]
-    print(f"Токены:  P={tm['precision']:.3f} R={tm['recall']:.3f} F1={tm['f1']:.3f} "
-          f"FPR={tm['fpr']:.3f} HDR={tm['hdr']:.3f}")
-    print(f"Фрагменты: P={evaluation['span_metrics']['precision']:.3f} "
-          f"R={evaluation['span_metrics']['recall']:.3f} "
-          f"F1={evaluation['span_metrics']['f1']:.3f}")
+    print(
+        f"Токены:  P={tm['precision']:.3f} R={tm['recall']:.3f} F1={tm['f1']:.3f} "
+        f"FPR={tm['fpr']:.3f} HDR={tm['hdr']:.3f}"
+    )
+    print(
+        f"Фрагменты: P={evaluation['span_metrics']['precision']:.3f} "
+        f"R={evaluation['span_metrics']['recall']:.3f} "
+        f"F1={evaluation['span_metrics']['f1']:.3f}"
+    )
     cm = evaluation["char_metrics"]
-    print(f"Символы:  P={cm['precision']:.3f} R={cm['recall']:.3f} F1={cm['f1']:.3f} "
-          f"IoU={evaluation['char_iou_mean']:.3f}")
+    print(
+        f"Символы:  P={cm['precision']:.3f} R={cm['recall']:.3f} F1={cm['f1']:.3f} "
+        f"IoU={evaluation['char_iou_mean']:.3f}"
+    )
     print(f"Доля участия ИИ: MAE={evaluation['share_mae']:.3f}")
-    print(f"Отчёт: {args.out / 'report.md'} | {args.out / 'report.json'} | "
-          f"{args.out / 'probabilities.svg'}")
+    print(f"Отчёт: {args.out / 'report.md'} | {args.out / 'report.json'} | " f"{args.out / 'probabilities.svg'}")
     return 0
 
 

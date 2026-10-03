@@ -14,8 +14,9 @@
 from __future__ import annotations
 
 import re
+from collections.abc import Iterable, Sequence
 from dataclasses import dataclass, field
-from typing import Any, Iterable, Sequence
+from typing import Any
 
 __all__ = [
     "TOKEN_RE",
@@ -33,10 +34,27 @@ __all__ = [
 TOKEN_RE = re.compile(r"\w+(?:[-'’]\w+)*|[^\w\s]", re.UNICODE)
 _SENTENCE_RE = re.compile(r"(?<=[.!?…])[ \t]+(?=[«\"(]?[A-ZА-ЯЁ0-9])")
 _NUMBER_WORDS = {
-    "ноль": 0, "один": 1, "одна": 1, "два": 2, "две": 2, "три": 3, "четыре": 4,
-    "пять": 5, "шесть": 6, "семь": 7, "восемь": 8, "девять": 9, "десять": 10,
-    "одиннадцать": 11, "двенадцать": 12, "пятнадцать": 15, "двадцать": 20,
-    "тридцать": 30, "сорок": 40, "пятьдесят": 50, "сто": 100,
+    "ноль": 0,
+    "один": 1,
+    "одна": 1,
+    "два": 2,
+    "две": 2,
+    "три": 3,
+    "четыре": 4,
+    "пять": 5,
+    "шесть": 6,
+    "семь": 7,
+    "восемь": 8,
+    "девять": 9,
+    "десять": 10,
+    "одиннадцать": 11,
+    "двенадцать": 12,
+    "пятнадцать": 15,
+    "двадцать": 20,
+    "тридцать": 30,
+    "сорок": 40,
+    "пятьдесят": 50,
+    "сто": 100,
 }
 
 
@@ -77,7 +95,7 @@ def tokenize_with_offsets(text: str) -> list[Token]:
     с точностью до количества пробелов внутри, а последовательность
     ``[text[t.start:t.end]]`` совпадает с текстом посимвольно.
     """
-    if not text:
+    if not text or not text.strip():
         return []
     spans: list[Token] = []
     cursor = 0
@@ -106,7 +124,7 @@ def tokenize_with_offsets(text: str) -> list[Token]:
 
 def split_sentences(text: str) -> list[tuple[int, int]]:
     """Границы предложений (start, end) с учётом пробелов после знаков."""
-    if not text:
+    if not text or not text.strip():
         return []
     bounds: list[int] = []
     for match in _SENTENCE_RE.finditer(text):
@@ -221,10 +239,12 @@ class VerificationResult:
         }
         if with_tokens:
             payload["tokens"] = self.tokens
+        if (with_tokens or self.tokens) and "tokens" not in payload:
+            payload["tokens"] = self.tokens
         return payload
 
     @classmethod
-    def from_dict(cls, data: dict[str, Any]) -> "VerificationResult":
+    def from_dict(cls, data: dict[str, Any]) -> VerificationResult:
         """Восстановить результат из JSON (для тестов и офлайн-разбора)."""
         return cls(
             score=float(data.get("score", 0.0)),

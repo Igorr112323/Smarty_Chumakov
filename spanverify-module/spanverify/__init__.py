@@ -1,20 +1,34 @@
-"""SpanVerify — локализация фрагментов текста, сгенерированных ИИ.
+"""SpanVerify — проверка достоверности ответа относительно контекста.
 
-Модуль определяет, какие участки документа написаны языковой моделью,
-и оценивает долю участия ИИ. Ядро работает на стандартной библиотеке
-Python; режим ``hf`` подключает HuggingFace-модель как опциональную
-зависимость.
+Продукт решает одну задачу: дан ответ и документ-контекст — найти фрагменты
+ответа, которые контекстом не подтверждаются, и вернуть оценку риска.
 
-Публичный API:
+    from spanverify import Verifier
+    verifier = Verifier(mode="demo")          # или mode="hf" (нужны torch+transformers)
+    result = verifier.verify(answer, context)
+    print(result.verdict, result.score, [s.text for s in result.spans])
 
-    from spanverify import Config, Detector
-    det = Detector(Config())
-    result = det.analyze(text)
-    print(result.ai_fraction, result.spans)
+Историческая ветка (определение «текст написан ИИ» без контекста) остаётся
+доступной через :class:`spanverify.detector.Detector` и команду
+``spanverify analyze``; продукт её не использует.
+
+Точки входа: ``python -m spanverify <команда>`` (см. ``spanverify.cli``),
+HTTP-сервис — ``spanverify server`` (порт по умолчанию 8765).
 """
 
 from .config import Config
-from .detector import Detector, VerifyResult, Span
+from .detector import Detector, Span, VerifyResult
+from .engine import WEIGHTS_FILENAME, VerificationResult, Verifier, WeightsBundle
 
-__version__ = "1.0.0"
-__all__ = ["Config", "Detector", "VerifyResult", "Span", "__version__"]
+__version__ = "1.1.0"
+__all__ = [
+    "Config",
+    "Detector",
+    "Span",
+    "VerifyResult",
+    "Verifier",
+    "VerificationResult",
+    "WeightsBundle",
+    "WEIGHTS_FILENAME",
+    "__version__",
+]

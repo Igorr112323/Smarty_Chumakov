@@ -21,9 +21,7 @@ from spanverify.training import train_calibrator
 def calibrator_config():
     """Герметичная калибровка на небольшом синтетическом корпусе."""
     config = Config(backend="surrogate", calibration_path="config/__tests_absent.json")
-    report = train_calibrator(
-        Detector(config), generate_dataset(80, seed=2024), config=config, dataset_name="tests"
-    )
+    report = train_calibrator(Detector(config), generate_dataset(80, seed=2024), config=config, dataset_name="tests")
     return config.with_overrides(threshold=report.threshold), report.calibrator
 
 
@@ -131,7 +129,7 @@ def test_mixed_document_estimates_track_ground_truth(detector: Detector):
 def _pearson(xs, ys) -> float:
     n = len(xs)
     mean_x, mean_y = sum(xs) / n, sum(ys) / n
-    cov = sum((x - mean_x) * (y - mean_y) for x, y in zip(xs, ys))
+    cov = sum((x - mean_x) * (y - mean_y) for x, y in zip(xs, ys, strict=False))
     var_x = sum((x - mean_x) ** 2 for x in xs) ** 0.5
     var_y = sum((y - mean_y) ** 2 for y in ys) ** 0.5
     return cov / (var_x * var_y) if var_x and var_y else 0.0

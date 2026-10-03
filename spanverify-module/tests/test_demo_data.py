@@ -41,7 +41,7 @@ def test_labels_alternate_between_classes():
     doc = make_mixed_document(random.Random(5), segments=6)
     labels = [label for _, _, label in doc["labels"]]
     assert len(labels) >= 5
-    assert all(a != b for a, b in zip(labels, labels[1:]))
+    assert all(a != b for a, b in zip(labels, labels[1:], strict=False))
 
 
 def test_ai_and_human_paragraphs_differ_in_vocabulary():

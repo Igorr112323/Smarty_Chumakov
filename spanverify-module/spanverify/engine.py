@@ -22,9 +22,10 @@ from __future__ import annotations
 
 import json
 import time
+from collections.abc import Sequence
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Sequence
+from typing import Any
 
 from .calibration import IsotonicCalibrator
 from .config import Config, read_runtime_text
@@ -40,13 +41,13 @@ from .core import (
 )
 from .detector import Detector
 from .features import (
-    is_scored_token,
     DEFAULT_WEIGHTS,
     DEMO_WARNING,
     FEATURE_NAMES,
     FeatureMatrix,
     combine,
     extract_features,
+    is_scored_token,
 )
 
 WEIGHTS_FILENAME = "config/weights.json"
@@ -72,6 +73,7 @@ class WeightsBundle:
     version: str = "1.1.0"
     mode: str = "demo"
     meta: dict[str, Any] | None = None
+    source: str = "defaults"  # откуда взяты параметры: disk | embedded | defaults
 
     def to_dict(self) -> dict[str, Any]:
         return {
@@ -93,7 +95,7 @@ class WeightsBundle:
         }
 
     @classmethod
-    def from_dict(cls, data: dict[str, Any]) -> "WeightsBundle":
+    def from_dict(cls, data: dict[str, Any]) -> WeightsBundle:
         isotonic_data = data.get("isotonic") or {}
         calibrator = (
             IsotonicCalibrator(
@@ -104,8 +106,7 @@ class WeightsBundle:
             else None
         )
         return cls(
-            weights={name: float(data.get("weights", {}).get(name, DEFAULT_WEIGHTS[name]))
-                     for name in FEATURE_NAMES},
+            weights={name: float(data.get("weights", {}).get(name, DEFAULT_WEIGHTS[name])) for name in FEATURE_NAMES},
             threshold=float(data.get("threshold", 0.5)),
             target_fpr=float(data.get("target_fpr", 0.1)),
             span_z=float(data.get("span_z", 1.0)),
@@ -129,20 +130,33 @@ class WeightsBundle:
         return target
 
     @classmethod
-    def load(cls, path: str | Path | None = WEIGHTS_FILENAME) -> "WeightsBundle":
-        """Загрузить обученные параметры; при отсутствии — значения по умолчанию."""
+    def load(cls, path: str | Path | None = WEIGHTS_FILENAME) -> WeightsBundle:
+        """Загрузить обученные параметры; при отсутствии — значения по умолчанию.
+
+        Порядок поиска: файл рядом с приложением → копия внутри zipapp/.exe
+        (``config/weights.json`` внутри бандла) → значения по умолчанию.
+        """
         if path is None:
             return cls(weights=dict(DEFAULT_WEIGHTS), threshold=0.5)
         target = Path(path)
         if target.is_file():
             with target.open("r", encoding="utf-8") as handle:
-                return cls.from_dict(json.load(handle))
+                bundle = cls.from_dict(json.load(handle))
+            bundle.source = "disk"
+            return bundle
         if target.is_absolute():
             return cls(weights=dict(DEFAULT_WEIGHTS), threshold=0.5)
         embedded = read_runtime_text(str(target))
         if embedded:
-            return cls.from_dict(json.loads(embedded))
+            bundle = cls.from_dict(json.loads(embedded))
+            bundle.source = "embedded"
+            return bundle
         return cls(weights=dict(DEFAULT_WEIGHTS), threshold=0.5)
+
+    @property
+    def loaded(self) -> bool:
+        """Обучены ли параметры (а не взяты значения по умолчанию)."""
+        return self.source in {"disk", "embedded"}
 
 
 class Verifier:
@@ -158,11 +172,11 @@ class Verifier:
         weights_path: str | Path | None = WEIGHTS_FILENAME,
     ) -> None:
         self.config = config or Config.load()
-        self.bundle = weights or WeightsBundle.load(weights_path)
+        # Явно переданные веса имеют приоритет: иначе обучение, которое считает
+        # сквозные метрики «в памяти», случайно перечитало бы файл с диска.
+        self.bundle = weights if weights is not None else WeightsBundle.load(weights_path)
+        self.weights_loaded = weights is not None or self.bundle.loaded
         self.mode = (mode or self.bundle.mode or self.config.backend or "demo").lower()
-        if self.mode != self.bundle.mode and self.bundle.mode not in {"", "unknown"}:
-            # Режим задан явно: берём веса и калибровку заказанного режима, если они есть.
-            self.bundle = WeightsBundle.load(weights_path) if weights_path else self.bundle
         self.model_name = model_name or getattr(self.config, "hf_model", "ai-forever/rugpt3small_based_on_gpt2")
         self._detector = detector
 
@@ -241,7 +255,7 @@ class Verifier:
         raw_score = _answer_score(scored)
         score = self._calibrate(raw_score)
         threshold = self.bundle.threshold
-        ai_share_soft, ai_share_hard = self._ai_share(answer)
+        ai_share_soft, ai_share_hard = self._shares(tokens, smoothed, scored_indices)
 
         tokens_payload = _token_payload(tokens, features, smoothed, span_threshold)
         stats = {
@@ -299,20 +313,11 @@ class Verifier:
 
         for pair in pairs:
             data = pair.to_dict() if isinstance(pair, Pair) else pair
-            result = self.verify(
-                data.get("answer", ""), data.get("context", ""), with_tokens=True
-            )
+            result = self.verify(data.get("answer", ""), data.get("context", ""), with_tokens=True)
             tokens = tokenize_with_offsets(data.get("answer", ""))
-            pair_truth = [
-                (int(start), int(end))
-                for start, end, label in data.get("labels", [])
-                if int(label) == 1
-            ]
+            pair_truth = [(int(start), int(end)) for start, end, label in data.get("labels", []) if int(label) == 1]
             pair_predicted = [(span.start, span.end) for span in result.spans]
-            pair_truth_expanded = [
-                _expand_to_sentence(data.get("answer", ""), start, end)
-                for start, end in pair_truth
-            ]
+            pair_truth_expanded = [_expand_to_sentence(data.get("answer", ""), start, end) for start, end in pair_truth]
 
             for index, token in enumerate(tokens):
                 if not is_scored_token(token.text):
@@ -336,9 +341,7 @@ class Verifier:
         # покрытию — размеченный фрагмент целиком попал в найденный; (б) F1 при
         # том же расширении разметки, то есть качество склейки и расширения.
         span_metrics["recall_containment"] = _containment_recall(predicted, truth)
-        span_metrics["f1_expanded_labels"] = _span_f1(
-            predicted, truth_expanded, iou_threshold=0.5
-        )["f1"]
+        span_metrics["f1_expanded_labels"] = _span_f1(predicted, truth_expanded, iou_threshold=0.5)["f1"]
         span_metrics["mean_width_ratio"] = _mean_width_ratio(predicted, truth)
         answer_metrics = _answer_metrics(
             answer_labels, answer_scores, threshold if threshold is not None else self.bundle.threshold
@@ -362,29 +365,47 @@ class Verifier:
 
     def _features(self, answer: str, context: str | Sequence[str] | None, tokens: Sequence[Token]) -> FeatureMatrix:
         if self.mode == "hf":
-            return extract_features(
-                answer, context, mode="hf", model_name=self.model_name, answer_tokens=tokens
-            )
+            return extract_features(answer, context, mode="hf", model_name=self.model_name, answer_tokens=tokens)
         return extract_features(answer, context, mode="demo", answer_tokens=tokens)
 
     def _span_threshold(self, risk: Sequence[float]) -> float:
         """Порог маски для текущего набора весов (см. :func:`span_threshold_for`)."""
-        return span_threshold_for(
-            risk, self.bundle.span_z, self.bundle.span_floor, self.bundle.span_cap
-        )
+        return span_threshold_for(risk, self.bundle.span_z, self.bundle.span_floor, self.bundle.span_cap)
 
     def _calibrate(self, raw_score: float) -> float:
         if self.bundle.isotonic is None:
             return raw_score
         return self.bundle.isotonic.transform_one(raw_score)
 
-    def _ai_share(self, answer: str) -> tuple[float, float]:
-        """Две оценки доли участия ИИ: средняя вероятность и доля выше порога."""
-        try:
-            result = self.detector.analyze(answer)
-        except Exception:  # noqa: BLE001 - режим hf без зависимостей не должен ломать verify
+    def _shares(
+        self,
+        tokens: Sequence[Token],
+        smoothed: Sequence[float],
+        scored_indices: Sequence[int],
+    ) -> tuple[float, float]:
+        """Доли «недостоверного» текста в ответе (поля ai_share/ai_share_hard).
+
+        * ``ai_share`` (мягкая) — средняя калиброванная вероятность
+          недостоверности по содержательным токенам: не зависит от порога и
+          показывает, «насколько тревожный» ответ в целом;
+        * ``ai_share_hard`` (жёсткая) — доля содержательных токенов, попавших
+          выше порога маски, то есть прямо помеченных конвейером.
+
+        Названия полей исторические (контракт API), смысл — доля недостоверного
+        текста, а не «доля ИИ»: это разные оси, и здесь измеряется вторая.
+        """
+        if not scored_indices:
             return 0.0, 0.0
-        return float(result.ai_fraction_soft), float(result.ai_fraction)
+        mask_threshold = span_threshold_for(
+            [smoothed[index] for index in scored_indices],
+            self.bundle.span_z,
+            self.bundle.span_floor,
+            self.bundle.span_cap,
+        )
+        probabilities = [self._calibrate(smoothed[index]) for index in scored_indices]
+        soft = sum(probabilities) / len(probabilities)
+        hard = sum(1 for index in scored_indices if smoothed[index] >= mask_threshold) / len(scored_indices)
+        return min(1.0, max(0.0, soft)), min(1.0, max(0.0, hard))
 
     def _build_spans(
         self,
@@ -436,14 +457,12 @@ class Verifier:
         return _merge_spans(spans)
 
 
-def _token_metrics(
-    labels: Sequence[int], flags: Sequence[bool], risks: Sequence[float]
-) -> dict[str, float]:
+def _token_metrics(labels: Sequence[int], flags: Sequence[bool], risks: Sequence[float]) -> dict[str, float]:
     """Precision/recall/F1 по токенам при заданном пороге маски."""
-    tp = sum(1 for label, flag in zip(labels, flags) if label and flag)
-    fp = sum(1 for label, flag in zip(labels, flags) if not label and flag)
-    fn = sum(1 for label, flag in zip(labels, flags) if label and not flag)
-    tn = sum(1 for label, flag in zip(labels, flags) if not label and not flag)
+    tp = sum(1 for label, flag in zip(labels, flags, strict=False) if label and flag)
+    fp = sum(1 for label, flag in zip(labels, flags, strict=False) if not label and flag)
+    fn = sum(1 for label, flag in zip(labels, flags, strict=False) if label and not flag)
+    tn = sum(1 for label, flag in zip(labels, flags, strict=False) if not label and not flag)
     precision = tp / (tp + fp) if tp + fp else 0.0
     recall = tp / (tp + fn) if tp + fn else 0.0
     return {
@@ -451,20 +470,21 @@ def _token_metrics(
         "recall": recall,
         "f1": 2 * precision * recall / (precision + recall) if precision + recall else 0.0,
         "fpr": fp / (fp + tn) if fp + tn else 0.0,
-        "tp": tp, "fp": fp, "fn": fn, "tn": tn,
+        "tp": tp,
+        "fp": fp,
+        "fn": fn,
+        "tn": tn,
         "auc": _auc(labels, risks),
     }
 
 
-def _answer_metrics(
-    labels: Sequence[int], scores: Sequence[float], threshold: float | None
-) -> dict[str, float]:
+def _answer_metrics(labels: Sequence[int], scores: Sequence[float], threshold: float | None) -> dict[str, float]:
     """Метрики уровня ответа: AUC и качество при пороге решения."""
     cut = threshold if threshold is not None else 0.5
-    tp = sum(1 for label, score in zip(labels, scores) if label and score >= cut)
-    fp = sum(1 for label, score in zip(labels, scores) if not label and score >= cut)
-    fn = sum(1 for label, score in zip(labels, scores) if label and score < cut)
-    tn = sum(1 for label, score in zip(labels, scores) if not label and score < cut)
+    tp = sum(1 for label, score in zip(labels, scores, strict=False) if label and score >= cut)
+    fp = sum(1 for label, score in zip(labels, scores, strict=False) if not label and score >= cut)
+    fn = sum(1 for label, score in zip(labels, scores, strict=False) if label and score < cut)
+    tn = sum(1 for label, score in zip(labels, scores, strict=False) if not label and score < cut)
     precision = tp / (tp + fp) if tp + fp else 0.0
     recall = tp / (tp + fn) if tp + fn else 0.0
     return {
@@ -474,7 +494,10 @@ def _answer_metrics(
         "f1": 2 * precision * recall / (precision + recall) if precision + recall else 0.0,
         "fpr": fp / (fp + tn) if fp + tn else 0.0,
         "auc": _auc(labels, scores),
-        "tp": tp, "fp": fp, "fn": fn, "tn": tn,
+        "tp": tp,
+        "fp": fp,
+        "fn": fn,
+        "tn": tn,
     }
 
 
@@ -515,7 +538,7 @@ def _span_f1(
 ) -> dict[str, float]:
     """F1 по фрагментам: жадное сопоставление с порогом IoU (как в разметке)."""
     tp = fp = fn = 0
-    for predicted_pair, truth_pair in zip(predicted, truth):
+    for predicted_pair, truth_pair in zip(predicted, truth, strict=False):
         used: set[int] = set()
         for guess in predicted_pair:
             best_index, best_iou = -1, 0.0
@@ -537,7 +560,9 @@ def _span_f1(
         "precision": precision,
         "recall": recall,
         "f1": 2 * precision * recall / (precision + recall) if precision + recall else 0.0,
-        "tp": tp, "fp": fp, "fn": fn,
+        "tp": tp,
+        "fp": fp,
+        "fn": fn,
         "iou_threshold": iou_threshold,
     }
 
@@ -548,7 +573,7 @@ def _containment_recall(
 ) -> float:
     """Доля размеченных фрагментов, целиком накрытых найденным фрагментом."""
     total = matched = 0
-    for predicted_pair, truth_pair in zip(predicted, truth):
+    for predicted_pair, truth_pair in zip(predicted, truth, strict=False):
         for gold in truth_pair:
             total += 1
             if any(guess[0] <= gold[0] and guess[1] >= gold[1] for guess in predicted_pair):
@@ -562,7 +587,7 @@ def _mean_width_ratio(
 ) -> float:
     """Во сколько раз найденные фрагменты шире разметки (в среднем, по накрытым)."""
     ratios: list[float] = []
-    for predicted_pair, truth_pair in zip(predicted, truth):
+    for predicted_pair, truth_pair in zip(predicted, truth, strict=False):
         for gold in truth_pair:
             for guess in predicted_pair:
                 if guess[0] <= gold[0] and guess[1] >= gold[1]:
@@ -572,9 +597,7 @@ def _mean_width_ratio(
     return sum(ratios) / len(ratios) if ratios else 0.0
 
 
-def span_threshold_for(
-    risk: Sequence[float], span_z: float, span_floor: float, span_cap: float
-) -> float:
+def span_threshold_for(risk: Sequence[float], span_z: float, span_floor: float, span_cap: float) -> float:
     """Порог маски: median + z·1.4826·MAD, зажатый в [floor, cap].
 
     Отклонение от буквального T = μ + z·σ и его причина: искомый сигнал —
@@ -611,9 +634,7 @@ def _smooth(values: Sequence[float], window: int) -> list[float]:
         low, high = max(0, index - half), min(len(values), index + half + 1)
         total_weight = centre_weight + side_weight * (index - low) + side_weight * (high - 1 - index)
         weighted = centre_weight * values[index] + sum(
-            side_weight * values[position]
-            for position in range(low, high)
-            if position != index
+            side_weight * values[position] for position in range(low, high) if position != index
         )
         out.append(weighted / total_weight)
     return out
@@ -675,7 +696,7 @@ def _head_risk(
             min(1.0, len(tokens[index].text.strip()) / 20),
         ]
         normalized = [(value - means[j]) / (scales[j] or 1.0) for j, value in enumerate(row)]
-        score = model.get("bias", 0.0) + sum(w * x for w, x in zip(weights, normalized))
+        score = model.get("bias", 0.0) + sum(w * x for w, x in zip(weights, normalized, strict=False))
         probabilities.append(1.0 / (1.0 + _math.exp(-max(-30.0, min(30.0, score)))))
     return probabilities
 
@@ -729,9 +750,7 @@ def _merge_spans(spans: Sequence[SpanResult]) -> list[SpanResult]:
                 text=previous.text,
                 risk=max(previous.risk, span.risk),
                 label=(
-                    "likely_hallucination"
-                    if "likely_hallucination" in (previous.label, span.label)
-                    else "doubtful"
+                    "likely_hallucination" if "likely_hallucination" in (previous.label, span.label) else "doubtful"
                 ),
                 n_tokens=previous.n_tokens + span.n_tokens,
             )

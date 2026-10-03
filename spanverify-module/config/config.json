@@ -1,6 +1,6 @@
 {
   "backend": "surrogate",
-  "hf_model": "cointegrated/rubert-tiny2",
+  "hf_model": "ai-forever/rugpt3small_based_on_gpt2",
   "hf_max_tokens": 512,
   "k_neighbors": 5,
   "vector_dim": 4096,
@@ -16,5 +16,6 @@
   "folds": 5,
   "seed": 1312,
   "host": "0.0.0.0",
-  "port": 8000
+  "port": 8765,
+  "legacy_port": 8000
 }

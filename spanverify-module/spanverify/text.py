@@ -8,8 +8,8 @@
 from __future__ import annotations
 
 import re
+from collections.abc import Iterable, Iterator
 from dataclasses import dataclass
-from typing import Iterable, Iterator
 
 # Слово: буквы (кириллица/латиница), цифры, дефисы и апострофы внутри.
 WORD_RE = re.compile(r"[A-Za-zА-Яа-яЁё0-9]+(?:[-'’][A-Za-zА-Яа-яЁё0-9]+)*")
@@ -18,9 +18,38 @@ WORD_RE = re.compile(r"[A-Za-zА-Яа-яЁё0-9]+(?:[-'’][A-Za-zА-Яа-яЁё
 _SENT_BOUNDARY = re.compile(r"(?<=[.!?…])[ \t]+(?=[«\"(]?[A-ZА-ЯЁ0-9])")
 
 ABBREV = {
-    "т", "е", "д", "п", "г", "гг", "рис", "табл", "см", "др", "проф", "акад",
-    "тыс", "млн", "млрд", "руб", "коп", "с", "стр", "напр", "им", "обл", "р",
-    "ул", "д", "кв", "оф", "mr", "dr", "etc", "vs", "i.e", "e.g",
+    "т",
+    "е",
+    "д",
+    "п",
+    "г",
+    "гг",
+    "рис",
+    "табл",
+    "см",
+    "др",
+    "проф",
+    "акад",
+    "тыс",
+    "млн",
+    "млрд",
+    "руб",
+    "коп",
+    "с",
+    "стр",
+    "напр",
+    "им",
+    "обл",
+    "р",
+    "ул",
+    "кв",
+    "оф",
+    "mr",
+    "dr",
+    "etc",
+    "vs",
+    "i.e",
+    "e.g",
 }
 
 
@@ -51,7 +80,7 @@ def tokenize(text: str) -> list[Token]:
     pos = 0
     for match in WORD_RE.finditer(text):
         if match.start() > pos:
-            tokens.append(Token(text[pos:match.start()], pos, match.start(), "gap"))
+            tokens.append(Token(text[pos : match.start()], pos, match.start(), "gap"))
         tokens.append(Token(match.group(0), match.start(), match.end(), "word"))
         pos = match.end()
     if pos < len(text):

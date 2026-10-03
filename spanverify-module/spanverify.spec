@@ -3,9 +3,22 @@
 
     pyinstaller spanverify.spec --noconfirm
 
-Результат: dist/spanverify(.exe). Конфигурация и калибратор кладутся рядом
-с исполняемым файлом (папка config/), чтобы порог можно было менять без
-пересборки. Если их нет, приложение стартует со значениями по умолчанию.
+Результат: ``dist/spanverify(.exe)`` — один файл, консольное приложение.
+
+Что важно в этой сборке (Приложение В мастер-промта):
+
+* ``console=True`` и ``strip=True`` — виден лог запуска, бинарник компактнее;
+* ``name="spanverify"`` — имя файла совпадает с именем в релизе;
+* ``datas`` включает ``config/`` и ``data/`` — обученные веса, калибратор и
+  демонстрационный корпус едут внутри файла, поэтому .exe работает сам по себе
+  (файл ``config/weights.json`` рядом с .exe, если он есть, имеет приоритет);
+* ``hiddenimports`` — модули, которые PyInstaller не видит за ленивыми
+  импортами (режим ``hf`` подключается только при наличии torch);
+* ``excludes`` — тяжёлые пакеты, которые .exe не использует. Если torch
+  установлен в среде сборки, без исключения бинарник вырос бы до гигабайт.
+
+Сборка выполняется только на Windows в GitHub Actions, поэтому .exe всегда
+проверяется смоук-тестом до публикации релиза.
 """
 
 import sys
@@ -18,13 +31,28 @@ datas = [
     (str(ROOT / "config"), "config"),
     (str(ROOT / "data"), "data"),
 ]
+
 hiddenimports = [
+    "spanverify.cli",
+    "spanverify.server",
+    "spanverify.webui",
+    "spanverify.engine",
+    "spanverify.features",
+    "spanverify.train",
+    "spanverify.dataset",
+    "spanverify.detector",
     "spanverify.backends.surrogate",
     "spanverify.backends.hf",
 ]
 
+excludes = [
+    "torch", "transformers", "faiss", "streamlit", "tkinter", "unittest",
+    "pydoc", "pytest", "setuptools", "pip", "matplotlib", "pandas", "scipy",
+    "PIL", "IPython", "notebook", "numpy.testing",
+]
+
 a = Analysis(
-    ["app.py"],
+    [str(ROOT / "scripts" / "exe_launcher.py")],
     pathex=[str(ROOT)],
     binaries=[],
     datas=datas,
@@ -32,9 +60,7 @@ a = Analysis(
     hookspath=[],
     hooksconfig={},
     runtime_hooks=[],
-    # torch/transformers подключаются только если установлены и указаны явно;
-    # для демо-сборки их вырезаем, чтобы бинарник остался компактным.
-    excludes=["torch", "transformers", "streamlit", "pandas", "matplotlib", "numpy"],
+    excludes=excludes,
     win_no_prefer_redirects=False,
     win_private_assemblies=False,
     cipher=block_cipher,
@@ -53,8 +79,8 @@ exe = EXE(
     name="spanverify",
     debug=False,
     bootloader_ignore_signals=False,
-    strip=False,
-    upx=True,
+    strip=True,
+    upx=False,
     upx_exclude=[],
     runtime_tmpdir=None,
     console=True,
@@ -65,7 +91,3 @@ exe = EXE(
     entitlements_file=None,
     icon=None,
 )
-
-if sys.platform == "win32":
-    # Консольное окно полезно: в нём печатается адрес интерфейса и логи.
-    exe.console = True

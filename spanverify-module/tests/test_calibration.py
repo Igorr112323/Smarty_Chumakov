@@ -20,7 +20,7 @@ def test_pava_output_is_non_decreasing():
     scores = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8]
     labels = [1, 0, 0, 1, 0, 1, 1, 1]
     _, values = pava(scores, labels)
-    assert all(b >= a for a, b in zip(values, values[1:]))
+    assert all(b >= a for a, b in zip(values, values[1:], strict=False))
 
 
 def test_pava_with_separable_data_gives_extremes():
@@ -48,7 +48,7 @@ def test_isotonic_calibrator_is_monotone_and_bounded():
     grid = [i / 100 for i in range(101)]
     probs = calibrator.transform(grid)
     assert all(0.0 <= p <= 1.0 for p in probs)
-    assert all(b >= a - 1e-9 for a, b in zip(probs, probs[1:]))
+    assert all(b >= a - 1e-9 for a, b in zip(probs, probs[1:], strict=False))
 
 
 def test_calibrator_roundtrip_through_dict():
@@ -77,7 +77,7 @@ def test_calibrator_compresses_pava_output():
     labels = [1 if s + rng.gauss(0, 0.2) > 0.5 else 0 for s in scores]
     calibrator = IsotonicCalibrator.fit(scores, labels, tolerance=0.01, max_points=200)
     assert len(calibrator.thresholds) <= 202
-    assert all(b >= a - 1e-9 for a, b in zip(calibrator.values, calibrator.values[1:]))
+    assert all(b >= a - 1e-9 for a, b in zip(calibrator.values, calibrator.values[1:], strict=False))
     assert calibrator.transform_one(0.0) <= calibrator.transform_one(1.0)
 
 

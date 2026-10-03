@@ -1,11 +1,20 @@
-"""Командный интерфейс SpanVerify.
+"""Командная строка SpanVerify.
 
-    python -m spanverify analyze --text "..." --json
-    python -m spanverify analyze --file document.txt
-    python -m spanverify demo --n 240 --out data/demo_dataset.jsonl
-    python -m spanverify calibrate --dataset data/demo_dataset.jsonl
-    python -m spanverify serve --port 8000
-    python -m spanverify selftest
+    spanverify verify    --answer "... --context "..."   # проверить ответ
+    spanverify train     --dataset data/demo_pairs.jsonl --out config/weights.json
+    spanverify calibrate --dataset data/demo_pairs.jsonl
+    spanverify evaluate  --dataset data/demo_pairs.jsonl
+    spanverify selftest                                  # само-проверка конвейера
+    spanverify server    --port 8765 [--no-browser]      # HTTP API + интерфейс
+    spanverify demo      --pairs 240                     # корпус → обучение → метрики
+    spanverify config                                    # действующие параметры
+    spanverify analyze   "текст"                         # историческая ветка: только текст
+
+Коды возврата:
+
+* ``0`` — проверка пройдена (ответ опирается на контекст) либо команда успешна;
+* ``1`` — проверка нашла сомнительные фрагменты (это результат, а не сбой);
+* ``2`` — ошибка: неверные аргументы, отсутствующий файл, сбой пайплайна.
 """
 
 from __future__ import annotations
@@ -13,282 +22,490 @@ from __future__ import annotations
 import argparse
 import json
 import sys
-import time
+import webbrowser
+from collections.abc import Sequence
 from pathlib import Path
+from typing import Any
 
 from . import __version__
-from .calibration import IsotonicCalibrator, cross_validate
-from .training import train_calibrator
-from .config import Config
-from .demo_data import (
-    dataset_statistics,
-    generate_dataset,
-    make_ai_paragraph,
-    make_human_paragraph,
-    make_mixed_document,
-    read_dataset,
-    write_dataset,
+from .dataset import (
+    DATASET_VERSION,
+    corpus_statistics,
+    generate_pairs,
+    read_pairs,
+    write_pairs,
 )
-from .detector import Detector, _moving_average
-from .text import tokenize
+from .engine import WEIGHTS_FILENAME, Verifier
+from .server import DEFAULT_PORT, serve
+
+EXIT_OK = 0
+EXIT_ISSUES = 1
+EXIT_ERROR = 2
+DEFAULT_DATASET = "data/demo_pairs.jsonl"
+BACKENDS = ("demo", "surrogate", "stub", "hf")
 
 
-def _load_config(args: argparse.Namespace) -> Config:
-    config = Config.load(getattr(args, "config", None))
-    return config.with_overrides(
-        backend=getattr(args, "backend", None),
-        threshold=getattr(args, "threshold", None),
-        host=getattr(args, "host", None),
-        port=getattr(args, "port", None),
-        calibration_path=getattr(args, "calibration", None),
-    )
+def _mode(args: argparse.Namespace) -> str:
+    """Режим работы: новый флаг --mode или исторический --backend."""
+    chosen = getattr(args, "mode", None) or getattr(args, "backend", None) or "demo"
+    return "demo" if chosen == "stub" else str(chosen)
 
 
-def _print_result(result, as_json: bool, quiet: bool = False) -> None:
+# ------------------------------------------------------------------ вывод
+
+
+def _print_result(result: Any, as_json: bool, tokens: bool) -> int:
+    """Напечатать результат проверки; вернуть код возврата."""
+    payload = result.to_dict()
     if as_json:
-        print(json.dumps(result.to_dict(), ensure_ascii=False, indent=2))
-        return
-    print(f"Вердикт: {result.verdict} | доля ИИ: {result.ai_fraction:.1%} символов, "
-          f"{result.ai_fraction_tokens:.1%} слов")
-    print(f"Порог: {result.threshold:.3f} | калибровка: {'да' if result.calibrated else 'нет'} | "
-          f"бэкенд: {result.backend}")
-    for warning in result.warnings:
-        print(f"[!] {warning}", file=sys.stderr)
-    if not result.spans and not quiet:
-        print("Фрагментов выше порога не найдено.")
-    for span in result.spans:
-        snippet = span.text if len(span.text) <= 90 else span.text[:90] + "…"
-        print(f"  #{span.index + 1} [{span.start_char}:{span.end_char}] "
-              f"токенов={span.n_tokens} p={span.mean_prob:.3f} — {snippet}")
-
-
-# ---------- команды ----------
-
-def cmd_analyze(args: argparse.Namespace) -> int:
-    config = _load_config(args)
-    if args.text:
-        text = args.text
-    elif args.file:
-        text = Path(args.file).read_text(encoding="utf-8")
-    elif not sys.stdin.isatty():
-        text = sys.stdin.read()
+        print(json.dumps(payload, ensure_ascii=False, indent=2))
     else:
-        print("Укажите --text, --file или передайте текст через stdin.", file=sys.stderr)
-        return 2
-
-    detector = Detector(config)
-    started = time.perf_counter()
-    if args.explain:
-        payload = detector.explain(text, threshold=config.threshold)
-        if args.json:
-            print(json.dumps(payload, ensure_ascii=False, indent=2))
+        verdicts = {
+            "grounded": "ОПОРА НА КОНТЕКСТ ЕСТЬ",
+            "doubtful": "ЕСТЬ СОМНИТЕЛЬНЫЕ ФРАГМЕНТЫ",
+            "likely_hallucination": "ВЫСОКИЙ РИСК НЕДОСТОВЕРНОСТИ",
+            "empty": "ПУСТОЙ ОТВЕТ",
+        }
+        print(f"Вердикт: {verdicts.get(result.verdict, result.verdict)}")
+        print(f"Оценка недостоверности: {result.score:.3f} (порог {result.threshold:.3f})")
+        print(f"Доля спорного текста: мягко {result.ai_share:.3f}, жёстко {result.ai_share_hard:.3f}")
+        print(f"Режим: {result.mode}; время: {result.latency_ms:.1f} мс")
+        if result.warning:
+            print(f"ВНИМАНИЕ: {result.warning}")
+        if result.spans:
+            print("Фрагменты:")
+            for span in result.spans:
+                print(f"  - {span.start}:{span.end} риск {span.risk:.3f} [{span.label}] {span.text!r}")
         else:
-            _print_result(detector.analyze(text, threshold=config.threshold), False)
-            print("\nТокен  Сырая  Калибр.  Метка")
-            for row in payload["tokens"][: args.limit]:
-                print(f"{row['token'][:18]:18s} {row['raw']:.3f}  {row['prob']:.3f}  "
-                      f"{'ИИ' if row['flag'] else '—'}")
-    else:
-        result = detector.analyze(text, threshold=config.threshold)
-        _print_result(result, args.json)
-    if args.time:
-        print(f"Время: {time.perf_counter() - started:.3f} с", file=sys.stderr)
-    return 0
+            print("Фрагменты: не найдены")
+        if tokens and result.tokens:
+            print("Токены:")
+            for row in result.tokens:
+                print(f"  {row['index']:3d} {row['text']:18s} риск {row['risk']:.3f} " f"метка {row['label']}")
+    return EXIT_OK if result.verdict in {"grounded", "empty"} else EXIT_ISSUES
 
 
-def cmd_demo(args: argparse.Namespace) -> int:
-    config = _load_config(args)
-    detector = Detector(config)
-    rng_seed = args.seed
-    import random
+def _load_dataset(path: str | Path, pairs: int = 0, seed: int = 1312) -> list[dict]:
+    """Прочитать корпус пар или сгенерировать его, если файла нет."""
+    target = Path(path)
+    if target.is_file():
+        return list(read_pairs(target))
+    if pairs > 0:
+        generated = generate_pairs(pairs, seed=seed)
+        write_pairs(generated, target)
+        print(f"Корпус сгенерирован: {target} ({len(generated)} пар, seed={seed})")
+        return [pair.to_dict() for pair in generated]
+    raise FileNotFoundError(f"корпус {target} не найден: укажите --dataset или добавьте --make-dataset N")
 
-    rng = random.Random(rng_seed)
-    print("=== Машинный фрагмент ===")
-    _print_result(detector.analyze(make_ai_paragraph(rng)), False)
-    print("\n=== Человеческий фрагмент ===")
-    _print_result(detector.analyze(make_human_paragraph(rng)), False)
-    print("\n=== Смешанный документ ===")
-    document = make_mixed_document(rng)
-    _print_result(detector.analyze(document["text"]), False)
-    print("\nРазметка (истина):", json.dumps(document["labels"], ensure_ascii=False))
-    if args.out:
-        docs = generate_dataset(args.n, seed=rng_seed)
-        path = write_dataset(docs, args.out)
-        print(f"\nКорпус записан: {path}")
-        for key, value in dataset_statistics(docs).items():
-            print(f"  {key}: {value}")
-    return 0
+
+# ------------------------------------------------------------------ команды
+
+
+def cmd_verify(args: argparse.Namespace) -> int:
+    """Проверить один ответ относительно контекста."""
+    answer = args.answer
+    if args.answer_file:
+        answer = Path(args.answer_file).read_text(encoding="utf-8")
+    if not answer:
+        print("ошибка: нужен --answer или --answer-file", file=sys.stderr)
+        return EXIT_ERROR
+
+    context = args.context
+    if args.context_file:
+        context = Path(args.context_file).read_text(encoding="utf-8")
+
+    verifier = Verifier(mode=_mode(args), weights_path=args.weights)
+    result = verifier.verify(answer, context, with_tokens=args.tokens)
+    return _print_result(result, as_json=args.json, tokens=args.tokens)
+
+
+def cmd_train(args: argparse.Namespace) -> int:
+    """Обучить веса, порог маски, голову и калибровку."""
+    from .train import save_training_artifacts, train
+
+    records = _load_dataset(args.dataset, pairs=args.make_dataset, seed=args.seed)
+    print(f"Корпус: {args.dataset} — {len(records)} пар")
+    report = train(
+        records,
+        mode=_mode(args),
+        seed=args.seed,
+        target_fpr=args.target_fpr,
+        test_size=args.test_size,
+        folds=args.folds,
+        dataset_name=str(args.dataset),
+        version=__version__,
+    )
+    print(report.summary())
+    validation = report.validation
+    print(
+        "Валидация (отложенная часть): "
+        f"precision={validation['precision']:.3f} recall={validation['recall']:.3f} "
+        f"F1={validation['f1']:.3f} FPR={validation['fpr']:.3f} AUC={validation['auc']:.3f}"
+    )
+    end_to_end = validation.get("end_to_end", {})
+    if end_to_end:
+        tokens = end_to_end.get("tokens", {})
+        spans = end_to_end.get("spans", {})
+        print(
+            "Сквозная проверка через verify(): "
+            f"token F1={tokens.get('f1', 0):.3f} FPR={tokens.get('fpr', 0):.3f} | "
+            f"фрагменты: полнота по покрытию={spans.get('recall_containment', 0):.3f} "
+            f"F1 при расширенной разметке={spans.get('f1_expanded_labels', 0):.3f}"
+        )
+    written = save_training_artifacts(report, args.out, root=Path(args.out).parent.parent or ".")
+    print("Записано: " + ", ".join(f"{name}={path}" for name, path in written.items()))
+    if args.json:
+        print(json.dumps({"validation": report.validation, "folds": report.folds}, ensure_ascii=False, indent=2))
+    return EXIT_OK
 
 
 def cmd_calibrate(args: argparse.Namespace) -> int:
-    config = _load_config(args)
-    detector = Detector(config)
-    dataset_path = Path(args.dataset)
-    if not dataset_path.is_file():
-        print(f"Датасет не найден: {dataset_path}. Сначала: python -m spanverify demo "
-              f"--out {dataset_path}", file=sys.stderr)
-        return 2
+    """Пересчитать калибровку и порог решения по размеченному корпусу."""
+    from .calibration import IsotonicCalibrator, choose_threshold
 
-    documents = list(read_dataset(dataset_path))
-    report = train_calibrator(detector, documents, config=config, dataset_name=str(dataset_path))
+    records = _load_dataset(args.dataset, pairs=args.make_dataset, seed=args.seed)
+    verifier = Verifier(mode=_mode(args), weights_path=args.weights)
+    bundle = verifier.bundle
 
-    mean = report.cross_validation["mean"]
-    print(f"Документов: {report.stats['documents']} | токенов: {report.stats['tokens']} | "
-          f"доля ИИ-токенов: {report.calibrator.meta['ai_token_share']:.1%}")
-    print(f"Кросс-валидация ({config.folds} фолдов, отложенная часть):")
-    print(f"  precision={mean['precision']:.3f} recall={mean['recall']:.3f} f1={mean['f1']:.3f}")
-    print(f"  FPR={mean['fpr']:.3f} (лимит {config.max_fpr}) HDR={mean['hdr']:.3f} "
-          f"accuracy={mean['accuracy']:.3f}")
+    raw_scores: list[float] = []
+    labels: list[int] = []
+    for record in records:
+        result = verifier.verify(record.get("answer", ""), record.get("context", ""))
+        raw_scores.append(float(result.stats.get("raw_score", 0.0)))
+        labels.append(1 if record.get("labels") else 0)
 
-    out = Path(args.out)
-    report.calibrator.save(out)
-    print(f"Порог: {report.threshold:.4f} | калибратор сохранён: {out}")
-    print(f"Проверка: python -m spanverify analyze --text \"...\" --threshold {report.threshold:.4f}")
-    return 0
+    calibrator = IsotonicCalibrator.fit(raw_scores, labels)
+    calibrated = calibrator.transform(raw_scores)
+    threshold = choose_threshold(calibrated, labels, max_fpr=args.target_fpr)
+    bundle.isotonic = calibrator
+    bundle.threshold = float(threshold)
+    bundle.target_fpr = args.target_fpr
+    bundle.meta = {**(bundle.meta or {}), "calibration_pairs": len(records)}
+    bundle.save(args.out)
+    print(
+        f"Калибровка пересчитана на {len(records)} парах: порог={threshold:.4f} "
+        f"(целевой FPR {args.target_fpr:.2f}); записано в {args.out}"
+    )
+    return EXIT_OK
 
 
-def cmd_serve(args: argparse.Namespace) -> int:
-    from .api import serve
+def cmd_evaluate(args: argparse.Namespace) -> int:
+    """Показать метрики конвейера на размеченном корпусе."""
+    records = _load_dataset(args.dataset, pairs=args.make_dataset, seed=args.seed)
+    verifier = Verifier(mode=_mode(args), weights_path=args.weights)
+    metrics = verifier.evaluate(records)
+    if args.json:
+        print(json.dumps(metrics, ensure_ascii=False, indent=2))
+        return EXIT_OK
+    tokens = metrics["tokens"]
+    spans = metrics["spans"]
+    answers = metrics["answers"]
+    print(f"Пар: {metrics['pairs']} (режим {metrics['mode']})")
+    print(
+        f"Токены: precision={tokens['precision']:.3f} recall={tokens['recall']:.3f} "
+        f"F1={tokens['f1']:.3f} FPR={tokens['fpr']:.3f} AUC={tokens['auc']:.3f}"
+    )
+    print(
+        f"Фрагменты: строгий IoU F1={spans['f1']:.3f}, полнота по покрытию="
+        f"{spans['recall_containment']:.3f}, F1 при расширенной разметке="
+        f"{spans['f1_expanded_labels']:.3f}, ширина ×{spans['mean_width_ratio']:.1f}"
+    )
+    print(
+        f"Ответы: precision={answers['precision']:.3f} recall={answers['recall']:.3f} "
+        f"F1={answers['f1']:.3f} FPR={answers['fpr']:.3f} AUC={answers['auc']:.3f} "
+        f"(порог {answers['threshold']:.3f})"
+    )
+    gate = tokens["f1"] >= 0.90 and tokens["fpr"] <= 0.10
+    print(f"Критерий качества (token F1 ≥ 0.90 при FPR ≤ 0.10): {'ДОСТИГНУТ' if gate else 'НЕ достигнут'}")
+    if metrics["warning"]:
+        print(f"ВНИМАНИЕ: {metrics['warning']}")
+    return EXIT_OK
 
-    config = _load_config(args)
-    if args.port:
-        config = config.with_overrides(port=args.port)
-    if args.host:
-        config = config.with_overrides(host=args.host)
-    if args.open_browser:
-        import threading
-        import webbrowser
 
-        threading.Timer(1.0, lambda: webbrowser.open(f"http://localhost:{config.port}")).start()
-    serve(config, quiet=args.quiet)
-    return 0
+SELFTEST_CASES = (
+    (
+        "достоверный ответ",
+        "Срок хранения первичных документов составляет 10 лет.",
+        "Регламент 343: срок хранения первичных документов составляет 10 лет.",
+        {"grounded"},
+    ),
+    (
+        "подмена числа",
+        "Срок хранения первичных документов составляет 3 года.",
+        "Регламент 343: срок хранения первичных документов составляет 10 лет.",
+        {"doubtful", "likely_hallucination"},
+    ),
+    (
+        "выдуманное утверждение",
+        "Срок хранения составляет 10 лет. Дополнительно требуется согласование с внешним аудитором.",
+        "Регламент 343: срок хранения составляет 10 лет.",
+        {"doubtful", "likely_hallucination"},
+    ),
+)
 
 
 def cmd_selftest(args: argparse.Namespace) -> int:
-    """Быстрая проверка работоспособности сборки (используется в CI и в exe)."""
-    config = _load_config(args)
-    checks: list[tuple[str, bool, str]] = []
+    """Проверить конвейер на встроенных примерах (без внешних данных)."""
+    verifier = Verifier(mode=_mode(args), weights_path=args.weights)
+    failures: list[str] = []
+    print(f"Само-проверка SpanVerify {__version__} (режим {verifier.mode})")
+    for name, answer, context, expected in SELFTEST_CASES:
+        result = verifier.verify(answer, context)
+        ok = result.verdict in expected
+        if not ok:
+            failures.append(name)
+        print(
+            f"  [{'OK ' if ok else 'ПРОВАЛ'}] {name}: вердикт={result.verdict} "
+            f"оценка={result.score:.3f} порог={result.threshold:.3f} "
+            f"фрагментов={len(result.spans)}"
+        )
+    stats = verifier.bundle
+    print(
+        f"  параметры: веса={ {k: round(v, 2) for k, v in stats.weights.items()} }, "
+        f"span_z={stats.span_z}, floor={stats.span_floor}, cap={stats.span_cap}"
+    )
+    print(f"  калибровка: {'есть' if stats.isotonic else 'нет'}; голова: {(stats.head or {}).get('type', 'none')}")
+    if verifier.warning:
+        print(f"  ВНИМАНИЕ: {verifier.warning}")
+    if failures:
+        print("ПРОВАЛЕНО: " + ", ".join(failures))
+        return EXIT_ERROR
+    print("Все проверки пройдены.")
+    return EXIT_OK
 
-    detector = Detector(config)
-    sample = "Важно отметить, что данный метод обеспечивает эффективное решение поставленной задачи."
-    result = detector.analyze(sample)
-    checks.append(("детектор отвечает", result.n_word_tokens > 0, f"{result.n_word_tokens} токенов"))
-    checks.append(("доля ИИ в диапазоне [0,1]", 0.0 <= result.ai_fraction <= 1.0,
-                   f"{result.ai_fraction:.3f}"))
-    checks.append(("калибратор", detector.calibrator is not None,
-                   "загружен" if detector.calibrator else "отсутствует (не критично)"))
 
-    tokens = tokenize("Проверка токенизации: 42 слова, дефис-пример.")
-    checks.append(("токенизация непрерывна",
-                   all(t.end <= len("Проверка токенизации: 42 слова, дефис-пример.") for t in tokens),
-                   f"{len(tokens)} токенов"))
+def cmd_server(args: argparse.Namespace) -> int:
+    """Запустить HTTP-сервис (по умолчанию порт 8765)."""
+    if not args.no_browser:
+        url = f"http://127.0.0.1:{args.port}"
+        try:
+            webbrowser.open(url)
+        except Exception:  # noqa: BLE001 - браузер может отсутствовать
+            pass
+    serve(
+        host=args.host,
+        port=args.port,
+        mode=_mode(args),
+        weights_path=args.weights,
+        quiet=args.quiet,
+    )
+    return EXIT_OK
 
-    from .api import create_server
 
-    try:
-        server = create_server(config.with_overrides(host="127.0.0.1", port=0), quiet=True)
-        port = server.server_address[1]
-        import threading
-        import urllib.request
+def cmd_demo(args: argparse.Namespace) -> int:
+    """Полный демонстрационный прогон: корпус → обучение → метрики → примеры."""
+    from .train import train
 
-        threading.Thread(target=server.serve_forever, daemon=True).start()
-        with urllib.request.urlopen(f"http://127.0.0.1:{port}/health", timeout=5) as response:
-            payload = json.loads(response.read().decode("utf-8"))
-        checks.append(("HTTP /health", payload.get("status") == "ok", f"порт {port}"))
-        server.shutdown()
-        server.server_close()
-    except Exception as exc:  # noqa: BLE001
-        checks.append(("HTTP /health", False, f"{type(exc).__name__}: {exc}"))
+    generated = generate_pairs(args.pairs, seed=args.seed)
+    path = write_pairs(generated, args.dataset)
+    print(f"Корпус: {path}")
+    for key, value in corpus_statistics(generated).items():
+        print(f"  {key}: {value}")
 
-    failed = 0
-    for name, ok, detail in checks:
-        print(f"[{'OK ' if ok else 'FAIL'}] {name} — {detail}")
-        failed += 0 if ok else 1
-    version_line = f"SpanVerify {__version__} | Python {sys.version.split()[0]} | {config.describe()}"
-    print(version_line)
-    return 1 if failed else 0
+    report = train(
+        [pair.to_dict() for pair in generated],
+        mode=_mode(args),
+        seed=args.seed,
+        folds=args.folds,
+        dataset_name=str(path),
+        version=__version__,
+    )
+    print(report.summary())
+    verifier = Verifier(mode=_mode(args), weights=report.bundle)
+    for name, answer, context, _expected in SELFTEST_CASES:
+        result = verifier.verify(answer, context)
+        print(f"  {name:24s} → {result.verdict:20s} оценка {result.score:.3f} фрагментов {len(result.spans)}")
+    print(f"Версия корпуса: {DATASET_VERSION}. Демо-числа не являются научным результатом.")
+    return EXIT_OK
 
 
 def cmd_config(args: argparse.Namespace) -> int:
-    config = _load_config(args)
-    print(json.dumps(config.to_dict(), ensure_ascii=False, indent=2))
-    return 0
+    """Напечатать действующие параметры конвейера."""
+    verifier = Verifier(mode=_mode(args), weights_path=args.weights)
+    payload = verifier.bundle.to_dict()
+    payload["runtime"] = {
+        "version": __version__,
+        "mode": verifier.mode,
+        "weights_source": verifier.bundle.source,
+        "weights_path": str(args.weights),
+        "model_name": verifier.model_name,
+    }
+    print(json.dumps(payload, ensure_ascii=False, indent=2))
+    return EXIT_OK
 
 
-# ---------- сборка парсера ----------
+def cmd_analyze(args: argparse.Namespace) -> int:
+    """Историческая ветка: оценка «текст создан ИИ» без контекста (surrogate/hf)."""
+    text = getattr(args, "text", None)
+    if args.text_file:
+        text = Path(args.text_file).read_text(encoding="utf-8")
+    if not text:
+        print("ошибка: нужен текст или --text-file", file=sys.stderr)
+        return EXIT_ERROR
+    from .config import Config
+    from .detector import Detector
+
+    backend = getattr(args, "backend", None) or getattr(args, "mode", None) or "surrogate"
+    detector = Detector(Config.load().with_overrides(backend="surrogate" if backend in {"demo", "stub"} else backend))
+    result = detector.analyze(text, threshold=args.threshold)
+    if args.json:
+        print(
+            json.dumps(
+                {
+                    "verdict": result.verdict,
+                    "share": result.share,
+                    "ai_fraction_soft": result.ai_fraction_soft,
+                    "ai_fraction_tokens": result.ai_fraction_tokens,
+                    "backend": result.backend,
+                    "calibrated": result.calibrated,
+                    "threshold": result.threshold,
+                    "spans": [span.to_dict() for span in result.spans],
+                    "warnings": result.warnings,
+                },
+                ensure_ascii=False,
+                indent=2,
+            )
+        )
+        return EXIT_OK
+    print(f"Вердикт: {result.verdict} (доля {result.share:.3f}, порог {result.threshold:.3f})")
+    print(f"Бэкенд: {result.backend}; калибровка: {'есть' if result.calibrated else 'нет'}")
+    for warning in result.warnings:
+        print(f"ВНИМАНИЕ: {warning}")
+    print(f"Фрагментов: {len(result.spans)}")
+    return EXIT_ISSUES if result.verdict in {"likely_ai", "mixed"} else EXIT_OK
+
+
+# ------------------------------------------------------------------ парсер
+
 
 def build_parser() -> argparse.ArgumentParser:
-    parser = argparse.ArgumentParser(
-        prog="spanverify",
-        description="SpanVerify — локализация фрагментов, написанных ИИ, и оценка доли участия модели.",
-    )
-    parser.add_argument("--version", action="version", version=f"spanverify {__version__}")
+    """Собрать парсер аргументов (общий для всех точек входа)."""
+    parser = argparse.ArgumentParser(prog="spanverify", description="Проверка ответа относительно контекста")
+    parser.add_argument("--version", action="version", version=f"SpanVerify {__version__}")
+    # Исторический флаг: раньше бэкенд задавался только глобально. Он оставлен
+    # и как глобальный, и у каждой подкоманды, чтобы старые скрипты, в которых
+    # флаг стоит и до, и после команды, продолжали работать.
+    parser.add_argument("--backend", choices=BACKENDS, default=None, help="историческое имя режима")
+    subparsers = parser.add_subparsers(dest="command")
 
-    # Общие параметры доступны и до, и после имени команды
-    # (spanverify --backend hf analyze ... и spanverify analyze --backend hf ...).
-    common = argparse.ArgumentParser(add_help=False)
-    common.add_argument("--config", help="путь к JSON-конфигу", default=argparse.SUPPRESS)
-    common.add_argument("--backend", choices=["surrogate", "hf"], help="бэкенд признаков",
-                        default=argparse.SUPPRESS)
-    common.add_argument("--threshold", type=float, help="порог срабатывания (0..1)",
-                        default=argparse.SUPPRESS)
-    common.add_argument("--calibration", help="путь к файлу калибратора",
-                        default=argparse.SUPPRESS)
-    for action in common._actions:
-        parser._add_action(action)
+    def add_common(sub: argparse.ArgumentParser) -> None:
+        # default=SUPPRESS: если флаг не указан у подкоманды, значение глобального
+        # флага не затирается (иначе «--backend hf analyze …» терял бы режим).
+        sub.add_argument("--mode", choices=["demo", "surrogate", "hf"], default=argparse.SUPPRESS)
+        sub.add_argument("--backend", choices=BACKENDS, default=argparse.SUPPRESS, help="историческое имя режима")
+        sub.add_argument("--weights", default=WEIGHTS_FILENAME)
 
-    sub = parser.add_subparsers(dest="command", required=True)
+    verify = subparsers.add_parser("verify", help="проверить ответ относительно контекста")
+    verify.add_argument("--answer", default=None, help="текст ответа")
+    verify.add_argument("--answer-file", default=None, help="файл с ответом")
+    verify.add_argument("--context", default=None, help="текст контекста (документ-источник)")
+    verify.add_argument("--context-file", default=None, help="файл с контекстом")
+    verify.add_argument("--json", action="store_true", help="вывести разбор в JSON")
+    verify.add_argument("--tokens", action="store_true", help="показать разбор по токенам")
+    add_common(verify)
+    verify.set_defaults(func=cmd_verify)
 
-    p = sub.add_parser("analyze", help="проверить текст", parents=[common])
-    p.add_argument("--text")
-    p.add_argument("--file")
-    p.add_argument("--json", action="store_true", help="вывод в JSON")
-    p.add_argument("--explain", action="store_true", help="покадровая таблица")
-    p.add_argument("--limit", type=int, default=30, help="строк в таблице")
-    p.add_argument("--time", action="store_true", help="замер времени")
-    p.set_defaults(func=cmd_analyze)
+    train_parser = subparsers.add_parser("train", help="обучить веса, порог, голову и калибровку")
+    train_parser.add_argument("--dataset", default=DEFAULT_DATASET)
+    train_parser.add_argument("--out", default=WEIGHTS_FILENAME)
+    train_parser.add_argument("--make-dataset", type=int, default=240, help="сгенерировать корпус, если файла нет")
+    train_parser.add_argument("--seed", type=int, default=42)
+    train_parser.add_argument("--folds", type=int, default=5)
+    train_parser.add_argument("--test-size", type=float, default=0.3)
+    train_parser.add_argument("--target-fpr", type=float, default=0.1)
+    train_parser.add_argument("--json", action="store_true")
+    add_common(train_parser)
+    train_parser.set_defaults(func=cmd_train)
 
-    p = sub.add_parser("demo", parents=[common], help="демонстрация + генерация корпуса")
-    p.add_argument("--n", type=int, default=240)
-    p.add_argument("--seed", type=int, default=1312)
-    p.add_argument("--out", help="куда записать корпус JSONL")
-    p.set_defaults(func=cmd_demo)
+    calibrate = subparsers.add_parser("calibrate", help="пересчитать калибровку и порог решения")
+    calibrate.add_argument("--dataset", default=DEFAULT_DATASET)
+    calibrate.add_argument("--out", default=WEIGHTS_FILENAME)
+    calibrate.add_argument("--make-dataset", type=int, default=0)
+    calibrate.add_argument("--seed", type=int, default=42)
+    calibrate.add_argument("--target-fpr", type=float, default=0.1)
+    add_common(calibrate)
+    calibrate.set_defaults(func=cmd_calibrate)
 
-    p = sub.add_parser("calibrate", parents=[common], help="обучить калибратор и подобрать порог")
-    p.add_argument("--dataset", default="data/demo_dataset.jsonl")
-    p.add_argument("--out", default="config/calibration.json")
-    p.set_defaults(func=cmd_calibrate)
+    evaluate = subparsers.add_parser("evaluate", help="метрики на размеченном корпусе")
+    evaluate.add_argument("--dataset", default=DEFAULT_DATASET)
+    evaluate.add_argument("--make-dataset", type=int, default=0)
+    evaluate.add_argument("--seed", type=int, default=1312)
+    evaluate.add_argument("--json", action="store_true")
+    add_common(evaluate)
+    evaluate.set_defaults(func=cmd_evaluate)
 
-    p = sub.add_parser("serve", help="запустить API и веб-интерфейс", parents=[common])
-    p.add_argument("--host", default=None)
-    p.add_argument("--port", type=int, default=None)
-    p.add_argument("--open-browser", action="store_true")
-    p.add_argument("--quiet", action="store_true")
-    p.set_defaults(func=cmd_serve)
+    selftest = subparsers.add_parser("selftest", help="само-проверка на встроенных примерах")
+    add_common(selftest)
+    selftest.set_defaults(func=cmd_selftest)
 
-    p = sub.add_parser("selftest", parents=[common], help="проверка работоспособности сборки")
-    p.set_defaults(func=cmd_selftest)
+    server = subparsers.add_parser("server", help="запустить HTTP-сервис")
+    server.add_argument("--host", default="0.0.0.0")
+    server.add_argument("--port", type=int, default=DEFAULT_PORT)
+    server.add_argument("--no-browser", action="store_true")
+    server.add_argument("--quiet", action="store_true")
+    add_common(server)
+    server.set_defaults(func=cmd_server)
+    serve_alias = subparsers.add_parser("serve", help="псевдоним команды server")
+    serve_alias.add_argument("--host", default="0.0.0.0")
+    serve_alias.add_argument("--port", type=int, default=DEFAULT_PORT)
+    serve_alias.add_argument("--no-browser", action="store_true")
+    serve_alias.add_argument("--quiet", action="store_true")
+    add_common(serve_alias)
+    serve_alias.set_defaults(func=cmd_server)
 
-    p = sub.add_parser("config", parents=[common], help="показать действующий конфиг")
-    p.set_defaults(func=cmd_config)
+    demo = subparsers.add_parser("demo", help="сквозной демонстрационный прогон")
+    demo.add_argument("--pairs", type=int, default=240)
+    demo.add_argument("--dataset", default=DEFAULT_DATASET)
+    demo.add_argument("--seed", type=int, default=42)
+    demo.add_argument("--folds", type=int, default=5)
+    add_common(demo)
+    demo.set_defaults(func=cmd_demo)
+
+    config = subparsers.add_parser("config", help="показать действующие параметры")
+    add_common(config)
+    config.set_defaults(func=cmd_config)
+
+    analyze = subparsers.add_parser("analyze", help="историческая ветка: только текст, без контекста")
+    analyze.add_argument("text", nargs="?", default=argparse.SUPPRESS)
+    # dest="text": флаг и позиционный аргумент пишут в одно поле, поэтому
+    # работают обе исторические формы записи («analyze "текст"» и
+    # «analyze --text "текст"»). default=SUPPRESS, чтобы необъявленный флаг не
+    # затирал значение позиционного аргумента.
+    analyze.add_argument("--text", dest="text", default=argparse.SUPPRESS, help="текст (историческое имя)")
+    analyze.add_argument("--text-file", default=None)
+    analyze.add_argument("--threshold", type=float, default=None)
+    analyze.add_argument("--mode", choices=["demo", "surrogate", "hf"], default=argparse.SUPPRESS)
+    analyze.add_argument("--backend", choices=BACKENDS, default=argparse.SUPPRESS)
+    analyze.add_argument("--json", action="store_true")
+    analyze.set_defaults(func=cmd_analyze)
 
     return parser
 
 
-def main(argv: list[str] | None = None) -> int:
+def main(argv: Sequence[str] | None = None) -> int:
+    """Точка входа CLI: возвращает код возврата 0/1/2."""
     parser = build_parser()
     args = parser.parse_args(argv)
+    if not getattr(args, "func", None):
+        parser.print_help()
+        return EXIT_OK
     try:
         return int(args.func(args))
+    except FileNotFoundError as error:
+        print(f"ошибка: {error}", file=sys.stderr)
+        return EXIT_ERROR
     except KeyboardInterrupt:
-        return 130
-    except Exception as exc:  # noqa: BLE001
-        print(f"Ошибка: {type(exc).__name__}: {exc}", file=sys.stderr)
-        if getattr(args, "backend", None) == "hf":
-            print("Подсказка: установите зависимости режима 'hf': "
-                  "pip install -r requirements-hf.txt", file=sys.stderr)
-        return 1
+        print("\nпрервано пользователем", file=sys.stderr)
+        return EXIT_ERROR
+    except Exception as error:  # noqa: BLE001 - CLI обязан вернуть код, а не трассировку
+        print(f"ошибка выполнения: {type(error).__name__}: {error}", file=sys.stderr)
+        return EXIT_ERROR
+
+
+def run() -> None:  # pragma: no cover - обёртка для консольной точки входа
+    """Обёртка для ``python -m spanverify``."""
+    raise SystemExit(main())
 
 
 if __name__ == "__main__":  # pragma: no cover
-    raise SystemExit(main())
+    run()

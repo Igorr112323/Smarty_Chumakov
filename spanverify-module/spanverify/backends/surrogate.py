@@ -21,7 +21,7 @@ from __future__ import annotations
 
 import math
 from collections import Counter
-from typing import Sequence
+from collections.abc import Sequence
 
 from ..lexicon import (
     BOILERPLATE_BIGRAMS,
@@ -37,10 +37,10 @@ WINDOW = 12
 NEUTRAL_STOPWORD_SCORE = 0.35  # служебные слова не дают стилевого сигнала
 
 WEIGHTS = {
-    "phrase_membership": 0.20,    # токен входит в шаблонный оборот
-    "phrase_density": 0.20,       # плотность оборотов в окне (работает на коротких текстах)
-    "boilerplate": 0.14,          # отдельное шаблонное слово
-    "content_reuse": 0.16,        # повторяемость содержательных слов в документе
+    "phrase_membership": 0.20,  # токен входит в шаблонный оборот
+    "phrase_density": 0.20,  # плотность оборотов в окне (работает на коротких текстах)
+    "boilerplate": 0.14,  # отдельное шаблонное слово
+    "content_reuse": 0.16,  # повторяемость содержательных слов в документе
     "context_repetition": 0.10,
     "length_uniformity": 0.08,
     "sentence_uniformity": 0.12,
@@ -87,7 +87,7 @@ class SurrogateBackend(Backend):
         boilerplate_hits = 0
         predictability: list[float] = []
         informative: list[bool] = []
-        for i, word in enumerate(words):
+        for i, _word in enumerate(words):
             norm = normal[i]
             is_service = (norm in STOPWORDS or len(norm) <= 2) and i not in phrase_hits
 
@@ -123,9 +123,7 @@ class SurrogateBackend(Backend):
             window = [w for w in normal[lo:hi] if w not in STOPWORDS and len(w) > 2]
             repeated = sum(1 for w in window if content_counts.get(w, 0) > 1)
             context_repetition = repeated / max(1, len(window))
-            phrases_in_window = sum(
-                1 for j in range(lo, hi) if j in phrase_hits and normal[j] not in STOPWORDS
-            )
+            phrases_in_window = sum(1 for j in range(lo, hi) if j in phrase_hits and normal[j] not in STOPWORDS)
             content_in_window = sum(1 for w in window)
             phrase_density = phrases_in_window / max(1, content_in_window)
 
@@ -133,9 +131,7 @@ class SurrogateBackend(Backend):
             length_uniformity = 1.0 - min(1.0, abs(lengths[i] - mean_len) / 5.0)
             token_pos = word_positions[i] if i < len(word_positions) else 0
             local_sent = sent_len_by_word.get(token_pos, mean_sent)
-            sentence_uniformity = 1.0 - min(
-                1.0, abs(local_sent - mean_sent) / max(3.0, mean_sent)
-            )
+            sentence_uniformity = 1.0 - min(1.0, abs(local_sent - mean_sent) / max(3.0, mean_sent))
 
             score = (
                 WEIGHTS["phrase_membership"] * phrase_membership

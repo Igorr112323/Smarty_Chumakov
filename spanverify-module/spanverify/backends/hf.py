@@ -17,7 +17,8 @@
 
 from __future__ import annotations
 
-from typing import Any, Sequence
+from collections.abc import Sequence
+from typing import Any
 
 from .base import Backend, BackendResult, BackendUnavailable
 
@@ -67,9 +68,7 @@ class HFBackend(Backend):
             from transformers import AutoModel, AutoTokenizer
 
             tokenizer = AutoTokenizer.from_pretrained(self.model_name, use_fast=True)
-            model = AutoModel.from_pretrained(
-                self.model_name, output_attentions=True, output_hidden_states=True
-            )
+            model = AutoModel.from_pretrained(self.model_name, output_attentions=True, output_hidden_states=True)
             model.eval()
             device = self.device or ("cuda" if torch.cuda.is_available() else "cpu")
             model.to(device)
@@ -96,12 +95,12 @@ class HFBackend(Backend):
             outputs = model(**encoded)
 
         attentions = outputs.attentions[-1][0]  # (heads, seq, seq)
-        hidden = outputs.hidden_states[-1][0]    # (seq, hidden_size)
+        hidden = outputs.hidden_states[-1][0]  # (seq, hidden_size)
 
         eps = 1e-9
         probs = attentions.clamp_min(eps)
-        entropy = -(probs * probs.log()).sum(dim=-1)          # (heads, seq)
-        entropy = entropy.mean(dim=0)                          # (seq,)
+        entropy = -(probs * probs.log()).sum(dim=-1)  # (heads, seq)
+        entropy = entropy.mean(dim=0)  # (seq,)
         seq_len = entropy.shape[0]
         import math
 
@@ -138,9 +137,9 @@ class HFBackend(Backend):
                 "model": self.model_name,
                 "seq_len": seq_len,
                 "device": str(device),
-                "mean_attention_entropy": round(sum(predictability) / len(predictability), 4)
-                if predictability
-                else 0.0,
+                "mean_attention_entropy": (
+                    round(sum(predictability) / len(predictability), 4) if predictability else 0.0
+                ),
             },
         )
 

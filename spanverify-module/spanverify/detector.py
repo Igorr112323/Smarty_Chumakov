@@ -2,9 +2,10 @@
 
 from __future__ import annotations
 
+from collections.abc import Sequence
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Any, Sequence
+from typing import Any
 
 from .backends import Backend, get_backend
 from .calibration import IsotonicCalibrator
@@ -104,9 +105,7 @@ class VerifyResult:
             "spans_count": len(self.spans),
         }
         if include_spans:
-            data["spans"] = [
-                span.to_dict(self.text_length if include_text else None) for span in self.spans
-            ]
+            data["spans"] = [span.to_dict(self.text_length if include_text else None) for span in self.spans]
         return data
 
 
@@ -164,9 +163,16 @@ class Detector:
             )
         if not text or not text.strip():
             return VerifyResult(
-                text_length=0, n_tokens=0, n_word_tokens=0, threshold=thr,
-                calibrated=self.calibrator is not None, backend=self.backend_name,
-                ai_fraction=0.0, ai_fraction_tokens=0.0, spans=[], warnings=warnings,
+                text_length=0,
+                n_tokens=0,
+                n_word_tokens=0,
+                threshold=thr,
+                calibrated=self.calibrator is not None,
+                backend=self.backend_name,
+                ai_fraction=0.0,
+                ai_fraction_tokens=0.0,
+                spans=[],
+                warnings=warnings,
                 meta={"empty": True},
             )
 
@@ -226,9 +232,7 @@ class Detector:
         word_tokens = [t for t in tokens if t.is_word]
         words = [t.text for t in word_tokens]
         features = self.backend.process(words, text, dim=cfg.vector_dim)
-        raw = self.raw_scores(
-            features.predictability, features.vectors, informative=features.informative
-        )
+        raw = self.raw_scores(features.predictability, features.vectors, informative=features.informative)
         smoothed_raw = _moving_average(raw, cfg.smoothing_window)
         probs = self._calibrate(smoothed_raw)
         return tokens, word_tokens, smoothed_raw, probs, features
@@ -282,7 +286,7 @@ class Detector:
         )
         ref = max(1e-6, cfg.density_ref)
         out: list[float] = []
-        for pred, dens in zip(predictability, density):
+        for pred, dens in zip(predictability, density, strict=False):
             density_scaled = min(1.0, max(0.0, dens / ref))
             score = cfg.w_predictability * float(pred) + cfg.w_density * density_scaled
             out.append(min(1.0, max(0.0, score)))
@@ -380,11 +384,7 @@ def _expand_to_sentences(
         start += lead
         end -= trail
 
-        inside = [
-            i
-            for i, token in enumerate(word_tokens)
-            if token.start >= start and token.end <= end
-        ]
+        inside = [i for i, token in enumerate(word_tokens) if token.start >= start and token.end <= end]
         if len(inside) < config.min_span_tokens:
             continue
         values = [probs[i] for i in inside]
@@ -412,9 +412,7 @@ def _sentence_index(bounds: Sequence[tuple[int, int]], position: int) -> int:
     return len(bounds) - 1 if position >= bounds[-1][1] else 0
 
 
-def _impute_uninformative(
-    scores: Sequence[float], mask: Sequence[bool], window: int
-) -> list[float]:
+def _impute_uninformative(scores: Sequence[float], mask: Sequence[bool], window: int) -> list[float]:
     """Заменить оценки неинформативных токенов локальным средним по окружению."""
     if not scores or all(mask):
         return [float(s) for s in scores]

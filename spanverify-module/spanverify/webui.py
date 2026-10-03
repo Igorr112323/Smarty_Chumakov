@@ -1,211 +1,237 @@
-"""Встроенный веб-интерфейс: один HTML-файл без сборки и CDN.
+"""Встроенный веб-интерфейс: один HTML-файл без сборки и без CDN.
 
-Страница обращается только к относительным адресам (``/v1/verify``),
-поэтому корректно работает и локально, и через прокси предпросмотра.
+Страница обращается только к относительным адресам (``/v1/verify``,
+``/health``), поэтому работает и из собранного .exe, и из предпросмотра, и
+локально без интернета. Слева — документ-контекст, справа — ответ: именно так
+формулируется задача «подтверждается ли ответ документом».
 """
 
 from __future__ import annotations
 
-INDEX_HTML = r"""<!DOCTYPE html>
+INDEX_HTML = """<!doctype html>
 <html lang="ru">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>SpanVerify — локализация фрагментов, написанных ИИ</title>
+<title>SpanVerify — проверка ответа по документу</title>
 <style>
-  :root { color-scheme: light dark; --bg:#f6f7fb; --card:#fff; --ink:#14181f; --muted:#5b6472;
-          --accent:#2f6df6; --ai:#e5484d; --human:#12855f; --border:#dfe3ec; }
-  @media (prefers-color-scheme: dark) {
-    :root { --bg:#0f1218; --card:#171b23; --ink:#eef1f7; --muted:#9aa4b5; --border:#2a303c; }
-  }
-  * { box-sizing: border-box; }
-  body { margin:0; padding:24px; background:var(--bg); color:var(--ink);
-         font:15px/1.55 -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; }
-  .wrap { max-width:1080px; margin:0 auto; }
-  h1 { font-size:22px; margin:0 0 4px; }
-  .sub { color:var(--muted); margin:0 0 18px; font-size:13.5px; }
-  .card { background:var(--card); border:1px solid var(--border); border-radius:12px; padding:16px; margin-bottom:16px; }
-  textarea { width:100%; min-height:190px; resize:vertical; padding:12px; border-radius:10px;
-             border:1px solid var(--border); background:transparent; color:inherit; font:14.5px/1.6 inherit; }
-  .row { display:flex; gap:12px; flex-wrap:wrap; align-items:center; margin-top:12px; }
-  button { cursor:pointer; border-radius:9px; border:1px solid var(--border); background:transparent;
-           color:inherit; padding:8px 13px; font-size:14px; }
-  button.primary { background:var(--accent); border-color:var(--accent); color:#fff; font-weight:600; padding:10px 20px; }
+  :root { --bg:#f5f6f8; --card:#fff; --ink:#1c2128; --muted:#6b7280; --line:#e3e6ea;
+          --ok:#1f8a4c; --warn:#b57d05; --bad:#c0392b; --accent:#2d5be3; }
+  * { box-sizing:border-box; }
+  body { margin:0; background:var(--bg); color:var(--ink);
+         font:15px/1.45 -apple-system,"Segoe UI",Roboto,Arial,sans-serif; }
+  header { background:#fff; border-bottom:1px solid var(--line); padding:14px 22px;
+           display:flex; align-items:baseline; gap:14px; flex-wrap:wrap; }
+  h1 { font-size:19px; margin:0; }
+  .sub { color:var(--muted); font-size:13px; }
+  main { max-width:1240px; margin:18px auto 60px; padding:0 16px; }
+  .grid { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+  @media (max-width:900px) { .grid { grid-template-columns:1fr; } }
+  .card { background:var(--card); border:1px solid var(--line); border-radius:10px; padding:14px; }
+  label { display:block; font-weight:600; margin-bottom:6px; font-size:13px; }
+  textarea { width:100%; min-height:210px; resize:vertical; padding:10px; font:13px/1.5 inherit;
+             border:1px solid var(--line); border-radius:8px; background:#fcfcfd; }
+  .row { display:flex; gap:10px; align-items:center; flex-wrap:wrap; margin-top:12px; }
+  button { border:1px solid var(--line); background:#fff; padding:9px 14px; border-radius:8px;
+           cursor:pointer; font-size:14px; }
+  button.primary { background:var(--accent); border-color:var(--accent); color:#fff; font-weight:600; }
   button:disabled { opacity:.55; cursor:progress; }
-  .slider { display:flex; align-items:center; gap:8px; font-size:13.5px; color:var(--muted); }
-  input[type=range] { width:150px; }
-  .badge { display:inline-block; padding:3px 10px; border-radius:999px; font-size:12.5px; font-weight:600; }
-  .badge.ai { background:rgba(229,72,77,.14); color:var(--ai); }
-  .badge.human { background:rgba(18,133,95,.14); color:var(--human); }
-  .badge.mixed { background:rgba(245,165,36,.18); color:#a35c00; }
-  .gauge { height:14px; border-radius:999px; background:rgba(128,128,128,.18); overflow:hidden; margin:10px 0 6px; }
-  .gauge > span { display:block; height:100%; background:linear-gradient(90deg,#12855f,#f5a524,#e5484d); }
-  .stats { display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:10px; margin-top:12px; }
-  .stat { border:1px solid var(--border); border-radius:10px; padding:9px 11px; }
-  .stat b { display:block; font-size:18px; }
-  .stat span { color:var(--muted); font-size:12.5px; }
-  .doc { white-space:pre-wrap; font:14.5px/1.7 inherit; }
-  mark { background:rgba(229,72,77,.22); border-bottom:2px solid var(--ai); border-radius:3px; padding:1px 2px; }
-  table { border-collapse:collapse; width:100%; font-size:13.5px; }
-  th, td { border-bottom:1px solid var(--border); padding:5px 8px; text-align:left; }
+  .verdict { display:flex; align-items:center; gap:14px; margin-bottom:12px; flex-wrap:wrap; }
+  .badge { padding:6px 12px; border-radius:999px; font-weight:700; font-size:14px; }
+  .grounded { background:#e7f6ec; color:var(--ok); }
+  .doubtful { background:#fdf3dd; color:var(--warn); }
+  .likely_hallucination { background:#fdecea; color:var(--bad); }
+  .empty { background:#eef1f5; color:var(--muted); }
+  .stats { display:flex; gap:22px; flex-wrap:wrap; }
+  .stat b { display:block; font-size:19px; }
+  .stat span { color:var(--muted); font-size:12px; }
+  .answer { white-space:pre-wrap; font-size:15px; line-height:1.7; }
+  mark { background:#ffd9d4; border-bottom:2px solid var(--bad); padding:1px 2px; border-radius:3px; }
+  mark.doubtful { background:#ffeec2; border-bottom-color:var(--warn); }
+  .errors { color:var(--bad); font-weight:600; }
+  table { width:100%; border-collapse:collapse; margin-top:10px; font-size:13px; }
+  th, td { border-bottom:1px solid var(--line); padding:7px 6px; text-align:left; vertical-align:top; }
   th { color:var(--muted); font-weight:600; }
-  .warn { border-left:3px solid #f5a524; background:rgba(245,165,36,.1); padding:9px 12px; border-radius:0 8px 8px 0; font-size:13.5px; margin-top:10px; }
-  .muted { color:var(--muted); font-size:13px; }
-  .err { border-left:3px solid var(--ai); background:rgba(229,72,77,.1); padding:9px 12px; border-radius:0 8px 8px 0; }
-  .hint { font-size:13px; color:var(--muted); margin-top:6px; }
+  .hint { color:var(--muted); font-size:12.5px; margin-top:10px; }
+  .warnbox { background:#fdf3dd; border:1px solid #f0dcae; color:#6b4c05; border-radius:8px;
+             padding:10px 12px; font-size:13px; margin-top:12px; }
+  details { margin-top:12px; }
+  summary { cursor:pointer; color:var(--accent); }
 </style>
 </head>
 <body>
-<div class="wrap">
+<header>
   <h1>SpanVerify</h1>
-  <p class="sub">Локализация фрагментов текста, написанных языковой моделью, и оценка доли участия ИИ.
-     Локальный сервис, без передачи текста третьим лицам.</p>
+  <div class="sub">проверка ответа по документу-источнику · <span id="backend">…</span></div>
+</header>
 
-  <div class="card">
-    <textarea id="input" placeholder="Вставьте текст для проверки…"></textarea>
-    <div class="row">
-      <button class="primary" id="run">Проверить достоверность</button>
-      <button id="s-ai">Пример: машинный</button>
-      <button id="s-hum">Пример: человеческий</button>
-      <button id="s-mix">Пример: смешанный</button>
-      <label class="slider">порог <input type="range" id="thr" min="0" max="1" step="0.01" value="0.5">
-        <span id="thrval">0.50</span></label>
-      <label class="slider"><input type="checkbox" id="explain"> покадровая таблица</label>
+<main>
+  <div class="grid">
+    <div class="card">
+      <label for="context">Документ-контекст (источник фактов)</label>
+      <textarea id="context" placeholder="Вставьте фрагмент документа, на который должен опираться ответ…"></textarea>
     </div>
-    <div class="hint" id="backend">…</div>
+    <div class="card">
+      <label for="answer">Ответ, который проверяем</label>
+      <textarea id="answer" placeholder="Вставьте ответ языковой модели или сотрудника…"></textarea>
+    </div>
   </div>
 
-  <div class="card" id="summary" style="display:none"></div>
-
-  <div class="card" id="docblock" style="display:none">
-    <b>Разметка документа</b>
-    <p class="muted">Красным выделены фрагменты, отнесённые к машинной генерации.</p>
-    <div class="doc" id="doc"></div>
+  <div class="row">
+    <button class="primary" id="run">Проверить</button>
+    <button id="sample-true">Пример: подтверждённый</button>
+    <button id="sample-false">Пример: подмена факта</button>
+    <button id="sample-fab">Пример: выдумка</button>
+    <label class="slider"><input type="checkbox" id="tokens"> разбор по токенам</label>
+    <span class="hint" id="latency"></span>
   </div>
 
-  <div class="card" id="spansblock" style="display:none">
-    <b>Найденные фрагменты</b>
-    <table id="spans"><thead><tr><th>#</th><th>Символы</th><th>Токенов</th><th>Ср. вероятность</th><th>Фрагмент</th></tr></thead><tbody></tbody></table>
+  <div class="card" id="result" style="display:none; margin-top:16px;">
+    <div class="verdict">
+      <span class="badge" id="badge">—</span>
+      <div class="stats">
+        <div class="stat"><b id="score">—</b><span>оценка недостоверности</span></div>
+        <div class="stat"><b id="thr">—</b><span>порог решения</span></div>
+        <div class="stat"><b id="share">—</b><span>доля спорного текста</span></div>
+        <div class="stat"><b id="nspans">—</b><span>фрагментов</span></div>
+      </div>
+    </div>
+    <div class="answer" id="marked"></div>
+    <div id="warning"></div>
+    <div id="spanblock" style="display:none">
+      <table><thead><tr><th>Символы</th><th>Риск</th><th>Метка</th><th>Фрагмент</th></tr></thead>
+      <tbody id="spans"></tbody></table>
+    </div>
+    <div id="tokenblock" style="display:none">
+      <table><thead><tr><th>#</th><th>Токен</th><th>Энтропия</th><th>Опора</th><th>Плотность</th><th>Риск</th><th>Метка</th></tr></thead>
+      <tbody id="tokens-body"></tbody></table>
+    </div>
+    <details>
+      <summary>Технические детали ответа</summary>
+      <pre id="raw" style="white-space:pre-wrap; font-size:12px;"></pre>
+    </details>
   </div>
-
-  <div class="card" id="tokenblock" style="display:none">
-    <b>Покадровая оценка</b>
-    <p class="muted">Фрагмент таблицы (первые 400 токенов). reprob — сырая оценка, prob — калиброванная.</p>
-    <table id="tokens"><thead><tr><th>#</th><th>Токен</th><th>Сырая</th><th>Калиброванная</th><th>Метка</th></tr></thead><tbody></tbody></table>
+  <div class="card errors" id="error" style="display:none; margin-top:16px;"></div>
+  <div class="hint">
+    Все вычисления выполняются локально на вашем компьютере: приложение не отправляет тексты в интернет.
   </div>
-</div>
+</main>
 
 <script>
-const SAMPLES = {
-  ai: "Важно отметить, что данный метод обеспечивает эффективное решение поставленной задачи, что подтверждает эффективность предложенного решения. Следует отметить, что предложенный подход позволяет оптимизировать ключевые процессы, что обеспечивает высокое качество получаемых результатов. Кроме того, реализация механизма обеспечивает повышение общей эффективности, что является ключевым фактором успешной реализации. Предложенный подход представляет собой комплексное решение задачи, что позволяет достичь поставленных целей.",
-  hum: "Вчера на семинаре мы прогнали три прогона — цифры разошлись примерно на 7 % между прогонами, а на ноутбуке это считалось 40 минут, а на кластере минуту с небольшим. Пётр предложил иначе: половина датасета оказалась с битыми подписями, пришлось вручную перепроверять 200 с лишним примеров. Честно говоря, ошибка вылезала только при batch_size=3, что странно; спрошу у Ларисы, она это уже делала.",
-  mix: "Отчёт сдали в срок, замечаний не было. Важно отметить, что реализация механизма обеспечивает повышение общей эффективности, что подтверждает эффективность предложенного решения. Следует отметить, что ключевой аспект заключается в комплексной оптимизации параметров, что позволяет достичь поставленных целей. Тут вышла заминка: формулу (3.2) я так и не проверил до конца. По моим наблюдениям, гипотезу пришлось отбросить — корреляция оказалась 0.12. В современном мире предложенный подход представляет собой комплексное решение, что свидетельствует о высокой эффективности подхода."
+const $ = (id) => document.getElementById(id);
+const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const pct = (x) => (100 * x).toFixed(1) + " %";
+const VERDICT = {
+  grounded: ["Ответ подтверждается документом", "grounded"],
+  doubtful: ["Есть сомнительные фрагменты", "doubtful"],
+  likely_hallucination: ["Высокий риск недостоверности", "likely_hallucination"],
+  empty: ["Пустой ответ", "empty"],
 };
 
-const $ = (id) => document.getElementById(id);
-const esc = (s) => s.replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
-const pct = (x) => (100 * x).toFixed(1) + " %";
-const VERDICT = { likely_ai: ["Скорее всего, текст создан ИИ", "ai"],
-                  mixed: ["Смешанный текст", "mixed"],
-                  likely_human: ["Скорее всего, текст человеческий", "human"] };
-
-$("thr").addEventListener("input", (e) => { $("thrval").textContent = (+e.target.value).toFixed(2); });
-$("s-ai").onclick = () => { $("input").value = SAMPLES.ai; };
-$("s-hum").onclick = () => { $("input").value = SAMPLES.hum; };
-$("s-mix").onclick = () => { $("input").value = SAMPLES.mix; };
+const SAMPLES = {
+  "sample-true": {
+    context: "Регламент 343: срок хранения первичных документов составляет 10 лет. Контроль исполнения возложен на службу делопроизводства.",
+    answer: "Срок хранения первичных документов установлен в размере 10 лет.",
+  },
+  "sample-false": {
+    context: "Регламент 343: срок хранения первичных документов составляет 10 лет.",
+    answer: "Срок хранения первичных документов составляет 3 года.",
+  },
+  "sample-fab": {
+    context: "Регламент 343: срок хранения первичных документов составляет 10 лет.",
+    answer: "Срок хранения первичных документов составляет 10 лет. Дополнительно требуется согласование с внешним аудитором и архивным агентством.",
+  },
+};
 
 fetch("/health").then((r) => r.json()).then((h) => {
-  const parts = ["режим: " + h.backend, "версия " + h.version,
-                 h.calibrated ? "калибратор: загружен" : "калибратор: отсутствует"];
-  $("backend").textContent = parts.join(" · ") + (h.notice ? " — " + h.notice : "");
+  const parts = ["режим: " + (h.mode || h.backend), "версия " + h.version];
+  if (h.calibrated) parts.push("порог " + Number(h.threshold).toFixed(3));
+  if (h.head && h.head !== "none") parts.push("голова: " + h.head);
+  $("backend").textContent = parts.join(" · ");
+  if (h.warning) showWarning(h.warning);
 }).catch(() => { $("backend").textContent = "сервис недоступен"; });
 
-$("run").onclick = async () => {
-  const text = $("input").value;
-  if (!text.trim()) { alert("Вставьте текст для проверки."); return; }
+for (const [id, sample] of Object.entries(SAMPLES)) {
+  $(id).addEventListener("click", () => {
+    $("context").value = sample.context;
+    $("answer").value = sample.answer;
+    $("result").style.display = "none";
+  });
+}
+
+$("run").addEventListener("click", async () => {
+  const answer = $("answer").value;
+  if (!answer.trim()) { showError("Введите ответ для проверки."); return; }
   $("run").disabled = true;
-  $("run").textContent = "Проверяю…";
+  $("error").style.display = "none";
   try {
-    const res = await fetch("/v1/verify", {
+    const response = await fetch("/v1/verify", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ text, threshold: +$("thr").value, explain: $("explain").checked })
+      body: JSON.stringify({ answer, context: $("context").value, with_tokens: $("tokens").checked }),
     });
-    const data = await res.json();
-    if (!res.ok) { showError(data.message || "ошибка"); return; }
-    render(data.result);
-    if (data.tokens) renderTokens(data.tokens);
-  } catch (e) {
-    showError(String(e));
+    const data = await response.json();
+    if (!response.ok) { showError(data.error || ("ошибка " + response.status)); return; }
+    render(data, answer);
+  } catch (error) {
+    showError("Не удалось выполнить запрос: " + error);
   } finally {
     $("run").disabled = false;
-    $("run").textContent = "Проверить достоверность";
   }
-};
+});
 
-function showError(message) {
-  $("summary").style.display = "block";
-  $("summary").innerHTML = '<div class="err"><b>Ошибка:</b> ' + esc(message) + "</div>";
-  $("docblock").style.display = "none";
-  $("spansblock").style.display = "none";
-  $("tokenblock").style.display = "none";
-}
+function showError(message) { $("error").textContent = message; $("error").style.display = "block"; }
+function showWarning(message) { $("warning").innerHTML = '<div class="warnbox">' + esc(message) + "</div>"; }
 
-function render(result) {
-  const [label, cls] = VERDICT[result.verdict] || ["—", "mixed"];
-  let html = '<b>' + label + '</b> <span class="badge ' + cls + '">' + esc(result.verdict) + "</span>";
-  html += '<div class="gauge"><span style="width:' + (100 * result.ai_fraction).toFixed(1) + '%"></span></div>';
-  html += '<div class="muted">Доля участия ИИ: ' + pct(result.ai_fraction) +
-          " символов · " + pct(result.ai_fraction_tokens) + " слов · порог " + result.threshold.toFixed(3) +
-          (result.calibrated ? " · калибровано" : " · без калибровки") + "</div>";
-  html += '<div class="stats">' +
-    stat(result.n_word_tokens, "слов в документе") +
-    stat(result.spans_count, "фрагментов найдено") +
-    stat(result.text_length, "символов") +
-    stat(result.backend, "бэкенд") + "</div>";
-  (result.warnings || []).forEach((w) => { html += '<div class="warn">' + esc(w) + "</div>"; });
-  $("summary").style.display = "block";
-  $("summary").innerHTML = html;
+function render(data, answer) {
+  const [label, cls] = VERDICT[data.verdict] || ["—", "empty"];
+  $("badge").textContent = label;
+  $("badge").className = "badge " + cls;
+  $("score").textContent = Number(data.score).toFixed(3);
+  $("thr").textContent = Number(data.threshold).toFixed(3);
+  $("share").textContent = pct(data.ai_share) + " / " + pct(data.ai_share_hard);
+  $("nspans").textContent = String((data.spans || []).length);
+  $("marked").innerHTML = markup(answer, data.spans || []);
+  $("warning").innerHTML = "";
+  if (data.stats && data.stats.warning) showWarning(data.stats.warning);
+  $("latency").textContent = "обработано за " + Number(data.latency_ms).toFixed(0) + " мс";
 
-  const spans = result.spans || [];
-  $("docblock").style.display = "block";
-  $("doc").innerHTML = markup($("input").value, spans);
+  const spans = data.spans || [];
+  $("spanblock").style.display = spans.length ? "block" : "none";
+  $("spans").innerHTML = spans.map((s) => (
+    "<tr><td>" + s.start + ":" + s.end + "</td><td>" + Number(s.risk).toFixed(3) +
+    "</td><td>" + esc(s.label) + "</td><td>" + esc(s.text) + "</td></tr>"
+  )).join("");
 
-  const tbody = $("spans").querySelector("tbody");
-  tbody.innerHTML = spans.length ? spans.map((s) =>
-    "<tr><td>" + (s.index + 1) + "</td><td>" + s.start_char + "–" + s.end_char + "</td><td>" + s.n_tokens +
-    "</td><td>" + s.mean_prob.toFixed(3) + "</td><td>" + esc(s.text.slice(0, 140)) + "</td></tr>").join("")
-    : '<tr><td colspan="5" class="muted">Фрагментов выше порога не найдено.</td></tr>';
-  $("spansblock").style.display = "block";
-}
+  const tokens = data.tokens || [];
+  $("tokenblock").style.display = tokens.length ? "block" : "none";
+  $("tokens-body").innerHTML = tokens.map((t) => (
+    "<tr><td>" + t.index + "</td><td>" + esc(t.text) + "</td><td>" + Number(t.attention_entropy).toFixed(3) +
+    "</td><td>" + Number(t.ctx_attention_mass).toFixed(3) + "</td><td>" + Number(t.embedding_density).toFixed(3) +
+    "</td><td>" + Number(t.risk).toFixed(3) + "</td><td>" + esc(t.label) + "</td></tr>"
+  )).join("");
 
-function stat(value, caption) {
-  return '<div class="stat"><b>' + esc(String(value)) + "</b><span>" + esc(caption) + "</span></div>";
+  $("raw").textContent = JSON.stringify(data.stats || {}, null, 1);
+  $("result").style.display = "block";
 }
 
 function markup(text, spans) {
-  const ordered = [...spans].sort((a, b) => a.start_char - b.start_char);
-  let out = "";
-  let cursor = 0;
-  for (const s of ordered) {
-    const start = Math.max(cursor, s.start_char);
-    const end = Math.max(start, s.end_char);
-    out += esc(text.slice(cursor, start));
-    out += "<mark>" + esc(text.slice(start, end)) + "</mark>";
+  const ordered = [...spans].sort((a, b) => a.start - b.start);
+  let cursor = 0, html = "";
+  for (const span of ordered) {
+    const start = Math.max(cursor, span.start);
+    const end = Math.max(start, span.end);
+    html += esc(text.slice(cursor, start));
+    const cls = span.label === "likely_hallucination" ? "" : ' class="doubtful"';
+    html += "<mark" + cls + " title=\\"риск " + Number(span.risk).toFixed(3) + " · " + esc(span.label) +
+            "\\">" + esc(text.slice(start, end)) + "</mark>";
     cursor = end;
   }
-  out += esc(text.slice(cursor));
-  return out;
-}
-
-function renderTokens(tokens) {
-  const tbody = $("tokens").querySelector("tbody");
-  tbody.innerHTML = tokens.slice(0, 400).map((t, i) =>
-    "<tr><td>" + (i + 1) + "</td><td>" + esc(t.token) + "</td><td>" + t.raw.toFixed(3) +
-    "</td><td>" + t.prob.toFixed(3) + "</td><td>" + (t.flag ? "ИИ" : "человек") + "</td></tr>").join("");
-  $("tokenblock").style.display = "block";
+  return html + esc(text.slice(cursor));
 }
 </script>
 </body>
 </html>
 """
+
+__all__ = ["INDEX_HTML"]
