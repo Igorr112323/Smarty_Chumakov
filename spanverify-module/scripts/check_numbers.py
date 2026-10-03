@@ -65,6 +65,10 @@ TOLERANT_PATTERNS = (
 
 OLD_MARKER = "устарел"
 
+# Числа, снятые из аннотаций CI (артефакты в песочнице недоступны),
+# помечаются в тексте словом «аннотаци» и сверяются с логом прогона.
+CI_MARKER = "аннотаци"
+
 # Числа рядом с этими словами — критерии и пороги, а не измерения: их сверять
 # с METRICS.json нельзя (например «token F1 ≥ 0.90 при FPR ≤ 0.10»).
 GUARD = re.compile(r"[≥≤<>]|критери|порог|цель|минимум|максимум|не менее|не более", re.IGNORECASE)
@@ -159,7 +163,7 @@ def check_docs(docs: list[Path], metrics: dict) -> list[str]:
                 for match in pattern.finditer(line):
                     value = match.group(1)
                     context = line[max(0, match.start(1) - 30) : match.start(1) + 5]
-                    if OLD_MARKER in line or GUARD.search(context):
+                    if OLD_MARKER in line or CI_MARKER in line or GUARD.search(context):
                         continue
                     if value not in allowed[kind]:
                         problems.append(
@@ -171,7 +175,7 @@ def check_docs(docs: list[Path], metrics: dict) -> list[str]:
                     value = match.group(1)
                     context = line[max(0, match.start(1) - 30) : match.start(1) + 5]
                     if allowed[kind] and value not in allowed[kind]:
-                        if OLD_MARKER in line or GUARD.search(context):
+                        if OLD_MARKER in line or CI_MARKER in line or GUARD.search(context):
                             continue
                         problems.append(
                             f"{path}:{number}: {kind}={value} нет в METRICS.json "
@@ -181,6 +185,7 @@ def check_docs(docs: list[Path], metrics: dict) -> list[str]:
                 if (
                     match.group(0) != version
                     and OLD_MARKER not in line
+                    and CI_MARKER not in line
                     and GUARD.search(line[max(0, match.start() - 30) : match.start() + 5]) is None
                 ):
                     problems.append(
