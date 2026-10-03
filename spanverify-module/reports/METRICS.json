@@ -8,15 +8,15 @@
   },
   "meta": {
     "version": "1.2.1",
-    "commit": "0fa53428409c63d675fc0788577a9ff2174af563",
-    "generated_at": "2026-10-03T15:34:44Z",
+    "commit": "47976b56b3d1f75a2630e265502c4f437ad53798",
+    "generated_at": "2026-10-03T15:57:48Z",
     "seed": 42,
     "dataset": "data/demo_pairs.jsonl"
   },
   "disclaimer": "Демонстрационные метрики получены на синтетическом корпусе и научным результатом не являются. Для подтверждения требуются 1200 пар «вопрос–ответ» с экспертной разметкой на реальных регламентах организации.",
   "tests": {
-    "collected": 252,
-    "coverage_percent": 86.89,
+    "collected": 289,
+    "coverage_percent": 87.13,
     "coverage_gate_percent": 85
   },
   "demo": {
@@ -48,6 +48,16 @@
         "fpr": 0.0,
         "auc": 1.0,
         "threshold": 1.0
+      },
+      "verdicts": {
+        "tp": 46,
+        "fp": 0,
+        "fn": 0,
+        "tn": 26,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "fpr": 0.0
       }
     },
     "validation": {
@@ -103,6 +113,16 @@
         "fpr": 0.0,
         "auc": 0.996,
         "threshold": 1.0
+      },
+      "verdicts": {
+        "tp": 124,
+        "fp": 0,
+        "fn": 0,
+        "tn": 116,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "fpr": 0.0
       }
     },
     "demo_answer_example": {
@@ -153,6 +173,210 @@
       }
     }
   },
+  "corpus_a": {
+    "available": true,
+    "dataset_version": "corpus-a1.0",
+    "pairs": 1200,
+    "balance": {
+      "counts": {
+        "faithful": 566,
+        "contradiction": 148,
+        "partial": 129,
+        "number_attribution": 93,
+        "unconfirmed": 83,
+        "missing": 57,
+        "oversight": 59,
+        "excess": 65
+      },
+      "clean": 566,
+      "clean_share": 0.4717,
+      "min_per_mode": 40,
+      "problems": []
+    },
+    "splits": {
+      "train": 840,
+      "dev": 180,
+      "test": 180
+    },
+    "shared_groups": 0,
+    "spans_checked": 634,
+    "sha256_pairs": "734c89159f4a828d63e2d99a27fcac830bf435f8a5bf822ff5f6819cf09e6c6e",
+    "documents": {
+      "count": 60,
+      "synthetic": true
+    },
+    "by_split": {
+      "dev": {
+        "tokens": {
+          "precision": 1.0,
+          "recall": 0.5465,
+          "f1": 0.7068,
+          "fpr": 0.0,
+          "auc": 0.9191,
+          "n": 1900
+        },
+        "spans": {
+          "strict_f1": 0.1854,
+          "coverage": 0.5326,
+          "soft_f1": 0.649,
+          "width_ratio": 4.08
+        },
+        "answers": {
+          "precision": 1.0,
+          "recall": 0.4022,
+          "f1": 0.5736,
+          "fpr": 0.0,
+          "auc": 0.7011,
+          "threshold": 1.0
+        },
+        "verdicts": {
+          "tp": 49,
+          "fp": 10,
+          "fn": 43,
+          "tn": 78,
+          "precision": 0.8305,
+          "recall": 0.5326,
+          "f1": 0.649,
+          "fpr": 0.1136
+        }
+      },
+      "test": {
+        "tokens": {
+          "precision": 1.0,
+          "recall": 0.5795,
+          "f1": 0.7338,
+          "fpr": 0.0,
+          "auc": 0.9536,
+          "n": 1868
+        },
+        "spans": {
+          "strict_f1": 0.0984,
+          "coverage": 0.7374,
+          "soft_f1": 0.7869,
+          "width_ratio": 5.22
+        },
+        "answers": {
+          "precision": 1.0,
+          "recall": 0.4242,
+          "f1": 0.5957,
+          "fpr": 0.0,
+          "auc": 0.7121,
+          "threshold": 1.0
+        },
+        "verdicts": {
+          "tp": 73,
+          "fp": 11,
+          "fn": 26,
+          "tn": 70,
+          "precision": 0.869,
+          "recall": 0.7374,
+          "f1": 0.7978,
+          "fpr": 0.1358
+        }
+      }
+    },
+    "by_mode": {
+      "contradiction": {
+        "pairs": 26,
+        "verdict_recall": 0.9231,
+        "verdict_fpr": 0.0,
+        "token_f1": 0.6269,
+        "span_coverage": 0.9231
+      },
+      "excess": {
+        "pairs": 14,
+        "verdict_recall": 1.0,
+        "verdict_fpr": 0.0,
+        "token_f1": 0.979,
+        "span_coverage": 1.0
+      },
+      "faithful": {
+        "pairs": 81,
+        "verdict_recall": 0.0,
+        "verdict_fpr": 0.1358,
+        "token_f1": 0.0,
+        "span_coverage": 0.0
+      },
+      "missing": {
+        "pairs": 10,
+        "verdict_recall": 0.0,
+        "verdict_fpr": 0.0,
+        "token_f1": 0.0,
+        "span_coverage": 0.0
+      },
+      "number_attribution": {
+        "pairs": 13,
+        "verdict_recall": 0.7692,
+        "verdict_fpr": 0.0,
+        "token_f1": 0.0,
+        "span_coverage": 0.7692
+      },
+      "oversight": {
+        "pairs": 11,
+        "verdict_recall": 1.0,
+        "verdict_fpr": 0.0,
+        "token_f1": 0.8,
+        "span_coverage": 1.0
+      },
+      "partial": {
+        "pairs": 15,
+        "verdict_recall": 0.2667,
+        "verdict_fpr": 0.0,
+        "token_f1": 0.0,
+        "span_coverage": 0.2667
+      },
+      "unconfirmed": {
+        "pairs": 10,
+        "verdict_recall": 1.0,
+        "verdict_fpr": 0.0,
+        "token_f1": 0.9302,
+        "span_coverage": 1.0
+      }
+    }
+  },
+  "corpus_b": {
+    "available": true,
+    "dataset": "RusHallu-RAG (SberQuAD-RAG + ruSciBench-RAG)",
+    "citation": "Sadkovskii F., Nasyrova R., Sorokin A. RusHallu-RAG: бенчмарк обнаружения галлюцинаций RAG (Диалог-2026, DOI 10.29003/2075-7182-2026-24-516-534)",
+    "mode": "demo",
+    "pairs": 1000,
+    "our_metrics": {
+      "tokens": {
+        "precision": 0.3616,
+        "recall": 0.0769,
+        "f1": 0.1269,
+        "fpr": 0.0642,
+        "auc": 0.5293
+      },
+      "spans": {
+        "strict_f1_iou_0_5": 0.2649,
+        "coverage": 0.5343,
+        "soft_f1_expanded": 0.3563,
+        "mean_width_ratio": 4.35
+      },
+      "answers": {
+        "precision": 0.3977,
+        "recall": 0.2042,
+        "f1": 0.2698,
+        "fpr": 0.1544,
+        "auc": 0.5249
+      }
+    },
+    "their_metrics": {
+      "rouge1": 0.5409,
+      "rouge2": 0.5334,
+      "rougeL": 0.5333,
+      "accuracy": 0.424,
+      "jaccard_score": 0.4352,
+      "hamming_loss": 0.2561,
+      "empty_reference": 667,
+      "pairs": 1000
+    },
+    "baseline_comparison": null,
+    "baseline_note": "Сравнение с baseline статьи не выполнено: значения из Таблиц 2-4 не извлечены в этом окружении (PDF не парсился). Числа не выдумываются.",
+    "disclaimer": "RusHallu-RAG — внешний тест с человеческой разметкой спанов. Числа режима demo получены лексическими суррогатами признаков и научным результатом не являются: научный вывод требует режима hf на GPU, который в этой среде не запускался.",
+    "role": "только тест: обучение и калибровка на корпусе B запрещены"
+  },
   "cross_corpus": {
     "in_corpus_f1": 0.9532,
     "cross_corpus_f1": 0.7173,
@@ -175,5 +399,5 @@
       }
     ]
   },
-  "duration_s": 24.6
+  "duration_s": 26.1
 }

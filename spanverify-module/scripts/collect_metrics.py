@@ -205,6 +205,101 @@ def _metrics_tree(metrics: dict) -> dict:
             "auc": round(answers["auc"], 4) if answers["auc"] == answers["auc"] else None,
             "threshold": round(answers["threshold"], 4),
         },
+        # Вердикт уровня ответа: сюда попадает и текстовое правило привязки числа
+        # к объекту (дефект D), которое не видно в метриках по токенам.
+        "verdicts": {
+            "tp": metrics.get("verdicts", {}).get("tp"),
+            "fp": metrics.get("verdicts", {}).get("fp"),
+            "fn": metrics.get("verdicts", {}).get("fn"),
+            "tn": metrics.get("verdicts", {}).get("tn"),
+            "precision": metrics.get("verdicts", {}).get("precision"),
+            "recall": metrics.get("verdicts", {}).get("recall"),
+            "f1": metrics.get("verdicts", {}).get("f1"),
+            "fpr": metrics.get("verdicts", {}).get("fpr"),
+        },
+    }
+
+
+def _corpus_a_block(verifier: Verifier) -> dict:
+    """Метрики нашего корпуса A (управляемые подмены), если он собран.
+
+    Корпус создаётся ``scripts/build_corpus_a.py``; здесь он только измеряется —
+    тем же кодом, что обслуживает API. Разбиение по документам, поэтому метрики
+    dev и test честные (одна группа не попадает в две части).
+    """
+    manifest_path = ROOT / "data" / "corpus_a" / "manifest.json"
+    if not manifest_path.is_file():
+        return {
+            "available": False,
+            "note": (
+                "корпус не собран: python scripts/build_corpus_a.py "
+                "--docs data/corpus_a/docs --out data/corpus_a --target 1200 --seed 42"
+            ),
+        }
+    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    block: dict = {
+        "available": True,
+        "dataset_version": manifest["dataset_version"],
+        "pairs": manifest["pairs"],
+        "balance": manifest["balance"],
+        "splits": manifest["splits"],
+        "shared_groups": manifest["shared_groups"],
+        "spans_checked": manifest["spans_checked"],
+        "sha256_pairs": manifest["sha256"]["pairs.jsonl"],
+        "documents": {
+            "count": manifest["documents"]["count"],
+            "synthetic": manifest["documents"]["synthetic"],
+        },
+        "by_split": {},
+        "by_mode": {},
+    }
+    for name in ("dev", "test"):
+        path = ROOT / "data" / "corpus_a" / "splits" / f"{name}.jsonl"
+        if not path.is_file():
+            continue
+        block["by_split"][name] = _metrics_tree(verifier.evaluate(list(read_pairs(path))))
+    test_path = ROOT / "data" / "corpus_a" / "splits" / "test.jsonl"
+    if test_path.is_file():
+        by_mode: dict[str, list] = {}
+        for pair in read_pairs(test_path):
+            by_mode.setdefault(pair["meta"]["mode"], []).append(pair)
+        for mode, pairs_block in sorted(by_mode.items()):
+            metrics = verifier.evaluate(pairs_block)
+            block["by_mode"][mode] = {
+                "pairs": len(pairs_block),
+                "verdict_recall": metrics["verdicts"]["recall"],
+                "verdict_fpr": metrics["verdicts"]["fpr"],
+                "token_f1": round(metrics["tokens"]["f1"], 4),
+                "span_coverage": round(metrics["spans"]["recall_containment"], 4),
+            }
+    return block
+
+
+def _corpus_b_block() -> dict:
+    """Числа внешнего бенчмарка RusHallu-RAG из отчёта оценщика (без выдумывания)."""
+    path = ROOT / "reports" / "rus_hallu_eval.json"
+    if not path.is_file():
+        return {
+            "available": False,
+            "note": (
+                "отчёт не собран: python scripts/fetch_rushallu.py --out data/external/rushallu "
+                "--verify && python scripts/rus_hallu_eval.py --data data/external/rushallu "
+                "--mode demo --json reports/rus_hallu_eval.json"
+            ),
+        }
+    report = json.loads(path.read_text(encoding="utf-8"))
+    return {
+        "available": True,
+        "dataset": report["dataset"],
+        "citation": report["citation"],
+        "mode": report["mode"],
+        "pairs": report["pairs"],
+        "our_metrics": report["our_metrics"],
+        "their_metrics": report["their_metrics"],
+        "baseline_comparison": report["baseline_comparison"],
+        "baseline_note": report["baseline_note"],
+        "disclaimer": report["disclaimer"],
+        "role": "только тест: обучение и калибровка на корпусе B запрещены",
     }
 
 
@@ -278,6 +373,8 @@ def collect(dataset: str, seed: int, release_dir: Path, coverage_json: Path) -> 
             "number_attribution": _attribution_block(pairs, verifier),
             "dataset_validation": _dataset_validation_block(),
         },
+        "corpus_a": _corpus_a_block(verifier),
+        "corpus_b": _corpus_b_block(),
         "cross_corpus": None,
         "pilot": None,
         "release": _release_info(release_dir),
@@ -346,6 +443,25 @@ def main() -> int:
         f"  демо (групповой сплит, сквозной путь): F1={demo['in_corpus']['tokens']['f1']:.3f} "
         f"FPR={demo['in_corpus']['tokens']['fpr']:.3f}"
     )
+    corpus_a = payload["corpus_a"]
+    if corpus_a.get("available"):
+        test_metrics = corpus_a["by_split"].get("test", {})
+        print(
+            f"  корпус A: {corpus_a['pairs']} пар, сплиты {corpus_a['splits']}, "
+            f"общих групп {corpus_a['shared_groups']}; test token F1="
+            f"{test_metrics.get('tokens', {}).get('f1')} вердикт F1={test_metrics.get('verdicts', {}).get('f1')}"
+        )
+    else:
+        print(f"  корпус A: {corpus_a['note']}")
+    corpus_b = payload["corpus_b"]
+    if corpus_b.get("available"):
+        theirs = corpus_b["their_metrics"]
+        print(
+            f"  корпус B (RusHallu-RAG, режим {corpus_b['mode']}): {corpus_b['pairs']} пар, "
+            f"accuracy={theirs['accuracy']} Jaccard={theirs['jaccard_score']} ROUGE-L={theirs['rougeL']}"
+        )
+    else:
+        print(f"  корпус B: {corpus_b['note']}")
     if payload["cross_corpus"]:
         cross = payload["cross_corpus"]
         print(

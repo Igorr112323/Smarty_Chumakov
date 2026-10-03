@@ -97,9 +97,11 @@ def evaluate(data_dir: Path, mode: str, limit: int | None = None) -> dict:
         "disclaimer": DISCLAIMER,
         "our_metrics": {
             "tokens": {
-                key: (round(ours["tokens"][key], 4) if key != "threshold" else ours["tokens"][key])
-                if isinstance(ours["tokens"].get(key), int | float)
-                else None
+                key: (
+                    (round(ours["tokens"][key], 4) if key != "threshold" else ours["tokens"][key])
+                    if isinstance(ours["tokens"].get(key), int | float)
+                    else None
+                )
                 for key in ("precision", "recall", "f1", "fpr", "auc")
             },
             "spans": {
@@ -114,8 +116,7 @@ def evaluate(data_dir: Path, mode: str, limit: int | None = None) -> dict:
             },
         },
         "their_metrics": {
-            key: (round(value, 4) if isinstance(value, float) else value)
-            for key, value in theirs.items()
+            key: (round(value, 4) if isinstance(value, float) else value) for key, value in theirs.items()
         },
         "baseline_comparison": None,
         "baseline_note": (

@@ -358,6 +358,8 @@ class Verifier:
         predicted: list[list[tuple[int, int]]] = []
         truth: list[list[tuple[int, int]]] = []
         truth_expanded: list[list[tuple[int, int]]] = []
+        verdict_labels: list[int] = []
+        verdict_flags: list[bool] = []
 
         for pair in pairs:
             data = pair.to_dict() if isinstance(pair, Pair) else pair
@@ -377,6 +379,10 @@ class Verifier:
 
             answer_labels.append(1 if pair_truth else 0)
             answer_scores.append(result.score)
+            # Вердикт — уровень ответа: ``doubtful`` приходит и от текстового правила
+            # привязки числа к объекту, которое иначе не видно в метриках по токенам.
+            verdict_labels.append(1 if pair_truth else 0)
+            verdict_flags.append(result.verdict not in {"grounded", "empty"})
             predicted.append(pair_predicted)
             truth.append(pair_truth)
             truth_expanded.append(pair_truth_expanded)
@@ -394,10 +400,12 @@ class Verifier:
         answer_metrics = _answer_metrics(
             answer_labels, answer_scores, threshold if threshold is not None else self.bundle.threshold
         )
+        verdict_metrics = _binary_metrics(verdict_labels, verdict_flags)
         return {
             "tokens": token_metrics,
             "spans": span_metrics,
             "answers": answer_metrics,
+            "verdicts": verdict_metrics,
             "pairs": len(truth),
             "mode": self.mode,
             "warning": self.warning if self.mode != "hf" else "",
@@ -574,6 +582,28 @@ def _token_metrics(labels: Sequence[int], flags: Sequence[bool], risks: Sequence
         "fn": fn,
         "tn": tn,
         "auc": _auc(labels, risks),
+    }
+
+
+def _binary_metrics(labels: Sequence[int], flags: Sequence[bool]) -> dict[str, float]:
+    """precision / recall / F1 / FPR по булевым решениям (здесь — вердиктам)."""
+    tp = sum(1 for label, flag in zip(labels, flags, strict=False) if label and flag)
+    fp = sum(1 for label, flag in zip(labels, flags, strict=False) if not label and flag)
+    fn = sum(1 for label, flag in zip(labels, flags, strict=False) if label and not flag)
+    tn = sum(1 for label, flag in zip(labels, flags, strict=False) if not label and not flag)
+    precision = tp / (tp + fp) if tp + fp else 0.0
+    recall = tp / (tp + fn) if tp + fn else 0.0
+    f1 = 2 * precision * recall / (precision + recall) if precision + recall else 0.0
+    return {
+        "tp": tp,
+        "fp": fp,
+        "fn": fn,
+        "tn": tn,
+        "precision": round(precision, 4),
+        "recall": round(recall, 4),
+        "f1": round(f1, 4),
+        "fpr": round(fp / (fp + tn), 4) if fp + tn else 0.0,
+        "flagged_share": round((tp + fp) / len(labels), 4) if labels else 0.0,
     }
 
 

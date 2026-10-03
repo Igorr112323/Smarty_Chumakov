@@ -154,3 +154,38 @@ def _make_fake_metrics() -> dict:
         "cross_corpus": {"in_corpus_f1": 0.953, "cross_corpus_f1": 0.731, "cross_fpr": 0.144},
         "pilot": None,
     }
+
+
+def test_evaluate_reports_verdict_metrics() -> None:
+    """В метриках есть уровень вердикта: правило привязки числа видно только там.
+
+    Токен-уровень считается по сглаженной маске и редко реагирует на одиночную
+    подмену числа, а вердикт ответа — реагирует (``doubtful``). Без этого блока
+    работа правила D не отражалась бы в отчётах вообще.
+    """
+    from spanverify.engine import Verifier
+
+    pairs = [
+        {
+            "id": "attribution-1",
+            "context": (
+                "Согласно регламенту, срок хранения первичных документов составляет пять лет. "
+                "Срок хранения вторичных документов составляет десять лет."
+            ),
+            "answer": "Срок хранения первичных документов составляет десять лет.",
+            "labels": [[45, 59, 1]],
+        },
+        {
+            "id": "clean-1",
+            "context": "Согласно регламенту, срок хранения первичных документов составляет пять лет.",
+            "answer": "Срок хранения первичных документов составляет пять лет.",
+            "labels": [],
+        },
+    ]
+    report = Verifier(mode="demo").evaluate(pairs)
+    verdicts = report["verdicts"]
+    assert set(verdicts) >= {"tp", "fp", "fn", "tn", "precision", "recall", "f1", "fpr"}
+    assert verdicts["tp"] == 1, "подмена числа обязана дать замечание на уровне ответа"
+    assert verdicts["tn"] == 1, "чистый ответ не должен получать замечание"
+    assert verdicts["recall"] == 1.0
+    assert verdicts["fpr"] == 0.0
