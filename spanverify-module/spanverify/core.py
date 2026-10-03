@@ -14,6 +14,7 @@
 from __future__ import annotations
 
 import re
+import sys
 from collections.abc import Iterable, Sequence
 from dataclasses import dataclass, field
 from typing import Any
@@ -86,6 +87,24 @@ class ContextChunks:
     text: str
     chunks: tuple[str, ...]
     positions: tuple[int, ...]  # смещение чанка в контексте
+
+
+def configure_stdio(encoding: str = "utf-8") -> None:
+    """Сделать вывод в консоль устойчивым к кодировкам Windows.
+
+    На Windows консоль может быть в cp866/cp1251, и печать русских сообщений
+    падает с ``UnicodeEncodeError`` (это ломало запуск собранного ``.exe`` в CI).
+    Поток переводится в UTF-8 с заменой непереводимых символов; там, где
+    переключение недоступно (тесты, перехваченный вывод), вызов молча пропускается.
+    """
+    for stream in (sys.stdout, sys.stderr):
+        reconfigure = getattr(stream, "reconfigure", None)
+        if reconfigure is None:
+            continue
+        try:
+            reconfigure(encoding=encoding, errors="replace")
+        except (ValueError, OSError):  # pragma: no cover - зависит от окружения
+            continue
 
 
 def tokenize_with_offsets(text: str) -> list[Token]:

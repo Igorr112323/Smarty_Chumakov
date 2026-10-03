@@ -70,6 +70,11 @@ jobs:
     name: Сборка и проверка .exe
     needs: test
     runs-on: windows-latest
+    env:
+      # Русские сообщения в консоли раннера: без UTF-8 вывод .exe падал
+      # с UnicodeEncodeError (Приложение А мастер-промта).
+      PYTHONUTF8: "1"
+      PYTHONIOENCODING: "utf-8"
     defaults:
       run:
         working-directory: spanverify-module
