@@ -330,6 +330,16 @@ jobs:
       - name: Оценка на RusHallu-RAG (внешний русский набор)
         run: python scripts/external_eval.py --dataset rushallu --mode demo --json reports/ext_rushallu.json
 
+      # Шаг 1.5: числа baseline из PDF статьи. PDF лежит на сайте конференции; его
+      # текст может не извлечься (нет текстового слоя) — тогда так и пишется,
+      # «не извлечено», без выдуманных значений.
+      - name: Извлечь baseline статьи (таблицы 2-4)
+        continue-on-error: true
+        run: python scripts/extract_baseline_pdf.py --out reports/baseline_from_article.json
+
+      - name: Оценка на RusHallu-RAG (после baseline)
+        run: python scripts/rus_hallu_eval.py --mode demo --json reports/rus_hallu_eval.json
+
       - name: Ключевые числа в аннотации (читаются без скачивания артефактов)
         run: python scripts/print_external_annotation.py
 
@@ -349,6 +359,8 @@ jobs:
             spanverify-module/reports/EXTERNAL_TESTS.md
             spanverify-module/reports/ext_ragtruth_qa.json
             spanverify-module/reports/ext_rushallu.json
+            spanverify-module/reports/baseline_from_article.json
+            spanverify-module/reports/rus_hallu_eval.json
           retention-days: 90
 
   # Корпус A3: реальные документы. Работает долго (скачивание PDF + OCR), поэтому в

@@ -62,6 +62,44 @@ def true_span_texts(pair: dict) -> list[str]:
     return [answer[int(start) : int(end)] for start, end, label in pair.get("labels", []) if int(label) == 1]
 
 
+def load_baseline() -> tuple[dict | None, str]:
+    """Числа baseline статьи, **только если** они извлечены из PDF (шаг 1.5).
+
+    Возвращает ``(None, "не извлечено …")``, пока ``reports/baseline_from_article.json``
+    не содержит разобранных чисел: выдумывать значения вместо «не извлечено» запрещено.
+    Пометка источника обязательна: «данные из статьи, таблица N».
+    """
+    path = ROOT / "reports" / "baseline_from_article.json"
+    not_extracted = (
+        "Сравнение с baseline статьи не выполнено: значения из Таблиц 2-4 не извлечены "
+        "(см. reports/baseline_from_article.json). Числа не выдумываются."
+    )
+    if not path.is_file():
+        return None, not_extracted
+    payload = json.loads(path.read_text(encoding="utf-8"))
+    if not payload.get("extracted"):
+        return None, f"{not_extracted} Причина: {payload.get('note', 'не записана')}"
+    tables: dict = {}
+    for number, rows in (payload.get("rows") or {}).items():
+        if not rows:
+            continue
+        tables[number] = {
+            "source_note": f"данные из статьи, таблица {number}",
+            "rows": rows,
+        }
+    if not tables:
+        return None, not_extracted
+    return (
+        {
+            "article_url": payload.get("url"),
+            "article_bytes": payload.get("bytes"),
+            "tables": tables,
+            "note": "числа взяты из текста статьи без пересчёта; источник — таблицы 2-4",
+        },
+        "Сравнение с baseline статьи приведено по извлечённым из PDF числам (таблицы 2-4).",
+    )
+
+
 def evaluate(data_dir: Path, mode: str, limit: int | None = None) -> dict:
     """Прогнать наш конвейер по внешнему набору и посчитать обе группы метрик."""
     pairs_path = data_dir / "pairs.jsonl"
@@ -85,6 +123,7 @@ def evaluate(data_dir: Path, mode: str, limit: int | None = None) -> dict:
     ours = verifier.evaluate(pairs)
     theirs = evaluate_spans(references, predictions)
     duration = time.perf_counter() - started
+    baseline, baseline_note = load_baseline()
 
     return {
         "dataset": "RusHallu-RAG (SberQuAD-RAG + ruSciBench-RAG)",
@@ -118,11 +157,8 @@ def evaluate(data_dir: Path, mode: str, limit: int | None = None) -> dict:
         "their_metrics": {
             key: (round(value, 4) if isinstance(value, float) else value) for key, value in theirs.items()
         },
-        "baseline_comparison": None,
-        "baseline_note": (
-            "Сравнение с baseline статьи не выполнено: значения из Таблиц 2-4 не извлечены "
-            "в этом окружении (PDF не парсился). Числа не выдумываются."
-        ),
+        "baseline_comparison": baseline,
+        "baseline_note": baseline_note,
         "prediction_examples": [
             {
                 "id": pair["id"],
