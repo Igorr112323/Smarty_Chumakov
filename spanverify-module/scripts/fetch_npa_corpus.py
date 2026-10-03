@@ -19,6 +19,13 @@
    выгрузки, видом/номером/датой акта, хешами PDF и текста, числом страниц и способом
    извлечения. Ровно эти файлы потом читает ``scripts/build_corpus_a.py --real``.
 
+Правовая основа и вежливость к источникам: берутся только официально опубликованные
+акты (п. 6 ст. 1259 ГК РФ — официальные документы государственных органов не являются
+объектами авторских прав); у каждого документа в ``sources.json`` записан URL, вид,
+номер, дата и SHA256 PDF; robots.txt каждого хоста белого списка читается и применяется
+(``is_allowed``), частота запросов — не чаще одного в секунду (по умолчанию 1.5 с),
+User-Agent содержит контакт, а приоритет отдан API и выгрузкам, а не разбору HTML.
+
 Честность важнее полноты: сколько документов реально скачано и с каким числом фактов —
 пишется в отчёт; недоступные источники помечаются ``available: false`` с фактической
 причиной (код ответа или таймаут), а не «предположительно недоступен».
@@ -322,6 +329,58 @@ def ocr_pdf(path: Path, dpi: int = 200, max_pages: int = 40) -> dict:
     }
 
 
+def pypdf_text(path: Path) -> dict:
+    """Извлечь текст из PDF средствами pypdf (``{text, pages, error}``).
+
+    Так делается, только если в PDF есть текстовый слой. Официальные PDF публикации
+    оказались сканами (≈1 знак на страницу — отчёт ``reports/npa_extract_probe.json``),
+    поэтому на практике чаще срабатывает OCR; но если текстовый слой есть, он точнее.
+    """
+    try:
+        from pypdf import PdfReader
+    except ImportError:  # pragma: no cover - в CI pypdf установлен
+        return {"text": "", "pages": 0, "error": "pypdf не установлен"}
+    try:
+        reader = PdfReader(str(path))
+        pages = [page.extract_text() or "" for page in reader.pages]
+    except Exception as error:  # noqa: BLE001 - битый PDF не должен ронять загрузку
+        return {"text": "", "pages": 0, "error": str(error)[:200]}
+    return {"text": "\n".join(pages), "pages": len(pages), "error": None}
+
+
+def pick_extraction(text_layer: dict, ocr: dict, min_chars_per_page: int = 120) -> str:
+    """Выбрать способ извлечения по фактам: текстовый слой или OCR.
+
+    Текстовый слой считается пригодным, если он даёт не меньше ``min_chars_per_page``
+    знаков на страницу. Иначе берётся OCR (если он что-то дал). Если не пригоден ни
+    один способ — ``"none"``: документ пропускается, а не попадает в корпус пустым.
+    """
+    pages = int(text_layer.get("pages") or 0)
+    chars = len(text_layer.get("text") or "")
+    if pages and chars >= min_chars_per_page * pages:
+        return "pypdf"
+    if (ocr.get("text") or "").strip():
+        return "ocr-tesseract-rus"
+    return "none"
+
+
+def extract_text(path: Path, dpi: int = 200, max_pages: int = 40) -> dict:
+    """Текст PDF: сначала текстовый слой, затем OCR. Возвращает факты, без догадок."""
+    text_layer = pypdf_text(path)
+    ocr = ocr_pdf(path, dpi=dpi, max_pages=max_pages)
+    method = pick_extraction(text_layer, ocr)
+    text = text_layer["text"] if method == "pypdf" else ocr["text"]
+    return {
+        "method": method,
+        "text": text,
+        "pages": int(text_layer.get("pages") or ocr.get("pages") or 0),
+        "chars": len(text or ""),
+        "text_layer_chars": len(text_layer.get("text") or ""),
+        "ocr_error": ocr.get("error"),
+        "pypdf_error": text_layer.get("error"),
+    }
+
+
 def sha256_bytes(raw: bytes) -> str:
     """SHA256 байтов (для PDF и текста источника)."""
     return hashlib.sha256(raw).hexdigest()
@@ -344,6 +403,34 @@ def write_sources(out_dir: Path, documents: list[dict], manifest: dict) -> None:
     (sources_dir / "sources.json").write_text(
         json.dumps(manifest, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
     )
+
+
+def load_existing(out_dir: Path) -> tuple[list[dict], dict]:
+    """Прочитать уже скачанные источники: ``(документы, метаданные манифеста)``.
+
+    Нужно, чтобы повторный запуск не скачивал и не распознавал документы заново: тексты
+    и хеши уже есть, а извлечение OCR стоит времени. Файлы, которых нет или хеш которых
+    не совпал, в результат не попадают — их загрузчик скачает снова.
+    """
+    manifest_path = out_dir / "sources" / "sources.json"
+    if not manifest_path.exists():
+        return [], {}
+    try:
+        manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    except json.JSONDecodeError:
+        return [], {}
+    documents: list[dict] = []
+    for doc_id, meta in (manifest.get("documents") or {}).items():
+        path = out_dir / "sources" / f"{doc_id}.txt"
+        if not path.exists():
+            continue
+        if meta.get("text_sha256") and sha256_bytes(path.read_bytes()) != meta["text_sha256"]:
+            continue
+        document = dict(meta)
+        document["doc_id"] = doc_id
+        document["text"] = path.read_text(encoding="utf-8").strip()
+        documents.append(document)
+    return documents, manifest
 
 
 def verify_sources(sources_dir: Path) -> dict:
@@ -380,6 +467,38 @@ def verify_sources(sources_dir: Path) -> dict:
     return {"checked": checked, "mismatches": mismatches, "documents": len(manifest.get("documents", {}))}
 
 
+def plan_downloads(
+    candidates: list[dict],
+    existing_ids: set[str],
+    needed: int,
+    buffer: int = 40,
+) -> list[dict]:
+    """Выбрать, что скачивать: заполняем темы по кругу, лишнее не тянем.
+
+    Сначала берём документы редких тем (их нужно хотя бы по нескольку), затем добираем
+    остальные по порядку выдачи. Уже скачанные документы пропускаются — повторный запуск
+    не тратит время и запросы.
+    """
+    fresh = [item for item in candidates if item["doc_id"] not in existing_ids and not item.get("skipped")]
+    limit = max(0, needed) + max(0, buffer)
+    selected: list[dict] = []
+    by_theme: dict[str, list[dict]] = {}
+    for item in fresh:
+        by_theme.setdefault(str(item.get("theme")), []).append(item)
+    quota = max(1, max(0, needed) // max(1, len(THEMES)))
+    for theme, _pattern in THEMES:
+        selected.extend(by_theme.get(theme, [])[:quota])
+    taken = {item["doc_id"] for item in selected}
+    for item in fresh:
+        if len(selected) >= limit:
+            break
+        if item["doc_id"] in taken:
+            continue
+        selected.append(item)
+        taken.add(item["doc_id"])
+    return selected[:limit]
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description="Загрузка текстов реальных актов для корпуса A3")
     parser.add_argument("--out", type=Path, default=ROOT / "data" / "corpus_a3")
@@ -393,8 +512,10 @@ def main() -> int:
     parser.add_argument(
         "--pause", type=float, default=PAUSE_SECONDS, help="пауза между запросами, секунд (не меньше 1)"
     )
-    parser.add_argument("--workers", type=int, default=4, help="сколько OCR-процессов запускать параллельно")
+    parser.add_argument("--workers", type=int, default=4, help="сколько распознаваний запускать параллельно")
     parser.add_argument("--dpi", type=int, default=200)
+    parser.add_argument("--buffer", type=int, default=40, help="сколько кандидатов взять сверх цели (на брак)")
+    parser.add_argument("--force", action="store_true", help="скачивать, даже если документов уже достаточно")
     parser.add_argument("--verify", action="store_true", help="только проверить хеши уже скачанных источников")
     args = parser.parse_args()
 
@@ -407,6 +528,20 @@ def main() -> int:
     pause = max(1.0, args.pause)  # требование задания: не чаще одного запроса в секунду
     out_dir.mkdir(parents=True, exist_ok=True)
     started_at = datetime.now(timezone.utc).isoformat()
+
+    existing, old_manifest = load_existing(out_dir)
+    print(f"уже скачано источников: {len(existing)}")
+    print(f"::notice title=A3 старт::уже скачано {len(existing)} документов, цель {args.target_docs}")
+
+    if len(existing) >= args.target_docs and not args.force:
+        # Цель достигнута: ничего не скачиваем, только сверяем хеши (быстро и без запросов).
+        report = verify_sources(out_dir / "sources")
+        print(f"цель достигнута: {len(existing)} документов, хеши проверены: {report['checked']}")
+        print(f"::notice title=A3 пропуск::документов {len(existing)}, расхождений хешей {len(report['mismatches'])}")
+        if report["mismatches"]:
+            print(f"ВНИМАНИЕ: расхождения хешей: {report['mismatches'][:3]}", file=sys.stderr)
+            return 2
+        return 0
 
     robots = fetch_robots()
     for host, info in robots.items():
@@ -428,121 +563,184 @@ def main() -> int:
     time.sleep(max(0.0, pause))
 
     candidates, scan_stats = collect_candidates(type_ids, args.max_pages_per_type, pause, robots)
-    print(f"просмотрено документов: {scan_stats['documents_scanned']}, подходящих по темам: {len(candidates)}")
+    existing_ids = {str(document["doc_id"]) for document in existing}
+    needed = max(0, args.target_docs - len(existing))
+    planned = plan_downloads(candidates, existing_ids, needed, buffer=args.buffer)
     print(
-        f"::notice title=A3 отбор::документов={scan_stats['documents_scanned']} тем={len(candidates)} по темам={scan_stats['by_theme']}"
+        f"просмотрено документов: {scan_stats['documents_scanned']}, подходящих по темам: {len(candidates)}, "
+        f"к скачиванию: {len(planned)}"
     )
-
-    # Кандидатов берём с запасом: часть сканов может не распознаться или дать мало фактов.
-    candidates = candidates[: max(args.target_docs * 2, args.target_docs + 40)]
+    print(
+        f"::notice title=A3 отбор::документов={scan_stats['documents_scanned']} тем={len(candidates)} "
+        f"к скачиванию={len(planned)} по темам={scan_stats['by_theme']}"
+    )
 
     tools = ocr_available()
     print(f"инструменты OCR: {tools}")
     print(f"::notice title=A3 OCR::инструменты={tools}")
 
     rules = {"*": robots.get("publication.pravo.gov.ru", {}).get("rules", {}).get("*", [])}
+    new_documents: list[dict] = []
+    skipped: list[dict] = []
     with tempfile.TemporaryDirectory() as tmp:
         tmp_dir = Path(tmp)
         downloaded: list[dict] = []
-        for index, candidate in enumerate(candidates, start=1):
+        for index, candidate in enumerate(planned, start=1):
             pdf_url = f"http://publication.pravo.gov.ru/file/pdf?eoNumber={candidate['eo_number']}"
             candidate["pdf_url"] = pdf_url
             if not is_allowed(pdf_url, rules):
-                candidate["skipped"] = "путь запрещён robots.txt"
+                skipped.append({"doc_id": candidate["doc_id"], "reason": "путь запрещён robots.txt"})
                 continue
             fetched = fetch(pdf_url)
             time.sleep(max(0.0, pause))
             if fetched["status"] != 200 or fetched["raw"][:4] != b"%PDF":
-                candidate["skipped"] = f"PDF не получен: {fetched['error'] or fetched['status']}"
+                skipped.append(
+                    {
+                        "doc_id": candidate["doc_id"],
+                        "reason": f"PDF не получен: {fetched['error'] or fetched['status']}",
+                    }
+                )
                 continue
             path = tmp_dir / f"{candidate['doc_id']}.pdf"
             path.write_bytes(fetched["raw"])
             candidate["pdf_sha256"] = sha256_bytes(fetched["raw"])
-            candidate["pdf_bytes_actual"] = len(fetched["raw"])
+            candidate["pdf_bytes"] = len(fetched["raw"])
+            candidate["downloaded_at"] = datetime.now(timezone.utc).isoformat()
             candidate["_pdf_path"] = str(path)
             downloaded.append(candidate)
             if index % 20 == 0:
                 print(f"скачано PDF: {len(downloaded)} из {index} попыток")
                 print(f"::notice title=A3 скачивание::PDF скачано {len(downloaded)} (попыток {index})")
 
-        documents: list[dict] = []
         with concurrent.futures.ThreadPoolExecutor(max_workers=max(1, args.workers)) as pool:
-            futures = {pool.submit(ocr_pdf, Path(item["_pdf_path"]), args.dpi): item for item in downloaded}
+            futures = {pool.submit(extract_text, Path(item["_pdf_path"]), args.dpi): item for item in downloaded}
             for future in concurrent.futures.as_completed(futures):
                 item = futures[future]
-                recognized = future.result()
-                item["ocr"] = {key: value for key, value in recognized.items() if key != "text"}
-                text = normalize_text(recognized["text"])
-                facts = extract_facts(str(item["doc_id"]), text) if text else []
+                extracted = future.result()
+                item["extraction"] = extracted["method"]
+                item["text_pages"] = extracted["pages"]
+                item["text_layer_chars"] = extracted["text_layer_chars"]
+                # Для длинных актов распознаётся начало документа (ограничение --dpi/страниц):
+                # это видно в манифесте, а не замалчивается.
+                item["text_truncated"] = bool(
+                    item.get("pages_count") and extracted["pages"] and extracted["pages"] < int(item["pages_count"])
+                )
+                if extracted["method"] == "none":
+                    skipped.append(
+                        {
+                            "doc_id": item["doc_id"],
+                            "reason": f"текст не извлечён (текстовый слой {extracted['text_layer_chars']} знаков, "
+                            f"OCR: {extracted['ocr_error'] or 'пусто'})",
+                        }
+                    )
+                    continue
+                text = normalize_text(extracted["text"])
+                facts = extract_facts(str(item["doc_id"]), text)
                 item["facts_found"] = len(facts)
-                item["extraction"] = "ocr-tesseract-rus"
                 item["text"] = text
                 if len(facts) < args.min_facts:
-                    item["skipped"] = f"фактов {len(facts)} < {args.min_facts}"
+                    skipped.append({"doc_id": item["doc_id"], "reason": f"фактов {len(facts)} < {args.min_facts}"})
                     continue
-                documents.append(item)
-                if len(documents) % 10 == 0:
-                    print(f"текстов готово: {len(documents)} (фактов ≥ {args.min_facts})")
-                    print(f"::notice title=A3 OCR::текстов готово {len(documents)}")
+                new_documents.append(item)
+                if len(new_documents) % 10 == 0:
+                    print(f"текстов готово: {len(new_documents)} (фактов ≥ {args.min_facts})")
+                    print(f"::notice title=A3 извлечение::текстов готово {len(new_documents)}")
 
-    documents.sort(key=lambda item: str(item["doc_id"]))
-    for item in documents:
+    for item in new_documents + existing:
         item.pop("_pdf_path", None)
 
+    documents = sorted(existing + new_documents, key=lambda item: str(item["doc_id"]))
     by_theme: dict[str, int] = {}
     by_type: dict[str, int] = {}
     for item in documents:
-        by_theme[item["theme"]] = by_theme.get(item["theme"], 0) + 1
-        by_type[item["act_type"]] = by_type.get(item["act_type"], 0) + 1
+        by_theme[str(item.get("theme"))] = by_theme.get(str(item.get("theme")), 0) + 1
+        by_type[str(item.get("act_type"))] = by_type.get(str(item.get("act_type")), 0) + 1
+
+    previous_sources = {item.get("host"): item for item in (old_manifest.get("sources") or [])}
+    default_sources = {
+        "publication.pravo.gov.ru": {
+            "host": "publication.pravo.gov.ru",
+            "documents_downloaded": 0,
+            "documents_with_text": 0,
+            "note": (
+                "официальный портал опубликования; отбор по API, текст — текстовый слой PDF либо "
+                "OCR сканов (pdftoppm + tesseract -l rus)"
+            ),
+        },
+        "pravo.gov.ru": {
+            "host": "pravo.gov.ru",
+            "documents_downloaded": 0,
+            "documents_with_text": 0,
+            "note": "ИПС «Законодательство России»: машинной выдачи текста не найдено (см. reports/ips_*_probe.json)",
+        },
+        "fstec.ru": {
+            "host": "fstec.ru",
+            "documents_downloaded": 0,
+            "documents_with_text": 0,
+            "note": "недоступен из сети CI (TLS)",
+        },
+        "mintrud.gov.ru": {
+            "host": "mintrud.gov.ru",
+            "documents_downloaded": 0,
+            "documents_with_text": 0,
+            "note": "403 из сети CI",
+        },
+        "rospotrebnadzor.ru": {
+            "host": "rospotrebnadzor.ru",
+            "documents_downloaded": 0,
+            "documents_with_text": 0,
+            "note": "таймаут из сети CI",
+        },
+        "eec.eaeunion.org": {
+            "host": "eec.eaeunion.org",
+            "documents_downloaded": 0,
+            "documents_with_text": 0,
+            "note": "доступен, но акты ЕАЭС не входят в приоритетные темы задания",
+        },
+    }
+    sources = []
+    for host in WHITELIST:
+        item = dict(
+            default_sources.get(host, {"host": host, "documents_downloaded": 0, "documents_with_text": 0, "note": ""})
+        )
+        previous = previous_sources.get(host) or {}
+        if host == "publication.pravo.gov.ru":
+            item["documents_downloaded"] = len(existing) + len(downloaded)
+            item["documents_with_text"] = len(documents)
+        else:
+            item["documents_downloaded"] = int(previous.get("documents_downloaded") or 0)
+            item["documents_with_text"] = int(previous.get("documents_with_text") or 0)
+        item["robots_status"] = (robots.get(host) or {}).get("status")
+        item["robots_error"] = (robots.get(host) or {}).get("error")
+        item["robots_disallow"] = (robots.get(host) or {}).get("rules", {}).get("*", [])
+        sources.append(item)
+
+    methods: dict[str, int] = {}
+    for item in documents:
+        methods[str(item.get("extraction"))] = methods.get(str(item.get("extraction")), 0) + 1
 
     manifest = {
         "generated_at": started_at,
-        "method": "publication.pravo.gov.ru API + OCR (pdftoppm + tesseract -l rus)",
+        "method": "publication.pravo.gov.ru (API отбора) + текст: текстовый слой PDF или OCR (pdftoppm + tesseract -l rus)",
         "user_agent": USER_AGENT,
         "pause_seconds": pause,
-        "robots": robots,
         "whitelist": list(WHITELIST),
-        "sources": [
-            {
-                "host": "publication.pravo.gov.ru",
-                "documents_downloaded": len(downloaded),
-                "documents_with_text": len(documents),
-                "note": "официальная публикация; текст получен OCR официальных PDF (сканы без текстового слоя)",
-            },
-            {
-                "host": "pravo.gov.ru",
-                "documents_downloaded": 0,
-                "documents_with_text": 0,
-                "note": "ИПС доступна, но машинной выдачи текста не найдено (см. reports/ips_*_probe.json)",
-            },
-            {"host": "fstec.ru", "documents_downloaded": 0, "documents_with_text": 0, "note": "недоступен из сети CI"},
-            {"host": "mintrud.gov.ru", "documents_downloaded": 0, "documents_with_text": 0, "note": "403 из сети CI"},
-            {
-                "host": "rospotrebnadzor.ru",
-                "documents_downloaded": 0,
-                "documents_with_text": 0,
-                "note": "таймаут из сети CI",
-            },
-            {
-                "host": "eec.eaeunion.org",
-                "documents_downloaded": 0,
-                "documents_with_text": 0,
-                "note": "недоступен из сети CI",
-            },
-        ],
+        "robots": robots,
+        "sources": sources,
         "scan_stats": scan_stats,
         "target_docs": args.target_docs,
         "documents_total": len(documents),
         "by_theme": by_theme,
         "by_type": by_type,
+        "extraction_methods": methods,
         "min_facts": args.min_facts,
         "ocr": {"tools": tools, "dpi": args.dpi, "workers": args.workers},
-        "candidates_skipped": [
-            {"doc_id": item["doc_id"], "reason": item.get("skipped")} for item in candidates if item.get("skipped")
-        ][:100],
+        "candidates_skipped": skipped[:100],
+        "skipped_total": len(skipped),
+        "documents": {},
     }
     write_sources(out_dir, documents, manifest)
-    print(f"источников с текстом: {len(documents)} (по темам: {by_theme}; по видам: {by_type})")
+    print(f"источников с текстом: {len(documents)} (по темам: {by_theme}; по видам: {by_type}; способ: {methods})")
     print(f"::notice title=A3 итог::документов с текстом {len(documents)}; по темам {by_theme}")
     if len(documents) < args.target_docs:
         print(f"ВНИМАНИЕ: получено {len(documents)} документов вместо {args.target_docs}", file=sys.stderr)

@@ -104,6 +104,20 @@ def build_report(corpus_dir: Path) -> tuple[str, dict]:
     )
     lines.append("")
     lines.append(
+        "Правовая основа: п. 6 ст. 1259 ГК РФ (официальные документы государственных органов "
+        "не являются объектами авторских прав); источник каждого документа указан (URL, вид, номер, дата). "
+        "robots.txt каждого хоста белого списка прочитан, запросы — не чаще одного в секунду."
+    )
+    truncated = [doc_id for doc_id, meta in documents.items() if meta.get("text_truncated")]
+    if truncated:
+        lines.append("")
+        lines.append(
+            f"Ограничение: у {len(truncated)} документов из {len(documents)} распознаны первые "
+            f"{sources.get('ocr', {}).get('dpi', '')} страниц (документ длиннее — в манифесте это поле "
+            "`text_truncated`); контексты пар берутся только из распознанной части."
+        )
+    lines.append("")
+    lines.append(
         f"Документов с текстом: **{manifest.get('documents', {}).get('count')}** "
         f"(по видам актов: {sources.get('by_type')}; по темам: {sources.get('by_theme')})."
     )

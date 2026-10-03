@@ -423,7 +423,8 @@ def plan_modes(
             victim = max(quotas, key=lambda mode: quotas[mode])
             quotas[victim] -= 1
 
-    clean = target - sum(quotas.values())
+    # Чистые пары получают всё, что осталось: их доля не опускается ниже min_clean_share.
+    clean = max(clean_min, target - sum(quotas.values()))
     plan = ["faithful"] * clean
     for mode in errors:
         plan.extend([mode] * quotas[mode])
@@ -488,6 +489,9 @@ def build_corpus_real(
                 for other in facts
                 if other.sentence_index != fact.sentence_index and other.value_kind == fact.value_kind
             ]
+            # Правдоподобнее подставлять значение того же вида; если таких в документе нет —
+            # берём любое значение из другого предложения (требование проверки №3 выполнено
+            # в обоих случаях: число есть в другом месте того же документа).
             any_here = [other.value for other in facts if other.sentence_index != fact.sentence_index]
             other_place = same_kind_here or any_here
             variant = build_real_variant(fact, mode, rng, same_kind, other_place)
