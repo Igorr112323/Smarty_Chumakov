@@ -407,8 +407,8 @@ def render_markdown(payload: dict) -> str:
             lines.append(
                 f"| {layer} | {name} | {values['auc_fact']:.3f} | "
                 f"[{values['ci_fact_low']:.3f}; {values['ci_fact_high']:.3f}] | "
-                f"{values['delta_mean']:+.4f} | "
-                f"[{values['delta_ci_low']:+.4f}; {values['delta_ci_high']:+.4f}] | {marker} |"
+                f"{values['delta_mean']:+.6f} | "
+                f"[{values['delta_ci_low']:+.6f}; {values['delta_ci_high']:+.6f}] | {marker} |"
             )
             if delta_significant:
                 significant.append((layer, name, values["delta_mean"], values["delta_ci_low"], values["delta_ci_high"]))

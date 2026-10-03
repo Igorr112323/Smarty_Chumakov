@@ -4,7 +4,7 @@
 [![build-and-release-exe](https://github.com/Igorr112323/Smarty_Chumakov/actions/workflows/build-and-release-exe.yml/badge.svg)](https://github.com/Igorr112323/Smarty_Chumakov/actions/workflows/build-and-release-exe.yml)
 [![release](https://img.shields.io/github/v/release/Igorr112323/Smarty_Chumakov)](https://github.com/Igorr112323/Smarty_Chumakov/releases/latest)
 [![python](https://img.shields.io/badge/python-3.10%20%7C%203.11%20%7C%203.12-blue)](spanverify-module/pyproject.toml)
-[![tests](https://img.shields.io/badge/tests-207%20passed-brightgreen)](spanverify-module/tests)
+[![tests](https://img.shields.io/badge/tests-210%20passed-brightgreen)](spanverify-module/tests)
 [![coverage](https://img.shields.io/badge/coverage-87%25-brightgreen)](spanverify-module/pyproject.toml)
 
 Программа берёт **документ-источник** и **ответ** (языковой модели или
@@ -36,7 +36,7 @@ python -m spanverify train --dataset data/demo_pairs.jsonl --out config/weights.
 python -m spanverify evaluate --dataset data/demo_pairs.jsonl   # метрики и критерий качества
 python -m spanverify selftest                                   # само-проверка конвейера
 python -m spanverify server --port 8765                         # API + веб-интерфейс
-python -m pytest -q                                             # 207 тестов
+python -m pytest -q                                             # 210 тестов
 ```
 
 Коды возврата `verify`: `0` — ответ подтверждён, `1` — найдены спорные
@@ -55,6 +55,18 @@ curl -X POST http://localhost:8765/v1/verify -H "Content-Type: application/json"
 `threshold`, `spans` (`start`, `end`, `text`, `risk`, `label`), `latency_ms`,
 `mode`, `stats`. Справочные маршруты: `GET /health`, `GET /v1/config`,
 `GET /v1/model`, `GET /` — веб-интерфейс.
+
+## Честно о результатах
+
+* Демонстрационный корпус **синтетический**: token F1 0.959 при FPR 0.002
+  (отложенная часть) подтверждает работоспособность и самосогласованность
+  конвейера, а не качество на реальных документах.
+* Пилот на реальной модели `rugpt3small` (CPU, 24 контрастные пары) показал
+  **отрицательный результат**: признаки внимания не отличают подставленное число
+  от правильного (AUC 0.50, парные разницы неотличимы от нуля). Это зафиксировано
+  честно — см. [`docs/ОТЧЁТ_о_НИР_шаблон.md`](docs/ОТЧЁТ_о_НИР_шаблон.md), раздел 7.2.
+* Порог решения никогда не подбирается по тестовой части; при недостижении
+  критерия дорабатываются признаки, а не порог.
 
 ## Честно о режимах
 
@@ -78,7 +90,9 @@ AUC 0.996 на отложенной части) доказывают работ�
 | [`PROGRESS.md`](PROGRESS.md) ( + `.docx`) | Журнал работы: что сделано на каждом шаге, какие решения приняты и почему, найденные и исправленные ошибки |
 | [`ИТОГ.md`](ИТОГ.md) ( + `.docx`) | Итог: ссылка на релиз, 10 проверок, чек-лист из 7 шагов, ограничения |
 | [`docs/РУКОВОДСТВО.md`](docs/РУКОВОДСТВО.md) ( + `.docx`) | Руководство для неспециалиста: запуск, SmartScreen, смысл чисел, удаление |
-| [`docs/ЗАЯВКА_поля.md`](docs/ЗАЯВКА_поля.md), [`docs/ТЗ_и_календарный_план.md`](docs/ТЗ_и_календарный_план.md), [`docs/ОТЧЁТ_о_НИР_шаблон.md`](docs/ОТЧЁТ_о_НИР_шаблон.md) ( + `.docx`) | Заявочные и отчётные формулировки в терминах НИР |
+| [`docs/ЗАЯВКА_поля.md`](docs/ЗАЯВКА_поля.md) ( + `.docx`) | Готовые формулировки полей заявки в АС «Фонд-М» + список того, что заполняет исполнитель |
+| [`docs/ТЗ_и_календарный_план.md`](docs/ТЗ_и_календарный_план.md) ( + `.docx`) | Техническое задание и календарный план НИР (8 этапов, критерии приёмки, риски) |
+| [`docs/ОТЧЁТ_о_НИР_шаблон.md`](docs/ОТЧЁТ_о_НИР_шаблон.md) ( + `.docx`) | Отчёт о НИР с фактическими числами, включая честный отрицательный результат пилота |
 | [`ПРОМТ_ИИ_СДЕЛАЙ_ВСЁ_НА_GITHUB.md`](ПРОМТ_ИИ_СДЕЛАЙ_ВСЁ_НА_GITHUB.md) ( + `.docx`) | Мастер-промт, по которому выполнялась работа |
 | [`Промты_для_ИИ.md`](Промты_для_ИИ.md) ( + `.docx`) | Пакет промтов: собрать приложение, `.exe`, боевой режим, приёмка |
 | [`Заявка_поля_и_формулировки.md`](Заявка_поля_и_формулировки.md) ( + `.docx`) | Формулировки по разделам заявки + чек-лист замечаний экспертизы |
