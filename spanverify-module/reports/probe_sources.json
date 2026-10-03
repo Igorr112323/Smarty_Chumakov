@@ -1,0 +1,118 @@
+{
+  "results": [
+    {
+      "url": "http://publication.pravo.gov.ru/",
+      "status": 200,
+      "size_hint": 4096,
+      "content_type": "text/html; charset=utf-8",
+      "looks_like_pdf": false,
+      "seconds": 0.72,
+      "error": null,
+      "name": "publication.pravo.gov.ru"
+    },
+    {
+      "url": "http://pravo.gov.ru/",
+      "status": 200,
+      "size_hint": 4096,
+      "content_type": "text/html; charset=UTF-8",
+      "looks_like_pdf": false,
+      "seconds": 0.69,
+      "error": null,
+      "name": "pravo.gov.ru"
+    },
+    {
+      "url": "http://publication.pravo.gov.ru/api/Documents",
+      "status": 200,
+      "size_hint": 4096,
+      "content_type": "application/json; charset=utf-8",
+      "looks_like_pdf": false,
+      "seconds": 0.75,
+      "error": null,
+      "name": "pravo.gov.ru API"
+    },
+    {
+      "url": "https://fstec.ru/dokumenty",
+      "status": null,
+      "size_hint": 0,
+      "content_type": "",
+      "looks_like_pdf": false,
+      "seconds": null,
+      "error": "<urlopen error [SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: unable to get local issuer certificate (_ssl.",
+      "name": "fstec.ru"
+    },
+    {
+      "url": "https://mintrud.gov.ru/docs",
+      "status": 403,
+      "size_hint": 0,
+      "content_type": "",
+      "looks_like_pdf": false,
+      "seconds": null,
+      "error": "HTTP 403",
+      "name": "mintrud.gov.ru"
+    },
+    {
+      "url": "https://rospotrebnadzor.ru/documents",
+      "status": null,
+      "size_hint": 0,
+      "content_type": "",
+      "looks_like_pdf": false,
+      "seconds": null,
+      "error": "<urlopen error timed out>",
+      "name": "rospotrebnadzor.ru"
+    },
+    {
+      "url": "https://eec.eaeunion.org/",
+      "status": 200,
+      "size_hint": 4096,
+      "content_type": "text/html; charset=UTF-8",
+      "looks_like_pdf": false,
+      "seconds": 2.16,
+      "error": null,
+      "name": "eec.eaeunion.org"
+    },
+    {
+      "url": "https://fstec.ru/dokumenty/vse-dokumenty/prikazy",
+      "status": null,
+      "size_hint": 0,
+      "content_type": "",
+      "looks_like_pdf": false,
+      "seconds": null,
+      "error": "<urlopen error [SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: unable to get local issuer certificate (_ssl.",
+      "name": "ФСТЭК: приказы"
+    },
+    {
+      "url": "https://mintrud.gov.ru/docs/mintrud/orders",
+      "status": 403,
+      "size_hint": 0,
+      "content_type": "",
+      "looks_like_pdf": false,
+      "seconds": null,
+      "error": "HTTP 403",
+      "name": "Минтруд: приказы"
+    },
+    {
+      "url": "https://dialogue-conf.org/wp-content/uploads/2026/06/SadkovskiiFNasyrovaRSorokinA.087.pdf",
+      "status": 200,
+      "size_hint": 4096,
+      "content_type": "application/pdf",
+      "looks_like_pdf": true,
+      "seconds": 0.59,
+      "error": null,
+      "name": "статья RusHallu-RAG (PDF)"
+    }
+  ],
+  "available": [
+    "publication.pravo.gov.ru",
+    "pravo.gov.ru",
+    "pravo.gov.ru API",
+    "eec.eaeunion.org",
+    "статья RusHallu-RAG (PDF)"
+  ],
+  "blocked": [
+    "fstec.ru",
+    "mintrud.gov.ru",
+    "rospotrebnadzor.ru",
+    "ФСТЭК: приказы",
+    "Минтруд: приказы"
+  ]
+}
