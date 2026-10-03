@@ -29,6 +29,10 @@ from pathlib import Path
 
 HISTORY_DOCS = {"PROGRESS.md", "AUDIT.md"}
 
+# Корень репозитория считаем от файла скрипта: запускать проверку можно из любого
+# каталога, и пути к документам всё равно указывают на репозиторий.
+DEFAULT_REPO_ROOT = Path(__file__).resolve().parents[2]
+
 DEFAULT_DOCS = (
     "README.md",
     "ИТОГ.md",
@@ -142,8 +146,29 @@ def _allowed(metrics: dict) -> dict[str, set[str]]:
     return allowed
 
 
-def check_docs(docs: list[Path], metrics: dict) -> list[str]:
+def check_required_sections(repo_root: Path) -> list[str]:
+    """Обязательные разделы: «заявлено/факт», «не проверено», «3 шага» в ИТОГ."""
+    problems: list[str] = []
+    itog = repo_root / "ИТОГ.md"
+    if itog.is_file():
+        text = itog.read_text(encoding="utf-8").lower()
+        for needle, description in REQUIRED_IN_ITOG:
+            if needle not in text:
+                problems.append(f"ИТОГ.md: нет обязательного элемента — {description}")
+    else:
+        problems.append(f"{itog}: файла нет, обязательные разделы проверить нельзя")
+    readme = repo_root / "README.md"
+    if readme.is_file():
+        text = readme.read_text(encoding="utf-8")
+        for needle, description in REQUIRED_IN_README:
+            if needle not in text:
+                problems.append(f"README.md: нет обязательного элемента — {description}")
+    return problems
+
+
+def check_docs(docs: list[Path], metrics: dict, repo_root: Path | None = None) -> list[str]:
     """Вернуть список нарушений (пустой список = числа сходятся)."""
+    repo_root = repo_root or DEFAULT_REPO_ROOT
     allowed = _allowed(metrics)
     version = str(metrics["meta"]["version"])
     problems: list[str] = []
@@ -192,18 +217,7 @@ def check_docs(docs: list[Path], metrics: dict) -> list[str]:
                         f"{path}:{number}: версия {match.group(0)} не совпадает с {version} → {line.strip()[:90]}"
                     )
 
-    itog = Path("ИТОГ.md")
-    if itog.is_file():
-        text = itog.read_text(encoding="utf-8")
-        for needle, description in REQUIRED_IN_ITOG:
-            if needle not in text.lower():
-                problems.append(f"ИТОГ.md: нет обязательного элемента — {description}")
-    readme = Path("README.md")
-    if readme.is_file():
-        text = readme.read_text(encoding="utf-8")
-        for needle, description in REQUIRED_IN_README:
-            if needle not in text:
-                problems.append(f"README.md: нет обязательного элемента — {description}")
+    problems.extend(check_required_sections(repo_root))
     return problems
 
 
@@ -213,7 +227,7 @@ def main() -> int:
     parser.add_argument("--docs", nargs="*", default=None, help="переопределить список документов")
     args = parser.parse_args()
 
-    repo_root = Path(__file__).resolve().parent.parent.parent
+    repo_root = DEFAULT_REPO_ROOT
     metrics_path = Path(args.metrics)
     if not metrics_path.is_absolute():
         metrics_path = Path(__file__).resolve().parent.parent / metrics_path
@@ -223,7 +237,7 @@ def main() -> int:
     metrics = json.loads(metrics_path.read_text(encoding="utf-8"))
 
     docs = [repo_root / name for name in (args.docs or DEFAULT_DOCS)]
-    problems = check_docs(docs, metrics)
+    problems = check_docs(docs, metrics, repo_root=repo_root)
     if problems:
         print(f"РАСХОЖДЕНИЯ ({len(problems)}):")
         for problem in problems[:60]:

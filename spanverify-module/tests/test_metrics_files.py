@@ -90,6 +90,16 @@ def test_check_numbers_reports_stale_value() -> None:
     assert any("token_f1" in problem for problem in problems)
 
 
+def test_check_numbers_requires_itog_sections(tmp_path: Path) -> None:
+    """ИТОГ.md обязан содержать разделы «заявлено/факт», «не проверено» и «3 шага» (приёмка E)."""
+    checker = _load_script("check_numbers")
+    (tmp_path / "ИТОГ.md").write_text("# Итог\n\nБез обязательных разделов.\n", encoding="utf-8")
+    problems = " ".join(checker.check_required_sections(tmp_path))
+    assert "заявлено / факт" in problems
+    assert "не проверено" in problems
+    assert "трёх шагов" in problems
+
+
 def test_documents_match_metrics_file() -> None:
     """Сквозная проверка: README, ИТОГ и docs/ сходятся с reports/METRICS.json."""
     checker = _load_script("check_numbers")
