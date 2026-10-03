@@ -842,7 +842,8 @@ P0 → P1 → P2 с регрессионными тестами и запись�
 | Корпус B не используется для обучения | разбор скриптов CI | обучающие шаги читают только `data/demo_pairs.jsonl`; на B — только `evaluate` |
 | Числа корпусов в едином файле | `python scripts/collect_metrics.py` | блоки `corpus_a`, `corpus_b` в `reports/METRICS.json` |
 | Документы сходятся с числами | `python scripts/check_numbers.py` | «Числа сходятся с METRICS.json: проверено документов 9» |
-| Релиз v1.2.1 | `gh release view v1.2.1` | 4 ассета: exe 9 135 103 Б, zip 9 312 404 Б, pyz 539 191 Б, SHA256SUMS; latest-ссылка отдаёт v1.2.1 |
+| Релиз v1.2.1 и v1.3.0 | `gh release view v1.2.1 v1.3.0`, `gh run view` по тегам | оба workflow'а зелёные, по 4 ассета (exe / zip / pyz / SHA256SUMS), `latest` → v1.3.0 |
+| Тег v1.2.0 не перезаписан | `git rev-parse 'v1.2.0^{}'`, `gh release view v1.2.0` | 4 ассета: exe 9 135 103 Б, zip 9 312 404 Б, pyz 539 191 Б, SHA256SUMS; latest-ссылка отдаёт v1.2.1 |
 | Тег v1.2.0 не перезаписан | `git rev-parse 'v1.2.0^{}'`, `gh release view v1.2.0` | ea76131, публикация 12:40:22Z, 4 ассета — без изменений |
 
 ### Что в пакете осталось непроверенным (осознанно)
