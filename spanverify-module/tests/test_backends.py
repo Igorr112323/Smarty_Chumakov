@@ -57,6 +57,17 @@ def test_hf_backend_reports_missing_dependencies_or_works():
         assert "transformers" in message
 
 
+def test_cli_accepts_global_options_in_both_positions():
+    """`--backend` работает и до, и после имени команды."""
+    from spanverify.cli import build_parser
+
+    parser = build_parser()
+    first = parser.parse_args(["--backend", "hf", "analyze", "--text", "тест"])
+    second = parser.parse_args(["analyze", "--backend", "hf", "--text", "тест"])
+    assert first.backend == second.backend == "hf"
+    assert first.text == second.text == "тест"
+
+
 def test_unknown_backend_raises_value_error():
     with pytest.raises(ValueError, match="неизвестный бэкенд"):
         get_backend("magic")
