@@ -3,13 +3,19 @@ name: build-and-release-exe
 # Сборка, проверка и публикация Windows-приложения SpanVerify.
 #
 # Запуск:
+#   * автоматически по тегу: git tag v1.0.1 && git push origin v1.0.1
 #   * вручную: Actions → build-and-release-exe → Run workflow
-#     (публикует релиз с постоянной ссылкой /releases/latest/download/spanverify.exe);
-#   * автоматически по тегу: git tag v1.0.0 && git push origin v1.0.0
 #
-# Перед публикацией раннер сам скачивает и запускает собранный .exe,
-# дёргает /health и делает реальный POST /v1/verify с русским текстом.
-# Упал смоук-тест — релиз не публикуется.
+# Порядок (Приложения А, Б, В мастер-промта):
+#   1) тесты на трёх версиях Python;
+#   2) сборка .exe на windows-latest (onefile + onedir + zipapp);
+#   3) СМОУК-ТЕСТ собранного .exe: запуск, GET /health, POST /v1/verify с
+#      русским текстом, проверка полей контракта и фрагментов;
+#   4) контрольные суммы;
+#   5) публикация релиза — только если смоук-тест прошёл.
+#
+# Постоянная ссылка на последнюю версию:
+#   https://github.com/<owner>/<repo>/releases/latest/download/spanverify.exe
 
 on:
   workflow_dispatch:
@@ -50,12 +56,14 @@ jobs:
           cache-dependency-path: spanverify-module/requirements.txt
 
       - name: Зависимости
-        run: python -m pip install --upgrade pip pytest
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install pytest
 
       - name: Тесты
         run: python -m pytest -q
 
-      - name: Самопроверка модуля
+      - name: Само-проверка конвейера
         run: python -m spanverify selftest
 
   windows-exe:
@@ -79,24 +87,26 @@ jobs:
           python -m pip install --upgrade pip
           python -m pip install -r requirements.txt
 
-      - name: Калибратор (обучить, если нет в репозитории)
+      - name: Убедиться, что веса обучены (обучить, если нет)
         shell: pwsh
         run: |
-          if (-not (Test-Path "config/calibration.json")) {
-            python -m spanverify demo --n 240 --seed 1312 --out data/demo_dataset.jsonl
-            python -m spanverify calibrate --dataset data/demo_dataset.jsonl --out config/calibration.json
+          if (-not (Test-Path "config/weights.json")) {
+            python -m spanverify train --dataset data/demo_pairs.jsonl --out config/weights.json --seed 42 --folds 5
           }
+          python -m spanverify config
 
       - name: Сборка onefile spanverify.exe
         run: python -m PyInstaller spanverify.spec --noconfirm --clean
 
-      - name: Сборка onedir (для антивирусов, которые не любят onefile)
+      - name: Сборка onedir (вариант для строгих антивирусов)
         run: >
           python -m PyInstaller --noconfirm --clean --onedir --name spanverify_onedir
           --add-data "config;config" --add-data "data;data"
+          --hidden-import spanverify.server --hidden-import spanverify.cli
           --exclude-module torch --exclude-module transformers --exclude-module streamlit
           --exclude-module numpy --exclude-module pandas --exclude-module matplotlib
-          app.py
+          --exclude-module tkinter --exclude-module pytest
+          scripts/exe_launcher.py
 
       - name: Сборка переносимого zipapp
         run: python scripts/make_zipapp.py --out release
@@ -111,46 +121,76 @@ jobs:
           Copy-Item data release/data -Recurse -Force
           Copy-Item README.md release/README.md -Force
 
-      - name: Смоук-тест собранного .exe (сервис + реальный запрос)
+      - name: Смоук-тест собранного .exe (Приложение Б)
         shell: pwsh
         working-directory: spanverify-module/release
         run: |
           $ErrorActionPreference = "Stop"
-          $sample = "Важно отметить, что данный метод обеспечивает эффективное решение поставленной задачи, что подтверждает эффективность предложенного решения."
+          $port = 8765
           $proc = Start-Process -FilePath ".\spanverify.exe" `
-            -ArgumentList "serve", "--host", "127.0.0.1", "--port", "8011", "--quiet" -PassThru
+            -ArgumentList "--port", $port, "--no-browser", "--quiet" -PassThru
           try {
             $ready = $false
             for ($i = 0; $i -lt 60; $i++) {
               Start-Sleep -Seconds 2
               try {
-                $health = Invoke-RestMethod -Uri "http://127.0.0.1:8011/health" -TimeoutSec 3
+                $health = Invoke-RestMethod -Uri "http://127.0.0.1:$port/health" -TimeoutSec 3
                 if ($health.status -eq "ok") { $ready = $true; break }
               } catch { }
               if ($proc.HasExited) { throw "процесс .exe завершился с кодом $($proc.ExitCode)" }
             }
             if (-not $ready) { throw "сервис из .exe не поднялся за 120 секунд" }
-            Write-Host "health: $($health | ConvertTo-Json -Compress)"
+            Write-Host ("health: " + ($health | ConvertTo-Json -Compress))
+            if (-not $health.calibrated) {
+              throw "калибровка не загрузилась из бандла — проверьте упаковку config/"
+            }
 
-            $payload = @{ text = $sample; explain = $false } | ConvertTo-Json -Compress
-            $body = [System.Text.Encoding]::UTF8.GetBytes($payload)
-            $response = Invoke-RestMethod -Uri "http://127.0.0.1:8011/v1/verify" `
-              -Method Post -Body $body -ContentType "application/json; charset=utf-8" -TimeoutSec 60
-            Write-Host "verify: $($response.result | ConvertTo-Json -Compress -Depth 4)"
-            if ($response.result.verdict -ne "likely_ai") {
-              throw "ожидался вердикт likely_ai, получен '$($response.result.verdict)'"
+            # 1. Подмена факта должна быть найдена.
+            $bad = @{
+              answer  = "Срок хранения первичных документов составляет 3 года."
+              context = "Регламент 343: срок хранения первичных документов составляет 10 лет."
+            } | ConvertTo-Json -Compress
+            $response = Invoke-RestMethod -Uri "http://127.0.0.1:$port/v1/verify" `
+              -Method Post -Body ([System.Text.Encoding]::UTF8.GetBytes($bad)) `
+              -ContentType "application/json; charset=utf-8" -TimeoutSec 60
+            Write-Host ("подмена: " + ($response | ConvertTo-Json -Compress -Depth 4))
+            foreach ($field in @("score","is_hallucination","ai_share","ai_share_hard","threshold","spans","latency_ms","mode","stats")) {
+              if ($null -eq $response.$field) { throw "в ответе нет поля контракта '$field'" }
             }
-            if (-not $response.result.calibrated) {
-              Write-Host "::warning::калибратор не загружен из бандла — проверьте упаковку config/"
+            if ($response.spans.Count -lt 1) { throw "подмена числа не найдена" }
+            if ($response.spans[0].label -notin @("doubtful","likely_hallucination")) {
+              throw "неверная метка фрагмента: '$($response.spans[0].label)'"
             }
+
+            # 2. Подтверждённый ответ не должен обвиняться.
+            $good = @{
+              answer  = "Срок хранения первичных документов составляет 10 лет."
+              context = "Регламент 343: срок хранения первичных документов составляет 10 лет."
+            } | ConvertTo-Json -Compress
+            $ok = Invoke-RestMethod -Uri "http://127.0.0.1:$port/v1/verify" `
+              -Method Post -Body ([System.Text.Encoding]::UTF8.GetBytes($good)) `
+              -ContentType "application/json; charset=utf-8" -TimeoutSec 60
+            Write-Host ("достоверный: " + ($ok | ConvertTo-Json -Compress -Depth 4))
+            if ($ok.verdict -ne "grounded") { throw "подтверждённый ответ получил вердикт '$($ok.verdict)'" }
+
+            # 3. Интерфейс и справочные маршруты отвечают.
+            $model = Invoke-RestMethod -Uri "http://127.0.0.1:$port/v1/model" -TimeoutSec 10
+            $config = Invoke-RestMethod -Uri "http://127.0.0.1:$port/v1/config" -TimeoutSec 10
+            $page = Invoke-WebRequest -Uri "http://127.0.0.1:$port/" -TimeoutSec 10
+            if ($page.StatusCode -ne 200) { throw "интерфейс не отдаётся" }
+            Write-Host ("модель: " + ($model | ConvertTo-Json -Compress -Depth 3))
+            Write-Host ("веса: " + ($config.weights | ConvertTo-Json -Compress))
+            Write-Host "СМОУК-ТЕСТ ПРОЙДЕН"
           } finally {
             if ($proc -and -not $proc.HasExited) { Stop-Process -Id $proc.Id -Force }
           }
 
-      - name: Смоук-тест zipapp
+      - name: Смоук-тест zipapp (Python-версия)
         shell: pwsh
         run: |
           python release/spanverify.pyz selftest
+          python release/spanverify.pyz verify --answer "Срок хранения первичных документов составляет 3 года." --context "Регламент 343: срок хранения первичных документов составляет 10 лет." --json | Out-File -Encoding utf8 release/pyz-verify.json
+          Get-Content release/pyz-verify.json -Encoding utf8 | Select-Object -First 5
 
       - name: Контрольные суммы
         shell: pwsh
@@ -164,6 +204,9 @@ jobs:
           }
           $lines | Set-Content -Encoding ASCII SHA256SUMS.txt
           Get-Content SHA256SUMS.txt
+          $size = (Get-Item spanverify.exe).Length
+          Write-Host ("размер spanverify.exe: {0} байт" -f $size)
+          "Размер spanverify.exe: $size байт" | Out-File -Encoding utf8 size.txt
 
       - name: Артефакты сборки
         uses: actions/upload-artifact@v4
@@ -174,41 +217,45 @@ jobs:
             spanverify-module/release/spanverify-win.zip
             spanverify-module/release/spanverify.pyz
             spanverify-module/release/SHA256SUMS.txt
+            spanverify-module/release/pyz-verify.json
+            spanverify-module/release/size.txt
             spanverify-module/release/README.md
           retention-days: 90
 
-      - name: Публикация релиза
+      - name: Публикация релиза (только после успешного смоук-теста)
         if: startsWith(github.ref, 'refs/tags/') || inputs.publish_release
         shell: pwsh
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         working-directory: spanverify-module/release
         run: |
-          $tag = if ("${{ github.ref }}".StartsWith("refs/tags/")) { "${{ github.ref_name }}" } else { "v1.0.0" }
+          $tag = if ("${{ github.ref }}".StartsWith("refs/tags/")) { "${{ github.ref_name }}" } else { "v1.0.1" }
           $title = "SpanVerify $tag"
           $notes = @"
-          Локальный анализатор текста: находит фрагменты, написанные ИИ, и оценивает долю участия модели.
+          Проверка ответа по документу: находит фрагменты ответа, которые контекст не подтверждает, и оценивает риск недостоверности.
 
           ## Файлы
-          * ``spanverify.exe`` — основной вариант (Windows x64, один файл, Python не нужен).
+          * ``spanverify.exe`` — основной вариант (Windows x64, один файл, Python не нужен). Запуск двойным кликом откроет браузер с интерфейсом.
           * ``spanverify-win.zip`` — распаковать и запустить ``spanverify-win\spanverify.exe`` (вариант для антивирусов, не любящих onefile).
-          * ``spanverify.pyz`` — страховка: нужен Python 3.10+ (``python spanverify.pyz serve --open-browser``).
+          * ``spanverify.pyz`` — страховка: нужен Python 3.10+ (``python spanverify.pyz server --port 8765``).
           * ``SHA256SUMS.txt`` — контрольные суммы.
 
-          ## Как проверить
-          1. Скачать ``spanverify.exe`` (или zip) и, при желании, сверить хеш: ``Get-FileHash .\spanverify.exe -Algorithm SHA256``.
-          2. Запустить двойным кликом — откроется браузер с интерфейсом на http://localhost:8000.
-          3. Нажать «Пример: смешанный» → «Проверить достоверность»: машинные фрагменты подсветятся красным, появятся доли участия ИИ.
+          ## Как проверить за минуту
+          1. Скачать ``spanverify.exe`` (в браузере может появиться предупреждение SmartScreen — «Подробнее» → «Выполнить в любом случае»: файл не подписан сертификатом).
+          2. Запустить двойным кликом; откроется страница ``http://localhost:8765``.
+          3. Нажать «Пример: подмена факта» → «Проверить»: строка с неверным числом подсветится, появится риск и порог.
+          4. Для сравнения нажать «Пример: подтверждённый» → «Проверить»: вердикт «Ответ подтверждается документом».
 
-          ## Что уже проверено автоматически
-          Сборка выполнялась и проверялась на windows-раннере: запуск ``.exe``, ``GET /health`` и реальный ``POST /v1/verify`` с русским текстом (ожидаемый вердикт ``likely_ai``), тесты на Python 3.10–3.12.
+          ## Что проверено автоматически перед публикацией
+          Смоук-тест на windows-раннере: запуск ``.exe``, ``GET /health`` (калибровка загрузилась из бандла), ``POST /v1/verify`` с подменой числа (найден фрагмент с меткой ``doubtful``/``likely_hallucination``), ``POST /v1/verify`` с подтверждённым ответом (вердикт ``grounded``), ``GET /v1/model``, ``GET /v1/config``, отдача интерфейса, отдельный смоук-тест ``spanverify.pyz``, тесты на Python 3.10–3.12.
 
-          ## Ограничение
-          В поставке включён демонстрационный режим (``surrogate``) с калибратором на синтетическом корпусе: он проверяет конвейер и интерфейс, а не достоверность текста. Для боевых выводов нужен режим ``hf`` и калибровка на размеченных данных (см. README).
+          ## Ограничение (важно)
+          В поставке — режим ``demo``: признаки считаются лексическими суррогатами без весов языковой модели, а веса обучены на синтетическом корпусе. Это проверяет конвейер и интерфейс, а не даёт научный вывод о достоверности. Для реальной работы нужен режим ``hf`` (torch + transformers) и калибровка на ваших размеченных парах — см. ``docs/РУКОВОДСТВО.md``.
           "@
           $notes = $notes -replace '(?m)^\s+', ''
           if (gh release view $tag --repo "${{ github.repository }}") {
             gh release upload $tag spanverify.exe spanverify-win.zip spanverify.pyz SHA256SUMS.txt --clobber --repo "${{ github.repository }}"
+            gh release edit $tag --title $title --notes $notes --latest --repo "${{ github.repository }}"
           } else {
             gh release create $tag spanverify.exe spanverify-win.zip spanverify.pyz SHA256SUMS.txt `
               --repo "${{ github.repository }}" --title $title --notes $notes --latest

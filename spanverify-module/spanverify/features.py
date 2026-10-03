@@ -329,10 +329,16 @@ def hf_features(
     device: str | None = None,
     max_length: int = 1024,
     answer_tokens: Sequence[Token] | None = None,
+    layer: int | str = "last",
 ) -> FeatureMatrix:
     """Реальные признаки модели: энтропия внимания, масса на контекст, плотность.
 
     Требует ``torch`` и ``transformers`` (ленивый импорт внутри функции).
+
+    ``layer`` выбирает слой внимания: ``"first"``, ``"middle"``, ``"last"``,
+    отрицательный индекс (``-4`` — четвёртый с конца) или целое число. Это нужно
+    пилоту: он сравнивает информативность признаков по слоям и не должен
+    зависеть от того, что «полезный» слой оказался не последним.
     """
     import torch  # noqa: PLC0415
     from transformers import AutoModelForCausalLM, AutoTokenizer  # noqa: PLC0415
@@ -367,8 +373,11 @@ def hf_features(
     with torch.no_grad():
         outputs = model(**encoded)
 
-    attentions = outputs.attentions[-1][0]  # (heads, seq, seq)
-    hidden = outputs.hidden_states[-1][0] if outputs.hidden_states else None
+    layer_index = resolve_layer(layer, len(outputs.attentions))
+    attentions = outputs.attentions[layer_index][0]  # (heads, seq, seq)
+    hidden = None
+    if outputs.hidden_states:
+        hidden = outputs.hidden_states[min(layer_index + 1, len(outputs.hidden_states) - 1)][0]
 
     # Позиции токенов ответа (по смещениям быстрого токенизатора).
     offsets = tokenizer(prompt, return_offsets_mapping=True, truncation=True, max_length=max_length)["offset_mapping"]
@@ -428,11 +437,42 @@ def hf_features(
         meta={
             "backend": "hf",
             "model": model_name,
+            "layer": layer if isinstance(layer, (int, str)) else str(layer),
+            "layer_index": layer_index,
+            "layers_total": len(outputs.attentions),
             "seq_len": seq_len,
             "context_tokens": len(context_positions),
             "k": k,
         },
     )
+
+
+def resolve_layer(layer: int | str, total: int) -> int:
+    """Индекс слоя внимания по имени или числу.
+
+    Поддерживаются ``"first"``, ``"middle"``, ``"last"``, отрицательные индексы
+    (``-4`` — четвёртый с конца) и обычные целые числа. Индекс всегда попадает
+    в диапазон ``[0, total - 1]``.
+    """
+    if total <= 0:
+        return 0
+    if isinstance(layer, bool):  # bool — подкласс int, отсекаем отдельно
+        return total - 1
+    if isinstance(layer, int):
+        index = layer if layer >= 0 else total + layer
+        return max(0, min(total - 1, index))
+    key = str(layer).strip().lower()
+    if key in {"last", "-1", ""}:
+        return total - 1
+    if key == "first":
+        return 0
+    if key == "middle":
+        return (total - 1) // 2
+    try:
+        index = int(key)
+    except ValueError:
+        return total - 1
+    return max(0, min(total - 1, index if index >= 0 else total + index))
 
 
 def _cosine_dense(a: Sequence[float], b: Sequence[float]) -> float:
