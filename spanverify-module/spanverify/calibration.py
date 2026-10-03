@@ -140,6 +140,10 @@ class IsotonicCalibrator:
     @classmethod
     def load(cls, path: str | Path) -> "IsotonicCalibrator | None":
         p = Path(path)
+        if not p.is_absolute():
+            from .config import resolve_runtime_path
+
+            p = resolve_runtime_path(str(p))
         if p.is_file():
             with p.open("r", encoding="utf-8") as fh:
                 return cls.from_dict(json.load(fh))

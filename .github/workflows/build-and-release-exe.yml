@@ -1,0 +1,216 @@
+name: build-and-release-exe
+
+# Сборка, проверка и публикация Windows-приложения SpanVerify.
+#
+# Запуск:
+#   * вручную: Actions → build-and-release-exe → Run workflow
+#     (публикует релиз с постоянной ссылкой /releases/latest/download/spanverify.exe);
+#   * автоматически по тегу: git tag v1.0.0 && git push origin v1.0.0
+#
+# Перед публикацией раннер сам скачивает и запускает собранный .exe,
+# дёргает /health и делает реальный POST /v1/verify с русским текстом.
+# Упал смоук-тест — релиз не публикуется.
+
+on:
+  workflow_dispatch:
+    inputs:
+      publish_release:
+        description: "Публиковать релиз (ссылка /releases/latest/download/spanverify.exe)"
+        type: boolean
+        default: true
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+
+env:
+  PYTHONUTF8: "1"
+  PYTHONIOENCODING: "utf-8"
+
+jobs:
+  test:
+    name: Тесты (Python ${{ matrix.python }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python: ["3.10", "3.11", "3.12"]
+    defaults:
+      run:
+        working-directory: spanverify-module
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
+          cache: pip
+          cache-dependency-path: spanverify-module/requirements.txt
+
+      - name: Зависимости
+        run: python -m pip install --upgrade pip pytest
+
+      - name: Тесты
+        run: python -m pytest -q
+
+      - name: Самопроверка модуля
+        run: python -m spanverify selftest
+
+  windows-exe:
+    name: Сборка и проверка .exe
+    needs: test
+    runs-on: windows-latest
+    defaults:
+      run:
+        working-directory: spanverify-module
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+          cache-dependency-path: spanverify-module/requirements.txt
+
+      - name: Зависимости сборки
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements.txt
+
+      - name: Калибратор (обучить, если нет в репозитории)
+        shell: pwsh
+        run: |
+          if (-not (Test-Path "config/calibration.json")) {
+            python -m spanverify demo --n 240 --seed 1312 --out data/demo_dataset.jsonl
+            python -m spanverify calibrate --dataset data/demo_dataset.jsonl --out config/calibration.json
+          }
+
+      - name: Сборка onefile spanverify.exe
+        run: python -m PyInstaller spanverify.spec --noconfirm --clean
+
+      - name: Сборка onedir (для антивирусов, которые не любят onefile)
+        run: >
+          python -m PyInstaller --noconfirm --clean --onedir --name spanverify_onedir
+          --add-data "config;config" --add-data "data;data"
+          --exclude-module torch --exclude-module transformers --exclude-module streamlit
+          --exclude-module numpy --exclude-module pandas --exclude-module matplotlib
+          app.py
+
+      - name: Сборка переносимого zipapp
+        run: python scripts/make_zipapp.py --out release
+
+      - name: Комплектация release/
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force -Path release | Out-Null
+          Copy-Item dist/spanverify.exe release/spanverify.exe -Force
+          Copy-Item dist/spanverify_onedir release/spanverify-win -Recurse -Force
+          Copy-Item config release/config -Recurse -Force
+          Copy-Item data release/data -Recurse -Force
+          Copy-Item README.md release/README.md -Force
+
+      - name: Смоук-тест собранного .exe (сервис + реальный запрос)
+        shell: pwsh
+        working-directory: spanverify-module/release
+        run: |
+          $ErrorActionPreference = "Stop"
+          $sample = "Важно отметить, что данный метод обеспечивает эффективное решение поставленной задачи, что подтверждает эффективность предложенного решения."
+          $proc = Start-Process -FilePath ".\spanverify.exe" `
+            -ArgumentList "serve", "--host", "127.0.0.1", "--port", "8011", "--quiet" -PassThru
+          try {
+            $ready = $false
+            for ($i = 0; $i -lt 60; $i++) {
+              Start-Sleep -Seconds 2
+              try {
+                $health = Invoke-RestMethod -Uri "http://127.0.0.1:8011/health" -TimeoutSec 3
+                if ($health.status -eq "ok") { $ready = $true; break }
+              } catch { }
+              if ($proc.HasExited) { throw "процесс .exe завершился с кодом $($proc.ExitCode)" }
+            }
+            if (-not $ready) { throw "сервис из .exe не поднялся за 120 секунд" }
+            Write-Host "health: $($health | ConvertTo-Json -Compress)"
+
+            $payload = @{ text = $sample; explain = $false } | ConvertTo-Json -Compress
+            $body = [System.Text.Encoding]::UTF8.GetBytes($payload)
+            $response = Invoke-RestMethod -Uri "http://127.0.0.1:8011/v1/verify" `
+              -Method Post -Body $body -ContentType "application/json; charset=utf-8" -TimeoutSec 60
+            Write-Host "verify: $($response.result | ConvertTo-Json -Compress -Depth 4)"
+            if ($response.result.verdict -ne "likely_ai") {
+              throw "ожидался вердикт likely_ai, получен '$($response.result.verdict)'"
+            }
+            if (-not $response.result.calibrated) {
+              Write-Host "::warning::калибратор не загружен из бандла — проверьте упаковку config/"
+            }
+          } finally {
+            if ($proc -and -not $proc.HasExited) { Stop-Process -Id $proc.Id -Force }
+          }
+
+      - name: Смоук-тест zipapp
+        shell: pwsh
+        run: |
+          python release/spanverify.pyz selftest
+
+      - name: Контрольные суммы
+        shell: pwsh
+        working-directory: spanverify-module/release
+        run: |
+          Compress-Archive -Path "spanverify-win/*" -DestinationPath "spanverify-win.zip" -Force
+          $files = @("spanverify.exe", "spanverify-win.zip", "spanverify.pyz")
+          $lines = foreach ($f in $files) {
+            $hash = (Get-FileHash $f -Algorithm SHA256).Hash.ToLower()
+            "{0}  {1}" -f $hash, $f
+          }
+          $lines | Set-Content -Encoding ASCII SHA256SUMS.txt
+          Get-Content SHA256SUMS.txt
+
+      - name: Артефакты сборки
+        uses: actions/upload-artifact@v4
+        with:
+          name: spanverify-windows-x64
+          path: |
+            spanverify-module/release/spanverify.exe
+            spanverify-module/release/spanverify-win.zip
+            spanverify-module/release/spanverify.pyz
+            spanverify-module/release/SHA256SUMS.txt
+            spanverify-module/release/README.md
+          retention-days: 90
+
+      - name: Публикация релиза
+        if: startsWith(github.ref, 'refs/tags/') || inputs.publish_release
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        working-directory: spanverify-module/release
+        run: |
+          $tag = if ("${{ github.ref }}".StartsWith("refs/tags/")) { "${{ github.ref_name }}" } else { "v1.0.0" }
+          $title = "SpanVerify $tag"
+          $notes = @"
+          Локальный анализатор текста: находит фрагменты, написанные ИИ, и оценивает долю участия модели.
+
+          ## Файлы
+          * ``spanverify.exe`` — основной вариант (Windows x64, один файл, Python не нужен).
+          * ``spanverify-win.zip`` — распаковать и запустить ``spanverify-win\spanverify.exe`` (вариант для антивирусов, не любящих onefile).
+          * ``spanverify.pyz`` — страховка: нужен Python 3.10+ (``python spanverify.pyz serve --open-browser``).
+          * ``SHA256SUMS.txt`` — контрольные суммы.
+
+          ## Как проверить
+          1. Скачать ``spanverify.exe`` (или zip) и, при желании, сверить хеш: ``Get-FileHash .\spanverify.exe -Algorithm SHA256``.
+          2. Запустить двойным кликом — откроется браузер с интерфейсом на http://localhost:8000.
+          3. Нажать «Пример: смешанный» → «Проверить достоверность»: машинные фрагменты подсветятся красным, появятся доли участия ИИ.
+
+          ## Что уже проверено автоматически
+          Сборка выполнялась и проверялась на windows-раннере: запуск ``.exe``, ``GET /health`` и реальный ``POST /v1/verify`` с русским текстом (ожидаемый вердикт ``likely_ai``), тесты на Python 3.10–3.12.
+
+          ## Ограничение
+          В поставке включён демонстрационный режим (``surrogate``) с калибратором на синтетическом корпусе: он проверяет конвейер и интерфейс, а не достоверность текста. Для боевых выводов нужен режим ``hf`` и калибровка на размеченных данных (см. README).
+          "@
+          $notes = $notes -replace '(?m)^\s+', ''
+          if (gh release view $tag --repo "${{ github.repository }}") {
+            gh release upload $tag spanverify.exe spanverify-win.zip spanverify.pyz SHA256SUMS.txt --clobber --repo "${{ github.repository }}"
+          } else {
+            gh release create $tag spanverify.exe spanverify-win.zip spanverify.pyz SHA256SUMS.txt `
+              --repo "${{ github.repository }}" --title $title --notes $notes --latest
+          }
+          gh release view $tag --repo "${{ github.repository }}" --json url,assets
