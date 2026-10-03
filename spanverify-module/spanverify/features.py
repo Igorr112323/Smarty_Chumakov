@@ -23,6 +23,7 @@
 
 from __future__ import annotations
 
+import statistics
 from collections.abc import Sequence
 from dataclasses import dataclass, field
 from typing import Any
@@ -321,6 +322,43 @@ def _lexical_vector_from_text(text: str, dim: int, n: int = 3) -> dict[int, floa
 # ---------------------------------------------------------------- hf-режим
 
 
+def _span_overlap(left: tuple[int, int], right: tuple[int, int]) -> int:
+    """Число общих символов у двух отрезков (0, если отрезки не пересекаются)."""
+    return max(0, min(left[1], right[1]) - max(left[0], right[0]))
+
+
+def map_token_positions(
+    token_spans: Sequence[tuple[int, int]],
+    model_spans: Sequence[tuple[int, int, int]],
+    answer_start: int,
+) -> list[list[int]]:
+    """Сопоставить токены нашего разбиения с позициями модели по символам.
+
+    ``token_spans`` — отрезки в координатах ответа, ``model_spans`` — тройки
+    ``(позиция, начало, конец)`` в координатах общего промпта. Возвращается
+    список позиций модели для каждого нашего токена (пустой список, если
+    пересечения нет). Разбиение модели на подслова не совпадает с нашим, и
+    сопоставление по индексу сдвигало признаки на соседние слова; здесь каждый
+    наш токен получает все позиции модели, которые с ним существенно
+    перекрываются, — признаки такого токена усредняются по его подсловам.
+    """
+    mapping: list[list[int]] = []
+    for start, end in token_spans:
+        absolute = (start + answer_start, end + answer_start)
+        hits = [
+            (position, _span_overlap(absolute, (span_start, span_end)))
+            for position, span_start, span_end in model_spans
+            if _span_overlap(absolute, (span_start, span_end)) > 0
+        ]
+        if not hits:
+            mapping.append([])
+            continue
+        best = max(overlap for _position, overlap in hits)
+        threshold = max(1, best // 2)
+        mapping.append(sorted(position for position, overlap in hits if overlap >= threshold))
+    return mapping
+
+
 def hf_features(
     answer: str,
     context: str | Sequence[str] | None,
@@ -398,11 +436,19 @@ def hf_features(
         offsets = list(offsets[0])
     offsets = [(int(start), int(end)) for start, end in offsets]
     seq_len = int(attention_mask.sum().item())
-    answer_positions = [
-        i for i, (start, end) in enumerate(offsets) if end > start and start >= answer_start and i < seq_len
+    model_spans = [
+        (i, start, end)
+        for i, (start, end) in enumerate(offsets)
+        if end > start and start >= answer_start and i < seq_len
     ]
+    answer_positions = [position for position, _start, _end in model_spans]
     answer_start_token = min(answer_positions) if answer_positions else seq_len
     context_positions = [i for i in range(seq_len) if i < answer_start_token]
+    token_positions = map_token_positions(
+        [(token.start, token.end) for token in tokens],
+        model_spans,
+        answer_start,
+    )
 
     eps = 1e-9
     probs = attentions.clamp_min(eps)
@@ -423,28 +469,30 @@ def hf_features(
         for position in context_positions:
             context_token_embeddings.append(hidden_cpu[position].tolist())
 
-    for local_index, _token in enumerate(tokens):
-        if local_index >= len(answer_positions):
+    for positions in token_positions:
+        if not positions:
             entropy_values.append(0.5)
             mass_values.append(0.0)
             density_values.append(0.0)
             continue
-        position = answer_positions[local_index]
-        entropy_values.append(float(entropy[position].item()))
-        row = attentions[:, position, :].mean(dim=0)  # (seq,)
-        mass = float(row[context_positions].sum().item()) if context_positions else 0.0
-        mass_values.append(min(1.0, max(0.0, mass)))
-
-        if hidden_cpu is not None and context_token_embeddings:
-            vector = hidden_cpu[position].tolist()
-            similarities = sorted(
-                (_cosine_dense(vector, other) for other in context_token_embeddings),
-                reverse=True,
-            )
-            top = similarities[: max(1, k)]
-            density_values.append(min(1.0, max(0.0, sum(top) / len(top))))
-        else:  # pragma: no cover - модель без hidden_states
-            density_values.append(0.0)
+        entropy_values.append(statistics.fmean(float(entropy[position].item()) for position in positions))
+        mass_parts: list[float] = []
+        density_parts: list[float] = []
+        for position in positions:
+            row = attentions[:, position, :].mean(dim=0)  # (seq,)
+            mass_parts.append(float(row[context_positions].sum().item()) if context_positions else 0.0)
+            if hidden_cpu is not None and context_token_embeddings:
+                vector = hidden_cpu[position].tolist()
+                similarities = sorted(
+                    (_cosine_dense(vector, other) for other in context_token_embeddings),
+                    reverse=True,
+                )
+                top = similarities[: max(1, k)]
+                density_parts.append(sum(top) / len(top))
+            else:  # pragma: no cover - модель без hidden_states
+                density_parts.append(0.0)
+        mass_values.append(min(1.0, max(0.0, statistics.fmean(mass_parts))))
+        density_values.append(min(1.0, max(0.0, statistics.fmean(density_parts))))
 
     return FeatureMatrix(
         attention_entropy=entropy_values,
