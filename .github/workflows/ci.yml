@@ -399,6 +399,18 @@ jobs:
         working-directory: spanverify-module
         run: python scripts/probe_npa_extract.py --out reports/npa_extract_probe.json
 
+      # OCR-инструменты: только для разведки (и, если понадобится, для загрузчика корпуса A3).
+      - name: Поставить OCR (poppler + tesseract с русским)
+        working-directory: spanverify-module
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq poppler-utils tesseract-ocr tesseract-ocr-rus
+
+      # Шестая разведка: текстовые версии (SVG, ИПС) и качество OCR сканов.
+      - name: Разведать текстовые версии и OCR
+        working-directory: spanverify-module
+        run: python scripts/probe_npa_svg.py --out reports/npa_svg_probe.json
+
       # Результат разведки коммитится: артефакты GitHub не читаются из окружения
       # разработки, а факты об API нужны в репозитории. [skip ci] не даёт запустить
       # новый прогон от этого коммита.
@@ -407,7 +419,7 @@ jobs:
         run: |
           git config user.name "spanverify-bot"
           git config user.email "actions@users.noreply.github.com"
-          git add -f spanverify-module/reports/probe_sources.json spanverify-module/reports/npa_probe.json spanverify-module/reports/npa_probe2.json spanverify-module/reports/npa_probe3.json spanverify-module/reports/npa_text_probe.json spanverify-module/reports/npa_extract_probe.json || true
+          git add -f spanverify-module/reports/probe_sources.json spanverify-module/reports/npa_probe.json spanverify-module/reports/npa_probe2.json spanverify-module/reports/npa_probe3.json spanverify-module/reports/npa_text_probe.json spanverify-module/reports/npa_extract_probe.json spanverify-module/reports/npa_svg_probe.json || true
           if git diff --cached --quiet; then
             echo "нечего коммитить"
           else
@@ -427,4 +439,5 @@ jobs:
             spanverify-module/reports/npa_probe3.json
             spanverify-module/reports/npa_text_probe.json
             spanverify-module/reports/npa_extract_probe.json
+            spanverify-module/reports/npa_svg_probe.json
           retention-days: 30
