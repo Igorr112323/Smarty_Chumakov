@@ -10,9 +10,10 @@ from __future__ import annotations
 
 import json
 import random
+from collections.abc import Iterable, Sequence
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Iterable, Sequence
+from typing import Any
 
 __all__ = [
     "pava",
@@ -40,7 +41,7 @@ def pava(scores: Sequence[float], labels: Sequence[float]) -> tuple[list[float],
 
     # Блоки: [сумма y, количество, суммарный вес]
     blocks: list[list[float]] = []
-    for x, y in zip(xs, ys):
+    for x, y in zip(xs, ys, strict=False):
         blocks.append([y, 1.0, x])
         while len(blocks) > 1 and blocks[-2][0] / blocks[-2][1] > blocks[-1][0] / blocks[-1][1]:
             y2, n2, x2 = blocks.pop()
@@ -105,7 +106,7 @@ class IsotonicCalibrator:
         tolerance: float = 0.003,
         max_points: int = 2000,
         **meta: Any,
-    ) -> "IsotonicCalibrator":
+    ) -> IsotonicCalibrator:
         """Обучить калибратор и сжать отображение без потери монотонности.
 
         PAVA на десятках тысяч токенов даёт тысячи блоков; для хранения и
@@ -122,7 +123,7 @@ class IsotonicCalibrator:
         return {"thresholds": self.thresholds, "values": self.values, "meta": self.meta or {}}
 
     @classmethod
-    def from_dict(cls, data: dict[str, Any]) -> "IsotonicCalibrator":
+    def from_dict(cls, data: dict[str, Any]) -> IsotonicCalibrator:
         return cls(
             thresholds=[float(x) for x in data.get("thresholds", [])],
             values=[float(v) for v in data.get("values", [])],
@@ -138,7 +139,7 @@ class IsotonicCalibrator:
         return p
 
     @classmethod
-    def load(cls, path: str | Path) -> "IsotonicCalibrator | None":
+    def load(cls, path: str | Path) -> IsotonicCalibrator | None:
         """Загрузить калибратор с диска или из бандла приложения."""
         p = Path(path)
         if p.is_file():
@@ -156,7 +157,7 @@ class IsotonicCalibrator:
 def metrics_at(probs: Sequence[float], labels: Sequence[int], threshold: float) -> dict[str, float]:
     """Метрики бинарной классификации при заданном пороге."""
     tp = fp = tn = fn = 0
-    for prob, label in zip(probs, labels):
+    for prob, label in zip(probs, labels, strict=False):
         predicted = 1 if prob >= threshold else 0
         if predicted and label:
             tp += 1
@@ -182,7 +183,10 @@ def metrics_at(probs: Sequence[float], labels: Sequence[int], threshold: float) 
         "fpr": fpr,
         "hdr": hdr,
         "accuracy": accuracy,
-        "tp": tp, "fp": fp, "tn": tn, "fn": fn,
+        "tp": tp,
+        "fp": fp,
+        "tn": tn,
+        "fn": fn,
     }
 
 
@@ -249,15 +253,11 @@ def cross_validate(
         stop = n if fold == folds - 1 else start + fold_size
         test_idx = indices[start:stop]
         train_idx = indices[:start] + indices[stop:]
-        calibrator = IsotonicCalibrator.fit(
-            [scores[i] for i in train_idx], [labels[i] for i in train_idx]
-        )
+        calibrator = IsotonicCalibrator.fit([scores[i] for i in train_idx], [labels[i] for i in train_idx])
         train_probs = calibrator.transform([scores[i] for i in train_idx])
-        thr = choose_threshold(
-            train_probs, [labels[i] for i in train_idx], max_fpr=max_fpr
-        )
+        thr = choose_threshold(train_probs, [labels[i] for i in train_idx], max_fpr=max_fpr)
         test_probs = calibrator.transform([scores[i] for i in test_idx])
-        for i, prob in zip(test_idx, test_probs):
+        for i, prob in zip(test_idx, test_probs, strict=False):
             all_probs[i] = prob
         report = metrics_at(test_probs, [labels[i] for i in test_idx], thr)
         report["fold"] = fold

@@ -8,8 +8,9 @@
 
 from __future__ import annotations
 
+from collections.abc import Iterable, Sequence
 from dataclasses import dataclass, field
-from typing import Any, Iterable, Sequence
+from typing import Any
 
 from .calibration import (
     IsotonicCalibrator,
@@ -103,17 +104,13 @@ def train_calibrator(
     """
     config = config or detector.config
     scoring = (
-        Detector(config, backend=detector.backend, calibrator=False)
-        if detector.calibrator is not None
-        else detector
+        Detector(config, backend=detector.backend, calibrator=False) if detector.calibrator is not None else detector
     )
     scores, labels, stats = collect_scores(scoring, documents)
     if not scores:
         raise ValueError("не удалось собрать оценки: проверьте разметку корпуса")
 
-    cross = cross_validate(
-        scores, labels, folds=config.folds, max_fpr=config.max_fpr, seed=config.seed
-    )
+    cross = cross_validate(scores, labels, folds=config.folds, max_fpr=config.max_fpr, seed=config.seed)
     calibrator = IsotonicCalibrator.fit(scores, labels)
     probs = calibrator.transform(scores)
     threshold = choose_threshold(probs, labels, max_fpr=config.max_fpr)
@@ -127,9 +124,7 @@ def train_calibrator(
         "ai_token_share": round(ai_share, 4),
         "threshold": round(threshold, 4),
         "metrics_in_sample": {k: round(v, 4) for k, v in metrics.items()},
-        "cross_validation_mean": {
-            k: round(v, 4) for k, v in cross.get("mean", {}).items()
-        },
+        "cross_validation_mean": {k: round(v, 4) for k, v in cross.get("mean", {}).items()},
         "note": (
             "Калибровка на синтетическом корпусе проверяет конвейер, а не качество "
             "на реальных текстах. Боевой порог обучается на размеченных данных "

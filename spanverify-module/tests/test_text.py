@@ -19,7 +19,7 @@ def test_tokenization_covers_text_without_gaps():
     text = "Привет, мир! Как дела — 42 раза?"
     tokens = tokenize(text)
     assert "".join(t.text for t in tokens) == text
-    for previous, current in zip(tokens, tokens[1:]):
+    for previous, current in zip(tokens, tokens[1:], strict=False):
         assert previous.end == current.start
 
 

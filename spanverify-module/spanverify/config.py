@@ -11,9 +11,10 @@ from __future__ import annotations
 import json
 import os
 import sys
-from dataclasses import dataclass, asdict, fields, replace
+from collections.abc import Mapping
+from dataclasses import asdict, dataclass, fields, replace
 from pathlib import Path
-from typing import Any, Mapping
+from typing import Any
 
 ENV_PREFIX = "SPANVERIFY_"
 
@@ -88,25 +89,26 @@ def default_config_path() -> Path | None:
             return candidate
     return None
 
+
 DEFAULTS: dict[str, Any] = {
     # --- бэкенд признаков ---
-    "backend": "surrogate",          # "surrogate" (демо, stdlib) | "hf" (реальная модель)
+    "backend": "surrogate",  # "surrogate" (демо, stdlib) | "hf" (реальная модель)
     "hf_model": "cointegrated/rubert-tiny2",
     "hf_max_tokens": 512,
     # --- признаки ---
-    "k_neighbors": 5,                # k в kNN-плотности контекстных эмбеддингов
-    "vector_dim": 4096,              # размерность хешированного пространства признаков
-    "density_ref": 0.35,             # опорная шкала косинусной близости (-> 1.0)
-    "w_predictability": 0.70,        # вес признака предсказуемости (энтропийный)
-    "w_density": 0.30,               # вес признака контекстной плотности
-    "smoothing_window": 7,           # сглаживание покадровой оценки, токенов
+    "k_neighbors": 5,  # k в kNN-плотности контекстных эмбеддингов
+    "vector_dim": 4096,  # размерность хешированного пространства признаков
+    "density_ref": 0.35,  # опорная шкала косинусной близости (-> 1.0)
+    "w_predictability": 0.70,  # вес признака предсказуемости (энтропийный)
+    "w_density": 0.30,  # вес признака контекстной плотности
+    "smoothing_window": 7,  # сглаживание покадровой оценки, токенов
     # --- сегментация и порог ---
-    "threshold": 0.5,                # порог по калиброванной вероятности
-    "min_span_tokens": 6,            # минимальная длина «машинного» фрагмента
-    "merge_gap_tokens": 6,           # склейка фрагментов с разрывом меньше N токенов
+    "threshold": 0.5,  # порог по калиброванной вероятности
+    "min_span_tokens": 6,  # минимальная длина «машинного» фрагмента
+    "merge_gap_tokens": 6,  # склейка фрагментов с разрывом меньше N токенов
     # --- калибровка ---
     "calibration_path": "config/calibration.json",
-    "max_fpr": 0.10,                 # ограничение на долю ложных срабатываний
+    "max_fpr": 0.10,  # ограничение на долю ложных срабатываний
     "folds": 5,
     "seed": 1312,
     # --- сервер ---
@@ -115,8 +117,15 @@ DEFAULTS: dict[str, Any] = {
 }
 
 INT_FIELDS = {
-    "k_neighbors", "vector_dim", "smoothing_window", "min_span_tokens",
-    "merge_gap_tokens", "folds", "seed", "port", "hf_max_tokens",
+    "k_neighbors",
+    "vector_dim",
+    "smoothing_window",
+    "min_span_tokens",
+    "merge_gap_tokens",
+    "folds",
+    "seed",
+    "port",
+    "hf_max_tokens",
 }
 FLOAT_FIELDS = {"w_predictability", "w_density", "threshold", "max_fpr", "density_ref"}
 
@@ -147,7 +156,7 @@ class Config:
     # ---------- создание ----------
 
     @classmethod
-    def from_dict(cls, data: Mapping[str, Any] | None = None) -> "Config":
+    def from_dict(cls, data: Mapping[str, Any] | None = None) -> Config:
         """Собрать конфиг из словаря, игнорируя неизвестные ключи."""
         if not data:
             return cls()
@@ -164,7 +173,7 @@ class Config:
         return cls(**clean)
 
     @classmethod
-    def load(cls, path: str | os.PathLike[str] | None = None) -> "Config":
+    def load(cls, path: str | os.PathLike[str] | None = None) -> Config:
         """Прочитать конфиг из JSON-файла (если он есть) + переменные окружения.
 
         Если путь не задан, используется ``config/config.json`` рядом с
@@ -179,7 +188,7 @@ class Config:
             embedded = read_runtime_text("config/config.json")
             if embedded:
                 data.update(json.loads(embedded))
-        for key, value in DEFAULTS.items():
+        for key, _value in DEFAULTS.items():
             env = os.environ.get(ENV_PREFIX + key.upper())
             if env is not None:
                 data[key] = env
@@ -187,7 +196,7 @@ class Config:
 
     # ---------- изменение ----------
 
-    def with_overrides(self, **kwargs: Any) -> "Config":
+    def with_overrides(self, **kwargs: Any) -> Config:
         """Вернуть копию конфига с переопределёнными параметрами.
 
         Значения ``None`` игнорируются — это удобно для аргументов CLI,

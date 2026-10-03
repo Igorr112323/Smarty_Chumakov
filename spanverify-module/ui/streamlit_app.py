@@ -27,8 +27,9 @@ st.caption("Локальный анализ. Текст не отправляе�
 
 with st.sidebar:
     st.header("Параметры")
-    backend = st.selectbox("Бэкенд", ["surrogate", "hf"], index=0,
-                           help="surrogate — демо-конвейер, hf — реальная модель")
+    backend = st.selectbox(
+        "Бэкенд", ["surrogate", "hf"], index=0, help="surrogate — демо-конвейер, hf — реальная модель"
+    )
     threshold = st.slider("Порог", 0.0, 1.0, 0.5, 0.01)
     calibrate = st.checkbox("Использовать калибратор", value=True)
     show_tokens = st.checkbox("Показать покадровую таблицу", value=False)
@@ -60,11 +61,7 @@ if st.button("Проверить", type="primary") and text.strip():
         marked = text
         for span in reversed(result["spans"]):
             start, end = span["start_char"], span["end_char"]
-            marked = (
-                marked[:start]
-                + "**==\\[" + marked[start:end] + "\\]==**"
-                + marked[end:]
-            )
+            marked = marked[:start] + "**==\\[" + marked[start:end] + "\\]==**" + marked[end:]
         st.markdown(marked)
 
         st.subheader("Фрагменты")

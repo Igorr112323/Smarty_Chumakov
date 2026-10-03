@@ -12,7 +12,6 @@ from __future__ import annotations
 
 import argparse
 import shutil
-import sys
 import tempfile
 import zipapp
 from pathlib import Path
@@ -36,13 +35,13 @@ def build(out_dir: Path, name: str = "spanverify.pyz") -> Path:
                 continue
             if source.is_dir():
                 shutil.copytree(
-                    source, stage / item,
+                    source,
+                    stage / item,
                     ignore=shutil.ignore_patterns("__pycache__", "*.pyc"),
                 )
             else:
                 shutil.copy2(source, stage / item)
-        zipapp.create_archive(stage, target, interpreter="/usr/bin/env python3",
-                              main="spanverify.cli:main")
+        zipapp.create_archive(stage, target, interpreter="/usr/bin/env python3", main="spanverify.cli:main")
 
     target.chmod(0o755)
     return target

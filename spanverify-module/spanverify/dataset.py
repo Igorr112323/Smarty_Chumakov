@@ -24,9 +24,9 @@ from __future__ import annotations
 
 import json
 import random
+from collections.abc import Iterator
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Iterator
 
 __all__ = [
     "Fact",
@@ -65,6 +65,8 @@ def unit_form(value: int, kind: str) -> str:
     if 2 <= last <= 4:
         return forms["few"]
     return forms["many"]
+
+
 SUBJECTS = [
     ("срок хранения первичных документов", "years", [3, 4, 5, 6, 10, 25, 45]),
     ("срок хранения актов проверок", "years", [3, 4, 5, 6, 10]),
@@ -89,7 +91,6 @@ CONTEXT_TEMPLATES = [
     "Согласно регламенту {number}, {subject} установлен в размере {value_phrase}.",
 ]
 CONTEXT_TAIL = [  # noqa: RUF100
-
     "Документ утверждён приказом директора.",
     "Контроль исполнения возложен на службу делопроизводства.",
     "Изменения вносятся распоряжением руководителя.",
@@ -119,10 +120,23 @@ EXTRA_TRUE = [
 
 # Числительные для формулировки значения словами.
 NUMERALS = {
-    3: "три", 4: "четыре", 5: "пять", 6: "шесть", 7: "семь", 9: "девять",
-    10: "десять", 12: "двенадцать", 14: "четырнадцать", 15: "пятнадцать",
-    20: "двадцать", 24: "двадцать четыре", 25: "двадцать пять",
-    30: "тридцать", 45: "сорок пять", 50: "пятьдесят", 75: "семьдесят пять",
+    3: "три",
+    4: "четыре",
+    5: "пять",
+    6: "шесть",
+    7: "семь",
+    9: "девять",
+    10: "десять",
+    12: "двенадцать",
+    14: "четырнадцать",
+    15: "пятнадцать",
+    20: "двадцать",
+    24: "двадцать четыре",
+    25: "двадцать пять",
+    30: "тридцать",
+    45: "сорок пять",
+    50: "пятьдесят",
+    75: "семьдесят пять",
 }
 
 
@@ -288,10 +302,7 @@ def generate_pairs(
 ) -> list[Pair]:
     """Сгенерировать корпус пар с заданным seed (воспроизводимо)."""
     rng = random.Random(seed)
-    return [
-        make_pair(rng, index=index, hallucination_rate=hallucination_rate)
-        for index in range(n_pairs)
-    ]
+    return [make_pair(rng, index=index, hallucination_rate=hallucination_rate) for index in range(n_pairs)]
 
 
 def write_pairs(pairs: list[Pair], path: str | Path) -> Path:

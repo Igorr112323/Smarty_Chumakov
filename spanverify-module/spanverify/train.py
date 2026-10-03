@@ -22,21 +22,22 @@ from __future__ import annotations
 import json
 import math
 import random
+from collections.abc import Iterable, Sequence
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Any, Iterable, Sequence
+from typing import Any
 
 from .calibration import IsotonicCalibrator, choose_threshold, metrics_at
 from .core import tokenize_with_offsets
 from .engine import (
     SMOOTH_WINDOW,
-    WeightsBundle,
     Verifier,
+    WeightsBundle,
     _answer_score,
     _smooth,
     span_threshold_for,
 )
-from .features import DEFAULT_WEIGHTS, FEATURE_NAMES, FeatureMatrix, combine, is_scored_token
+from .features import DEFAULT_WEIGHTS, combine, is_scored_token
 
 __all__ = [
     "TrainReport",
@@ -148,10 +149,10 @@ def auc_score(labels: Sequence[int], scores: Sequence[float]) -> float:
 
 
 def _token_metrics(labels: Sequence[int], flags: Sequence[bool], risk: Sequence[float]) -> dict[str, float]:
-    tp = sum(1 for label, flag in zip(labels, flags) if label and flag)
-    fp = sum(1 for label, flag in zip(labels, flags) if not label and flag)
-    fn = sum(1 for label, flag in zip(labels, flags) if label and not flag)
-    tn = sum(1 for label, flag in zip(labels, flags) if not label and not flag)
+    tp = sum(1 for label, flag in zip(labels, flags, strict=False) if label and flag)
+    fp = sum(1 for label, flag in zip(labels, flags, strict=False) if not label and flag)
+    fn = sum(1 for label, flag in zip(labels, flags, strict=False) if label and not flag)
+    tn = sum(1 for label, flag in zip(labels, flags, strict=False) if not label and not flag)
     precision = tp / (tp + fp) if tp + fp else 0.0
     recall = tp / (tp + fn) if tp + fn else 0.0
     f1 = 2 * precision * recall / (precision + recall) if precision + recall else 0.0
@@ -160,7 +161,10 @@ def _token_metrics(labels: Sequence[int], flags: Sequence[bool], risk: Sequence[
         "recall": recall,
         "f1": f1,
         "fpr": fp / (fp + tn) if fp + tn else 0.0,
-        "tp": tp, "fp": fp, "fn": fn, "tn": tn,
+        "tp": tp,
+        "fp": fp,
+        "fn": fn,
+        "tn": tn,
         "auc": auc_score(labels, risk),
     }
 
@@ -192,7 +196,6 @@ class TrainReport:
 
 
 def _weight_grid(step: float = WEIGHT_GRID_STEP) -> list[dict[str, float]]:
-    values = [round(step * i, 2) for i in range(int(1 / step) + 1)]
     grid: list[dict[str, float]] = []
     total_units = int(round(1 / step))
     for units_w1 in range(total_units + 1):
@@ -246,14 +249,16 @@ def _score_pairs(
         samples = samples_by_pair.get(pair_id, [])
         if not samples:
             continue
-        risks_by_index = {sample.index: risk for sample, risk in zip(samples, _risk_for(samples, weights))}
+        risks_by_index = {
+            sample.index: risk for sample, risk in zip(samples, _risk_for(samples, weights), strict=False)
+        }
         labels_by_index = {sample.index: sample.label for sample in samples}
         max_index = max(samples, key=lambda sample: sample.index).index
         risk_sequence = [risks_by_index.get(index, 0.0) for index in range(max_index + 1)]
         smoothed = _smooth(risk_sequence, SMOOTH_WINDOW)
         threshold = span_threshold_for(smoothed, span_z, span_floor, span_cap)
 
-        for index, value in risks_by_index.items():
+        for index in risks_by_index:
             flags.append(smoothed[index] >= threshold)
             labels.append(labels_by_index[index])
             risks.append(smoothed[index])
@@ -312,6 +317,7 @@ def _span_f1_from_indices(
 
 # ---------------------------------------------------------------- голова
 
+
 def _standardize(rows: Sequence[Sequence[float]]) -> tuple[list[list[float]], list[float], list[float]]:
     if not rows:
         return [], [], []
@@ -320,7 +326,7 @@ def _standardize(rows: Sequence[Sequence[float]]) -> tuple[list[list[float]], li
     scales = []
     for j in range(width):
         variance = sum((row[j] - means[j]) ** 2 for row in rows) / len(rows)
-        scales.append(variance ** 0.5 or 1.0)
+        scales.append(variance**0.5 or 1.0)
     normalized = [[(row[j] - means[j]) / scales[j] for j in range(width)] for row in rows]
     return normalized, means, scales
 
@@ -328,7 +334,7 @@ def _standardize(rows: Sequence[Sequence[float]]) -> tuple[list[list[float]], li
 def _head_rows(samples: Sequence[TokenSample], risks: Sequence[float], with_label: bool = True):
     rows: list[list[float]] = []
     labels: list[int] = []
-    for sample, risk in zip(samples, risks):
+    for sample, risk in zip(samples, risks, strict=False):
         rows.append(
             [
                 sample.features["attention_entropy"],
@@ -358,8 +364,8 @@ def _train_logreg(
     for _ in range(epochs):
         gradient = [0.0] * width
         bias_gradient = 0.0
-        for row, label in zip(rows, labels):
-            score = bias + sum(w * x for w, x in zip(weights, row))
+        for row, label in zip(rows, labels, strict=False):
+            score = bias + sum(w * x for w, x in zip(weights, row, strict=False))
             probability = 1.0 / (1.0 + math.exp(-max(-30.0, min(30.0, score))))
             error = probability - label
             for j in range(width):
@@ -374,12 +380,13 @@ def _train_logreg(
 def _head_probabilities(model: dict[str, Any], rows: Sequence[Sequence[float]]) -> list[float]:
     out: list[float] = []
     for row in rows:
-        score = model["bias"] + sum(w * x for w, x in zip(model["weights"], row))
+        score = model["bias"] + sum(w * x for w, x in zip(model["weights"], row, strict=False))
         out.append(1.0 / (1.0 + math.exp(-max(-30.0, min(30.0, score)))))
     return out
 
 
 # ---------------------------------------------------------------- основной вход
+
 
 def _score_pairs(
     verifier: Verifier,
@@ -408,7 +415,7 @@ def _score_pairs(
         if not samples:
             continue
         values = risk_fn(samples)
-        risks_by_index = {sample.index: value for sample, value in zip(samples, values)}
+        risks_by_index = {sample.index: value for sample, value in zip(samples, values, strict=False)}
         max_index = max(sample.index for sample in samples)
         sequence = [0.0] * (max_index + 1)
         for sample in samples:
@@ -457,9 +464,7 @@ def _select_mask(
             for cap in CAP_GRID:
                 if floor >= cap:
                     continue
-                metrics = _score_pairs(
-                    verifier, pairs, risk_fn, (span_z, floor, cap), samples_by_pair
-                )
+                metrics = _score_pairs(verifier, pairs, risk_fn, (span_z, floor, cap), samples_by_pair)
                 if metrics["fpr"] > target_fpr:
                     continue
                 key = (metrics["f1"], -metrics["fpr"], metrics["recall"])
@@ -476,11 +481,13 @@ def _head_scores(samples: Sequence[TokenSample], payload: dict[str, Any], rule_r
         return list(rule_risks)
     means = payload.get("scaler", {}).get("means", [])
     scales = payload.get("scaler", {}).get("scales", [])
-    if len(means) != len(weights) or len(scales) != len(weights):
+    if len(weights) != len(HEAD_FEATURES) or len(means) != len(weights) or len(scales) != len(weights):
+        # Артефакт не той размерности (например, обучен на другом наборе
+        # признаков): честно откатываемся к правилу, а не падаем с IndexError.
         return list(rule_risks)
 
     out: list[float] = []
-    for sample, rule_risk in zip(samples, rule_risks):
+    for sample, rule_risk in zip(samples, rule_risks, strict=False):
         row = [
             sample.features["attention_entropy"],
             sample.features["ctx_attention_mass"],
@@ -490,7 +497,7 @@ def _head_scores(samples: Sequence[TokenSample], payload: dict[str, Any], rule_r
             min(1.0, len(sample.text) / 20),
         ]
         normalized = [(value - means[j]) / (scales[j] or 1.0) for j, value in enumerate(row)]
-        score = model.get("bias", 0.0) + sum(w * x for w, x in zip(weights, normalized))
+        score = model.get("bias", 0.0) + sum(w * x for w, x in zip(weights, normalized, strict=False))
         out.append(1.0 / (1.0 + math.exp(-max(-30.0, min(30.0, score)))))
     return out
 
@@ -539,9 +546,7 @@ def train(
         return _risk_for(samples, best_weights)
 
     # 2. Голова: логистическая регрессия, 5-кратная кросс-валидация по парам.
-    head_report = _train_and_compare_head(
-        train_samples, test_samples, best_weights, folds, seed
-    )
+    head_report = _train_and_compare_head(train_samples, test_samples, best_weights, folds, seed)
     head_model = head_report.get("payload") or {}
 
     def head_risk_fn(samples: Sequence[TokenSample]) -> list[float]:
@@ -550,9 +555,7 @@ def train(
     # 3. Порог маски — на том сигнале, который пойдёт в API. Сравниваем правило и
     #    голову на обучающей части (тест не используется для выбора!), победитель
     #    определяется по F1 при ограничении FPR.
-    rule_params, rule_metrics = _select_mask(
-        verifier, train_pairs, rule_risk, train_by_pair, target_fpr
-    )
+    rule_params, rule_metrics = _select_mask(verifier, train_pairs, rule_risk, train_by_pair, target_fpr)
     candidate = {
         "signal": "rule",
         "params": rule_params,
@@ -560,9 +563,7 @@ def train(
         "risk_fn": rule_risk,
     }
     if head_report.get("type") == "logreg":
-        head_params, head_metrics = _select_mask(
-            verifier, train_pairs, head_risk_fn, train_by_pair, target_fpr
-        )
+        head_params, head_metrics = _select_mask(verifier, train_pairs, head_risk_fn, train_by_pair, target_fpr)
         head_report["head_best_f1"] = head_metrics.get("f1", 0.0)
         head_report["head_best_fpr"] = head_metrics.get("fpr", 1.0)
         if (head_metrics.get("f1", 0.0), -head_metrics.get("fpr", 1.0)) > (
@@ -588,9 +589,7 @@ def train(
     threshold = choose_threshold(calibrated, train_metrics["answer_labels"], max_fpr=target_fpr)
 
     validation = _score_pairs(verifier, test_pairs, risk_fn, best_span, test_by_pair)
-    validation_at = metrics_at(
-        calibrator.transform(validation["raw_scores"]), validation["answer_labels"], threshold
-    )
+    validation_at = metrics_at(calibrator.transform(validation["raw_scores"]), validation["answer_labels"], threshold)
 
     saved_head = head_report["saved"] if candidate["signal"] == "logreg" else {"type": "none", "file": None}
     bundle = WeightsBundle(
@@ -631,8 +630,10 @@ def train(
             "f1": validation["f1"],
             "fpr": validation["fpr"],
             "auc": validation["auc"],
-            "tp": validation["tp"], "fp": validation["fp"],
-            "fn": validation["fn"], "tn": validation["tn"],
+            "tp": validation["tp"],
+            "fp": validation["fp"],
+            "fn": validation["fn"],
+            "tn": validation["tn"],
             "span_f1": validation["span_f1"],
             "answer_auc": validation["answer_auc"],
             "answer_threshold": threshold,
@@ -670,7 +671,7 @@ def _token_metrics_from_samples(
     for samples in samples_by_pair.values():
         values = risk_fn(samples)
         sequence = [0.0] * (max(sample.index for sample in samples) + 1)
-        for sample, value in zip(samples, values):
+        for sample, value in zip(samples, values, strict=False):
             sequence[sample.index] = value
         smoothed = _smooth(sequence, SMOOTH_WINDOW)
         threshold = span_threshold_for(smoothed, *span_params)
@@ -694,9 +695,7 @@ def _train_and_compare_head(
     train_rows, train_labels = _head_rows(train_samples, train_risks)
     test_rows, test_labels = _head_rows(test_samples, test_risks)
     train_scaled, means, scales = _standardize(train_rows)
-    test_scaled = [
-        [(row[j] - means[j]) / (scales[j] or 1.0) for j in range(len(row))] for row in test_rows
-    ]
+    test_scaled = [[(row[j] - means[j]) / (scales[j] or 1.0) for j in range(len(row))] for row in test_rows]
 
     fold_reports: list[dict[str, Any]] = []
     rng = random.Random(seed)
@@ -714,7 +713,9 @@ def _train_and_compare_head(
         if not train_idx or not test_idx:
             continue
         model = _train_logreg([train_scaled[i] for i in train_idx], [train_labels[i] for i in train_idx])
-        for index, probability in zip(test_idx, _head_probabilities(model, [train_scaled[i] for i in test_idx])):
+        for index, probability in zip(
+            test_idx, _head_probabilities(model, [train_scaled[i] for i in test_idx]), strict=False
+        ):
             out_of_fold[index] = probability
         fold_reports.append(
             {

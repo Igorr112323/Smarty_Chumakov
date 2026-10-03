@@ -154,9 +154,7 @@ def test_detector_loads_calibrator_from_bundle(monkeypatch, tmp_path):
     bundle = tmp_path / "bundle"
     (bundle / "config").mkdir(parents=True)
     calibrator = IsotonicCalibrator.fit([0.1, 0.5, 0.9], [0, 0, 1])
-    (bundle / "config" / "calibration.json").write_text(
-        json.dumps(calibrator.to_dict()), encoding="utf-8"
-    )
+    (bundle / "config" / "calibration.json").write_text(json.dumps(calibrator.to_dict()), encoding="utf-8")
     monkeypatch.setattr(_sys, "_MEIPASS", str(bundle), raising=False)
     monkeypatch.setattr(_sys, "frozen", True, raising=False)
     monkeypatch.chdir(tmp_path)

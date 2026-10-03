@@ -23,16 +23,20 @@
 
 from __future__ import annotations
 
+from collections.abc import Sequence
 from dataclasses import dataclass, field
-from typing import Any, Sequence
+from typing import Any
 
 from .core import Token, number_value, numbers_in, split_chunks
 from .lexicon import BOILERPLATE_WORDS, PARAPHRASE_WORDS, STOPWORDS, find_phrase_hits
-from .vectors import cosine, hash_index, normalize
+from .vectors import hash_index, normalize
 
 FEATURE_NAMES = ("attention_entropy", "ctx_attention_mass", "embedding_density")
 SCORED_MIN_LEN = 3
-DEFAULT_WEIGHTS = {"attention_entropy": 0.4, "ctx_attention_mass": 0.4, "embedding_density": 0.2}
+# Значения по умолчанию — не «на глаз»: это режим, к которому сходится перебор
+# весов на демонстрационном корпусе (масса опоры на контекст несёт основную
+# нагрузку). Обучение на своих данных заменяет их (``spanverify train``).
+DEFAULT_WEIGHTS = {"attention_entropy": 0.1, "ctx_attention_mass": 0.8, "embedding_density": 0.1}
 DEMO_WARNING = (
     "ДЕМО-РЕЖИМ: признаки считаются лексическими суррогатами без весов языковой модели. "
     "Он проверяет работоспособность конвейера и интерфейса, а не достоверность ответа. "
@@ -174,9 +178,7 @@ def demo_features(
         (token.word, _trigrams(token.word)) for token in context_tokens if _is_content(token)
     ]
 
-
     # --- признаки ---
-    lower_answer = [token.lower for token in tokens]
     phrase_hits = find_phrase_hits([token.text for token in tokens])
     seen: dict[str, int] = {}
     entropy: list[float] = []
@@ -219,9 +221,7 @@ def demo_features(
         #    не различает токены.
         grams = _trigrams(token.word) if content else frozenset()
         if grams and context_words:
-            similarities = sorted(
-                (_jaccard(grams, context_gram) for _, context_gram in context_words), reverse=True
-            )
+            similarities = sorted((_jaccard(grams, context_gram) for _, context_gram in context_words), reverse=True)
             top = similarities[: max(1, k)]
             density.append(min(1.0, max(0.0, sum(top) / len(top))))
         else:
@@ -283,9 +283,7 @@ def _support_overlap(word: str, context_words: Sequence[tuple[str, frozenset[str
     return best
 
 
-def _apply_number_consistency(
-    tokens: Sequence[Token], context_numbers: set[str], mass: list[float]
-) -> None:
+def _apply_number_consistency(tokens: Sequence[Token], context_numbers: set[str], mass: list[float]) -> None:
     """Число, противоречащее контексту, не может считаться поддержанным.
 
     Если в контексте есть числовые значения, но конкретное число ответа там
@@ -339,8 +337,8 @@ def hf_features(
     import torch  # noqa: PLC0415
     from transformers import AutoModelForCausalLM, AutoTokenizer  # noqa: PLC0415
 
-    from .core import tokenize_with_offsets  # noqa: PLC0415
     from .backends.base import BackendUnavailable  # noqa: PLC0415
+    from .core import tokenize_with_offsets  # noqa: PLC0415
 
     tokens = list(answer_tokens) if answer_tokens is not None else tokenize_with_offsets(answer)
     if not tokens:
@@ -353,9 +351,7 @@ def hf_features(
 
     try:
         tokenizer = AutoTokenizer.from_pretrained(model_name)
-        model = AutoModelForCausalLM.from_pretrained(
-            model_name, attn_implementation="eager", output_attentions=True
-        )
+        model = AutoModelForCausalLM.from_pretrained(model_name, attn_implementation="eager", output_attentions=True)
     except Exception as exc:  # pragma: no cover - зависит от окружения
         raise BackendUnavailable(
             f"не удалось загрузить модель {model_name}: {type(exc).__name__}: {exc}. "
@@ -375,12 +371,10 @@ def hf_features(
     hidden = outputs.hidden_states[-1][0] if outputs.hidden_states else None
 
     # Позиции токенов ответа (по смещениям быстрого токенизатора).
-    offsets = tokenizer(prompt, return_offsets_mapping=True, truncation=True,
-                        max_length=max_length)["offset_mapping"]
+    offsets = tokenizer(prompt, return_offsets_mapping=True, truncation=True, max_length=max_length)["offset_mapping"]
     seq_len = int(attention_mask.sum().item())
     answer_positions = [
-        i for i, (start, end) in enumerate(offsets.tolist())
-        if end > start and start >= answer_start and i < seq_len
+        i for i, (start, end) in enumerate(offsets.tolist()) if end > start and start >= answer_start and i < seq_len
     ]
     answer_start_token = min(answer_positions) if answer_positions else seq_len
     context_positions = [i for i in range(seq_len) if i < answer_start_token]
@@ -404,7 +398,7 @@ def hf_features(
         for position in context_positions:
             context_token_embeddings.append(hidden_cpu[position].tolist())
 
-    for local_index, token in enumerate(tokens):
+    for local_index, _token in enumerate(tokens):
         if local_index >= len(answer_positions):
             entropy_values.append(0.5)
             mass_values.append(0.0)
@@ -442,7 +436,7 @@ def hf_features(
 
 
 def _cosine_dense(a: Sequence[float], b: Sequence[float]) -> float:
-    numerator = sum(x * y for x, y in zip(a, b))
+    numerator = sum(x * y for x, y in zip(a, b, strict=False))
     norm_a = sum(x * x for x in a) ** 0.5
     norm_b = sum(y * y for y in b) ** 0.5
     if norm_a <= 0 or norm_b <= 0:
