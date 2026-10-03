@@ -21,6 +21,7 @@
 from __future__ import annotations
 
 import json
+import sys
 import time
 from collections.abc import Sequence
 from dataclasses import dataclass
@@ -28,7 +29,7 @@ from pathlib import Path
 from typing import Any
 
 from .calibration import IsotonicCalibrator
-from .config import Config, read_runtime_text
+from .config import Config, read_runtime_text, runtime_roots
 from .core import (
     ContextChunks,
     SpanResult,
@@ -134,19 +135,40 @@ class WeightsBundle:
     def load(cls, path: str | Path | None = WEIGHTS_FILENAME) -> WeightsBundle:
         """Загрузить обученные параметры; при отсутствии — значения по умолчанию.
 
-        Порядок поиска: файл рядом с приложением → копия внутри zipapp/.exe
-        (``config/weights.json`` внутри бандла) → значения по умолчанию.
+        Порядок поиска для относительного пути (он же путь по умолчанию):
+        содержимое бандла (``sys._MEIPASS`` у собранного ``.exe``) → папка рядом
+        с исполняемым файлом → текущая папка. Так ``.exe`` работает автономно
+        (веса внутри файла), но обученные параметры, положенные рядом с ним или
+        указанные явно, имеют приоритет. Абсолютный путь используется как есть.
         """
         if path is None:
             return cls(weights=dict(DEFAULT_WEIGHTS), threshold=0.5)
         target = Path(path)
-        if target.is_file():
-            with target.open("r", encoding="utf-8") as handle:
-                bundle = cls.from_dict(json.load(handle))
-            bundle.source = "disk"
-            return bundle
         if target.is_absolute():
+            if target.is_file():
+                with target.open("r", encoding="utf-8") as handle:
+                    bundle = cls.from_dict(json.load(handle))
+                bundle.source = "disk"
+                return bundle
             return cls(weights=dict(DEFAULT_WEIGHTS), threshold=0.5)
+        meipass = getattr(sys, "_MEIPASS", None)
+        if getattr(sys, "frozen", False):
+            # Собранное приложение: сначала параметры рядом с .exe (осознанное
+            # переобучение пользователем), затем встроенные в файл, затем
+            # текущая папка — она не должна перебивать содержимое бандла.
+            roots = [Path(sys.executable).resolve().parent]
+            if meipass:
+                roots.append(Path(meipass))
+            roots.append(Path.cwd())
+        else:
+            roots = runtime_roots()
+        for root in roots:
+            candidate = Path(root) / target
+            if candidate.is_file():
+                with candidate.open("r", encoding="utf-8") as handle:
+                    bundle = cls.from_dict(json.load(handle))
+                bundle.source = "embedded" if meipass and Path(root) == Path(meipass) else "disk"
+                return bundle
         embedded = read_runtime_text(str(target))
         if embedded:
             bundle = cls.from_dict(json.loads(embedded))

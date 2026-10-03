@@ -58,6 +58,7 @@ class TokenRow:
     text: str
     features: dict[str, float]
     label: int
+    role: str = "other"  # "fact" — токен числового значения, по нему идёт парный тест
 
 
 def auc(labels: list[int], scores: list[float]) -> float:
@@ -185,6 +186,12 @@ def collect_rows(pairs: list[dict], model_name: str, max_length: int) -> list[To
             )
             matrix_by_layer[layer] = {name: list(getattr(matrix, name)) for name in FEATURE_NAMES}
         label = int(pair["label"])
+        # Токен числового значения — единственное место, которое отличается в
+        # контрастной паре. Отдельная разметка нужна для парного анализа:
+        # агрегат по всем токенам размывает эффект одного числа.
+        fact_indices = {index for index in scored if tokens[index].word.isdigit()}
+        if not fact_indices:
+            fact_indices = set(scored[:1])
         for index in scored:
             for layer in LAYERS:
                 values = matrix_by_layer[layer]
@@ -195,10 +202,41 @@ def collect_rows(pairs: list[dict], model_name: str, max_length: int) -> list[To
                         text=tokens[index].text,
                         features={name: float(values[name][index]) for name in FEATURE_NAMES},
                         label=label,
+                        role="fact" if index in fact_indices else "other",
                     )
                 )
         print(f"  [{position}/{len(pairs)}] {pair['id']}: токенов {len(scored)}, метка {label}", flush=True)
     return rows
+
+
+def bootstrap_mean_ci(values: list[float], iterations: int = 5000, seed: int = 42) -> tuple[float, float]:
+    """95 % доверительный интервал для среднего парных разниц (бутстрэп по парам)."""
+    if len(values) < 2:
+        return (0.0, 0.0)
+    rng = random.Random(seed)
+    means = []
+    for _ in range(iterations):
+        sample = [values[rng.randrange(len(values))] for _ in range(len(values))]
+        means.append(statistics.fmean(sample))
+    means.sort()
+    low = means[int(0.025 * len(means))]
+    high = means[min(len(means) - 1, int(0.975 * len(means)))]
+    return (low, high)
+
+
+def paired_deltas(rows: list[TokenRow], feature: str) -> list[float]:
+    """Разницы «без опоры − с опорой» по парам для одного признака.
+
+    Пары сопоставлены: один и тот же документ, один и тот же шаблон ответа,
+    отличается только число. Поэтому сравнивать надо внутри пары, а не по
+    средним групп: так из сравнения уходит вся вариативность жанра.
+    """
+    by_pair: dict[str, dict[int, float]] = {}
+    for row in rows:
+        if row.role != "fact":
+            continue
+        by_pair.setdefault(row.pair_id.rsplit("-", 1)[0], {})[row.label] = row.features[feature]
+    return [values[1] - values[0] for values in by_pair.values() if 0 in values and 1 in values]
 
 
 def analyse(rows: list[TokenRow], iterations: int) -> dict:
@@ -219,12 +257,29 @@ def analyse(rows: list[TokenRow], iterations: int) -> dict:
             orient = -1.0 if name == "ctx_attention_mass" else 1.0
             oriented = [orient * score for score in scores]
             oriented_auc = auc(labels, oriented)
+            fact_rows = [row for row in layer_rows if row.role == "fact"]
+            fact_labels = [row.label for row in fact_rows]
+            fact_scores = [row.features[name] for row in fact_rows]
+            fact_auc = auc(fact_labels, fact_scores)
+            fact_low, fact_high = bootstrap_ci(fact_labels, fact_scores, iterations=iterations)
+            deltas = paired_deltas(layer_rows, name)
+            delta_mean = statistics.fmean(deltas) if deltas else 0.0
+            delta_low, delta_high = bootstrap_mean_ci(deltas, iterations=iterations)
             report[layer][name] = {
                 "auc": value,
                 "auc_oriented": oriented_auc,
                 "ci_low": low,
                 "ci_high": high,
                 "tokens": len(scores),
+                "auc_fact": fact_auc,
+                "auc_fact_oriented": orient * fact_auc if fact_auc is not None else None,
+                "ci_fact_low": fact_low,
+                "ci_fact_high": fact_high,
+                "fact_tokens": len(fact_scores),
+                "delta_mean": delta_mean,
+                "delta_ci_low": delta_low,
+                "delta_ci_high": delta_high,
+                "delta_significant": bool(delta_low * delta_high > 0),
             }
     return report
 
@@ -336,26 +391,87 @@ def render_markdown(payload: dict) -> str:
             )
             if values["auc_oriented"] > best[0]:
                 best = (values["auc_oriented"], layer, name)
+    lines += [
+        "",
+        "Агрегат по всем токенам размывает эффект одного числа, поэтому основной",
+        "анализ — парный, по токену значения:",
+        "",
+        "| Слой | Признак | AUC (токен значения) | 95 % ДИ | Δ «без опоры − с опорой» | 95 % ДИ Δ | Значимо |",
+        "| --- | --- | --- | --- | --- | --- | --- |",
+    ]
+    significant: list[tuple[str, str, float, float, float]] = []
+    for layer, features in payload["auc"].items():
+        for name, values in features.items():
+            delta_significant = bool(values.get("delta_significant"))
+            marker = "да" if delta_significant else "нет"
+            lines.append(
+                f"| {layer} | {name} | {values['auc_fact']:.3f} | "
+                f"[{values['ci_fact_low']:.3f}; {values['ci_fact_high']:.3f}] | "
+                f"{values['delta_mean']:+.4f} | "
+                f"[{values['delta_ci_low']:+.4f}; {values['delta_ci_high']:+.4f}] | {marker} |"
+            )
+            if delta_significant:
+                significant.append((layer, name, values["delta_mean"], values["delta_ci_low"], values["delta_ci_high"]))
+
     entropy_last = payload["auc"].get("last", {}).get("attention_entropy", {}).get("auc_oriented")
     mass_last = payload["auc"].get("last", {}).get("ctx_attention_mass", {}).get("auc_oriented")
     density_last = payload["auc"].get("last", {}).get("embedding_density", {}).get("auc_oriented")
+    mass_fact = payload["auc"].get("last", {}).get("ctx_attention_mass", {}).get("auc_fact")
+    entropy_fact = payload["auc"].get("last", {}).get("attention_entropy", {}).get("auc_fact")
     lines += [
         "",
         "## Выводы",
         "",
-        f"* Лучший сигнал: `{best[2]}` на слое `{best[1]}` (AUC {best[0]:.3f}).",
+        f"* Лучший сигнал по всем токенам: `{best[2]}` на слое `{best[1]}` (AUC {best[0]:.3f}).",
         f"* Последний слой: энтропия внимания AUC {entropy_last:.3f}, масса на контекст AUC {mass_last:.3f}, "
         f"косинусная плотность (базовый уровень без внимания) AUC {density_last:.3f}.",
-        "* Случайное угадывание: 0.500 — все признаки выше, значит сигнал есть.",
     ]
-    if entropy_last is not None and mass_last is not None:
-        if mass_last > entropy_last:
-            lines.append("* Гипотеза подтверждена: масса внимания на контекст информативнее «сырой» энтропии внимания.")
+    if significant:
+        lines.append(
+            "* Парный анализ по токену значения: значимые изменения есть — "
+            + ", ".join(
+                f"`{name}` на слое `{layer}`: Δ {delta:+.4f} [{low:+.4f}; {high:+.4f}]"
+                for layer, name, delta, low, high in significant[:6]
+            )
+            + "."
+        )
+    else:
+        lines.append(
+            "* Парный анализ по токену значения: **ни один признак ни на одном слое не отличается значимо** "
+            "между подставленным и правильным числом. То есть на этой постановке сигнала нет."
+        )
+    lines.append(
+        "* Случайное угадывание — AUC 0.500; попадание нуля в доверительный интервал разницы означает, "
+        "что отличие неотличимо от шума при данном объёме."
+    )
+    if mass_fact is not None and entropy_fact is not None:
+        if mass_fact > entropy_fact + 0.05:
+            lines.append(
+                f"* Гипотеза о превосходстве массы внимания над энтропией **подтверждается** на токене значения: "
+                f"{mass_fact:.3f} против {entropy_fact:.3f}."
+            )
+        elif entropy_fact > mass_fact + 0.05:
+            lines.append(
+                f"* Гипотеза о превосходстве массы внимания над энтропией **не подтверждается**: "
+                f"энтропия внимания на токене значения даёт {entropy_fact:.3f} против {mass_fact:.3f} у массы. "
+                "Это честный результат пилота, его нужно учитывать при выборе признаков."
+            )
         else:
             lines.append(
-                "* Гипотеза НЕ подтверждена: «сырая» энтропия внимания оказалась не хуже массы на контекст. "
-                "Это честный результат пилота — его нужно учитывать при выборе признаков."
+                f"* Масса внимания ({mass_fact:.3f}) и энтропия ({entropy_fact:.3f}) на токене значения "
+                "различимы не лучше случайного угадывания — выбирать между ними по этому пилоту нельзя."
             )
+    lines += [
+        "",
+        "## Чего этот пилот не показывает",
+        "",
+        "* Пары синтетические и отличаются **одним числом**: это самый трудный случай, "
+        "и нулевой результат здесь означает «на таком контрасте признак не работает», "
+        "а не «признак бесполезен вообще».",
+        "* Выводы ограничены одной моделью, одним жанром и объёмом в десятки пар.",
+        "* Режим `demo` продукта к этому отчёту отношения не имеет: здесь считает реальная модель.",
+    ]
+    _ = (entropy_last, mass_last, density_last)
     if payload["contrast"]["contrast_ok"]:
         lines.append(
             "* Контраст групп выдержан: значение документа воспроизводится в "
@@ -369,9 +485,7 @@ def render_markdown(payload: dict) -> str:
         "## Ограничения",
         "",
         "* Пары синтетические: они сгенерированы по шаблонам, а не взяты из реальных документов.",
-        "* Объём малый (десятки пар), ДИ широкие.",
-        "* Модель одна и небольшая; другие модели могут вести себя иначе.",
-        "* Демо-режим продукта (`demo`) к этому отчёту отношения не имеет: здесь всё считается реальной моделью.",
+        "* Объём малый (десятки пар), доверительные интервалы широкие.",
     ]
     return "\n".join(lines) + "\n"
 
