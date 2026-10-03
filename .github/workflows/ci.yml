@@ -190,8 +190,8 @@ jobs:
               paired = ", ".join(
                   f"{name}: AUC={values.get('auc_fact'):.3f} "
                   f"[{values.get('ci_fact_low'):.3f}; {values.get('ci_fact_high'):.3f}] "
-                  f"delta={values.get('delta_mean'):+.4f} "
-                  f"[{values.get('delta_ci_low'):+.4f}; {values.get('delta_ci_high'):+.4f}] "
+                  f"delta={values.get('delta_mean'):+.6f} "
+                  f"[{values.get('delta_ci_low'):+.6f}; {values.get('delta_ci_high'):+.6f}] "
                   f"значимо={'да' if values.get('delta_significant') else 'нет'}"
                   for name, values in features.items()
               )
