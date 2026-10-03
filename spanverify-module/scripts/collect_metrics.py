@@ -19,10 +19,13 @@
 from __future__ import annotations
 
 import argparse
+import contextlib
 import hashlib
+import io
 import json
 import subprocess
 import sys
+import tempfile
 import time
 from pathlib import Path
 
@@ -31,6 +34,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 from spanverify import __version__  # noqa: E402
 from spanverify.dataset import read_pairs  # noqa: E402
 from spanverify.engine import Verifier  # noqa: E402
+from spanverify.features import number_attribution  # noqa: E402
 from spanverify.train import train  # noqa: E402
 
 DISCLAIMER = (
@@ -108,6 +112,69 @@ def _release_info(release_dir: Path) -> dict | None:
                 }
             )
     return {"dir": str(release_dir), "artifacts": artifacts} if artifacts else None
+
+
+def _attribution_block(pairs: list[dict], verifier: Verifier) -> dict:
+    """Правило привязки числа к объекту: кейсы дефекта D и ложные срабатывания.
+
+    Числа считаются тем же кодом, что обслуживает API (`number_attribution` и
+    `Verifier.verify`), поэтому попадают в документы, а не берутся из отчёта.
+    """
+    context_two = (
+        "Согласно регламенту, срок хранения первичных документов составляет пять лет. "
+        "Срок хранения вторичных документов составляет десять лет."
+    )
+    borrowed = verifier.verify("Срок хранения первичных документов составляет десять лет.", context_two)
+    own = verifier.verify("Срок хранения первичных документов составляет пять лет.", context_two)
+    clean = [pair for pair in pairs if not any(int(label[2]) == 1 for label in pair.get("labels", []))]
+    flagged_clean = [pair["id"] for pair in clean if number_attribution(pair["answer"], pair["context"])]
+    return {
+        "borrowed_number_verdict": borrowed.verdict,
+        "borrowed_number_spans": [span.text for span in borrowed.spans],
+        "own_number_verdict": own.verdict,
+        "clean_pairs": len(clean),
+        "false_positives": len(flagged_clean),
+        "false_positive_ids": flagged_clean[:10],
+        "rule": (
+            "число ответа сверяется с измерениями того же объекта документа; "
+            "если оно взято у другого объекта — фрагмент doubtful независимо от головы"
+        ),
+    }
+
+
+def _dataset_validation_block() -> dict:
+    """Проверка схемы корпуса (дефект E): чужие форматы отвергаются с кодом 2."""
+    from spanverify.cli import EXIT_ERROR, main
+    from spanverify.dataset import DatasetFormatError
+
+    checks: dict[str, object] = {}
+    samples = {
+        "foreign": '{"id":"x","question":"тест","answer":"тест","label":1}',
+        "empty": "",
+        "broken_json": '{"id":"x", ',
+    }
+    with tempfile.TemporaryDirectory() as tmp:
+        for name, content in samples.items():
+            path = Path(tmp) / f"{name}.jsonl"
+            path.write_text(content + "\n", encoding="utf-8")
+            try:
+                list(read_pairs(path))
+                checks[name] = {"rejected": False, "returncode": None}
+            except DatasetFormatError:
+                checks[name] = {"rejected": True, "returncode": EXIT_ERROR}
+    valid = Path(tempfile.mkdtemp()) / "valid.jsonl"
+    valid.write_text(
+        '{"id":"p","context":"Регламент: срок 10 лет.","answer":"Срок 10 лет.","labels":[[6,8,1]]}\n',
+        encoding="utf-8",
+    )
+    # Вывод команды глушим: он нужен как код возврата, а не как шум в консоли.
+    with contextlib.redirect_stdout(io.StringIO()):
+        checks["valid"] = {"rejected": False, "returncode": main(["evaluate", "--dataset", str(valid)])}
+    return {
+        "schema_required": ["context", "answer"],
+        "schema_optional": ["id", "labels", "meta"],
+        "checks": checks,
+    }
 
 
 def _metrics_tree(metrics: dict) -> dict:
@@ -206,6 +273,10 @@ def collect(dataset: str, seed: int, release_dir: Path, coverage_json: Path) -> 
                     "Регламент: срок хранения первичных документов составляет 10 лет.",
                 ).verdict,
             },
+        },
+        "defects": {
+            "number_attribution": _attribution_block(pairs, verifier),
+            "dataset_validation": _dataset_validation_block(),
         },
         "cross_corpus": None,
         "pilot": None,

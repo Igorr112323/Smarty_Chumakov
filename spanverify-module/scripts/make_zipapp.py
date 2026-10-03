@@ -41,7 +41,10 @@ def build(out_dir: Path, name: str = "spanverify.pyz") -> Path:
                 )
             else:
                 shutil.copy2(source, stage / item)
-        zipapp.create_archive(stage, target, interpreter="/usr/bin/env python3", main="spanverify.cli:main")
+        # Точка входа — ``cli:run``: она поднимает SystemExit с кодом команды.
+        # С ``cli:main`` zipapp печатал результат, но всегда возвращал код 0,
+        # то есть контракт «0 / 1 / 2» на релизном .pyz не соблюдался.
+        zipapp.create_archive(stage, target, interpreter="/usr/bin/env python3", main="spanverify.cli:run")
 
     target.chmod(0o755)
     return target

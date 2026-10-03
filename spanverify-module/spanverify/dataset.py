@@ -34,7 +34,9 @@ __all__ = [
     "make_pair",
     "generate_pairs",
     "write_pairs",
+    "DatasetFormatError",
     "read_pairs",
+    "validate_pair",
     "corpus_statistics",
     "DATASET_VERSION",
 ]
@@ -314,12 +316,111 @@ def write_pairs(pairs: list[Pair], path: str | Path) -> Path:
     return target
 
 
+REQUIRED_PAIR_FIELDS = ("context", "answer")
+ALLOWED_PAIR_FIELDS = ("id", "context", "answer", "labels", "meta")
+PAIR_EXAMPLE = (
+    '{"id": "p1", "context": "текст документа-источника", "answer": "текст ответа", '
+    '"labels": [[12, 27, 1]], "meta": {"kind": "faithful"}}'
+)
+
+
+class DatasetFormatError(ValueError):
+    """Корпус не соответствует схеме пар «контекст — ответ».
+
+    Ошибка схемы — это не «плохие метрики», а невозможность считать метрики
+    вообще: раньше чужой формат принимался молча, и ``evaluate`` печатал
+    ``F1 0.000, AUC=nan`` с кодом возврата 0 (дефект E / N1).
+    """
+
+
+def _schema_problem(path: Path, line_number: int, reasons: list[str]) -> DatasetFormatError:
+    """Собрать понятное сообщение об ошибке схемы с примером корректной строки."""
+    where = f"{path}: строка {line_number}"
+    lines = [f"{where}: корпус не соответствует формату «контекст — ответ»."]
+    lines.extend(f"  - {reason}" for reason in reasons)
+    lines.append(f"  ожидалось: {', '.join(REQUIRED_PAIR_FIELDS)}; допустимы также {', '.join(ALLOWED_PAIR_FIELDS)}")
+    lines.append(f"  пример корректной строки: {PAIR_EXAMPLE}")
+    return DatasetFormatError("\n".join(lines))
+
+
+def validate_pair(data: object, *, path: str | Path, line_number: int) -> dict:
+    """Проверить одну пару корпуса и вернуть её как словарь.
+
+    Проверяются: тип записи (объект), обязательные ключи ``context``/``answer``
+    (непустые строки), отсутствие неизвестных ключей, ``labels`` — список троек
+    ``[start, end, label]`` в границах ответа, ``meta`` — объект, ``id`` — строка.
+    """
+    target = Path(path)
+    if not isinstance(data, dict):
+        raise _schema_problem(target, line_number, [f"ожидался объект JSON, найдено: {type(data).__name__}"])
+    reasons: list[str] = []
+    missing = [name for name in REQUIRED_PAIR_FIELDS if name not in data]
+    if missing:
+        reasons.append(f"отсутствуют обязательные поля: {', '.join(missing)}")
+    unknown = [name for name in data if name not in ALLOWED_PAIR_FIELDS]
+    if unknown:
+        reasons.append(f"неизвестные поля: {', '.join(sorted(unknown))}")
+    for name in REQUIRED_PAIR_FIELDS:
+        if name in data and not isinstance(data[name], str):
+            reasons.append(f"поле {name} должно быть строкой, найдено: {type(data[name]).__name__}")
+    answer = data.get("answer") if isinstance(data.get("answer"), str) else ""
+    if "labels" in data:
+        labels = data["labels"]
+        if not isinstance(labels, list):
+            reasons.append("labels должен быть списком троек [start, end, label]")
+        else:
+            for position, label in enumerate(labels, start=1):
+                if not isinstance(label, list | tuple) or len(label) != 3:
+                    reasons.append(f"метка №{position} должна быть тройкой [start, end, label]: {label!r}")
+                    continue
+                start, end, flag = label
+                if not all(isinstance(value, int) for value in (start, end, flag)):
+                    reasons.append(f"метка №{position}: значения должны быть целыми: {label!r}")
+                    continue
+                if flag not in (0, 1):
+                    reasons.append(f"метка №{position}: недопустимая метка {flag} (допустимо 0 или 1)")
+                if not 0 <= start <= end <= len(answer):
+                    reasons.append(
+                        f"метка №{position} выходит за границы ответа: [{start}, {end}] "
+                        f"при длине ответа {len(answer)}"
+                    )
+    if "meta" in data and not isinstance(data["meta"], dict):
+        reasons.append("meta должен быть объектом")
+    if "id" in data and not isinstance(data["id"], str):
+        reasons.append("id должен быть строкой")
+    if reasons:
+        raise _schema_problem(target, line_number, reasons)
+    return dict(data)
+
+
 def read_pairs(path: str | Path) -> Iterator[dict]:
-    with Path(path).open("r", encoding="utf-8") as handle:
-        for line in handle:
-            line = line.strip()
-            if line:
-                yield json.loads(line)
+    """Читать корпус JSONL со проверкой схемы (см. :class:`DatasetFormatError`).
+
+    Формат: одна пара на строку, обязательны ``context`` и ``answer``,
+    ``labels`` — смещения в символах ответа. Чужой формат (например, исторический
+    ``text``/``label``) отвергается с указанием строки и примера.
+    """
+    target = Path(path)
+    total = 0
+    with target.open("r", encoding="utf-8") as handle:
+        for line_number, line in enumerate(handle, start=1):
+            if not line.strip():
+                continue
+            total += 1
+            try:
+                data = json.loads(line)
+            except json.JSONDecodeError as error:
+                raise _schema_problem(
+                    target,
+                    line_number,
+                    [f"строка не является корректным JSON: {error.msg} (позиция {error.colno})"],
+                ) from error
+            yield validate_pair(data, path=target, line_number=line_number)
+    if total == 0:
+        raise DatasetFormatError(
+            f"{target}: файл пуст — метрики считать не на чем.\n"
+            f"  ожидалось: по одной паре на строку; пример: {PAIR_EXAMPLE}"
+        )
 
 
 def corpus_statistics(pairs: list[Pair] | list[dict]) -> dict:

@@ -31,6 +31,7 @@ from . import __version__
 from .core import configure_stdio
 from .dataset import (
     DATASET_VERSION,
+    DatasetFormatError,
     corpus_statistics,
     generate_pairs,
     read_pairs,
@@ -42,6 +43,29 @@ from .server import DEFAULT_PORT, serve
 EXIT_OK = 0
 EXIT_ISSUES = 1
 EXIT_ERROR = 2
+
+
+def json_safe(value: Any) -> Any:
+    """Заменить нечисловые float (nan/inf) на ``null``.
+
+    По RFC 8259 ``NaN`` и ``Infinity`` не являются допустимыми значениями JSON:
+    строгие парсеры на них падают. Метрики без положительных примеров дают
+    ``AUC = nan`` — в выводе это должно быть ``null``, а не ``NaN``.
+    """
+    if isinstance(value, float):
+        return value if value == value and value not in (float("inf"), float("-inf")) else None
+    if isinstance(value, dict):
+        return {key: json_safe(item) for key, item in value.items()}
+    if isinstance(value, (list, tuple)):
+        return [json_safe(item) for item in value]
+    return value
+
+
+def _print_json(payload: Any) -> None:
+    """Напечатать JSON без NaN (см. :func:`json_safe`)."""
+    print(json.dumps(json_safe(payload), ensure_ascii=False, indent=2, allow_nan=False))
+
+
 DEFAULT_DATASET = "data/demo_pairs.jsonl"
 BACKENDS = ("demo", "surrogate", "stub", "hf")
 
@@ -59,7 +83,7 @@ def _print_result(result: Any, as_json: bool, tokens: bool) -> int:
     """Напечатать результат проверки; вернуть код возврата."""
     payload = result.to_dict()
     if as_json:
-        print(json.dumps(payload, ensure_ascii=False, indent=2))
+        _print_json(payload)
     else:
         verdicts = {
             "grounded": "ОПОРА НА КОНТЕКСТ ЕСТЬ",
@@ -161,7 +185,7 @@ def cmd_train(args: argparse.Namespace) -> int:
     written = save_training_artifacts(report, args.out, root=Path(args.out).parent.parent or ".")
     print("Записано: " + ", ".join(f"{name}={path}" for name, path in written.items()))
     if args.json:
-        print(json.dumps({"validation": report.validation, "folds": report.folds}, ensure_ascii=False, indent=2))
+        _print_json({"validation": report.validation, "folds": report.folds})
     return EXIT_OK
 
 
@@ -201,7 +225,7 @@ def cmd_evaluate(args: argparse.Namespace) -> int:
     verifier = Verifier(mode=_mode(args), weights_path=args.weights)
     metrics = verifier.evaluate(records)
     if args.json:
-        print(json.dumps(metrics, ensure_ascii=False, indent=2))
+        _print_json(metrics)
         return EXIT_OK
     tokens = metrics["tokens"]
     spans = metrics["spans"]
@@ -336,7 +360,7 @@ def cmd_config(args: argparse.Namespace) -> int:
         "weights_path": str(args.weights),
         "model_name": verifier.model_name,
     }
-    print(json.dumps(payload, ensure_ascii=False, indent=2))
+    _print_json(payload)
     return EXIT_OK
 
 
@@ -503,6 +527,10 @@ def main(argv: Sequence[str] | None = None) -> int:
         return EXIT_ERROR
     except KeyboardInterrupt:
         print("\nпрервано пользователем", file=sys.stderr)
+        return EXIT_ERROR
+    except DatasetFormatError as error:
+        # Схема корпуса: сообщение уже содержит строку, причины и пример.
+        print(f"ошибка: {error}", file=sys.stderr)
         return EXIT_ERROR
     except Exception as error:  # noqa: BLE001 - CLI обязан вернуть код, а не трассировку
         print(f"ошибка выполнения: {type(error).__name__}: {error}", file=sys.stderr)

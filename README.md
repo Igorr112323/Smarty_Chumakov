@@ -4,8 +4,8 @@
 [![build-and-release-exe](https://github.com/Igorr112323/Smarty_Chumakov/actions/workflows/build-and-release-exe.yml/badge.svg)](https://github.com/Igorr112323/Smarty_Chumakov/actions/workflows/build-and-release-exe.yml)
 [![release](https://img.shields.io/github/v/release/Igorr112323/Smarty_Chumakov)](https://github.com/Igorr112323/Smarty_Chumakov/releases/latest)
 [![python](https://img.shields.io/badge/python-3.10%20%7C%203.11%20%7C%203.12-blue)](spanverify-module/pyproject.toml)
-[![tests](https://img.shields.io/badge/tests-234%20passed-brightgreen)](spanverify-module/tests)
-[![coverage](https://img.shields.io/badge/coverage-86%25-brightgreen)](spanverify-module/pyproject.toml)
+[![tests](https://img.shields.io/badge/tests-252%20passed-brightgreen)](spanverify-module/tests)
+[![coverage](https://img.shields.io/badge/coverage-87%25-brightgreen)](spanverify-module/pyproject.toml)
 
 Программа берёт **документ-источник** и **ответ** (языковой модели или
 сотрудника) и показывает, какие места ответа документ не подтверждает: подмену
@@ -36,7 +36,7 @@ python -m spanverify train --dataset data/demo_pairs.jsonl --out config/weights.
 python -m spanverify evaluate --dataset data/demo_pairs.jsonl   # метрики и критерий качества
 python -m spanverify selftest                                   # само-проверка конвейера
 python -m spanverify server --port 8765                         # API + веб-интерфейс
-python -m pytest -q                                             # 234 тестов
+python -m pytest -q                                             # 252 тестов
 ```
 
 Коды возврата `verify`: `0` — ответ подтверждён, `1` — найдены спорные
@@ -80,6 +80,14 @@ curl -X POST http://localhost:8765/v1/verify -H "Content-Type: application/json"
   [`docs/ОТЧЁТ_о_НИР_шаблон.md`](docs/ОТЧЁТ_о_НИР_шаблон.md), раздел 7.2.
 * Порог решения никогда не подбирается по тестовой части; при недостижении
   критерия дорабатываются признаки, а не порог.
+* **Число привязывается к своему объекту** (исправление D, релиз 1.2.1): если ответ
+  берёт число из другого факта того же документа («первичные — пять лет»,
+  «вторичные — десять лет», ответ про первичные говорит «десять»), фрагмент
+  помечается `doubtful`. Правило текстовое и работает поверх обученной головы;
+  на чистых парах демо-корпуса ложных срабатываний 0 из 116.
+* **Чужой формат датасета отвергается** (исправление E): `evaluate` проверяет схему
+  до расчёта метрик и возвращает код 2 с указанием строки, причин и примера
+  корректной записи, вместо `F1 0.000 / AUC=nan` с кодом 0.
 
 ## Честно о режимах
 

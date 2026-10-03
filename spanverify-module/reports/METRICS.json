@@ -7,16 +7,16 @@
     "coverage": "python -m pytest --cov=spanverify --cov-fail-under=85"
   },
   "meta": {
-    "version": "1.2.0",
-    "commit": "6874e1497b32c56f9d033c15efc63a174ab34b26",
-    "generated_at": "2026-10-03T11:33:43Z",
+    "version": "1.2.1",
+    "commit": "c68ebd3b2feb7e926f9cb7d09c7a5a3547cc1c22",
+    "generated_at": "2026-10-03T15:01:48Z",
     "seed": 42,
     "dataset": "data/demo_pairs.jsonl"
   },
   "disclaimer": "Демонстрационные метрики получены на синтетическом корпусе и научным результатом не являются. Для подтверждения требуются 1200 пар «вопрос–ответ» с экспертной разметкой на реальных регламентах организации.",
   "tests": {
-    "collected": 234,
-    "coverage_percent": 86.09,
+    "collected": 252,
+    "coverage_percent": 86.89,
     "coverage_gate_percent": 85
   },
   "demo": {
@@ -111,6 +111,48 @@
       "verdict": "likely_hallucination"
     }
   },
+  "defects": {
+    "number_attribution": {
+      "borrowed_number_verdict": "doubtful",
+      "borrowed_number_spans": [
+        "Срок хранения первичных документов составляет десять лет."
+      ],
+      "own_number_verdict": "grounded",
+      "clean_pairs": 116,
+      "false_positives": 0,
+      "false_positive_ids": [],
+      "rule": "число ответа сверяется с измерениями того же объекта документа; если оно взято у другого объекта — фрагмент doubtful независимо от головы"
+    },
+    "dataset_validation": {
+      "schema_required": [
+        "context",
+        "answer"
+      ],
+      "schema_optional": [
+        "id",
+        "labels",
+        "meta"
+      ],
+      "checks": {
+        "foreign": {
+          "rejected": true,
+          "returncode": 2
+        },
+        "empty": {
+          "rejected": true,
+          "returncode": 2
+        },
+        "broken_json": {
+          "rejected": true,
+          "returncode": 2
+        },
+        "valid": {
+          "rejected": false,
+          "returncode": 0
+        }
+      }
+    }
+  },
   "cross_corpus": {
     "in_corpus_f1": 0.9532,
     "cross_corpus_f1": 0.7306,
@@ -128,10 +170,10 @@
     "artifacts": [
       {
         "name": "spanverify.pyz",
-        "size_bytes": 1289707,
-        "sha256": "1873c4cef9b5171e6fc3199233ce0fa46ae785eebe74244d8afaa156d8369cb4"
+        "size_bytes": 1354245,
+        "sha256": "5ebf16561b9b6494cd0a1a2ecdb1ba7913cafb54915ca3cff8614bbfe8021716"
       }
     ]
   },
-  "duration_s": 33.9
+  "duration_s": 27.8
 }

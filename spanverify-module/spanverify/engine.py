@@ -49,6 +49,7 @@ from .features import (
     combine,
     extract_features,
     is_scored_token,
+    number_attribution,
 )
 from .participation import PARTICIPATION_FILENAME, ParticipationModel
 
@@ -289,17 +290,20 @@ class Verifier:
         scored = [smoothed[i] for i in scored_indices] or [0.0]
         span_threshold = span_threshold_for(scored, self.bundle.span_z, self.bundle.span_floor, self.bundle.span_cap)
         spans = self._build_spans(answer, tokens, smoothed, span_threshold)
+        # Правило привязки числа к объекту (дефект D): текстовое, поверх маски.
+        spans = _merge_spans([*spans, *self._attribution_spans(answer, context_text, tokens, smoothed, span_threshold)])
 
         raw_score = _answer_score(scored)
         score = self._calibrate(raw_score)
         threshold = self.bundle.threshold
-        ai_share_soft, ai_share_hard = self._shares(tokens, smoothed, scored_indices)
+        ai_share_soft, ai_share_hard = self._shares(tokens, smoothed, scored_indices, spans)
         ai_participation = self.participation.estimate(answer, features) if self.participation is not None else 0.0
 
         tokens_payload = _token_payload(tokens, features, smoothed, span_threshold)
         stats = {
             "token_count": len(tokens),
             "scored_tokens": len(scored_indices),
+            "number_attribution": number_attribution(answer, context_text) if context_text else [],
             "mean_risk": round(mean(scored), 4),
             "p90_risk": round(_percentile(scored, 90), 4),
             "raw_score": round(raw_score, 4),
@@ -426,6 +430,7 @@ class Verifier:
         tokens: Sequence[Token],
         smoothed: Sequence[float],
         scored_indices: Sequence[int],
+        spans: Sequence[SpanResult] = (),
     ) -> tuple[float, float]:
         """Доли «недостоверного» текста в ответе (поля ai_share/ai_share_hard).
 
@@ -446,10 +451,60 @@ class Verifier:
             self.bundle.span_floor,
             self.bundle.span_cap,
         )
-        probabilities = [self._calibrate(smoothed[index]) for index in scored_indices]
+        # Токены, попавшие в отчётные фрагменты (в том числе по правилу привязки
+        # числа к объекту), считаются помеченными: иначе ответ с найденным
+        # фрагментом сообщал бы «доля спорного текста 0.000».
+        in_span = {
+            index for index in scored_indices if any(span.start <= tokens[index].start < span.end for span in spans)
+        }
+        probabilities = [1.0 if index in in_span else self._calibrate(smoothed[index]) for index in scored_indices]
         soft = sum(probabilities) / len(probabilities)
-        hard = sum(1 for index in scored_indices if smoothed[index] >= mask_threshold) / len(scored_indices)
+        hard_numerator = sum(1 for index in scored_indices if index in in_span or smoothed[index] >= mask_threshold)
+        hard = hard_numerator / len(scored_indices)
         return min(1.0, max(0.0, soft)), min(1.0, max(0.0, hard))
+
+    def _attribution_spans(
+        self,
+        answer: str,
+        context: str | None,
+        tokens: Sequence[Token],
+        risk: Sequence[float],
+        threshold: float,
+    ) -> list[SpanResult]:
+        """Фрагменты по правилу привязки числа к объекту (дефект D).
+
+        Правило текстовое, а не статистическое: если число ответа совпадает с
+        числом **другого** объекта документа, оно не подтверждено — независимо от
+        того, как его оценили признаки и обученная голова. Поэтому фрагмент
+        добавляется поверх обычной маски.
+        """
+        if not context:
+            return []
+        allowed = {id(token) for token in tokens}
+        found: list[SpanResult] = []
+        for item in number_attribution(answer, context):
+            start, end = int(item["start"]), int(item["end"])
+            token_risk = [
+                risk[index]
+                for index, token in enumerate(tokens)
+                if id(token) in allowed and token.start >= start and token.end <= end
+            ]
+            risk_value = max([*token_risk, threshold])
+            span_start, span_end = _expand_to_sentence(answer, start, end)
+            fragment = answer[span_start:span_end]
+            if not fragment.strip():
+                continue
+            found.append(
+                SpanResult(
+                    start=span_start,
+                    end=span_end,
+                    text=fragment,
+                    risk=risk_value,
+                    label="likely_hallucination" if risk_value >= HALLUCINATION_LABEL_RISK else "doubtful",
+                    n_tokens=len(token_risk),
+                )
+            )
+        return found
 
     def _build_spans(
         self,

@@ -33,6 +33,8 @@ from .lexicon import BOILERPLATE_WORDS, PARAPHRASE_WORDS, STOPWORDS, find_phrase
 from .vectors import hash_index, normalize
 
 FEATURE_NAMES = ("attention_entropy", "ctx_attention_mass", "embedding_density")
+MEASUREMENT_SUBJECT_WINDOW = 6  # сколько слов перед числом считаем его субъектом
+MEASUREMENT_MATCH_MIN = 0.5  # порог совпадения субъекта ответа с измерением контекста
 SCORED_MIN_LEN = 3
 # Значения по умолчанию — не «на глаз»: это режим, к которому сходится перебор
 # весов на демонстрационном корпусе (масса опоры на контекст несёт основную
@@ -41,7 +43,9 @@ DEFAULT_WEIGHTS = {"attention_entropy": 0.1, "ctx_attention_mass": 0.8, "embeddi
 DEMO_WARNING = (
     "ДЕМО-РЕЖИМ: признаки считаются лексическими суррогатами без весов языковой модели. "
     "Он проверяет работоспособность конвейера и интерфейса, а не достоверность ответа. "
-    "Научные выводы возможны только в режиме 'hf'."
+    "Подмена числа ловится, если число есть у другого объекта документа (например, "
+    "«первичные — пять лет» против «вторичные — десять лет»); перефразирования и "
+    "таблицы требуют режима 'hf'. Научные выводы возможны только в режиме 'hf'."
 )
 
 _CONTENT_MIN_LEN = 3
@@ -229,6 +233,8 @@ def demo_features(
             density.append(0.0)
 
     _apply_number_consistency(tokens, context_numbers, mass)
+    # Дефект D: число проверяется внутри своего объекта, а не «где-то в контексте».
+    _apply_number_attribution(tokens, answer, chunks.text, mass)
 
     return FeatureMatrix(
         attention_entropy=entropy,
@@ -282,6 +288,311 @@ def _support_overlap(word: str, context_words: Sequence[tuple[str, frozenset[str
             grams = _trigrams(word)
         best = max(best, 0.7 * _jaccard(grams, context_grams))
     return best
+
+
+# Слова-«реквизиты документа»: число сразу после них — это номер документа
+# («регламенту 669», «приказ 45»), а не измерение факта. Без этого правила номер
+# документа становился вторым «измерением» и давал ложные срабатывания.
+_DOCUMENT_NUMBER_STEMS = frozenset(
+    {
+        "регл",
+        "прик",
+        "пост",
+        "расп",
+        "зако",
+        "указ",
+        "инст",
+        "пись",
+        "коде",
+        "номе",
+        "форм",
+        "блан",
+        "пасп",
+        "прот",
+        "доку",
+        "№",
+    }
+)
+
+# Слова, которые не описывают объект измерения: связки, предлоги, глаголы-связки.
+_SUBJECT_SKIP_WORDS = frozenset(
+    {
+        "и",
+        "а",
+        "но",
+        "или",
+        "не",
+        "в",
+        "во",
+        "на",
+        "с",
+        "со",
+        "по",
+        "для",
+        "от",
+        "до",
+        "из",
+        "о",
+        "об",
+        "при",
+        "за",
+        "к",
+        "ко",
+        "у",
+        "это",
+        "был",
+        "была",
+        "было",
+        "быть",
+        "составляет",
+        "составляют",
+        "составляла",
+        "составлял",
+        "равен",
+        "равна",
+        "равно",
+        "равняться",
+        "установлен",
+        "установлена",
+        "установлено",
+        "установлены",
+        "определен",
+        "определена",
+        "определено",
+        "должен",
+        "должна",
+        "должно",
+        "может",
+        "могут",
+        "согласно",
+        "то",
+        "же",
+        "также",
+        "более",
+        "менее",
+        "только",
+        "уже",
+        "всего",
+    }
+)
+
+
+@dataclass(frozen=True)
+class Measurement:
+    """Измерение в контексте: числовое значение и слова его субъекта."""
+
+    value: str
+    subject: tuple[str, ...]
+    start: int
+    end: int
+
+    def as_dict(self) -> dict[str, Any]:
+        return {
+            "value": self.value,
+            "subject": list(self.subject),
+            "start": self.start,
+            "end": self.end,
+        }
+
+
+@dataclass(frozen=True)
+class NumberAttribution:
+    """Решение по числу ответа: чьё это число и подтверждено ли оно своим объектом."""
+
+    start: int
+    end: int
+    value: str
+    subject: tuple[str, ...]
+    matched_value: str | None
+    matched_subject: tuple[str, ...]
+    borrowed: bool
+
+    def as_dict(self) -> dict[str, Any]:
+        return {
+            "start": self.start,
+            "end": self.end,
+            "value": self.value,
+            "subject": list(self.subject),
+            "matched_value": self.matched_value,
+            "matched_subject": list(self.matched_subject),
+            "ok": not self.borrowed,
+        }
+
+
+def _subject_words(tokens: Sequence[Token], index: int) -> tuple[str, ...]:
+    """Слова-субъект перед числом: берём окно назад до границы предложения."""
+    window: list[str] = []
+    position = index - 1
+    while position >= 0 and len(window) < MEASUREMENT_SUBJECT_WINDOW:
+        token = tokens[position]
+        if token.text.strip() and token.text.strip()[-1] in ".!?…;:":
+            break
+        word = token.word.lower()
+        if word and word not in _SUBJECT_SKIP_WORDS and not word.isdigit():
+            window.append(word)
+        position -= 1
+    window.reverse()
+    return tuple(window)
+
+
+def _is_document_number(tokens: Sequence[Token], index: int) -> bool:
+    """Число, стоящее **вплотную** к слову-реквизиту («регламенту 669») — номер документа.
+
+    Важно именно соседство: в «срок хранения документов составляет пять лет» между
+    словом «документов» и числом стоит глагол, и это настоящее измерение факта.
+    """
+    if index <= 0:
+        return False
+    word = tokens[index - 1].word.lower()
+    return bool(word) and _stem(word) in _DOCUMENT_NUMBER_STEMS
+
+
+def _context_text(context: str | Sequence[str] | None) -> str:
+    """Привести контекст к строке: API и CLI принимают и список фрагментов."""
+    if not context:
+        return ""
+    if isinstance(context, str):
+        return context
+    return split_chunks(context).text
+
+
+def context_measurements(context: str | Sequence[str] | None) -> list[Measurement]:
+    """Найти измерения контекста: числа вместе со словами их объектов.
+
+    Пример: «срок хранения первичных документов составляет пять лет» → измерение
+    со значением ``5`` и субъектом ``("срок", "хранения", "первичных", "документов")``.
+    Нужны, чтобы отличать «это число есть в документе» от «это число стоит рядом
+    со своим объектом» (дефект D: подмена числа на число из другого факта).
+    """
+    from .core import tokenize_with_offsets
+
+    found: list[Measurement] = []
+    tokens = tokenize_with_offsets(_context_text(context))
+    for index, token in enumerate(tokens):
+        value = number_value(token)
+        if value is None:
+            continue
+        if _is_document_number(tokens, index):
+            continue
+        found.append(
+            Measurement(
+                value=value,
+                subject=_subject_words(tokens, index),
+                start=token.start,
+                end=token.end,
+            )
+        )
+    return found
+
+
+def _stems(words: Sequence[str]) -> set[str]:
+    """Основы слов для сравнения субъектов (переиспользует _stem)."""
+    return {_stem(word) for word in words if word}
+
+
+def _distinctive_measurements(measurements: Sequence[Measurement]) -> list[tuple[str, ...]]:
+    """Субъекты без слов, общих для всех измерений (общие слова не различают объекты).
+
+    Если после удаления общих слов не остаётся ничего, возвращаются полные субъекты.
+    """
+    if not measurements:
+        return []
+    stem_sets = [_stems(item.subject) for item in measurements]
+    common = set.intersection(*stem_sets) if all(stem_sets) else set()
+    distinctive: list[tuple[str, ...]] = []
+    for item in measurements:
+        filtered = tuple(word for word in item.subject if _stem(word) not in common)
+        distinctive.append(filtered or item.subject)
+    return distinctive
+
+
+def _distinctive_match(answer_subject: Sequence[str], distinctive: Sequence[str]) -> float:
+    """Доля различающих слов субъекта измерения, найденных в субъекте ответа.
+
+    Считается именно вхождение (containment), а не Jaccard: различающих слов мало
+    («первичных» против «вторичных»), и объединение множеств размывало бы сигнал.
+    """
+    distinctive_stems = _stems(distinctive)
+    if not distinctive_stems:
+        return 0.0
+    answer_stems = _stems(answer_subject)
+    return len(distinctive_stems & answer_stems) / len(distinctive_stems)
+
+
+def number_attribution(answer: str, context: str | Sequence[str] | None) -> list[dict[str, Any]]:
+    """Отчёт по каждому числу ответа: к какому объекту контекста оно относится.
+
+    Возвращает список словарей (см. :class:`NumberAttribution`). Пустой список
+    означает, что привязывать нечего: в ответе нет чисел или в контексте меньше
+    двух измерений.
+    """
+    from .core import tokenize_with_offsets
+
+    measurements = context_measurements(context)
+    tokens = tokenize_with_offsets(answer)
+    return [item.as_dict() for item in _attribute_tokens(tokens, measurements)]
+
+
+def _attribute_tokens(tokens: Sequence[Token], measurements: Sequence[Measurement]) -> list[NumberAttribution]:
+    """Для каждого числа ответа найти ближайший по смыслу субъект контекста."""
+    if len(measurements) < 2:
+        return []
+    distinctive = _distinctive_measurements(measurements)
+    results: list[NumberAttribution] = []
+    for index, token in enumerate(tokens):
+        value = number_value(token)
+        if value is None:
+            continue
+        subject = _subject_words(tokens, index)
+        if not subject:
+            # Слов-субъекта нет — привязывать не к чему, вслепую не обвиняем.
+            continue
+        best_index, best_score = -1, 0.0
+        for position, _item in enumerate(measurements):
+            score = _distinctive_match(subject, distinctive[position])
+            if score > best_score:
+                best_index, best_score = position, score
+        if best_index < 0 or best_score < MEASUREMENT_MATCH_MIN:
+            continue
+        matched = measurements[best_index]
+        if matched.value == value:
+            continue
+        borrowed = any(item.value == value for position, item in enumerate(measurements) if position != best_index)
+        if not borrowed:
+            continue
+        results.append(
+            NumberAttribution(
+                start=token.start,
+                end=token.end,
+                value=value,
+                subject=subject,
+                matched_value=matched.value,
+                matched_subject=matched.subject,
+                borrowed=True,
+            )
+        )
+    return results
+
+
+def _apply_number_attribution(
+    tokens: Sequence[Token], answer: str, context: str | Sequence[str] | None, mass: list[float]
+) -> None:
+    """Число, взятое из другого объекта документа, не может считаться подтверждённым.
+
+    Это закрытие дефекта D: раньше число получало опору уже за то, что встречается
+    где-то в контексте («пять лет» у первичных и «десять лет» у вторичных — ответ
+    про первичные со словом «десять» считался подтверждённым).
+    """
+    del answer  # токены ответа уже содержат смещения; текст нужен только вызывающему
+    if not context:
+        return
+    measurements = context_measurements(context)
+    if len(measurements) < 2:
+        return
+    for item in _attribute_tokens(tokens, measurements):
+        for index, token in enumerate(tokens):
+            if token.start == item.start and token.end == item.end:
+                mass[index] = 0.0
 
 
 def _apply_number_consistency(tokens: Sequence[Token], context_numbers: set[str], mass: list[float]) -> None:
