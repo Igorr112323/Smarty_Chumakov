@@ -372,6 +372,28 @@ jobs:
           # текстов с числами выполняет job «Единый файл чисел» (check_numbers.py).
           python scripts/make_external_report.py
 
+      - name: Закоммитить отчёт по baseline и внешним наборам
+        if: always()
+        working-directory: .
+        run: |
+          git config user.name "spanverify-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add -f spanverify-module/reports/baseline_from_article.json spanverify-module/reports/rus_hallu_eval.json spanverify-module/reports/external_tests.json spanverify-module/reports/EXTERNAL_TESTS.md spanverify-module/reports/ext_ragtruth_qa.json spanverify-module/reports/ext_rushallu.json || true
+          if git diff --cached --quiet; then
+            echo "нечего коммитить"
+            exit 0
+          fi
+          git commit -m "внешние наборы: baseline статьи и числа оценки [skip ci]"
+          for attempt in 1 2 3; do
+            if git pull --rebase --autostash -q origin "${GITHUB_REF_NAME}" && git push; then
+              echo "отчёты закоммичены (попытка $attempt)"
+              exit 0
+            fi
+            sleep 5
+          done
+          echo "::warning title=Внешние::не удалось закоммитить отчёты за 3 попытки"
+          exit 0
+
       - name: Артефакт отчётов по внешним наборам
         if: always()
         uses: actions/upload-artifact@v4
@@ -420,7 +442,12 @@ jobs:
       # загрузчик только сверяет хеши (проверено: 0 сетевых запросов в этом случае).
       - name: Источники корпуса A3 (robots.txt, пауза ≥1 с, UA с контактом)
         continue-on-error: true
-        run: python scripts/fetch_npa_corpus.py --out data/corpus_a3 --target-docs 130 --max-pages-per-type 15 --pause 1.5 --workers 4
+        run: |
+          # Параметры подобраны по факту: OCR — самая долгая часть (на 2 ядрах раннера
+          # ~2.5 с на страницу), поэтому распознаются первые страницы каждого акта;
+          # в манифесте у таких документов text_truncated=true. Прогресс пишется на диск
+          # по ходу, поэтому повторный запуск продолжает с места остановки.
+          python scripts/fetch_npa_corpus.py --out data/corpus_a3 --target-docs 130 --max-pages-per-type 8 --max-pages 6 --buffer 20 --pause 1.5 --workers 4
 
       - name: Собрать корпус A3 (пары на реальных фрагментах)
         id: build_a3

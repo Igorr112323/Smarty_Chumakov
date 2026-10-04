@@ -307,7 +307,7 @@ def ocr_available() -> dict[str, str | None]:
     return {name: shutil.which(name) for name in ("pdftoppm", "tesseract")}
 
 
-def ocr_pdf(path: Path, dpi: int = 200, max_pages: int = 40) -> dict:
+def ocr_pdf(path: Path, dpi: int = 200, max_pages: int = 20) -> dict:
     """OCR PDF: вернуть ``{text, pages, seconds, error}`` без интерпретаций.
 
     Текст собирается постранично (``pdftoppm -png`` → ``tesseract -l rus``), поэтому в
@@ -382,7 +382,7 @@ def pick_extraction(text_layer: dict, ocr: dict, min_chars_per_page: int = 120) 
     return "none"
 
 
-def extract_text(path: Path, dpi: int = 200, max_pages: int = 40) -> dict:
+def extract_text(path: Path, dpi: int = 200, max_pages: int = 20) -> dict:
     """Текст PDF: сначала текстовый слой, затем OCR. Возвращает факты, без догадок."""
     text_layer = pypdf_text(path)
     ocr = ocr_pdf(path, dpi=dpi, max_pages=max_pages)
@@ -531,6 +531,12 @@ def main() -> int:
         "--pause", type=float, default=PAUSE_SECONDS, help="пауза между запросами, секунд (не меньше 1)"
     )
     parser.add_argument("--workers", type=int, default=4, help="сколько распознаваний запускать параллельно")
+    parser.add_argument(
+        "--max-pages",
+        type=int,
+        default=20,
+        help="сколько первых страниц документа распознавать (длинные акты распознаются частично, признак — text_truncated)",
+    )
     parser.add_argument("--dpi", type=int, default=200)
     parser.add_argument("--buffer", type=int, default=40, help="сколько кандидатов взять сверх цели (на брак)")
     parser.add_argument("--force", action="store_true", help="скачивать, даже если документов уже достаточно")
@@ -598,6 +604,9 @@ def main() -> int:
     print(f"::notice title=A3 OCR::инструменты={tools}")
 
     rules = {"*": robots.get("publication.pravo.gov.ru", {}).get("rules", {}).get("*", [])}
+    # Промежуточный манифест: заполняется полностью в конце, но уже позволяет писать
+    # источники по мере распознавания.
+    manifest: dict = {"generated_at": started_at, "documents": {}}
     new_documents: list[dict] = []
     skipped: list[dict] = []
     with tempfile.TemporaryDirectory() as tmp:
@@ -631,7 +640,10 @@ def main() -> int:
                 print(f"::notice title=A3 скачивание::PDF скачано {len(downloaded)} (попыток {index})")
 
         with concurrent.futures.ThreadPoolExecutor(max_workers=max(1, args.workers)) as pool:
-            futures = {pool.submit(extract_text, Path(item["_pdf_path"]), args.dpi): item for item in downloaded}
+            futures = {
+                pool.submit(extract_text, Path(item["_pdf_path"]), args.dpi, args.max_pages): item
+                for item in downloaded
+            }
             for future in concurrent.futures.as_completed(futures):
                 item = futures[future]
                 extracted = future.result()
@@ -661,7 +673,10 @@ def main() -> int:
                     continue
                 new_documents.append(item)
                 if len(new_documents) % 10 == 0:
-                    print(f"текстов готово: {len(new_documents)} (фактов ≥ {args.min_facts})")
+                    # Пишем прогресс на диск: если прогон оборвётся (таймаут CI), уже
+                    # распознанные документы не придётся распознавать заново.
+                    write_sources(out_dir, sorted(existing + new_documents, key=lambda doc: doc["doc_id"]), manifest)
+                    print(f"текстов готово: {len(new_documents)} (фактов ≥ {args.min_facts}), записано на диск")
                     print(f"::notice title=A3 извлечение::текстов готово {len(new_documents)}")
 
     for item in new_documents + existing:
