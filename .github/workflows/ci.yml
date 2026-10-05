@@ -35,7 +35,10 @@ jobs:
   quality:
     name: Линтер, форматирование, покрытие
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    # В job'е не только линтер, но и прогон с покрытием, воспроизводимость
+    # обучения и чистая установка в отдельный venv: 20 минут не хватило
+    # (job снимался на 20-й минуте), сорок — с запасом.
+    timeout-minutes: 40
     defaults:
       run:
         working-directory: spanverify-module
