@@ -82,6 +82,7 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--folds", type=int, default=5)
     parser.add_argument("--target-fpr", type=float, default=0.1)
     parser.add_argument("--pairs", type=int, default=240, help="сгенерировать, если файла нет")
+    parser.add_argument("--model", default=None, help="модель для режима hf (имя или путь к папке с весами)")
     args = parser.parse_args(argv)
 
     dataset = Path(args.dataset)
@@ -95,7 +96,7 @@ def main(argv: list[str] | None = None) -> int:
         target_fpr=args.target_fpr,
         dataset_name=str(dataset),
     )
-    verifier = Verifier(mode=args.mode, weights=report.bundle)
+    verifier = Verifier(mode=args.mode, weights=report.bundle, model_name=args.model)
     metrics = verifier.evaluate(records)
     bundle = report.bundle
 

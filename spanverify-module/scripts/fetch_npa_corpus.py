@@ -463,6 +463,7 @@ def write_sources(out_dir: Path, documents: list[dict], manifest: dict) -> None:
         path = sources_dir / f"{document['doc_id']}.txt"
         path.write_text(document["text"] + "\n", encoding="utf-8")
         manifest["documents"][document["doc_id"]] = {key: value for key, value in document.items() if key != "text"}
+        manifest["documents"][document["doc_id"]]["available"] = True
         manifest["documents"][document["doc_id"]]["text_file"] = f"sources/{document['doc_id']}.txt"
         manifest["documents"][document["doc_id"]]["text_chars"] = len(document["text"])
         # Хеш считается по фактическим байтам файла (а не по строке), поэтому проверка
@@ -607,6 +608,18 @@ def main() -> int:
         default="23:15,77:6,50:5,78:5,61:5,26:5,16:5,66:5",
         help="квоты регионов в виде «код:сколько» (23 — Краснодарский край); пустая строка — без регионов",
     )
+    parser.add_argument(
+        "--pdf-cache",
+        type=Path,
+        default=None,
+        help="каталог кэша скачанных PDF (по умолчанию <out>/.cache/pdfs): повторный запуск не качает заново",
+    )
+    parser.add_argument(
+        "--time-budget",
+        type=int,
+        default=0,
+        help="бюджет времени на скачивание и распознавание, секунд (0 — без ограничения); при исчерпании прогресс сохраняется и работа завершается штатно",
+    )
     parser.add_argument("--force", action="store_true", help="скачивать, даже если документов уже достаточно")
     parser.add_argument("--verify", action="store_true", help="только проверить хеши уже скачанных источников")
     args = parser.parse_args()
@@ -674,6 +687,12 @@ def main() -> int:
         f"к скачиванию={len(planned)} по темам={scan_stats['by_theme']}"
     )
 
+    pdf_cache = Path(args.pdf_cache) if args.pdf_cache else out_dir / ".cache" / "pdfs"
+    pdf_cache.mkdir(parents=True, exist_ok=True)
+    print(f"кэш PDF: {pdf_cache}")
+    deadline = time.monotonic() + args.time_budget if args.time_budget else None
+    budget_exhausted = False
+
     tools = ocr_available()
     print(f"инструменты OCR: {tools}")
     print(f"::notice title=A3 OCR::инструменты={tools}")
@@ -684,8 +703,7 @@ def main() -> int:
     manifest: dict = {"generated_at": started_at, "documents": {}}
     new_documents: list[dict] = []
     skipped: list[dict] = []
-    with tempfile.TemporaryDirectory() as tmp:
-        tmp_dir = Path(tmp)
+    with tempfile.TemporaryDirectory():
         downloaded: list[dict] = []
         for index, candidate in enumerate(planned, start=1):
             pdf_url = f"http://publication.pravo.gov.ru/file/pdf?eoNumber={candidate['eo_number']}"
@@ -693,20 +711,34 @@ def main() -> int:
             if not is_allowed(pdf_url, rules):
                 skipped.append({"doc_id": candidate["doc_id"], "reason": "путь запрещён robots.txt"})
                 continue
-            fetched = fetch(pdf_url)
-            time.sleep(max(0.0, pause))
-            if fetched["status"] != 200 or fetched["raw"][:4] != b"%PDF":
-                skipped.append(
-                    {
-                        "doc_id": candidate["doc_id"],
-                        "reason": f"PDF не получен: {fetched['error'] or fetched['status']}",
-                    }
-                )
-                continue
-            path = tmp_dir / f"{candidate['doc_id']}.pdf"
-            path.write_bytes(fetched["raw"])
-            candidate["pdf_sha256"] = sha256_bytes(fetched["raw"])
-            candidate["pdf_bytes"] = len(fetched["raw"])
+            path = pdf_cache / f"{candidate['doc_id']}.pdf"
+            if path.is_file():
+                # Кэш: тот же документ уже скачивался (в этом или прошлом запуске).
+                raw = path.read_bytes()
+                candidate["pdf_from_cache"] = True
+            else:
+                if deadline is not None and time.monotonic() >= deadline:
+                    budget_exhausted = True
+                    print(
+                        f"::notice title=A3 бюджет::время вышло, обработано PDF {len(downloaded)}, "
+                        f"остальные будут в следующем запуске"
+                    )
+                    break
+                fetched = fetch(pdf_url)
+                time.sleep(max(0.0, pause))
+                if fetched["status"] != 200 or fetched["raw"][:4] != b"%PDF":
+                    skipped.append(
+                        {
+                            "doc_id": candidate["doc_id"],
+                            "reason": f"PDF не получен: {fetched['error'] or fetched['status']}",
+                        }
+                    )
+                    continue
+                raw = fetched["raw"]
+                path.write_bytes(raw)
+                candidate["pdf_from_cache"] = False
+            candidate["pdf_sha256"] = sha256_bytes(raw)
+            candidate["pdf_bytes"] = len(raw)
             candidate["downloaded_at"] = datetime.now(timezone.utc).isoformat()
             candidate["_pdf_path"] = str(path)
             downloaded.append(candidate)
@@ -756,6 +788,10 @@ def main() -> int:
 
     for item in new_documents + existing:
         item.pop("_pdf_path", None)
+    if budget_exhausted:
+        print(
+            f"::notice title=A3 бюджет::прогон остановлен по бюджету времени, в корпусе {len(new_documents) + len(existing)} документов"
+        )
 
     documents = sorted(existing + new_documents, key=lambda item: str(item["doc_id"]))
     by_theme: dict[str, int] = {}
@@ -866,6 +902,17 @@ def main() -> int:
         "ocr": {"tools": tools, "dpi": args.dpi, "workers": args.workers},
         "candidates_skipped": skipped[:100],
         "skipped_total": len(skipped),
+        # Недоступные документы фиксируются отдельно: по каждому — адрес и
+        # фактическая причина (robots, ошибка сети, нет текста, мало фактов).
+        "unavailable": [
+            {
+                "doc_id": str(item.get("doc_id") or ""),
+                "available": False,
+                "url": str(item.get("source_url") or item.get("pdf_url") or ""),
+                "reason": str(item.get("reason") or ""),
+            }
+            for item in skipped[:200]
+        ],
         "documents": {},
     }
     write_sources(out_dir, documents, manifest)

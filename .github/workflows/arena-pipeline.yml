@@ -1,0 +1,270 @@
+# Единый исследовательский конвейер SpanVerify.
+#
+# Зачем отдельный рабочий процесс: в песочнице разработчика нет доступа к
+# huggingface.co и к официальным сайтам публикации актов (проверено: TLS EOF).
+# У раннеров GitHub доступ есть, поэтому тяжёлая часть — загрузка реальных НПА,
+# прогон реальной языковой модели, внешние наборы — выполняется здесь, а итоги
+# коммитятся обратно в ветку и выкладываются артефактами.
+#
+# Каждый шаг идемпотентен: повторный запуск не перекачивает уже скачанное
+# (кэш PDF, кэш весов), а источники сверяются по SHA256.
+
+name: arena-pipeline
+
+on:
+  push:
+    branches: [main, "arena/**"]
+  workflow_dispatch:
+    inputs:
+      tasks:
+        description: "Задачи: corpus,hf,docs (через запятую; пусто — все)"
+        default: "corpus,hf,docs"
+        required: false
+      pilot_model:
+        description: "Модель для режима hf"
+        default: "ai-forever/rugpt3small_based_on_gpt2"
+        required: false
+
+permissions:
+  contents: write
+
+concurrency:
+  group: arena-pipeline-${{ github.ref }}
+  cancel-in-progress: false
+
+env:
+  PYTHONUTF8: "1"
+  PYTHONIOENCODING: "utf-8"
+  PILOT_MODEL: ${{ inputs.pilot_model || 'ai-forever/rugpt3small_based_on_gpt2' }}
+
+jobs:
+  # ------------------------------------------------------------------ корпус
+  npa-corpus:
+    name: Реальные НПА и корпус A3
+    runs-on: ubuntu-latest
+    timeout-minutes: 340
+    if: ${{ github.event_name == 'push' || !inputs.tasks || contains(inputs.tasks, 'corpus') }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Инструменты OCR и PDF
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq poppler-utils tesseract-ocr tesseract-ocr-rus
+          tesseract --version | head -1
+      - name: Зависимости
+        run: python -m pip install --quiet --upgrade pip && python -m pip install --quiet pypdf pytest
+      - name: Кэш скачанных PDF (переживает перезапуски)
+        uses: actions/cache@v4
+        with:
+          path: spanverify-module/data/corpus_a3/.cache
+          key: a3-pdf-cache-${{ github.ref_name }}-${{ github.run_number }}
+          restore-keys: |
+            a3-pdf-cache-${{ github.ref_name }}-
+            a3-pdf-cache-
+      - name: Загрузка реальных актов (robots.txt, пауза больше секунды, SHA256)
+        working-directory: spanverify-module
+        run: |
+          python scripts/fetch_npa_corpus.py \
+            --target-docs 130 \
+            --regions "23:18,77:8,50:6,78:6,61:6,26:6,16:6,66:6" \
+            --max-pages 20 --workers 4 --min-facts 6 --time-budget 11000
+      - name: Проверка хешей скачанных источников
+        working-directory: spanverify-module
+        run: python scripts/fetch_npa_corpus.py --verify
+      - name: Сборка корпуса A3 (пары, разбиения, манифест)
+        working-directory: spanverify-module
+        run: |
+          python scripts/build_corpus_a.py --real \
+            --docs data/corpus_a3/sources \
+            --out data/corpus_a3 \
+            --target 1200 --seed 42
+      - name: Отчёт по корпусу A3
+        working-directory: spanverify-module
+        run: python scripts/make_corpus_a3_report.py
+      - name: Очередь проверки (10 % пар)
+        working-directory: spanverify-module
+        run: |
+          python - <<'PY'
+          import json, random
+          from pathlib import Path
+          path = Path("data/corpus_a3/pairs.jsonl")
+          pairs = [json.loads(line) for line in path.read_text(encoding="utf-8").splitlines() if line.strip()]
+          sample = random.Random(42).sample(pairs, max(1, len(pairs) // 10))
+          out = Path("data/review_queue/corpus_a3_10pct.jsonl")
+          out.parent.mkdir(parents=True, exist_ok=True)
+          out.write_text("".join(json.dumps(item, ensure_ascii=False) + "\n" for item in sample), encoding="utf-8")
+          print(f"в очередь проверки: {len(sample)} пар из {len(pairs)} → {out}")
+          PY
+      - name: Зафиксировать результаты в ветке
+        if: always()
+        run: |
+          git config user.name "arena-pipeline"
+          git config user.email "arena-pipeline@users.noreply.github.com"
+          git add -A spanverify-module/data/corpus_a3 spanverify-module/data/review_queue \
+                     spanverify-module/reports/CORPUS_A3.md spanverify-module/reports/CORPUS_REPORT.md || true
+          if git diff --cached --quiet; then echo "изменений нет"; exit 0; fi
+          git commit -m "шаг A3-1: корпус A3 из реальных актов (автоматический прогон CI)"
+          for attempt in 1 2 3; do
+            git pull --rebase --autostash origin "${GITHUB_REF_NAME}" && git push origin "HEAD:${GITHUB_REF_NAME}" && break
+            sleep 5
+          done
+      - name: "Артефакт: источники и корпус"
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: corpus-a3
+          path: |
+            spanverify-module/data/corpus_a3
+            spanverify-module/reports/CORPUS_A3.md
+          if-no-files-found: warn
+
+  # --------------------------------------------------------------- режим hf
+  hf-runs:
+    name: Реальная модель — пилот, признаки, эксперименты
+    runs-on: ubuntu-latest
+    timeout-minutes: 340
+    if: ${{ github.event_name == 'push' || !inputs.tasks || contains(inputs.tasks, 'hf') }}
+    env:
+      HF_HOME: ${{ github.workspace }}/spanverify-module/.hf-cache
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Кэш весов модели
+        uses: actions/cache@v4
+        with:
+          path: spanverify-module/.hf-cache
+          key: hf-model-cache-${{ github.run_number }}
+          restore-keys: |
+            hf-model-cache-
+      - name: Установка torch (CPU), transformers, sentencepiece
+        run: |
+          python -m pip install --quiet --upgrade pip
+          python -m pip install --quiet --index-url https://download.pytorch.org/whl/cpu "torch~=2.14"
+          python -m pip install --quiet "transformers~=5.18" "sentencepiece~=0.2" numpy
+          python -c "import torch, transformers; print('torch', torch.__version__, 'transformers', transformers.__version__)"
+      - name: Пилот на реальной модели (слои, бутстрэп 5000, контроль контраста)
+        working-directory: spanverify-module
+        run: |
+          python scripts/pilot_rugpt3small.py --model "${PILOT_MODEL}" \
+            --pairs 48 --bootstrap 5000 --seed 2026 --max-length 512 --out reports/pilot
+      - name: Итерации признаков на реальной модели (AUC + 95 % ДИ)
+        working-directory: spanverify-module
+        run: |
+          if [ -f data/corpus_a3/pairs.jsonl ]; then
+            DATASET=data/corpus_a3/pairs.jsonl
+          else
+            DATASET=data/corpus_a/splits/test.jsonl
+          fi
+          python scripts/feature_iterations.py --mode hf --model "${PILOT_MODEL}" \
+            --dataset "$DATASET" --layers "first,middle,-4,last" --limit 240 \
+            --bootstrap 5000 --seed 42 --out reports/experiments/features_hf.json
+      - name: Эксперименты на корпусе A (режим hf, разбиение по документам)
+        working-directory: spanverify-module
+        run: |
+          python scripts/run_experiments.py --mode hf --model "${PILOT_MODEL}" \
+            --dataset data/corpus_a/splits/train.jsonl --seed 42 --folds 5 \
+            --out reports/experiments/hf_corpus_a.json || true
+      - name: Эксперименты на корпусе A3 (режим hf)
+        working-directory: spanverify-module
+        run: |
+          if [ -f data/corpus_a3/pairs.jsonl ]; then
+            python scripts/run_experiments.py --mode hf --model "${PILOT_MODEL}" \
+              --dataset data/corpus_a3/pairs.jsonl --seed 42 --folds 5 \
+              --out reports/experiments/hf_corpus_a3.json || true
+          fi
+      - name: Устойчивость к искажениям (реальная модель)
+        working-directory: spanverify-module
+        run: |
+          DATASET=data/corpus_a/splits/test.jsonl
+          [ -f data/corpus_a3/pairs.jsonl ] && DATASET=data/corpus_a3/pairs.jsonl
+          python scripts/robustness.py --mode hf --model "${PILOT_MODEL}" \
+            --dataset "$DATASET" --limit 60 --seed 42 --out reports/robustness_hf || true
+      - name: Калибровка доли участия ИИ на реальных текстах
+        working-directory: spanverify-module
+        run: |
+          python scripts/calibrate_participation_real.py --mode hf --model "${PILOT_MODEL}" \
+            --sources data/corpus_a3/sources --pairs data/corpus_a3/pairs.jsonl \
+            --samples 120 --seed 42 --out config/participation.json \
+            --report reports/participation_real.json || true
+      - name: Зафиксировать результаты в ветке
+        if: always()
+        run: |
+          git config user.name "arena-pipeline"
+          git config user.email "arena-pipeline@users.noreply.github.com"
+          git add -A spanverify-module/reports spanverify-module/config/participation.json || true
+          if git diff --cached --quiet; then echo "изменений нет"; exit 0; fi
+          git commit -m "шаг HF-1: прогон реальной модели (автоматический прогон CI)"
+          for attempt in 1 2 3; do
+            git pull --rebase --autostash origin "${GITHUB_REF_NAME}" && git push origin "HEAD:${GITHUB_REF_NAME}" && break
+            sleep 5
+          done
+      - name: "Артефакт: отчёты hf"
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: hf-reports
+          path: spanverify-module/reports
+          if-no-files-found: warn
+
+  # ------------------------------------------------- документы, РИД, обзоры
+  docs-rid:
+    name: Документы, РИД, обзор аналогов
+    runs-on: ubuntu-latest
+    timeout-minutes: 150
+    if: ${{ github.event_name == 'push' || !inputs.tasks || contains(inputs.tasks, 'docs') }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Зависимости
+        run: python -m pip install --quiet --upgrade pip && python -m pip install --quiet requests python-docx
+      - name: Функциональные испытания (длительности, память, коды возврата, смоук API)
+        working-directory: spanverify-module
+        run: |
+          python scripts/functional_tests.py --mode demo --lengths 500,2000,10000,50000 \
+            --max-lengths 100000,200000 --cycle-seconds 90 \
+            --out reports/FUNCTIONAL_TESTS.md --json-out reports/functional_tests.json || true
+      - name: ГОСТ-документы (протокол, акт, ведомость)
+        working-directory: spanverify-module
+        run: python scripts/make_gost_docs.py --out reports/gost || true
+      - name: РИД-комплект (заявки на ПО/БД, депонирование)
+        working-directory: spanverify-module
+        run: python scripts/make_rid_package.py --out reports/rid || true
+      - name: Обзор аналогов и патентный поиск
+        working-directory: spanverify-module
+        run: python scripts/prior_art_search.py --out reports/prior_art.json || true
+      - name: Зафиксировать результаты в ветке
+        if: always()
+        run: |
+          git config user.name "arena-pipeline"
+          git config user.email "arena-pipeline@users.noreply.github.com"
+          git add -A spanverify-module/reports spanverify-module/docs || true
+          if git diff --cached --quiet; then echo "изменений нет"; exit 0; fi
+          git commit -m "шаг ДОК-1: документы, РИД и обзор аналогов (автоматический прогон CI)"
+          for attempt in 1 2 3; do
+            git pull --rebase --autostash origin "${GITHUB_REF_NAME}" && git push origin "HEAD:${GITHUB_REF_NAME}" && break
+            sleep 5
+          done
+      - name: "Артефакт: документы"
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: docs-rid
+          path: |
+            spanverify-module/reports/gost
+            spanverify-module/reports/rid
+            spanverify-module/reports/prior_art.json
+            spanverify-module/reports/FUNCTIONAL_TESTS.md
+          if-no-files-found: warn

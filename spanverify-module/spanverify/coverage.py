@@ -220,6 +220,49 @@ DOCUMENT_FREQUENCY_MAX = 0.5
 MIN_DISTINCTIVE_LEMMAS = 2
 
 
+#: Роды величин по единице измерения: подменой считается только замена значения
+#: того же рода (годы → годы), а «срок вместо объёма» — это другой признак.
+UNIT_CLASSES: tuple[tuple[str, str], ...] = (
+    ("календарн", "duration"),
+    ("рабоч", "duration"),
+    ("год", "duration"),
+    ("день", "duration"),
+    ("месяц", "duration"),
+    ("час", "duration"),
+    ("сутки", "duration"),
+    ("недел", "duration"),
+    ("квартал", "duration"),
+    ("минут", "duration"),
+    ("секунд", "duration"),
+    ("мегабайт", "data"),
+    ("гигабайт", "data"),
+    ("терабайт", "data"),
+    ("байт", "data"),
+    ("процент", "percent"),
+    ("рубл", "money"),
+    ("квадратн", "area"),
+    ("гектар", "area"),
+    ("метр", "length"),
+    ("килограмм", "mass"),
+    ("тонн", "mass"),
+    ("штук", "count"),
+    ("экземпляр", "count"),
+    ("человек", "count"),
+    ("раз", "count"),
+)
+
+
+def number_class(unit: str | None) -> str:
+    """Род величины по единице измерения (``None`` — единицы нет)."""
+    if not unit:
+        return "none"
+    key = str(unit).strip().lower()
+    for pattern, name in UNIT_CLASSES:
+        if pattern in key:
+            return name
+    return "other"
+
+
 @dataclass(frozen=True)
 class DocumentFact:
     """Атомарный факт документа."""
@@ -430,7 +473,6 @@ def extract_salient_facts(document: str, *, max_facts: int = 400) -> list[Docume
         sentence = document[start:end]
         if not sentence.strip():
             continue
-        lowered = normalize_text(sentence)
         predicate = _predicate(sentence)
         mentions = measure_mentions(sentence)
         condition = _find_condition(sentence)
@@ -597,6 +639,26 @@ def _overlap(fact_lemmas: Sequence[str], unit_lemmas: Sequence[str]) -> float:
     return len(distinctive & set(unit_lemmas)) / len(distinctive)
 
 
+def _same_number_kind(fact: DocumentFact, mentions: Sequence[NumberMention]) -> bool:
+    """Совпадает ли род величины факта и упоминаний ответа.
+
+    Если у факта и у ответа явно указаны единицы разных родов (например, «рабочих
+    дней» против «мегабайт»), то ответ говорит о другом признаке, а не подменяет
+    значение. Такие пары не считаются расхождением — иначе на верных ответах
+    возникали бы ложные срабатывания (разбор — в reports/CORPUS_REPORT.md).
+    """
+    if fact.number is None:
+        return True
+    fact_class = number_class(fact.number.unit)
+    classes = {number_class(mention.unit) for mention in mentions}
+    classes.discard("none")
+    if not classes:
+        return True  # единицы в ответе нет: считаем, что род не противоречит
+    if fact_class in {"none", "other"}:
+        return True
+    return fact_class in classes
+
+
 def _numbers_match(fact: DocumentFact, numbers: Sequence[NumberMention]) -> bool | None:
     """Совпадает ли значение факта с числами единицы ответа.
 
@@ -700,7 +762,7 @@ def coverage_report(document: str, answer: str, *, max_facts: int = 400) -> Cove
         if current is None or value > current[1]:
             best_fact_for_unit[index] = (fact_id, value)
 
-    for fact, distinctive in fact_subjects:
+    for fact, _distinctive in fact_subjects:
         base_subject = fact.distinctive
         if len(base_subject) < MIN_DISTINCTIVE_LEMMAS:
             covered += 1
@@ -776,7 +838,11 @@ def coverage_report(document: str, answer: str, *, max_facts: int = 400) -> Cove
                         severity=0.75,
                     )
                 )
-            elif match is False and overlap >= DISTORTION_OVERLAP:
+            elif (
+                match is False
+                and overlap >= DISTORTION_OVERLAP
+                and _same_number_kind(fact, numbers or sentence_numbers)
+            ):
                 pending_distorted.append(
                     FactMatch(
                         fact=fact,
@@ -795,7 +861,7 @@ def coverage_report(document: str, answer: str, *, max_facts: int = 400) -> Cove
                     FactMatch(
                         fact=fact,
                         status="covered",
-                        reason="совпадение по субъекту слабое — расхождение не утверждается",
+                        reason="значение другого рода или слабое совпадение субъекта — расхождение не утверждается",
                         overlap=overlap,
                     )
                 )
