@@ -199,6 +199,31 @@ def _allowed(metrics: dict) -> dict[str, set[str]]:
                 if isinstance(block.get(key), (int, float)):
                     f1_values.append(float(block[key]))
 
+    # Таблица «корпус × режим» (reports/METRICS.json → corpora): сюда попадают числа
+    # режима hf и demo рядом. Документы вправе на них ссылаться, но только на те,
+    # что реально записаны прогоном.
+    corpora = metrics.get("corpora") or {}
+    for payload in corpora.values():
+        for block in (payload.get("modes") or {}).values():
+            tokens = block.get("tokens") or {}
+            verdicts = block.get("verdicts") or {}
+            spans = block.get("spans") or {}
+            for value in (tokens.get("f1"), tokens.get("precision"), tokens.get("recall")):
+                if isinstance(value, (int, float)):
+                    f1_values.append(float(value))
+            for value in (verdicts.get("f1"), verdicts.get("precision"), verdicts.get("recall")):
+                if isinstance(value, (int, float)):
+                    f1_values.append(float(value))
+            if isinstance(tokens.get("fpr"), (int, float)):
+                fpr_values.append(float(tokens["fpr"]))
+            if isinstance(verdicts.get("fpr"), (int, float)):
+                fpr_values.append(float(verdicts["fpr"]))
+            if isinstance(tokens.get("auc"), (int, float)):
+                auc_values.append(float(tokens["auc"]))
+            for value in (spans.get("f1"), spans.get("soft_f1"), spans.get("coverage")):
+                if isinstance(value, (int, float)):
+                    f1_values.append(float(value))
+
     corpus_b = metrics.get("corpus_b") or {}
     if corpus_b.get("available"):
         ours = corpus_b.get("our_metrics") or {}

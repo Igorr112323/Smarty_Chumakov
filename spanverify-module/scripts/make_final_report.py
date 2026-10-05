@@ -295,7 +295,8 @@ def section_6(pilot: dict[str, Any] | None, iterations: dict[str, Any] | None) -
         contrast = pilot.get("contrast") or {}
         hypothesis = pilot.get("hypothesis") or {}
         lines += [
-            f"Модель: `{pilot.get('model')}`; пар: {pilot.get('pairs', NO_DATA)}; "
+            f"Модель: `{pilot.get('model') or (pilot.get('environment') or {}).get('model')}`; "
+            f"пар: {pilot.get('pairs', NO_DATA)}; "
             f"бутстрэп {pilot.get('bootstrap_iterations', NO_DATA)} итераций, seed {pilot.get('seed', NO_DATA)}.",
             f"Слои: {', '.join(pilot.get('layers', []))}.",
             "",
@@ -328,10 +329,12 @@ def section_6(pilot: dict[str, Any] | None, iterations: dict[str, Any] | None) -
     else:
         lines += ["Итерации доработки признаков:", "", "| Итерация | AUC | 95 % ДИ | Признаки |", "|---|---|---|---|"]
         for item in iterations.get("iterations", []):
+            label = item.get("title") or item.get("iteration") or item.get("name")
+            added = item.get("features") or item.get("added_features") or []
             lines.append(
-                f"| {item.get('title', item.get('name'))} | {fmt(item.get('auc'))} | "
+                f"| {label} | {fmt(item.get('auc'))} | "
                 f"[{fmt(item.get('ci_low'))}; {fmt(item.get('ci_high'))}] | "
-                f"{', '.join(item.get('features', []))} |"
+                f"{', '.join(added) if added else 'базовые признаки (12)'} |"
             )
         if iterations.get("note"):
             lines += ["", iterations["note"]]
@@ -524,6 +527,10 @@ def main(argv: Sequence[str] | None = None) -> int:
     summary = read_json(reports / "review_queue.json")
     metrics = read_json(reports / "METRICS.json")
     pilot = read_json(reports / "pilot" / "pilot.json")
+    if not pilot:
+        # Локальный пилот на доступной реальной модели (MiniLM-L6) — тот же формат,
+        # получается scripts/pilot_rugpt3small.py --model <путь> --out reports/pilot_local.
+        pilot = read_json(reports / "pilot_local" / "pilot.json")
     iterations = read_json(reports / "experiments" / "features_hf.json")
     robustness_data = read_json(reports / "robustness_hf.json")
     functional = read_json(reports / "functional_tests.json")
