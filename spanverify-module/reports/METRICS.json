@@ -8,14 +8,14 @@
   },
   "meta": {
     "version": "1.3.0",
-    "commit": "b67819746bbba8c67685996d35049e86d883586b",
-    "generated_at": "2026-10-05T20:16:37Z",
+    "commit": "2eedcac03b8355f6dd1a6622646fa7b79d313222",
+    "generated_at": "2026-10-05T20:35:50Z",
     "seed": 42,
     "dataset": "data/demo_pairs.jsonl"
   },
   "disclaimer": "Демонстрационные метрики получены на синтетическом корпусе и научным результатом не являются. Для подтверждения требуются 1200 пар «вопрос–ответ» с экспертной разметкой на реальных регламентах организации.",
   "tests": {
-    "collected": 392,
+    "collected": 397,
     "coverage_percent": null,
     "coverage_gate_percent": 85
   },
@@ -214,13 +214,13 @@
           "recall": 0.5465,
           "f1": 0.6963,
           "fpr": 0.0037,
-          "auc": 0.9177,
+          "auc": 0.9157,
           "n": 1900
         },
         "spans": {
-          "strict_f1": 0.6364,
-          "coverage": 0.5326,
-          "soft_f1": 0.1818,
+          "strict_f1": 0.6483,
+          "coverage": 0.5109,
+          "soft_f1": 0.1931,
           "width_ratio": 1.06
         },
         "answers": {
@@ -232,14 +232,14 @@
           "threshold": 1.0
         },
         "verdicts": {
-          "tp": 49,
-          "fp": 10,
-          "fn": 43,
-          "tn": 78,
-          "precision": 0.8305,
-          "recall": 0.5326,
-          "f1": 0.649,
-          "fpr": 0.1136
+          "tp": 47,
+          "fp": 5,
+          "fn": 45,
+          "tn": 83,
+          "precision": 0.9038,
+          "recall": 0.5109,
+          "f1": 0.6528,
+          "fpr": 0.0568
         }
       },
       "test": {
@@ -248,13 +248,13 @@
           "recall": 0.5795,
           "f1": 0.7338,
           "fpr": 0.0,
-          "auc": 0.9542,
+          "auc": 0.9524,
           "n": 1868
         },
         "spans": {
-          "strict_f1": 0.7935,
-          "coverage": 0.7374,
-          "soft_f1": 0.1087,
+          "strict_f1": 0.7778,
+          "coverage": 0.6364,
+          "soft_f1": 0.1235,
           "width_ratio": 1.09
         },
         "answers": {
@@ -266,24 +266,24 @@
           "threshold": 1.0
         },
         "verdicts": {
-          "tp": 73,
-          "fp": 11,
-          "fn": 26,
-          "tn": 70,
-          "precision": 0.869,
-          "recall": 0.7374,
-          "f1": 0.7978,
-          "fpr": 0.1358
+          "tp": 63,
+          "fp": 0,
+          "fn": 36,
+          "tn": 81,
+          "precision": 1.0,
+          "recall": 0.6364,
+          "f1": 0.7778,
+          "fpr": 0.0
         }
       }
     },
     "by_mode": {
       "contradiction": {
         "pairs": 26,
-        "verdict_recall": 0.9231,
+        "verdict_recall": 0.8077,
         "verdict_fpr": 0.0,
         "token_f1": 0.6269,
-        "span_coverage": 0.9231
+        "span_coverage": 0.8077
       },
       "excess": {
         "pairs": 14,
@@ -295,7 +295,7 @@
       "faithful": {
         "pairs": 81,
         "verdict_recall": 0.0,
-        "verdict_fpr": 0.1358,
+        "verdict_fpr": 0.0,
         "token_f1": 0.0,
         "span_coverage": 0.0
       },
@@ -308,10 +308,10 @@
       },
       "number_attribution": {
         "pairs": 13,
-        "verdict_recall": 0.7692,
+        "verdict_recall": 0.5385,
         "verdict_fpr": 0.0,
         "token_f1": 0.0,
-        "span_coverage": 0.7692
+        "span_coverage": 0.5385
       },
       "oversight": {
         "pairs": 11,
@@ -322,10 +322,10 @@
       },
       "partial": {
         "pairs": 15,
-        "verdict_recall": 0.2667,
+        "verdict_recall": 0.0,
         "verdict_fpr": 0.0,
         "token_f1": 0.0,
-        "span_coverage": 0.2667
+        "span_coverage": 0.0
       },
       "unconfirmed": {
         "pairs": 10,
@@ -576,5 +576,5 @@
   },
   "pilot": null,
   "release": null,
-  "duration_s": 26.4
+  "duration_s": 27.6
 }

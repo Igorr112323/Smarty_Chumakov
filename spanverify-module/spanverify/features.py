@@ -577,8 +577,13 @@ def _attribute_tokens(tokens: Sequence[Token], measurements: Sequence[Measuremen
         return []
     distinctive = _distinctive_measurements(measurements)
     results: list[NumberAttribution] = []
+    # Значение берётся для группы токенов: «двадцать пять» — одно число, а не
+    # «20» и «5». Иначе число прописью не совпадало бы с «25» в документе и
+    # обвинялось бы в заимствовании у чужого объекта — отсюда ложные
+    # замечания на совершенно корректных ответах (исправление B4).
+    group_values = _group_number_values(tokens)
     for index, token in enumerate(tokens):
-        value = number_value(token)
+        value = group_values[index] if index < len(group_values) else None
         if value is None:
             continue
         subject = _subject_words(tokens, index)
@@ -727,11 +732,21 @@ def hf_features(
     пилоту: он сравнивает информативность признаков по слоям и не должен
     зависеть от того, что «полезный» слой оказался не последним.
     """
+    from .backends.base import BackendUnavailable  # noqa: PLC0415
+
+    # Зависимости проверяются до импорта torch: иначе при их отсутствии вылетал
+    # бы голый ModuleNotFoundError, и пользователь не понимал бы, что делать.
+    # Тихая подмена hf на demo здесь запрещена: если запрошен реальный режим,
+    # ответ должен быть либо реальным, либо явной ошибкой (дефект A3 реестра).
+    from .backends.hf import HFBackend  # noqa: PLC0415
+    from .core import tokenize_with_offsets  # noqa: PLC0415
+
+    ok, reason = HFBackend.dependencies()
+    if not ok:
+        raise BackendUnavailable(reason)
+
     import torch  # noqa: PLC0415
     from transformers import AutoModelForCausalLM, AutoTokenizer  # noqa: PLC0415
-
-    from .backends.base import BackendUnavailable  # noqa: PLC0415
-    from .core import tokenize_with_offsets  # noqa: PLC0415
 
     tokens = list(answer_tokens) if answer_tokens is not None else tokenize_with_offsets(answer)
     if not tokens:
