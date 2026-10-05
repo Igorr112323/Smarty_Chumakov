@@ -10,7 +10,15 @@ name: corpus-a3
 # 23 из 23 источников — SSLZeroReturnError), поэтому загрузка выполняется на раннере
 # GitHub, а тексты и манифест возвращаются в ветку обычным коммитом.
 
+# Запуск руками (Run workflow) доступен только для рабочих процессов, лежащих в
+# ветке по умолчанию. Эта работа ведётся в рабочей ветке, поэтому предусмотрен второй
+# способ запуска: push, затрагивающий файл-триггер .github/corpus-a3.trigger. Менять
+# файл нужно осознанно — обычные коммиты в ветку загрузку не запускают.
 on:
+  push:
+    paths:
+      - ".github/corpus-a3.trigger"
+      - ".github/workflows/corpus-a3.yml"
   workflow_dispatch:
     inputs:
       target_docs:
@@ -97,12 +105,12 @@ jobs:
         run: |
           python scripts/fetch_npa_corpus.py \
             --out data/corpus_a3 \
-            --target-docs "${{ inputs.target_docs }}" \
-            --max-pages-per-type "${{ inputs.max_pages_per_type }}" \
-            --max-pages-per-block "${{ inputs.max_pages_per_block }}" \
-            --buffer "${{ inputs.buffer }}" \
-            --pause "${{ inputs.pause }}" \
-            --max-pages "${{ inputs.max_ocr_pages }}" \
+            --target-docs "${{ inputs.target_docs || '130' }}" \
+            --max-pages-per-type "${{ inputs.max_pages_per_type || '3' }}" \
+            --max-pages-per-block "${{ inputs.max_pages_per_block || '2' }}" \
+            --buffer "${{ inputs.buffer || '60' }}" \
+            --pause "${{ inputs.pause || '1.2' }}" \
+            --max-pages "${{ inputs.max_ocr_pages || '8' }}" \
             --all-themes \
             --workers 4
 
