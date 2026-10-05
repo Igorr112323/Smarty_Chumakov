@@ -13,61 +13,61 @@
       "param": "PublishDateFrom",
       "status": 200,
       "recognized": false,
-      "body_head": "{\"items\":[{\"eoNumber\":\"0001202610030023\",\"hasSvg\":false,\"zipFileLength\":null,\"publishDateShort\":\"2026-10-03T00:00:00\",\"complexName\":\"Постановление Правительства Российской Федерации от 02.10.2026 № 1296\\n \\\"Об утверждении Правил формирования и изменения перечня государственных учреждений, которым ра"
+      "body_head": "{\"items\":[{\"eoNumber\":\"0001202610050002\",\"hasSvg\":false,\"zipFileLength\":null,\"publishDateShort\":\"2026-10-05T00:00:00\",\"complexName\":\"Указ Президента Российской Федерации от 05.10.2026 № 716\\n \\\"Об автономной некоммерческой организации, обеспечивающей деятельность Уполномоченного при Президенте Росси"
     },
     {
       "param": "PublishDateTo",
       "status": 200,
       "recognized": false,
-      "body_head": "{\"items\":[{\"eoNumber\":\"0001202610030023\",\"hasSvg\":false,\"zipFileLength\":null,\"publishDateShort\":\"2026-10-03T00:00:00\",\"complexName\":\"Постановление Правительства Российской Федерации от 02.10.2026 № 1296\\n \\\"Об утверждении Правил формирования и изменения перечня государственных учреждений, которым ра"
+      "body_head": "{\"items\":[{\"eoNumber\":\"0001202610050002\",\"hasSvg\":false,\"zipFileLength\":null,\"publishDateShort\":\"2026-10-05T00:00:00\",\"complexName\":\"Указ Президента Российской Федерации от 05.10.2026 № 716\\n \\\"Об автономной некоммерческой организации, обеспечивающей деятельность Уполномоченного при Президенте Росси"
     },
     {
       "param": "DocumentDateFrom",
       "status": 200,
       "recognized": false,
-      "body_head": "{\"items\":[{\"eoNumber\":\"0001202610030023\",\"hasSvg\":false,\"zipFileLength\":null,\"publishDateShort\":\"2026-10-03T00:00:00\",\"complexName\":\"Постановление Правительства Российской Федерации от 02.10.2026 № 1296\\n \\\"Об утверждении Правил формирования и изменения перечня государственных учреждений, которым ра"
+      "body_head": "{\"items\":[{\"eoNumber\":\"0001202610050002\",\"hasSvg\":false,\"zipFileLength\":null,\"publishDateShort\":\"2026-10-05T00:00:00\",\"complexName\":\"Указ Президента Российской Федерации от 05.10.2026 № 716\\n \\\"Об автономной некоммерческой организации, обеспечивающей деятельность Уполномоченного при Президенте Росси"
     },
     {
       "param": "DocumentDateTo",
       "status": 200,
       "recognized": false,
-      "body_head": "{\"items\":[{\"eoNumber\":\"0001202610030023\",\"hasSvg\":false,\"zipFileLength\":null,\"publishDateShort\":\"2026-10-03T00:00:00\",\"complexName\":\"Постановление Правительства Российской Федерации от 02.10.2026 № 1296\\n \\\"Об утверждении Правил формирования и изменения перечня государственных учреждений, которым ра"
+      "body_head": "{\"items\":[{\"eoNumber\":\"0001202610050002\",\"hasSvg\":false,\"zipFileLength\":null,\"publishDateShort\":\"2026-10-05T00:00:00\",\"complexName\":\"Указ Президента Российской Федерации от 05.10.2026 № 716\\n \\\"Об автономной некоммерческой организации, обеспечивающей деятельность Уполномоченного при Президенте Росси"
     },
     {
       "param": "JdRegDateFrom",
       "status": 200,
       "recognized": false,
-      "body_head": "{\"items\":[{\"eoNumber\":\"0001202610030023\",\"hasSvg\":false,\"zipFileLength\":null,\"publishDateShort\":\"2026-10-03T00:00:00\",\"complexName\":\"Постановление Правительства Российской Федерации от 02.10.2026 № 1296\\n \\\"Об утверждении Правил формирования и изменения перечня государственных учреждений, которым ра"
+      "body_head": "{\"items\":[{\"eoNumber\":\"0001202610050002\",\"hasSvg\":false,\"zipFileLength\":null,\"publishDateShort\":\"2026-10-05T00:00:00\",\"complexName\":\"Указ Президента Российской Федерации от 05.10.2026 № 716\\n \\\"Об автономной некоммерческой организации, обеспечивающей деятельность Уполномоченного при Президенте Росси"
     },
     {
       "param": "JdRegDateTo",
       "status": 200,
       "recognized": false,
-      "body_head": "{\"items\":[{\"eoNumber\":\"0001202610030023\",\"hasSvg\":false,\"zipFileLength\":null,\"publishDateShort\":\"2026-10-03T00:00:00\",\"complexName\":\"Постановление Правительства Российской Федерации от 02.10.2026 № 1296\\n \\\"Об утверждении Правил формирования и изменения перечня государственных учреждений, которым ра"
+      "body_head": "{\"items\":[{\"eoNumber\":\"0001202610050002\",\"hasSvg\":false,\"zipFileLength\":null,\"publishDateShort\":\"2026-10-05T00:00:00\",\"complexName\":\"Указ Президента Российской Федерации от 05.10.2026 № 716\\n \\\"Об автономной некоммерческой организации, обеспечивающей деятельность Уполномоченного при Президенте Росси"
     },
     {
       "param": "SignatoryAuthorityId",
       "status": 400,
       "recognized": true,
-      "body_head": "{\"type\":\"https://tools.ietf.org/html/rfc7231#section-6.5.1\",\"title\":\"One or more validation errors occurred.\",\"status\":400,\"traceId\":\"|4df47a08-4e9eb50a4262021d.\",\"errors\":{\"SignatoryAuthorityId\":[\"The value 'неверное_значение' is not valid for SignatoryAuthorityId.\"]}}"
+      "body_head": "{\"type\":\"https://tools.ietf.org/html/rfc7231#section-6.5.1\",\"title\":\"One or more validation errors occurred.\",\"status\":400,\"traceId\":\"|2cf12fe9-49a6dd5edfc51f53.\",\"errors\":{\"SignatoryAuthorityId\":[\"The value 'неверное_значение' is not valid for SignatoryAuthorityId.\"]}}"
     },
     {
       "param": "DocumentTypes",
       "status": 400,
       "recognized": true,
-      "body_head": "{\"type\":\"https://tools.ietf.org/html/rfc7231#section-6.5.1\",\"title\":\"One or more validation errors occurred.\",\"status\":400,\"traceId\":\"|f8c82e43-4b5e1c095be14f9f.\",\"errors\":{\"DocumentTypes\":[\"The value 'неверное_значение' is not valid.\"]}}"
+      "body_head": "{\"type\":\"https://tools.ietf.org/html/rfc7231#section-6.5.1\",\"title\":\"One or more validation errors occurred.\",\"status\":400,\"traceId\":\"|bc0d083b-4c8ce2c17565247f.\",\"errors\":{\"DocumentTypes\":[\"The value 'неверное_значение' is not valid.\"]}}"
     },
     {
       "param": "PageSize",
       "status": 200,
       "recognized": false,
-      "body_head": "{\"items\":[{\"eoNumber\":\"0001202610030023\",\"hasSvg\":false,\"zipFileLength\":null,\"publishDateShort\":\"2026-10-03T00:00:00\",\"complexName\":\"Постановление Правительства Российской Федерации от 02.10.2026 № 1296\\n \\\"Об утверждении Правил формирования и изменения перечня государственных учреждений, которым ра"
+      "body_head": "{\"items\":[{\"eoNumber\":\"0001202610050002\",\"hasSvg\":false,\"zipFileLength\":null,\"publishDateShort\":\"2026-10-05T00:00:00\",\"complexName\":\"Указ Президента Российской Федерации от 05.10.2026 № 716\\n \\\"Об автономной некоммерческой организации, обеспечивающей деятельность Уполномоченного при Президенте Росси"
     },
     {
       "param": "Index",
       "status": 200,
       "recognized": false,
-      "body_head": "{\"items\":[{\"eoNumber\":\"0001202610030023\",\"hasSvg\":false,\"zipFileLength\":null,\"publishDateShort\":\"2026-10-03T00:00:00\",\"complexName\":\"Постановление Правительства Российской Федерации от 02.10.2026 № 1296\\n \\\"Об утверждении Правил формирования и изменения перечня государственных учреждений, которым ра"
+      "body_head": "{\"items\":[{\"eoNumber\":\"0001202610050002\",\"hasSvg\":false,\"zipFileLength\":null,\"publishDateShort\":\"2026-10-05T00:00:00\",\"complexName\":\"Указ Президента Российской Федерации от 05.10.2026 № 716\\n \\\"Об автономной некоммерческой организации, обеспечивающей деятельность Уполномоченного при Президенте Росси"
     },
     {
       "param": "Block",
@@ -79,25 +79,25 @@
       "param": "Blocks",
       "status": 200,
       "recognized": false,
-      "body_head": "{\"items\":[{\"eoNumber\":\"0001202610030023\",\"hasSvg\":false,\"zipFileLength\":null,\"publishDateShort\":\"2026-10-03T00:00:00\",\"complexName\":\"Постановление Правительства Российской Федерации от 02.10.2026 № 1296\\n \\\"Об утверждении Правил формирования и изменения перечня государственных учреждений, которым ра"
+      "body_head": "{\"items\":[{\"eoNumber\":\"0001202610050002\",\"hasSvg\":false,\"zipFileLength\":null,\"publishDateShort\":\"2026-10-05T00:00:00\",\"complexName\":\"Указ Президента Российской Федерации от 05.10.2026 № 716\\n \\\"Об автономной некоммерческой организации, обеспечивающей деятельность Уполномоченного при Президенте Росси"
     },
     {
       "param": "SearchTerm",
       "status": 200,
       "recognized": false,
-      "body_head": "{\"items\":[{\"eoNumber\":\"0001202610030023\",\"hasSvg\":false,\"zipFileLength\":null,\"publishDateShort\":\"2026-10-03T00:00:00\",\"complexName\":\"Постановление Правительства Российской Федерации от 02.10.2026 № 1296\\n \\\"Об утверждении Правил формирования и изменения перечня государственных учреждений, которым ра"
+      "body_head": "{\"items\":[{\"eoNumber\":\"0001202610050002\",\"hasSvg\":false,\"zipFileLength\":null,\"publishDateShort\":\"2026-10-05T00:00:00\",\"complexName\":\"Указ Президента Российской Федерации от 05.10.2026 № 716\\n \\\"Об автономной некоммерческой организации, обеспечивающей деятельность Уполномоченного при Президенте Росси"
     },
     {
       "param": "SortBy",
       "status": 200,
       "recognized": false,
-      "body_head": "{\"items\":[{\"eoNumber\":\"0001202610030023\",\"hasSvg\":false,\"zipFileLength\":null,\"publishDateShort\":\"2026-10-03T00:00:00\",\"complexName\":\"Постановление Правительства Российской Федерации от 02.10.2026 № 1296\\n \\\"Об утверждении Правил формирования и изменения перечня государственных учреждений, которым ра"
+      "body_head": "{\"items\":[{\"eoNumber\":\"0001202610050002\",\"hasSvg\":false,\"zipFileLength\":null,\"publishDateShort\":\"2026-10-05T00:00:00\",\"complexName\":\"Указ Президента Российской Федерации от 05.10.2026 № 716\\n \\\"Об автономной некоммерческой организации, обеспечивающей деятельность Уполномоченного при Президенте Росси"
     },
     {
       "param": "OrderBy",
       "status": 200,
       "recognized": false,
-      "body_head": "{\"items\":[{\"eoNumber\":\"0001202610030023\",\"hasSvg\":false,\"zipFileLength\":null,\"publishDateShort\":\"2026-10-03T00:00:00\",\"complexName\":\"Постановление Правительства Российской Федерации от 02.10.2026 № 1296\\n \\\"Об утверждении Правил формирования и изменения перечня государственных учреждений, которым ра"
+      "body_head": "{\"items\":[{\"eoNumber\":\"0001202610050002\",\"hasSvg\":false,\"zipFileLength\":null,\"publishDateShort\":\"2026-10-05T00:00:00\",\"complexName\":\"Указ Президента Российской Федерации от 05.10.2026 № 716\\n \\\"Об автономной некоммерческой организации, обеспечивающей деятельность Уполномоченного при Президенте Росси"
     }
   ],
   "documents": [
@@ -115,46 +115,46 @@
     {
       "type_name": "Постановление",
       "type_id": "fd5a8766-f6fd-4ac2-8fd9-66f414d314ac",
-      "eoNumber": "0001202610030023",
-      "document_id": "d64fa3b3-aa3a-47ce-94a3-96194f0f743b",
-      "name": "Об утверждении Правил формирования и изменения перечня государственных учреждений, которым разрешается заготовка древесины в соответствии с частью 6 статьи 29-1 Лесного кодекса Российской Федерации\r\n",
-      "number": "1296",
-      "documentDate": "2026-10-02T00:00:00",
-      "pagesCount": 8,
-      "pdfFileLength": 1741311
+      "eoNumber": "0001202610050016",
+      "document_id": "8bd9a825-9ee5-4168-a3d6-1cfd9af65923",
+      "name": "О внесении изменений в некоторые акты Правительства Российской Федерации",
+      "number": "1298",
+      "documentDate": "2026-10-05T00:00:00",
+      "pagesCount": 22,
+      "pdfFileLength": 4855884
     },
     {
       "type_name": "Приказ",
       "type_id": "2dddb344-d3e2-4785-a899-7aa12bd47b6f",
-      "eoNumber": "0001202610020007",
-      "document_id": "1e1b11ac-d5b7-4e0b-9bab-a40f5962fc48",
-      "name": "О внесении изменений в Положение о квалификационной комиссии, утвержденное приказом Министерства юстиции Российской Федерации от 29.06.2015 № 150",
-      "number": "267",
-      "documentDate": "2026-09-29T00:00:00",
-      "pagesCount": 8,
-      "pdfFileLength": 509365
+      "eoNumber": "0001202610050012",
+      "document_id": "30f092e2-e7fe-4ce1-ad8b-35aa3beb7ca3",
+      "name": "Об установлении норм обеспечения кормами (продуктами) штатных животных учреждений уголовно-исполнительной системы Российской Федерации, норм замены одних кормов (продуктов) другими при обеспечении штатных животных учреждений уголовно-исполнительной системы Российской Федерации, нормы обеспечения подстилочными материалами штатных животных учреждений уголовно-исполнительной системы Российской Федерации, нормы замены одних подстилочных материалов другими при обеспечении штатных животных учреждений уголовно-исполнительной системы Российской Федерации",
+      "number": "547",
+      "documentDate": "2026-08-31T00:00:00",
+      "pagesCount": 21,
+      "pdfFileLength": 769789
     },
     {
       "type_name": "Распоряжение",
       "type_id": "7ff5b3b5-3757-44f1-bb76-3766cabe3593",
-      "eoNumber": "0001202610030014",
-      "document_id": "65f1265a-f523-4e85-bd39-42d3db81585d",
-      "name": "О подписании Соглашения между Правительством Российской Федерации и Правительством Гвинейской Республики об урегулировании финансовых обязательств Гвинейской Республики по заблокированным средствам на счетах государственной корпорации развития \"ВЭБ.РФ\" в Центральном банке Гвинеи",
-      "number": "2773-р",
-      "documentDate": "2026-10-02T00:00:00",
-      "pagesCount": 7,
-      "pdfFileLength": 1343134
+      "eoNumber": "0001202610050003",
+      "document_id": "55affb0c-cab3-40e2-af3e-f32ba17b6774",
+      "name": "\"О специальном решении о реорганизации акционерного общества \"ЮниКредит Банк\" и совершении сделок с его акциями\"",
+      "number": "368-рп",
+      "documentDate": "2026-10-05T00:00:00",
+      "pagesCount": 1,
+      "pdfFileLength": 71243
     },
     {
       "type_name": "Указ",
       "type_id": "0790e34b-784b-4372-884e-3282622a24bd",
-      "eoNumber": "0001202610020002",
-      "document_id": "51625e87-2a3e-4d35-9a0b-2de98f231fe5",
-      "name": "\"О Чрезвычайном и Полномочном После Российской Федерации в Греческой Республике\"",
-      "number": "712",
-      "documentDate": "2026-10-02T00:00:00",
-      "pagesCount": 1,
-      "pdfFileLength": 32349
+      "eoNumber": "0001202610050002",
+      "document_id": "525bffbe-f7fd-448d-97a6-fc8babf74f82",
+      "name": "\"Об автономной некоммерческой организации, обеспечивающей деятельность Уполномоченного при Президенте Российской Федерации по защите прав предпринимателей\"",
+      "number": "716",
+      "documentDate": "2026-10-05T00:00:00",
+      "pagesCount": 3,
+      "pdfFileLength": 219035
     },
     {
       "type_name": "Федеральный закон",
@@ -195,86 +195,63 @@
     {
       "type_name": "Постановление",
       "type_id": "fd5a8766-f6fd-4ac2-8fd9-66f414d314ac",
-      "eoNumber": "0001202610030023",
-      "document_id": "d64fa3b3-aa3a-47ce-94a3-96194f0f743b",
-      "name": "Об утверждении Правил формирования и изменения перечня государственных учреждений, которым разрешается заготовка древесины в соответствии с частью 6 статьи 29-1 Лесного кодекса Российской Федерации\r\n",
-      "number": "1296",
-      "documentDate": "2026-10-02T00:00:00",
-      "pagesCount": 8,
-      "pdfFileLength": 1741311,
-      "pdf_url": "http://publication.pravo.gov.ru/file/pdf?eoNumber=0001202610030023",
+      "eoNumber": "0001202610050016",
+      "document_id": "8bd9a825-9ee5-4168-a3d6-1cfd9af65923",
+      "name": "О внесении изменений в некоторые акты Правительства Российской Федерации",
+      "number": "1298",
+      "documentDate": "2026-10-05T00:00:00",
+      "pagesCount": 22,
+      "pdfFileLength": 4855884,
+      "pdf_url": "http://publication.pravo.gov.ru/file/pdf?eoNumber=0001202610050016",
       "pdf_status": 200,
       "pdf_content_type": "application/octet-stream",
-      "pdf_bytes": 1741311,
+      "pdf_bytes": 4855884,
       "pdf_error": null,
-      "text_pages": 8,
-      "text_chars": 7,
-      "text_chars_per_page": 0.9,
+      "text_pages": 22,
+      "text_chars": 21,
+      "text_chars_per_page": 1.0,
       "text_text_head": "",
       "text_error": null,
       "act_number_found": false,
-      "act_number_checked": "1296"
+      "act_number_checked": "1298"
     },
     {
       "type_name": "Приказ",
       "type_id": "2dddb344-d3e2-4785-a899-7aa12bd47b6f",
-      "eoNumber": "0001202610020007",
-      "document_id": "1e1b11ac-d5b7-4e0b-9bab-a40f5962fc48",
-      "name": "О внесении изменений в Положение о квалификационной комиссии, утвержденное приказом Министерства юстиции Российской Федерации от 29.06.2015 № 150",
-      "number": "267",
-      "documentDate": "2026-09-29T00:00:00",
-      "pagesCount": 8,
-      "pdfFileLength": 509365,
-      "pdf_url": "http://publication.pravo.gov.ru/file/pdf?eoNumber=0001202610020007",
+      "eoNumber": "0001202610050012",
+      "document_id": "30f092e2-e7fe-4ce1-ad8b-35aa3beb7ca3",
+      "name": "Об установлении норм обеспечения кормами (продуктами) штатных животных учреждений уголовно-исполнительной системы Российской Федерации, норм замены одних кормов (продуктов) другими при обеспечении штатных животных учреждений уголовно-исполнительной системы Российской Федерации, нормы обеспечения подстилочными материалами штатных животных учреждений уголовно-исполнительной системы Российской Федерации, нормы замены одних подстилочных материалов другими при обеспечении штатных животных учреждений уголовно-исполнительной системы Российской Федерации",
+      "number": "547",
+      "documentDate": "2026-08-31T00:00:00",
+      "pagesCount": 21,
+      "pdfFileLength": 769789,
+      "pdf_url": "http://publication.pravo.gov.ru/file/pdf?eoNumber=0001202610050012",
       "pdf_status": 200,
       "pdf_content_type": "application/octet-stream",
-      "pdf_bytes": 509365,
+      "pdf_bytes": 769789,
       "pdf_error": null,
-      "text_pages": 8,
-      "text_chars": 7,
-      "text_chars_per_page": 0.9,
+      "text_pages": 21,
+      "text_chars": 20,
+      "text_chars_per_page": 1.0,
       "text_text_head": "",
       "text_error": null,
       "act_number_found": false,
-      "act_number_checked": "267"
+      "act_number_checked": "547"
     },
     {
       "type_name": "Распоряжение",
       "type_id": "7ff5b3b5-3757-44f1-bb76-3766cabe3593",
-      "eoNumber": "0001202610030014",
-      "document_id": "65f1265a-f523-4e85-bd39-42d3db81585d",
-      "name": "О подписании Соглашения между Правительством Российской Федерации и Правительством Гвинейской Республики об урегулировании финансовых обязательств Гвинейской Республики по заблокированным средствам на счетах государственной корпорации развития \"ВЭБ.РФ\" в Центральном банке Гвинеи",
-      "number": "2773-р",
-      "documentDate": "2026-10-02T00:00:00",
-      "pagesCount": 7,
-      "pdfFileLength": 1343134,
-      "pdf_url": "http://publication.pravo.gov.ru/file/pdf?eoNumber=0001202610030014",
-      "pdf_status": 200,
-      "pdf_content_type": "application/octet-stream",
-      "pdf_bytes": 1343134,
-      "pdf_error": null,
-      "text_pages": 7,
-      "text_chars": 6,
-      "text_chars_per_page": 0.9,
-      "text_text_head": "",
-      "text_error": null,
-      "act_number_found": false,
-      "act_number_checked": "2773-р"
-    },
-    {
-      "type_name": "Указ",
-      "type_id": "0790e34b-784b-4372-884e-3282622a24bd",
-      "eoNumber": "0001202610020002",
-      "document_id": "51625e87-2a3e-4d35-9a0b-2de98f231fe5",
-      "name": "\"О Чрезвычайном и Полномочном После Российской Федерации в Греческой Республике\"",
-      "number": "712",
-      "documentDate": "2026-10-02T00:00:00",
+      "eoNumber": "0001202610050003",
+      "document_id": "55affb0c-cab3-40e2-af3e-f32ba17b6774",
+      "name": "\"О специальном решении о реорганизации акционерного общества \"ЮниКредит Банк\" и совершении сделок с его акциями\"",
+      "number": "368-рп",
+      "documentDate": "2026-10-05T00:00:00",
       "pagesCount": 1,
-      "pdfFileLength": 32349,
-      "pdf_url": "http://publication.pravo.gov.ru/file/pdf?eoNumber=0001202610020002",
+      "pdfFileLength": 71243,
+      "pdf_url": "http://publication.pravo.gov.ru/file/pdf?eoNumber=0001202610050003",
       "pdf_status": 200,
       "pdf_content_type": "application/octet-stream",
-      "pdf_bytes": 32349,
+      "pdf_bytes": 71243,
       "pdf_error": null,
       "text_pages": 1,
       "text_chars": 0,
@@ -282,7 +259,30 @@
       "text_text_head": "",
       "text_error": null,
       "act_number_found": false,
-      "act_number_checked": "712"
+      "act_number_checked": "368-рп"
+    },
+    {
+      "type_name": "Указ",
+      "type_id": "0790e34b-784b-4372-884e-3282622a24bd",
+      "eoNumber": "0001202610050002",
+      "document_id": "525bffbe-f7fd-448d-97a6-fc8babf74f82",
+      "name": "\"Об автономной некоммерческой организации, обеспечивающей деятельность Уполномоченного при Президенте Российской Федерации по защите прав предпринимателей\"",
+      "number": "716",
+      "documentDate": "2026-10-05T00:00:00",
+      "pagesCount": 3,
+      "pdfFileLength": 219035,
+      "pdf_url": "http://publication.pravo.gov.ru/file/pdf?eoNumber=0001202610050002",
+      "pdf_status": 200,
+      "pdf_content_type": "application/octet-stream",
+      "pdf_bytes": 219035,
+      "pdf_error": null,
+      "text_pages": 3,
+      "text_chars": 2,
+      "text_chars_per_page": 0.7,
+      "text_text_head": "",
+      "text_error": null,
+      "act_number_found": false,
+      "act_number_checked": "716"
     },
     {
       "type_name": "Федеральный закон",
