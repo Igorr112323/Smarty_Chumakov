@@ -845,7 +845,7 @@
       "current_page": 1,
       "first_eo_number": "0001202610050002",
       "body_head": "{\"items\":[{\"eoNumber\":\"0001202610050002\",\"hasSvg\":false,\"zipFileLength\":null,\"publishDateShort\":\"2026-10-05T00:00:00\",\"complexName\":\"Указ Президента Российской Федерации от 05.10.2026 № 716\\n \\\"Об автономной некоммерческой организации, обеспечивающей деятельность Уполномоченного при Президенте Российской Федерации по защите прав предпринимателей\\\"\",\"pagesCount\":3,\"pdfFileLength\":219035,\"jdRegNumber\":null,\"jdRegDate\":null,\"name\":\"\\\"Об автономной некоммерческой организации, обеспечивающей деятельность Уполномоченного при Президенте Российской Федерации по защите прав предпринимателей\\\"\",\"number\":\"716\",\"documentDate\":\"2026-10-05T00:00:00\",\"signatoryAuthorityId\":\"225698f1-cfbc-4e42-9caa-32f9f7403211\",\"documentTypeId\":\"0790e34b-784b-4372-884e-3282622a24bd\",\"title\":\"Указ Президента Российской Федерации от 05.10.2026 № 716<br /> \\\"Об автономной некоммерческой организации, обеспечивающей деятельность Уполномоченного при Президенте Российской Федерации по защите прав предпринимателей\\\"\",\"viewDate\":\"05.10.2026\",\"id\":\"525bffbe-f7fd-448d-97a6-fc8babf74f82\"},{\"eoNumber\":\"0001202610050001\",\"hasSvg\":false,\"zipFileLength\":null,\"publishDateShort\":\"2026-10-05T00:00:00\",\"complexName\":\"Указ Президента Российской Федерации от 05.10.2026 № 715\\n \\\"Об Уполномоченном при Президенте Российской Федерации по защите прав предпринимателей\\\"\",\"pagesCount\":1,\"pdfFileLength\":32485,\"jdRegNumber\":null,\"jdRegDate\":null,\"name\":\"\\\"Об Уполномоченном при Президенте Российской Федерации по защите прав предпринимате",
-      "seconds": 1.13,
+      "seconds": 0.78,
       "error": null,
       "name": "documents-page1-size30"
     },
@@ -858,7 +858,7 @@
         "type": "https://tools.ietf.org/html/rfc7231#section-6.5.1",
         "title": "One or more validation errors occurred.",
         "status": 400,
-        "traceId": "|2ceed6fe-49a6dd5edfc51f53.",
+        "traceId": "|2cf0a6aa-49a6dd5edfc51f53.",
         "errors": {
           "PageSize": [
             "The value '5' is invalid."
@@ -870,8 +870,8 @@
       "items_total_count": null,
       "current_page": null,
       "first_eo_number": null,
-      "body_head": "{\"type\":\"https://tools.ietf.org/html/rfc7231#section-6.5.1\",\"title\":\"One or more validation errors occurred.\",\"status\":400,\"traceId\":\"|2ceed6fe-49a6dd5edfc51f53.\",\"errors\":{\"PageSize\":[\"The value '5' is invalid.\"]}}",
-      "seconds": 0.36,
+      "body_head": "{\"type\":\"https://tools.ietf.org/html/rfc7231#section-6.5.1\",\"title\":\"One or more validation errors occurred.\",\"status\":400,\"traceId\":\"|2cf0a6aa-49a6dd5edfc51f53.\",\"errors\":{\"PageSize\":[\"The value '5' is invalid.\"]}}",
+      "seconds": 0.33,
       "error": "HTTP 400",
       "name": "documents-size-5"
     },
@@ -1084,7 +1084,7 @@
       "current_page": 1,
       "first_eo_number": "0001202610050002",
       "body_head": "{\"items\":[{\"eoNumber\":\"0001202610050002\",\"hasSvg\":false,\"zipFileLength\":null,\"publishDateShort\":\"2026-10-05T00:00:00\",\"complexName\":\"Указ Президента Российской Федерации от 05.10.2026 № 716\\n \\\"Об автономной некоммерческой организации, обеспечивающей деятельность Уполномоченного при Президенте Российской Федерации по защите прав предпринимателей\\\"\",\"pagesCount\":3,\"pdfFileLength\":219035,\"jdRegNumber\":null,\"jdRegDate\":null,\"name\":\"\\\"Об автономной некоммерческой организации, обеспечивающей деятельность Уполномоченного при Президенте Российской Федерации по защите прав предпринимателей\\\"\",\"number\":\"716\",\"documentDate\":\"2026-10-05T00:00:00\",\"signatoryAuthorityId\":\"225698f1-cfbc-4e42-9caa-32f9f7403211\",\"documentTypeId\":\"0790e34b-784b-4372-884e-3282622a24bd\",\"title\":\"Указ Президента Российской Федерации от 05.10.2026 № 716<br /> \\\"Об автономной некоммерческой организации, обеспечивающей деятельность Уполномоченного при Президенте Российской Федерации по защите прав предпринимателей\\\"\",\"viewDate\":\"05.10.2026\",\"id\":\"525bffbe-f7fd-448d-97a6-fc8babf74f82\"},{\"eoNumber\":\"0001202610050001\",\"hasSvg\":false,\"zipFileLength\":null,\"publishDateShort\":\"2026-10-05T00:00:00\",\"complexName\":\"Указ Президента Российской Федерации от 05.10.2026 № 715\\n \\\"Об Уполномоченном при Президенте Российской Федерации по защите прав предпринимателей\\\"\",\"pagesCount\":1,\"pdfFileLength\":32485,\"jdRegNumber\":null,\"jdRegDate\":null,\"name\":\"\\\"Об Уполномоченном при Президенте Российской Федерации по защите прав предпринимате",
-      "seconds": 0.58,
+      "seconds": 0.51,
       "error": null,
       "name": "documents-size-10"
     },
@@ -1097,7 +1097,7 @@
         "type": "https://tools.ietf.org/html/rfc7231#section-6.5.1",
         "title": "One or more validation errors occurred.",
         "status": 400,
-        "traceId": "|d5abdf40-4d71c4d6a7267f4b.",
+        "traceId": "|bc0cd969-4c8ce2c17565247f.",
         "errors": {
           "PageSize": [
             "The value '20' is invalid."
@@ -1109,8 +1109,8 @@
       "items_total_count": null,
       "current_page": null,
       "first_eo_number": null,
-      "body_head": "{\"type\":\"https://tools.ietf.org/html/rfc7231#section-6.5.1\",\"title\":\"One or more validation errors occurred.\",\"status\":400,\"traceId\":\"|d5abdf40-4d71c4d6a7267f4b.\",\"errors\":{\"PageSize\":[\"The value '20' is invalid.\"]}}",
-      "seconds": 0.34,
+      "body_head": "{\"type\":\"https://tools.ietf.org/html/rfc7231#section-6.5.1\",\"title\":\"One or more validation errors occurred.\",\"status\":400,\"traceId\":\"|bc0cd969-4c8ce2c17565247f.\",\"errors\":{\"PageSize\":[\"The value '20' is invalid.\"]}}",
+      "seconds": 0.55,
       "error": "HTTP 400",
       "name": "documents-size-20"
     },
@@ -1123,7 +1123,7 @@
         "type": "https://tools.ietf.org/html/rfc7231#section-6.5.1",
         "title": "One or more validation errors occurred.",
         "status": 400,
-        "traceId": "|586ff67e-47d3dbf587a3f56d.",
+        "traceId": "|5870a7ce-47d3dbf587a3f56d.",
         "errors": {
           "PageSize": [
             "The value '50' is invalid."
@@ -1135,8 +1135,8 @@
       "items_total_count": null,
       "current_page": null,
       "first_eo_number": null,
-      "body_head": "{\"type\":\"https://tools.ietf.org/html/rfc7231#section-6.5.1\",\"title\":\"One or more validation errors occurred.\",\"status\":400,\"traceId\":\"|586ff67e-47d3dbf587a3f56d.\",\"errors\":{\"PageSize\":[\"The value '50' is invalid.\"]}}",
-      "seconds": 0.56,
+      "body_head": "{\"type\":\"https://tools.ietf.org/html/rfc7231#section-6.5.1\",\"title\":\"One or more validation errors occurred.\",\"status\":400,\"traceId\":\"|5870a7ce-47d3dbf587a3f56d.\",\"errors\":{\"PageSize\":[\"The value '50' is invalid.\"]}}",
+      "seconds": 0.39,
       "error": "HTTP 400",
       "name": "documents-size-50"
     },
@@ -3059,7 +3059,7 @@
       "current_page": 1,
       "first_eo_number": "0001202610050002",
       "body_head": "{\"items\":[{\"eoNumber\":\"0001202610050002\",\"hasSvg\":false,\"zipFileLength\":null,\"publishDateShort\":\"2026-10-05T00:00:00\",\"complexName\":\"Указ Президента Российской Федерации от 05.10.2026 № 716\\n \\\"Об автономной некоммерческой организации, обеспечивающей деятельность Уполномоченного при Президенте Российской Федерации по защите прав предпринимателей\\\"\",\"pagesCount\":3,\"pdfFileLength\":219035,\"jdRegNumber\":null,\"jdRegDate\":null,\"name\":\"\\\"Об автономной некоммерческой организации, обеспечивающей деятельность Уполномоченного при Президенте Российской Федерации по защите прав предпринимателей\\\"\",\"number\":\"716\",\"documentDate\":\"2026-10-05T00:00:00\",\"signatoryAuthorityId\":\"225698f1-cfbc-4e42-9caa-32f9f7403211\",\"documentTypeId\":\"0790e34b-784b-4372-884e-3282622a24bd\",\"title\":\"Указ Президента Российской Федерации от 05.10.2026 № 716<br /> \\\"Об автономной некоммерческой организации, обеспечивающей деятельность Уполномоченного при Президенте Российской Федерации по защите прав предпринимателей\\\"\",\"viewDate\":\"05.10.2026\",\"id\":\"525bffbe-f7fd-448d-97a6-fc8babf74f82\"},{\"eoNumber\":\"0001202610050001\",\"hasSvg\":false,\"zipFileLength\":null,\"publishDateShort\":\"2026-10-05T00:00:00\",\"complexName\":\"Указ Президента Российской Федерации от 05.10.2026 № 715\\n \\\"Об Уполномоченном при Президенте Российской Федерации по защите прав предпринимателей\\\"\",\"pagesCount\":1,\"pdfFileLength\":32485,\"jdRegNumber\":null,\"jdRegDate\":null,\"name\":\"\\\"Об Уполномоченном при Президенте Российской Федерации по защите прав предпринимате",
-      "seconds": 1.61,
+      "seconds": 1.69,
       "error": null,
       "name": "documents-size-100"
     },
@@ -3272,7 +3272,7 @@
       "current_page": 2,
       "first_eo_number": "0001202610050008",
       "body_head": "{\"items\":[{\"eoNumber\":\"0001202610050008\",\"hasSvg\":false,\"zipFileLength\":null,\"publishDateShort\":\"2026-10-05T00:00:00\",\"complexName\":\"Приказ Министерства спорта Российской Федерации от 27.08.2026 № 764\\n \\\"Об утверждении примерной дополнительной образовательной программы спортивной подготовки по виду спорта \\\"подводный спорт\\\"\",\"pagesCount\":16,\"pdfFileLength\":823292,\"jdRegNumber\":\"88595\",\"jdRegDate\":\"2026-10-02T00:00:00\",\"name\":\"Об утверждении примерной дополнительной образовательной программы спортивной подготовки по виду спорта «подводный спорт»\",\"number\":\"764\",\"documentDate\":\"2026-08-27T00:00:00\",\"signatoryAuthorityId\":\"d12c90ee-64ed-4d07-a360-438c1c40b0e2\",\"documentTypeId\":\"2dddb344-d3e2-4785-a899-7aa12bd47b6f\",\"title\":\"Приказ Министерства спорта Российской Федерации от 27.08.2026 № 764<br /> \\\"Об утверждении примерной дополнительной образовательной программы спортивной подготовки по виду спорта \\\"подводный спорт\\\"<br/>(Зарегистрирован 02.10.2026 № 88595)\",\"viewDate\":\"05.10.2026\",\"id\":\"13eb08b0-a371-49a4-8b3f-9918305dff1d\"},{\"eoNumber\":\"0001202610050006\",\"hasSvg\":false,\"zipFileLength\":null,\"publishDateShort\":\"2026-10-05T00:00:00\",\"complexName\":\"Приказ Министерства спорта Российской Федерации от 27.08.2026 № 763\\n \\\"Об утверждении примерной дополнительной образовательной программы спортивной подготовки по виду спорта \\\"сумо\\\"\",\"pagesCount\":16,\"pdfFileLength\":756342,\"jdRegNumber\":\"88594\",\"jdRegDate\":\"2026-10-02T00:00:00\",\"name\":\"Об утверждении примерной дополнительной образо",
-      "seconds": 0.61,
+      "seconds": 0.79,
       "error": null,
       "name": "documents-page2-size10"
     },
@@ -3485,7 +3485,7 @@
       "current_page": 1,
       "first_eo_number": "0001202610050002",
       "body_head": "{\"items\":[{\"eoNumber\":\"0001202610050002\",\"hasSvg\":false,\"zipFileLength\":null,\"publishDateShort\":\"2026-10-05T00:00:00\",\"complexName\":\"Указ Президента Российской Федерации от 05.10.2026 № 716\\n \\\"Об автономной некоммерческой организации, обеспечивающей деятельность Уполномоченного при Президенте Российской Федерации по защите прав предпринимателей\\\"\",\"pagesCount\":3,\"pdfFileLength\":219035,\"jdRegNumber\":null,\"jdRegDate\":null,\"name\":\"\\\"Об автономной некоммерческой организации, обеспечивающей деятельность Уполномоченного при Президенте Российской Федерации по защите прав предпринимателей\\\"\",\"number\":\"716\",\"documentDate\":\"2026-10-05T00:00:00\",\"signatoryAuthorityId\":\"225698f1-cfbc-4e42-9caa-32f9f7403211\",\"documentTypeId\":\"0790e34b-784b-4372-884e-3282622a24bd\",\"title\":\"Указ Президента Российской Федерации от 05.10.2026 № 716<br /> \\\"Об автономной некоммерческой организации, обеспечивающей деятельность Уполномоченного при Президенте Российской Федерации по защите прав предпринимателей\\\"\",\"viewDate\":\"05.10.2026\",\"id\":\"525bffbe-f7fd-448d-97a6-fc8babf74f82\"},{\"eoNumber\":\"0001202610050001\",\"hasSvg\":false,\"zipFileLength\":null,\"publishDateShort\":\"2026-10-05T00:00:00\",\"complexName\":\"Указ Президента Российской Федерации от 05.10.2026 № 715\\n \\\"Об Уполномоченном при Президенте Российской Федерации по защите прав предпринимателей\\\"\",\"pagesCount\":1,\"pdfFileLength\":32485,\"jdRegNumber\":null,\"jdRegDate\":null,\"name\":\"\\\"Об Уполномоченном при Президенте Российской Федерации по защите прав предпринимате",
-      "seconds": 0.52,
+      "seconds": 0.6,
       "error": null,
       "name": "documents-pascal"
     },
@@ -3698,7 +3698,7 @@
       "current_page": 1,
       "first_eo_number": "0001202608040078",
       "body_head": "{\"items\":[{\"eoNumber\":\"0001202608040078\",\"hasSvg\":false,\"zipFileLength\":null,\"publishDateShort\":\"2026-08-04T00:00:00\",\"complexName\":\"Федеральный закон от 04.08.2026 № 334-ФЗ\\n \\\"О внесении изменений в отдельные законодательные акты Российской Федерации\\\"\",\"pagesCount\":45,\"pdfFileLength\":2408334,\"jdRegNumber\":null,\"jdRegDate\":null,\"name\":\"\\\"О внесении изменений в отдельные законодательные акты Российской Федерации\\\"\",\"number\":\"334-ФЗ\",\"documentDate\":\"2026-08-04T00:00:00\",\"signatoryAuthorityId\":\"225698f1-cfbc-4e42-9caa-32f9f7403211\",\"documentTypeId\":\"82a8bf1c-3bc7-47ed-827f-7affd43a7f27\",\"title\":\"Федеральный закон от 04.08.2026 № 334-ФЗ<br /> \\\"О внесении изменений в отдельные законодательные акты Российской Федерации\\\"\",\"viewDate\":\"04.08.2026\",\"id\":\"ac47584e-fc7c-485f-8552-9529d2bc85a7\"},{\"eoNumber\":\"0001202608040076\",\"hasSvg\":false,\"zipFileLength\":null,\"publishDateShort\":\"2026-08-04T00:00:00\",\"complexName\":\"Федеральный закон от 04.08.2026 № 333-ФЗ\\n \\\"О внесении изменений в отдельные законодательные акты Российской Федерации\\\"\",\"pagesCount\":4,\"pdfFileLength\":148225,\"jdRegNumber\":null,\"jdRegDate\":null,\"name\":\"\\\"О внесении изменений в отдельные законодательные акты Российской Федерации\\\"\",\"number\":\"333-ФЗ\",\"documentDate\":\"2026-08-04T00:00:00\",\"signatoryAuthorityId\":\"225698f1-cfbc-4e42-9caa-32f9f7403211\",\"documentTypeId\":\"82a8bf1c-3bc7-47ed-827f-7affd43a7f27\",\"title\":\"Федеральный закон от 04.08.2026 № 333-ФЗ<br /> \\\"О внесении изменений в отдельные законодательные акты Российско",
-      "seconds": 0.57,
+      "seconds": 0.35,
       "error": null,
       "name": "documents-type-full-guid"
     },
@@ -3714,7 +3714,7 @@
       "current_page": null,
       "first_eo_number": null,
       "body_head": "<urlset xmlns=\"http://www.sitemaps.org/schemas/sitemap/0.9\">\r\n  <url>\r\n    <loc>http://publication.pravo.gov.ru/documents/president/daily</loc>\r\n    <priority>1.0</priority>\r\n  </url>\r\n  <url>\r\n    <loc>http://publication.pravo.gov.ru/documents/president/monthly</loc>\r\n    <priority>1.0</priority>\r\n  </url>\r\n  <url>\r\n    <loc>http://publication.pravo.gov.ru/documents/president/weekly</loc>\r\n    <priority>1.0</priority>\r\n  </url>\r\n  <url>\r\n    <loc>http://publication.pravo.gov.ru/calendar/president</loc>\r\n    <priority>1.0</priority>\r\n  </url>\r\n  <url>\r\n    <loc>http://publication.pravo.gov.ru/documents/block/president</loc>\r\n    <priority>1.0</priority>\r\n  </url>\r\n  <url>\r\n    <loc>http://publication.pravo.gov.ru/documents/government/daily</loc>\r\n    <priority>1.0</priority>\r\n  </url>\r\n  <url>\r\n    <loc>http://publication.pravo.gov.ru/documents/government/monthly</loc>\r\n    <priority>1.0</priority>\r\n  </url>\r\n  <url>\r\n    <loc>http://publication.pravo.gov.ru/documents/government/weekly</loc>\r\n    <priority>1.0</priority>\r\n  </url>\r\n  <url>\r\n    <loc>http://publication.pravo.gov.ru/calendar/government</loc>\r\n    <priority>1.0</priority>\r\n  </url>\r\n  <url>\r\n    <loc>http://publication.pravo.gov.ru/documents/block/government</loc>\r\n    <priority>1.0</priority>\r\n  </url>\r\n  <url>\r\n    <loc>http://publication.pravo.gov.ru/documents/federal_authorities/daily</loc>\r\n    <priority>1.0</priority>\r\n  </url>\r\n  <url>\r\n    <loc>http://publication.pravo.gov.ru/documents/federal_authoritie",
-      "seconds": 0.88,
+      "seconds": 0.84,
       "error": null,
       "name": "sitemap"
     },
@@ -3730,7 +3730,7 @@
       "current_page": null,
       "first_eo_number": null,
       "body_head": "<!DOCTYPE html>\r\n<html lang=\"ru\">\r\n<head>\r\n    <meta charset=\"utf-8\" />\r\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\" />\r\n    <meta http-equiv=\"X-UA-Compatible\" content=\"IE=edge\">\r\n    <meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\">\r\n    <title>&#x423;&#x43A;&#x430;&#x437; &#x41F;&#x440;&#x435;&#x437;&#x438;&#x434;&#x435;&#x43D;&#x442;&#x430; &#x420;&#x43E;&#x441;&#x441;&#x438;&#x439;&#x441;&#x43A;&#x43E;&#x439; &#x424;&#x435;&#x434;&#x435;&#x440;&#x430;&#x446;&#x438;&#x438; &#x43E;&#x442; 05.10.2026 &#x2116; 716 &#x2219; &#x41E;&#x444;&#x438;&#x446;&#x438;&#x430;&#x43B;&#x44C;&#x43D;&#x43E;&#x435; &#x43E;&#x43F;&#x443;&#x431;&#x43B;&#x438;&#x43A;&#x43E;&#x432;&#x430;&#x43D;&#x438;&#x435; &#x43F;&#x440;&#x430;&#x432;&#x43E;&#x432;&#x44B;&#x445; &#x430;&#x43A;&#x442;&#x43E;&#x432;</title>\r\n\r\n    <link rel=\"shortcut icon\" href=\"/favicon/favicon.ico\" />\r\n    <link rel=\"icon\" sizes=\"16x16 32x32 64x64\" href=\"/favicon/favicon.ico\" />\r\n    <link rel=\"icon\" type=\"image/png\" sizes=\"196x196\" href=\"/favicon/favicon-192.png\" />\r\n    <link rel=\"icon\" type=\"image/png\" sizes=\"160x160\" href=\"/favicon/favicon-160.png\" />\r\n    <link rel=\"icon\" type=\"image/png\" sizes=\"96x96\" href=\"/favicon/favicon-96.png\" />\r\n    <link rel=\"icon\" type=\"image/png\" sizes=\"64x64\" href=\"/favicon/favicon-64.png\" />\r\n    <link rel=\"icon\" type=\"image/png\" sizes=\"32x32\" href=\"/favicon/favicon-32.png\" />\r\n    <link rel=\"icon\" type=\"image/png\" sizes=\"16x16\" href=\"/favicon/",
-      "seconds": 0.82,
+      "seconds": 0.51,
       "error": null,
       "name": "document-view-by-eo"
     },
@@ -3746,7 +3746,7 @@
       "current_page": null,
       "first_eo_number": null,
       "body_head": "<!DOCTYPE html>\r\n<html lang=\"ru\">\r\n<head>\r\n    <meta charset=\"utf-8\" />\r\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\" />\r\n    <meta http-equiv=\"X-UA-Compatible\" content=\"IE=edge\">\r\n    <meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\">\r\n    <title></title>\r\n\r\n    <link rel=\"shortcut icon\" href=\"/favicon/favicon.ico\" />\r\n    <link rel=\"icon\" sizes=\"16x16 32x32 64x64\" href=\"/favicon/favicon.ico\" />\r\n    <link rel=\"icon\" type=\"image/png\" sizes=\"196x196\" href=\"/favicon/favicon-192.png\" />\r\n    <link rel=\"icon\" type=\"image/png\" sizes=\"160x160\" href=\"/favicon/favicon-160.png\" />\r\n    <link rel=\"icon\" type=\"image/png\" sizes=\"96x96\" href=\"/favicon/favicon-96.png\" />\r\n    <link rel=\"icon\" type=\"image/png\" sizes=\"64x64\" href=\"/favicon/favicon-64.png\" />\r\n    <link rel=\"icon\" type=\"image/png\" sizes=\"32x32\" href=\"/favicon/favicon-32.png\" />\r\n    <link rel=\"icon\" type=\"image/png\" sizes=\"16x16\" href=\"/favicon/favicon-16.png\" />\r\n    <link rel=\"apple-touch-icon-precomposed\" href=\"/favicon/favicon-57.png\" />\r\n    <link rel=\"apple-touch-icon-precomposed\" sizes=\"60x60\" href=\"/favicon/favicon-60.png\" />\r\n    <link rel=\"apple-touch-icon-precomposed\" sizes=\"72x72\" href=\"/favicon/favicon-72.png\" />\r\n    <link rel=\"apple-touch-icon-precomposed\" sizes=\"76x76\" href=\"/favicon/favicon-76.png\" />\r\n    <link rel=\"apple-touch-icon-precomposed\" sizes=\"114x114\" href=\"/favicon/favicon-114.png\" />\r\n    <link rel=\"apple-touch-icon-precomposed\" sizes=\"120x120\" href=",
-      "seconds": 0.54,
+      "seconds": 0.35,
       "error": "HTTP 404",
       "name": "document-card-by-guid"
     }

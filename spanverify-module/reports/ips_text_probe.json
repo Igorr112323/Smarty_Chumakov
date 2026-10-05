@@ -224,22 +224,14 @@
     {
       "name": "searchres-a0-a1",
       "url": "http://pravo.gov.ru/proxy/ips/?searchres=1&a0=%EF%E5%F0%F1%EE%ED%E0%EB%FC%ED%FB%E5%20%E4%E0%ED%ED%FB%E5&a1=1",
-      "status": 200,
-      "bytes": 1347,
-      "text_chars": 149,
+      "status": null,
+      "bytes": 0,
+      "text_chars": 0,
       "nd_occurrences": 0,
       "nd_examples": [],
-      "query_words_in_text": true,
-      "text_head": "Законодательство России. Поиск: Контекст: 'персональные данные' Наименование: 1 Для отображения этого сайта необходим браузер, поддерживающий фреймы.",
-      "addresses": [
-        "?style.css",
-        "?favicon.ico",
-        "?json.js",
-        "?script.js",
-        "?listsel.js",
-        "?searchlist=1&a0=%EF%E5%F0%F1%EE%ED%E0%EB%FC%ED%FB%E5%20%E4%E0%ED%ED%FB%E5&a1=1",
-        "about:blank"
-      ]
+      "query_words_in_text": false,
+      "text_head": "",
+      "addresses": []
     },
     {
       "name": "searchres-a0-a16",
