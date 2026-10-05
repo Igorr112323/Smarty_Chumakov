@@ -8,8 +8,8 @@
   "pairs": 1000,
   "pairs_total_in_file": 1000,
   "limit": null,
-  "source_file": "/home/user/Smarty_Chumakov/spanverify-module/data/external/adapted/rushallu.jsonl",
-  "duration_s": 67.4,
+  "source_file": "/home/runner/work/Smarty_Chumakov/Smarty_Chumakov/spanverify-module/data/external/adapted/rushallu.jsonl",
+  "duration_s": 119.3,
   "label_origin": {
     "human": 1000
   },
@@ -25,36 +25,36 @@
       "auc": 0.5293
     },
     "spans": {
-      "strict_f1_iou_0_5": 0.2649,
-      "coverage": 0.5343,
-      "soft_f1_expanded": 0.3563,
-      "mean_width_ratio": 4.35
+      "strict_f1_iou_0_5": 0.0975,
+      "coverage": 0.13,
+      "soft_f1_expanded": 0.0819,
+      "mean_width_ratio": 2.33
     },
     "answers": {
       "precision": 0.3977,
       "recall": 0.2042,
       "f1": 0.2698,
       "fpr": 0.1544,
-      "auc": 0.5249
+      "auc": 0.5298
     },
     "verdicts": {
-      "tp": 259,
-      "fp": 307,
-      "fn": 74,
-      "tn": 360,
-      "precision": 0.4576,
-      "recall": 0.7778,
-      "f1": 0.5762,
-      "fpr": 0.4603
+      "tp": 261,
+      "fp": 314,
+      "fn": 72,
+      "tn": 353,
+      "precision": 0.4539,
+      "recall": 0.7838,
+      "f1": 0.5749,
+      "fpr": 0.4708
     }
   },
   "their_metrics": {
-    "rouge1": 0.5409,
-    "rouge2": 0.5334,
-    "rougeL": 0.5333,
-    "accuracy": 0.424,
-    "jaccard_score": 0.4352,
-    "hamming_loss": 0.2561,
+    "rouge1": 0.4716,
+    "rouge2": 0.4478,
+    "rougeL": 0.455,
+    "accuracy": 0.372,
+    "jaccard_score": 0.3756,
+    "hamming_loss": 0.3054,
     "empty_reference": 667,
     "pairs": 1000
   },

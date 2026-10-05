@@ -1,11 +1,11 @@
 {
   "dataset": "RusHallu-RAG (SberQuAD-RAG + ruSciBench-RAG)",
-  "dataset_dir": "data/external/rushallu",
+  "dataset_dir": "/home/runner/work/Smarty_Chumakov/Smarty_Chumakov/spanverify-module/data/external/rushallu",
   "dataset_version": "rushallu-rag@pinned",
   "citation": "Sadkovskii F., Nasyrova R., Sorokin A. RusHallu-RAG: бенчмарк обнаружения галлюцинаций RAG (Диалог-2026, DOI 10.29003/2075-7182-2026-24-516-534)",
   "mode": "demo",
   "pairs": 1000,
-  "duration_s": 51.4,
+  "duration_s": 123.8,
   "disclaimer": "RusHallu-RAG — внешний тест с человеческой разметкой спанов. Числа режима demo получены лексическими суррогатами признаков и научным результатом не являются: научный вывод требует режима hf на GPU, который в этой среде не запускался.",
   "our_metrics": {
     "tokens": {
@@ -16,31 +16,279 @@
       "auc": 0.5293
     },
     "spans": {
-      "strict_f1_iou_0_5": 0.2649,
-      "coverage": 0.5343,
-      "soft_f1_expanded": 0.3563,
-      "mean_width_ratio": 4.35
+      "strict_f1_iou_0_5": 0.0975,
+      "coverage": 0.13,
+      "soft_f1_expanded": 0.0819,
+      "mean_width_ratio": 2.33
     },
     "answers": {
       "precision": 0.3977,
       "recall": 0.2042,
       "f1": 0.2698,
       "fpr": 0.1544,
-      "auc": 0.5249
+      "auc": 0.5298
     }
   },
   "their_metrics": {
-    "rouge1": 0.5409,
-    "rouge2": 0.5334,
-    "rougeL": 0.5333,
-    "accuracy": 0.424,
-    "jaccard_score": 0.4352,
-    "hamming_loss": 0.2561,
+    "rouge1": 0.4716,
+    "rouge2": 0.4478,
+    "rougeL": 0.455,
+    "accuracy": 0.372,
+    "jaccard_score": 0.3756,
+    "hamming_loss": 0.3054,
     "empty_reference": 667,
     "pairs": 1000
   },
-  "baseline_comparison": null,
-  "baseline_note": "Сравнение с baseline статьи не выполнено: значения из Таблиц 2-4 не извлечены в этом окружении (PDF не парсился). Числа не выдумываются.",
+  "baseline_comparison": {
+    "article_url": "https://dialogue-conf.org/wp-content/uploads/2026/06/SadkovskiiFNasyrovaRSorokinA.087.pdf",
+    "article_bytes": 944040,
+    "tables": {
+      "2": {
+        "source_note": "данные из статьи, таблица 2",
+        "rows": [
+          {
+            "metric": "precision",
+            "line": "Table 2: Total benchmark binary metrics. P=Precision, R=Recall, SR=Success Rate",
+            "numbers": [
+              "2"
+            ]
+          },
+          {
+            "metric": "accuracy",
+            "line": "multi-label type classification, and span identification. Results are sorted by the accuracy metric. All",
+            "numbers": []
+          },
+          {
+            "metric": "precision",
+            "line": "precision, recall, F1-score and Jaccard metrics are macro-averaged 22.",
+            "numbers": [
+              "1",
+              "22"
+            ]
+          },
+          {
+            "metric": "f1",
+            "line": "acy 81.3, F1 78.5) with perfect format compliance, followed by Gemini-2.5-Flash (accuracy 75.2, F1",
+            "numbers": [
+              "81.3",
+              "1",
+              "78.5",
+              "2.5",
+              "75.2",
+              "1"
+            ]
+          },
+          {
+            "metric": "accuracy",
+            "line": "72.2). The proprietary GPT5.1-Pro achieves near-perfect format adherence (99.4% SR) with accuracy of",
+            "numbers": [
+              "72.2",
+              "5.1",
+              "99.4"
+            ]
+          },
+          {
+            "metric": "accuracy",
+            "line": "69.5. Y andexGPT-5.1 shows moderate performance (accuracy 54.3) with acceptable format compliance",
+            "numbers": [
+              "69.5",
+              "5.1",
+              "54.3"
+            ]
+          },
+          {
+            "metric": "accuracy",
+            "line": "detection (accuracy 65.0 and 63.0, respectively) but lower success rates (81.9 for both). GLM-4.6v",
+            "numbers": [
+              "65.0",
+              "63.0",
+              "81.9",
+              "4.6"
+            ]
+          },
+          {
+            "metric": "accuracy",
+            "line": "demonstrates competitive detection capability (accuracy 70.1) despite moderate success rate (89.5). The",
+            "numbers": [
+              "70.1",
+              "89.5"
+            ]
+          },
+          {
+            "metric": "precision",
+            "line": "reasoning-focused Kimi-k2-thinking achieves 56.4% accuracy with notably high precision (57.6) but low",
+            "numbers": [
+              "2",
+              "56.4",
+              "57.6"
+            ]
+          },
+          {
+            "metric": "recall",
+            "line": "recall (31.8) and reduced format compliance (63.9% SR).",
+            "numbers": [
+              "31.8",
+              "63.9"
+            ]
+          },
+          {
+            "metric": "accuracy",
+            "line": "herence but substantially weaker detection accuracy (41.6 and 35.5, respectively), though both maintain",
+            "numbers": [
+              "41.6",
+              "35.5"
+            ]
+          },
+          {
+            "metric": "recall",
+            "line": "high recall (54.6 and 50.9). DeepSeek-chat-v3-0324 underperforms on accuracy (37.0) with moder-",
+            "numbers": [
+              "54.6",
+              "50.9",
+              "3",
+              "0324",
+              "37.0"
+            ]
+          }
+        ]
+      },
+      "3": {
+        "source_note": "данные из статьи, таблица 3",
+        "rows": [
+          {
+            "metric": "precision",
+            "line": "Table 3: Total benchmark multi-label metrics. P=Precision, R=Recall, HL=Hamming Loss.",
+            "numbers": [
+              "3"
+            ]
+          },
+          {
+            "metric": "f1",
+            "line": "curacy 71.6, macro F1 47.0, Jaccard 34.1) with minimal Hamming Loss (7.0), confirming superior per-",
+            "numbers": [
+              "71.6",
+              "1",
+              "47.0",
+              "34.1",
+              "7.0"
+            ]
+          },
+          {
+            "metric": "f1",
+            "line": "label prediction quality. Gemini-2.5-Flash follows at a distance (accuracy 63.1, F1 31.7, Jaccard 21.9).",
+            "numbers": [
+              "2.5",
+              "63.1",
+              "1",
+              "31.7",
+              "21.9"
+            ]
+          },
+          {
+            "metric": "precision",
+            "line": "GLM-4.6v model achieves competitive accuracy (61.7) with strong precision (40.7), closely match-",
+            "numbers": [
+              "4.6",
+              "61.7",
+              "40.7"
+            ]
+          },
+          {
+            "metric": "accuracy",
+            "line": "Y andexGPT-5.1, and Kimi-k2-thinking cluster in the 51.9–58.1% accuracy range, though with varying",
+            "numbers": [
+              "5.1",
+              "2",
+              "51.9",
+              "58.1"
+            ]
+          },
+          {
+            "metric": "precision",
+            "line": "precision-recall trade-offs: T-pro-it-2.0 and gpt-oss-20b favor precision (38.8 and 41.9), while Kimi",
+            "numbers": [
+              "2.0",
+              "20",
+              "38.8",
+              "41.9"
+            ]
+          },
+          {
+            "metric": "precision",
+            "line": "shows the highest precision (48.7) but lowest recall (21.2) in this group.",
+            "numbers": [
+              "48.7",
+              "21.2"
+            ]
+          },
+          {
+            "metric": "accuracy",
+            "line": "A performance gap emerges below 20% accuracy: DeepSeek-chat-v3-0324, Llama-3.3-70B, and",
+            "numbers": [
+              "20",
+              "3",
+              "0324",
+              "3.3",
+              "70"
+            ]
+          },
+          {
+            "metric": "recall",
+            "line": "showing relatively higher recall (33.7 and 34.8). Smaller models (Gemma-3-27b-it, Y andexGPT-5-8B-",
+            "numbers": [
+              "33.7",
+              "34.8",
+              "3",
+              "27",
+              "5",
+              "8"
+            ]
+          },
+          {
+            "metric": "accuracy",
+            "line": "Span identification. Gemini-2.5-Pro achieves the highest span accuracy (71.7), Jaccard (73.6), and",
+            "numbers": [
+              "2.5",
+              "71.7",
+              "73.6"
+            ]
+          },
+          {
+            "metric": "accuracy",
+            "line": "Gemini-2.5-Flash drops to seventh place (accuracy 61.9, ROUGE-L 70.7), suggesting that span extrac-",
+            "numbers": [
+              "2.5",
+              "61.9",
+              "70.7"
+            ]
+          }
+        ]
+      },
+      "4": {
+        "source_note": "данные из статьи, таблица 4",
+        "rows": [
+          {
+            "metric": "accuracy",
+            "line": "tection, Gemini-2.5-Pro’s accuracy drops from 84.6% (SberQuAD) to 75.1% (ruSciBench), with similar",
+            "numbers": [
+              "2.5",
+              "84.6",
+              "75.1"
+            ]
+          },
+          {
+            "metric": "accuracy",
+            "line": "both datasets (below 30% accuracy).",
+            "numbers": [
+              "30"
+            ]
+          }
+        ]
+      }
+    },
+    "note": "числа взяты из текста статьи без пересчёта; источник — таблицы 2-4"
+  },
+  "baseline_note": "Сравнение с baseline статьи приведено по извлечённым из PDF числам (таблицы 2-4).",
   "prediction_examples": [
     {
       "id": "rushallu-sberquad-50488",
@@ -60,21 +308,25 @@
       "id": "rushallu-sberquad-51600",
       "true": [],
       "predicted": [
-        "В контексте предоставленных документов нет информации о том, что в каменоломне что-либо находили."
+        "В контексте предоставленных документов нет информации о том",
+        "что в каменоломне что-либо находили."
       ]
     },
     {
       "id": "rushallu-sberquad-51905",
       "true": [],
       "predicted": [
-        "В предоставленном контексте нет информации о том, как называется первый тезис. Уточните, пожалуйста, какой именно тезис вас интересует?"
+        "В предоставленном контексте нет информации о том",
+        "Уточните, пожалуйста, какой именно тезис вас интересует?"
       ]
     },
     {
       "id": "rushallu-sberquad-52505",
       "true": [],
       "predicted": [
-        "Нарушение кальциевого обмена может влиять на различные внутриклеточные процессы в организме, включая мышечное сокращение и секрецию гормонов и нейромедиаторов. В контексте сердечно-сосудистой системы нарушения кальциевого обмена могут иметь последствия для процессов свёртывания крови. Однако в предоставленных документах нет информации о прямой связи между нарушением кальциевого обмена и поражением сердечно-сосудистой и нервной систем в контексте конкретных заболеваний, таких как атеросклероз или другие патологии."
+        "Нарушение кальциевого обмена может влиять на различные внутриклеточные процессы в организме",
+        "включая мышечное сокращение",
+        "В контексте сердечно-сосудистой системы нарушения кальциевого обмена могут иметь последствия для процессов свёртывания крови."
       ]
     }
   ]

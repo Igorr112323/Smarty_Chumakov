@@ -8,8 +8,8 @@
   "pairs": 875,
   "pairs_total_in_file": 875,
   "limit": null,
-  "source_file": "/home/user/Smarty_Chumakov/spanverify-module/data/external/adapted/ragtruth_qa_test.jsonl",
-  "duration_s": 51.7,
+  "source_file": "/home/runner/work/Smarty_Chumakov/Smarty_Chumakov/spanverify-module/data/external/adapted/ragtruth_qa_test.jsonl",
+  "duration_s": 64.3,
   "label_origin": {
     "human": 875
   },
@@ -25,10 +25,10 @@
       "auc": 0.7167
     },
     "spans": {
-      "strict_f1_iou_0_5": 0.0197,
-      "coverage": 0.966,
-      "soft_f1_expanded": 0.0723,
-      "mean_width_ratio": 12.54
+      "strict_f1_iou_0_5": 0.0227,
+      "coverage": 0.4511,
+      "soft_f1_expanded": 0.0285,
+      "mean_width_ratio": 7.93
     },
     "answers": {
       "precision": 0.2717,
@@ -49,12 +49,12 @@
     }
   },
   "their_metrics": {
-    "rouge1": 0.0777,
-    "rouge2": 0.0716,
-    "rougeL": 0.0718,
+    "rouge1": 0.0911,
+    "rouge2": 0.0631,
+    "rougeL": 0.0714,
     "accuracy": 0.0103,
-    "jaccard_score": 0.0103,
-    "hamming_loss": 0.1829,
+    "jaccard_score": 0.0138,
+    "hamming_loss": 0.1663,
     "empty_reference": 715,
     "pairs": 875
   },
