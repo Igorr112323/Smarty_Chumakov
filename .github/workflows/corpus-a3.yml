@@ -85,6 +85,29 @@ jobs:
           path: spanverify-module/reports/OCR_BENCH.json
           retention-days: 90
 
+      # Замер коммитится: артефакты GitHub не читаются из среды разработки, а число
+      # нужно реестру работ (пункт P2-2) и отчёту о функциональном тестировании.
+      - name: Закоммитить замер
+        if: always()
+        run: |
+          git config user.name "spanverify-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add -f reports/OCR_BENCH.json || true
+          if git diff --cached --quiet; then
+            echo "нечего коммитить"
+            exit 0
+          fi
+          git commit -m "замер скорости распознавания сканов [skip ci]"
+          for attempt in 1 2 3; do
+            if git pull --rebase --autostash -q origin "${GITHUB_REF_NAME}" && git push origin "HEAD:${GITHUB_REF_NAME}"; then
+              echo "замер закоммичен (попытка $attempt)"
+              exit 0
+            fi
+            sleep 5
+          done
+          echo "::warning title=замер::не удалось закоммитить за 3 попытки"
+          exit 0
+
   harvest:
     name: "Срез ${{ matrix.slice.name }}"
     runs-on: ubuntu-latest
