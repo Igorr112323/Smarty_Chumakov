@@ -143,6 +143,46 @@ REGION_NAMES: dict[str, str] = dict(REGION_BLOCKS)
 
 FEDERAL_PREFIX = "00"
 
+ALL = "all"
+NONE = "none"
+
+
+def _selection(value: str) -> set[str] | None:
+    """Разобрать значение ключа отбора: ``None`` — всё, пустое множество — ничего.
+
+    Различать «не задано» и «ничего не брать» обязательно: раньше пустая строка
+    означала «все виды актов», из-за чего региональные срезы всё равно сканировали
+    федеральные ленты и расходовали бюджет загрузки на них (замер прогона 2:
+    из 73 документов региональными оказались 19, дубликатов между срезами — 23).
+    """
+    cleaned = (value or "").strip().lower()
+    if cleaned in {"", ALL, "все"}:
+        return None
+    if cleaned in {NONE, "нет", "-"}:
+        return set()
+    return {part.strip() for part in value.split(",") if part.strip()}
+
+
+def select_types(type_ids: dict[str, str], value: str) -> dict[str, str]:
+    """Оставить запрошенные виды актов (``all`` — все, ``none`` — ни одного)."""
+    chosen = _selection(value)
+    if chosen is None:
+        return dict(type_ids)
+    return {name: identifier for name, identifier in type_ids.items() if name in chosen}
+
+
+def select_blocks(value: str, blocks: tuple[tuple[str, str], ...] = REGION_BLOCKS) -> tuple[tuple[str, str], ...]:
+    """Оставить запрошенные региональные разделы (``all`` — все, ``none`` — ни одного).
+
+    Код, которого нет в ``REGION_BLOCKS``, не отбрасывается: регион берётся по коду, а
+    название остаётся неизвестным и будет восстановлено из номера опубликования.
+    """
+    chosen = _selection(value)
+    if chosen is None:
+        return blocks
+    known = {code: name for code, name in blocks}
+    return tuple((code, known.get(code, f"регион {code}")) for code in sorted(chosen))
+
 
 def region_of(eo_number: str) -> dict[str, str | None]:
     """Уровень и регион акта по номеру опубликования.
@@ -794,13 +834,13 @@ def main() -> int:
     )
     parser.add_argument(
         "--only-types",
-        default="",
-        help="брать только эти виды актов (через запятую); пусто — все виды из TYPES",
+        default="all",
+        help="виды актов: «all» — все, «none» — не сканировать по видам, иначе список через запятую",
     )
     parser.add_argument(
         "--only-blocks",
-        default="",
-        help="брать только эти региональные разделы по коду (например 23,77); пусто — все из REGION_BLOCKS",
+        default="all",
+        help="региональные разделы: «all» — все, «none» — не сканировать регионы, иначе коды через запятую (23,77)",
     )
     parser.add_argument(
         "--regional-share",
@@ -874,14 +914,8 @@ def main() -> int:
                     type_ids[str(item["name"])] = str(item["id"])
         except json.JSONDecodeError:
             type_ids = {}
-    only_types = {name.strip() for name in args.only_types.split(",") if name.strip()}
-    if only_types:
-        missing = only_types - set(type_ids)
-        type_ids = {name: value for name, value in type_ids.items() if name in only_types}
-        if missing:
-            print(f"ВНИМАНИЕ: виды актов не найдены в справочнике API: {sorted(missing)}", file=sys.stderr)
-    only_blocks = {code.strip() for code in args.only_blocks.split(",") if code.strip()}
-    blocks = tuple(item for item in REGION_BLOCKS if not only_blocks or item[0] in only_blocks)
+    type_ids = select_types(type_ids, args.only_types)
+    blocks = select_blocks(args.only_blocks)
     print(f"срез: виды={sorted(type_ids) or '—'}; регионы={[code for code, _ in blocks] or '—'}")
     print(f"::notice title=A3 виды актов::{sorted(type_ids)}")
     time.sleep(max(0.0, pause))

@@ -12,8 +12,10 @@ from pathlib import Path
 
 from scripts import fetch_npa_corpus
 from scripts.fetch_npa_corpus import (
+    REGION_BLOCKS,
     WHITELIST,
     candidate_from_item,
+    collect_candidates,
     extract_facts,
     is_allowed,
     load_existing,
@@ -23,6 +25,8 @@ from scripts.fetch_npa_corpus import (
     plan_downloads,
     region_of,
     scan_list,
+    select_blocks,
+    select_types,
     text_layer_is_enough,
     theme_of,
     verify_sources,
@@ -331,3 +335,58 @@ def test_project_whitelist_config_is_valid() -> None:
     hosts = load_whitelist()
     assert "publication.pravo.gov.ru" in hosts
     assert len(hosts) >= 6
+
+
+def test_selection_distinguishes_all_none_and_list() -> None:
+    """«all», «none» и список — три разных значения, а не два.
+
+    Прогон 2 корпуса A3 показал цену смешения: пустое значение трактовалось как
+    «все виды актов», региональные срезы сканировали федеральные ленты, и из
+    73 собранных документов региональными оказались только 19 при 23 дубликатах.
+    """
+    types = {"Приказ": "a", "Указ": "b", "Постановление": "c"}
+
+    assert select_types(types, "all") == types
+    assert select_types(types, "") == types
+    assert select_types(types, "none") == {}
+    assert select_types(types, "-") == {}
+    assert select_types(types, "Приказ,Указ") == {"Приказ": "a", "Указ": "b"}
+    # Неизвестный вид просто не находится, остальные остаются.
+    assert select_types(types, "Приказ,Телеграмма") == {"Приказ": "a"}
+
+
+def test_select_blocks_keeps_order_and_unknown_codes() -> None:
+    """Регионы отбираются по коду; неизвестный код не теряется, а берётся без названия."""
+    assert select_blocks("all") == REGION_BLOCKS
+    assert select_blocks("none") == ()
+    assert select_blocks("23") == (("23", "Краснодарский край"),)
+    assert select_blocks("23,77") == (("23", "Краснодарский край"), ("77", "Москва"))
+    # Код вне списка приоритета всё равно сканируется — название подставляется явное.
+    assert select_blocks("02") == (("02", "регион 02"),)
+
+
+def test_collect_candidates_can_skip_a_whole_branch(monkeypatch) -> None:
+    """При пустом наборе видов ветка отбора по видам не делает ни одного запроса."""
+    requested: list[str] = []
+
+    def fake_scan(url: str, rules: dict, stats: dict, pause: float) -> list[dict] | None:
+        requested.append(url)
+        stats["pages_scanned"] += 1
+        return [{"eoNumber": "2300202610020003", "name": "Акт", "complexName": "Постановление", "pagesCount": 3}]
+
+    monkeypatch.setattr(fetch_npa_corpus, "scan_list", fake_scan)
+
+    candidates, stats = collect_candidates(
+        type_ids={},
+        max_pages_per_type=3,
+        pause=0.0,
+        robots={},
+        blocks=(("23", "Краснодарский край"),),
+        max_pages_per_block=1,
+        allow_other=True,
+    )
+    assert all("documentTypes" not in url for url in requested)
+    assert any("block=region23" in url for url in requested)
+    assert len(candidates) == 1
+    assert candidates[0]["region_name"] == "Краснодарский край"
+    assert stats["by_level"] == {"региональный": 1}

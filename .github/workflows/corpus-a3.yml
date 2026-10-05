@@ -91,25 +91,35 @@ jobs:
     timeout-minutes: 120
     strategy:
       fail-fast: false
-      max-parallel: 14
+      max-parallel: 21
       matrix:
         slice:
-          # Федеральные и ведомственные акты — по видам актов.
-          - { name: "fz", types: "Федеральный закон", blocks: "" }
-          - { name: "ukaz", types: "Указ", blocks: "" }
-          - { name: "postanovlenie", types: "Постановление", blocks: "" }
-          - { name: "prikaz", types: "Приказ", blocks: "" }
-          - { name: "polozhenie", types: "Положение", blocks: "" }
-          - { name: "rasporyazhenie", types: "Распоряжение", blocks: "" }
-          # Региональные акты — по разделам субъектов, Краснодарский край первым.
-          - { name: "region23-krasnodar", types: "", blocks: "23" }
-          - { name: "region77-moskva", types: "", blocks: "77" }
-          - { name: "region50-mo", types: "", blocks: "50" }
-          - { name: "region78-spb", types: "", blocks: "78" }
-          - { name: "region61-rostov", types: "", blocks: "61" }
-          - { name: "region26-stavropol", types: "", blocks: "26" }
-          - { name: "region16-tatarstan", types: "", blocks: "16" }
-          - { name: "region66-sverdlovsk", types: "", blocks: "66" }
+          # Федеральные и ведомственные акты — только ветка по видам актов.
+          - { name: "fz", types: "Федеральный закон", blocks: "none", share: "0.0" }
+          - { name: "ukaz", types: "Указ", blocks: "none", share: "0.0" }
+          - { name: "postanovlenie", types: "Постановление", blocks: "none", share: "0.0" }
+          - { name: "prikaz", types: "Приказ", blocks: "none", share: "0.0" }
+          - { name: "polozhenie", types: "Положение", blocks: "none", share: "0.0" }
+          - { name: "rasporyazhenie", types: "Распоряжение", blocks: "none", share: "0.0" }
+          # Региональные акты — только ветка по разделам субъектов. Приоритет задания:
+          # Краснодарский край, Москва, Московская область, Санкт-Петербург, Ростовская
+          # область, Ставропольский край, Татарстан, Свердловская область. Остальные
+          # субъекты добраны, чтобы выйти на требуемые 40 региональных актов.
+          - { name: "region23-krasnodar", types: "none", blocks: "23", share: "1.0" }
+          - { name: "region50-mo", types: "none", blocks: "50", share: "1.0" }
+          - { name: "region78-spb", types: "none", blocks: "78", share: "1.0" }
+          - { name: "region61-rostov", types: "none", blocks: "61", share: "1.0" }
+          - { name: "region26-stavropol", types: "none", blocks: "26", share: "1.0" }
+          - { name: "region16-tatarstan", types: "none", blocks: "16", share: "1.0" }
+          - { name: "region66-sverdlovsk", types: "none", blocks: "66", share: "1.0" }
+          - { name: "region77-moskva", types: "none", blocks: "77", share: "1.0" }
+          - { name: "region02-bashkortostan", types: "none", blocks: "02", share: "1.0" }
+          - { name: "region24-krasnoyarsk", types: "none", blocks: "24", share: "1.0" }
+          - { name: "region36-voronezh", types: "none", blocks: "36", share: "1.0" }
+          - { name: "region52-nizhny", types: "none", blocks: "52", share: "1.0" }
+          - { name: "region54-novosibirsk", types: "none", blocks: "54", share: "1.0" }
+          - { name: "region63-samara", types: "none", blocks: "63", share: "1.0" }
+          - { name: "region74-chelyabinsk", types: "none", blocks: "74", share: "1.0" }
     defaults:
       run:
         working-directory: spanverify-module
@@ -137,18 +147,32 @@ jobs:
       # копируется, иначе срез решит, что цель достигнута, и ничего не скачает.
       # Предел времени стоит на шаге: если он исчерпан, шаг снимается, но
       # артефакт с уже распознанными документами всё равно выгружается.
+      # Срез начинает с уже собранного корпуса ветки: загрузчик видит эти документы
+      # как скачанные и добирает только новые. Без этого каждый срез заново тянет
+      # начало той же ленты — в прогоне 2 так получилось 23 дубликата из 73 документов.
+      - name: Взять за основу уже собранный корпус
+        run: |
+          mkdir -p shard
+          if [ -d data/corpus_a3/sources ]; then
+            cp -r data/corpus_a3/sources shard/sources
+            echo "взято за основу документов: $(ls shard/sources/*.txt 2>/dev/null | wc -l)"
+          else
+            echo "корпуса в ветке нет — срез начинает с нуля"
+          fi
+
       - name: Загрузка среза (robots.txt, пауза ≥1 с, SHA256, прогресс на диск)
         continue-on-error: true
         timeout-minutes: ${{ fromJSON(inputs.fetch_timeout_minutes || '70') }}
         run: |
           python scripts/fetch_npa_corpus.py \
             --out "shard" \
-            --target-docs "${DOCS_PER_SHARD}" \
-            --max-pages-per-type 4 \
-            --max-pages-per-block 4 \
+            --target-docs "$(( $(ls shard/sources/*.txt 2>/dev/null | wc -l) + DOCS_PER_SHARD ))" \
+            --max-pages-per-type 6 \
+            --max-pages-per-block 6 \
             --only-types "${{ matrix.slice.types }}" \
             --only-blocks "${{ matrix.slice.blocks }}" \
-            --buffer 8 \
+            --regional-share "${{ matrix.slice.share }}" \
+            --buffer 6 \
             --pause 1.1 \
             --max-pages 6 \
             --dpi 150 \
