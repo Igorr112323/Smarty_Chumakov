@@ -31,7 +31,6 @@ from typing import Any
 from .bounds import narrow_bounds, span_variants
 from .calibration import IsotonicCalibrator
 from .config import Config, read_runtime_text, runtime_roots
-from .coverage import CoverageReport, coverage_report
 from .core import (
     ContextChunks,
     SpanResult,
@@ -42,6 +41,7 @@ from .core import (
     split_sentences,
     tokenize_with_offsets,
 )
+from .coverage import CoverageReport, coverage_report
 from .detector import Detector
 from .features import (
     DEFAULT_WEIGHTS,
@@ -297,11 +297,7 @@ class Verifier:
         # Обратный проход: покрытие фактов документа ответом (типы missing/partial).
         # Он даёт замечания там, где ответ «от ответа к документу» ничего не находит:
         # субъект назван, а значение опущено или потеряно условие.
-        coverage = (
-            coverage_report(split_chunks(context_text).text, answer)
-            if context_text
-            else None
-        )
+        coverage = coverage_report(split_chunks(context_text).text, answer) if context_text else None
         if coverage is not None and coverage.spans:
             spans = _merge_spans([*spans, *self._coverage_spans(answer, coverage)])
 
@@ -473,7 +469,19 @@ class Verifier:
 
     def _features(self, answer: str, context: str | Sequence[str] | None, tokens: Sequence[Token]) -> FeatureMatrix:
         if self.mode == "hf":
-            return extract_features(answer, context, mode="hf", model_name=self.model_name, answer_tokens=tokens)
+            # Параметры модели (окно, слой, кэши) берутся из конфигурации, чтобы
+            # пилот и сервер считали признаки одинаково.
+            return extract_features(
+                answer,
+                context,
+                mode="hf",
+                model_name=self.model_name,
+                answer_tokens=tokens,
+                max_length=int(getattr(self.config, "hf_max_tokens", 512) or 512),
+                layer=str(getattr(self.config, "hf_layer", "last") or "last"),
+                cache_dir=getattr(self.config, "hf_cache_dir", None),
+                feature_cache=getattr(self.config, "hf_feature_cache", None),
+            )
         return extract_features(answer, context, mode="demo", answer_tokens=tokens)
 
     def _span_threshold(self, risk: Sequence[float]) -> float:
@@ -981,9 +989,7 @@ def _merge_spans(spans: Sequence[SpanResult]) -> list[SpanResult]:
                     if value is not None
                 ),
                 expanded_end=max(
-                    value
-                    for value in (previous.expanded_end, span.expanded_end, previous.end)
-                    if value is not None
+                    value for value in (previous.expanded_end, span.expanded_end, previous.end) if value is not None
                 ),
                 source=previous.source if previous.source == span.source else "mixed",
                 reason=previous.reason or span.reason,

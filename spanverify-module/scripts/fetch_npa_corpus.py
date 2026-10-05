@@ -109,6 +109,30 @@ THEMES = (
     ("кадровый учёт", r"кадров|персонал|трудов(?:ых|ые) отношени|служебн(?:ой|ая) контракт"),
 )
 
+# Регионы: код субъекта в номере публикации (первые две цифры eoNumber).
+# Приоритет — Краснодарский край (23), затем субъекты из задания.
+REGIONS: dict[str, str] = {
+    "23": "Краснодарский край",
+    "77": "Москва",
+    "50": "Московская область",
+    "78": "Санкт-Петербург",
+    "61": "Ростовская область",
+    "26": "Ставропольский край",
+    "16": "Республика Татарстан",
+    "66": "Свердловская область",
+    "03": "Республика Башкортостан",
+}
+# Уровень акта по типу: используется в sources.json и в отчёте по корпусу.
+LEVEL_BY_TYPE: dict[str, str] = {
+    "Федеральный закон": "федеральный",
+    "Федеральный конституционный закон": "федеральный",
+    "Указ": "федеральный",
+    "Постановление": "федеральный",
+    "Распоряжение": "федеральный",
+    "Приказ": "ведомственный",
+    "Положение": "ведомственный",
+}
+
 TYPES = (
     "Федеральный закон",
     "Указ",
@@ -224,6 +248,28 @@ def fetch_robots() -> dict[str, dict]:
     return result
 
 
+def region_of(eo_number: str) -> tuple[str | None, str | None]:
+    """Регион публикации по номеру: ``("23", "Краснодарский край")`` или ``(None, None)``.
+
+    Федеральные акты имеют префикс ``0001``; у актов субъектов первые две цифры —
+    код региона (``23`` — Краснодарский край), далее ``00``.
+    """
+    if len(eo_number) < 4 or not eo_number[:4].isdigit():
+        return None, None
+    prefix = eo_number[:4]
+    if prefix.startswith("0001"):
+        return None, None
+    code = prefix[:2]
+    return (code, REGIONS.get(code)) if code in REGIONS else (code, None)
+
+
+def level_of(act_type: str, region_code: str | None) -> str:
+    """Уровень акта: федеральный / ведомственный / региональный / местный."""
+    if region_code:
+        return "региональный"
+    return LEVEL_BY_TYPE.get(act_type, "федеральный")
+
+
 def collect_candidates(
     type_ids: dict[str, str],
     max_pages_per_type: int,
@@ -276,9 +322,13 @@ def collect_candidates(
                 seen.add(eo)
                 stats["by_theme"][theme] += 1
                 stats["by_type"][type_name] = stats["by_type"].get(type_name, 0) + 1
+                region_code, region_name = region_of(eo)
                 candidates.append(
                     {
                         "doc_id": f"eo-{eo}",
+                        "region_code": region_code,
+                        "region_name": region_name,
+                        "level": level_of(type_name, region_code),
                         "source_host": "publication.pravo.gov.ru",
                         "eo_number": eo,
                         "document_id": item.get("id"),
@@ -490,6 +540,7 @@ def plan_downloads(
     existing_ids: set[str],
     needed: int,
     buffer: int = 40,
+    regions: dict[str, int] | None = None,
 ) -> list[dict]:
     """Выбрать, что скачивать: заполняем темы по кругу, лишнее не тянем.
 
@@ -507,6 +558,18 @@ def plan_downloads(
     for theme, _pattern in THEMES:
         selected.extend(by_theme.get(theme, [])[:quota])
     taken = {item["doc_id"] for item in selected}
+    if regions:
+        # Региональные квоты: Краснодарский край берётся первым (как в задании).
+        for code, count in regions.items():
+            picked = 0
+            for item in fresh:
+                if picked >= count:
+                    break
+                if item.get("region_code") != code or item["doc_id"] in taken:
+                    continue
+                selected.append(item)
+                taken.add(item["doc_id"])
+                picked += 1
     for item in fresh:
         if len(selected) >= limit:
             break
@@ -539,6 +602,11 @@ def main() -> int:
     )
     parser.add_argument("--dpi", type=int, default=200)
     parser.add_argument("--buffer", type=int, default=40, help="сколько кандидатов взять сверх цели (на брак)")
+    parser.add_argument(
+        "--regions",
+        default="23:15,77:6,50:5,78:5,61:5,26:5,16:5,66:5",
+        help="квоты регионов в виде «код:сколько» (23 — Краснодарский край); пустая строка — без регионов",
+    )
     parser.add_argument("--force", action="store_true", help="скачивать, даже если документов уже достаточно")
     parser.add_argument("--verify", action="store_true", help="только проверить хеши уже скачанных источников")
     args = parser.parse_args()
@@ -550,6 +618,13 @@ def main() -> int:
         return 0 if not report["mismatches"] else 2
 
     pause = max(1.0, args.pause)  # требование задания: не чаще одного запроса в секунду
+    region_quotas: dict[str, int] = {}
+    for chunk in str(args.regions or "").split(","):
+        if ":" not in chunk:
+            continue
+        code, _sep, count = chunk.partition(":")
+        if code.strip().isdigit() and count.strip().isdigit():
+            region_quotas[code.strip()] = int(count.strip())
     out_dir.mkdir(parents=True, exist_ok=True)
     started_at = datetime.now(timezone.utc).isoformat()
 
@@ -589,7 +664,7 @@ def main() -> int:
     candidates, scan_stats = collect_candidates(type_ids, args.max_pages_per_type, pause, robots)
     existing_ids = {str(document["doc_id"]) for document in existing}
     needed = max(0, args.target_docs - len(existing))
-    planned = plan_downloads(candidates, existing_ids, needed, buffer=args.buffer)
+    planned = plan_downloads(candidates, existing_ids, needed, buffer=args.buffer, regions=region_quotas)
     print(
         f"просмотрено документов: {scan_stats['documents_scanned']}, подходящих по темам: {len(candidates)}, "
         f"к скачиванию: {len(planned)}"
@@ -685,9 +760,25 @@ def main() -> int:
     documents = sorted(existing + new_documents, key=lambda item: str(item["doc_id"]))
     by_theme: dict[str, int] = {}
     by_type: dict[str, int] = {}
+    by_level: dict[str, int] = {}
+    by_region: dict[str, int] = {}
     for item in documents:
         by_theme[str(item.get("theme"))] = by_theme.get(str(item.get("theme")), 0) + 1
         by_type[str(item.get("act_type"))] = by_type.get(str(item.get("act_type")), 0) + 1
+        level = str(item.get("level") or level_of(str(item.get("act_type") or ""), item.get("region_code")))
+        by_level[level] = by_level.get(level, 0) + 1
+        if item.get("region_code"):
+            by_region[str(item.get("region_code"))] = by_region.get(str(item.get("region_code")), 0) + 1
+    # Какие региональные квоты выполнены, а какие — нет (с фактическим числом найденных).
+    region_status = {
+        code: {
+            "name": REGIONS.get(code, ""),
+            "wanted": count,
+            "found": by_region.get(code, 0),
+            "available": by_region.get(code, 0) >= count,
+        }
+        for code, count in region_quotas.items()
+    }
 
     previous_sources = {item.get("host"): item for item in (old_manifest.get("sources") or [])}
     default_sources = {
@@ -755,6 +846,11 @@ def main() -> int:
     manifest = {
         "generated_at": started_at,
         "method": "publication.pravo.gov.ru (API отбора) + текст: текстовый слой PDF или OCR (pdftoppm + tesseract -l rus)",
+        "by_level": by_level,
+        "by_region": by_region,
+        "region_status": region_status,
+        "legal_basis": "п. 6 ст. 1259 ГК РФ: официальные документы государственных органов не являются объектами авторских прав",
+        "personal_data_policy": "акты с персональными данными, внутренние и закрытые документы не загружаются",
         "user_agent": USER_AGENT,
         "pause_seconds": pause,
         "whitelist": list(WHITELIST),

@@ -68,7 +68,12 @@ def _corpus(tmp_path: Path, target: int = 30) -> Path:
                 "documents_with_text": 3,
                 "note": "тест",
             },
-            {"host": "pravo.gov.ru", "documents_downloaded": 0, "documents_with_text": 0, "note": "нет машиночитаемой выдачи"},
+            {
+                "host": "pravo.gov.ru",
+                "documents_downloaded": 0,
+                "documents_with_text": 0,
+                "note": "нет машиночитаемой выдачи",
+            },
         ],
         "robots": {"publication.pravo.gov.ru": {"status": 200, "rules": {"*": ["/Search"]}}},
         "by_type": {"Приказ": 3},

@@ -115,8 +115,7 @@ def test_prohibition_lost_modality_is_reported() -> None:
 def test_omitted_findings_are_limited() -> None:
     """На документе из сотен фактов ответ получает не больше лимита замечаний."""
     sentences = [
-        f"Статья {index}. Срок хранения документов вида {index} составляет {index + 1} лет."
-        for index in range(1, 25)
+        f"Статья {index}. Срок хранения документов вида {index} составляет {index + 1} лет." for index in range(1, 25)
     ]
     document = " ".join(sentences)
     report = coverage_report(document, "Порядок хранения документов определяется локальным актом организации.")

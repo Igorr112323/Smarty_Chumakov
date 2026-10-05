@@ -144,7 +144,7 @@ def cmd_verify(args: argparse.Namespace) -> int:
     if args.context_file:
         context = Path(args.context_file).read_text(encoding="utf-8")
 
-    verifier = Verifier(mode=_mode(args), weights_path=args.weights)
+    verifier = _verifier(args)
     result = verifier.verify(answer, context, with_tokens=args.tokens)
     return _print_result(result, as_json=args.json, tokens=args.tokens)
 
@@ -194,7 +194,7 @@ def cmd_calibrate(args: argparse.Namespace) -> int:
     from .calibration import IsotonicCalibrator, choose_threshold
 
     records = _load_dataset(args.dataset, pairs=args.make_dataset, seed=args.seed)
-    verifier = Verifier(mode=_mode(args), weights_path=args.weights)
+    verifier = _verifier(args)
     bundle = verifier.bundle
 
     raw_scores: list[float] = []
@@ -222,7 +222,7 @@ def cmd_calibrate(args: argparse.Namespace) -> int:
 def cmd_evaluate(args: argparse.Namespace) -> int:
     """Показать метрики конвейера на размеченном корпусе."""
     records = _load_dataset(args.dataset, pairs=args.make_dataset, seed=args.seed)
-    verifier = Verifier(mode=_mode(args), weights_path=args.weights)
+    verifier = _verifier(args)
     metrics = verifier.evaluate(records)
     if args.json:
         _print_json(metrics)
@@ -276,7 +276,7 @@ SELFTEST_CASES = (
 
 def cmd_selftest(args: argparse.Namespace) -> int:
     """Проверить конвейер на встроенных примерах (без внешних данных)."""
-    verifier = Verifier(mode=_mode(args), weights_path=args.weights)
+    verifier = _verifier(args)
     failures: list[str] = []
     print(f"Само-проверка SpanVerify {__version__} (режим {verifier.mode})")
     for name, answer, context, expected in SELFTEST_CASES:
@@ -341,7 +341,7 @@ def cmd_demo(args: argparse.Namespace) -> int:
         version=__version__,
     )
     print(report.summary())
-    verifier = Verifier(mode=_mode(args), weights=report.bundle)
+    verifier = _verifier(args, weights=report.bundle)
     for name, answer, context, _expected in SELFTEST_CASES:
         result = verifier.verify(answer, context)
         print(f"  {name:24s} → {result.verdict:20s} оценка {result.score:.3f} фрагментов {len(result.spans)}")
@@ -351,7 +351,7 @@ def cmd_demo(args: argparse.Namespace) -> int:
 
 def cmd_config(args: argparse.Namespace) -> int:
     """Напечатать действующие параметры конвейера."""
-    verifier = Verifier(mode=_mode(args), weights_path=args.weights)
+    verifier = _verifier(args)
     payload = verifier.bundle.to_dict()
     payload["runtime"] = {
         "version": __version__,
@@ -405,6 +405,35 @@ def cmd_analyze(args: argparse.Namespace) -> int:
     return EXIT_ISSUES if result.verdict in {"likely_ai", "mixed"} else EXIT_OK
 
 
+def _hf_options(args: argparse.Namespace) -> dict[str, object]:
+    """Параметры режима hf из командной строки (только явно заданные)."""
+    options: dict[str, object] = {}
+    model = getattr(args, "model", None)
+    if model:
+        options["model_name"] = model
+    if getattr(args, "max_tokens", None):
+        options["hf_max_tokens"] = int(args.max_tokens)
+    if getattr(args, "layer", None):
+        options["hf_layer"] = str(args.layer)
+    if getattr(args, "hf_cache_dir", None):
+        options["hf_cache_dir"] = str(args.hf_cache_dir)
+    if getattr(args, "feature_cache", None):
+        options["hf_feature_cache"] = str(args.feature_cache)
+    return options
+
+
+def _verifier(args: argparse.Namespace, **kwargs: object):
+    """Создать Verifier с учётом режима, весов и параметров hf."""
+    options = _hf_options(args)
+    model_name = str(options.pop("model_name", "")) or None
+    config = None
+    if options:
+        from .config import Config  # noqa: PLC0415
+
+        config = Config.load().with_overrides(**options)
+    return Verifier(config=config, mode=_mode(args), weights_path=args.weights, model_name=model_name, **kwargs)
+
+
 # ------------------------------------------------------------------ парсер
 
 
@@ -424,6 +453,15 @@ def build_parser() -> argparse.ArgumentParser:
         sub.add_argument("--mode", choices=["demo", "surrogate", "hf"], default=argparse.SUPPRESS)
         sub.add_argument("--backend", choices=BACKENDS, default=argparse.SUPPRESS, help="историческое имя режима")
         sub.add_argument("--weights", default=WEIGHTS_FILENAME)
+        # Параметры режима hf: имя/путь модели, окно, слой и кэши. Значения по
+        # умолчанию берутся из конфигурации, поэтому здесь default=SUPPRESS.
+        sub.add_argument(
+            "--model", default=argparse.SUPPRESS, help="модель hf: имя на HuggingFace или путь к папке с весами"
+        )
+        sub.add_argument("--max-tokens", type=int, default=argparse.SUPPRESS, help="размер окна модели (hf)")
+        sub.add_argument("--layer", default=argparse.SUPPRESS, help="слой внимания: first|middle|last|номер|-N")
+        sub.add_argument("--hf-cache-dir", default=argparse.SUPPRESS, help="каталог кэша весов модели")
+        sub.add_argument("--feature-cache", default=argparse.SUPPRESS, help="каталог кэша посчитанных признаков")
 
     verify = subparsers.add_parser("verify", help="проверить ответ относительно контекста")
     verify.add_argument("--answer", default=None, help="текст ответа")

@@ -23,7 +23,6 @@
 
 from __future__ import annotations
 
-import statistics
 from collections.abc import Sequence
 from dataclasses import dataclass, field
 from typing import Any
@@ -75,6 +74,11 @@ class FeatureMatrix:
     ctx_attention_mass: list[float] = field(default_factory=list)
     embedding_density: list[float] = field(default_factory=list)
     token_risk: list[float] = field(default_factory=list)
+    # Признаки доработки (пункт 2.2): нормировка массы, позиция/расстояние до
+    # опоры, лексико-семантические сигналы. Не входят в свёртку risk по умолчанию —
+    # их вклад измеряется отдельно (scripts/feature_iterations.py), чтобы не
+    # менять порог и веса без числа.
+    extra: dict[str, list[float]] = field(default_factory=dict)
     meta: dict[str, Any] = field(default_factory=dict)
 
     def __len__(self) -> int:
@@ -235,11 +239,21 @@ def demo_features(
     _apply_number_consistency(tokens, context_numbers, mass)
     # Дефект D: число проверяется внутри своего объекта, а не «где-то в контексте».
     _apply_number_attribution(tokens, answer, chunks.text, mass)
+    from .feature_pack import extra_features  # noqa: PLC0415 - локальный импорт без цикла
+
+    extra = extra_features(
+        answer,
+        chunks.text,
+        tokens,
+        mass=mass,
+        context_tokens=len(context_tokens),
+    )
 
     return FeatureMatrix(
         attention_entropy=entropy,
         ctx_attention_mass=mass,
         embedding_density=density,
+        extra=extra,
         meta={
             "backend": "demo",
             "token_count": len(tokens),
@@ -676,178 +690,70 @@ def hf_features(
     model_name: str = "ai-forever/rugpt3small_based_on_gpt2",
     k: int = 5,
     device: str | None = None,
-    max_length: int = 1024,
+    max_length: int = 512,
     answer_tokens: Sequence[Token] | None = None,
     layer: int | str = "last",
+    cache_dir: str | None = None,
+    feature_cache: str | None = None,
 ) -> FeatureMatrix:
     """Реальные признаки модели: энтропия внимания, масса на контекст, плотность.
 
-    Требует ``torch`` и ``transformers`` (ленивый импорт внутри функции).
+    Работа выполняется модулем :mod:`spanverify.hfmodel`: он кэширует веса,
+    поддерживает причинные модели и энкодеры, режет длинный текст скользящим
+    окном и уменьшает окно при нехватке памяти. Здесь результат лишь
+    приводится к общей матрице признаков.
 
     ``layer`` выбирает слой внимания: ``"first"``, ``"middle"``, ``"last"``,
     отрицательный индекс (``-4`` — четвёртый с конца) или целое число. Это нужно
-    пилоту: он сравнивает информативность признаков по слоям и не должен
-    зависеть от того, что «полезный» слой оказался не последним.
-    """
-    import torch  # noqa: PLC0415
-    from transformers import AutoModelForCausalLM, AutoTokenizer  # noqa: PLC0415
+    пилоту: он сравнивает информативность признаков по слоям.
 
-    from .backends.base import BackendUnavailable  # noqa: PLC0415
-    from .core import tokenize_with_offsets  # noqa: PLC0415
+    ``feature_cache`` — каталог кэша посчитанных признаков (повторный прогон по
+    тем же текстам не пересчитывает модель). ``cache_dir`` — каталог кэша весов.
+    """
+    from .feature_pack import extra_features  # noqa: PLC0415 - локальный импорт без цикла
+    from .hfmodel import model_features  # noqa: PLC0415 - torch импортируется лениво
 
     tokens = list(answer_tokens) if answer_tokens is not None else tokenize_with_offsets(answer)
     if not tokens:
         return FeatureMatrix(meta={"backend": "hf", "empty": True})
-
-    chunks = split_chunks(context)
-    context_text = chunks.text
-    prompt = f"{context_text}\n{answer}" if context_text else answer
-    answer_start = len(prompt) - len(answer)
-
-    try:
-        tokenizer = AutoTokenizer.from_pretrained(model_name)
-        model = AutoModelForCausalLM.from_pretrained(model_name, attn_implementation="eager", output_attentions=True)
-    except Exception as exc:  # pragma: no cover - зависит от окружения
-        raise BackendUnavailable(
-            f"не удалось загрузить модель {model_name}: {type(exc).__name__}: {exc}. "
-            "Проверьте доступ к весам или укажите другую модель."
-        ) from exc
-
-    model.eval()
-    # Скрытые состояния нужны третьему признаку (плотность представлений), а
-    # карты внимания — первым двум. Флаги ставим в конфиге: так одинаково
-    # работают и старые, и новые версии transformers.
-    model.config.output_attentions = True
-    model.config.output_hidden_states = True
-    torch_device = device or ("cuda" if torch.cuda.is_available() else "cpu")
-    model.to(torch_device)
-
-    encoded = tokenizer(prompt, return_tensors="pt", truncation=True, max_length=max_length)
-    attention_mask = encoded["attention_mask"]
-    with torch.no_grad():
-        outputs = model(**encoded)
-
-    layer_index = resolve_layer(layer, len(outputs.attentions))
-    attentions = outputs.attentions[layer_index][0]  # (heads, seq, seq)
-    hidden = None
-    if outputs.hidden_states:
-        hidden = outputs.hidden_states[min(layer_index + 1, len(outputs.hidden_states) - 1)][0]
-
-    # Позиции токенов ответа (по смещениям быстрого токенизатора).
-    # Разные версии transformers отдают смещения то как тензор/`BatchEncoding`
-    # (с методом ``tolist``), то как обычный список списков — приводим к списку
-    # кортежей, иначе на свежих версиях падало бы AttributeError.
-    raw_offsets = tokenizer(prompt, return_offsets_mapping=True, truncation=True, max_length=max_length)[
-        "offset_mapping"
-    ]
-    if hasattr(raw_offsets, "tolist"):
-        raw_offsets = raw_offsets.tolist()
-    offsets = list(raw_offsets)
-    if offsets and isinstance(offsets[0], (list, tuple)) and offsets[0] and isinstance(offsets[0][0], (list, tuple)):
-        offsets = list(offsets[0])
-    offsets = [(int(start), int(end)) for start, end in offsets]
-    seq_len = int(attention_mask.sum().item())
-    model_spans = [
-        (i, start, end)
-        for i, (start, end) in enumerate(offsets)
-        if end > start and start >= answer_start and i < seq_len
-    ]
-    answer_positions = [position for position, _start, _end in model_spans]
-    answer_start_token = min(answer_positions) if answer_positions else seq_len
-    context_positions = [i for i in range(seq_len) if i < answer_start_token]
-    token_positions = map_token_positions(
-        [(token.start, token.end) for token in tokens],
-        model_spans,
-        answer_start,
+    result = model_features(
+        answer,
+        context,
+        model_name,
+        k=k,
+        device=device,
+        max_tokens=max_length,
+        layer=layer,
+        cache_dir=cache_dir,
+        feature_cache=feature_cache,
+        answer_tokens=tokens,
     )
-
-    eps = 1e-9
-    probs = attentions.clamp_min(eps)
-    entropy = -(probs * probs.log()).sum(dim=-1).mean(dim=0)  # (seq,)
-    import math  # noqa: PLC0415
-
-    entropy = entropy / max(eps, math.log(max(2, seq_len)))
-
-    entropy_values: list[float] = []
-    mass_values: list[float] = []
-    density_values: list[float] = []
-
-    # Векторы контекстных чанков и токенов — для плотности.
-    context_token_embeddings: list[list[float]] = []
-    hidden_cpu = None
-    if hidden is not None:
-        hidden_cpu = hidden.detach().to("cpu")
-        for position in context_positions:
-            context_token_embeddings.append(hidden_cpu[position].tolist())
-
-    for positions in token_positions:
-        if not positions:
-            entropy_values.append(0.5)
-            mass_values.append(0.0)
-            density_values.append(0.0)
-            continue
-        entropy_values.append(statistics.fmean(float(entropy[position].item()) for position in positions))
-        mass_parts: list[float] = []
-        density_parts: list[float] = []
-        for position in positions:
-            row = attentions[:, position, :].mean(dim=0)  # (seq,)
-            mass_parts.append(float(row[context_positions].sum().item()) if context_positions else 0.0)
-            if hidden_cpu is not None and context_token_embeddings:
-                vector = hidden_cpu[position].tolist()
-                similarities = sorted(
-                    (_cosine_dense(vector, other) for other in context_token_embeddings),
-                    reverse=True,
-                )
-                top = similarities[: max(1, k)]
-                density_parts.append(sum(top) / len(top))
-            else:  # pragma: no cover - модель без hidden_states
-                density_parts.append(0.0)
-        mass_values.append(min(1.0, max(0.0, statistics.fmean(mass_parts))))
-        density_values.append(min(1.0, max(0.0, statistics.fmean(density_parts))))
-
+    context_text = split_chunks(context).text
+    extra = extra_features(
+        answer,
+        context_text,
+        tokens,
+        mass=result.mass,
+        context_tokens=int((result.meta or {}).get("context_tokens", 0) or 0),
+    )
     return FeatureMatrix(
-        attention_entropy=entropy_values,
-        ctx_attention_mass=mass_values,
-        embedding_density=density_values,
-        meta={
-            "backend": "hf",
-            "model": model_name,
-            "layer": layer if isinstance(layer, (int, str)) else str(layer),
-            "layer_index": layer_index,
-            "layers_total": len(outputs.attentions),
-            "seq_len": seq_len,
-            "context_tokens": len(context_positions),
-            "k": k,
-        },
+        attention_entropy=list(result.entropy),
+        ctx_attention_mass=list(result.mass),
+        embedding_density=list(result.density),
+        extra=extra,
+        meta=dict(result.meta or {}),
     )
 
 
 def resolve_layer(layer: int | str, total: int) -> int:
-    """Индекс слоя внимания по имени или числу.
+    """Индекс слоя внимания по имени или числу (общий с модулем работы с моделью).
 
     Поддерживаются ``"first"``, ``"middle"``, ``"last"``, отрицательные индексы
-    (``-4`` — четвёртый с конца) и обычные целые числа. Индекс всегда попадает
-    в диапазон ``[0, total - 1]``.
+    (``-4`` — четвёртый с конца) и обычные целые числа.
     """
-    if total <= 0:
-        return 0
-    if isinstance(layer, bool):  # bool — подкласс int, отсекаем отдельно
-        return total - 1
-    if isinstance(layer, int):
-        index = layer if layer >= 0 else total + layer
-        return max(0, min(total - 1, index))
-    key = str(layer).strip().lower()
-    if key in {"last", "-1", ""}:
-        return total - 1
-    if key == "first":
-        return 0
-    if key == "middle":
-        return (total - 1) // 2
-    try:
-        index = int(key)
-    except ValueError:
-        return total - 1
-    return max(0, min(total - 1, index if index >= 0 else total + index))
+    from .hfmodel import resolve_layer as _resolve  # noqa: PLC0415
+
+    return _resolve(layer, total)
 
 
 def _cosine_dense(a: Sequence[float], b: Sequence[float]) -> float:

@@ -95,6 +95,9 @@ DEFAULTS: dict[str, Any] = {
     "backend": "surrogate",  # "surrogate" (демо, stdlib) | "hf" (реальная модель)
     "hf_model": "cointegrated/rubert-tiny2",
     "hf_max_tokens": 512,
+    "hf_layer": "last",
+    "hf_cache_dir": None,
+    "hf_feature_cache": None,
     # --- признаки ---
     "k_neighbors": 5,  # k в kNN-плотности контекстных эмбеддингов
     "vector_dim": 4096,  # размерность хешированного пространства признаков
@@ -126,6 +129,9 @@ INT_FIELDS = {
     "seed",
     "port",
     "hf_max_tokens",
+    "hf_layer",
+    "hf_cache_dir",
+    "hf_feature_cache",
 }
 FLOAT_FIELDS = {"w_predictability", "w_density", "threshold", "max_fpr", "density_ref"}
 
@@ -137,6 +143,9 @@ class Config:
     backend: str = "surrogate"
     hf_model: str = "cointegrated/rubert-tiny2"
     hf_max_tokens: int = 512
+    hf_layer: str = "last"
+    hf_cache_dir: str | None = None
+    hf_feature_cache: str | None = None
     k_neighbors: int = 5
     vector_dim: int = 4096
     density_ref: float = 0.35

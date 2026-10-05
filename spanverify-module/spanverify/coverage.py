@@ -32,8 +32,9 @@
 from __future__ import annotations
 
 import re
+from collections.abc import Sequence
 from dataclasses import dataclass, field
-from typing import Any, Sequence
+from typing import Any
 
 from .core import split_sentences, tokenize_with_offsets
 from .normalize import (
@@ -90,6 +91,7 @@ def _has_marker(text: str, markers: Sequence[str]) -> bool:
         if re.search(rf"(^|[^a-zа-я]){re.escape(marker)}", lowered):
             return True
     return False
+
 
 # Маркеры утверждения: по ним видно, что ответ формулирует факт, а не упоминает тему.
 # Нужны, чтобы «пропуск значения» ловился там, где значение ожидалось, и не срабатывал
@@ -538,9 +540,7 @@ def _answer_units(
         if not text:
             continue
         lemmas = tuple(
-            lemma
-            for lemma in (lemmatize(token.word) for token in tokenize_with_offsets(text) if token.word)
-            if lemma
+            lemma for lemma in (lemmatize(token.word) for token in tokenize_with_offsets(text) if token.word) if lemma
         )
         numbers = numbers_in_text(text)
         # Клаузы внутри предложения: покрытие чаще всего касается одной клаузы.
@@ -664,11 +664,7 @@ def coverage_report(document: str, answer: str, *, max_facts: int = 400) -> Cove
         for lemma in subject:
             document_frequency[lemma] = document_frequency.get(lemma, 0) + 1
     total_documents = max(1, len(subject_sets))
-    common = {
-        lemma
-        for lemma, count in document_frequency.items()
-        if count / total_documents > DOCUMENT_FREQUENCY_MAX
-    }
+    common = {lemma for lemma, count in document_frequency.items() if count / total_documents > DOCUMENT_FREQUENCY_MAX}
 
     # Сопоставление идёт в два прохода. Первый считает совпадение каждого факта с
     # каждой единицей ответа, второй выбирает для единицы **лучший** факт. Без
@@ -764,7 +760,9 @@ def coverage_report(document: str, answer: str, *, max_facts: int = 400) -> Cove
                 match = match_sentence
             if match is True and _condition_present(fact, sentence_text):
                 covered += 1
-                report.matches.append(FactMatch(fact=fact, status="covered", reason="значение совпало", overlap=overlap))
+                report.matches.append(
+                    FactMatch(fact=fact, status="covered", reason="значение совпало", overlap=overlap)
+                )
             elif match is True:
                 pending_distorted.append(
                     FactMatch(
@@ -851,10 +849,14 @@ def coverage_report(document: str, answer: str, *, max_facts: int = 400) -> Cove
     pending_omitted.sort(key=lambda item: (-item.severity, -item.overlap))
     chosen = [*pending_distorted[:MAX_DISTORTED_REPORTS], *pending_omitted[:MAX_OMITTED_REPORTS]]
     for match in pending_distorted[MAX_DISTORTED_REPORTS:]:
-        report.matches.append(FactMatch(fact=match.fact, status="covered", reason="замечание не выдано (лимит)", overlap=match.overlap))
+        report.matches.append(
+            FactMatch(fact=match.fact, status="covered", reason="замечание не выдано (лимит)", overlap=match.overlap)
+        )
         covered += 1
     for match in pending_omitted[MAX_OMITTED_REPORTS:]:
-        report.matches.append(FactMatch(fact=match.fact, status="covered", reason="замечание не выдано (лимит)", overlap=match.overlap))
+        report.matches.append(
+            FactMatch(fact=match.fact, status="covered", reason="замечание не выдано (лимит)", overlap=match.overlap)
+        )
         covered += 1
     report.matches.extend(chosen)
 

@@ -22,8 +22,8 @@
 
 from __future__ import annotations
 
+from collections.abc import Sequence
 from dataclasses import dataclass
-from typing import Sequence
 
 from .core import Token, split_sentences
 from .normalize import NumberMention, numbers_in_text

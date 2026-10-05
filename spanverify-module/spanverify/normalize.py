@@ -19,8 +19,8 @@
 from __future__ import annotations
 
 import re
+from collections.abc import Iterable, Iterator, Sequence
 from dataclasses import dataclass
-from typing import Iterable, Iterator, Sequence
 
 __all__ = [
     "UNIT_KINDS",
@@ -596,7 +596,9 @@ def numbers_in_text(text: str) -> list[NumberMention]:
                     # «5 (пяти) процентов» — уточнение того же числа словом: слово в
                     # скобках не должно попасть в список вторым числом.
                     skip_until = end + len(lowered[end:]) - len(tail) + (closing + 1 if closing > 0 else 0)
-            mentions.append(NumberMention(value=value, text=lowered[start:end], start=start, end=end, unit=unit, source=source))
+            mentions.append(
+                NumberMention(value=value, text=lowered[start:end], start=start, end=end, unit=unit, source=source)
+            )
             index = max(index, skip_until)
             continue
         match = _WORD_RE.match(lowered, index)
