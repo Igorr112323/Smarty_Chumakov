@@ -213,16 +213,26 @@ class SpanResult:
     risk: float
     label: str  # "likely_hallucination" | "doubtful"
     n_tokens: int = 0
+    # Вид расхождения: "risk" — найден признаками; "number_attribution" —
+    # правилом привязки числа; "missing"/"partial"/"oversight" — проверкой
+    # покрытия фактов документа (spanverify.facts). Поле нужно, чтобы в
+    # метриках была разбивка по типам, а человеку — понятная причина.
+    kind: str = "risk"
+    reason: str = ""
 
     def to_dict(self) -> dict[str, Any]:
-        return {
+        payload = {
             "start": self.start,
             "end": self.end,
             "text": self.text,
             "risk": round(self.risk, 4),
             "label": self.label,
             "n_tokens": self.n_tokens,
+            "kind": self.kind,
         }
+        if self.reason:
+            payload["reason"] = self.reason
+        return payload
 
 
 @dataclass

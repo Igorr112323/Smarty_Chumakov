@@ -21,6 +21,7 @@
 from __future__ import annotations
 
 import json
+import re
 import sys
 import time
 from collections.abc import Sequence
@@ -31,6 +32,7 @@ from typing import Any
 from .calibration import IsotonicCalibrator
 from .config import Config, read_runtime_text, runtime_roots
 from .core import (
+    PUNCT,
     ContextChunks,
     SpanResult,
     Token,
@@ -51,11 +53,18 @@ from .features import (
     is_scored_token,
     number_attribution,
 )
+from .numnorm import canonical_unit
 from .participation import PARTICIPATION_FILENAME, ParticipationModel
 
 WEIGHTS_FILENAME = "config/weights.json"
 HALLUCINATION_LABEL_RISK = 0.75
 TOP_SHARE = 0.2
+
+# Риск фрагмента, найденного проверкой покрытия фактов документа. Это не
+# вероятность из калибровки, а отметка «здесь потеряно сведение документа»:
+# значение выбрано так, чтобы фрагмент попадал в вывод и получал метку
+# likely_hallucination, не меняя при этом оценку ответа в целом.
+COVERAGE_SPAN_RISK = 0.9
 SMOOTH_WINDOW = 3
 
 
@@ -75,6 +84,10 @@ class WeightsBundle:
     seed: int = 42
     version: str = "1.1.0"
     mode: str = "demo"
+    # Режим границ фрагмента: "narrow" — границы по самому спорному месту
+    # (число, единица, клауза), "expanded" — историческое расширение до
+    # предложения. Узкий режим по умолчанию: расширение давало ширину ×24.
+    span_mode: str = "narrow"
     meta: dict[str, Any] | None = None
     source: str = "defaults"  # откуда взяты параметры: disk | embedded | defaults
 
@@ -95,6 +108,7 @@ class WeightsBundle:
             "seed": self.seed,
             "version": self.version,
             "mode": self.mode,
+            "span_mode": self.span_mode,
             "meta": self.meta or {},
         }
 
@@ -122,6 +136,7 @@ class WeightsBundle:
             seed=int(data.get("seed", 42)),
             version=str(data.get("version", "1.1.0")),
             mode=str(data.get("mode", "demo")),
+            span_mode=str(data.get("span_mode", "narrow")),
             meta=dict(data.get("meta", {})),
         )
 
@@ -195,6 +210,7 @@ class Verifier:
         detector: Detector | None = None,
         model_name: str | None = None,
         weights_path: str | Path | None = WEIGHTS_FILENAME,
+        span_mode: str | None = None,
     ) -> None:
         self.config = config or Config.load()
         # Явно переданные веса имеют приоритет: иначе обучение, которое считает
@@ -203,6 +219,12 @@ class Verifier:
         self.weights_loaded = weights is not None or self.bundle.loaded
         self.mode = (mode or self.bundle.mode or self.config.backend or "demo").lower()
         self.model_name = model_name or getattr(self.config, "hf_model", "ai-forever/rugpt3small_based_on_gpt2")
+        self.span_mode = (span_mode or getattr(self.config, "span_mode", None) or self.bundle.span_mode).lower()
+        # Проверка покрытия фактов документа (типы missing/partial/oversight).
+        self.fact_coverage = bool(getattr(self.config, "fact_coverage", True))
+        self.max_facts = int(getattr(self.config, "max_facts", 200))
+        if self.span_mode not in {"narrow", "expanded"}:
+            raise ValueError(f"span_mode должен быть 'narrow' или 'expanded', получено {self.span_mode!r}")
         self._detector = detector
         # Оценка доли участия ИИ (требование заявки) — отдельная голова; если
         # файла нет, поле остаётся нулевым и это видно в stats.
@@ -292,6 +314,12 @@ class Verifier:
         spans = self._build_spans(answer, tokens, smoothed, span_threshold)
         # Правило привязки числа к объекту (дефект D): текстовое, поверх маски.
         spans = _merge_spans([*spans, *self._attribution_spans(answer, context_text, tokens, smoothed, span_threshold)])
+        # Покрытие фактов документа (пункт 2.4): пропуск сведения не создаёт
+        # токенов в ответе, поэтому признаки его не видят — нужен отдельный
+        # проход «от документа к ответу».
+        coverage_found = self._coverage_spans(answer, context_text, span_threshold)
+        if coverage_found:
+            spans = _merge_spans([*spans, *coverage_found])
 
         raw_score = _answer_score(scored)
         score = self._calibrate(raw_score)
@@ -360,6 +388,8 @@ class Verifier:
         truth_expanded: list[list[tuple[int, int]]] = []
         verdict_labels: list[int] = []
         verdict_flags: list[bool] = []
+        predicted_expanded: list[list[tuple[int, int]]] = []
+        kinds: list[str] = []
 
         for pair in pairs:
             data = pair.to_dict() if isinstance(pair, Pair) else pair
@@ -384,8 +414,13 @@ class Verifier:
             verdict_labels.append(1 if pair_truth else 0)
             verdict_flags.append(result.verdict not in {"grounded", "empty"})
             predicted.append(pair_predicted)
+            predicted_expanded.append(
+                [_expand_to_sentence(data.get("answer", ""), start, end) for start, end in pair_predicted]
+            )
             truth.append(pair_truth)
             truth_expanded.append(pair_truth_expanded)
+            meta = data.get("meta") or {}
+            kinds.append(str(meta.get("mode") or meta.get("kind") or ("faithful" if not pair_truth else "unknown")))
 
         token_metrics = _token_metrics(labels, flags, risks)
         span_metrics = _span_f1(predicted, truth, iou_threshold=0.5)
@@ -397,6 +432,14 @@ class Verifier:
         span_metrics["recall_containment"] = _containment_recall(predicted, truth)
         span_metrics["f1_expanded_labels"] = _span_f1(predicted, truth_expanded, iou_threshold=0.5)["f1"]
         span_metrics["mean_width_ratio"] = _mean_width_ratio(predicted, truth)
+        # Пункт 2.3: метрики считаются отдельно для узкой и расширенной
+        # разметки, чтобы было видно и точность границ, и качество склейки.
+        narrow_metrics = _span_f1(predicted, truth, iou_threshold=0.5)
+        narrow_metrics["recall_containment"] = _containment_recall(predicted, truth)
+        narrow_metrics["mean_width_ratio"] = _mean_width_ratio(predicted, truth)
+        expanded_metrics = _span_f1(predicted_expanded, truth_expanded, iou_threshold=0.5)
+        expanded_metrics["recall_containment"] = _containment_recall(predicted_expanded, truth_expanded)
+        expanded_metrics["mean_width_ratio"] = _mean_width_ratio(predicted_expanded, truth_expanded)
         answer_metrics = _answer_metrics(
             answer_labels, answer_scores, threshold if threshold is not None else self.bundle.threshold
         )
@@ -404,10 +447,14 @@ class Verifier:
         return {
             "tokens": token_metrics,
             "spans": span_metrics,
+            "spans_narrow": narrow_metrics,
+            "spans_expanded": expanded_metrics,
             "answers": answer_metrics,
             "verdicts": verdict_metrics,
+            "by_kind": _metrics_by_kind(kinds, predicted, truth, verdict_flags),
             "pairs": len(truth),
             "mode": self.mode,
+            "span_mode": self.span_mode,
             "warning": self.warning if self.mode != "hf" else "",
         }
 
@@ -498,7 +545,8 @@ class Verifier:
                 if id(token) in allowed and token.start >= start and token.end <= end
             ]
             risk_value = max([*token_risk, threshold])
-            span_start, span_end = _expand_to_sentence(answer, start, end)
+            bounds = _expand_to_sentence if self.span_mode == "expanded" else narrow_bounds
+            span_start, span_end = bounds(answer, start, end)
             fragment = answer[span_start:span_end]
             if not fragment.strip():
                 continue
@@ -510,6 +558,50 @@ class Verifier:
                     risk=risk_value,
                     label="likely_hallucination" if risk_value >= HALLUCINATION_LABEL_RISK else "doubtful",
                     n_tokens=len(token_risk),
+                    kind="number_attribution",
+                    reason="число совпадает со значением другого объекта документа",
+                )
+            )
+        return found
+
+    def _coverage_spans(self, answer: str, context: str | Sequence[str] | None, threshold: float) -> list[SpanResult]:
+        """Фрагменты, объяснённые пропуском или усечением факта документа.
+
+        Типы ``missing``, ``partial`` и ``oversight`` конвейер признаков не
+        ловит по определению: у пропущенного сведения нет токенов. Поэтому
+        факты документа сверяются с ответом напрямую
+        (:mod:`spanverify.facts`), а найденные места добавляются к маске.
+        """
+        if not context or not self.fact_coverage:
+            return []
+        from .facts import coverage_spans, extract_facts  # noqa: PLC0415
+
+        # Контекст приходит и строкой, и списком фрагментов документа —
+        # приводим к единому виду той же функцией, что и признаки.
+        context_text = split_chunks(context).text
+        if not context_text.strip():
+            return []
+        try:
+            facts = extract_facts(context_text, max_facts=self.max_facts)
+        except (ValueError, RecursionError):  # pragma: no cover - защита от битого текста
+            return []
+        found: list[SpanResult] = []
+        for item in coverage_spans(answer, facts):
+            start, end = int(item["start"]), int(item["end"])
+            fragment = answer[start:end]
+            if not fragment.strip():
+                continue
+            risk = max(threshold, COVERAGE_SPAN_RISK)
+            found.append(
+                SpanResult(
+                    start=start,
+                    end=end,
+                    text=fragment,
+                    risk=risk,
+                    label="likely_hallucination" if risk >= HALLUCINATION_LABEL_RISK else "doubtful",
+                    n_tokens=len(fragment.split()),
+                    kind=str(item["kind"]),
+                    reason=str(item.get("reason", "")),
                 )
             )
         return found
@@ -521,7 +613,7 @@ class Verifier:
         risk: Sequence[float],
         threshold: float,
     ) -> list[SpanResult]:
-        """Маска → склейка → расширение до границ предложений → метки."""
+        """Маска → склейка → границы фрагмента (узкие или расширенные) → метки."""
         # Маска строится только по содержательным токенам: пунктуация и
         # служебные слова не могут быть «недостоверными» сами по себе, они
         # лишь попадают внутрь найденного фрагмента при расширении.
@@ -541,10 +633,11 @@ class Verifier:
                 groups.append([index])
 
         spans: list[SpanResult] = []
+        bounds = _expand_to_sentence if self.span_mode == "expanded" else narrow_bounds
         for group in groups:
             start = tokens[group[0]].start
             end = tokens[group[-1]].end
-            start, end = _expand_to_sentence(answer, start, end)
+            start, end = bounds(answer, start, end)
             fragment = answer[start:end]
             if not fragment.strip():
                 continue
@@ -562,6 +655,44 @@ class Verifier:
                 )
             )
         return _merge_spans(spans)
+
+
+def _metrics_by_kind(
+    kinds: Sequence[str],
+    predicted: Sequence[Sequence[tuple[int, int]]],
+    truth: Sequence[Sequence[tuple[int, int]]],
+    verdict_flags: Sequence[bool],
+) -> dict[str, dict[str, float]]:
+    """Разбивка качества по типам расхождений (faithful, missing, partial, …).
+
+    Для чистых пар (``faithful``) показателем служит доля ложных замечаний,
+    для остальных — полнота обнаружения на уровне ответа и на уровне фрагмента
+    (попадание с IoU ≥ 0,5).
+    """
+    out: dict[str, dict[str, float]] = {}
+    for kind in sorted(set(kinds)):
+        indices = [i for i, value in enumerate(kinds) if value == kind]
+        if not indices:
+            continue
+        flagged = sum(1 for i in indices if verdict_flags[i])
+        has_truth = sum(1 for i in indices if truth[i])
+        hit = 0
+        for i in indices:
+            if not truth[i]:
+                continue
+            if any(_iou(p, t) >= 0.5 for t in truth[i] for p in predicted[i]):
+                hit += 1
+        row = {
+            "n": float(len(indices)),
+            "flagged_share": round(flagged / len(indices), 4),
+        }
+        if has_truth:
+            row["recall_answer"] = round(flagged / has_truth, 4)
+            row["recall_span_iou_0_5"] = round(hit / has_truth, 4)
+        else:
+            row["false_alarm_share"] = round(flagged / len(indices), 4)
+        out[kind] = row
+    return out
 
 
 def _token_metrics(labels: Sequence[int], flags: Sequence[bool], risks: Sequence[float]) -> dict[str, float]:
@@ -856,6 +987,72 @@ def _percentile(values: Sequence[float], percentile: float) -> float:
     ordered = sorted(values)
     index = min(len(ordered) - 1, max(0, int(round(percentile / 100 * len(ordered))) - 1))
     return ordered[index]
+
+
+_CLAUSE_SEPARATORS = ",;:—–()\n"
+# Единица может быть из двух слов («рабочих дней»), поэтому пробуем сначала
+# двухсловный хвост, затем односложный.
+_UNIT_TAIL_RES = (
+    re.compile(r"^\s*[А-Яа-яЁёA-Za-z]{1,14}\s+[А-Яа-яЁёA-Za-z]{1,14}\b"),
+    re.compile(r"^\s*(?:[А-Яа-яЁёA-Za-z]{1,14}|%)\b"),
+)
+
+
+def narrow_bounds(answer: str, start: int, end: int) -> tuple[int, int]:
+    """Узкие границы фрагмента (пункт 2.3 реестра).
+
+    Вместо расширения до предложения (оно давало ширину ×24 к эталону):
+
+    * снимаются пробелы и обрамляющая пунктуация;
+    * если фрагмент заканчивается числом, к нему прирастает единица измерения
+      справа («10» → «10 мегабайт»): число без единицы человеку бесполезно;
+    * если фрагмент начинается с единицы измерения, слева прирастает число;
+    * фрагмент не выходит за границы своей клаузы (запятая, тире, скобка).
+
+    Возвращает пару ``(start, end)``; при пустом результате — исходную пару.
+    """
+    if not answer:
+        return start, end
+    start = max(0, min(start, len(answer)))
+    end = max(start, min(end, len(answer)))
+    # граница клаузы слева и справа
+    clause_start = start
+    while clause_start > 0 and answer[clause_start - 1] not in _CLAUSE_SEPARATORS:
+        if answer[clause_start - 1] in ".!?" and (clause_start < 2 or answer[clause_start - 2] != " "):
+            break
+        clause_start -= 1
+    clause_end = end
+    while clause_end < len(answer) and answer[clause_end] not in _CLAUSE_SEPARATORS + ".!?":
+        clause_end += 1
+
+    while start < end and (answer[start].isspace() or answer[start] in PUNCT):
+        start += 1
+    while end > start and (answer[end - 1].isspace() or answer[end - 1] in PUNCT):
+        end -= 1
+    if end <= start:
+        return start, max(start + 1, end)
+
+    # число -> добавить единицу измерения справа (в пределах клаузы)
+    if answer[end - 1].isdigit() or _is_number_word(answer, start, end):
+        for pattern in _UNIT_TAIL_RES:
+            tail = pattern.match(answer[end:clause_end])
+            if tail and canonical_unit(answer[end : end + tail.end()].strip()):
+                end = end + tail.end()
+                break
+    # единица измерения -> добавить число слева
+    if canonical_unit(answer[start:end]):
+        head = re.search(r"(\d+(?:[.,]\d+)?|[А-Яа-яЁё]+)\s*$", answer[clause_start:start])
+        if head:
+            start = clause_start + head.start()
+    return start, end
+
+
+def _is_number_word(answer: str, start: int, end: int) -> bool:
+    """Заканчивается ли фрагмент числительным прописью («пять», «двадцать»)."""
+    from .numnorm import words_to_number  # noqa: PLC0415
+
+    tail = re.search(r"[А-Яа-яЁё]+$", answer[start:end])
+    return bool(tail and words_to_number(tail.group()) is not None)
 
 
 def _expand_to_sentence(answer: str, start: int, end: int) -> tuple[int, int]:
