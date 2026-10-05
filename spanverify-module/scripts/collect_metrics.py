@@ -181,6 +181,8 @@ def _metrics_tree(metrics: dict) -> dict:
     """Сжать дерево метрик evaluate() до чисел, которые попадают в документы."""
     tokens = metrics["tokens"]
     spans = metrics["spans"]
+    narrow = metrics.get("spans_narrow") or spans
+    expanded = metrics.get("spans_expanded") or spans
     answers = metrics["answers"]
     return {
         "tokens": {
@@ -196,6 +198,26 @@ def _metrics_tree(metrics: dict) -> dict:
             "coverage": round(spans["recall_containment"], 4),
             "soft_f1": round(spans["f1_expanded_labels"], 4),
             "width_ratio": round(spans["mean_width_ratio"], 2),
+            # Пункт 2.3 задания: узкая и расширенная разметка публикуются отдельно.
+            # «strict_f1» и «soft_f1» выше — смешанные величины (найденные фрагменты
+            # против узкой и против расширенной разметки соответственно), и после
+            # перехода на точные границы их сравнение между собой смысла не имеет:
+            # узкий фрагмент не даёт IoU ≥ 0.5 с целым предложением. Сравнивать
+            # следует однородные пары ниже.
+            "narrow": {
+                "f1_iou_0_5": round(narrow["f1"], 4),
+                "precision": round(narrow["precision"], 4),
+                "recall": round(narrow["recall"], 4),
+                "coverage": round(narrow["recall_containment"], 4),
+                "width_ratio": round(narrow["mean_width_ratio"], 2),
+            },
+            "expanded": {
+                "f1_iou_0_5": round(expanded["f1"], 4),
+                "precision": round(expanded["precision"], 4),
+                "recall": round(expanded["recall"], 4),
+                "coverage": round(expanded["recall_containment"], 4),
+                "width_ratio": round(expanded["mean_width_ratio"], 2),
+            },
         },
         "answers": {
             "precision": round(answers["precision"], 4),

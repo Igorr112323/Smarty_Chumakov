@@ -69,12 +69,32 @@ def test_metrics_json_keeps_cross_corpus_drop() -> None:
 
 
 def test_metrics_json_exposes_strict_span_quality() -> None:
-    """Строгая метрика фрагментов (узкая разметка) обязана публиковаться рядом с мягкой (P1-4)."""
+    """Узкая и расширенная разметка публикуются раздельно и обе — честными числами (P1-4, п. 2.3).
+
+    Раньше тест требовал ``strict_f1 < soft_f1``. Это предположение перестало быть
+    верным после перехода на точные границы фрагментов: ``strict_f1`` считается против
+    узкой разметки, а ``soft_f1`` — против разметки, расширенной до предложения, и
+    узкий найденный фрагмент не даёт IoU ≥ 0.5 с целым предложением. Сравнивать между
+    собой можно только однородные пары, поэтому проверяются они.
+    """
     metrics = _metrics()
     for name in ("in_corpus", "whole_corpus"):
         spans = metrics["demo"][name]["spans"]
-        assert 0.0 <= spans["strict_f1"] < spans["soft_f1"] <= 1.0, name
-        assert spans["coverage"] >= 0.9, name
+        assert 0.0 <= spans["strict_f1"] <= 1.0, name
+        assert 0.0 <= spans["soft_f1"] <= 1.0, name
+        for markup in ("narrow", "expanded"):
+            block = spans[markup]
+            assert set(block) == {"f1_iou_0_5", "precision", "recall", "coverage", "width_ratio"}, (name, markup)
+            for key in ("f1_iou_0_5", "precision", "recall", "coverage"):
+                assert 0.0 <= block[key] <= 1.0, (name, markup, key)
+            assert block["width_ratio"] > 0.0, (name, markup)
+        # Расширение разметки огрубляет границы: ширина найденного фрагмента
+        # относительно эталона на расширенной разметке не больше, чем на узкой.
+        assert spans["expanded"]["width_ratio"] <= spans["narrow"]["width_ratio"], name
+        # На расширенной разметке конвейер обязан накрывать размеченное место:
+        # это и есть «нашли нужное предложение». Узкое накрытие ниже — это плата за
+        # точные границы, и она публикуется числом, а не замалчивается.
+        assert spans["expanded"]["coverage"] >= 0.9, name
 
 
 def test_check_numbers_reports_stale_value() -> None:
