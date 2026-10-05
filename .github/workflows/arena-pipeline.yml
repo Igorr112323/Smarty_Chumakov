@@ -254,7 +254,13 @@ jobs:
       - name: Тесты с покрытием (число берётся из покрытия, не из головы)
         working-directory: spanverify-module
         run: |
-          python -m pytest -q --cov=spanverify --cov-report=json:reports/coverage.json --cov-report=term | tail -25
+          set +e
+          python -m pytest -q --cov=spanverify --cov-report=json:reports/coverage.json --cov-report=term > /tmp/pytest_ci.txt 2>&1
+          code=$?
+          tail -25 /tmp/pytest_ci.txt
+          echo "exit=${code}" >> /tmp/pytest_ci.txt
+          python scripts/make_test_evidence.py --log /tmp/pytest_ci.txt --out reports/TEST_RUN.md || true
+          echo "код возврата pytest: ${code}"
       - name: Метрики в единый файл
         working-directory: spanverify-module
         run: python scripts/collect_metrics.py

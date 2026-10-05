@@ -29,6 +29,7 @@ from __future__ import annotations
 import argparse
 import json
 import platform
+import re
 import subprocess
 import sys
 from collections.abc import Sequence
@@ -135,9 +136,14 @@ def section_2(code: dict[str, Any] | None) -> list[str]:
     if not code:
         lines += [missing(ROOT / "reports" / "code_state.json"), ""]
         return lines
+    note = test_run_note()
     lines += [
         f"Версия: {code.get('version', __version__)}. Python: {code.get('python', platform.python_version())}.",
         "",
+    ]
+    if note:
+        lines += [note, ""]
+    lines += [
         "| Проверка | Результат |",
         "|---|---|",
         f"| Тесты | {code.get('tests_passed', NO_DATA)} из {code.get('tests_total', NO_DATA)} "
@@ -156,6 +162,22 @@ def section_2(code: dict[str, Any] | None) -> list[str]:
             lines.append(f"| {name} | {payload.get('bytes', 'null')} | {payload.get('check', NO_DATA)} |")
         lines.append("")
     return lines
+
+
+def test_run_note() -> str:
+    """Строка о прогоне тестов из reports/TEST_RUN.md (если он есть)."""
+    path = ROOT / "reports" / "TEST_RUN.md"
+    if not path.is_file():
+        return ""
+    text = path.read_text(encoding="utf-8")
+    code = re.search(r"код возврата: (-?\d+)", text)
+    collected = re.search(r"собрано тестов: (\d+)", text)
+    if not code:
+        return ""
+    parts = [f"код возврата pytest {code.group(1)}"]
+    if collected:
+        parts.append(f"собрано тестов {collected.group(1)}")
+    return "Прогон тестов: " + ", ".join(parts) + " — подробности в `reports/TEST_RUN.md`."
 
 
 def section_3(sources: dict[str, Any] | None) -> list[str]:
