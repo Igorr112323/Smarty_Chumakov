@@ -1,0 +1,169 @@
+{
+  "comment": "Белый список источников официально опубликованных НПА (пункт 3.1 задания). Только официальные публикации: платные и подписочные источники (Гарант, КонсультантПлюс, Кодекс) в список не входят принципиально. Правовая основа использования текстов — п. 6 ст. 1259 ГК РФ: официальные документы государственных органов не являются объектами авторских прав.",
+  "updated": "2026-10-05",
+  "pause_seconds_min": 1.0,
+  "user_agent": "SpanVerify-CorpusBot/1.1 (+https://github.com/Igorr112323/Smarty_Chumakov; research corpus; contact: repository issues)",
+  "sources": [
+    {
+      "host": "publication.pravo.gov.ru",
+      "level": "federal",
+      "title": "Официальный интернет-портал правовой информации",
+      "api": "https://publication.pravo.gov.ru/api/Documents",
+      "pdf": "https://publication.pravo.gov.ru/file/pdf?eoNumber={eo}",
+      "machine_readable": true,
+      "notes": "основной источник: федеральные законы, указы, постановления, приказы, а также акты субъектов РФ"
+    },
+    {
+      "host": "pravo.gov.ru",
+      "level": "federal",
+      "title": "Официальный интернет-портал правовой информации (основной домен)",
+      "machine_readable": false
+    },
+    {
+      "host": "regulation.gov.ru",
+      "level": "federal",
+      "title": "Федеральный портал проектов нормативных правовых актов",
+      "api": "https://regulation.gov.ru/api/public/Projects",
+      "machine_readable": true,
+      "notes": "проекты актов; в корпус берутся только опубликованные тексты"
+    },
+    {
+      "host": "mintrud.gov.ru",
+      "level": "ministry",
+      "organ": "Минтруд России",
+      "topics": ["охрана труда", "кадровый учёт"]
+    },
+    {
+      "host": "digital.gov.ru",
+      "level": "ministry",
+      "organ": "Минцифры России",
+      "topics": ["защита информации", "государственные услуги"]
+    },
+    {
+      "host": "minjust.gov.ru",
+      "level": "ministry",
+      "organ": "Минюст России",
+      "topics": ["делопроизводство", "обращения граждан"]
+    },
+    {
+      "host": "fstec.ru",
+      "level": "agency",
+      "organ": "ФСТЭК России",
+      "topics": ["защита информации"]
+    },
+    {
+      "host": "rkn.gov.ru",
+      "level": "agency",
+      "organ": "Роскомнадзор",
+      "topics": ["персональные данные"]
+    },
+    {
+      "host": "archives.gov.ru",
+      "level": "agency",
+      "organ": "Росархив",
+      "topics": ["сроки хранения документов", "архивное дело", "делопроизводство"]
+    },
+    {
+      "host": "minzdrav.gov.ru",
+      "level": "ministry",
+      "organ": "Минздрав России",
+      "topics": ["охрана здоровья"]
+    },
+    {
+      "host": "edu.gov.ru",
+      "level": "ministry",
+      "organ": "Минпросвещения России",
+      "topics": ["образование"]
+    },
+    {
+      "host": "nalog.gov.ru",
+      "level": "agency",
+      "organ": "ФНС России",
+      "topics": ["документооборот", "формы документов"]
+    },
+    {
+      "host": "admkrai.krasnodar.ru",
+      "level": "region",
+      "region": "Краснодарский край",
+      "organ": "Администрация Краснодарского края",
+      "priority": 1
+    },
+    {
+      "host": "kubzsk.ru",
+      "level": "region",
+      "region": "Краснодарский край",
+      "organ": "Законодательное Собрание Краснодарского края",
+      "priority": 1
+    },
+    {
+      "host": "mos.ru",
+      "level": "region",
+      "region": "Москва",
+      "organ": "Правительство Москвы",
+      "priority": 2
+    },
+    {
+      "host": "mosreg.ru",
+      "level": "region",
+      "region": "Московская область",
+      "organ": "Правительство Московской области",
+      "priority": 2
+    },
+    {
+      "host": "gov.spb.ru",
+      "level": "region",
+      "region": "Санкт-Петербург",
+      "organ": "Правительство Санкт-Петербурга",
+      "priority": 2
+    },
+    {
+      "host": "donland.ru",
+      "level": "region",
+      "region": "Ростовская область",
+      "organ": "Правительство Ростовской области",
+      "priority": 2
+    },
+    {
+      "host": "stavregion.ru",
+      "level": "region",
+      "region": "Ставропольский край",
+      "organ": "Правительство Ставропольского края",
+      "priority": 2
+    },
+    {
+      "host": "tatarstan.ru",
+      "level": "region",
+      "region": "Республика Татарстан",
+      "organ": "Правительство Республики Татарстан",
+      "priority": 2
+    },
+    {
+      "host": "midural.ru",
+      "level": "region",
+      "region": "Свердловская область",
+      "organ": "Правительство Свердловской области",
+      "priority": 2
+    },
+    {
+      "host": "krd.ru",
+      "level": "municipal",
+      "region": "Краснодарский край",
+      "organ": "Администрация муниципального образования город Краснодар",
+      "priority": 1
+    },
+    {
+      "host": "sochi.ru",
+      "level": "municipal",
+      "region": "Краснодарский край",
+      "organ": "Администрация города Сочи",
+      "priority": 2
+    }
+  ],
+  "forbidden": [
+    "документы с персональными данными",
+    "внутренние и закрытые документы организаций",
+    "платные и подписочные источники (КонсультантПлюс, Гарант, Кодекс)",
+    "сайты, закрытые robots.txt",
+    "акты, снятые с публикации"
+  ]
+}

@@ -88,6 +88,8 @@ PAUSE_SECONDS = 1.5
 PAGE_SIZE = 100  # допустимые значения API: 10, 30, 100 (5/20/50 отклонены — проверено в CI)
 
 # Белый список источников из задания (только официальные публикации).
+# Запасное значение: основной список читается из config/sources_whitelist.json
+# (функция ``load_whitelist``), чтобы список источников был один на весь проект.
 WHITELIST = (
     "publication.pravo.gov.ru",
     "pravo.gov.ru",
@@ -96,6 +98,71 @@ WHITELIST = (
     "rospotrebnadzor.ru",
     "eec.eaeunion.org",
 )
+
+WHITELIST_CONFIG = ROOT / "config" / "sources_whitelist.json"
+
+
+def load_whitelist(path: Path | None = None) -> tuple[str, ...]:
+    """Хосты белого списка из ``config/sources_whitelist.json``.
+
+    Единый источник правды о допустимых источниках. Если файла нет или он битый,
+    возвращается встроенный кортеж ``WHITELIST`` — загрузчик не должен падать из-за
+    конфигурации, но и расширять список молча он тоже не должен.
+    """
+    config_path = path or WHITELIST_CONFIG
+    try:
+        data = json.loads(config_path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
+        return WHITELIST
+    hosts: list[str] = []
+    for entry in data.get("sources") or []:
+        host = (entry or {}).get("host") if isinstance(entry, dict) else None
+        if host and host not in hosts:
+            hosts.append(str(host))
+    return tuple(hosts) or WHITELIST
+
+
+# Региональные разделы портала опубликования. Проверено запросом: работает только
+# слуг вида ``region<код>`` (``krasnodarskij-kraj`` отдаёт 500, ``/api/Regions`` — 404).
+# Тот же код региона — первые две цифры номера опубликования (eoNumber), поэтому
+# уровень и регион документа определяются по номеру, без справочника органов.
+# Порядок — приоритет задания: Краснодарский край первым.
+REGION_BLOCKS: tuple[tuple[str, str], ...] = (
+    ("23", "Краснодарский край"),
+    ("77", "Москва"),
+    ("50", "Московская область"),
+    ("78", "Санкт-Петербург"),
+    ("61", "Ростовская область"),
+    ("26", "Ставропольский край"),
+    ("16", "Республика Татарстан"),
+    ("66", "Свердловская область"),
+)
+
+REGION_NAMES: dict[str, str] = dict(REGION_BLOCKS)
+
+FEDERAL_PREFIX = "00"
+
+
+def region_of(eo_number: str) -> dict[str, str | None]:
+    """Уровень и регион акта по номеру опубликования.
+
+    Номер опубликования устроен так: две цифры кода региона (``00`` — федеральный
+    уровень), две цифры органа, затем ``ГГГГММДД`` и порядковый номер за день.
+    Поэтому уровень публикации читается из самого номера и не требует разрешения
+    идентификаторов органов (их перебор в ``/api/SignatoryAuthorities`` — 66 страниц).
+    """
+    digits = "".join(character for character in str(eo_number or "") if character.isdigit())
+    if len(digits) < 4:
+        return {"level": None, "region_code": None, "region_name": None}
+    code = digits[:2]
+    if code == FEDERAL_PREFIX:
+        return {"level": "федеральный", "region_code": code, "region_name": None}
+    return {
+        "level": "региональный",
+        "region_code": code,
+        "region_name": REGION_NAMES.get(code),
+    }
+
 
 # Темы приоритета: (название темы, регулярное выражение по названию акта).
 THEMES = (
@@ -197,19 +264,29 @@ def is_allowed(url: str, rules: dict[str, list[str]]) -> bool:
 # ---------------------------------------------------------------------------
 
 
-def theme_of(name: str) -> str | None:
-    """Тема приоритета по названию акта (``None`` — не наша тема)."""
+OTHER_THEME = "прочее"
+
+
+def theme_of(name: str, allow_other: bool = False) -> str | None:
+    """Тема приоритета по названию акта (``None`` — не наша тема).
+
+    При ``allow_other=True`` акт вне приоритетных тем не отбрасывается, а помечается
+    темой ``«прочее»``. Это нужно для набора объёма корпуса: приоритетных тем в суточной
+    выдаче портала мало (замерено: 10 документов за прогон на 4800 просмотренных), и
+    без этого цель в 120 документов недостижима. Тема остаётся в манифесте, поэтому
+    доля приоритетных тем в корпусе видна и не выдаётся за 100 %.
+    """
     lowered = (name or "").lower()
     for theme, pattern in THEMES:
         if re.search(pattern, lowered):
             return theme
-    return None
+    return OTHER_THEME if allow_other else None
 
 
-def fetch_robots() -> dict[str, dict]:
+def fetch_robots(hosts: tuple[str, ...] | None = None) -> dict[str, dict]:
     """Правила robots.txt по всем источникам белого списка (для отчёта)."""
     result: dict[str, dict] = {}
-    for host in WHITELIST:
+    for host in hosts if hosts is not None else WHITELIST:
         scheme = "https" if host not in {"publication.pravo.gov.ru", "pravo.gov.ru"} else "http"
         url = f"{scheme}://{host}/robots.txt"
         fetched = fetch(url, timeout=45, read_limit=200_000)
@@ -224,76 +301,149 @@ def fetch_robots() -> dict[str, dict]:
     return result
 
 
+def candidate_from_item(
+    item: dict,
+    theme: str,
+    act_type: str | None,
+    base: str = "http://publication.pravo.gov.ru",
+) -> dict:
+    """Карточка кандидата из элемента выдачи API (без сетевых запросов)."""
+    eo = str(item["eoNumber"])
+    placement = region_of(eo)
+    title = item.get("name") or ""
+    complex_name = item.get("complexName") or ""
+    # Вид акта у региональной выдачи в элементе не назван: берём первое слово
+    # заголовка («Постановление …», «Приказ …»), иначе остаётся None.
+    resolved_type = act_type
+    if not resolved_type and complex_name:
+        head = complex_name.strip().split()
+        resolved_type = head[0].strip('"«') if head else None
+    return {
+        "doc_id": f"eo-{eo}",
+        "source_host": "publication.pravo.gov.ru",
+        "eo_number": eo,
+        "document_id": item.get("id"),
+        "act_type": resolved_type,
+        "act_number": item.get("number"),
+        "act_date": (item.get("documentDate") or "")[:10] or None,
+        "published_at": (item.get("publishDateShort") or "")[:10] or None,
+        "title": title,
+        "complex_name": complex_name,
+        "pages_count": item.get("pagesCount"),
+        "pdf_bytes_expected": item.get("pdfFileLength"),
+        "source_url": f"{base}/document/{eo}",
+        "theme": theme,
+        "level": placement["level"],
+        "region_code": placement["region_code"],
+        "region_name": placement["region_name"],
+        "signatory_authority_id": item.get("signatoryAuthorityId"),
+        "document_type_id": item.get("documentTypeId"),
+    }
+
+
+def scan_list(
+    url: str,
+    rules: dict[str, list[str]],
+    stats: dict,
+    pause: float,
+) -> list[dict] | None:
+    """Одна страница выдачи API: список элементов либо ``None`` при отказе.
+
+    ``None`` означает «дальше по этой ветке идти незачем» (robots, ошибка, пусто) —
+    вызывающий код прекращает перебор страниц, а причина попадает в статистику.
+    """
+    if not is_allowed(url, {"*": rules.get("*", [])}):
+        stats.setdefault("skipped_by_robots", []).append(url)
+        return None
+    fetched = fetch(url)
+    stats["pages_scanned"] += 1
+    time.sleep(max(0.0, pause))
+    if fetched["status"] != 200:
+        stats.setdefault("page_errors", []).append(f"{url} → {fetched['error']}")
+        return None
+    try:
+        items = json.loads(fetched["raw"].decode("utf-8")).get("items", [])
+    except json.JSONDecodeError:
+        stats.setdefault("page_errors", []).append(f"{url} → тело не JSON")
+        return None
+    return items or None
+
+
 def collect_candidates(
     type_ids: dict[str, str],
     max_pages_per_type: int,
     pause: float,
     robots: dict[str, dict],
     base: str = "http://publication.pravo.gov.ru",
+    blocks: tuple[tuple[str, str], ...] = REGION_BLOCKS,
+    max_pages_per_block: int = 0,
+    allow_other: bool = False,
 ) -> tuple[list[dict], dict]:
-    """Набрать кандидатов: документы наших тем, с метаданными карточки.
+    """Набрать кандидатов: документы по видам актов и по региональным разделам.
 
-    Возвращает ``(кандидаты, статистика)``: сколько страниц просмотрено, сколько
-    документов просмотрено и сколько попало в темы (по каждой теме отдельно).
+    Две ветки отбора:
+
+    * по виду акта — ``/api/Documents?documentTypes=<guid>`` (выдача федеральная с
+      примесью регионов);
+    * по региональному разделу — ``/api/Documents?block=region<код>``; именно так
+      добираются акты субъектов, потому что справочник регионов API не отдаёт
+      (``/api/Regions`` — 404, проверено).
+
+    Возвращает ``(кандидаты, статистика)``: сколько страниц и документов просмотрено,
+    сколько попало в темы, уровни и регионы — по фактическому подсчёту.
     """
     candidates: list[dict] = []
     seen: set[str] = set()
-    stats = {
+    stats: dict = {
         "pages_scanned": 0,
         "documents_scanned": 0,
         "by_theme": {theme: 0 for theme, _ in THEMES},
         "by_type": {name: 0 for name in type_ids},
+        "by_level": {},
+        "by_region": {},
+        "blocks_scanned": [],
     }
     rules = robots.get("publication.pravo.gov.ru", {}).get("rules", {})
+
+    def absorb(items: list[dict], act_type: str | None) -> None:
+        for item in items:
+            stats["documents_scanned"] += 1
+            if not isinstance(item, dict) or not item.get("eoNumber"):
+                continue
+            theme = theme_of(item.get("name") or item.get("complexName") or "", allow_other=allow_other)
+            if theme is None:
+                continue
+            eo = str(item["eoNumber"])
+            if eo in seen:
+                continue
+            seen.add(eo)
+            candidate = candidate_from_item(item, theme, act_type, base=base)
+            stats["by_theme"][theme] = stats["by_theme"].get(theme, 0) + 1
+            if act_type:
+                stats["by_type"][act_type] = stats["by_type"].get(act_type, 0) + 1
+            level = str(candidate.get("level"))
+            stats["by_level"][level] = stats["by_level"].get(level, 0) + 1
+            region = str(candidate.get("region_name") or candidate.get("region_code"))
+            stats["by_region"][region] = stats["by_region"].get(region, 0) + 1
+            candidates.append(candidate)
+
     for type_name, type_id in type_ids.items():
         for page in range(1, max_pages_per_type + 1):
             url = f"{base}/api/Documents?pageSize={PAGE_SIZE}&index={page}&documentTypes={type_id}"
-            if not is_allowed(url, {"*": rules.get("*", [])}):
-                stats.setdefault("skipped_by_robots", []).append(url)
+            items = scan_list(url, rules, stats, pause)
+            if items is None:
                 break
-            fetched = fetch(url)
-            stats["pages_scanned"] += 1
-            time.sleep(max(0.0, pause))
-            if fetched["status"] != 200:
-                stats.setdefault("page_errors", []).append(f"{url} → {fetched['error']}")
+            absorb(items, type_name)
+
+    for code, name in blocks:
+        for page in range(1, max_pages_per_block + 1):
+            url = f"{base}/api/Documents?pageSize={PAGE_SIZE}&index={page}&block=region{code}"
+            items = scan_list(url, rules, stats, pause)
+            if items is None:
                 break
-            try:
-                items = json.loads(fetched["raw"].decode("utf-8")).get("items", [])
-            except json.JSONDecodeError:
-                items = []
-            if not items:
-                break
-            for item in items:
-                stats["documents_scanned"] += 1
-                if not isinstance(item, dict) or not item.get("eoNumber"):
-                    continue
-                theme = theme_of(item.get("name") or item.get("complexName") or "")
-                if theme is None:
-                    continue
-                eo = str(item["eoNumber"])
-                if eo in seen:
-                    continue
-                seen.add(eo)
-                stats["by_theme"][theme] += 1
-                stats["by_type"][type_name] = stats["by_type"].get(type_name, 0) + 1
-                candidates.append(
-                    {
-                        "doc_id": f"eo-{eo}",
-                        "source_host": "publication.pravo.gov.ru",
-                        "eo_number": eo,
-                        "document_id": item.get("id"),
-                        "act_type": type_name,
-                        "act_number": item.get("number"),
-                        "act_date": (item.get("documentDate") or "")[:10] or None,
-                        "published_at": (item.get("publishDateShort") or "")[:10] or None,
-                        "title": item.get("name"),
-                        "complex_name": item.get("complexName"),
-                        "pages_count": item.get("pagesCount"),
-                        "pdf_bytes_expected": item.get("pdfFileLength"),
-                        "source_url": f"{base}/document/{eo}",
-                        "theme": theme,
-                    }
-                )
+            absorb(items, None)
+        stats["blocks_scanned"].append({"block": f"region{code}", "region": name})
+
     return candidates, stats
 
 
@@ -382,11 +532,35 @@ def pick_extraction(text_layer: dict, ocr: dict, min_chars_per_page: int = 120) 
     return "none"
 
 
-def extract_text(path: Path, dpi: int = 200, max_pages: int = 20) -> dict:
-    """Текст PDF: сначала текстовый слой, затем OCR. Возвращает факты, без догадок."""
+def text_layer_is_enough(text_layer: dict, min_chars_per_page: int = 120) -> bool:
+    """Достаточен ли текстовый слой PDF, чтобы не запускать OCR."""
+    pages = int(text_layer.get("pages") or 0)
+    chars = len(text_layer.get("text") or "")
+    return bool(pages) and chars >= min_chars_per_page * pages
+
+
+def extract_text(
+    path: Path,
+    dpi: int = 200,
+    max_pages: int = 20,
+    min_chars_per_page: int = 120,
+    allow_ocr: bool = True,
+) -> dict:
+    """Текст PDF: сначала текстовый слой, OCR — только если слоя не хватило.
+
+    Раньше OCR запускался всегда, даже когда текстовый слой был пригоден: на прогоне
+    в CI это и съело лимит в 150 минут (распознавание — около 2,5 с на страницу).
+    Теперь распознавание включается только для тех документов, где текстовый слой
+    действительно пуст или слишком беден; факт пропуска OCR виден в ``ocr_skipped``.
+    """
     text_layer = pypdf_text(path)
-    ocr = ocr_pdf(path, dpi=dpi, max_pages=max_pages)
-    method = pick_extraction(text_layer, ocr)
+    if text_layer_is_enough(text_layer, min_chars_per_page):
+        ocr = {"text": "", "pages": 0, "seconds": None, "error": None, "skipped": "текстовый слой пригоден"}
+    elif allow_ocr:
+        ocr = ocr_pdf(path, dpi=dpi, max_pages=max_pages)
+    else:
+        ocr = {"text": "", "pages": 0, "seconds": None, "error": "OCR отключён ключом --no-ocr"}
+    method = pick_extraction(text_layer, ocr, min_chars_per_page)
     text = text_layer["text"] if method == "pypdf" else ocr["text"]
     return {
         "method": method,
@@ -395,6 +569,8 @@ def extract_text(path: Path, dpi: int = 200, max_pages: int = 20) -> dict:
         "chars": len(text or ""),
         "text_layer_chars": len(text_layer.get("text") or ""),
         "ocr_error": ocr.get("error"),
+        "ocr_skipped": ocr.get("skipped"),
+        "ocr_seconds": ocr.get("seconds"),
         "pypdf_error": text_layer.get("error"),
     }
 
@@ -490,24 +666,62 @@ def plan_downloads(
     existing_ids: set[str],
     needed: int,
     buffer: int = 40,
+    min_pages: int = 2,
+    max_pages_doc: int = 30,
+    regional_share: float = 0.45,
 ) -> list[dict]:
-    """Выбрать, что скачивать: заполняем темы по кругу, лишнее не тянем.
+    """Выбрать, что скачивать: приоритетные темы, затем баланс уровней и регионов.
 
-    Сначала берём документы редких тем (их нужно хотя бы по нескольку), затем добираем
-    остальные по порядку выдачи. Уже скачанные документы пропускаются — повторный запуск
-    не тратит время и запросы.
+    Порядок отбора задан требованиями корпуса: не меньше 60 федеральных и не меньше 40
+    региональных актов, причём среди региональных первым идёт Краснодарский край, затем
+    Москва, Московская область, Санкт-Петербург, Ростовская область, Ставропольский
+    край, Татарстан и Свердловская область (порядок ``REGION_BLOCKS``).
+
+    Документы вне диапазона ``min_pages``…``max_pages_doc`` страниц откладываются в
+    конец очереди: одностраничные акты почти не дают фактов, а очень длинные дорого
+    распознавать. Это именно порядок, а не исключение — если ничего другого нет, они
+    всё равно будут взяты, и это видно по манифесту.
     """
     fresh = [item for item in candidates if item["doc_id"] not in existing_ids and not item.get("skipped")]
     limit = max(0, needed) + max(0, buffer)
-    selected: list[dict] = []
-    by_theme: dict[str, list[dict]] = {}
-    for item in fresh:
-        by_theme.setdefault(str(item.get("theme")), []).append(item)
-    quota = max(1, max(0, needed) // max(1, len(THEMES)))
-    for theme, _pattern in THEMES:
-        selected.extend(by_theme.get(theme, [])[:quota])
+    if not fresh or limit == 0:
+        return []
+
+    def page_rank(item: dict) -> int:
+        pages = item.get("pages_count")
+        if not isinstance(pages, int):
+            return 1
+        return 0 if min_pages <= pages <= max_pages_doc else 1
+
+    priority_themes = [theme for theme, _pattern in THEMES]
+
+    def theme_rank(item: dict) -> int:
+        theme = str(item.get("theme"))
+        return priority_themes.index(theme) if theme in priority_themes else len(priority_themes)
+
+    region_order = [code for code, _name in REGION_BLOCKS]
+
+    def region_rank(item: dict) -> int:
+        code = str(item.get("region_code") or "")
+        return region_order.index(code) if code in region_order else len(region_order)
+
+    federal = sorted(
+        (item for item in fresh if item.get("level") == "федеральный"),
+        key=lambda item: (page_rank(item), theme_rank(item)),
+    )
+    regional = sorted(
+        (item for item in fresh if item.get("level") == "региональный"),
+        key=lambda item: (region_rank(item), page_rank(item), theme_rank(item)),
+    )
+    other = [item for item in fresh if item.get("level") not in {"федеральный", "региональный"}]
+
+    regional_target = int(round(limit * regional_share))
+    federal_target = limit - regional_target
+    selected = federal[:federal_target] + regional[:regional_target]
     taken = {item["doc_id"] for item in selected}
-    for item in fresh:
+    # Недобор по одному уровню добираем другим: цель — объём корпуса, а перекос
+    # фиксируется в манифесте (``by_level``), а не прячется.
+    for item in federal + regional + other:
         if len(selected) >= limit:
             break
         if item["doc_id"] in taken:
@@ -523,6 +737,34 @@ def main() -> int:
     parser.add_argument("--target-docs", type=int, default=130, help="сколько документов с текстом нужно")
     parser.add_argument(
         "--max-pages-per-type", type=int, default=10, help="сколько страниц выдачи смотреть по виду акта"
+    )
+    parser.add_argument(
+        "--max-pages-per-block",
+        type=int,
+        default=4,
+        help="сколько страниц выдачи смотреть по каждому региональному разделу (block=region<код>)",
+    )
+    parser.add_argument(
+        "--all-themes",
+        action="store_true",
+        help="брать акты вне приоритетных тем с пометкой темы «прочее» (нужно для объёма корпуса)",
+    )
+    parser.add_argument(
+        "--no-ocr",
+        action="store_true",
+        help="не запускать OCR: брать только документы с пригодным текстовым слоем PDF",
+    )
+    parser.add_argument(
+        "--min-chars-per-page",
+        type=int,
+        default=120,
+        help="порог пригодности текстового слоя PDF, знаков на страницу",
+    )
+    parser.add_argument(
+        "--regional-share",
+        type=float,
+        default=0.45,
+        help="доля региональных актов в плане загрузки (требование: ≥40 из ≥120)",
     )
     parser.add_argument(
         "--min-facts", type=int, default=6, help="минимум фактов (предложений со значениями) в документе"
@@ -567,7 +809,9 @@ def main() -> int:
             return 2
         return 0
 
-    robots = fetch_robots()
+    whitelist = load_whitelist()
+    print(f"белый список источников ({WHITELIST_CONFIG.name}): {len(whitelist)} хостов")
+    robots = fetch_robots(whitelist)
     for host, info in robots.items():
         print(f"robots {host}: статус={info['status']} правил={len(info['rules'].get('*', []))}")
         print(f"::notice title=A3 robots {host}::статус={info['status']} правил={len(info['rules'].get('*', []))}")
@@ -586,10 +830,23 @@ def main() -> int:
     print(f"::notice title=A3 виды актов::{sorted(type_ids)}")
     time.sleep(max(0.0, pause))
 
-    candidates, scan_stats = collect_candidates(type_ids, args.max_pages_per_type, pause, robots)
+    candidates, scan_stats = collect_candidates(
+        type_ids,
+        args.max_pages_per_type,
+        pause,
+        robots,
+        max_pages_per_block=args.max_pages_per_block,
+        allow_other=args.all_themes,
+    )
     existing_ids = {str(document["doc_id"]) for document in existing}
     needed = max(0, args.target_docs - len(existing))
-    planned = plan_downloads(candidates, existing_ids, needed, buffer=args.buffer)
+    planned = plan_downloads(
+        candidates,
+        existing_ids,
+        needed,
+        buffer=args.buffer,
+        regional_share=args.regional_share,
+    )
     print(
         f"просмотрено документов: {scan_stats['documents_scanned']}, подходящих по темам: {len(candidates)}, "
         f"к скачиванию: {len(planned)}"
@@ -641,7 +898,14 @@ def main() -> int:
 
         with concurrent.futures.ThreadPoolExecutor(max_workers=max(1, args.workers)) as pool:
             futures = {
-                pool.submit(extract_text, Path(item["_pdf_path"]), args.dpi, args.max_pages): item
+                pool.submit(
+                    extract_text,
+                    Path(item["_pdf_path"]),
+                    args.dpi,
+                    args.max_pages,
+                    args.min_chars_per_page,
+                    not args.no_ocr,
+                ): item
                 for item in downloaded
             }
             for future in concurrent.futures.as_completed(futures):
@@ -650,6 +914,8 @@ def main() -> int:
                 item["extraction"] = extracted["method"]
                 item["text_pages"] = extracted["pages"]
                 item["text_layer_chars"] = extracted["text_layer_chars"]
+                item["ocr_skipped"] = extracted.get("ocr_skipped")
+                item["ocr_seconds"] = extracted.get("ocr_seconds")
                 # Для длинных актов распознаётся начало документа (ограничение --dpi/страниц):
                 # это видно в манифесте, а не замалчивается.
                 item["text_truncated"] = bool(
@@ -685,9 +951,19 @@ def main() -> int:
     documents = sorted(existing + new_documents, key=lambda item: str(item["doc_id"]))
     by_theme: dict[str, int] = {}
     by_type: dict[str, int] = {}
+    by_level: dict[str, int] = {}
+    by_region: dict[str, int] = {}
     for item in documents:
         by_theme[str(item.get("theme"))] = by_theme.get(str(item.get("theme")), 0) + 1
         by_type[str(item.get("act_type"))] = by_type.get(str(item.get("act_type")), 0) + 1
+        # Уровень и регион у старых записей могли не сохраняться: восстанавливаем из
+        # номера опубликования, чтобы счёт был по всем документам, а не по новым.
+        placement = region_of(str(item.get("eo_number") or ""))
+        level = str(item.get("level") or placement["level"])
+        region = str(item.get("region_name") or placement["region_name"] or placement["region_code"])
+        by_level[level] = by_level.get(level, 0) + 1
+        if level == "региональный":
+            by_region[region] = by_region.get(region, 0) + 1
 
     previous_sources = {item.get("host"): item for item in (old_manifest.get("sources") or [])}
     default_sources = {
@@ -732,7 +1008,7 @@ def main() -> int:
         },
     }
     sources = []
-    for host in WHITELIST:
+    for host in whitelist:
         item = dict(
             default_sources.get(host, {"host": host, "documents_downloaded": 0, "documents_with_text": 0, "note": ""})
         )
@@ -754,10 +1030,15 @@ def main() -> int:
 
     manifest = {
         "generated_at": started_at,
-        "method": "publication.pravo.gov.ru (API отбора) + текст: текстовый слой PDF или OCR (pdftoppm + tesseract -l rus)",
+        "method": (
+            "publication.pravo.gov.ru: отбор по /api/Documents (по видам актов и по "
+            "региональным разделам block=region<код>), текст — текстовый слой PDF; "
+            "OCR (pdftoppm + tesseract -l rus) только там, где слоя не хватило"
+        ),
         "user_agent": USER_AGENT,
         "pause_seconds": pause,
-        "whitelist": list(WHITELIST),
+        "whitelist": list(whitelist),
+        "whitelist_config": str(WHITELIST_CONFIG.relative_to(ROOT)),
         "robots": robots,
         "sources": sources,
         "scan_stats": scan_stats,
@@ -765,6 +1046,8 @@ def main() -> int:
         "documents_total": len(documents),
         "by_theme": by_theme,
         "by_type": by_type,
+        "by_level": by_level,
+        "by_region": by_region,
         "extraction_methods": methods,
         "min_facts": args.min_facts,
         "ocr": {"tools": tools, "dpi": args.dpi, "workers": args.workers},
@@ -774,7 +1057,11 @@ def main() -> int:
     }
     write_sources(out_dir, documents, manifest)
     print(f"источников с текстом: {len(documents)} (по темам: {by_theme}; по видам: {by_type}; способ: {methods})")
-    print(f"::notice title=A3 итог::документов с текстом {len(documents)}; по темам {by_theme}")
+    print(f"уровни: {by_level}; регионы: {by_region}")
+    print(
+        f"::notice title=A3 итог::документов с текстом {len(documents)}; уровни {by_level}; "
+        f"регионы {by_region}; способ {methods}"
+    )
     if len(documents) < args.target_docs:
         print(f"ВНИМАНИЕ: получено {len(documents)} документов вместо {args.target_docs}", file=sys.stderr)
     print(f"Источники: {out_dir / 'sources'}")

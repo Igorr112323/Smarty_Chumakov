@@ -1,0 +1,189 @@
+name: corpus-a3
+
+# Сборка корпуса A3 на реальных официально опубликованных актах.
+#
+# Почему отдельный рабочий процесс, а не шаг ci: загрузка зависит от внешнего сайта,
+# идёт минутами и пишет результат в репозиторий. Её не нужно повторять на каждый push —
+# она запускается вручную (Run workflow) и по расписанию не запускается вовсе.
+#
+# Среда разработки проекта в интернет не выпускается (см. reports/SOURCES_AVAILABILITY.json:
+# 23 из 23 источников — SSLZeroReturnError), поэтому загрузка выполняется на раннере
+# GitHub, а тексты и манифест возвращаются в ветку обычным коммитом.
+
+on:
+  workflow_dispatch:
+    inputs:
+      target_docs:
+        description: "Сколько документов с текстом нужно всего"
+        required: false
+        default: "130"
+      max_pages_per_type:
+        description: "Страниц выдачи API по каждому виду акта (по 100 документов)"
+        required: false
+        default: "3"
+      max_pages_per_block:
+        description: "Страниц выдачи по каждому региональному разделу block=region<код>"
+        required: false
+        default: "2"
+      buffer:
+        description: "Сколько кандидатов брать сверх цели (на брак извлечения)"
+        required: false
+        default: "60"
+      pause:
+        description: "Пауза между запросами, секунд (не меньше 1)"
+        required: false
+        default: "1.2"
+      max_ocr_pages:
+        description: "Сколько первых страниц распознавать, если текстового слоя нет"
+        required: false
+        default: "8"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: corpus-a3-${{ github.ref }}
+  cancel-in-progress: false
+
+env:
+  PYTHONUTF8: "1"
+  PYTHONIOENCODING: "utf-8"
+
+jobs:
+  harvest:
+    name: "Корпус A3: загрузка актов, извлечение текста, сборка пар"
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    defaults:
+      run:
+        working-directory: spanverify-module
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref_name }}
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+          cache-dependency-path: spanverify-module/requirements.txt
+
+      - name: Зависимости
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements.txt
+          python -m pip install --disable-pip-version-check "pypdf~=6.1"
+
+      # OCR нужен только для тех актов, где в PDF нет текстового слоя. Загрузчик
+      # сначала пробует текстовый слой (pypdf) и запускает распознавание лишь при
+      # нехватке знаков на страницу — иначе прогон не укладывается в лимит времени.
+      - name: Поставить OCR (poppler + tesseract с русским)
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq poppler-utils tesseract-ocr tesseract-ocr-rus
+
+      - name: Версии инструментов (для протокола)
+        run: |
+          python -V
+          pdftoppm -v 2>&1 | head -1 || true
+          tesseract --version 2>&1 | head -1 || true
+          python -c "import pypdf; print('pypdf', pypdf.__version__)"
+
+      # robots.txt читается до запросов, пауза между запросами ≥1 с, User-Agent
+      # содержит контакт. Отбор идёт по официальному API, а не разбором HTML.
+      - name: Загрузка актов (robots.txt, пауза, SHA256, резюмируемость)
+        id: fetch
+        continue-on-error: true
+        run: |
+          python scripts/fetch_npa_corpus.py \
+            --out data/corpus_a3 \
+            --target-docs "${{ inputs.target_docs }}" \
+            --max-pages-per-type "${{ inputs.max_pages_per_type }}" \
+            --max-pages-per-block "${{ inputs.max_pages_per_block }}" \
+            --buffer "${{ inputs.buffer }}" \
+            --pause "${{ inputs.pause }}" \
+            --max-pages "${{ inputs.max_ocr_pages }}" \
+            --all-themes \
+            --workers 4
+
+      - name: Что реально скачано (факты из манифеста)
+        if: always()
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          path = Path("data/corpus_a3/sources/sources.json")
+          if not path.exists():
+              print("::error title=A3::sources.json не создан — скачивание не состоялось")
+              raise SystemExit(0)
+          manifest = json.loads(path.read_text(encoding="utf-8"))
+          documents = manifest.get("documents") or {}
+          print(f"документов: {len(documents)}")
+          print(f"уровни: {manifest.get('by_level')}")
+          print(f"регионы: {manifest.get('by_region')}")
+          print(f"способы извлечения: {manifest.get('extraction_methods')}")
+          print(f"темы: {manifest.get('by_theme')}")
+          print(f"пропущено кандидатов: {manifest.get('skipped_total')}")
+          chars = sum(int(item.get("text_chars") or 0) for item in documents.values())
+          facts = sum(int(item.get("facts_found") or 0) for item in documents.values())
+          print(f"знаков текста: {chars}; фактов найдено: {facts}")
+          print(
+              "::notice title=A3 загрузка::"
+              f"документов={len(documents)} уровни={manifest.get('by_level')} "
+              f"регионы={manifest.get('by_region')} способы={manifest.get('extraction_methods')} "
+              f"знаков={chars} фактов={facts}"
+          )
+          PY
+
+      - name: Проверка хешей источников
+        if: always()
+        continue-on-error: true
+        run: python scripts/fetch_npa_corpus.py --out data/corpus_a3 --verify
+
+      - name: Сборка корпуса A3 (пары на реальных фрагментах)
+        if: always()
+        continue-on-error: true
+        run: python scripts/build_corpus_a.py --docs data/corpus_a3/sources --out data/corpus_a3 --target 1200 --seed 43 --real
+
+      - name: Проверки корпуса A3
+        if: always()
+        continue-on-error: true
+        run: python -m pytest tests/test_corpus_a3.py -q
+
+      - name: Отчёт по корпусу A3
+        if: always()
+        continue-on-error: true
+        run: python scripts/make_corpus_a3_report.py
+
+      - name: Артефакт корпуса A3
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: corpus-a3
+          path: |
+            spanverify-module/data/corpus_a3
+            spanverify-module/reports/CORPUS_A3.md
+          retention-days: 90
+
+      # [skip ci] в сообщении: корпус не должен запускать второй прогон проверок.
+      - name: Закоммитить корпус в ветку
+        if: always()
+        run: |
+          git config user.name "spanverify-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add -f data/corpus_a3 reports/CORPUS_A3.md reports/CORPUS_REPORT.md || true
+          if git diff --cached --quiet; then
+            echo "нечего коммитить"
+            exit 0
+          fi
+          git commit -m "корпус A3: реальные акты, тексты и манифест [skip ci]"
+          for attempt in 1 2 3; do
+            if git pull --rebase --autostash -q origin "${GITHUB_REF_NAME}" && git push origin "HEAD:${GITHUB_REF_NAME}"; then
+              echo "корпус закоммичен (попытка $attempt)"
+              exit 0
+            fi
+            sleep 5
+          done
+          echo "::warning title=A3::не удалось закоммитить корпус за 3 попытки"
+          exit 0
