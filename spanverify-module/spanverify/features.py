@@ -646,8 +646,16 @@ def _apply_number_consistency(tokens: Sequence[Token], context_numbers: set[str]
     """
     if not context_numbers:
         return
+    # Значение берётся для группы токенов, а не по одному токену: иначе
+    # «двадцать пять» распадается на «20» и «5», которых в документе нет,
+    # и корректный ответ с числом прописью получает нулевую опору.
+    # Тот же дефект, что закрывался в _attribute_tokens (B4), но в этой
+    # функции он оставался незамеченным.
+    group_values = _group_number_values(tokens)
     for index, token in enumerate(tokens):
-        value = number_value(token)
+        value = group_values[index] if index < len(group_values) else None
+        if value is None:
+            value = number_value(token)
         if value is not None and value not in context_numbers:
             mass[index] = 0.0
 

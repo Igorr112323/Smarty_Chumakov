@@ -51,7 +51,7 @@ python -c "import torch, transformers; print(torch.__version__, transformers.__v
 |---|---|---|---|---|---|---|---|
 | A1 | Режим `hf` ни разу не прогонялся | `external_tests.hf_runs = 0` (`reports/METRICS.json`) | `spanverify/backends/hf.py`, `spanverify/engine.py` | P0 | Прогон в `hf` на корпусе A1 и A3; в METRICS появляются строки с `hf_runs > 0` | `tests/test_backends.py` + job «Пилот» в CI с артефактом | нет |
 | A2 | Пилот: признаки внимания не работают | AUC 0,405–0,700, типично ~0,50 (`reports/METRICS.json` → `pilot.auc`) | `scripts/pilot_rugpt3small.py` | P0 | 4 итерации признаков (2.2 а–г), AUC с 95 % ДИ после каждой; честный вывод по гипотезе | `tests/test_pilot_iterations.py` + `reports/pilot/` | нет |
-| A3 | Тихой подмене `hf` → `demo` нет запрета | подмена возможна по пути загрузки весов | `spanverify/engine.py`, `spanverify/config.py` | P0 | Запрошен `hf` → либо работает `hf`, либо явная ошибка с кодом 2. Никакого молчаливого `demo` | `tests/test_hf_no_silent_fallback.py` | нет |
+| A3 | Тихой подмене `hf` → `demo` нет запрета | **закрыто**: зависимости проверяются до импорта, иначе `BackendUnavailable` и код 2 | `spanverify/engine.py`, `spanverify/config.py` | P0 | Запрошен `hf` → либо работает `hf`, либо явная ошибка с кодом 2. Никакого молчаливого `demo` | `tests/test_hf_no_silent_fallback.py` (5 тестов) | **закрыто** |
 | A4 | Сопоставление подслов модели с символами ответа | слабое место, названо в отчёте о НИР | `spanverify/backends/hf.py` | P0 | Смещения подслов → символы ответа проверены на русском тексте с «ё» и дефисами | `tests/test_token_mapping.py` (расширить) | нет |
 | A5 | Нет GPU | `nvidia-smi` отсутствует; в CI — CPU-раннер | среда | P1 | Либо CPU-прогон с фиксацией времени, либо аренда GPU (решение человека) | — | нет |
 
@@ -59,10 +59,10 @@ python -c "import torch, transformers; print(torch.__version__, transformers.__v
 
 | № | Что | Факт сейчас | Где | Приор. | Что значит «готово» | Тест-закрытие | Статус |
 |---|---|---|---|---|---|---|---|
-| B1 | Фрагмент расширяется до границы предложения | `spans.width_ratio` 23,63 (демо) и 24,17 (весь корпус); строгий span-F1 0,283 / 0,098 (тест A1) | `spanverify/engine.py::_build_spans`, `_expand_to_sentence` | P0 | Сужение до подтверждающего/опровергающего участка; метрики считаются для **узкой и расширенной** разметки отдельно | `tests/test_span_boundaries.py` | нет |
+| B1 | Фрагмент расширяется до границы предложения | **закрыто**: сужение до клаузы — ширина ×1,1 (было ×24,17), строгий span-F1 0,717 (было 0,098) | `spanverify/engine.py::_build_spans`, `_expand_to_sentence` | P0 | Сужение до подтверждающего/опровергающего участка; метрики считаются для **узкой и расширенной** разметки отдельно | `tests/test_span_boundaries.py` (7 тестов) | **закрыто** |
 | B2 | Тип `missing` не обнаруживается | `by_mode.missing.verdict_recall = 0.0`, `token_f1 = 0.0` | механизм отсутствует в `engine.py` | P0 | Механизм покрытия фактов документа ответом: факт упомянут / искажён / опущен | `tests/test_fact_coverage.py` | нет |
 | B3 | Тип `partial` ловится плохо | `by_mode.partial.verdict_recall = 0.2667`, `token_f1 = 0.0` | там же | P1 | Покрытие ≥ 0,60 по `partial` на отложенной части | `tests/test_fact_coverage.py` | нет |
-| B4 | Ложные замечания на чистых парах корпуса A1 | `faithful.verdict_fpr = 0.1358` (тест), 0,1136 (dev) | `spanverify/engine.py`, `spanverify/features.py` | P1 | FPR ≤ 0,10 на чистых парах A1 без подбора порога по тесту | `tests/test_clean_pair_fpr.py` | нет |
+| B4 | Ложные замечания на чистых парах корпуса A1 | **закрыто**: 0,000 на 81 чистой паре тестовой части (было 0,1358) | `spanverify/engine.py`, `spanverify/features.py` | P1 | FPR ≤ 0,10 на чистых парах A1 без подбора порога по тесту | `tests/test_clean_pair_fpr.py` (4 теста) | **закрыто** |
 
 ### C. Устойчивость
 
@@ -70,7 +70,7 @@ python -c "import torch, transformers; print(torch.__version__, transformers.__v
 |---|---|---|---|---|---|---|---|
 | C1 | Перенос на другой генератор | 0,953 → 0,717 (F1), FPR 0,157 (`reports/cross_corpus.json`) | `spanverify/features.py` | P1 | Падение F1 ≤ 0,10 на альтернативном генераторе | `tests/test_robustness.py` + `reports/robustness.md` | нет |
 | C2 | Внешние наборы | RAGTruth QA token F1 0,204, RusHallu 0,127 (`reports/EXTERNAL_TESTS.md`) | `spanverify/features.py` | P1 | Рост не менее чем в 1,5 раза от текущего без обучения на внешних данных | `tests/test_external_datasets.py` | нет |
-| C3 | Нет лемматизации и нормализации чисел/единиц | признаки требуют почти дословного совпадения | `spanverify/features.py`, `spanverify/text.py` | P1 | Нормализация чисел (включая прописью) и единиц измерения; числа прописью не меняют вердикт | `tests/test_normalization.py` | нет |
+| C3 | Нет лемматизации и нормализации чисел/единиц | **закрыто для чисел прописью**: `_group_number_values` и `_apply_number_consistency` считают значение по группе токенов | `spanverify/features.py`, `spanverify/text.py` | P1 | Нормализация чисел (включая прописью) и единиц измерения; числа прописью не меняют вердикт | `tests/test_number_words_in_answer.py` (6 тестов) | **закрыто для чисел** |
 
 ### D. Корпуса
 

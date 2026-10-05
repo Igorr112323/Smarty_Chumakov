@@ -4,7 +4,7 @@
 [![build-and-release-exe](https://github.com/Igorr112323/Smarty_Chumakov/actions/workflows/build-and-release-exe.yml/badge.svg)](https://github.com/Igorr112323/Smarty_Chumakov/actions/workflows/build-and-release-exe.yml)
 [![release](https://img.shields.io/github/v/release/Igorr112323/Smarty_Chumakov)](https://github.com/Igorr112323/Smarty_Chumakov/releases/latest)
 [![python](https://img.shields.io/badge/python-3.10%20%7C%203.11%20%7C%203.12-blue)](spanverify-module/pyproject.toml)
-[![tests](https://img.shields.io/badge/tests-397%20passed-brightgreen)](spanverify-module/tests)
+[![tests](https://img.shields.io/badge/tests-406%20passed-brightgreen)](spanverify-module/tests)
 [![coverage](https://img.shields.io/badge/coverage-88%25-brightgreen)](spanverify-module/pyproject.toml)
 
 Программа берёт **документ-источник** и **ответ** (языковой модели или
@@ -36,7 +36,7 @@ python -m spanverify train --dataset data/demo_pairs.jsonl --out config/weights.
 python -m spanverify evaluate --dataset data/demo_pairs.jsonl   # метрики и критерий качества
 python -m spanverify selftest                                   # само-проверка конвейера
 python -m spanverify server --port 8765                         # API + веб-интерфейс
-python -m pytest -q                                             # 397 тестов
+python -m pytest -q                                             # 406 тестов
 ```
 
 Коды возврата `verify`: `0` — ответ подтверждён, `1` — найдены спорные
@@ -62,8 +62,8 @@ curl -X POST http://localhost:8765/v1/verify -H "Content-Type: application/json"
   (отложенная часть) подтверждает работоспособность и самосогласованность
   конвейера, а не качество на реальных документах.
 * **Перенос между генераторами проверен и даёт падение**: на корпусе другого
-  генератора (числа словами, другие шаблоны) тот же метод даёт token F1 0.717 при
-  FPR 0.157 — критерий F1 ≥ 0.90 при FPR ≤ 0.10 там **не выполняется**. Числа:
+  генератора (числа словами, другие шаблоны) тот же метод даёт token F1 0.737 при
+  FPR 0.145 — критерий F1 ≥ 0.90 при FPR ≤ 0.10 там **не выполняется**. Числа:
   `spanverify-module/reports/cross_corpus.json`.
 * **Качество фрагментов показано с двух сторон**: строгий F1 по узкой разметке
   0.283 (весь корпус — 0.315; конвейер расширяет найденный токен до границы
@@ -105,7 +105,7 @@ AUC 0.996 на отложенной части) доказывают работ�
 
 **Кросс-корпусный тест:** обучение на демо-корпусе, оценка на корпусе другого
 генератора (другие клише, числа прописью, перефразировки). Числа: внутри
-корпуса token F1 0.953 / FPR 0.002, кросс-корпус token F1 0.717 / FPR 0.157.
+корпуса token F1 0.953 / FPR 0.002, кросс-корпус token F1 0.737 / FPR 0.145.
 Кросс-корпусный тест показывает переносимость метода на другой генератор,
 а не на реальные регламенты; для реальных нужны 1200 пар.
 

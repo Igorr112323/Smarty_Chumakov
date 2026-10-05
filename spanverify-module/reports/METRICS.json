@@ -8,14 +8,14 @@
   },
   "meta": {
     "version": "1.3.0",
-    "commit": "39453a6d22c29d07b0101dfe7778ec45fe81a074",
-    "generated_at": "2026-10-05T20:52:12Z",
+    "commit": "2eedcac03b8355f6dd1a6622646fa7b79d313222",
+    "generated_at": "2026-10-05T21:15:36Z",
     "seed": 42,
     "dataset": "data/demo_pairs.jsonl"
   },
   "disclaimer": "Демонстрационные метрики получены на синтетическом корпусе и научным результатом не являются. Для подтверждения требуются 1200 пар «вопрос–ответ» с экспертной разметкой на реальных регламентах организации.",
   "tests": {
-    "collected": 397,
+    "collected": 406,
     "coverage_percent": null,
     "coverage_gate_percent": 85
   },
@@ -210,36 +210,36 @@
     "by_split": {
       "dev": {
         "tokens": {
-          "precision": 0.9592,
+          "precision": 1.0,
           "recall": 0.5465,
-          "f1": 0.6963,
-          "fpr": 0.0037,
-          "auc": 0.9157,
+          "f1": 0.7068,
+          "fpr": 0.0,
+          "auc": 0.9138,
           "n": 1900
         },
         "spans": {
-          "strict_f1": 0.6483,
+          "strict_f1": 0.6763,
           "coverage": 0.5109,
-          "soft_f1": 0.1931,
+          "soft_f1": 0.2014,
           "width_ratio": 1.06
         },
         "answers": {
-          "precision": 0.9487,
+          "precision": 1.0,
           "recall": 0.4022,
-          "f1": 0.5649,
-          "fpr": 0.0227,
-          "auc": 0.6897,
+          "f1": 0.5736,
+          "fpr": 0.0,
+          "auc": 0.7011,
           "threshold": 1.0
         },
         "verdicts": {
           "tp": 47,
-          "fp": 5,
+          "fp": 0,
           "fn": 45,
-          "tn": 83,
-          "precision": 0.9038,
+          "tn": 88,
+          "precision": 1.0,
           "recall": 0.5109,
-          "f1": 0.6528,
-          "fpr": 0.0568
+          "f1": 0.6763,
+          "fpr": 0.0
         }
       },
       "test": {
@@ -248,7 +248,7 @@
           "recall": 0.5795,
           "f1": 0.7338,
           "fpr": 0.0,
-          "auc": 0.9524,
+          "auc": 0.9273,
           "n": 1868
         },
         "spans": {
@@ -565,9 +565,9 @@
   },
   "cross_corpus": {
     "in_corpus_f1": 0.9532,
-    "cross_corpus_f1": 0.7173,
-    "drop": 0.2359,
-    "cross_fpr": 0.1571,
+    "cross_corpus_f1": 0.7374,
+    "drop": 0.2158,
+    "cross_fpr": 0.1451,
     "corpus_b": {
       "name": "alt-generator 1.0 (числа словами, другие шаблоны)",
       "pairs": 240,
@@ -575,15 +575,6 @@
     }
   },
   "pilot": null,
-  "release": {
-    "dir": "release",
-    "artifacts": [
-      {
-        "name": "spanverify.pyz",
-        "size_bytes": 593578,
-        "sha256": "933ab94a4366b201f7c3a45bb7995780b1c71d7bdb7774372f008b24d4effe11"
-      }
-    ]
-  },
-  "duration_s": 28.1
+  "release": null,
+  "duration_s": 24.7
 }
