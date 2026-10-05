@@ -1,0 +1,183 @@
+name: hf-runs
+
+# Прогоны на реальной языковой модели (режим hf).
+#
+# Зачем отдельный рабочий процесс: режим hf требует torch и весов модели, он тяжёлый
+# и не должен выполняться на каждый push. При этом без него отчёт нечестен — правило
+# задания прямое: режим demo никогда не выдаётся за hf, и в каждой таблице метрик
+# стоит столбец «режим». Пока здесь нет ни одного прогона, в reports/METRICS.json
+# поле external_tests.hf_runs равно нулю, и реестр работ показывает пункт P0-1
+# незакрытым.
+#
+# Среда разработки проекта в интернет не выпускается, поэтому веса модели скачиваются
+# на раннере. Результаты коммитятся в ветку: артефакты GitHub из среды разработки
+# не читаются.
+#
+# Запуск: изменить .github/hf-runs.trigger и запушить.
+
+on:
+  push:
+    paths:
+      - ".github/hf-runs.trigger"
+  workflow_dispatch:
+    inputs:
+      external_limit:
+        description: "Сколько пар внешнего набора брать в режиме hf (срез)"
+        required: false
+        default: "200"
+      pilot_pairs:
+        description: "Сколько пар в пилоте по слоям внимания"
+        required: false
+        default: "24"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: hf-runs-${{ github.ref }}
+  cancel-in-progress: false
+
+env:
+  PYTHONUTF8: "1"
+  PYTHONIOENCODING: "utf-8"
+  EXTERNAL_LIMIT: ${{ inputs.external_limit || '200' }}
+  PILOT_PAIRS: ${{ inputs.pilot_pairs || '24' }}
+
+jobs:
+  hf:
+    name: "Режим hf: пилот, свой корпус, внешние наборы"
+    runs-on: ubuntu-latest
+    timeout-minutes: 300
+    defaults:
+      run:
+        working-directory: spanverify-module
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref_name }}
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+          cache-dependency-path: spanverify-module/requirements-hf.txt
+
+      - name: Кэш весов модели
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/huggingface
+          key: hf-${{ runner.os }}-rugpt3small-v1
+
+      - name: Зависимости режима hf (torch CPU + transformers)
+        run: |
+          python -m pip install --upgrade pip --quiet
+          python -m pip install --quiet -r requirements.txt
+          python -m pip install --quiet "torch~=2.14" --index-url https://download.pytorch.org/whl/cpu
+          python -m pip install --quiet "transformers~=5.18" "sentencepiece~=0.2"
+
+      - name: Что за окружение (для протокола измерений)
+        run: |
+          nproc
+          free -g | head -2
+          python -c "import torch, transformers, platform; print('torch', torch.__version__); print('transformers', transformers.__version__); print(platform.platform())"
+
+      # Пилот: есть ли вообще сигнал в слоях внимания. Нижняя граница 95 % ДИ выше 0.5
+      # означает, что признак отличает опирающийся на документ токен от неопирающегося.
+      - name: "Пилот на реальной модели (бутстрэп 5000)"
+        continue-on-error: true
+        run: python scripts/pilot_rugpt3small.py --pairs "${PILOT_PAIRS}" --bootstrap 5000 --out reports/pilot
+
+      - name: Показать пилот
+        if: always()
+        continue-on-error: true
+        run: cat reports/pilot/pilot.md
+
+      # Свой корпус на реальных актах — отложенная часть, порог с train не трогаем.
+      - name: "Корпус A3 (реальные акты), режим hf"
+        continue-on-error: true
+        run: |
+          python -m spanverify evaluate --dataset data/corpus_a3/splits/test.jsonl --mode hf --json \
+            > reports/a3_test_hf.json
+          cat reports/a3_test_hf.json
+
+      - name: "Корпус A3 (реальные акты), режим demo — для столбца «режим»"
+        continue-on-error: true
+        run: |
+          python -m spanverify evaluate --dataset data/corpus_a3/splits/test.jsonl --mode demo --json \
+            > reports/a3_test_demo.json
+          cat reports/a3_test_demo.json
+
+      # Внешние наборы в режиме hf. Берётся срез: полный прогон на процессоре
+      # не укладывается в лимит времени, и размер среза указывается в отчёте.
+      - name: "RAGTruth QA, режим hf (срез)"
+        continue-on-error: true
+        run: |
+          python scripts/external_eval.py --dataset ragtruth --task qa --split test --mode hf \
+            --limit "${EXTERNAL_LIMIT}" --json reports/ext_ragtruth_qa_hf.json
+
+      - name: "RusHallu-RAG, режим hf (срез)"
+        continue-on-error: true
+        run: |
+          python scripts/external_eval.py --dataset rushallu --split test --mode hf \
+            --limit "${EXTERNAL_LIMIT}" --json reports/ext_rushallu_hf.json
+
+      - name: Что получилось
+        if: always()
+        continue-on-error: true
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          for name in (
+              "reports/pilot/pilot.json",
+              "reports/a3_test_hf.json",
+              "reports/a3_test_demo.json",
+              "reports/ext_ragtruth_qa_hf.json",
+              "reports/ext_rushallu_hf.json",
+          ):
+              path = Path(name)
+              if not path.exists():
+                  print(f"{name}: файла нет")
+                  continue
+              data = json.loads(path.read_text(encoding="utf-8"))
+              tokens = (data.get("our_metrics") or data).get("tokens") or {}
+              print(
+                  f"{name}: режим={data.get('mode')} пар={data.get('pairs')} "
+                  f"token F1={tokens.get('f1')} FPR={tokens.get('fpr')} AUC={tokens.get('auc')}"
+              )
+          PY
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: hf-runs
+          path: |
+            spanverify-module/reports/pilot
+            spanverify-module/reports/a3_test_hf.json
+            spanverify-module/reports/a3_test_demo.json
+            spanverify-module/reports/ext_ragtruth_qa_hf.json
+            spanverify-module/reports/ext_rushallu_hf.json
+          retention-days: 90
+
+      - name: Закоммитить результаты режима hf
+        if: always()
+        run: |
+          git config user.name "spanverify-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add -f reports/pilot reports/a3_test_hf.json reports/a3_test_demo.json \
+                     reports/ext_ragtruth_qa_hf.json reports/ext_rushallu_hf.json || true
+          if git diff --cached --quiet; then
+            echo "нечего коммитить"
+            exit 0
+          fi
+          git commit -m "прогоны в режиме hf: пилот, корпус A3, внешние наборы [skip ci]"
+          for attempt in 1 2 3; do
+            if git pull --rebase --autostash -q origin "${GITHUB_REF_NAME}" && git push origin "HEAD:${GITHUB_REF_NAME}"; then
+              echo "результаты закоммичены (попытка $attempt)"
+              exit 0
+            fi
+            sleep 5
+          done
+          echo "::warning title=hf::не удалось закоммитить за 3 попытки"
+          exit 0
