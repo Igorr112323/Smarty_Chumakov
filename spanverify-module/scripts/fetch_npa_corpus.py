@@ -60,6 +60,7 @@ import argparse
 import concurrent.futures
 import hashlib
 import json
+import os
 import re
 import shutil
 import subprocess
@@ -457,15 +458,35 @@ def ocr_available() -> dict[str, str | None]:
     return {name: shutil.which(name) for name in ("pdftoppm", "tesseract")}
 
 
-def ocr_pdf(path: Path, dpi: int = 200, max_pages: int = 20) -> dict:
+# Режим распознавания. Значения подобраны по замеру, а не по умолчанию:
+# у tesseract режим по умолчанию ``--oem 3`` прогоняет и старый движок, и LSTM, что
+# на сканах официальных публикаций давало сотни секунд на страницу (замер первого
+# прогона: 580–2680 с на документ, см. reports/OCR_BENCH.json). ``--oem 1`` — только
+# LSTM, ``--psm 6`` — «единый блок текста», что соответствует полосе текста акта.
+OCR_OEM = "1"
+OCR_PSM = "6"
+# tesseract сам распараллеливается через OpenMP. Когда рядом работает несколько
+# процессов распознавания, потоки конкурируют за те же ядра и всё замедляется.
+# Один поток на процесс плюс параллельные процессы — рекомендованный режим.
+OCR_ENV = {"OMP_THREAD_LIMIT": "1"}
+
+
+def ocr_pdf(
+    path: Path,
+    dpi: int = 150,
+    max_pages: int = 20,
+    oem: str = OCR_OEM,
+    psm: str = OCR_PSM,
+) -> dict:
     """OCR PDF: вернуть ``{text, pages, seconds, error}`` без интерпретаций.
 
     Текст собирается постранично (``pdftoppm -png`` → ``tesseract -l rus``), поэтому в
-    отчёте есть фактическое число распознанных страниц.
+    отчёте есть фактическое число распознанных страниц и фактическое время.
     """
     tools = ocr_available()
     if not all(tools.values()):
         return {"text": "", "pages": 0, "seconds": None, "error": f"нет инструментов OCR: {tools}"}
+    environment = {**os.environ, **OCR_ENV}
     with tempfile.TemporaryDirectory() as tmp:
         started = time.perf_counter()
         rendered = subprocess.run(  # noqa: S603 - фиксированные аргументы, входной файл наш
@@ -482,11 +503,22 @@ def ocr_pdf(path: Path, dpi: int = 200, max_pages: int = 20) -> dict:
             }
         pieces: list[str] = []
         for image in sorted(Path(tmp).glob("page*.png")):
+            command = ["tesseract", str(image), "stdout", "-l", "rus", "--oem", str(oem), "--psm", str(psm)]
             result = subprocess.run(  # noqa: S603 - фиксированные аргументы
-                ["tesseract", str(image), "stdout", "-l", "rus"],
+                command,
                 check=False,
                 capture_output=True,
+                env=environment,
             )
+            if result.returncode != 0:
+                # Сборка tesseract может не содержать запрошенный движок: тогда
+                # распознаём настройками по умолчанию, а не теряем страницу.
+                result = subprocess.run(  # noqa: S603 - фиксированные аргументы
+                    ["tesseract", str(image), "stdout", "-l", "rus"],
+                    check=False,
+                    capture_output=True,
+                    env=environment,
+                )
             pieces.append(result.stdout.decode("utf-8", "replace"))
         text = "\n".join(piece for piece in pieces if piece.strip())
     return {
@@ -541,7 +573,7 @@ def text_layer_is_enough(text_layer: dict, min_chars_per_page: int = 120) -> boo
 
 def extract_text(
     path: Path,
-    dpi: int = 200,
+    dpi: int = 150,
     max_pages: int = 20,
     min_chars_per_page: int = 120,
     allow_ocr: bool = True,
@@ -761,6 +793,16 @@ def main() -> int:
         help="порог пригодности текстового слоя PDF, знаков на страницу",
     )
     parser.add_argument(
+        "--only-types",
+        default="",
+        help="брать только эти виды актов (через запятую); пусто — все виды из TYPES",
+    )
+    parser.add_argument(
+        "--only-blocks",
+        default="",
+        help="брать только эти региональные разделы по коду (например 23,77); пусто — все из REGION_BLOCKS",
+    )
+    parser.add_argument(
         "--regional-share",
         type=float,
         default=0.45,
@@ -774,12 +816,18 @@ def main() -> int:
     )
     parser.add_argument("--workers", type=int, default=4, help="сколько распознаваний запускать параллельно")
     parser.add_argument(
+        "--flush-every",
+        type=int,
+        default=10,
+        help="через сколько готовых документов сбрасывать источники на диск (устойчивость к обрыву прогона)",
+    )
+    parser.add_argument(
         "--max-pages",
         type=int,
         default=20,
         help="сколько первых страниц документа распознавать (длинные акты распознаются частично, признак — text_truncated)",
     )
-    parser.add_argument("--dpi", type=int, default=200)
+    parser.add_argument("--dpi", type=int, default=150)
     parser.add_argument("--buffer", type=int, default=40, help="сколько кандидатов взять сверх цели (на брак)")
     parser.add_argument("--force", action="store_true", help="скачивать, даже если документов уже достаточно")
     parser.add_argument("--verify", action="store_true", help="только проверить хеши уже скачанных источников")
@@ -826,7 +874,15 @@ def main() -> int:
                     type_ids[str(item["name"])] = str(item["id"])
         except json.JSONDecodeError:
             type_ids = {}
-    print(f"видов актов доступно: {sorted(type_ids)}")
+    only_types = {name.strip() for name in args.only_types.split(",") if name.strip()}
+    if only_types:
+        missing = only_types - set(type_ids)
+        type_ids = {name: value for name, value in type_ids.items() if name in only_types}
+        if missing:
+            print(f"ВНИМАНИЕ: виды актов не найдены в справочнике API: {sorted(missing)}", file=sys.stderr)
+    only_blocks = {code.strip() for code in args.only_blocks.split(",") if code.strip()}
+    blocks = tuple(item for item in REGION_BLOCKS if not only_blocks or item[0] in only_blocks)
+    print(f"срез: виды={sorted(type_ids) or '—'}; регионы={[code for code, _ in blocks] or '—'}")
     print(f"::notice title=A3 виды актов::{sorted(type_ids)}")
     time.sleep(max(0.0, pause))
 
@@ -835,6 +891,7 @@ def main() -> int:
         args.max_pages_per_type,
         pause,
         robots,
+        blocks=blocks,
         max_pages_per_block=args.max_pages_per_block,
         allow_other=args.all_themes,
     )
@@ -938,7 +995,7 @@ def main() -> int:
                     skipped.append({"doc_id": item["doc_id"], "reason": f"фактов {len(facts)} < {args.min_facts}"})
                     continue
                 new_documents.append(item)
-                if len(new_documents) % 10 == 0:
+                if len(new_documents) % max(1, args.flush_every) == 0:
                     # Пишем прогресс на диск: если прогон оборвётся (таймаут CI), уже
                     # распознанные документы не придётся распознавать заново.
                     write_sources(out_dir, sorted(existing + new_documents, key=lambda doc: doc["doc_id"]), manifest)
