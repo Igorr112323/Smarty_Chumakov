@@ -30,6 +30,7 @@ from typing import Any
 
 from .core import Token, number_value, numbers_in, split_chunks
 from .lexicon import BOILERPLATE_WORDS, PARAPHRASE_WORDS, STOPWORDS, find_phrase_hits
+from .normalize import numbers_to_digits, words_to_number
 from .vectors import hash_index, normalize
 
 FEATURE_NAMES = ("attention_entropy", "ctx_attention_mass", "embedding_density")
@@ -178,7 +179,9 @@ def demo_features(
     context_tokens = tokenize_with_offsets(chunks.text) if chunks.text else []
 
     # --- контекстные слова (для лексической поддержки и словаря опоры) ---
-    context_numbers = numbers_in(chunks.text) if chunks.text else set()
+    # Контекст нормализуется: иначе «25» в документе и «двадцать пять» в ответе
+    # не совпадали, и корректный ответ получал ложное замечание.
+    context_numbers = numbers_in(numbers_to_digits(chunks.text)) if chunks.text else set()
     context_words: list[tuple[str, frozenset[str]]] = [
         (token.word, _trigrams(token.word)) for token in context_tokens if _is_content(token)
     ]
@@ -190,6 +193,9 @@ def demo_features(
     mass: list[float] = []
     density: list[float] = []
 
+    # Числа прописью занимают несколько токенов («двадцать» + «пять»), поэтому
+    # значение считается для группы целиком, а не по отдельному токену.
+    token_values = _group_number_values(tokens)
     for index, token in enumerate(tokens):
         word = token.word.lower()
         content = _is_content(token)
@@ -209,7 +215,7 @@ def demo_features(
         support = 0.0
         if content and context_words:
             support = _support_overlap(word, context_words)
-        value = number_value(token)
+        value = token_values[index] if index < len(token_values) else None
         if value is not None and context_numbers:
             # Число подтверждено, только если такое же значение есть в контексте.
             support = 1.0 if value in context_numbers else 0.0
@@ -248,6 +254,38 @@ def demo_features(
             "k": k,
         },
     )
+
+
+def _group_number_values(tokens: Sequence[Token]) -> list[str | None]:
+    """Каноническое значение числа для каждого токена с учётом группы токенов.
+
+    «двадцать пять» — два токена, но одно число. Раньше каждый токен
+    сравнивался с контекстом отдельно, и корректный ответ с числом прописью
+    получал нулевую опору: в документе «25», а в ответе токены «20» и «5».
+    Отсюда ложные замечания на чистых парах и провал на кросс-корпусе, где
+    генератор пишет числа словами.
+    """
+    values: list[str | None] = [None] * len(tokens)
+    index = 0
+    while index < len(tokens):
+        if number_value(tokens[index]) is None:
+            index += 1
+            continue
+        end = index
+        group: list[str] = []
+        while end < len(tokens) and number_value(tokens[end]) is not None:
+            group.append(tokens[end].word.lower().replace("ё", "е"))
+            end += 1
+        if all(item.isdigit() for item in group):
+            joined = "".join(group)
+            value: str | None = str(int(joined)) if joined.isdigit() else None
+        else:
+            total = words_to_number(group)
+            value = str(total) if total is not None else None
+        for position in range(index, end):
+            values[position] = value
+        index = end
+    return values
 
 
 def _trigrams(text: str, n: int = 3) -> frozenset[str]:

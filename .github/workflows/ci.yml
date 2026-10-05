@@ -416,6 +416,12 @@ jobs:
     name: "Корпус A3: реальные акты (скачивание, распознавание, сборка)"
     runs-on: ubuntu-latest
     timeout-minutes: 150
+    # Прогоны идут строго по одному: job коммитит скачанное перед таймаутом, и
+    # следующий прогон продолжает с того же места. Параллельные прогоны качали
+    # бы одни и те же документы и ломали бы коммит.
+    concurrency:
+      group: corpus-a3
+      cancel-in-progress: false
     defaults:
       run:
         working-directory: spanverify-module

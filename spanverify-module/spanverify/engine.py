@@ -21,6 +21,7 @@
 from __future__ import annotations
 
 import json
+import re
 import sys
 import time
 from collections.abc import Sequence
@@ -39,6 +40,12 @@ from .core import (
     split_chunks,
     split_sentences,
     tokenize_with_offsets,
+)
+from .coverage import (
+    STATUS_DISTORTED,
+    STATUS_OMITTED,
+    STATUS_PARTIAL,
+    cover_facts,
 )
 from .detector import Detector
 from .features import (
@@ -195,6 +202,8 @@ class Verifier:
         detector: Detector | None = None,
         model_name: str | None = None,
         weights_path: str | Path | None = WEIGHTS_FILENAME,
+        *,
+        coverage: bool = False,
     ) -> None:
         self.config = config or Config.load()
         # Явно переданные веса имеют приоритет: иначе обучение, которое считает
@@ -204,6 +213,17 @@ class Verifier:
         self.mode = (mode or self.bundle.mode or self.config.backend or "demo").lower()
         self.model_name = model_name or getattr(self.config, "hf_model", "ai-forever/rugpt3small_based_on_gpt2")
         self._detector = detector
+        # Проверка покрытия фактов документа ответом (типы missing и partial).
+        #
+        # ВЫКЛЮЧЕНО по результатам измерения, а не «на всякий случай». Факт
+        # (commit этого изменения, корпус A, отложенная часть, 180 пар, режим
+        # demo): доля ложных замечаний на чистых парах 0,136 → 0,210, тип
+        # missing по-прежнему не ловится (recall 0,000), тип partial вырос
+        # лишь с 0,267 до 0,333. Механизм приносит больше вреда, чем пользы,
+        # поэтому в продукт не включён до доработки; код и тесты сохранены,
+        # чтобы доработка шла с готового задела. Пункт B2/B3 реестра
+        # TODO_AUDIT.md остаётся ОТКРЫТЫМ.
+        self.coverage = coverage
         # Оценка доли участия ИИ (требование заявки) — отдельная голова; если
         # файла нет, поле остаётся нулевым и это видно в stats.
         self.participation = self._load_participation()
@@ -270,6 +290,15 @@ class Verifier:
                 verdict="empty",
             )
 
+        # Текстовые правила (покрытие фактов) работают со строкой, а не со
+        # списком фрагментов; признаки умеют оба вида, поэтому строку
+        # готовим отдельно, не подменяя исходный context_text.
+        if isinstance(context_text, str):
+            coverage_context: str = context_text
+        elif context_text:
+            coverage_context = "\n".join(str(item) for item in context_text)
+        else:
+            coverage_context = ""
         tokens = tokenize_with_offsets(answer)
         features = self._features(answer, context_text, tokens)
         risk = combine(
@@ -291,7 +320,13 @@ class Verifier:
         span_threshold = span_threshold_for(scored, self.bundle.span_z, self.bundle.span_floor, self.bundle.span_cap)
         spans = self._build_spans(answer, tokens, smoothed, span_threshold)
         # Правило привязки числа к объекту (дефект D): текстовое, поверх маски.
-        spans = _merge_spans([*spans, *self._attribution_spans(answer, context_text, tokens, smoothed, span_threshold)])
+        spans = _merge_spans(
+            [
+                *spans,
+                *self._attribution_spans(answer, context_text, tokens, smoothed, span_threshold),
+                *self._coverage_spans(answer, coverage_context, tokens, span_threshold),
+            ]
+        )
 
         raw_score = _answer_score(scored)
         score = self._calibrate(raw_score)
@@ -304,6 +339,16 @@ class Verifier:
             "token_count": len(tokens),
             "scored_tokens": len(scored_indices),
             "number_attribution": number_attribution(answer, context_text) if context_text else [],
+            "fact_coverage": [
+                {
+                    "value": item.fact.value,
+                    "kind": item.fact.kind,
+                    "subject": item.fact.subject,
+                    "status": item.status,
+                    "overlap": item.overlap,
+                }
+                for item in (cover_facts(answer, coverage_context) if (coverage_context and self.coverage) else [])
+            ],
             "mean_risk": round(mean(scored), 4),
             "p90_risk": round(_percentile(scored, 90), 4),
             "raw_score": round(raw_score, 4),
@@ -498,7 +543,7 @@ class Verifier:
                 if id(token) in allowed and token.start >= start and token.end <= end
             ]
             risk_value = max([*token_risk, threshold])
-            span_start, span_end = _expand_to_sentence(answer, start, end)
+            span_start, span_end = _shrink_to_clause(answer, start, end, start, end)
             fragment = answer[span_start:span_end]
             if not fragment.strip():
                 continue
@@ -510,6 +555,62 @@ class Verifier:
                     risk=risk_value,
                     label="likely_hallucination" if risk_value >= HALLUCINATION_LABEL_RISK else "doubtful",
                     n_tokens=len(token_risk),
+                )
+            )
+        return found
+
+    def _coverage_spans(
+        self,
+        answer: str,
+        context: str | None,
+        tokens: Sequence[Token],
+        threshold: float,
+    ) -> list[SpanResult]:
+        """Фрагменты по покрытию фактов документа (типы missing и partial).
+
+        Исправление B2/B3. Обученная голова и признаки отвечают на вопрос «есть
+        ли в ответе лишнее», но пропуск сведения ими не ловился вовсе
+        (``missing.recall = 0.0``). Здесь ответ сверяется с фактами документа:
+        факт, про который ответ явно говорит, но значение которого выбросил,
+        даёт фрагмент с меткой doubtful.
+
+        Риск фрагмента берётся от порога, а не от признаков: правило текстовое,
+        оно работает поверх головы, как и привязка числа к объекту (дефект D).
+        """
+        if not context or not self.coverage:
+            return []
+        # Контекст приходит и строкой, и списком фрагментов документа.
+        if isinstance(context, str):
+            context_text: str = context
+        else:
+            context_text = "\n".join(str(item) for item in context)
+        if not context_text.strip():
+            return []
+        found: list[SpanResult] = []
+        for item in cover_facts(answer, context_text):
+            if item.status not in (STATUS_OMITTED, STATUS_PARTIAL, STATUS_DISTORTED):
+                continue
+            if item.answer_start < 0 or item.answer_end <= item.answer_start:
+                continue
+            start, end = item.answer_start, item.answer_end
+            # Указываем на клаузу с предметом, а не на всё предложение: иначе
+            # фрагмент снова расползался бы до границ предложения (дефект B1).
+            if item.subject_start >= 0 and item.subject_end > item.subject_start:
+                start, end = _shrink_to_clause(answer, start, end, item.subject_start, item.subject_end)
+            fragment = answer[start:end].strip()
+            if not fragment:
+                continue
+            # Подмена числа — самые сильный сигнал, пропуск условия — слабее.
+            bump = 0.15 if item.status == STATUS_DISTORTED else 0.10
+            risk_value = min(1.0, max(threshold, threshold + bump))
+            found.append(
+                SpanResult(
+                    start=start,
+                    end=end,
+                    text=fragment,
+                    risk=risk_value,
+                    label="likely_hallucination" if risk_value >= HALLUCINATION_LABEL_RISK else "doubtful",
+                    n_tokens=len(fragment.split()),
                 )
             )
         return found
@@ -542,9 +643,9 @@ class Verifier:
 
         spans: list[SpanResult] = []
         for group in groups:
-            start = tokens[group[0]].start
-            end = tokens[group[-1]].end
-            start, end = _expand_to_sentence(answer, start, end)
+            keep_start = tokens[group[0]].start
+            keep_end = tokens[group[-1]].end
+            start, end = _shrink_to_clause(answer, keep_start, keep_end, keep_start, keep_end)
             fragment = answer[start:end]
             if not fragment.strip():
                 continue
@@ -864,6 +965,50 @@ def _expand_to_sentence(answer: str, start: int, end: int) -> tuple[int, int]:
         if sentence_start <= start < sentence_end:
             return sentence_start, max(sentence_end, end)
     return start, end
+
+
+# Границы клауз: запятая, точка с запятой, двоеточие, тире, скобки, кавычки и
+# союзы, после которых начинается самостоятельная часть высказывания.
+_CLAUSE_RE = re.compile(
+    r"[,;:()\[\]{}«»\"“”]|—|(?<=\s)-(?=\s)"
+    r"|\s(?:и|а|но|или|либо|причем|причём|при\s+этом|который|которая|которое|которые|"
+    r"что|чтобы|если|когда|в\s+случае|за\s+исключением|кроме|порядке|соответствии)\s",
+    re.IGNORECASE,
+)
+
+
+def _shrink_to_clause(answer: str, start: int, end: int, keep_start: int, keep_end: int) -> tuple[int, int]:
+    """Сузить границы предложения до клаузы, в которой стоит найденный токен.
+
+    Исправление B1. Раньше найденный токен расширялся до границ всего
+    предложения, из-за чего фрагмент был в ~24 раза шире истинной ошибки, а
+    строгий span-F1 держался на 0,098–0,283. Здесь от предложения остаётся
+    только та часть, где стоит спорное значение: границы ищутся по разделителям
+    клауз, но никогда не обрезают сами найденные токены (``keep_start``,
+    ``keep_end``).
+    """
+    sent_start, sent_end = _expand_to_sentence(answer, start, end)
+    left = sent_start
+    for match in _CLAUSE_RE.finditer(answer, sent_start, sent_end):
+        if match.end() > keep_start:
+            break
+        left = match.end()
+    right = sent_end
+    for match in _CLAUSE_RE.finditer(answer, sent_start, sent_end):
+        if match.start() >= keep_end:
+            right = match.start()
+            break
+    # Найденные токены обязаны остаться внутри фрагмента.
+    left = min(left, keep_start)
+    right = max(right, keep_end)
+    left = max(sent_start, left)
+    right = min(sent_end, right)
+    if right <= left:
+        return sent_start, sent_end
+    # Пустой или состоящий из одной пунктуационной единицы фрагмент не нужен.
+    if not answer[left:right].strip(' \t\r\n,;:()[]{}«»"“”'):
+        return sent_start, sent_end
+    return left, right
 
 
 def _merge_spans(spans: Sequence[SpanResult]) -> list[SpanResult]:
