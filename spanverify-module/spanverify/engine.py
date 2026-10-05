@@ -28,8 +28,10 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
+from .bounds import narrow_bounds, span_variants
 from .calibration import IsotonicCalibrator
 from .config import Config, read_runtime_text, runtime_roots
+from .coverage import CoverageReport, coverage_report
 from .core import (
     ContextChunks,
     SpanResult,
@@ -292,9 +294,24 @@ class Verifier:
         spans = self._build_spans(answer, tokens, smoothed, span_threshold)
         # Правило привязки числа к объекту (дефект D): текстовое, поверх маски.
         spans = _merge_spans([*spans, *self._attribution_spans(answer, context_text, tokens, smoothed, span_threshold)])
+        # Обратный проход: покрытие фактов документа ответом (типы missing/partial).
+        # Он даёт замечания там, где ответ «от ответа к документу» ничего не находит:
+        # субъект назван, а значение опущено или потеряно условие.
+        coverage = (
+            coverage_report(split_chunks(context_text).text, answer)
+            if context_text
+            else None
+        )
+        if coverage is not None and coverage.spans:
+            spans = _merge_spans([*spans, *self._coverage_spans(answer, coverage)])
 
         raw_score = _answer_score(scored)
         score = self._calibrate(raw_score)
+        if coverage is not None:
+            # Риск покрытия работает как нижняя граница: искажение факта не может
+            # считаться «подтверждённым» только потому, что лексические признаки
+            # промолчали.
+            score = max(score, coverage.risk)
         threshold = self.bundle.threshold
         ai_share_soft, ai_share_hard = self._shares(tokens, smoothed, scored_indices, spans)
         ai_participation = self.participation.estimate(answer, features) if self.participation is not None else 0.0
@@ -316,6 +333,7 @@ class Verifier:
             "ai_participation_calibrated_on": (
                 self.participation.calibrated_on if self.participation is not None else None
             ),
+            "fact_coverage": coverage.as_dict() if coverage is not None else None,
             "warning": self.warning,
         }
 
@@ -356,10 +374,13 @@ class Verifier:
         answer_labels: list[int] = []
         answer_scores: list[float] = []
         predicted: list[list[tuple[int, int]]] = []
+        predicted_expanded: list[list[tuple[int, int]]] = []
         truth: list[list[tuple[int, int]]] = []
         truth_expanded: list[list[tuple[int, int]]] = []
         verdict_labels: list[int] = []
         verdict_flags: list[bool] = []
+        by_type: dict[str, dict[str, list]] = {}
+        coverage_totals = {"facts": 0, "distorted": 0, "omitted": 0, "absent": 0}
 
         for pair in pairs:
             data = pair.to_dict() if isinstance(pair, Pair) else pair
@@ -367,7 +388,16 @@ class Verifier:
             tokens = tokenize_with_offsets(data.get("answer", ""))
             pair_truth = [(int(start), int(end)) for start, end, label in data.get("labels", []) if int(label) == 1]
             pair_predicted = [(span.start, span.end) for span in result.spans]
+            pair_predicted_expanded = [
+                (
+                    span.expanded_start if span.expanded_start is not None else span.start,
+                    span.expanded_end if span.expanded_end is not None else span.end,
+                )
+                for span in result.spans
+            ]
             pair_truth_expanded = [_expand_to_sentence(data.get("answer", ""), start, end) for start, end in pair_truth]
+            mode = str((data.get("meta") or {}).get("mode") or "unknown")
+            bucket = by_type.setdefault(mode, {"labels": [], "flags": []})
 
             for index, token in enumerate(tokens):
                 if not is_scored_token(token.text):
@@ -381,31 +411,53 @@ class Verifier:
             answer_scores.append(result.score)
             # Вердикт — уровень ответа: ``doubtful`` приходит и от текстового правила
             # привязки числа к объекту, которое иначе не видно в метриках по токенам.
-            verdict_labels.append(1 if pair_truth else 0)
-            verdict_flags.append(result.verdict not in {"grounded", "empty"})
+            verdict_label = 1 if pair_truth else 0
+            verdict_flag = result.verdict not in {"grounded", "empty"}
+            verdict_labels.append(verdict_label)
+            verdict_flags.append(verdict_flag)
+            bucket["labels"].append(verdict_label)
+            bucket["flags"].append(verdict_flag)
             predicted.append(pair_predicted)
+            predicted_expanded.append(pair_predicted_expanded)
             truth.append(pair_truth)
             truth_expanded.append(pair_truth_expanded)
+            fact_coverage = (result.stats or {}).get("fact_coverage") or {}
+            for key in coverage_totals:
+                coverage_totals[key] += int((fact_coverage.get("counts") or {}).get(key) or 0)
 
         token_metrics = _token_metrics(labels, flags, risks)
         span_metrics = _span_f1(predicted, truth, iou_threshold=0.5)
-        # Конвейер намеренно расширяет найденные токены до границ предложения,
-        # поэтому строгий IoU с узкой разметкой («5» против целого предложения)
-        # мало информативен. Поэтому дополнительно считаем: (а) полноту по
-        # покрытию — размеченный фрагмент целиком попал в найденный; (б) F1 при
-        # том же расширении разметки, то есть качество склейки и расширения.
+        # Конвейер отдаёт узкие границы (число с единицей или клауза), а расширенные
+        # (предложение) — рядом. Метрики считаются для обеих разметок отдельно:
+        # узкая показывает точность локализации значения, расширенная — качество
+        # выделения участка целиком.
         span_metrics["recall_containment"] = _containment_recall(predicted, truth)
         span_metrics["f1_expanded_labels"] = _span_f1(predicted, truth_expanded, iou_threshold=0.5)["f1"]
+        span_metrics["strict_f1_expanded"] = _span_f1(predicted_expanded, truth_expanded, iou_threshold=0.5)["f1"]
+        span_metrics["coverage_expanded"] = _span_f1(predicted_expanded, truth_expanded, iou_threshold=0.5)["recall"]
         span_metrics["mean_width_ratio"] = _mean_width_ratio(predicted, truth)
+        span_metrics["mean_width_ratio_expanded"] = _mean_width_ratio(predicted_expanded, truth_expanded)
+        span_metrics["n_narrow"] = len(predicted)
+        span_metrics["n_expanded"] = len(predicted_expanded)
         answer_metrics = _answer_metrics(
             answer_labels, answer_scores, threshold if threshold is not None else self.bundle.threshold
         )
         verdict_metrics = _binary_metrics(verdict_labels, verdict_flags)
+        by_type_metrics = {
+            mode: {
+                **_binary_metrics(bucket["labels"], bucket["flags"]),
+                "pairs": len(bucket["labels"]),
+                "positives": sum(bucket["labels"]),
+            }
+            for mode, bucket in sorted(by_type.items())
+        }
         return {
             "tokens": token_metrics,
             "spans": span_metrics,
             "answers": answer_metrics,
             "verdicts": verdict_metrics,
+            "by_type": by_type_metrics,
+            "fact_coverage": coverage_totals,
             "pairs": len(truth),
             "mode": self.mode,
             "warning": self.warning if self.mode != "hf" else "",
@@ -542,9 +594,10 @@ class Verifier:
 
         spans: list[SpanResult] = []
         for group in groups:
-            start = tokens[group[0]].start
-            end = tokens[group[-1]].end
-            start, end = _expand_to_sentence(answer, start, end)
+            group_start = tokens[group[0]].start
+            group_end = tokens[group[-1]].end
+            variants = span_variants(answer, group_start, group_end)
+            start, end = variants.narrow
             fragment = answer[start:end]
             if not fragment.strip():
                 continue
@@ -559,9 +612,49 @@ class Verifier:
                     risk=risk_value,
                     label=label,
                     n_tokens=len(group),
+                    expanded_start=variants.expanded[0],
+                    expanded_end=variants.expanded[1],
+                    source="risk",
                 )
             )
         return _merge_spans(spans)
+
+    def _coverage_spans(self, answer: str, coverage: CoverageReport) -> list[SpanResult]:
+        """Фрагменты по неполному покрытию фактов документа.
+
+        Замечание ставится на **клаузу ответа**, где назван субъект факта, и сужается
+        до проверяемого участка (число с единицей, если оно есть). Риск берётся из
+        значимости расхождения: искажённое значение «дороже» опущенного, потому что
+        опущение бывает и законным (ответ мог отвечать не на весь документ), а
+        подмена значения — всегда расхождение.
+        """
+        found: list[SpanResult] = []
+        for span in coverage.spans:
+            start, end = int(span["start"]), int(span["end"])
+            if not (0 <= start < end <= len(answer)):
+                continue
+            narrow = narrow_bounds(answer, start, end)
+            if narrow[1] > narrow[0]:
+                start, end = narrow
+            fragment = answer[start:end]
+            if not fragment.strip():
+                continue
+            severity = float(span.get("severity") or 0.5)
+            found.append(
+                SpanResult(
+                    start=start,
+                    end=end,
+                    text=fragment,
+                    risk=severity,
+                    label="likely_hallucination" if severity >= HALLUCINATION_LABEL_RISK else "doubtful",
+                    n_tokens=len(fragment.split()),
+                    expanded_start=span.get("start"),
+                    expanded_end=span.get("end"),
+                    source="coverage",
+                    reason=str(span.get("reason") or ""),
+                )
+            )
+        return found
 
 
 def _token_metrics(labels: Sequence[int], flags: Sequence[bool], risks: Sequence[float]) -> dict[str, float]:
@@ -882,6 +975,18 @@ def _merge_spans(spans: Sequence[SpanResult]) -> list[SpanResult]:
                     "likely_hallucination" if "likely_hallucination" in (previous.label, span.label) else "doubtful"
                 ),
                 n_tokens=previous.n_tokens + span.n_tokens,
+                expanded_start=min(
+                    value
+                    for value in (previous.expanded_start, span.expanded_start, previous.start)
+                    if value is not None
+                ),
+                expanded_end=max(
+                    value
+                    for value in (previous.expanded_end, span.expanded_end, previous.end)
+                    if value is not None
+                ),
+                source=previous.source if previous.source == span.source else "mixed",
+                reason=previous.reason or span.reason,
             )
         else:
             merged.append(span)

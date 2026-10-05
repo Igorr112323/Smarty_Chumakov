@@ -205,7 +205,13 @@ def numbers_in(text: str) -> set[str]:
 
 @dataclass
 class SpanResult:
-    """Спорный фрагмент ответа."""
+    """Спорный фрагмент ответа.
+
+    ``start``/``end`` — **узкие** границы: проверяемый участок (число с единицей
+    измерения или клауза). Расширенные границы (предложение) хранятся рядом, чтобы
+    метрики считались отдельно по узкой и расширенной разметке и одно число не
+    подменяло другое.
+    """
 
     start: int
     end: int
@@ -213,16 +219,27 @@ class SpanResult:
     risk: float
     label: str  # "likely_hallucination" | "doubtful"
     n_tokens: int = 0
+    expanded_start: int | None = None
+    expanded_end: int | None = None
+    source: str = "risk"  # risk | attribution | coverage
+    reason: str = ""
 
     def to_dict(self) -> dict[str, Any]:
-        return {
+        payload = {
             "start": self.start,
             "end": self.end,
             "text": self.text,
             "risk": round(self.risk, 4),
             "label": self.label,
             "n_tokens": self.n_tokens,
+            "source": self.source,
         }
+        if self.expanded_start is not None and self.expanded_end is not None:
+            payload["expanded_start"] = self.expanded_start
+            payload["expanded_end"] = self.expanded_end
+        if self.reason:
+            payload["reason"] = self.reason
+        return payload
 
 
 @dataclass
