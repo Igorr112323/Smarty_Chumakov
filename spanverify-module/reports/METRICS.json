@@ -8,8 +8,8 @@
   },
   "meta": {
     "version": "1.3.0",
-    "commit": "c5cbe06913bb73fee668ab498b1424896bb0e893",
-    "generated_at": "2026-10-05T22:56:46Z",
+    "commit": "112d81785801c34b0dd6948e3e28f34cfed0fda8",
+    "generated_at": "2026-10-05T23:24:56Z",
     "seed": 42,
     "dataset": "data/demo_pairs.jsonl"
   },
@@ -1092,16 +1092,258 @@
   },
   "cross_corpus": {
     "in_corpus_f1": 0.9532,
-    "cross_corpus_f1": 0.7173,
-    "drop": 0.2359,
-    "cross_fpr": 0.1571,
+    "cross_corpus_f1": 0.7334,
+    "drop": 0.2198,
+    "cross_fpr": 0.1438,
     "corpus_b": {
       "name": "alt-generator 1.0 (числа словами, другие шаблоны)",
       "pairs": 240,
       "seed": 4242
     }
   },
-  "pilot": null,
+  "pilot": {
+    "status": "ok",
+    "published": true,
+    "wording": "пилот на малой модели (ruGPT3-small) на синтетических промтах: модель реальная, корпус промтов синтетический",
+    "control": {
+      "grounded_copy_min": 0.8,
+      "unsupported_copy_max": 0.3,
+      "grounded_copy_rate": 1.0,
+      "unsupported_copy_rate": 0.0,
+      "grounded_ok": true,
+      "unsupported_ok": true,
+      "contrast_ok": true
+    },
+    "pairs": 48,
+    "tokens": 1384,
+    "bootstrap_iterations": 5000,
+    "auc": {
+      "first": {
+        "attention_entropy": {
+          "auc_oriented": 0.4972768886364396,
+          "ci": [
+            0.43484291443850265,
+            0.559808052434457
+          ],
+          "auc_fact_oriented": 0.4982638888888889,
+          "fact_ci": [
+            0.328042328042328,
+            0.6695804195804196
+          ],
+          "delta_mean": -0.0003193026949227286,
+          "delta_ci": [
+            -0.003199082794380729,
+            0.002578048561455548
+          ],
+          "delta_significant": false
+        },
+        "ctx_attention_mass": {
+          "auc_oriented": 0.4952721440743092,
+          "ci": [
+            0.4419984622070672,
+            0.565901716120831
+          ],
+          "auc_fact_oriented": -0.5954861111111112,
+          "fact_ci": [
+            0.42832167832167833,
+            0.7555555555555555
+          ],
+          "delta_mean": 0.004376620713773402,
+          "delta_ci": [
+            0.0023094795619082154,
+            0.006342451395001486
+          ],
+          "delta_significant": true
+        },
+        "embedding_density": {
+          "auc_oriented": 0.4644659026362391,
+          "ci": [
+            0.4035493827160494,
+            0.5263536096256685
+          ],
+          "auc_fact_oriented": 0.078125,
+          "fact_ci": [
+            0.017391304347826087,
+            0.16521739130434782
+          ],
+          "delta_mean": -0.022748202085494995,
+          "delta_ci": [
+            -0.026446116467316944,
+            -0.019030429422855377
+          ],
+          "delta_significant": true
+        }
+      },
+      "middle": {
+        "attention_entropy": {
+          "auc_oriented": 0.4930669250559658,
+          "ci": [
+            0.43255440778256943,
+            0.5541069100391134
+          ],
+          "auc_fact_oriented": 0.4513888888888889,
+          "fact_ci": [
+            0.29043478260869565,
+            0.6258741258741258
+          ],
+          "delta_mean": -0.002755475364556767,
+          "delta_ci": [
+            -0.009145564943534459,
+            0.0035278137993626176
+          ],
+          "delta_significant": false
+        },
+        "ctx_attention_mass": {
+          "auc_oriented": 0.4980453740519229,
+          "ci": [
+            0.43934266952559636,
+            0.5635671088242173
+          ],
+          "auc_fact_oriented": -0.5104166666666666,
+          "fact_ci": [
+            0.3443478260869565,
+            0.6770833333333334
+          ],
+          "delta_mean": 0.0005350495930389609,
+          "delta_ci": [
+            -0.0029198050738007686,
+            0.004081853306607837
+          ],
+          "delta_significant": false
+        },
+        "embedding_density": {
+          "auc_oriented": 0.4687426910354506,
+          "ci": [
+            0.40634213347627984,
+            0.5300461476725522
+          ],
+          "auc_fact_oriented": 0.16493055555555555,
+          "fact_ci": [
+            0.06076388888888889,
+            0.2927689594356261
+          ],
+          "delta_mean": -0.010789295037587484,
+          "delta_ci": [
+            -0.013602209587891897,
+            -0.007951530317465464
+          ],
+          "delta_significant": true
+        }
+      },
+      "-4": {
+        "attention_entropy": {
+          "auc_oriented": 0.47378796485014535,
+          "ci": [
+            0.41236715947567804,
+            0.5349513589409287
+          ],
+          "auc_fact_oriented": 0.2708333333333333,
+          "fact_ci": [
+            0.13756613756613756,
+            0.4295652173913043
+          ],
+          "delta_mean": -0.0174952405275644,
+          "delta_ci": [
+            -0.023707562116858313,
+            -0.010994999417157486
+          ],
+          "delta_significant": true
+        },
+        "ctx_attention_mass": {
+          "auc_oriented": 0.4791339503491597,
+          "ci": [
+            0.45782770033095976,
+            0.5812282229965157
+          ],
+          "auc_fact_oriented": -0.7534722222222222,
+          "fact_ci": [
+            0.602020202020202,
+            0.8819444444444444
+          ],
+          "delta_mean": 0.012662718749208268,
+          "delta_ci": [
+            0.009186345371657445,
+            0.016181462009899426
+          ],
+          "delta_significant": true
+        },
+        "embedding_density": {
+          "auc_oriented": 0.497611012730128,
+          "ci": [
+            0.43703029690290834,
+            0.5576170895597232
+          ],
+          "auc_fact_oriented": 0.3975694444444444,
+          "fact_ci": [
+            0.24074074074074073,
+            0.5607142857142857
+          ],
+          "delta_mean": -0.004470321039358775,
+          "delta_ci": [
+            -0.007845684885978699,
+            -0.0011111274361610413
+          ],
+          "delta_significant": true
+        }
+      },
+      "last": {
+        "attention_entropy": {
+          "auc_oriented": 0.4943365966119817,
+          "ci": [
+            0.43340651916905926,
+            0.5554979946524065
+          ],
+          "auc_fact_oriented": 0.4444444444444444,
+          "fact_ci": [
+            0.28,
+            0.6172839506172839
+          ],
+          "delta_mean": -0.006287725819163902,
+          "delta_ci": [
+            -0.01222287926066685,
+            -0.0006771736374626506
+          ],
+          "delta_significant": true
+        },
+        "ctx_attention_mass": {
+          "auc_oriented": 0.4955060309398911,
+          "ci": [
+            0.4436647955092221,
+            0.5665429746264166
+          ],
+          "auc_fact_oriented": -0.578125,
+          "fact_ci": [
+            0.40347826086956523,
+            0.7372134038800705
+          ],
+          "delta_mean": 0.0036054148550408774,
+          "delta_ci": [
+            0.0013571853033560177,
+            0.0060102092393515315
+          ],
+          "delta_significant": true
+        },
+        "embedding_density": {
+          "auc_oriented": 0.5028901734104047,
+          "ci": [
+            0.44037065533736997,
+            0.5627067669172933
+          ],
+          "auc_fact_oriented": 0.4930555555555556,
+          "fact_ci": [
+            0.3262786596119929,
+            0.6584440227703985
+          ],
+          "delta_mean": 0.00023880600929260254,
+          "delta_ci": [
+            -0.006367782751719157,
+            0.00688903530438741
+          ],
+          "delta_significant": false
+        }
+      }
+    }
+  },
   "release": null,
-  "duration_s": 34.7
+  "duration_s": 51.7
 }
