@@ -1,199 +1,29 @@
 {
-  "generated_at": "2026-10-05T22:29:11.768459+00:00",
-  "method": null,
+  "generated_at": "2026-10-05T22:41:29.760006+00:00",
+  "method": "publication.pravo.gov.ru: отбор по /api/Documents (по видам актов и по региональным разделам block=region<код>), текст — распознавание скана (pdftoppm + tesseract -l rus)",
   "user_agent": null,
   "pause_seconds": null,
   "whitelist": null,
   "whitelist_config": null,
   "robots": null,
-  "sources": null,
+  "sources": [
+    {
+      "host": "publication.pravo.gov.ru",
+      "documents_downloaded": 272,
+      "documents_with_text": 272,
+      "robots_status": null,
+      "robots_error": null,
+      "robots_disallow": []
+    }
+  ],
   "merged_from": [
     {
       "shard": "data/corpus_a3/sources",
-      "documents": 73,
-      "problems": []
-    },
-    {
-      "shard": "/tmp/shards/corpus-shard-fz",
-      "documents": 82,
-      "problems": []
-    },
-    {
-      "shard": "/tmp/shards/corpus-shard-polozhenie",
-      "documents": 73,
-      "problems": []
-    },
-    {
-      "shard": "/tmp/shards/corpus-shard-postanovlenie",
-      "documents": 83,
-      "problems": []
-    },
-    {
-      "shard": "/tmp/shards/corpus-shard-prikaz",
-      "documents": 85,
-      "problems": []
-    },
-    {
-      "shard": "/tmp/shards/corpus-shard-rasporyazhenie",
-      "documents": 74,
-      "problems": []
-    },
-    {
-      "shard": "/tmp/shards/corpus-shard-region02-bashkortostan",
-      "documents": 83,
-      "problems": []
-    },
-    {
-      "shard": "/tmp/shards/corpus-shard-region16-tatarstan",
-      "documents": 87,
-      "problems": []
-    },
-    {
-      "shard": "/tmp/shards/corpus-shard-region23-krasnodar",
-      "documents": 86,
-      "problems": []
-    },
-    {
-      "shard": "/tmp/shards/corpus-shard-region24-krasnoyarsk",
-      "documents": 79,
-      "problems": []
-    },
-    {
-      "shard": "/tmp/shards/corpus-shard-region26-stavropol",
-      "documents": 86,
-      "problems": []
-    },
-    {
-      "shard": "/tmp/shards/corpus-shard-region36-voronezh",
-      "documents": 84,
-      "problems": []
-    },
-    {
-      "shard": "/tmp/shards/corpus-shard-region50-mo",
-      "documents": 85,
-      "problems": []
-    },
-    {
-      "shard": "/tmp/shards/corpus-shard-region52-nizhny",
-      "documents": 86,
-      "problems": []
-    },
-    {
-      "shard": "/tmp/shards/corpus-shard-region54-novosibirsk",
-      "documents": 85,
-      "problems": []
-    },
-    {
-      "shard": "/tmp/shards/corpus-shard-region61-rostov",
-      "documents": 87,
-      "problems": []
-    },
-    {
-      "shard": "/tmp/shards/corpus-shard-region63-samara",
-      "documents": 81,
-      "problems": []
-    },
-    {
-      "shard": "/tmp/shards/corpus-shard-region66-sverdlovsk",
-      "documents": 85,
-      "problems": []
-    },
-    {
-      "shard": "/tmp/shards/corpus-shard-region74-chelyabinsk",
-      "documents": 85,
-      "problems": []
-    },
-    {
-      "shard": "/tmp/shards/corpus-shard-region77-moskva",
-      "documents": 73,
-      "problems": []
-    },
-    {
-      "shard": "/tmp/shards/corpus-shard-region78-spb",
-      "documents": 87,
-      "problems": []
-    },
-    {
-      "shard": "/tmp/shards/corpus-shard-ukaz",
-      "documents": 76,
+      "documents": 272,
       "problems": []
     }
   ],
-  "merge_duplicates": [
-    "eo-0001201509080004",
-    "eo-0001201805240007",
-    "eo-0001201901250031",
-    "eo-0001202001270009",
-    "eo-0001202005180037",
-    "eo-0001202104290058",
-    "eo-0001202506240038",
-    "eo-0001202507070019",
-    "eo-0001202509260016",
-    "eo-0001202512290056",
-    "eo-0001202512290057",
-    "eo-0001202605020012",
-    "eo-0001202605020013",
-    "eo-0001202607260024",
-    "eo-0001202608040067",
-    "eo-0001202608040068",
-    "eo-0001202608040069",
-    "eo-0001202608040071",
-    "eo-0001202608040072",
-    "eo-0001202608040073",
-    "eo-0001202608040074",
-    "eo-0001202608040075",
-    "eo-0001202608040076",
-    "eo-0001202608040077",
-    "eo-0001202609180001",
-    "eo-0001202609210002",
-    "eo-0001202609280007",
-    "eo-0001202609280008",
-    "eo-0001202609290020",
-    "eo-0001202610020023",
-    "eo-0001202610030001",
-    "eo-0001202610030002",
-    "eo-0001202610030003",
-    "eo-0001202610030004",
-    "eo-0001202610030011",
-    "eo-0001202610030013",
-    "eo-0001202610030014",
-    "eo-0001202610030017",
-    "eo-0001202610030020",
-    "eo-0001202610030023",
-    "eo-0001202610050002",
-    "eo-0001202610050004",
-    "eo-0001202610050005",
-    "eo-0001202610050006",
-    "eo-0001202610050007",
-    "eo-0001202610050008",
-    "eo-0001202610050009",
-    "eo-0001202610050010",
-    "eo-0001202610050011",
-    "eo-0001202610050012",
-    "eo-0001202610050013",
-    "eo-0001202610050014",
-    "eo-0001202610050015",
-    "eo-0001202610050016",
-    "eo-0300202609090013",
-    "eo-1800202610020012",
-    "eo-2300202608060005",
-    "eo-2300202608210001",
-    "eo-2300202610020001",
-    "eo-2300202610020002",
-    "eo-2300202610020003",
-    "eo-2300202610020004",
-    "eo-2300202610020005",
-    "eo-2300202610020006",
-    "eo-2301202609100011",
-    "eo-2301202609160006",
-    "eo-2301202609240002",
-    "eo-2301202609240003",
-    "eo-2301202609300007",
-    "eo-2301202610020001",
-    "eo-3800202609020003",
-    "eo-4300202610020004",
-    "eo-6500202609110003"
-  ],
+  "merge_duplicates": [],
   "merge_problems": [],
   "documents_total": 272,
   "by_theme": {
@@ -208,9 +38,9 @@
     "Положение": 7,
     "Федеральный закон": 26,
     "Указ": 24,
-    "Постановление": 110,
     "Распоряжение": 21,
     "Приказ": 77,
+    "Постановление": 110,
     "Закон": 7
   },
   "by_level": {
@@ -218,24 +48,24 @@
     "региональный": 188
   },
   "by_region": {
-    "03": 1,
-    "18": 1,
-    "Краснодарский край": 27,
-    "38": 1,
-    "43": 1,
-    "65": 1,
-    "Московская область": 17,
-    "02": 10,
+    "Республика Башкортостан": 10,
+    "Республика Бурятия": 1,
     "Республика Татарстан": 14,
-    "24": 6,
+    "Удмуртская Республика": 1,
+    "Краснодарский край": 27,
+    "Красноярский край": 6,
     "Ставропольский край": 13,
-    "36": 11,
-    "52": 13,
-    "54": 12,
+    "Воронежская область": 11,
+    "Иркутская область": 1,
+    "Кировская область": 1,
+    "Московская область": 17,
+    "Нижегородская область": 13,
+    "Новосибирская область": 12,
     "Ростовская область": 14,
-    "63": 8,
+    "Самарская область": 8,
+    "Сахалинская область": 1,
     "Свердловская область": 12,
-    "74": 12,
+    "Челябинская область": 12,
     "Санкт-Петербург": 14
   },
   "extraction_methods": {

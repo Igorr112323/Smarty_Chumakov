@@ -176,11 +176,18 @@ def test_region_of_reads_level_from_publication_number() -> None:
 
     # Второй орган того же региона (приказы краевых министерств) — тот же регион.
     assert region_of("2301202610020001")["region_name"] == "Краснодарский край"
-    # Регион вне списка приоритета опознаётся как региональный, но без названия.
+    # Субъект вне приоритетного списка тоже опознаётся — по коду и по названию
+    # из справочника EXTRA_REGION_NAMES (он пополняется по мере сбора корпуса).
     altai = region_of("0400202609090013")
     assert altai["level"] == "региональный"
     assert altai["region_code"] == "04"
-    assert altai["region_name"] is None
+    assert altai["region_name"] == "Республика Алтай"
+    # Код, которого нет ни в одном справочнике, остаётся без названия, но уровень
+    # определяется всё равно: выдумывать название нельзя.
+    unknown = region_of("9900202609090013")
+    assert unknown["level"] == "региональный"
+    assert unknown["region_code"] == "99"
+    assert unknown["region_name"] is None
     # Мусор не должен приводить к выдуманному уровню.
     assert region_of("")["level"] is None
     assert region_of("12")["level"] is None

@@ -92,6 +92,35 @@ def read_shard(shard: Path) -> dict:
     return {"shard": str(shard), "documents": documents, "problems": problems, "manifest": manifest}
 
 
+def host_summary(documents: dict[str, dict], base_manifest: dict) -> list[dict]:
+    """Перечень источников с фактическим числом документов по каждому хосту.
+
+    Части корпуса могли оборваться по пределу времени, и в их манифестах раздела
+    «sources» нет. Поэтому он собирается заново по самим документам, а сведения о
+    robots.txt подхватываются из той части, где они есть.
+    """
+    robots = base_manifest.get("robots") or {}
+    counts: dict[str, int] = {}
+    for meta in documents.values():
+        host = str(meta.get("source_host") or "publication.pravo.gov.ru")
+        counts[host] = counts.get(host, 0) + 1
+    hosts = list(dict.fromkeys(list(counts) + list(base_manifest.get("whitelist") or [])))
+    result = []
+    for host in hosts:
+        entry = {
+            "host": host,
+            "documents_downloaded": counts.get(host, 0),
+            "documents_with_text": counts.get(host, 0),
+            "robots_status": (robots.get(host) or {}).get("status"),
+            "robots_error": (robots.get(host) or {}).get("error"),
+            "robots_disallow": ((robots.get(host) or {}).get("rules") or {}).get("*", []),
+        }
+        if counts.get(host, 0) == 0:
+            entry["note"] = "документов из этого источника в корпусе нет"
+        result.append(entry)
+    return result
+
+
 def summarise(documents: dict[str, dict]) -> dict:
     """Пересчитать сводные числа по фактическому составу документов."""
     by_theme: dict[str, int] = {}
@@ -167,13 +196,18 @@ def merge(shards: list[Path], out_dir: Path) -> dict:
 
     manifest = {
         "generated_at": datetime.now(timezone.utc).isoformat(),
-        "method": base_manifest.get("method"),
+        "method": base_manifest.get("method")
+        or (
+            "publication.pravo.gov.ru: отбор по /api/Documents (по видам актов и по "
+            "региональным разделам block=region<код>), текст — распознавание скана "
+            "(pdftoppm + tesseract -l rus)"
+        ),
         "user_agent": base_manifest.get("user_agent"),
         "pause_seconds": base_manifest.get("pause_seconds"),
         "whitelist": base_manifest.get("whitelist"),
         "whitelist_config": base_manifest.get("whitelist_config"),
         "robots": base_manifest.get("robots"),
-        "sources": base_manifest.get("sources"),
+        "sources": host_summary(merged, base_manifest),
         "merged_from": shard_reports,
         "merge_duplicates": sorted(set(duplicates)),
         "merge_problems": problems,

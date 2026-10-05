@@ -84,7 +84,7 @@ def build_report(corpus_dir: Path) -> tuple[str, dict]:
     lines.append("")
     lines.append("| Источник | Скачано документов | С текстом | Примечание |")
     lines.append("|---|---|---|---|")
-    for item in sources.get("sources", []):
+    for item in sources.get("sources") or []:
         lines.append(
             f"| `{item.get('host')}` | {item.get('documents_downloaded')} | {item.get('documents_with_text')} | "
             f"{item.get('note', '')} |"
@@ -196,7 +196,7 @@ def build_report(corpus_dir: Path) -> tuple[str, dict]:
     host_of_doc: dict[str, str] = {}
     for doc_id, meta in documents.items():
         host_of_doc[doc_id] = meta.get("source_host", "publication.pravo.gov.ru")
-    for item in sources.get("sources", []):
+    for item in sources.get("sources") or []:
         host = item.get("host")
         host_docs = {doc_id for doc_id, value in host_of_doc.items() if value == host}
         host_pairs = sum(count for doc_id, count in pairs_per_doc.items() if doc_id in host_docs)
@@ -239,7 +239,7 @@ def build_report(corpus_dir: Path) -> tuple[str, dict]:
     lines.append("## 6. Не сделано")
     lines.append("")
     not_done: list[str] = []
-    for item in sources.get("sources", []):
+    for item in sources.get("sources") or []:
         if not item.get("documents_downloaded"):
             not_done.append(f"из `{item.get('host')}` документов нет: {item.get('note', 'причина не записана')}")
     if manifest.get("pairs", 0) < manifest.get("target", 0):

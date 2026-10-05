@@ -36,7 +36,7 @@ python -m spanverify train --dataset data/demo_pairs.jsonl --out config/weights.
 python -m spanverify evaluate --dataset data/demo_pairs.jsonl   # метрики и критерий качества
 python -m spanverify selftest                                   # само-проверка конвейера
 python -m spanverify server --port 8765                         # API + веб-интерфейс
-python -m pytest -q                                             # 456 тестов
+python -m pytest -q                                             # 477 тестов
 ```
 
 Коды возврата `verify`: `0` — ответ подтверждён, `1` — найдены спорные
@@ -144,7 +144,7 @@ AUC 0.996 на отложенной части) доказывают работ�
 | RusHallu-RAG (`feudor2/RusHallu-RAG`) | ru | human (спан-уровень) | не подтверждена | 1000 пар, 423 спана |
 
 Что получилось в режиме `demo` (лексические признаки, без весов модели — это не
-научный результат): RAGTruth QA token F1 **0.204**, FPR 0.169, AUC 0.717;
+научный результат): RAGTruth QA token F1 **0.204**, FPR 0.166, AUC 0.716;
 Summary token F1 0.113; Data2txt token F1 0.101; RusHallu-RAG token F1 0.127.
 Их метрики на наших предсказаниях: RAGTruth QA accuracy 0.010, RusHallu-RAG
 accuracy 0.424 / ROUGE-L 0.533.

@@ -60,11 +60,21 @@ def test_evaluate_reports_both_metric_groups(tmp_path: Path) -> None:
 
 
 def test_baseline_comparison_is_not_invented(tmp_path: Path) -> None:
-    """Пока числа статьи не извлечены, сравнение с baseline = null, и это сказано словами."""
+    """Сравнение с опубликованной работой либо снабжено источником, либо равно null.
+
+    Третьего не дано: число без ссылки на то, откуда оно взято, в отчёт попасть не
+    должно. Раньше тест фиксировал только случай «не извлечено»; после того как
+    извлечение из PDF заработало, проверяется и второй случай.
+    """
     _write_pairs(tmp_path / "pairs.jsonl")
     report = evaluate(tmp_path, mode="demo")
-    assert report["baseline_comparison"] is None
-    assert "не извлечены" in report["baseline_note"]
+    comparison = report["baseline_comparison"]
+    if comparison is None:
+        assert "не извлечены" in report["baseline_note"]
+        return
+    assert comparison["article_url"].startswith("http"), "у числа обязан быть источник"
+    assert comparison["note"], "обязано быть сказано, откуда взяты числа"
+    assert comparison["tables"], "сравнение без таблиц статьи бессмысленно"
 
 
 def test_evaluate_handles_clean_pairs_without_labels(tmp_path: Path) -> None:
