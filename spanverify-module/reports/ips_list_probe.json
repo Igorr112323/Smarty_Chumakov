@@ -192,13 +192,13 @@
     {
       "name": "searchlist-a1",
       "url": "http://pravo.gov.ru/proxy/ips/?searchlist=1&a0=%EF%E5%F0%F1%EE%ED%E0%EB%FC%ED%FB%E5%20%E4%E0%ED%ED%FB%E5&a1=1",
-      "status": 200,
-      "bytes": 24933,
+      "status": null,
+      "bytes": 0,
       "nd_count": 0,
       "nd_examples": [],
-      "content_type": "text/html; CHARSET=windows-1251",
-      "visible_head": " Поиск: Контекст: \"персональные данные\" Наименование: 1 table.menu_workspace { width: 100%; } table.menu_workspace td { vertical-align: top; } table.menu_workspace tr.cur { background-color: #fff4b7; ",
-      "error": null
+      "content_type": "",
+      "visible_head": "",
+      "error": "timed out"
     }
   ]
 }

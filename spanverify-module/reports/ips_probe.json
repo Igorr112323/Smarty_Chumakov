@@ -12,12 +12,44 @@
   },
   "root": {
     "url": "http://pravo.gov.ru/proxy/ips/",
-    "status": 502,
-    "bytes": 157,
-    "forms": [],
+    "status": 200,
+    "bytes": 142593,
+    "forms": [
+      {
+        "action": "?",
+        "method": "get",
+        "fields": [
+          "searchres",
+          "bpas",
+          "a3",
+          "a3type",
+          "a3value",
+          "a6",
+          "a6type",
+          "a6value",
+          "a15",
+          "a15type",
+          "a15value",
+          "a7type",
+          "a7from",
+          "a7to",
+          "a7date",
+          "a8",
+          "a8type",
+          "a1",
+          "a0",
+          "a16",
+          "a16type",
+          "a16value",
+          "a17",
+          "a17type",
+          "a17value"
+        ]
+      }
+    ],
     "nd_links_count": 0,
     "nd_links_examples": [],
-    "text_head": "502 Bad Gateway 502 Bad Gateway nginx/1.18.0"
+    "text_head": "Законодательство России. Расширенный поиск Законодательство России Подключение БПА Подключение БПА Отметить все Снять отметку со всех Федеральное законодательство Федеральное законодательство ФЕДЕРАЛЬНОЕ ЗАКОНОДАТЕЛЬСТВО Региональное законодательство Региональное законодательство Центральный Федерал"
   },
   "searches": [
     {
@@ -35,14 +67,14 @@
     {
       "name": "searchP-searchF",
       "url": "http://pravo.gov.ru/proxy/ips/?searchP=%EF%E5%F0%F1%EE%ED%E0%EB%FC%ED%FB%E5%20%E4%E0%ED%ED%FB%E5&searchF=0",
-      "status": 502,
-      "bytes": 157,
-      "text_chars": 44,
+      "status": 200,
+      "bytes": 142593,
+      "text_chars": 5196,
       "nd_links_count": 0,
       "nd_links_examples": [],
       "query_words_in_text": false,
-      "text_head": "502 Bad Gateway 502 Bad Gateway nginx/1.18.0",
-      "error": "HTTP 502"
+      "text_head": "Законодательство России. Расширенный поиск Законодательство России Подключение БПА Подключение БПА Отметить все Снять отметку со всех Федеральное законодательство Федеральное законодательство ФЕДЕРАЛЬНОЕ ЗАКОНОДАТЕЛЬСТВО Региональное законодательство Региональное законодательство Центральный Федерал",
+      "error": null
     },
     {
       "name": "text",
@@ -59,14 +91,14 @@
     {
       "name": "intelsearch",
       "url": "http://pravo.gov.ru/proxy/ips/?intelsearch=%EF%E5%F0%F1%EE%ED%E0%EB%FC%ED%FB%E5%20%E4%E0%ED%ED%FB%E5",
-      "status": 502,
-      "bytes": 157,
-      "text_chars": 44,
+      "status": 200,
+      "bytes": 142593,
+      "text_chars": 5196,
       "nd_links_count": 0,
       "nd_links_examples": [],
       "query_words_in_text": false,
-      "text_head": "502 Bad Gateway 502 Bad Gateway nginx/1.18.0",
-      "error": "HTTP 502"
+      "text_head": "Законодательство России. Расширенный поиск Законодательство России Подключение БПА Подключение БПА Отметить все Снять отметку со всех Федеральное законодательство Федеральное законодательство ФЕДЕРАЛЬНОЕ ЗАКОНОДАТЕЛЬСТВО Региональное законодательство Региональное законодательство Центральный Федерал",
+      "error": null
     },
     {
       "name": "query",
