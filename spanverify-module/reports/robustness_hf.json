@@ -1,0 +1,72 @@
+{
+ "dataset": "data/corpus_a/splits/test.jsonl",
+ "mode": "hf",
+ "model": "ai-forever/rugpt3small_based_on_gpt2",
+ "seed": 42,
+ "pairs": 19,
+ "clean_pairs": 19,
+ "document_groups": 9,
+ "baseline": {
+  "token_f1": 0.0,
+  "verdict_f1": 0.0,
+  "verdict_fpr": 0.0526
+ },
+ "distortions": [
+  {
+   "name": "перефразирование",
+   "pairs": 19,
+   "changed_answers": 14,
+   "flagged_share_before": 0.0526,
+   "flagged_share_after": 0.0,
+   "delta": -0.0526,
+   "token_f1_before": 0.0,
+   "token_f1_after": null,
+   "token_f1_after_reason": "разметка исходного ответа к искажённому тексту не переносится"
+  },
+  {
+   "name": "числовая подмена",
+   "pairs": 19,
+   "changed_answers": 11,
+   "flagged_share_before": 0.0526,
+   "flagged_share_after": 0.5789,
+   "delta": 0.5263,
+   "token_f1_before": 0.0,
+   "token_f1_after": null,
+   "token_f1_after_reason": "разметка исходного ответа к искажённому тексту не переносится"
+  },
+  {
+   "name": "противоречие источнику",
+   "pairs": 19,
+   "changed_answers": 11,
+   "flagged_share_before": 0.0526,
+   "flagged_share_after": 0.5263,
+   "delta": 0.4737,
+   "token_f1_before": 0.0,
+   "token_f1_after": null,
+   "token_f1_after_reason": "разметка исходного ответа к искажённому тексту не переносится"
+  },
+  {
+   "name": "пропуск существенного сведения",
+   "pairs": 19,
+   "changed_answers": 11,
+   "flagged_share_before": 0.0526,
+   "flagged_share_after": 0.1579,
+   "delta": 0.1053,
+   "token_f1_before": 0.0,
+   "token_f1_after": null,
+   "token_f1_after_reason": "разметка исходного ответа к искажённому тексту не переносится"
+  },
+  {
+   "name": "числа прописью и другие шаблоны",
+   "pairs": 19,
+   "changed_answers": 0,
+   "flagged_share_before": 0.0526,
+   "flagged_share_after": 0.0526,
+   "delta": 0.0,
+   "token_f1_before": 0.0,
+   "token_f1_after": null,
+   "token_f1_after_reason": "разметка исходного ответа к искажённому тексту не переносится"
+  }
+ ],
+ "duration_s": 95.2
+}

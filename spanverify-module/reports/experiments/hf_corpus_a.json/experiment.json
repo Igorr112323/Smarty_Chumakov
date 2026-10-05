@@ -1,0 +1,302 @@
+{
+  "dataset": "data/corpus_a/splits/train.jsonl",
+  "mode": "hf",
+  "seed": 42,
+  "duration_s": 1513.29,
+  "corpus": {
+    "pairs": 840,
+    "kinds": {
+      "corpus_a": 840
+    },
+    "hallucination_rate": 0.0,
+    "mean_answer_chars": 101.5,
+    "mean_context_chars": 1063.5,
+    "flagged_share_of_answers": 0.1113,
+    "vocabulary": 102,
+    "dataset_version": "2.0-synthetic-pairs"
+  },
+  "metrics": {
+    "tokens": {
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1": 0.0,
+      "fpr": 0.0,
+      "tp": 0,
+      "fp": 0,
+      "fn": 1152,
+      "tn": 7851,
+      "auc": 0.6919871097453969
+    },
+    "spans": {
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1": 0.0,
+      "tp": 0,
+      "fp": 301,
+      "fn": 443,
+      "iou_threshold": 0.5,
+      "recall_containment": 0.2979683972911964,
+      "f1_expanded_labels": 0.5376344086021505,
+      "strict_f1_expanded": 0.5376344086021505,
+      "coverage_expanded": 0.45146726862302483,
+      "mean_width_ratio": 6.299992373453241,
+      "mean_width_ratio_expanded": 1.0,
+      "n_narrow": 840,
+      "n_expanded": 840
+    },
+    "answers": {
+      "threshold": 0.6068376068376068,
+      "precision": 1.0,
+      "recall": 0.32054176072234764,
+      "f1": 0.4854700854700854,
+      "fpr": 0.0,
+      "auc": 0.6849537445059163,
+      "tp": 142,
+      "fp": 0,
+      "fn": 301,
+      "tn": 397
+    },
+    "verdicts": {
+      "tp": 221,
+      "fp": 80,
+      "fn": 222,
+      "tn": 317,
+      "precision": 0.7342,
+      "recall": 0.4989,
+      "f1": 0.5941,
+      "fpr": 0.2015,
+      "flagged_share": 0.3583
+    },
+    "by_type": {
+      "contradiction": {
+        "tp": 76,
+        "fp": 0,
+        "fn": 33,
+        "tn": 0,
+        "precision": 1.0,
+        "recall": 0.6972,
+        "f1": 0.8216,
+        "fpr": 0.0,
+        "flagged_share": 0.6972,
+        "pairs": 109,
+        "positives": 109
+      },
+      "excess": {
+        "tp": 5,
+        "fp": 0,
+        "fn": 34,
+        "tn": 0,
+        "precision": 1.0,
+        "recall": 0.1282,
+        "f1": 0.2273,
+        "fpr": 0.0,
+        "flagged_share": 0.1282,
+        "pairs": 39,
+        "positives": 39
+      },
+      "faithful": {
+        "tp": 0,
+        "fp": 80,
+        "fn": 0,
+        "tn": 317,
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0,
+        "fpr": 0.2015,
+        "flagged_share": 0.2015,
+        "pairs": 397,
+        "positives": 0
+      },
+      "missing": {
+        "tp": 27,
+        "fp": 0,
+        "fn": 8,
+        "tn": 0,
+        "precision": 1.0,
+        "recall": 0.7714,
+        "f1": 0.871,
+        "fpr": 0.0,
+        "flagged_share": 0.7714,
+        "pairs": 35,
+        "positives": 35
+      },
+      "number_attribution": {
+        "tp": 47,
+        "fp": 0,
+        "fn": 22,
+        "tn": 0,
+        "precision": 1.0,
+        "recall": 0.6812,
+        "f1": 0.8103,
+        "fpr": 0.0,
+        "flagged_share": 0.6812,
+        "pairs": 69,
+        "positives": 69
+      },
+      "oversight": {
+        "tp": 0,
+        "fp": 0,
+        "fn": 42,
+        "tn": 0,
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0,
+        "fpr": 0.0,
+        "flagged_share": 0.0,
+        "pairs": 42,
+        "positives": 42
+      },
+      "partial": {
+        "tp": 52,
+        "fp": 0,
+        "fn": 38,
+        "tn": 0,
+        "precision": 1.0,
+        "recall": 0.5778,
+        "f1": 0.7324,
+        "fpr": 0.0,
+        "flagged_share": 0.5778,
+        "pairs": 90,
+        "positives": 90
+      },
+      "unconfirmed": {
+        "tp": 14,
+        "fp": 0,
+        "fn": 45,
+        "tn": 0,
+        "precision": 1.0,
+        "recall": 0.2373,
+        "f1": 0.3836,
+        "fpr": 0.0,
+        "flagged_share": 0.2373,
+        "pairs": 59,
+        "positives": 59
+      }
+    },
+    "fact_coverage": {
+      "facts": 4580,
+      "distorted": 142,
+      "omitted": 50,
+      "absent": 3979
+    },
+    "pairs": 840,
+    "mode": "hf",
+    "warning": ""
+  },
+  "bundle": {
+    "weights": {
+      "attention_entropy": 0.1,
+      "ctx_attention_mass": 0.9,
+      "embedding_density": 0.0
+    },
+    "threshold": 0.606838,
+    "target_fpr": 0.1,
+    "span_z": 3.0,
+    "span_floor": 0.3,
+    "span_cap": 0.5,
+    "isotonic": {
+      "x": [
+        0.252265,
+        0.295028,
+        0.302637,
+        0.316251,
+        0.362903
+      ],
+      "y": [
+        0.473815,
+        0.606838,
+        0.636364,
+        0.882353,
+        0.894737
+      ]
+    },
+    "head": {
+      "type": "logreg",
+      "file": "config/head.json"
+    },
+    "folds": [
+      {
+        "fold": 0,
+        "n_train": 4791,
+        "n_test": 1197,
+        "auc": 0.8703757891197967
+      },
+      {
+        "fold": 1,
+        "n_train": 4791,
+        "n_test": 1197,
+        "auc": 0.8642476561299247
+      },
+      {
+        "fold": 2,
+        "n_train": 4791,
+        "n_test": 1197,
+        "auc": 0.8687112556995747
+      },
+      {
+        "fold": 3,
+        "n_train": 4791,
+        "n_test": 1197,
+        "auc": 0.8925816775263049
+      },
+      {
+        "fold": 4,
+        "n_train": 4788,
+        "n_test": 1200,
+        "auc": 0.8849376808704741
+      }
+    ],
+    "seed": 42,
+    "version": "1.3.0",
+    "mode": "hf",
+    "meta": {
+      "dataset": "data/corpus_a/splits/train.jsonl",
+      "synthetic": false,
+      "signal": "logreg",
+      "note": "Демонстрационный корпус: параметры проверяют конвейер, а не качество на реальных документах. Для боевой калибровки используйте размеченные реальные пары в режиме hf.",
+      "participation": {
+        "type": "participation-logreg",
+        "auc_out_of_fold": 1.0,
+        "calibrated_on": "synthetic-participation-corpus 1.0 (два стиля, доля смеси известна)"
+      }
+    }
+  },
+  "folds": [
+    {
+      "fold": 0,
+      "n_train": 4791,
+      "n_test": 1197,
+      "auc": 0.8703757891197967
+    },
+    {
+      "fold": 1,
+      "n_train": 4791,
+      "n_test": 1197,
+      "auc": 0.8642476561299247
+    },
+    {
+      "fold": 2,
+      "n_train": 4791,
+      "n_test": 1197,
+      "auc": 0.8687112556995747
+    },
+    {
+      "fold": 3,
+      "n_train": 4791,
+      "n_test": 1197,
+      "auc": 0.8925816775263049
+    },
+    {
+      "fold": 4,
+      "n_train": 4788,
+      "n_test": 1200,
+      "auc": 0.8849376808704741
+    }
+  ],
+  "gate": "НЕ достигнут",
+  "artifacts": {
+    "weights": "reports/experiments/hf_corpus_a.json/weights.json",
+    "head": "reports/experiments/hf_corpus_a.json/config/head.json",
+    "participation": "reports/experiments/hf_corpus_a.json/config/participation.json"
+  }
+}

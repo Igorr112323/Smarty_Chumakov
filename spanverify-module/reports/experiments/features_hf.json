@@ -1,0 +1,406 @@
+{
+ "dataset": "data/corpus_a/splits/test.jsonl",
+ "mode": "hf",
+ "model": "ai-forever/rugpt3small_based_on_gpt2",
+ "seed": 42,
+ "bootstrap_iterations": 5000,
+ "limit": 240,
+ "test_share": 0.3,
+ "held_out_pairs": 60,
+ "document_groups": 9,
+ "layers": {
+  "first": {
+   "tokens": 658,
+   "features": {
+    "attention_entropy": {
+     "auc_oriented": 0.8312,
+     "ci_low": 0.794,
+     "ci_high": 0.8657,
+     "orientation": 1
+    },
+    "ctx_attention_mass": {
+     "auc_oriented": 0.4868,
+     "ci_low": 0.4362,
+     "ci_high": 0.5379,
+     "orientation": -1
+    },
+    "embedding_density": {
+     "auc_oriented": 0.4944,
+     "ci_low": 0.43,
+     "ci_high": 0.5644,
+     "orientation": 1
+    },
+    "mass_per_context_token": {
+     "auc_oriented": 0.5403,
+     "ci_low": 0.4852,
+     "ci_high": 0.5952,
+     "orientation": -1
+    },
+    "mass_per_answer_token": {
+     "auc_oriented": 0.4626,
+     "ci_low": 0.3985,
+     "ci_high": 0.5276,
+     "orientation": -1
+    },
+    "position": {
+     "auc_oriented": 0.8529,
+     "ci_low": 0.821,
+     "ci_high": 0.8821,
+     "orientation": 1
+    },
+    "evidence_distance": {
+     "auc_oriented": 0.795,
+     "ci_low": 0.7469,
+     "ci_high": 0.842,
+     "orientation": 1
+    },
+    "number_support": {
+     "auc_oriented": 0.4754,
+     "ci_low": 0.449,
+     "ci_high": 0.4981,
+     "orientation": -1
+    },
+    "unit_support": {
+     "auc_oriented": 0.5045,
+     "ci_low": 0.5009,
+     "ci_high": 0.5089,
+     "orientation": -1
+    },
+    "negation_conflict": {
+     "auc_oriented": 0.543,
+     "ci_low": 0.4903,
+     "ci_high": 0.5947,
+     "orientation": 1
+    },
+    "modality_conflict": {
+     "auc_oriented": 0.5,
+     "ci_low": 0.5,
+     "ci_high": 0.5,
+     "orientation": 1
+    },
+    "date_support": {
+     "auc_oriented": 0.5,
+     "ci_low": 0.5,
+     "ci_high": 0.5,
+     "orientation": -1
+    }
+   }
+  },
+  "middle": {
+   "tokens": 658,
+   "features": {
+    "attention_entropy": {
+     "auc_oriented": 0.8046,
+     "ci_low": 0.7603,
+     "ci_high": 0.8461,
+     "orientation": 1
+    },
+    "ctx_attention_mass": {
+     "auc_oriented": 0.5088,
+     "ci_low": 0.4532,
+     "ci_high": 0.5658,
+     "orientation": -1
+    },
+    "embedding_density": {
+     "auc_oriented": 0.5099,
+     "ci_low": 0.4487,
+     "ci_high": 0.5719,
+     "orientation": 1
+    },
+    "mass_per_context_token": {
+     "auc_oriented": 0.5502,
+     "ci_low": 0.4889,
+     "ci_high": 0.61,
+     "orientation": -1
+    },
+    "mass_per_answer_token": {
+     "auc_oriented": 0.464,
+     "ci_low": 0.4001,
+     "ci_high": 0.5298,
+     "orientation": -1
+    },
+    "position": {
+     "auc_oriented": 0.8529,
+     "ci_low": 0.821,
+     "ci_high": 0.8821,
+     "orientation": 1
+    },
+    "evidence_distance": {
+     "auc_oriented": 0.795,
+     "ci_low": 0.7469,
+     "ci_high": 0.842,
+     "orientation": 1
+    },
+    "number_support": {
+     "auc_oriented": 0.4754,
+     "ci_low": 0.449,
+     "ci_high": 0.4981,
+     "orientation": -1
+    },
+    "unit_support": {
+     "auc_oriented": 0.5045,
+     "ci_low": 0.5009,
+     "ci_high": 0.5089,
+     "orientation": -1
+    },
+    "negation_conflict": {
+     "auc_oriented": 0.543,
+     "ci_low": 0.4903,
+     "ci_high": 0.5947,
+     "orientation": 1
+    },
+    "modality_conflict": {
+     "auc_oriented": 0.5,
+     "ci_low": 0.5,
+     "ci_high": 0.5,
+     "orientation": 1
+    },
+    "date_support": {
+     "auc_oriented": 0.5,
+     "ci_low": 0.5,
+     "ci_high": 0.5,
+     "orientation": -1
+    }
+   }
+  },
+  "-4": {
+   "tokens": 658,
+   "features": {
+    "attention_entropy": {
+     "auc_oriented": 0.8075,
+     "ci_low": 0.7676,
+     "ci_high": 0.8449,
+     "orientation": 1
+    },
+    "ctx_attention_mass": {
+     "auc_oriented": 0.59,
+     "ci_low": 0.5337,
+     "ci_high": 0.6486,
+     "orientation": -1
+    },
+    "embedding_density": {
+     "auc_oriented": 0.4611,
+     "ci_low": 0.398,
+     "ci_high": 0.5275,
+     "orientation": 1
+    },
+    "mass_per_context_token": {
+     "auc_oriented": 0.5784,
+     "ci_low": 0.5125,
+     "ci_high": 0.6427,
+     "orientation": -1
+    },
+    "mass_per_answer_token": {
+     "auc_oriented": 0.4673,
+     "ci_low": 0.4041,
+     "ci_high": 0.5323,
+     "orientation": -1
+    },
+    "position": {
+     "auc_oriented": 0.8529,
+     "ci_low": 0.821,
+     "ci_high": 0.8821,
+     "orientation": 1
+    },
+    "evidence_distance": {
+     "auc_oriented": 0.795,
+     "ci_low": 0.7469,
+     "ci_high": 0.842,
+     "orientation": 1
+    },
+    "number_support": {
+     "auc_oriented": 0.4754,
+     "ci_low": 0.449,
+     "ci_high": 0.4981,
+     "orientation": -1
+    },
+    "unit_support": {
+     "auc_oriented": 0.5045,
+     "ci_low": 0.5009,
+     "ci_high": 0.5089,
+     "orientation": -1
+    },
+    "negation_conflict": {
+     "auc_oriented": 0.543,
+     "ci_low": 0.4903,
+     "ci_high": 0.5947,
+     "orientation": 1
+    },
+    "modality_conflict": {
+     "auc_oriented": 0.5,
+     "ci_low": 0.5,
+     "ci_high": 0.5,
+     "orientation": 1
+    },
+    "date_support": {
+     "auc_oriented": 0.5,
+     "ci_low": 0.5,
+     "ci_high": 0.5,
+     "orientation": -1
+    }
+   }
+  },
+  "last": {
+   "tokens": 658,
+   "features": {
+    "attention_entropy": {
+     "auc_oriented": 0.7818,
+     "ci_low": 0.7378,
+     "ci_high": 0.823,
+     "orientation": 1
+    },
+    "ctx_attention_mass": {
+     "auc_oriented": 0.4391,
+     "ci_low": 0.3903,
+     "ci_high": 0.4889,
+     "orientation": -1
+    },
+    "embedding_density": {
+     "auc_oriented": 0.6221,
+     "ci_low": 0.5647,
+     "ci_high": 0.6773,
+     "orientation": 1
+    },
+    "mass_per_context_token": {
+     "auc_oriented": 0.5345,
+     "ci_low": 0.4758,
+     "ci_high": 0.5929,
+     "orientation": -1
+    },
+    "mass_per_answer_token": {
+     "auc_oriented": 0.4623,
+     "ci_low": 0.3986,
+     "ci_high": 0.527,
+     "orientation": -1
+    },
+    "position": {
+     "auc_oriented": 0.8529,
+     "ci_low": 0.821,
+     "ci_high": 0.8821,
+     "orientation": 1
+    },
+    "evidence_distance": {
+     "auc_oriented": 0.795,
+     "ci_low": 0.7469,
+     "ci_high": 0.842,
+     "orientation": 1
+    },
+    "number_support": {
+     "auc_oriented": 0.4754,
+     "ci_low": 0.449,
+     "ci_high": 0.4981,
+     "orientation": -1
+    },
+    "unit_support": {
+     "auc_oriented": 0.5045,
+     "ci_low": 0.5009,
+     "ci_high": 0.5089,
+     "orientation": -1
+    },
+    "negation_conflict": {
+     "auc_oriented": 0.543,
+     "ci_low": 0.4903,
+     "ci_high": 0.5947,
+     "orientation": 1
+    },
+    "modality_conflict": {
+     "auc_oriented": 0.5,
+     "ci_low": 0.5,
+     "ci_high": 0.5,
+     "orientation": 1
+    },
+    "date_support": {
+     "auc_oriented": 0.5,
+     "ci_low": 0.5,
+     "ci_high": 0.5,
+     "orientation": -1
+    }
+   }
+  }
+ },
+ "iterations": [
+  {
+   "iteration": "1-baseline",
+   "added_features": [],
+   "auc": 0.85,
+   "ci_low": 0.8149,
+   "ci_high": 0.8834,
+   "features_used": 12
+  },
+  {
+   "iteration": "2-mass-normalized",
+   "added_features": [
+    "mass_per_context_token",
+    "mass_per_answer_token"
+   ],
+   "auc": 0.8718,
+   "ci_low": 0.8424,
+   "ci_high": 0.8981,
+   "features_used": 12
+  },
+  {
+   "iteration": "3-position-evidence",
+   "added_features": [
+    "position",
+    "evidence_distance"
+   ],
+   "auc": 0.8996,
+   "ci_low": 0.8708,
+   "ci_high": 0.9242,
+   "features_used": 12
+  },
+  {
+   "iteration": "4-lexical-semantic",
+   "added_features": [
+    "number_support",
+    "unit_support",
+    "negation_conflict",
+    "modality_conflict",
+    "date_support"
+   ],
+   "auc": 0.7618,
+   "ci_low": 0.7113,
+   "ci_high": 0.8086,
+   "features_used": 12
+  }
+ ],
+ "hypothesis": {
+  "statement": "масса внимания на контекст информативнее сырой энтропии внимания",
+  "entropy_auc": 0.8312,
+  "mass_auc": 0.4868,
+  "difference": -0.3444,
+  "supported": false,
+  "note": "сравнение по AUC на отложенной части; различия меньше 0.02 считаются шумом"
+ },
+ "contrast": {
+  "first": {
+   "grounded_pairs": 23,
+   "grounded_word_overlap": 0.9468,
+   "unsupported_pairs": 14,
+   "unsupported_word_overlap": 0.6685,
+   "criterion": "≥ 0.80 для пар с опорой, ≤ 0.30 для пар без опоры"
+  },
+  "middle": {
+   "grounded_pairs": 23,
+   "grounded_word_overlap": 0.9468,
+   "unsupported_pairs": 14,
+   "unsupported_word_overlap": 0.6685,
+   "criterion": "≥ 0.80 для пар с опорой, ≤ 0.30 для пар без опоры"
+  },
+  "-4": {
+   "grounded_pairs": 23,
+   "grounded_word_overlap": 0.9468,
+   "unsupported_pairs": 14,
+   "unsupported_word_overlap": 0.6685,
+   "criterion": "≥ 0.80 для пар с опорой, ≤ 0.30 для пар без опоры"
+  },
+  "last": {
+   "grounded_pairs": 23,
+   "grounded_word_overlap": 0.9468,
+   "unsupported_pairs": 14,
+   "unsupported_word_overlap": 0.6685,
+   "criterion": "≥ 0.80 для пар с опорой, ≤ 0.30 для пар без опоры"
+  }
+ },
+ "duration_s": 288.4
+}
