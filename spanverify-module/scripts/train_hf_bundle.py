@@ -126,7 +126,9 @@ def main(argv: Sequence[str] | None = None) -> int:
         "n_train_pairs": len(pairs),
         "train_file": str(train_path),
         "folds": report.folds,
-        "head_auc_folds": [round(fold.get("auc", float("nan")), 4) for fold in report.folds if fold.get("auc") is not None],
+        "head_auc_folds": [
+            round(fold.get("auc", float("nan")), 4) for fold in report.folds if fold.get("auc") is not None
+        ],
         "threshold": bundle.threshold,
         "target_fpr": bundle.target_fpr,
         "weights": bundle.weights,

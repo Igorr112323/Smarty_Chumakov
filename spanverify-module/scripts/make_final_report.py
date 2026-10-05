@@ -108,15 +108,19 @@ def section_1(audit: dict[str, Any] | None) -> list[str]:
             "",
         ]
         return lines
-    lines += ["| № | Находка аудита | Приоритет | Что сделано | Проверка | Коммит |", "|---|---|---|---|---|---|"]
+    lines += [
+        "| № | Находка аудита | Приоритет | Статус | Что сделано (проверка) | Коммит |",
+        "|---|---|---|---|---|---|",
+    ]
     for item in audit.get("items", []):
+        evidence = str(item.get("evidence", "—")).replace("|", "/").replace("\n", " ")
         lines.append(
             "| {id} | {title} | {priority} | {status} | {evidence} | {commit} |".format(
                 id=item.get("id", "—"),
                 title=item.get("title", "—"),
                 priority=item.get("priority", "—"),
                 status=item.get("status", "—"),
-                evidence=item.get("evidence", "—"),
+                evidence=evidence,
                 commit=f"`{item.get('commit', '—')}`",
             )
         )

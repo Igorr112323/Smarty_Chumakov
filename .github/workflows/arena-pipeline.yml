@@ -213,7 +213,7 @@ jobs:
         run: |
           git config user.name "arena-pipeline"
           git config user.email "arena-pipeline@users.noreply.github.com"
-          git add -A spanverify-module/reports spanverify-module/config/participation.json || true
+          git add -A spanverify-module/reports spanverify-module/config || true
           if git diff --cached --quiet; then echo "изменений нет"; exit 0; fi
           git commit -m "шаг HF-1: прогон реальной модели (автоматический прогон CI)"
           for attempt in 1 2 3; do
@@ -270,7 +270,7 @@ jobs:
       - name: Зафиксировать результаты в ветке
         if: always()
         run: |
-          git add -A spanverify-module/reports || true
+          git add -A spanverify-module/reports spanverify-module/config || true
           if git diff --cached --quiet; then echo "изменений нет"; exit 0; fi
           git commit -m "шаг ИТОГ-1: метрики, состояние и итоговый отчёт (автоматический прогон CI)"
           for attempt in 1 2 3; do

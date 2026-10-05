@@ -33,7 +33,9 @@ def main(argv: Sequence[str] | None = None) -> int:
     parser.add_argument("--splits", default="data/corpus_a/splits")
     parser.add_argument("--mode", choices=["demo", "hf"], default="demo")
     parser.add_argument("--model", default=None)
-    parser.add_argument("--weights", default="config/weights.json", help="файл параметров (для режима hf — config/weights_hf.json)")
+    parser.add_argument(
+        "--weights", default="config/weights.json", help="файл параметров (для режима hf — config/weights_hf.json)"
+    )
     parser.add_argument("--feature-cache", default=None, help="каталог кэша признаков hf (повторный прогон без модели)")
     parser.add_argument("--splits-names", default="dev,test")
     parser.add_argument("--json", action="store_true")

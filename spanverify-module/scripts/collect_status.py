@@ -194,16 +194,74 @@ def get_path(data: Any, path: str, default: Any = None) -> Any:
     return current
 
 
-def targets_report(source: Path, metrics: dict[str, Any] | None) -> dict[str, Any]:
+def extra_facts(coverage_path: Path, pilot_path: Path, root: Path) -> dict[str, Any]:
+    """Факты для целей, которых нет в METRICS.json: покрытие, контраст, барьер чисел."""
+
+    def read_json(path: Path) -> dict[str, Any] | None:
+        if not path.is_file():
+            return None
+        try:
+            value = json.loads(path.read_text(encoding="utf-8"))
+        except json.JSONDecodeError:
+            return None
+        return value if isinstance(value, dict) else None
+
+    facts: dict[str, Any] = {}
+    coverage = read_json(coverage_path)
+    if coverage:
+        percent = (coverage.get("totals") or {}).get("percent_covered")
+        facts["coverage_percent"] = round(float(percent), 2) if isinstance(percent, (int, float)) else None
+    pilot = read_json(pilot_path)
+    if pilot:
+        contrast = pilot.get("contrast") or {}
+        grounded = contrast.get("grounded_value_copy_rate")
+        unsupported = contrast.get("unsupported_value_copy_rate")
+        if isinstance(grounded, (int, float)) and isinstance(unsupported, (int, float)):
+            facts["contrast_grounded"] = float(grounded)
+            facts["contrast_unsupported"] = float(unsupported)
+    check = subprocess.run(
+        [sys.executable, "scripts/check_numbers.py"],
+        cwd=root,
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    line = (check.stdout or "").strip().splitlines()
+    facts["check_numbers_output"] = line[0] if line else None
+    facts["check_numbers_ok"] = check.returncode == 0
+    facts["check_numbers_divergences"] = 0 if check.returncode == 0 else None
+    return facts
+
+
+def targets_report(
+    source: Path,
+    metrics: dict[str, Any] | None,
+    extras: dict[str, Any] | None = None,
+) -> dict[str, Any]:
     """Цель/факт: цель — из источника, факт — из METRICS.json по указанному пути."""
     payload = json.loads(source.read_text(encoding="utf-8")) if source.is_file() else {"items": []}
+    extras = extras or {}
     items: list[dict[str, Any]] = []
     for item in payload.get("items", []):
         fact = None
         if metrics and item.get("metric_path"):
             fact = get_path(metrics, item["metric_path"])
+        if fact is None:
+            # Цели без пути в METRICS.json: факт берётся из своего файла-источника.
+            if item.get("name", "").startswith("Покрытие автотестами"):
+                fact = extras.get("coverage_percent")
+            elif item.get("name", "").startswith("Контроль контраста"):
+                grounded = extras.get("contrast_grounded")
+                unsupported = extras.get("contrast_unsupported")
+                if grounded is not None and unsupported is not None:
+                    fact = min(grounded, 1.0 - unsupported)
+            elif item.get("name", "").startswith("Прохождение барьера"):
+                fact = extras.get("check_numbers_divergences")
         achieved = None
-        if fact is not None and item.get("compare"):
+        reason = ""
+        if fact is None:
+            reason = "нет измерения (см. источник в поле comment)"
+        elif item.get("compare"):
             target = item.get("target_value")
             if isinstance(fact, (int, float)) and isinstance(target, (int, float)):
                 achieved = fact >= target if item["compare"] == ">=" else fact <= target
@@ -212,11 +270,16 @@ def targets_report(source: Path, metrics: dict[str, Any] | None) -> dict[str, An
                 "name": item.get("name"),
                 "target": item.get("target"),
                 "fact": fact,
-                "achieved": bool(achieved) if achieved is not None else False,
+                "achieved": achieved,
+                "reason": reason,
                 "comment": item.get("comment", "") or ("измеряется в CI" if fact is None else ""),
             }
         )
-    return {"generated_at": datetime.now(timezone.utc).isoformat(), "items": items}
+    return {
+        "generated_at": datetime.now(timezone.utc).isoformat(),
+        "extras": extras,
+        "items": items,
+    }
 
 
 def review_queue_report(root: Path) -> dict[str, Any]:
@@ -259,7 +322,15 @@ def main(argv: Sequence[str] | None = None) -> int:
     metrics = json.loads(args.metrics.read_text(encoding="utf-8")) if args.metrics.is_file() else None
     audit = audit_report(args.status_source, args.audit)
     code = code_state(args.coverage)
-    targets = targets_report(args.targets, metrics)
+    pilot_path = ROOT / "reports" / "pilot_local" / "pilot.json"
+    ci_pilot = ROOT / "reports" / "pilot" / "pilot.json"
+    if ci_pilot.is_file() and not pilot_path.is_file():
+        pilot_path = ci_pilot
+    targets = targets_report(
+        args.targets,
+        metrics,
+        extra_facts(args.coverage, pilot_path, ROOT),
+    )
     review = review_queue_report(ROOT)
 
     outputs = {
