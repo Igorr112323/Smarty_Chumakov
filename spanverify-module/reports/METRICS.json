@@ -9,7 +9,7 @@
   "meta": {
     "version": "1.3.0",
     "commit": "2eedcac03b8355f6dd1a6622646fa7b79d313222",
-    "generated_at": "2026-10-05T21:15:36Z",
+    "generated_at": "2026-10-05T22:41:20Z",
     "seed": 42,
     "dataset": "data/demo_pairs.jsonl"
   },
@@ -337,8 +337,175 @@
     }
   },
   "corpus_a3_real": {
-    "available": false,
-    "note": "корпус A3 не собран: python scripts/fetch_npa_corpus.py --out data/corpus_a3 && python scripts/build_corpus_a.py --docs data/corpus_a3/sources --out data/corpus_a3 --target 1200 --seed 43 --real"
+    "available": true,
+    "dataset_version": "corpus-a3.0",
+    "real_documents": true,
+    "pairs": 1075,
+    "target": 1200,
+    "balance": {
+      "counts": {
+        "faithful": 540,
+        "contradiction": 144,
+        "partial": 44,
+        "number_attribution": 132,
+        "unconfirmed": 84,
+        "missing": 39,
+        "oversight": 32,
+        "excess": 60
+      },
+      "clean": 540,
+      "clean_share": 0.5023,
+      "min_per_mode": 40,
+      "problems": [
+        "режим missing: 39 пар — меньше 40",
+        "режим oversight: 32 пар — меньше 40"
+      ]
+    },
+    "splits": {
+      "train": 753,
+      "dev": 164,
+      "test": 158
+    },
+    "shared_groups": 0,
+    "documents": {
+      "count": 70,
+      "synthetic": false,
+      "by_type": null,
+      "by_theme": null,
+      "extraction": null
+    },
+    "sources": null,
+    "checks": {
+      "spans_checked": 535,
+      "spans_problems": 0,
+      "contexts_checked": 1075,
+      "contexts_problems": 0,
+      "number_attribution_checked": 132,
+      "number_attribution_problems": 0,
+      "plan_problems": 3
+    },
+    "sha256_pairs": "ee013089cdf8b1748ce1c0e83b22ada70f773753de74a22388307926fcb8ce88",
+    "by_split": {
+      "dev": {
+        "tokens": {
+          "precision": 0.6914,
+          "recall": 0.7437,
+          "f1": 0.7166,
+          "fpr": 0.0082,
+          "auc": 0.9357,
+          "n": 9858
+        },
+        "spans": {
+          "strict_f1": 0.2989,
+          "coverage": 0.7,
+          "soft_f1": 0.092,
+          "width_ratio": 14.59
+        },
+        "answers": {
+          "precision": 0.8462,
+          "recall": 0.275,
+          "f1": 0.4151,
+          "fpr": 0.0476,
+          "auc": 0.6137,
+          "threshold": 1.0
+        },
+        "verdicts": {
+          "tp": 73,
+          "fp": 34,
+          "fn": 7,
+          "tn": 50,
+          "precision": 0.6822,
+          "recall": 0.9125,
+          "f1": 0.7807,
+          "fpr": 0.4048
+        }
+      },
+      "test": {
+        "tokens": {
+          "precision": 0.6775,
+          "recall": 0.8095,
+          "f1": 0.7377,
+          "fpr": 0.0085,
+          "auc": 0.9802,
+          "n": 10701
+        },
+        "spans": {
+          "strict_f1": 0.0556,
+          "coverage": 0.8592,
+          "soft_f1": 0.0578,
+          "width_ratio": 12.67
+        },
+        "answers": {
+          "precision": 0.9032,
+          "recall": 0.3944,
+          "f1": 0.549,
+          "fpr": 0.0345,
+          "auc": 0.6799,
+          "threshold": 1.0
+        },
+        "verdicts": {
+          "tp": 67,
+          "fp": 47,
+          "fn": 4,
+          "tn": 40,
+          "precision": 0.5877,
+          "recall": 0.9437,
+          "f1": 0.7243,
+          "fpr": 0.5402
+        }
+      }
+    },
+    "by_mode": {
+      "contradiction": {
+        "pairs": 24,
+        "verdict_recall": 1.0,
+        "verdict_fpr": 0.0,
+        "token_f1": 0.8522,
+        "span_coverage": 1.0
+      },
+      "excess": {
+        "pairs": 6,
+        "verdict_recall": 1.0,
+        "verdict_fpr": 0.0,
+        "token_f1": 0.9375,
+        "span_coverage": 0.0
+      },
+      "faithful": {
+        "pairs": 87,
+        "verdict_recall": 0.0,
+        "verdict_fpr": 0.5402,
+        "token_f1": 0.0,
+        "span_coverage": 0.0
+      },
+      "number_attribution": {
+        "pairs": 21,
+        "verdict_recall": 0.9524,
+        "verdict_fpr": 0.0,
+        "token_f1": 0.625,
+        "span_coverage": 0.9524
+      },
+      "oversight": {
+        "pairs": 2,
+        "verdict_recall": 1.0,
+        "verdict_fpr": 0.0,
+        "token_f1": 0.875,
+        "span_coverage": 1.0
+      },
+      "partial": {
+        "pairs": 4,
+        "verdict_recall": 0.25,
+        "verdict_fpr": 0.0,
+        "token_f1": 0.2222,
+        "span_coverage": 0.25
+      },
+      "unconfirmed": {
+        "pairs": 14,
+        "verdict_recall": 1.0,
+        "verdict_fpr": 0.0,
+        "token_f1": 0.9317,
+        "span_coverage": 1.0
+      }
+    }
   },
   "corpus_b": {
     "available": true,
@@ -348,17 +515,17 @@
     "pairs": 1000,
     "our_metrics": {
       "tokens": {
-        "precision": 0.3616,
+        "precision": 0.3611,
         "recall": 0.0769,
         "f1": 0.1269,
-        "fpr": 0.0642,
+        "fpr": 0.0644,
         "auc": 0.5293
       },
       "spans": {
-        "strict_f1_iou_0_5": 0.2649,
-        "coverage": 0.5343,
-        "soft_f1_expanded": 0.3563,
-        "mean_width_ratio": 4.35
+        "strict_f1_iou_0_5": 0.0902,
+        "coverage": 0.0993,
+        "soft_f1_expanded": 0.0676,
+        "mean_width_ratio": 2.29
       },
       "answers": {
         "precision": 0.3977,
@@ -369,17 +536,265 @@
       }
     },
     "their_metrics": {
-      "rouge1": 0.5409,
-      "rouge2": 0.5334,
-      "rougeL": 0.5333,
-      "accuracy": 0.424,
-      "jaccard_score": 0.4352,
-      "hamming_loss": 0.2561,
+      "rouge1": 0.4861,
+      "rouge2": 0.4609,
+      "rougeL": 0.4679,
+      "accuracy": 0.372,
+      "jaccard_score": 0.373,
+      "hamming_loss": 0.3205,
       "empty_reference": 667,
       "pairs": 1000
     },
-    "baseline_comparison": null,
-    "baseline_note": "Сравнение с baseline статьи не выполнено: значения из Таблиц 2-4 не извлечены в этом окружении (PDF не парсился). Числа не выдумываются.",
+    "baseline_comparison": {
+      "article_url": "https://dialogue-conf.org/wp-content/uploads/2026/06/SadkovskiiFNasyrovaRSorokinA.087.pdf",
+      "article_bytes": 944040,
+      "tables": {
+        "2": {
+          "source_note": "данные из статьи, таблица 2",
+          "rows": [
+            {
+              "metric": "precision",
+              "line": "Table 2: Total benchmark binary metrics. P=Precision, R=Recall, SR=Success Rate",
+              "numbers": [
+                "2"
+              ]
+            },
+            {
+              "metric": "accuracy",
+              "line": "multi-label type classification, and span identification. Results are sorted by the accuracy metric. All",
+              "numbers": []
+            },
+            {
+              "metric": "precision",
+              "line": "precision, recall, F1-score and Jaccard metrics are macro-averaged 22.",
+              "numbers": [
+                "1",
+                "22"
+              ]
+            },
+            {
+              "metric": "f1",
+              "line": "acy 81.3, F1 78.5) with perfect format compliance, followed by Gemini-2.5-Flash (accuracy 75.2, F1",
+              "numbers": [
+                "81.3",
+                "1",
+                "78.5",
+                "2.5",
+                "75.2",
+                "1"
+              ]
+            },
+            {
+              "metric": "accuracy",
+              "line": "72.2). The proprietary GPT5.1-Pro achieves near-perfect format adherence (99.4% SR) with accuracy of",
+              "numbers": [
+                "72.2",
+                "5.1",
+                "99.4"
+              ]
+            },
+            {
+              "metric": "accuracy",
+              "line": "69.5. Y andexGPT-5.1 shows moderate performance (accuracy 54.3) with acceptable format compliance",
+              "numbers": [
+                "69.5",
+                "5.1",
+                "54.3"
+              ]
+            },
+            {
+              "metric": "accuracy",
+              "line": "detection (accuracy 65.0 and 63.0, respectively) but lower success rates (81.9 for both). GLM-4.6v",
+              "numbers": [
+                "65.0",
+                "63.0",
+                "81.9",
+                "4.6"
+              ]
+            },
+            {
+              "metric": "accuracy",
+              "line": "demonstrates competitive detection capability (accuracy 70.1) despite moderate success rate (89.5). The",
+              "numbers": [
+                "70.1",
+                "89.5"
+              ]
+            },
+            {
+              "metric": "precision",
+              "line": "reasoning-focused Kimi-k2-thinking achieves 56.4% accuracy with notably high precision (57.6) but low",
+              "numbers": [
+                "2",
+                "56.4",
+                "57.6"
+              ]
+            },
+            {
+              "metric": "recall",
+              "line": "recall (31.8) and reduced format compliance (63.9% SR).",
+              "numbers": [
+                "31.8",
+                "63.9"
+              ]
+            },
+            {
+              "metric": "accuracy",
+              "line": "herence but substantially weaker detection accuracy (41.6 and 35.5, respectively), though both maintain",
+              "numbers": [
+                "41.6",
+                "35.5"
+              ]
+            },
+            {
+              "metric": "recall",
+              "line": "high recall (54.6 and 50.9). DeepSeek-chat-v3-0324 underperforms on accuracy (37.0) with moder-",
+              "numbers": [
+                "54.6",
+                "50.9",
+                "3",
+                "0324",
+                "37.0"
+              ]
+            }
+          ]
+        },
+        "3": {
+          "source_note": "данные из статьи, таблица 3",
+          "rows": [
+            {
+              "metric": "precision",
+              "line": "Table 3: Total benchmark multi-label metrics. P=Precision, R=Recall, HL=Hamming Loss.",
+              "numbers": [
+                "3"
+              ]
+            },
+            {
+              "metric": "f1",
+              "line": "curacy 71.6, macro F1 47.0, Jaccard 34.1) with minimal Hamming Loss (7.0), confirming superior per-",
+              "numbers": [
+                "71.6",
+                "1",
+                "47.0",
+                "34.1",
+                "7.0"
+              ]
+            },
+            {
+              "metric": "f1",
+              "line": "label prediction quality. Gemini-2.5-Flash follows at a distance (accuracy 63.1, F1 31.7, Jaccard 21.9).",
+              "numbers": [
+                "2.5",
+                "63.1",
+                "1",
+                "31.7",
+                "21.9"
+              ]
+            },
+            {
+              "metric": "precision",
+              "line": "GLM-4.6v model achieves competitive accuracy (61.7) with strong precision (40.7), closely match-",
+              "numbers": [
+                "4.6",
+                "61.7",
+                "40.7"
+              ]
+            },
+            {
+              "metric": "accuracy",
+              "line": "Y andexGPT-5.1, and Kimi-k2-thinking cluster in the 51.9–58.1% accuracy range, though with varying",
+              "numbers": [
+                "5.1",
+                "2",
+                "51.9",
+                "58.1"
+              ]
+            },
+            {
+              "metric": "precision",
+              "line": "precision-recall trade-offs: T-pro-it-2.0 and gpt-oss-20b favor precision (38.8 and 41.9), while Kimi",
+              "numbers": [
+                "2.0",
+                "20",
+                "38.8",
+                "41.9"
+              ]
+            },
+            {
+              "metric": "precision",
+              "line": "shows the highest precision (48.7) but lowest recall (21.2) in this group.",
+              "numbers": [
+                "48.7",
+                "21.2"
+              ]
+            },
+            {
+              "metric": "accuracy",
+              "line": "A performance gap emerges below 20% accuracy: DeepSeek-chat-v3-0324, Llama-3.3-70B, and",
+              "numbers": [
+                "20",
+                "3",
+                "0324",
+                "3.3",
+                "70"
+              ]
+            },
+            {
+              "metric": "recall",
+              "line": "showing relatively higher recall (33.7 and 34.8). Smaller models (Gemma-3-27b-it, Y andexGPT-5-8B-",
+              "numbers": [
+                "33.7",
+                "34.8",
+                "3",
+                "27",
+                "5",
+                "8"
+              ]
+            },
+            {
+              "metric": "accuracy",
+              "line": "Span identification. Gemini-2.5-Pro achieves the highest span accuracy (71.7), Jaccard (73.6), and",
+              "numbers": [
+                "2.5",
+                "71.7",
+                "73.6"
+              ]
+            },
+            {
+              "metric": "accuracy",
+              "line": "Gemini-2.5-Flash drops to seventh place (accuracy 61.9, ROUGE-L 70.7), suggesting that span extrac-",
+              "numbers": [
+                "2.5",
+                "61.9",
+                "70.7"
+              ]
+            }
+          ]
+        },
+        "4": {
+          "source_note": "данные из статьи, таблица 4",
+          "rows": [
+            {
+              "metric": "accuracy",
+              "line": "tection, Gemini-2.5-Pro’s accuracy drops from 84.6% (SberQuAD) to 75.1% (ruSciBench), with similar",
+              "numbers": [
+                "2.5",
+                "84.6",
+                "75.1"
+              ]
+            },
+            {
+              "metric": "accuracy",
+              "line": "both datasets (below 30% accuracy).",
+              "numbers": [
+                "30"
+              ]
+            }
+          ]
+        }
+      },
+      "note": "числа взяты из текста статьи без пересчёта; источник — таблицы 2-4"
+    },
+    "baseline_note": "Сравнение с baseline статьи приведено по извлечённым из PDF числам (таблицы 2-4).",
     "disclaimer": "RusHallu-RAG — внешний тест с человеческой разметкой спанов. Числа режима demo получены лексическими суррогатами признаков и научным результатом не являются: научный вывод требует режима hf на GPU, который в этой среде не запускался.",
     "role": "только тест: обучение и калибровка на корпусе B запрещены"
   },
@@ -414,18 +829,18 @@
           "fpr": 0.9874
         },
         "spans": {
-          "strict_f1_iou_0_5": 0.0197,
-          "coverage": 0.966,
-          "soft_f1_expanded": 0.0723,
-          "mean_width_ratio": 12.54
+          "strict_f1_iou_0_5": 0.0357,
+          "coverage": 0.383,
+          "soft_f1_expanded": 0.0266,
+          "mean_width_ratio": 3.35
         },
         "their": {
           "accuracy": 0.0103,
-          "jaccard_score": 0.0103,
-          "hamming_loss": 0.1829,
-          "rouge1": 0.0777,
-          "rouge2": 0.0716,
-          "rougeL": 0.0718
+          "jaccard_score": 0.0106,
+          "hamming_loss": 0.1817,
+          "rouge1": 0.104,
+          "rouge2": 0.0715,
+          "rougeL": 0.0797
         },
         "baseline_extracted": false
       },
@@ -526,35 +941,35 @@
         "pairs": 1000,
         "limit": null,
         "tokens": {
-          "precision": 0.3616,
+          "precision": 0.3611,
           "recall": 0.0769,
           "f1": 0.1269,
-          "fpr": 0.0642,
+          "fpr": 0.0644,
           "auc": 0.5293
         },
         "answers": {
           "tp": 259,
-          "fp": 307,
+          "fp": 305,
           "fn": 74,
-          "tn": 360,
-          "precision": 0.4576,
+          "tn": 362,
+          "precision": 0.4592,
           "recall": 0.7778,
-          "f1": 0.5762,
-          "fpr": 0.4603
+          "f1": 0.5775,
+          "fpr": 0.4573
         },
         "spans": {
-          "strict_f1_iou_0_5": 0.2649,
-          "coverage": 0.5343,
-          "soft_f1_expanded": 0.3563,
-          "mean_width_ratio": 4.35
+          "strict_f1_iou_0_5": 0.0902,
+          "coverage": 0.0993,
+          "soft_f1_expanded": 0.0676,
+          "mean_width_ratio": 2.29
         },
         "their": {
-          "accuracy": 0.424,
-          "jaccard_score": 0.4352,
-          "hamming_loss": 0.2561,
-          "rouge1": 0.5409,
-          "rouge2": 0.5334,
-          "rougeL": 0.5333
+          "accuracy": 0.372,
+          "jaccard_score": 0.373,
+          "hamming_loss": 0.3205,
+          "rouge1": 0.4861,
+          "rouge2": 0.4609,
+          "rougeL": 0.4679
         },
         "baseline_extracted": false
       }
@@ -576,5 +991,5 @@
   },
   "pilot": null,
   "release": null,
-  "duration_s": 24.7
+  "duration_s": 65.8
 }
