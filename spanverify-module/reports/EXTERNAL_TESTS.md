@@ -2,7 +2,7 @@
 
 Файл сгенерирован `scripts/make_external_report.py` из `reports/external_tests.json`. Числа здесь и в JSON — одни и те же; отчёт не правится руками.
 
-Прогонов записано: 4. Дата сборки: 2026-10-03T19:21:23Z.
+Прогонов записано: 4. Дата сборки: 2026-10-05T21:39:10Z.
 
 ## 1. Источники и лицензии
 
@@ -40,10 +40,10 @@
 
 | Набор (задача) | Язык | Разметка | Режим | Пар | Наши: token F1 / FPR / AUC | Наши ответы: recall / FPR | Строгий span-F1 / накрытие | Их: accuracy / Jaccard / ROUGE-L | Baseline статьи |
 |---|---|---|---|---|---|---|---|---|---|
-| RAGTruth — QA | en | human | demo | 875 | token F1 0.204, FPR 0.169, AUC 0.717 | recall 1.000, FPR 0.987 | строгий span-F1 0.020, накрытие 0.966 | accuracy 0.010, Jaccard 0.010, ROUGE-L 0.072 | не извлечено |
+| RAGTruth — QA | en | human | demo | 875 | token F1 0.206, FPR 0.166, AUC 0.716 | recall 1.000, FPR 0.987 | строгий span-F1 0.003, накрытие 0.004 | accuracy 0.010, Jaccard 0.010, ROUGE-L 0.037 | не извлечено |
 | RAGTruth — Summary | en | human | demo | 900 | token F1 0.113, FPR 0.102, AUC 0.644 | recall 1.000, FPR 0.981 | строгий span-F1 0.021, накрытие 0.873 | accuracy 0.017, Jaccard 0.017, ROUGE-L 0.079 | не извлечено |
 | RAGTruth — Data2txt | en | human | demo | 900 | token F1 0.101, FPR 0.329, AUC 0.591 | recall 1.000, FPR 1.000 | строгий span-F1 0.000, накрытие 0.983 | accuracy 0.000, Jaccard 0.000, ROUGE-L 0.063 | не извлечено |
-| RusHallu-RAG — все задачи | ru | human | demo | 1000 | token F1 0.127, FPR 0.064, AUC 0.529 | recall 0.778, FPR 0.460 | строгий span-F1 0.265, накрытие 0.534 | accuracy 0.424, Jaccard 0.435, ROUGE-L 0.533 | не извлечено |
+| RusHallu-RAG — все задачи | ru | human | demo | 1000 | token F1 0.127, FPR 0.063, AUC 0.530 | recall 0.769, FPR 0.426 | строгий span-F1 0.003, накрытие 0.000 | accuracy 0.383, Jaccard 0.383, ROUGE-L 0.414 | не извлечено |
 
 Разметка в колонке «Разметка» — происхождение меток: human (человек), llm (модель), auto (автоматика).
 

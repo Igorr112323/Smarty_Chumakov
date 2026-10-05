@@ -1,0 +1,265 @@
+{
+  "url": "https://dialogue-conf.org/wp-content/uploads/2026/06/SadkovskiiFNasyrovaRSorokinA.087.pdf",
+  "status": 200,
+  "content_type": "application/pdf",
+  "bytes": 944040,
+  "error": null,
+  "extracted": true,
+  "tables": {
+    "2": {
+      "page": 8,
+      "title": "Table 2",
+      "fragment": "Table 2: Total benchmark binary metrics. P=Precision, R=Recall, SR=Success Rate\nTo enable automated evaluation, models were constrained to output a structured JSON array. Each\narray contains objects with two fields:\n• span: The exact text substring containing a hallucination (null if none).\n• type: One of Contradiction, Unconfirmed, Excess, Partial, Missing, Oversight (null if no hallucin-\nation).\nThis format ensures consistent parsing and metric computation across all baselines.\n8 Results\nTables 2, 3 and 4 present evaluation results across the three subtasks: binary hallucination detection,\nmulti-label type classification, and span identification. Results are sorted by the accuracy metric. All\nprecision, recall, F1-score and Jaccard metrics are macro-averaged 22.\n8.1 Overall Performance\nBinary hallucination detection. Gemini-2.5-Pro achieves the highest binary performance (accur-\nacy 81.3, F1 78.5) with perfect format compliance, followed by Gemini-2.5-Flash (accuracy 75.2, F1\n72.2). The proprietary GPT5.1-Pro achieves near-perfect format adherence (99.4% SR) with accuracy of\n69.5. Y andexGPT-5.1 shows moderate performance (accuracy 54.3) with acceptable format compliance\n(73.5% SR).\nOpen-source models show significant variation: T-pro-it-2.0 and gpt-oss-20b demonstrate reasonable\ndetection (accuracy 65.0 and 63.0, respectively) but lower success rates (81.9 for both). GLM-4.6v\ndemonstrates competitive detection capability (accuracy 70.1) despite moderate success rate (89.5). The\nreasoning-focused Kimi-k2-thinking achieves 56.4% accuracy with notably high precision (57.6) but low\nrecall (31.8) and reduced format compliance (63.9% SR).\nLarger models exhibit divergent behavior: Llama-3.3-70B and Qwen3-235B attain perfect format ad-\nherence but substantially weaker detection accuracy (41.6 and 35.5, respectively), though both maintain\nhigh recall (54.6 and 50.9). DeepSeek-chat-v3-0324 underperforms on accuracy (37.0) with moder-\nate format compliance (79.7% SR). Small",
+      "title_found": true
+    },
+    "3": {
+      "page": 9,
+      "title": "Table 3",
+      "fragment": "Table 3: Total benchmark multi-label metrics. P=Precision, R=Recall, HL=Hamming Loss.\nMulti-label type classification. Gemini-2.5-Pro dominates multi-label classification (exact match ac-\ncuracy 71.6, macro F1 47.0, Jaccard 34.1) with minimal Hamming Loss (7.0), confirming superior per-\nlabel prediction quality. Gemini-2.5-Flash follows at a distance (accuracy 63.1, F1 31.7, Jaccard 21.9).\nGLM-4.6v model achieves competitive accuracy (61.7) with strong precision (40.7), closely match-\ning the Flash variant. Among the remaining top-tier models, T-pro-it-2.0, gpt-oss-20b, GPT5.1-Pro,\nY andexGPT-5.1, and Kimi-k2-thinking cluster in the 51.9–58.1% accuracy range, though with varying\nprecision-recall trade-offs: T-pro-it-2.0 and gpt-oss-20b favor precision (38.8 and 41.9), while Kimi\nshows the highest precision (48.7) but lowest recall (21.2) in this group.\nA performance gap emerges below 20% accuracy: DeepSeek-chat-v3-0324, Llama-3.3-70B, and\nQwen3-235B achieve accuracies of 17.3%, 16.1%, and 11.4% respectively, with DeepSeek and Qwen\nshowing relatively higher recall (33.7 and 34.8). Smaller models (Gemma-3-27b-it, Y andexGPT-5-8B-\nLite, Qwen3-8B, T-lite-it-2.1) achieve accuracies below 7%, indicating severe difficulty with fine-grained\ntype discrimination. Overall low Jaccard scores (3.8–34.1) across all models reflect the inherent difficulty\nof multi-label hallucination type classification.\nSpan identification. Gemini-2.5-Pro achieves the highest span accuracy (71.7), Jaccard (73.6), and\nROUGE-L (79.4), establishing a clear performance ceiling. The next tier—comprising gpt-oss-20b,\nT-pro-it-2.0, GLM-4.6v, Kimi-k2-thinking, and Y andexGPT-5.1—delivers competitive span extraction\nwith accuracies between 63.8 and 67.7% and ROUGE-L scores ranging from 65.2 to 72.2. Notably,\nGemini-2.5-Flash drops to seventh place (accuracy 61.9, ROUGE-L 70.7), suggesting that span extrac-\ntion benefits less from the Flash optimization compared to classification tasks. GPT5.1-Pro shows mod",
+      "title_found": true
+    },
+    "4": {
+      "page": 10,
+      "title": "Table 4",
+      "fragment": "Table 4: Total benchmark span-based metrics. HL=Hamming Loss.\ntection, Gemini-2.5-Pro’s accuracy drops from 84.6% (SberQuAD) to 75.1% (ruSciBench), with similar\npatterns observed across top models: Gemini-2.5-Flash drops from 79.8% to 66.4%, GLM-4.6v from\n76.8% to 57.4%, and GPT5.1-Pro from 73.4% to 62.0%.\nThe difficulty gap is even more pronounced for multi-label classification: Gemini-2.5-Pro shows a 21.2\npercentage point drop (78.9% to 57.7%), while Gemini-2.5-Flash drops 28.7 points (73.0% to 44.3%).\nThis pattern holds across most models, with SberQuAD multi-label accuracies consistently 20–35 per-\ncentage points higher than ruSciBench. The only exceptions are models already performing poorly on\nboth datasets (below 30% accuracy).\nSpan identification shows the largest complexity gap: Gemini-2.5-Pro drops 22.3 points (79.4% to\n57.1%), Gemini-2.5-Flash drops 29.9 points (72.2% to 42.3%), and gpt-oss-20b drops 27.2 points (77.1%\nto 49.9%). This validates our perturbation strategy and highlights the added challenge of scientific ter-\nminology, domain-specific reasoning, and precise boundary identification in specialized contexts.\nNotably, some models show extreme asymmetry: Kimi-k2-thinking achieves 76.0% on SberQuAD\nbinary detection but only 19.1% on ruSciBench—a 56.9 point gap, the largest observed. This suggests\ncertain models may overfit to general knowledge patterns and fail to transfer reasoning capabilities to\nscientific domains.\nModel consistency. Top-performing models (Gemini-2.5-Pro, Gemini-2.5-Flash, GLM-4.6v) main-\ntain consistent ranking across all task-dataset combinations. The middle tier (T-pro-it-2.0, gpt-oss-20b,\nGPT5.1-Pro) shows moderate robustness with performance drops of 27–35 points between datasets.\nKimi-k2-thinking exhibits the most inconsistent behavior: strong SberQuAD performance (76.0%,\n71.6%, 74.8%) contrasts sharply with severe ruSciBench degradation (19.1%, 14.5%, 47.0%), indicating\nbrittleness to domain shift despite reasoning-focus",
+      "title_found": true
+    }
+  },
+  "rows": {
+    "2": [
+      {
+        "metric": "precision",
+        "line": "Table 2: Total benchmark binary metrics. P=Precision, R=Recall, SR=Success Rate",
+        "numbers": [
+          "2"
+        ]
+      },
+      {
+        "metric": "accuracy",
+        "line": "multi-label type classification, and span identification. Results are sorted by the accuracy metric. All",
+        "numbers": []
+      },
+      {
+        "metric": "precision",
+        "line": "precision, recall, F1-score and Jaccard metrics are macro-averaged 22.",
+        "numbers": [
+          "1",
+          "22"
+        ]
+      },
+      {
+        "metric": "f1",
+        "line": "acy 81.3, F1 78.5) with perfect format compliance, followed by Gemini-2.5-Flash (accuracy 75.2, F1",
+        "numbers": [
+          "81.3",
+          "1",
+          "78.5",
+          "2.5",
+          "75.2",
+          "1"
+        ]
+      },
+      {
+        "metric": "accuracy",
+        "line": "72.2). The proprietary GPT5.1-Pro achieves near-perfect format adherence (99.4% SR) with accuracy of",
+        "numbers": [
+          "72.2",
+          "5.1",
+          "99.4"
+        ]
+      },
+      {
+        "metric": "accuracy",
+        "line": "69.5. Y andexGPT-5.1 shows moderate performance (accuracy 54.3) with acceptable format compliance",
+        "numbers": [
+          "69.5",
+          "5.1",
+          "54.3"
+        ]
+      },
+      {
+        "metric": "accuracy",
+        "line": "detection (accuracy 65.0 and 63.0, respectively) but lower success rates (81.9 for both). GLM-4.6v",
+        "numbers": [
+          "65.0",
+          "63.0",
+          "81.9",
+          "4.6"
+        ]
+      },
+      {
+        "metric": "accuracy",
+        "line": "demonstrates competitive detection capability (accuracy 70.1) despite moderate success rate (89.5). The",
+        "numbers": [
+          "70.1",
+          "89.5"
+        ]
+      },
+      {
+        "metric": "precision",
+        "line": "reasoning-focused Kimi-k2-thinking achieves 56.4% accuracy with notably high precision (57.6) but low",
+        "numbers": [
+          "2",
+          "56.4",
+          "57.6"
+        ]
+      },
+      {
+        "metric": "recall",
+        "line": "recall (31.8) and reduced format compliance (63.9% SR).",
+        "numbers": [
+          "31.8",
+          "63.9"
+        ]
+      },
+      {
+        "metric": "accuracy",
+        "line": "herence but substantially weaker detection accuracy (41.6 and 35.5, respectively), though both maintain",
+        "numbers": [
+          "41.6",
+          "35.5"
+        ]
+      },
+      {
+        "metric": "recall",
+        "line": "high recall (54.6 and 50.9). DeepSeek-chat-v3-0324 underperforms on accuracy (37.0) with moder-",
+        "numbers": [
+          "54.6",
+          "50.9",
+          "3",
+          "0324",
+          "37.0"
+        ]
+      }
+    ],
+    "3": [
+      {
+        "metric": "precision",
+        "line": "Table 3: Total benchmark multi-label metrics. P=Precision, R=Recall, HL=Hamming Loss.",
+        "numbers": [
+          "3"
+        ]
+      },
+      {
+        "metric": "f1",
+        "line": "curacy 71.6, macro F1 47.0, Jaccard 34.1) with minimal Hamming Loss (7.0), confirming superior per-",
+        "numbers": [
+          "71.6",
+          "1",
+          "47.0",
+          "34.1",
+          "7.0"
+        ]
+      },
+      {
+        "metric": "f1",
+        "line": "label prediction quality. Gemini-2.5-Flash follows at a distance (accuracy 63.1, F1 31.7, Jaccard 21.9).",
+        "numbers": [
+          "2.5",
+          "63.1",
+          "1",
+          "31.7",
+          "21.9"
+        ]
+      },
+      {
+        "metric": "precision",
+        "line": "GLM-4.6v model achieves competitive accuracy (61.7) with strong precision (40.7), closely match-",
+        "numbers": [
+          "4.6",
+          "61.7",
+          "40.7"
+        ]
+      },
+      {
+        "metric": "accuracy",
+        "line": "Y andexGPT-5.1, and Kimi-k2-thinking cluster in the 51.9–58.1% accuracy range, though with varying",
+        "numbers": [
+          "5.1",
+          "2",
+          "51.9",
+          "58.1"
+        ]
+      },
+      {
+        "metric": "precision",
+        "line": "precision-recall trade-offs: T-pro-it-2.0 and gpt-oss-20b favor precision (38.8 and 41.9), while Kimi",
+        "numbers": [
+          "2.0",
+          "20",
+          "38.8",
+          "41.9"
+        ]
+      },
+      {
+        "metric": "precision",
+        "line": "shows the highest precision (48.7) but lowest recall (21.2) in this group.",
+        "numbers": [
+          "48.7",
+          "21.2"
+        ]
+      },
+      {
+        "metric": "accuracy",
+        "line": "A performance gap emerges below 20% accuracy: DeepSeek-chat-v3-0324, Llama-3.3-70B, and",
+        "numbers": [
+          "20",
+          "3",
+          "0324",
+          "3.3",
+          "70"
+        ]
+      },
+      {
+        "metric": "recall",
+        "line": "showing relatively higher recall (33.7 and 34.8). Smaller models (Gemma-3-27b-it, Y andexGPT-5-8B-",
+        "numbers": [
+          "33.7",
+          "34.8",
+          "3",
+          "27",
+          "5",
+          "8"
+        ]
+      },
+      {
+        "metric": "accuracy",
+        "line": "Span identification. Gemini-2.5-Pro achieves the highest span accuracy (71.7), Jaccard (73.6), and",
+        "numbers": [
+          "2.5",
+          "71.7",
+          "73.6"
+        ]
+      },
+      {
+        "metric": "accuracy",
+        "line": "Gemini-2.5-Flash drops to seventh place (accuracy 61.9, ROUGE-L 70.7), suggesting that span extrac-",
+        "numbers": [
+          "2.5",
+          "61.9",
+          "70.7"
+        ]
+      }
+    ],
+    "4": [
+      {
+        "metric": "accuracy",
+        "line": "tection, Gemini-2.5-Pro’s accuracy drops from 84.6% (SberQuAD) to 75.1% (ruSciBench), with similar",
+        "numbers": [
+          "2.5",
+          "84.6",
+          "75.1"
+        ]
+      },
+      {
+        "metric": "accuracy",
+        "line": "both datasets (below 30% accuracy).",
+        "numbers": [
+          "30"
+        ]
+      }
+    ]
+  },
+  "note": "числа взяты из текста статьи (таблицы 2-4); ничего не пересчитано",
+  "pages": 19
+}
