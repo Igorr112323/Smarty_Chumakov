@@ -49,13 +49,13 @@
       "param": "SignatoryAuthorityId",
       "status": 400,
       "recognized": true,
-      "body_head": "{\"type\":\"https://tools.ietf.org/html/rfc7231#section-6.5.1\",\"title\":\"One or more validation errors occurred.\",\"status\":400,\"traceId\":\"|bc0cc04f-4c8ce2c17565247f.\",\"errors\":{\"SignatoryAuthorityId\":[\"The value 'неверное_значение' is not valid for SignatoryAuthorityId.\"]}}"
+      "body_head": "{\"type\":\"https://tools.ietf.org/html/rfc7231#section-6.5.1\",\"title\":\"One or more validation errors occurred.\",\"status\":400,\"traceId\":\"|bc0d49fe-4c8ce2c17565247f.\",\"errors\":{\"SignatoryAuthorityId\":[\"The value 'неверное_значение' is not valid for SignatoryAuthorityId.\"]}}"
     },
     {
       "param": "DocumentTypes",
       "status": 400,
       "recognized": true,
-      "body_head": "{\"type\":\"https://tools.ietf.org/html/rfc7231#section-6.5.1\",\"title\":\"One or more validation errors occurred.\",\"status\":400,\"traceId\":\"|d5ad7516-4d71c4d6a7267f4b.\",\"errors\":{\"DocumentTypes\":[\"The value 'неверное_значение' is not valid.\"]}}"
+      "body_head": "{\"type\":\"https://tools.ietf.org/html/rfc7231#section-6.5.1\",\"title\":\"One or more validation errors occurred.\",\"status\":400,\"traceId\":\"|2cf1fb83-49a6dd5edfc51f53.\",\"errors\":{\"DocumentTypes\":[\"The value 'неверное_значение' is not valid.\"]}}"
     },
     {
       "param": "PageSize",
