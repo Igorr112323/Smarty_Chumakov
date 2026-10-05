@@ -8,8 +8,8 @@
   },
   "meta": {
     "version": "1.3.0",
-    "commit": "2eedcac03b8355f6dd1a6622646fa7b79d313222",
-    "generated_at": "2026-10-05T20:35:50Z",
+    "commit": "39453a6d22c29d07b0101dfe7778ec45fe81a074",
+    "generated_at": "2026-10-05T20:52:12Z",
     "seed": 42,
     "dataset": "data/demo_pairs.jsonl"
   },
@@ -575,6 +575,15 @@
     }
   },
   "pilot": null,
-  "release": null,
-  "duration_s": 27.6
+  "release": {
+    "dir": "release",
+    "artifacts": [
+      {
+        "name": "spanverify.pyz",
+        "size_bytes": 593578,
+        "sha256": "933ab94a4366b201f7c3a45bb7995780b1c71d7bdb7774372f008b24d4effe11"
+      }
+    ]
+  },
+  "duration_s": 28.1
 }
