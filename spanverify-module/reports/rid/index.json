@@ -1,0 +1,56 @@
+{
+ "status": "draft_not_submitted",
+ "note": "ЧЕРНОВИК. НЕ ПОДАНО. Документ подготовлен автоматически для ручного заполнения.",
+ "documents": [
+  "OPIS_deponiruemyh_materialov.md",
+  "ZAYAVKA_baza_dannyh.md",
+  "ZAYAVKA_programma_EVM.md"
+ ],
+ "stats": {
+  "modules": [
+   "spanverify/__init__.py",
+   "spanverify/__main__.py",
+   "spanverify/_version.py",
+   "spanverify/api.py",
+   "spanverify/bounds.py",
+   "spanverify/calibration.py",
+   "spanverify/cli.py",
+   "spanverify/config.py",
+   "spanverify/core.py",
+   "spanverify/corpus_alt.py",
+   "spanverify/coverage.py",
+   "spanverify/dataset.py",
+   "spanverify/demo_data.py",
+   "spanverify/detector.py",
+   "spanverify/engine.py",
+   "spanverify/external_datasets.py",
+   "spanverify/feature_pack.py",
+   "spanverify/features.py",
+   "spanverify/hfmodel.py",
+   "spanverify/lexicon.py",
+   "spanverify/logreg.py",
+   "spanverify/normalize.py",
+   "spanverify/participation.py",
+   "spanverify/rushallu_metrics.py",
+   "spanverify/server.py",
+   "spanverify/text.py",
+   "spanverify/train.py",
+   "spanverify/training.py",
+   "spanverify/vectors.py",
+   "spanverify/webui.py",
+   "spanverify/backends/__init__.py",
+   "spanverify/backends/base.py",
+   "spanverify/backends/hf.py",
+   "spanverify/backends/surrogate.py"
+  ],
+  "module_count": 34,
+  "lines": 10920,
+  "test_files": 31,
+  "script_files": 44
+ },
+ "human_fields_required": [
+  "правообладатель",
+  "автор(ы)",
+  "дата приоритета"
+ ]
+}

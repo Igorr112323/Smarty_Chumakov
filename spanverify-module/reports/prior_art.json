@@ -1,0 +1,601 @@
+{
+ "generated_at": "2026-10-05T19:23:05.541607+00:00",
+ "user_agent": "SpanVerify-prior-art/1.0 (research; contact: repository issues)",
+ "note": "Результаты сохранены как есть, без интерпретации. Недоступность источника фиксируется кодом ответа и текстом ошибки; выводы делает человек.",
+ "topics": {
+  "детекция галлюцинаций": {
+   "query": "hallucination detection retrieval augmented generation",
+   "openalex": {
+    "status": 200,
+    "error": null,
+    "url": "https://api.openalex.org/works?search=hallucination+detection+retrieval+augmented+generation&per-page=5&mailto=spanverify%40example.invalid",
+    "found": [
+     {
+      "title": "Numerical Hallucinations in Retrieval-Augmented Generation: Detection and Analysis",
+      "year": 2026,
+      "doi": "https://doi.org/10.1145/3805712.3809882",
+      "cited_by": 0,
+      "url": "https://doi.org/10.1145/3805712.3809882"
+     },
+     {
+      "title": "Evidence-Aligned Entity Verification for Hallucination Detection in Retrieval-Augmented Generation",
+      "year": 2026,
+      "doi": "https://doi.org/10.18653/v1/2026.findings-acl.1477",
+      "cited_by": 0,
+      "url": "https://doi.org/10.18653/v1/2026.findings-acl.1477"
+     },
+     {
+      "title": "Evidence-Aligned Entity Verification for Hallucination Detection in Retrieval-Augmented Generation",
+      "year": 2026,
+      "doi": "https://doi.org/10.48448/hkk7-xw83",
+      "cited_by": 0,
+      "url": "https://doi.org/10.48448/hkk7-xw83"
+     },
+     {
+      "title": "Bi'an: A Bilingual Benchmark and Model for Hallucination Detection in Retrieval-Augmented Generation",
+      "year": 2025,
+      "doi": "https://doi.org/10.48550/arxiv.2502.19209",
+      "cited_by": 0,
+      "url": "http://arxiv.org/abs/2502.19209"
+     },
+     {
+      "title": "ContextCheck: A Self-Consistency Framework for Hallucination Detection in Retrieval-Augmented Generation Systems",
+      "year": 2026,
+      "doi": "https://doi.org/10.1109/isiber68248.2026.11470068",
+      "cited_by": 1,
+      "url": "https://doi.org/10.1109/isiber68248.2026.11470068"
+     }
+    ]
+   },
+   "crossref": {
+    "status": 200,
+    "error": null,
+    "url": "https://api.crossref.org/works?query=hallucination+detection+retrieval+augmented+generation&rows=5",
+    "found": [
+     {
+      "title": "FaithGate: A Proposed Architecture for Real-Time Hallucination Detection and Correction in Retrieval-Augmented Generation Systems",
+      "container": null,
+      "year": 2026,
+      "doi": "10.2139/ssrn.7242858",
+      "url": "https://doi.org/10.2139/ssrn.7242858"
+     },
+     {
+      "title": "Genomic Convergence Verification: A Multi-Agent Framework for Hallucination Detection in Retrieval-Augmented Generation. Overcoming Gödel's Limitation Through Multi-System Convergence.",
+      "container": null,
+      "year": 2026,
+      "doi": "10.24108/preprints-3116223",
+      "url": "https://doi.org/10.24108/preprints-3116223"
+     },
+     {
+      "title": "Evaluating hallucination Mitigation in Retrieval-Augmented Generation Systems through Guarded Response Strategies, Embedding Comparison, and Retrieval Depth Analysis",
+      "container": null,
+      "year": 2026,
+      "doi": "10.2139/ssrn.6702638",
+      "url": "https://doi.org/10.2139/ssrn.6702638"
+     },
+     {
+      "title": "Retrieval-Augmented Generation (RAG) vs. Fine-Tuning: A Systematic Review of Hallucination Mitigation in Medical LLMs",
+      "container": null,
+      "year": 2026,
+      "doi": "10.22541/au.176903295.54191070/v1",
+      "url": "https://doi.org/10.22541/au.176903295.54191070/v1"
+     },
+     {
+      "title": "DynamiRAG: Dynamic Memory Retrieval-Augmented Generation with Entropy-Aware Hallucination Prediction",
+      "container": null,
+      "year": 2026,
+      "doi": "10.2139/ssrn.6329665",
+      "url": "https://doi.org/10.2139/ssrn.6329665"
+     }
+    ]
+   },
+   "github": {
+    "status": 200,
+    "error": null,
+    "url": "https://api.github.com/search/repositories?q=hallucination+detection+retrieval+augmented+generation&per_page=5&sort=stars&order=desc",
+    "found": [
+     {
+      "name": "nipa-analytics/Clinical-LLM-RAG-Pipeline-FHIR-RAG-Safety-Evaluation-",
+      "stars": 4,
+      "language": "Jupyter Notebook",
+      "description": "A production-style **Clinical Retrieval-Augmented Generation (RAG) system** that converts **FHIR R4 patient data into structured clinical narratives**, enables **semantic search via vector embeddings*",
+      "url": "https://github.com/nipa-analytics/Clinical-LLM-RAG-Pipeline-FHIR-RAG-Safety-Evaluation-",
+      "updated": "2026-07-06T08:49:01Z"
+     },
+     {
+      "name": "zhutianning/Hallucination-detection-for-RAG",
+      "stars": 3,
+      "language": "Jupyter Notebook",
+      "description": "This project aims to design and implement a hallucination detection and evaluation pipeline for Retrieval- Augmented Generation (RAG) systems processing multi-modal financial reports (text, tables, im",
+      "url": "https://github.com/zhutianning/Hallucination-detection-for-RAG",
+      "updated": "2026-08-22T08:04:08Z"
+     },
+     {
+      "name": "mirofadlalla/DeepRAG",
+      "stars": 3,
+      "language": "Jupyter Notebook",
+      "description": "A production-grade Retrieval-Augmented Generation (RAG) system designed with real-world AI engineering practices in mind. The project goes beyond basic RAG implementations by introducing systematic be",
+      "url": "https://github.com/mirofadlalla/DeepRAG",
+      "updated": "2026-06-15T19:46:06Z"
+     },
+     {
+      "name": "anshpandey0390/Intelligent-Vulnerability-Detector",
+      "stars": 3,
+      "language": "Python",
+      "description": "An offline, privacy-preserving Retrieval-Augmented Generation (RAG) pipeline for intelligent C/C++ vulnerability detection. Built with local LLMs (Llama 3.2), FAISS vector search, and the DiverseVul d",
+      "url": "https://github.com/anshpandey0390/Intelligent-Vulnerability-Detector",
+      "updated": "2026-04-25T16:59:05Z"
+     },
+     {
+      "name": "nourhan-ali-ml/Healthcare-RAG-Assistant",
+      "stars": 2,
+      "language": "Python",
+      "description": "Production-ready healthcare-focused Retrieval-Augmented Generation (RAG) system with evaluation and hallucination detection.",
+      "url": "https://github.com/nourhan-ali-ml/Healthcare-RAG-Assistant",
+      "updated": "2026-09-26T17:12:42Z"
+     }
+    ]
+   },
+   "patents": {
+    "status": 500,
+    "error": "HTTP 500: Internal Server Error",
+    "url": "https://patents.google.com/xhr/query?url=q%253Dhallucination%2520detection%2520retrieval%2520augmented%2520generation%2526num%253D5&exp=",
+    "found": []
+   }
+  },
+  "атрибуция ответа": {
+   "query": "attribution of generated text to source documents",
+   "openalex": {
+    "status": 200,
+    "error": null,
+    "url": "https://api.openalex.org/works?search=attribution+of+generated+text+to+source+documents&per-page=5&mailto=spanverify%40example.invalid",
+    "found": [
+     {
+      "title": "Source Attribution for Large Language Model-Generated Data",
+      "year": 2023,
+      "doi": "https://doi.org/10.48550/arxiv.2310.00646",
+      "cited_by": 6,
+      "url": "http://arxiv.org/abs/2310.00646"
+     },
+     {
+      "title": "Attribute First, then Generate: Locally-attributable Grounded Text Generation",
+      "year": 2024,
+      "doi": "https://doi.org/10.18653/v1/2024.acl-long.182",
+      "cited_by": 14,
+      "url": "https://doi.org/10.18653/v1/2024.acl-long.182"
+     },
+     {
+      "title": "Degradation of Stylometric Attribution Accuracy for AI-Generated Text",
+      "year": 2026,
+      "doi": "https://doi.org/10.3390/engproc2026150098",
+      "cited_by": 1,
+      "url": "https://doi.org/10.3390/engproc2026150098"
+     },
+     {
+      "title": "Assessing the Stylistic Properties of Neurally Generated Text in Authorship Attribution",
+      "year": 2017,
+      "doi": "https://doi.org/10.18653/v1/w17-4914",
+      "cited_by": 10,
+      "url": "https://doi.org/10.18653/v1/w17-4914"
+     },
+     {
+      "title": "MAVIS: A Benchmark for Multimodal Source Attribution in Long-form Visual Question Answering",
+      "year": 2026,
+      "doi": "https://doi.org/10.1609/aaai.v40i39.40585",
+      "cited_by": 1,
+      "url": "https://doi.org/10.1609/aaai.v40i39.40585"
+     }
+    ]
+   },
+   "crossref": {
+    "status": 200,
+    "error": null,
+    "url": "https://api.crossref.org/works?query=attribution+of+generated+text+to+source+documents&rows=5",
+    "found": [
+     {
+      "title": "Source Attribution for Images Generated by Diffusion-Based Text-to-Image Models: Exploring the Forensics Approach",
+      "container": "2024 Asia Pacific Signal and Information Processing Association Annual Summit and Conference (APSIPA ASC)",
+      "year": 2024,
+      "doi": "10.1109/apsipaasc63619.2025.10849098",
+      "url": "https://doi.org/10.1109/apsipaasc63619.2025.10849098"
+     },
+     {
+      "title": "AI Generated Text Detection &amp; Source Identification",
+      "container": null,
+      "year": null,
+      "doi": "10.31979/etd.dvr7-kbxs",
+      "url": "https://doi.org/10.31979/etd.dvr7-kbxs"
+     },
+     {
+      "title": "Metacognitive Confidence, AI Familiarity, and Heuristic Judgment in AI-Generated Text Attribution: An Exploratory Study Among Undergraduate Students",
+      "container": null,
+      "year": 2026,
+      "doi": "10.31234/osf.io/f6wev_v1",
+      "url": "https://doi.org/10.31234/osf.io/f6wev_v1"
+     },
+     {
+      "title": "Leveraging Explainable AI for LLM Text Attribution: Differentiating Human-Written and Multiple LLM-Generated Text",
+      "container": "Information",
+      "year": 2025,
+      "doi": "10.3390/info16090767",
+      "url": "https://doi.org/10.3390/info16090767"
+     },
+     {
+      "title": "Beyond Text: Using AI-Generated Visual Conjoints to Study Gender and Housework Attribution",
+      "container": "Sociological Science",
+      "year": 2026,
+      "doi": "10.15195/v13.a26",
+      "url": "https://doi.org/10.15195/v13.a26"
+     }
+    ]
+   },
+   "github": {
+    "status": 200,
+    "error": null,
+    "url": "https://api.github.com/search/repositories?q=attribution+of+generated+text+to+source+documents&per_page=5&sort=stars&order=desc",
+    "found": [
+     {
+      "name": "mohittomar2008/Global-Power-Plant-Database",
+      "stars": 6,
+      "language": "Jupyter Notebook",
+      "description": "Problem Statement: Description  The Global Power Plant Database is a comprehensive, open source database of power plants around the world. It centralizes power plant data to make it easier to navigate",
+      "url": "https://github.com/mohittomar2008/Global-Power-Plant-Database",
+      "updated": "2025-12-31T15:18:10Z"
+     },
+     {
+      "name": "admin1i/https---apps.facebook.com-artexas--by_",
+      "stars": 5,
+      "language": null,
+      "description": "       Apache License                            Version 2.0, January 2004                         http://www.apache.org/licenses/     TERMS AND CONDITIONS FOR USE, REPRODUCTION, AND DISTRIBUTION     ",
+      "url": "https://github.com/admin1i/https---apps.facebook.com-artexas--by_",
+      "updated": "2023-10-25T10:42:09Z"
+     },
+     {
+      "name": "katvasoft-oy/ldap-util",
+      "stars": 1,
+      "language": "Java",
+      "description": "                                 Apache License                            Version 2.0, January 2004                         http://www.apache.org/licenses/     TERMS AND CONDITIONS FOR USE, REPRODUCT",
+      "url": "https://github.com/katvasoft-oy/ldap-util",
+      "updated": "2023-10-25T10:42:23Z"
+     },
+     {
+      "name": "zhanhuen555/turnt-octo-ninja",
+      "stars": 0,
+      "language": null,
+      "description": "                                  Apache License                            Version 2.0, January 2004                         http://www.apache.org/licenses/     TERMS AND CONDITIONS FOR USE, REPRODUC",
+      "url": "https://github.com/zhanhuen555/turnt-octo-ninja",
+      "updated": "2023-10-25T10:42:09Z"
+     },
+     {
+      "name": "AAEMH/Sad-",
+      "stars": 0,
+      "language": null,
+      "description": "   TERMS AND CONDITIONS FOR USE, REPRODUCTION, AND DISTRIBUTION     1. Definitions.        \"License\" shall mean the terms and conditions for use, reproduction,       and distribution as defined by Sec",
+      "url": "https://github.com/AAEMH/Sad-",
+      "updated": "2023-10-25T10:42:28Z"
+     }
+    ]
+   },
+   "patents": {
+    "status": 500,
+    "error": "HTTP 500: Internal Server Error",
+    "url": "https://patents.google.com/xhr/query?url=q%253Dattribution%2520of%2520generated%2520text%2520to%2520source%2520documents%2526num%253D5&exp=",
+    "found": []
+   }
+  },
+  "неопределённость внимания": {
+   "query": "attention entropy uncertainty language model factuality",
+   "openalex": {
+    "status": 200,
+    "error": null,
+    "url": "https://api.openalex.org/works?search=attention+entropy+uncertainty+language+model+factuality&per-page=5&mailto=spanverify%40example.invalid",
+    "found": [
+     {
+      "title": "Detecting hallucinations in large language models using semantic entropy",
+      "year": 2024,
+      "doi": "https://doi.org/10.1038/s41586-024-07421-0",
+      "cited_by": 863,
+      "url": "https://doi.org/10.1038/s41586-024-07421-0"
+     },
+     {
+      "title": "Entropy Guided Extrapolative Decoding to Improve Factuality in Large Language Models",
+      "year": 2024,
+      "doi": "https://doi.org/10.48550/arxiv.2404.09338",
+      "cited_by": 2,
+      "url": "http://arxiv.org/abs/2404.09338"
+     },
+     {
+      "title": "Entropy and Attention Dynamics in Small Language Models: A Trace-Level Structural Analysis on the TruthfulQA Benchmark",
+      "year": 2026,
+      "doi": "https://doi.org/10.1007/978-3-032-32732-1_8",
+      "cited_by": 0,
+      "url": "https://doi.org/10.1007/978-3-032-32732-1_8"
+     },
+     {
+      "title": "UAlign: Leveraging Uncertainty Estimations for Factuality Alignment on Large Language Models",
+      "year": 2024,
+      "doi": "https://doi.org/10.48550/arxiv.2412.11803",
+      "cited_by": 0,
+      "url": "http://arxiv.org/abs/2412.11803"
+     },
+     {
+      "title": "Entropy-Constrained Embeddings for Safe and Reliable Enterprise Large Language Models",
+      "year": 2025,
+      "doi": "https://doi.org/10.32692/ijdi-eret/14.2.2025.2510",
+      "cited_by": 0,
+      "url": "https://doi.org/10.32692/ijdi-eret/14.2.2025.2510"
+     }
+    ]
+   },
+   "crossref": {
+    "status": 200,
+    "error": null,
+    "url": "https://api.crossref.org/works?query=attention+entropy+uncertainty+language+model+factuality&rows=5",
+    "found": [
+     {
+      "title": "An entropy model of decision uncertainty reveals that attention influences decisions but does not alter appearance",
+      "container": null,
+      "year": 2021,
+      "doi": "10.31234/osf.io/hveac_v1",
+      "url": "https://doi.org/10.31234/osf.io/hveac_v1"
+     },
+     {
+      "title": "An entropy model of decision uncertainty reveals that attention influences decisions but does not alter appearance",
+      "container": null,
+      "year": 2021,
+      "doi": "10.31234/osf.io/hveac",
+      "url": "https://doi.org/10.31234/osf.io/hveac"
+     },
+     {
+      "title": "Boosting Long-term Factuality in Large Language Model with Real-World Entity Queries",
+      "container": null,
+      "year": 2024,
+      "doi": "10.21203/rs.3.rs-4834886/v1",
+      "url": "https://doi.org/10.21203/rs.3.rs-4834886/v1"
+     },
+     {
+      "title": "An entropy model of decision uncertainty",
+      "container": null,
+      "year": 2025,
+      "doi": "10.31234/osf.io/hveac_v4",
+      "url": "https://doi.org/10.31234/osf.io/hveac_v4"
+     },
+     {
+      "title": "An entropy model of decision uncertainty",
+      "container": null,
+      "year": 2025,
+      "doi": "10.31234/osf.io/hveac_v2",
+      "url": "https://doi.org/10.31234/osf.io/hveac_v2"
+     }
+    ]
+   },
+   "github": {
+    "status": 200,
+    "error": null,
+    "url": "https://api.github.com/search/repositories?q=attention+entropy+uncertainty+language+model+factuality&per_page=5&sort=stars&order=desc",
+    "found": []
+   },
+   "patents": {
+    "status": 500,
+    "error": "HTTP 500: Internal Server Error",
+    "url": "https://patents.google.com/xhr/query?url=q%253Dattention%2520entropy%2520uncertainty%2520language%2520model%2520factuality%2526num%253D5&exp=",
+    "found": []
+   }
+  },
+  "проверка фактов": {
+   "query": "fact verification against source document Russian",
+   "openalex": {
+    "status": 200,
+    "error": null,
+    "url": "https://api.openalex.org/works?search=fact+verification+against+source+document+Russian&per-page=5&mailto=spanverify%40example.invalid",
+    "found": [
+     {
+      "title": "ruSciFact: Open Benchmark for Verifying Scientific Facts in Russian",
+      "year": 2025,
+      "doi": "https://doi.org/10.28995/2075-7182-2025-23-435-459",
+      "cited_by": 0,
+      "url": "https://doi.org/10.28995/2075-7182-2025-23-435-459"
+     },
+     {
+      "title": "Fact-Saboteurs: A Taxonomy of Evidence Manipulation Attacks against Fact-Verification Systems",
+      "year": 2022,
+      "doi": "https://doi.org/10.48550/arxiv.2209.03755",
+      "cited_by": 3,
+      "url": "http://arxiv.org/abs/2209.03755"
+     },
+     {
+      "title": "Verification of communicative types in the judicial public space of media discourse in the USA, Kazakhstan and Russia as a psycholinguistic marker of fact-checking",
+      "year": 2023,
+      "doi": "https://doi.org/10.34069/ai/2023.61.01.14",
+      "cited_by": 4,
+      "url": "https://doi.org/10.34069/ai/2023.61.01.14"
+     },
+     {
+      "title": "WhatTheWikiFact: Fact-Checking Claims Against Wikipedia",
+      "year": 2021,
+      "doi": "https://doi.org/10.48550/arxiv.2105.00826",
+      "cited_by": 2,
+      "url": "http://arxiv.org/abs/2105.00826"
+     },
+     {
+      "title": "Preparing Students for the Fight Against False Information With Visual Verification and Open Source Reporting",
+      "year": 2019,
+      "doi": "https://doi.org/10.1177/1077695819831098",
+      "cited_by": 20,
+      "url": "https://doi.org/10.1177/1077695819831098"
+     }
+    ]
+   },
+   "crossref": {
+    "status": 200,
+    "error": null,
+    "url": "https://api.crossref.org/works?query=fact+verification+against+source+document+Russian&rows=5",
+    "found": [
+     {
+      "title": "Source Document Verification",
+      "container": "Definitions",
+      "year": 2020,
+      "doi": "10.32388/uppxom",
+      "url": "https://doi.org/10.32388/uppxom"
+     },
+     {
+      "title": "Robust Document Retrieval and Individual Evidence Modeling for Fact Extraction and Verification.",
+      "container": "Proceedings of the First Workshop on Fact Extraction and VERification (FEVER)",
+      "year": 2018,
+      "doi": "10.18653/v1/w18-5521",
+      "url": "https://doi.org/10.18653/v1/w18-5521"
+     },
+     {
+      "title": "Source Data Verification Document",
+      "container": "Definitions",
+      "year": 2020,
+      "doi": "10.32388/o53cjs",
+      "url": "https://doi.org/10.32388/o53cjs"
+     },
+     {
+      "title": "Automatic Fact-Checking with Document-level Annotations using BERT and Multiple Instance Learning",
+      "container": "Proceedings of the Fourth Workshop on Fact Extraction and VERification (FEVER)",
+      "year": 2021,
+      "doi": "10.18653/v1/2021.fever-1.11",
+      "url": "https://doi.org/10.18653/v1/2021.fever-1.11"
+     },
+     {
+      "title": "Multi-Source Fact Verification for a Robust Fake News Detection",
+      "container": "International Journal of Research Publication and Reviews",
+      "year": 2026,
+      "doi": "10.55248/gengpi.07.0426.a927",
+      "url": "https://doi.org/10.55248/gengpi.07.0426.a927"
+     }
+    ]
+   },
+   "github": {
+    "status": 200,
+    "error": null,
+    "url": "https://api.github.com/search/repositories?q=fact+verification+against+source+document+Russian&per_page=5&sort=stars&order=desc",
+    "found": []
+   },
+   "patents": {
+    "status": 500,
+    "error": "HTTP 500: Internal Server Error",
+    "url": "https://patents.google.com/xhr/query?url=q%253Dfact%2520verification%2520against%2520source%2520document%2520Russian%2526num%253D5&exp=",
+    "found": []
+   }
+  },
+  "доля участия ИИ": {
+   "query": "AI-generated text detection share of machine text",
+   "openalex": {
+    "status": 200,
+    "error": null,
+    "url": "https://api.openalex.org/works?search=AI-generated+text+detection+share+of+machine+text&per-page=5&mailto=spanverify%40example.invalid",
+    "found": [
+     {
+      "title": "Human or Machine? A Survey on Machine-Generated Text Detection",
+      "year": 2026,
+      "doi": "https://doi.org/10.1109/access.2026.3666781",
+      "cited_by": 1,
+      "url": "https://doi.org/10.1109/access.2026.3666781"
+     },
+     {
+      "title": "MAGE: Machine-generated Text Detection in the Wild",
+      "year": 2024,
+      "doi": "https://doi.org/10.18653/v1/2024.acl-long.3",
+      "cited_by": 66,
+      "url": "https://doi.org/10.18653/v1/2024.acl-long.3"
+     },
+     {
+      "title": "Machine-Generated Text: A Comprehensive Survey of Threat Models and Detection Methods",
+      "year": 2023,
+      "doi": "https://doi.org/10.1109/access.2023.3294090",
+      "cited_by": 183,
+      "url": "https://doi.org/10.1109/access.2023.3294090"
+     },
+     {
+      "title": "MGTBench: Benchmarking Machine-Generated Text Detection",
+      "year": 2024,
+      "doi": "https://doi.org/10.1145/3658644.3670344",
+      "cited_by": 38,
+      "url": "https://doi.org/10.1145/3658644.3670344"
+     },
+     {
+      "title": "SeqXGPT: Sentence-Level AI-Generated Text Detection",
+      "year": 2023,
+      "doi": "https://doi.org/10.18653/v1/2023.emnlp-main.73",
+      "cited_by": 43,
+      "url": "https://doi.org/10.18653/v1/2023.emnlp-main.73"
+     }
+    ]
+   },
+   "crossref": {
+    "status": 200,
+    "error": null,
+    "url": "https://api.crossref.org/works?query=AI-generated+text+detection+share+of+machine+text&rows=5",
+    "found": [
+     {
+      "title": "An Empirical Study of AI-Generated Text Detection Tools",
+      "container": "Advances in Machine Learning &amp; Artificial Intelligence",
+      "year": 2023,
+      "doi": "10.33140/amlai.04.02.03",
+      "url": "https://doi.org/10.33140/amlai.04.02.03"
+     },
+     {
+      "title": "A Multimodal Transformer-based Approach for Cross-Domain Detection of Machine-Generated Text",
+      "container": "Proceedings of the Shared Task on Multi-Domain Detection of AI-Generated Text",
+      "year": 2025,
+      "doi": "10.26615/978-954-452-108-0-004",
+      "url": "https://doi.org/10.26615/978-954-452-108-0-004"
+     },
+     {
+      "title": "A Multi-Strategy Approach for AI-Generated Text Detection",
+      "container": "Proceedings of the Shared Task on Multi-Domain Detection of AI-Generated Text",
+      "year": 2025,
+      "doi": "10.26615/978-954-452-108-0-003",
+      "url": "https://doi.org/10.26615/978-954-452-108-0-003"
+     },
+     {
+      "title": "AI Generated Text Detection &amp; Source Identification",
+      "container": null,
+      "year": null,
+      "doi": "10.31979/etd.dvr7-kbxs",
+      "url": "https://doi.org/10.31979/etd.dvr7-kbxs"
+     },
+     {
+      "title": "AI-Generated Text and Academic Integrity: A Systematic Review of Detection Tools in Educational Settings",
+      "container": "Advances in Machine Learning &amp; Artificial Intelligence",
+      "year": 2026,
+      "doi": "10.33140/amlai.07.03.02",
+      "url": "https://doi.org/10.33140/amlai.07.03.02"
+     }
+    ]
+   },
+   "github": {
+    "status": 200,
+    "error": null,
+    "url": "https://api.github.com/search/repositories?q=AI-generated+text+detection+share+of+machine+text&per_page=5&sort=stars&order=desc",
+    "found": [
+     {
+      "name": "Tasneem-Duridi/Arabic-Authorship-Style-Transfer-and-AI-Generated-Text-Detection-Shared-Task",
+      "stars": 1,
+      "language": "Jupyter Notebook",
+      "description": "Arabic AI-Generated News Detection (ARATECT 4.3 Subtask 3) — Official implementation of the PTUK-HULAT system for detecting machine-generated Arabic news articles. Includes data preprocessing scripts,",
+      "url": "https://github.com/Tasneem-Duridi/Arabic-Authorship-Style-Transfer-and-AI-Generated-Text-Detection-Shared-Task",
+      "updated": "2025-09-15T12:55:54Z"
+     },
+     {
+      "name": "Cashcoin123/Cashcoin123",
+      "stars": 1,
+      "language": null,
+      "description": "# Application card: GitHub Copilot Chat  Learn how to use GitHub Copilot Chat responsibly by understanding its purposes, capabilities, and limitations.  ## What is an Application Card?  <!-- Do not mo",
+      "url": "https://github.com/Cashcoin123/Cashcoin123",
+      "updated": "2026-10-05T03:30:50Z"
+     }
+    ]
+   },
+   "patents": {
+    "status": 500,
+    "error": "HTTP 500: Internal Server Error",
+    "url": "https://patents.google.com/xhr/query?url=q%253DAI-generated%2520text%2520detection%2520share%2520of%2520machine%2520text%2526num%253D5&exp=",
+    "found": []
+   }
+  }
+ }
+}
