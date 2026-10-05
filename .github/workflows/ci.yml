@@ -406,93 +406,10 @@ jobs:
             spanverify-module/reports/ext_rushallu.json
             spanverify-module/reports/baseline_from_article.json
             spanverify-module/reports/rus_hallu_eval.json
-          retention-days: 90
-
-  # Корпус A3: пары на фрагментах реальных опубликованных актов. Долгий job:
-  # скачивание официальных PDF и распознавание сканов. Результат (тексты источников,
-  # пары, манифест, отчёт) коммитится в main — иначе его не увидеть из окружения
-  # разработки, а проверяющему нужны сами документы для выборочной сверки.
-  corpus-a3:
-    name: "Корпус A3: реальные акты (скачивание, распознавание, сборка)"
-    runs-on: ubuntu-latest
-    timeout-minutes: 150
-    defaults:
-      run:
-        working-directory: spanverify-module
-    steps:
-      - uses: actions/checkout@v4
-
-      - uses: actions/setup-python@v5
-        with:
-          python-version: "3.11"
-
-      - name: Зависимости
-        run: |
-          python -m pip install --upgrade pip
-          python -m pip install -r requirements.txt
-          python -m pip install --disable-pip-version-check "pypdf~=6.1"
-
-      # Официальные PDF публикации — сканы без текстового слоя, поэтому нужен OCR.
-      - name: Поставить OCR (poppler + tesseract с русским)
-        run: |
-          sudo apt-get update -qq
-          sudo apt-get install -y -qq poppler-utils tesseract-ocr tesseract-ocr-rus
-
-      # Повторный прогон ничего не скачивает: если документов уже достаточно,
-      # загрузчик только сверяет хеши (проверено: 0 сетевых запросов в этом случае).
-      - name: Источники корпуса A3 (robots.txt, пауза ≥1 с, UA с контактом)
-        continue-on-error: true
-        run: |
-          # Параметры подобраны по факту: OCR — самая долгая часть (на 2 ядрах раннера
-          # ~2.5 с на страницу), поэтому распознаются первые страницы каждого акта;
-          # в манифесте у таких документов text_truncated=true. Прогресс пишется на диск
-          # по ходу, поэтому повторный запуск продолжает с места остановки.
-          python scripts/fetch_npa_corpus.py --out data/corpus_a3 --target-docs 130 --max-pages-per-type 8 --max-pages 6 --buffer 20 --pause 1.5 --workers 4
-
-      - name: Собрать корпус A3 (пары на реальных фрагментах)
-        id: build_a3
-        continue-on-error: true
-        run: python scripts/build_corpus_a.py --docs data/corpus_a3/sources --out data/corpus_a3 --target 1200 --seed 43 --real
-
-      - name: Проверки корпуса A3 (контексты, спаны, атрибуция числа, сплиты, хеши)
-        continue-on-error: true
-        run: python -m pytest tests/test_corpus_a3.py -q
-
-      - name: Отчёт по корпусу A3
-        if: always()
-        run: python scripts/make_corpus_a3_report.py
-
-      - name: Артефакт корпуса A3 (на случай, если коммит не пройдёт)
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: corpus-a3
-          path: |
-            spanverify-module/data/corpus_a3
-            spanverify-module/reports/CORPUS_A3.md
-          retention-days: 90
-
-      # Коммит без [skip ci]: следующий прогон увидит корпус и посчитает METRICS с ним.
-      - name: Закоммитить источники, пары и отчёт A3
-        if: always()
-        run: |
-          git config user.name "spanverify-bot"
-          git config user.email "actions@users.noreply.github.com"
-          git add -f data/corpus_a3 reports/CORPUS_A3.md reports/CORPUS_REPORT.md || true
-          if git diff --cached --quiet; then
-            echo "нечего коммитить"
-            exit 0
-          fi
-          git commit -m "корпус A3: источники реальных актов, пары и отчёт"
-          for attempt in 1 2 3; do
-            if git pull --rebase --autostash -q origin "${GITHUB_REF_NAME}" && git push; then
-              echo "корпус A3 закоммичен (попытка $attempt)"
-              exit 0
-            fi
-            sleep 5
-          done
-          echo "::warning title=A3::не удалось закоммитить корпус за 3 попытки"
-          exit 0
+  # Корпус A3 (долгий job: скачивание официальных PDF и OCR) живёт в
+  # .github/workflows/arena-pipeline.yml → job npa-corpus: там бюджет 340 минут,
+  # бюджет времени загрузчика и коммит результата в ветку. Дублировать его здесь
+  # нельзя: job не укладывался в 150 минут и оставлял CI красным без результата.
 
   probe-sources:
     name: Разведка официальных источников (не блокирует CI)
