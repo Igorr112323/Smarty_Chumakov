@@ -1,0 +1,93 @@
+{
+  "weights": {
+    "attention_entropy": 0.0,
+    "ctx_attention_mass": 0.8,
+    "embedding_density": 0.2
+  },
+  "threshold": 0.531915,
+  "target_fpr": 0.1,
+  "span_z": 0.0,
+  "span_floor": 0.35,
+  "span_cap": 0.5,
+  "isotonic": {
+    "x": [
+      0.10639,
+      0.288367,
+      0.318222,
+      0.33197,
+      0.391976,
+      0.424269,
+      0.436758
+    ],
+    "y": [
+      0.4,
+      0.514403,
+      0.531915,
+      0.666667,
+      0.888889,
+      1.0,
+      1.0
+    ]
+  },
+  "head": {
+    "type": "logreg",
+    "file": "config/head_hf.json"
+  },
+  "folds": [
+    {
+      "fold": 0,
+      "n_train": 4791,
+      "n_test": 1197,
+      "auc": 0.863381105950617
+    },
+    {
+      "fold": 1,
+      "n_train": 4791,
+      "n_test": 1197,
+      "auc": 0.8614715149341667
+    },
+    {
+      "fold": 2,
+      "n_train": 4791,
+      "n_test": 1197,
+      "auc": 0.86477278549106
+    },
+    {
+      "fold": 3,
+      "n_train": 4791,
+      "n_test": 1197,
+      "auc": 0.8852600557180025
+    },
+    {
+      "fold": 4,
+      "n_train": 4788,
+      "n_test": 1200,
+      "auc": 0.8684048356986207
+    }
+  ],
+  "seed": 42,
+  "version": "1.3.0",
+  "mode": "hf",
+  "meta": {
+    "dataset": "data/corpus_a/splits/train.jsonl",
+    "synthetic": false,
+    "signal": "logreg",
+    "note": "Параметры режима hf обучены только на обучающем разбиении. Тест не использовался ни для подбора весов, ни для порога.",
+    "participation": {
+      "type": "participation-logreg",
+      "auc_out_of_fold": 1.0,
+      "calibrated_on": "synthetic-participation-corpus 1.0 (два стиля, доля смеси известна)"
+    },
+    "mode": "hf",
+    "model": "/home/user/models/minilm-l6",
+    "calibrated_on": "data/corpus_a/splits/train.jsonl (обучающее разбиение корпуса A; разбиение по документам)",
+    "n_train_pairs": 840,
+    "held_out": "dev/test корпуса A оцениваются отдельно scripts/evaluate_splits.py",
+    "hardware": {
+      "platform": "Linux-6.1.158+-x86_64-with-glibc2.36",
+      "python": "3.11.2",
+      "processor": "x86_64"
+    },
+    "seconds": 84.6
+  }
+}

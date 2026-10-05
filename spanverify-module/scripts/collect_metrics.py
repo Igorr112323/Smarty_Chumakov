@@ -23,6 +23,8 @@ import contextlib
 import hashlib
 import io
 import json
+import os
+import platform
 import subprocess
 import sys
 import tempfile
@@ -196,6 +198,16 @@ def _metrics_tree(metrics: dict) -> dict:
             "coverage": round(spans["recall_containment"], 4),
             "soft_f1": round(spans["f1_expanded_labels"], 4),
             "width_ratio": round(spans["mean_width_ratio"], 2),
+            # Ширины и накрытие расширенной разметки — отдельными числами: узкая и
+            # расширенная разметка не смешиваются (требование отчёта).
+            "width_ratio_expanded": (
+                round(spans["mean_width_ratio_expanded"], 2)
+                if spans.get("mean_width_ratio_expanded") is not None
+                else None
+            ),
+            "coverage_expanded": (
+                round(spans["coverage_expanded"], 4) if spans.get("coverage_expanded") is not None else None
+            ),
         },
         "answers": {
             "precision": round(answers["precision"], 4),
@@ -259,7 +271,9 @@ def _corpus_a_block(verifier: Verifier) -> dict:
         path = ROOT / "data" / "corpus_a" / "splits" / f"{name}.jsonl"
         if not path.is_file():
             continue
-        block["by_split"][name] = _metrics_tree(verifier.evaluate(list(read_pairs(path))))
+        evaluated = verifier.evaluate(list(read_pairs(path)))
+        block["by_split"][name] = _metrics_tree(evaluated)
+        block["by_split"][name]["by_type"] = evaluated.get("by_type") or {}
     test_path = ROOT / "data" / "corpus_a" / "splits" / "test.jsonl"
     if test_path.is_file():
         by_mode: dict[str, list] = {}
@@ -332,7 +346,9 @@ def _corpus_a3_block(verifier: Verifier) -> dict:
         path = ROOT / "data" / "corpus_a3" / "splits" / f"{name}.jsonl"
         if not path.is_file() or not path.stat().st_size:
             continue
-        block["by_split"][name] = _metrics_tree(verifier.evaluate(list(read_pairs(path))))
+        evaluated = verifier.evaluate(list(read_pairs(path)))
+        block["by_split"][name] = _metrics_tree(evaluated)
+        block["by_split"][name]["by_type"] = evaluated.get("by_type") or {}
     test_path = ROOT / "data" / "corpus_a3" / "splits" / "test.jsonl"
     if test_path.is_file() and test_path.stat().st_size:
         by_mode: dict[str, list] = {}
@@ -424,6 +440,62 @@ def _external_tests_block() -> dict:
     return summary
 
 
+def _corpora_block(demo_tree: dict, corpus_a: dict, hf_splits: dict | None) -> dict:
+    """Таблица «корпус × режим»: demo и hf не смешиваются, у каждой строки своя модель.
+
+    Числа берутся из уже выполненных прогонов: demo — сквозной путь на своём корпусе,
+    hf — файл reports/hf_splits.json (его создаёт scripts/evaluate_splits.py на
+    отложенных разбиениях dev/test). Если прогона hf нет, строка не выдумывается:
+    в поле note стоит причина.
+    """
+
+    def row(tree: dict, model: str) -> dict:
+        """Одна строка таблицы «корпус × режим» с едиными именами метрик.
+
+        Разные источники называют одни и те же величины по-разному (``f1`` против
+        ``strict_f1``), поэтому имена приводятся к одному виду; отсутствующая
+        величина остаётся ``None``, а не подставляется нулём.
+        """
+        tokens = tree.get("tokens") or {}
+        verdicts = tree.get("verdicts") or {}
+        spans = tree.get("spans") or {}
+        strict = spans.get("strict_f1", spans.get("f1"))
+        soft = spans.get("soft_f1", spans.get("f1_expanded_labels"))
+        width = spans.get("width_ratio", spans.get("mean_width_ratio"))
+        width_expanded = spans.get("width_ratio_expanded", spans.get("mean_width_ratio_expanded"))
+        coverage = spans.get("coverage", spans.get("recall_containment"))
+        return {
+            "model": model,
+            "tokens": tokens,
+            "verdicts": verdicts,
+            "spans": {
+                "f1": strict,
+                "mean_width_ratio": width,
+                "mean_width_ratio_expanded": width_expanded,
+                "coverage": coverage,
+                "soft_f1": soft,
+            },
+            "by_type": tree.get("by_type") or {},
+        }
+
+    block: dict = {
+        "демонстрационный корпус (data/demo_pairs.jsonl)": {
+            "modes": {"demo": row(demo_tree, "лексические суррогаты (demo)")}
+        }
+    }
+    corpus_a_modes = {"demo": row((corpus_a.get("by_split") or {}).get("test") or {}, "лексические суррогаты (demo)")}
+    note = "прогон режима hf на отложенных разбиениях не выполнен"
+    if hf_splits and (hf_splits.get("splits") or {}):
+        test_tree = hf_splits["splits"].get("test") or {}
+        corpus_a_modes["hf"] = row(test_tree, str(hf_splits.get("model") or "реальная модель"))
+        note = ""
+    block["A1 (синтетический корпус A, отложенный test)"] = {
+        "modes": corpus_a_modes,
+        "note": note,
+    }
+    return block
+
+
 def collect(dataset: str, seed: int, release_dir: Path, coverage_json: Path) -> dict:
     """Собрать METRICS.json целиком (каждое число — из прогона, а не из памяти)."""
     started = time.time()
@@ -449,6 +521,14 @@ def collect(dataset: str, seed: int, release_dir: Path, coverage_json: Path) -> 
             "generated_at": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
             "seed": seed,
             "dataset": dataset,
+            "pairs": len(pairs),
+            "hardware": f"{platform.processor() or platform.machine()}, {os.cpu_count()} CPU",
+            "os": platform.platform(),
+            "python": platform.python_version(),
+            "command": (
+                "python scripts/collect_metrics.py --dataset "
+                f"{dataset} --seed {seed} --coverage-json reports/coverage.json"
+            ),
         },
         "disclaimer": DISCLAIMER,
         "tests": {
@@ -495,6 +575,7 @@ def collect(dataset: str, seed: int, release_dir: Path, coverage_json: Path) -> 
             "dataset_validation": _dataset_validation_block(),
         },
         "corpus_a": _corpus_a_block(verifier),
+        "corpora": None,  # заполняется ниже, когда прочитаны прогоны hf
         "corpus_a3_real": _corpus_a3_block(verifier),
         "corpus_b": _corpus_b_block(),
         "external_tests": _external_tests_block(),
@@ -503,6 +584,15 @@ def collect(dataset: str, seed: int, release_dir: Path, coverage_json: Path) -> 
         "release": _release_info(release_dir),
         "duration_s": round(time.time() - started, 1),
     }
+
+    hf_splits = None
+    hf_path = ROOT / "reports" / "hf_splits.json"
+    if hf_path.is_file():
+        try:
+            hf_splits = json.loads(hf_path.read_text(encoding="utf-8"))
+        except json.JSONDecodeError:
+            hf_splits = None
+    payload["corpora"] = _corpora_block(payload["demo"]["in_corpus"], payload["corpus_a"], hf_splits)
 
     cross_path = ROOT / "reports" / "cross_corpus.json"
     if cross_path.is_file():

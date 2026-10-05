@@ -631,7 +631,15 @@ def train(
 
     # 6. Сквозная проверка: те же параметры, но через публичный verify() — то, что
     #    реально увидит пользователь API. Числа берутся из настоящего пути.
-    end_to_end = Verifier(mode=mode, weights=bundle).evaluate(test_pairs)
+    #    Модель и конфигурация берутся у обучающего проверяющего: иначе сквозной
+    #    прогон молча уходил бы на модель по умолчанию (в режиме hf это другая
+    #    модель, а без сети — отказ загрузки весов).
+    end_to_end = Verifier(
+        mode=mode,
+        weights=bundle,
+        model_name=getattr(verifier, "model_name", None),
+        config=getattr(verifier, "config", None),
+    ).evaluate(test_pairs)
 
     report = TrainReport(
         bundle=bundle,

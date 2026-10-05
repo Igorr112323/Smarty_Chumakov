@@ -15,3 +15,7 @@ reports/experiments/config/
 
 # Кэш признаков hf (большой, воспроизводится прогоном)
 data/cache/
+
+# База данных покрытия (создаётся pytest-cov)
+.coverage
+.coverage.*

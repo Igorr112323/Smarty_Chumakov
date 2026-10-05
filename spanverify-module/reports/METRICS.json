@@ -8,15 +8,20 @@
   },
   "meta": {
     "version": "1.3.0",
-    "commit": "0f12f542a973b0e531a09710674f4efc2cd55e02",
-    "generated_at": "2026-10-05T19:37:23Z",
+    "commit": "19e179490002de1290c0931fdc0e60ca94510808",
+    "generated_at": "2026-10-05T20:06:39Z",
     "seed": 42,
-    "dataset": "data/demo_pairs.jsonl"
+    "dataset": "data/demo_pairs.jsonl",
+    "pairs": 240,
+    "hardware": "x86_64, 2 CPU",
+    "os": "Linux-6.1.158+-x86_64-with-glibc2.36",
+    "python": "3.11.2",
+    "command": "python scripts/collect_metrics.py --dataset data/demo_pairs.jsonl --seed 42 --coverage-json reports/coverage.json"
   },
   "disclaimer": "Демонстрационные метрики получены на синтетическом корпусе и научным результатом не являются. Для подтверждения требуются 1200 пар «вопрос–ответ» с экспертной разметкой на реальных регламентах организации.",
   "tests": {
-    "collected": 415,
-    "coverage_percent": null,
+    "collected": 420,
+    "coverage_percent": 87.02,
     "coverage_gate_percent": 85
   },
   "demo": {
@@ -39,7 +44,9 @@
         "strict_f1": 0.2796,
         "coverage": 0.9783,
         "soft_f1": 0.2796,
-        "width_ratio": 3.74
+        "width_ratio": 3.74,
+        "width_ratio_expanded": 1.0,
+        "coverage_expanded": 1.0
       },
       "answers": {
         "precision": 1.0,
@@ -104,7 +111,9 @@
         "strict_f1": 0.3071,
         "coverage": 0.9516,
         "soft_f1": 0.3071,
-        "width_ratio": 3.86
+        "width_ratio": 3.86,
+        "width_ratio_expanded": 1.0,
+        "coverage_expanded": 1.0
       },
       "answers": {
         "precision": 1.0,
@@ -221,7 +230,9 @@
           "strict_f1": 0.306,
           "coverage": 0.5543,
           "soft_f1": 0.5683,
-          "width_ratio": 3.73
+          "width_ratio": 3.73,
+          "width_ratio_expanded": 1.0,
+          "coverage_expanded": 0.7935
         },
         "answers": {
           "precision": 1.0,
@@ -240,6 +251,112 @@
           "recall": 0.7935,
           "f1": 0.8249,
           "fpr": 0.1364
+        },
+        "by_type": {
+          "contradiction": {
+            "tp": 12,
+            "fp": 0,
+            "fn": 1,
+            "tn": 0,
+            "precision": 1.0,
+            "recall": 0.9231,
+            "f1": 0.96,
+            "fpr": 0.0,
+            "flagged_share": 0.9231,
+            "pairs": 13,
+            "positives": 13
+          },
+          "excess": {
+            "tp": 12,
+            "fp": 0,
+            "fn": 0,
+            "tn": 0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "fpr": 0.0,
+            "flagged_share": 1.0,
+            "pairs": 12,
+            "positives": 12
+          },
+          "faithful": {
+            "tp": 0,
+            "fp": 12,
+            "fn": 0,
+            "tn": 76,
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "fpr": 0.1364,
+            "flagged_share": 0.1364,
+            "pairs": 88,
+            "positives": 0
+          },
+          "missing": {
+            "tp": 10,
+            "fp": 0,
+            "fn": 2,
+            "tn": 0,
+            "precision": 1.0,
+            "recall": 0.8333,
+            "f1": 0.9091,
+            "fpr": 0.0,
+            "flagged_share": 0.8333,
+            "pairs": 12,
+            "positives": 12
+          },
+          "number_attribution": {
+            "tp": 6,
+            "fp": 0,
+            "fn": 5,
+            "tn": 0,
+            "precision": 1.0,
+            "recall": 0.5455,
+            "f1": 0.7059,
+            "fpr": 0.0,
+            "flagged_share": 0.5455,
+            "pairs": 11,
+            "positives": 11
+          },
+          "oversight": {
+            "tp": 6,
+            "fp": 0,
+            "fn": 0,
+            "tn": 0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "fpr": 0.0,
+            "flagged_share": 1.0,
+            "pairs": 6,
+            "positives": 6
+          },
+          "partial": {
+            "tp": 13,
+            "fp": 0,
+            "fn": 11,
+            "tn": 0,
+            "precision": 1.0,
+            "recall": 0.5417,
+            "f1": 0.7027,
+            "fpr": 0.0,
+            "flagged_share": 0.5417,
+            "pairs": 24,
+            "positives": 24
+          },
+          "unconfirmed": {
+            "tp": 14,
+            "fp": 0,
+            "fn": 0,
+            "tn": 0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "fpr": 0.0,
+            "flagged_share": 1.0,
+            "pairs": 14,
+            "positives": 14
+          }
         }
       },
       "test": {
@@ -255,7 +372,9 @@
           "strict_f1": 0.4115,
           "coverage": 0.7576,
           "soft_f1": 0.5072,
-          "width_ratio": 3.31
+          "width_ratio": 3.31,
+          "width_ratio_expanded": 1.0,
+          "coverage_expanded": 0.9192
         },
         "answers": {
           "precision": 1.0,
@@ -274,6 +393,112 @@
           "recall": 0.9192,
           "f1": 0.9055,
           "fpr": 0.1358
+        },
+        "by_type": {
+          "contradiction": {
+            "tp": 24,
+            "fp": 0,
+            "fn": 2,
+            "tn": 0,
+            "precision": 1.0,
+            "recall": 0.9231,
+            "f1": 0.96,
+            "fpr": 0.0,
+            "flagged_share": 0.9231,
+            "pairs": 26,
+            "positives": 26
+          },
+          "excess": {
+            "tp": 14,
+            "fp": 0,
+            "fn": 0,
+            "tn": 0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "fpr": 0.0,
+            "flagged_share": 1.0,
+            "pairs": 14,
+            "positives": 14
+          },
+          "faithful": {
+            "tp": 0,
+            "fp": 11,
+            "fn": 0,
+            "tn": 70,
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "fpr": 0.1358,
+            "flagged_share": 0.1358,
+            "pairs": 81,
+            "positives": 0
+          },
+          "missing": {
+            "tp": 7,
+            "fp": 0,
+            "fn": 3,
+            "tn": 0,
+            "precision": 1.0,
+            "recall": 0.7,
+            "f1": 0.8235,
+            "fpr": 0.0,
+            "flagged_share": 0.7,
+            "pairs": 10,
+            "positives": 10
+          },
+          "number_attribution": {
+            "tp": 12,
+            "fp": 0,
+            "fn": 1,
+            "tn": 0,
+            "precision": 1.0,
+            "recall": 0.9231,
+            "f1": 0.96,
+            "fpr": 0.0,
+            "flagged_share": 0.9231,
+            "pairs": 13,
+            "positives": 13
+          },
+          "oversight": {
+            "tp": 11,
+            "fp": 0,
+            "fn": 0,
+            "tn": 0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "fpr": 0.0,
+            "flagged_share": 1.0,
+            "pairs": 11,
+            "positives": 11
+          },
+          "partial": {
+            "tp": 13,
+            "fp": 0,
+            "fn": 2,
+            "tn": 0,
+            "precision": 1.0,
+            "recall": 0.8667,
+            "f1": 0.9286,
+            "fpr": 0.0,
+            "flagged_share": 0.8667,
+            "pairs": 15,
+            "positives": 15
+          },
+          "unconfirmed": {
+            "tp": 10,
+            "fp": 0,
+            "fn": 0,
+            "tn": 0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "fpr": 0.0,
+            "flagged_share": 1.0,
+            "pairs": 10,
+            "positives": 10
+          }
         }
       }
     },
@@ -334,6 +559,318 @@
         "token_f1": 0.9302,
         "span_coverage": 0.8
       }
+    }
+  },
+  "corpora": {
+    "демонстрационный корпус (data/demo_pairs.jsonl)": {
+      "modes": {
+        "demo": {
+          "model": "лексические суррогаты (demo)",
+          "tokens": {
+            "precision": 0.9912,
+            "recall": 0.918,
+            "f1": 0.9532,
+            "fpr": 0.0021,
+            "auc": 0.998,
+            "n": 594
+          },
+          "verdicts": {
+            "tp": 46,
+            "fp": 0,
+            "fn": 0,
+            "tn": 26,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "fpr": 0.0
+          },
+          "spans": {
+            "f1": 0.2796,
+            "mean_width_ratio": 3.74,
+            "mean_width_ratio_expanded": 1.0,
+            "coverage": 0.9783,
+            "soft_f1": 0.2796
+          },
+          "by_type": {}
+        }
+      }
+    },
+    "A1 (синтетический корпус A, отложенный test)": {
+      "modes": {
+        "demo": {
+          "model": "лексические суррогаты (demo)",
+          "tokens": {
+            "precision": 1.0,
+            "recall": 0.5795,
+            "f1": 0.7338,
+            "fpr": 0.0,
+            "auc": 0.9536,
+            "n": 1868
+          },
+          "verdicts": {
+            "tp": 91,
+            "fp": 11,
+            "fn": 8,
+            "tn": 70,
+            "precision": 0.8922,
+            "recall": 0.9192,
+            "f1": 0.9055,
+            "fpr": 0.1358
+          },
+          "spans": {
+            "f1": 0.4115,
+            "mean_width_ratio": 3.31,
+            "mean_width_ratio_expanded": 1.0,
+            "coverage": 0.7576,
+            "soft_f1": 0.5072
+          },
+          "by_type": {
+            "contradiction": {
+              "tp": 24,
+              "fp": 0,
+              "fn": 2,
+              "tn": 0,
+              "precision": 1.0,
+              "recall": 0.9231,
+              "f1": 0.96,
+              "fpr": 0.0,
+              "flagged_share": 0.9231,
+              "pairs": 26,
+              "positives": 26
+            },
+            "excess": {
+              "tp": 14,
+              "fp": 0,
+              "fn": 0,
+              "tn": 0,
+              "precision": 1.0,
+              "recall": 1.0,
+              "f1": 1.0,
+              "fpr": 0.0,
+              "flagged_share": 1.0,
+              "pairs": 14,
+              "positives": 14
+            },
+            "faithful": {
+              "tp": 0,
+              "fp": 11,
+              "fn": 0,
+              "tn": 70,
+              "precision": 0.0,
+              "recall": 0.0,
+              "f1": 0.0,
+              "fpr": 0.1358,
+              "flagged_share": 0.1358,
+              "pairs": 81,
+              "positives": 0
+            },
+            "missing": {
+              "tp": 7,
+              "fp": 0,
+              "fn": 3,
+              "tn": 0,
+              "precision": 1.0,
+              "recall": 0.7,
+              "f1": 0.8235,
+              "fpr": 0.0,
+              "flagged_share": 0.7,
+              "pairs": 10,
+              "positives": 10
+            },
+            "number_attribution": {
+              "tp": 12,
+              "fp": 0,
+              "fn": 1,
+              "tn": 0,
+              "precision": 1.0,
+              "recall": 0.9231,
+              "f1": 0.96,
+              "fpr": 0.0,
+              "flagged_share": 0.9231,
+              "pairs": 13,
+              "positives": 13
+            },
+            "oversight": {
+              "tp": 11,
+              "fp": 0,
+              "fn": 0,
+              "tn": 0,
+              "precision": 1.0,
+              "recall": 1.0,
+              "f1": 1.0,
+              "fpr": 0.0,
+              "flagged_share": 1.0,
+              "pairs": 11,
+              "positives": 11
+            },
+            "partial": {
+              "tp": 13,
+              "fp": 0,
+              "fn": 2,
+              "tn": 0,
+              "precision": 1.0,
+              "recall": 0.8667,
+              "f1": 0.9286,
+              "fpr": 0.0,
+              "flagged_share": 0.8667,
+              "pairs": 15,
+              "positives": 15
+            },
+            "unconfirmed": {
+              "tp": 10,
+              "fp": 0,
+              "fn": 0,
+              "tn": 0,
+              "precision": 1.0,
+              "recall": 1.0,
+              "f1": 1.0,
+              "fpr": 0.0,
+              "flagged_share": 1.0,
+              "pairs": 10,
+              "positives": 10
+            }
+          }
+        },
+        "hf": {
+          "model": "/home/user/models/minilm-l6",
+          "tokens": {
+            "precision": 0.4028776978417266,
+            "recall": 0.21212121212121213,
+            "f1": 0.27791563275434245,
+            "fpr": 0.051745635910224436,
+            "tp": 56,
+            "fp": 83,
+            "fn": 208,
+            "tn": 1521,
+            "auc": 0.8501532626766417
+          },
+          "verdicts": {
+            "tp": 70,
+            "fp": 45,
+            "fn": 29,
+            "tn": 36,
+            "precision": 0.6087,
+            "recall": 0.7071,
+            "f1": 0.6542,
+            "fpr": 0.5556,
+            "flagged_share": 0.6389
+          },
+          "spans": {
+            "f1": 0.19469026548672563,
+            "mean_width_ratio": 4.538976973784626,
+            "mean_width_ratio_expanded": 1.0,
+            "coverage": 0.48484848484848486,
+            "soft_f1": 0.4336283185840708
+          },
+          "by_type": {
+            "contradiction": {
+              "tp": 21,
+              "fp": 0,
+              "fn": 5,
+              "tn": 0,
+              "precision": 1.0,
+              "recall": 0.8077,
+              "f1": 0.8936,
+              "fpr": 0.0,
+              "flagged_share": 0.8077,
+              "pairs": 26,
+              "positives": 26
+            },
+            "excess": {
+              "tp": 11,
+              "fp": 0,
+              "fn": 3,
+              "tn": 0,
+              "precision": 1.0,
+              "recall": 0.7857,
+              "f1": 0.88,
+              "fpr": 0.0,
+              "flagged_share": 0.7857,
+              "pairs": 14,
+              "positives": 14
+            },
+            "faithful": {
+              "tp": 0,
+              "fp": 45,
+              "fn": 0,
+              "tn": 36,
+              "precision": 0.0,
+              "recall": 0.0,
+              "f1": 0.0,
+              "fpr": 0.5556,
+              "flagged_share": 0.5556,
+              "pairs": 81,
+              "positives": 0
+            },
+            "missing": {
+              "tp": 7,
+              "fp": 0,
+              "fn": 3,
+              "tn": 0,
+              "precision": 1.0,
+              "recall": 0.7,
+              "f1": 0.8235,
+              "fpr": 0.0,
+              "flagged_share": 0.7,
+              "pairs": 10,
+              "positives": 10
+            },
+            "number_attribution": {
+              "tp": 12,
+              "fp": 0,
+              "fn": 1,
+              "tn": 0,
+              "precision": 1.0,
+              "recall": 0.9231,
+              "f1": 0.96,
+              "fpr": 0.0,
+              "flagged_share": 0.9231,
+              "pairs": 13,
+              "positives": 13
+            },
+            "oversight": {
+              "tp": 0,
+              "fp": 0,
+              "fn": 11,
+              "tn": 0,
+              "precision": 0.0,
+              "recall": 0.0,
+              "f1": 0.0,
+              "fpr": 0.0,
+              "flagged_share": 0.0,
+              "pairs": 11,
+              "positives": 11
+            },
+            "partial": {
+              "tp": 13,
+              "fp": 0,
+              "fn": 2,
+              "tn": 0,
+              "precision": 1.0,
+              "recall": 0.8667,
+              "f1": 0.9286,
+              "fpr": 0.0,
+              "flagged_share": 0.8667,
+              "pairs": 15,
+              "positives": 15
+            },
+            "unconfirmed": {
+              "tp": 6,
+              "fp": 0,
+              "fn": 4,
+              "tn": 0,
+              "precision": 1.0,
+              "recall": 0.6,
+              "f1": 0.75,
+              "fpr": 0.0,
+              "flagged_share": 0.6,
+              "pairs": 10,
+              "positives": 10
+            }
+          }
+        }
+      },
+      "note": ""
     }
   },
   "corpus_a3_real": {
@@ -576,5 +1113,5 @@
   },
   "pilot": null,
   "release": null,
-  "duration_s": 70.6
+  "duration_s": 51.4
 }

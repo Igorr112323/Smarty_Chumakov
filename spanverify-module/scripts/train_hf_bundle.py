@@ -107,6 +107,11 @@ def main(argv: Sequence[str] | None = None) -> int:
     head_written = None
     head_payload = (report.head or {}).get("payload")
     if bundle.head.get("type") == "logreg" and head_payload:
+        # Важно: голова режима hf лежит в своём файле. Если оставить ссылку на
+        # общую config/head.json, к признакам hf применится голова, обученная на
+        # демо-признаках, и риск выродится в 1.0 (проверено).
+        payload["head"] = {"type": "logreg", "file": Path(args.head_out).as_posix()}
+        weights_path.write_text(json.dumps(payload, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
         head_path = Path(args.head_out)
         head_path.parent.mkdir(parents=True, exist_ok=True)
         head_path.write_text(

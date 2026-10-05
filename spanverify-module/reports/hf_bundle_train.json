@@ -1,0 +1,263 @@
+{
+  "mode": "hf",
+  "model": "/home/user/models/minilm-l6",
+  "n_train_pairs": 840,
+  "train_file": "data/corpus_a/splits/train.jsonl",
+  "folds": [
+    {
+      "fold": 0,
+      "n_train": 4791,
+      "n_test": 1197,
+      "auc": 0.863381105950617
+    },
+    {
+      "fold": 1,
+      "n_train": 4791,
+      "n_test": 1197,
+      "auc": 0.8614715149341667
+    },
+    {
+      "fold": 2,
+      "n_train": 4791,
+      "n_test": 1197,
+      "auc": 0.86477278549106
+    },
+    {
+      "fold": 3,
+      "n_train": 4791,
+      "n_test": 1197,
+      "auc": 0.8852600557180025
+    },
+    {
+      "fold": 4,
+      "n_train": 4788,
+      "n_test": 1200,
+      "auc": 0.8684048356986207
+    }
+  ],
+  "head_auc_folds": [
+    0.8634,
+    0.8615,
+    0.8648,
+    0.8853,
+    0.8684
+  ],
+  "threshold": 0.5319148936170213,
+  "target_fpr": 0.1,
+  "weights": {
+    "attention_entropy": 0.0,
+    "ctx_attention_mass": 0.8,
+    "embedding_density": 0.2
+  },
+  "head": "logreg",
+  "head_file": "config/head_hf.json",
+  "validation": {
+    "tokens": {
+      "precision": 0.36795252225519287,
+      "recall": 0.3333333333333333,
+      "f1": 0.34978843441466856,
+      "fpr": 0.08059023836549375,
+      "tp": 124,
+      "fp": 213,
+      "fn": 248,
+      "tn": 2430,
+      "auc": 0.8604184720035476
+    },
+    "precision": 0.36795252225519287,
+    "recall": 0.3333333333333333,
+    "f1": 0.34978843441466856,
+    "fpr": 0.08059023836549375,
+    "auc": 0.8604184720035476,
+    "tp": 124,
+    "fp": 213,
+    "fn": 248,
+    "tn": 2430,
+    "span_f1": 0.4931506849315069,
+    "answer_auc": 0.4164547573638483,
+    "answer_threshold": 0.5319148936170213,
+    "answer_precision": 0.5333333333333333,
+    "answer_recall": 0.055944055944055944,
+    "answer_f1": 0.10126582278481013,
+    "answer_fpr": 0.05303030303030303,
+    "end_to_end": {
+      "tokens": {
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0,
+        "fpr": 0.0,
+        "tp": 0,
+        "fp": 0,
+        "fn": 372,
+        "tn": 2643,
+        "auc": 0.6305070403052901
+      },
+      "spans": {
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0,
+        "tp": 0,
+        "fp": 102,
+        "fn": 143,
+        "iou_threshold": 0.5,
+        "recall_containment": 0.32167832167832167,
+        "f1_expanded_labels": 0.5387755102040817,
+        "strict_f1_expanded": 0.5387755102040817,
+        "coverage_expanded": 0.46153846153846156,
+        "mean_width_ratio": 5.930660388952219,
+        "mean_width_ratio_expanded": 1.0,
+        "n_narrow": 275,
+        "n_expanded": 275
+      },
+      "answers": {
+        "threshold": 0.5319148936170213,
+        "precision": 0.8955223880597015,
+        "recall": 0.4195804195804196,
+        "f1": 0.5714285714285715,
+        "fpr": 0.05303030303030303,
+        "auc": 0.6921752489934309,
+        "tp": 60,
+        "fp": 7,
+        "fn": 83,
+        "tn": 125
+      },
+      "verdicts": {
+        "tp": 74,
+        "fp": 28,
+        "fn": 69,
+        "tn": 104,
+        "precision": 0.7255,
+        "recall": 0.5175,
+        "f1": 0.6041,
+        "fpr": 0.2121,
+        "flagged_share": 0.3709
+      },
+      "by_type": {
+        "contradiction": {
+          "tp": 25,
+          "fp": 0,
+          "fn": 14,
+          "tn": 0,
+          "precision": 1.0,
+          "recall": 0.641,
+          "f1": 0.7813,
+          "fpr": 0.0,
+          "flagged_share": 0.641,
+          "pairs": 39,
+          "positives": 39
+        },
+        "excess": {
+          "tp": 3,
+          "fp": 0,
+          "fn": 6,
+          "tn": 0,
+          "precision": 1.0,
+          "recall": 0.3333,
+          "f1": 0.5,
+          "fpr": 0.0,
+          "flagged_share": 0.3333,
+          "pairs": 9,
+          "positives": 9
+        },
+        "faithful": {
+          "tp": 0,
+          "fp": 28,
+          "fn": 0,
+          "tn": 104,
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "fpr": 0.2121,
+          "flagged_share": 0.2121,
+          "pairs": 132,
+          "positives": 0
+        },
+        "missing": {
+          "tp": 8,
+          "fp": 0,
+          "fn": 1,
+          "tn": 0,
+          "precision": 1.0,
+          "recall": 0.8889,
+          "f1": 0.9412,
+          "fpr": 0.0,
+          "flagged_share": 0.8889,
+          "pairs": 9,
+          "positives": 9
+        },
+        "number_attribution": {
+          "tp": 11,
+          "fp": 0,
+          "fn": 6,
+          "tn": 0,
+          "precision": 1.0,
+          "recall": 0.6471,
+          "f1": 0.7857,
+          "fpr": 0.0,
+          "flagged_share": 0.6471,
+          "pairs": 17,
+          "positives": 17
+        },
+        "oversight": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 14,
+          "tn": 0,
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "fpr": 0.0,
+          "flagged_share": 0.0,
+          "pairs": 14,
+          "positives": 14
+        },
+        "partial": {
+          "tp": 20,
+          "fp": 0,
+          "fn": 13,
+          "tn": 0,
+          "precision": 1.0,
+          "recall": 0.6061,
+          "f1": 0.7547,
+          "fpr": 0.0,
+          "flagged_share": 0.6061,
+          "pairs": 33,
+          "positives": 33
+        },
+        "unconfirmed": {
+          "tp": 7,
+          "fp": 0,
+          "fn": 15,
+          "tn": 0,
+          "precision": 1.0,
+          "recall": 0.3182,
+          "f1": 0.4828,
+          "fpr": 0.0,
+          "flagged_share": 0.3182,
+          "pairs": 22,
+          "positives": 22
+        }
+      },
+      "fact_coverage": {
+        "facts": 1505,
+        "distorted": 48,
+        "omitted": 19,
+        "absent": 1308
+      },
+      "pairs": 275,
+      "mode": "hf",
+      "warning": ""
+    },
+    "selection": {
+      "signal": "logreg",
+      "rule_f1_train": 0.012706480304955529,
+      "head_f1_train": 0.369901547116737
+    }
+  },
+  "seconds": 84.6,
+  "hardware": {
+    "platform": "Linux-6.1.158+-x86_64-with-glibc2.36",
+    "python": "3.11.2",
+    "processor": "x86_64"
+  },
+  "command": "python scripts/train_hf_bundle.py --model /home/user/models/minilm-l6 --feature-cache data/cache/hf_features --out-json reports/hf_bundle_train.json"
+}
