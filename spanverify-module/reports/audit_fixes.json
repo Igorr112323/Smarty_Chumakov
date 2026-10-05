@@ -1,0 +1,181 @@
+{
+ "generated_at": "2026-10-05T19:25:00.549864+00:00",
+ "source": "audit_status_source.json",
+ "items": [
+  {
+   "id": "P0-1",
+   "title": "Режим hf не прогонялся ни разу",
+   "priority": "P0",
+   "status": "частично",
+   "evidence": "Режим hf прогоняется: локально на реальной модели MiniLM-L6 (reports/pilot_local/pilot.md), в CI — на ruGPT3-small (reports/pilot). Признаки считаются модулем spanverify/hfmodel.py, тесты tests/test_hfmodel.py (29 проверок).",
+   "commit": "e55670f"
+  },
+  {
+   "id": "P0-2",
+   "title": "Пилот на реальной модели: AUC признаков внимания ≈ 0,50",
+   "priority": "P0",
+   "status": "частично",
+   "evidence": "Пилот с 4 слоями, бутстрэпом 5000 и контролем контраста выполнен: reports/pilot_local/pilot.json (локально, MiniLM) и reports/pilot (CI, ruGPT3-small). Гипотеза «масса внимания на контекст информативнее энтропии» проверяется скриптом и печатается честно, включая отрицательный результат.",
+   "commit": "—"
+  },
+  {
+   "id": "P0-3",
+   "title": "Локализация: строгий span-F1 0.098–0.283 при ширине ×24",
+   "priority": "P0",
+   "status": "частично",
+   "evidence": "Точные границы: spanverify/bounds.py (narrow/expanded), метрики строгого span-F1, накрытия и ширины по обоим вариантам в engine.evaluate; тесты tests/test_bounds.py. Числа — в reports/METRICS.json и CORPUS_REPORT.md.",
+   "commit": "f69b87c"
+  },
+  {
+   "id": "P0-4",
+   "title": "Тип `missing` не обнаруживается (recall 0.00)",
+   "priority": "P0",
+   "status": "частично",
+   "evidence": "Покрытие фактов документа: spanverify/coverage.py (сопоставление субъекта, конкуренция фактов, условия, «другой предмет»), метрика fact_coverage в engine.evaluate, тесты tests/test_coverage.py.",
+   "commit": "f69b87c"
+  },
+  {
+   "id": "P0-5",
+   "title": "Корпус A3 (реальные акты) не собран",
+   "priority": "P0",
+   "status": "частично",
+   "evidence": "Загрузчик реальных актов расширен (региональные квоты, кэш PDF, бюджет времени, записи unavailable с причиной) и запускается в CI: .github/workflows/arena-pipeline.yml, job npa-corpus. Числа — data/corpus_a3/sources/sources.json и reports/CORPUS_A3.md.",
+   "commit": "2eedcac"
+  },
+  {
+   "id": "P1-1",
+   "title": "Тип `partial` — recall 0.2667",
+   "priority": "P1",
+   "status": "частично",
+   "evidence": "Тип partial обрабатывается покрытием фактов (потеря условия, частичное значение) и правилом рода величины; измеряется в recalls по типам в reports/METRICS.json.",
+   "commit": "f69b87c"
+  },
+  {
+   "id": "P1-2",
+   "title": "14 % ложных замечаний на чистых парах A1",
+   "priority": "P1",
+   "status": "частично",
+   "evidence": "Ложные срабатывания на чистых парах измеряются отдельно (by_type.faithful.fpr) и разбираются по источникам в reports/CORPUS_REPORT.md; добавлено правило рода величины (spanverify/coverage.py, _same_number_kind).",
+   "commit": "—"
+  },
+  {
+   "id": "P1-3",
+   "title": "Перенос на другой генератор и внешние наборы",
+   "priority": "P1",
+   "status": "нет",
+   "evidence": "Перенос на другой генератор и внешние наборы: адаптеры и оценка есть (scripts/external_eval.py, reports/external_tests.json), прогоны в режиме hf не выполнены.",
+   "commit": "—"
+  },
+  {
+   "id": "P1-4",
+   "title": "Корпус A2 (ответы реальной модели) — только `--dry-run`",
+   "priority": "P1",
+   "status": "нет",
+   "evidence": "Корпус A2 собирается в режиме --dry-run; реальные ответы модели требуют модели с доступом к HuggingFace (в песочнице недоступен).",
+   "commit": "—"
+  },
+  {
+   "id": "P1-5",
+   "title": "Оценка доли участия ИИ калибрована на синтетике",
+   "priority": "P1",
+   "status": "частично",
+   "evidence": "Калибровка доли участия ИИ на реальных текстах: scripts/calibrate_participation_real.py (смеси 0/0.25/0.5/0.75/1, AUC и MAE вне фолдов, честное calibrated_on). Прогон в CI — job hf-runs.",
+   "commit": "—"
+  },
+  {
+   "id": "P1-6",
+   "title": "Устойчивость к перефразированию и числам прописью",
+   "priority": "P1",
+   "status": "частично",
+   "evidence": "Устойчивость к пяти искажениям: scripts/robustness.py (перефразирование, числовая подмена, противоречие, пропуск, числа прописью), тесты tests/test_infrastructure_scripts.py. Числа — reports/robustness*.json/md.",
+   "commit": "e55670f"
+  },
+  {
+   "id": "P1-7",
+   "title": "Режим hf не работает как сквозной путь: нет скользящего окна, кэша весов, пакетной обработки",
+   "priority": "P1",
+   "status": "закрыто",
+   "evidence": "Сквозной путь hf: spanverify/hfmodel.py — кэш весов и признаков, скользящее окно, выбор слоя, уменьшение окна при OOM, отказ без подмены на demo; тесты tests/test_hfmodel.py; локальный прогон reports/pilot_local/pilot.json.",
+   "commit": "e55670f"
+  },
+  {
+   "id": "P1-8",
+   "title": "Качество кода: барьер `check_numbers.py` не пройден, порог покрытия рискует",
+   "priority": "P1",
+   "status": "частично",
+   "evidence": "Качество кода: ruff и black чисто, тесты 383 (см. reports/code_state.json), барьер scripts/check_numbers.py проверяется перед итоговым отчётом.",
+   "commit": "d99ea8c"
+  },
+  {
+   "id": "P2-1",
+   "title": "Baseline-числа аналогов = null",
+   "priority": "P2",
+   "status": "частично",
+   "evidence": "Базовые уровни: в пилоте — случайное угадывание 0.5 и косинусная близость без внимания (embedding_density); извлечение таблиц статьи — scripts/extract_baseline_pdf.py, результаты в reports/ext_*.json.",
+   "commit": "—"
+  },
+  {
+   "id": "P2-2",
+   "title": "Очередь ручной проверки разметки не проверена",
+   "priority": "P2",
+   "status": "нет",
+   "evidence": "Очередь ручной проверки: файлы создаются (data/review_queue/*.jsonl), отметки ставит человек через scripts/review_server.py; фактическое число проверенных фиксируется в reports/review_queue.json.",
+   "commit": "—"
+  },
+  {
+   "id": "P2-3",
+   "title": "Загрузчик знает только один источник",
+   "priority": "P2",
+   "status": "частично",
+   "evidence": "Загрузчик расширен: региональные квоты и уровень акта по номеру публикации, кэш PDF, бюджет времени, явные записи unavailable с причиной, сверка SHA256 (scripts/fetch_npa_corpus.py, tests/test_fetch_npa_corpus.py).",
+   "commit": "—"
+  },
+  {
+   "id": "P2-4",
+   "title": "Нет функциональных испытаний лабораторного образца",
+   "priority": "P2",
+   "status": "закрыто",
+   "evidence": "Функциональные испытания: scripts/functional_tests.py — длины 500/2000/10000/50000 и 100000/200000 символов, коды возврата 0/1/2, смоук GET /health и POST /v1/verify, цикл с замером памяти, размеры артефактов; отчёт reports/FUNCTIONAL_TESTS.md.",
+   "commit": "—"
+  },
+  {
+   "id": "P2-5",
+   "title": "Документы сдачи и материалы РИД отсутствуют",
+   "priority": "P2",
+   "status": "закрыто",
+   "evidence": "Документы сдачи и РИД: scripts/make_gost_docs.py (протокол, акт, ведомость, .docx) и scripts/make_rid_package.py (заявки на ПО и БД, опись депонирования, пометка «не подано»), reports/gost и reports/rid.",
+   "commit": "0f12f54"
+  },
+  {
+   "id": "P2-6",
+   "title": "Патентный поиск не выполнен",
+   "priority": "P2",
+   "status": "закрыто",
+   "evidence": "Патентный поиск и обзор аналогов: scripts/prior_art_search.py (OpenAlex, Crossref, GitHub, Google Patents), результаты без интерпретации — reports/prior_art.json и prior_art.md.",
+   "commit": "0f12f54"
+  }
+ ],
+ "unfinished": [
+  "P0-1",
+  "P0-2",
+  "P0-3",
+  "P0-4",
+  "P0-5",
+  "P1-1",
+  "P1-2",
+  "P1-3",
+  "P1-4",
+  "P1-5",
+  "P1-6",
+  "P1-8",
+  "P2-1",
+  "P2-2",
+  "P2-3"
+ ],
+ "unmeasured": [
+  "Прогоны на внешних наборах (RAGTruth, RusHallu-RAG) в режиме hf — из песочницы нет доступа к их серверам, ожидается в CI.",
+  "Ответы реальной модели для корпуса A2 — требуется генерация моделью (в CI, если доступен HuggingFace).",
+  "Отметки человека в очереди ручной проверки (P2-2) — без участия человека число остаётся нулевым.",
+  "8-часовой цикл на утечки памяти — выполняется сокращённый цикл, фактическая длительность указана в отчёте."
+ ]
+}

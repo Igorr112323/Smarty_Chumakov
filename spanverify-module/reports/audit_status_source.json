@@ -1,0 +1,125 @@
+{
+ "note": "Статусы находок аудита ведёт человек (это суждение), хеши коммитов подтягивает scripts/collect_status.py из git log по ключевым словам. Статус «закрыто» ставится только при наличии кода, теста и числа в файле отчёта.",
+ "items": [
+  {
+   "id": "P0-1",
+   "status": "частично",
+   "evidence": "Режим hf прогоняется: локально на реальной модели MiniLM-L6 (reports/pilot_local/pilot.md), в CI — на ruGPT3-small (reports/pilot). Признаки считаются модулем spanverify/hfmodel.py, тесты tests/test_hfmodel.py (29 проверок).",
+   "keywords": ["режим hf"]
+  },
+  {
+   "id": "P0-2",
+   "status": "частично",
+   "evidence": "Пилот с 4 слоями, бутстрэпом 5000 и контролем контраста выполнен: reports/pilot_local/pilot.json (локально, MiniLM) и reports/pilot (CI, ruGPT3-small). Гипотеза «масса внимания на контекст информативнее энтропии» проверяется скриптом и печатается честно, включая отрицательный результат.",
+   "keywords": ["пилот"]
+  },
+  {
+   "id": "P0-3",
+   "status": "частично",
+   "evidence": "Точные границы: spanverify/bounds.py (narrow/expanded), метрики строгого span-F1, накрытия и ширины по обоим вариантам в engine.evaluate; тесты tests/test_bounds.py. Числа — в reports/METRICS.json и CORPUS_REPORT.md.",
+   "keywords": ["границ"]
+  },
+  {
+   "id": "P0-4",
+   "status": "частично",
+   "evidence": "Покрытие фактов документа: spanverify/coverage.py (сопоставление субъекта, конкуренция фактов, условия, «другой предмет»), метрика fact_coverage в engine.evaluate, тесты tests/test_coverage.py.",
+   "keywords": ["покрытие фактов"]
+  },
+  {
+   "id": "P0-5",
+   "status": "частично",
+   "evidence": "Загрузчик реальных актов расширен (региональные квоты, кэш PDF, бюджет времени, записи unavailable с причиной) и запускается в CI: .github/workflows/arena-pipeline.yml, job npa-corpus. Числа — data/corpus_a3/sources/sources.json и reports/CORPUS_A3.md.",
+   "keywords": ["корпус A3"]
+  },
+  {
+   "id": "P1-1",
+   "status": "частично",
+   "evidence": "Тип partial обрабатывается покрытием фактов (потеря условия, частичное значение) и правилом рода величины; измеряется в recalls по типам в reports/METRICS.json.",
+   "keywords": ["покрытие фактов"]
+  },
+  {
+   "id": "P1-2",
+   "status": "частично",
+   "evidence": "Ложные срабатывания на чистых парах измеряются отдельно (by_type.faithful.fpr) и разбираются по источникам в reports/CORPUS_REPORT.md; добавлено правило рода величины (spanverify/coverage.py, _same_number_kind).",
+   "keywords": ["ложн"]
+  },
+  {
+   "id": "P1-3",
+   "status": "нет",
+   "evidence": "Перенос на другой генератор и внешние наборы: адаптеры и оценка есть (scripts/external_eval.py, reports/external_tests.json), прогоны в режиме hf не выполнены.",
+   "keywords": ["внешн"]
+  },
+  {
+   "id": "P1-4",
+   "status": "нет",
+   "evidence": "Корпус A2 собирается в режиме --dry-run; реальные ответы модели требуют модели с доступом к HuggingFace (в песочнице недоступен).",
+   "keywords": ["A2"]
+  },
+  {
+   "id": "P1-5",
+   "status": "частично",
+   "evidence": "Калибровка доли участия ИИ на реальных текстах: scripts/calibrate_participation_real.py (смеси 0/0.25/0.5/0.75/1, AUC и MAE вне фолдов, честное calibrated_on). Прогон в CI — job hf-runs.",
+   "keywords": ["участия"]
+  },
+  {
+   "id": "P1-6",
+   "status": "частично",
+   "evidence": "Устойчивость к пяти искажениям: scripts/robustness.py (перефразирование, числовая подмена, противоречие, пропуск, числа прописью), тесты tests/test_infrastructure_scripts.py. Числа — reports/robustness*.json/md.",
+   "keywords": ["устойчив"]
+  },
+  {
+   "id": "P1-7",
+   "status": "закрыто",
+   "evidence": "Сквозной путь hf: spanverify/hfmodel.py — кэш весов и признаков, скользящее окно, выбор слоя, уменьшение окна при OOM, отказ без подмены на demo; тесты tests/test_hfmodel.py; локальный прогон reports/pilot_local/pilot.json.",
+   "keywords": ["режим hf", "скользящее окно"]
+  },
+  {
+   "id": "P1-8",
+   "status": "частично",
+   "evidence": "Качество кода: ruff и black чисто, тесты 383 (см. reports/code_state.json), барьер scripts/check_numbers.py проверяется перед итоговым отчётом.",
+   "keywords": ["конвейер CI", "шаг 3-"]
+  },
+  {
+   "id": "P2-1",
+   "status": "частично",
+   "evidence": "Базовые уровни: в пилоте — случайное угадывание 0.5 и косинусная близость без внимания (embedding_density); извлечение таблиц статьи — scripts/extract_baseline_pdf.py, результаты в reports/ext_*.json.",
+   "keywords": ["baseline", "пилот"]
+  },
+  {
+   "id": "P2-2",
+   "status": "нет",
+   "evidence": "Очередь ручной проверки: файлы создаются (data/review_queue/*.jsonl), отметки ставит человек через scripts/review_server.py; фактическое число проверенных фиксируется в reports/review_queue.json.",
+   "keywords": ["очередь"]
+  },
+  {
+   "id": "P2-3",
+   "status": "частично",
+   "evidence": "Загрузчик расширен: региональные квоты и уровень акта по номеру публикации, кэш PDF, бюджет времени, явные записи unavailable с причиной, сверка SHA256 (scripts/fetch_npa_corpus.py, tests/test_fetch_npa_corpus.py).",
+   "keywords": ["загрузчик"]
+  },
+  {
+   "id": "P2-4",
+   "status": "закрыто",
+   "evidence": "Функциональные испытания: scripts/functional_tests.py — длины 500/2000/10000/50000 и 100000/200000 символов, коды возврата 0/1/2, смоук GET /health и POST /v1/verify, цикл с замером памяти, размеры артефактов; отчёт reports/FUNCTIONAL_TESTS.md.",
+   "keywords": ["функциональн"]
+  },
+  {
+   "id": "P2-5",
+   "status": "закрыто",
+   "evidence": "Документы сдачи и РИД: scripts/make_gost_docs.py (протокол, акт, ведомость, .docx) и scripts/make_rid_package.py (заявки на ПО и БД, опись депонирования, пометка «не подано»), reports/gost и reports/rid.",
+   "keywords": ["документ", "РИД"]
+  },
+  {
+   "id": "P2-6",
+   "status": "закрыто",
+   "evidence": "Патентный поиск и обзор аналогов: scripts/prior_art_search.py (OpenAlex, Crossref, GitHub, Google Patents), результаты без интерпретации — reports/prior_art.json и prior_art.md.",
+   "keywords": ["аналог", "патент"]
+  }
+ ],
+ "unmeasured": [
+  "Прогоны на внешних наборах (RAGTruth, RusHallu-RAG) в режиме hf — из песочницы нет доступа к их серверам, ожидается в CI.",
+  "Ответы реальной модели для корпуса A2 — требуется генерация моделью (в CI, если доступен HuggingFace).",
+  "Отметки человека в очереди ручной проверки (P2-2) — без участия человека число остаётся нулевым.",
+  "8-часовой цикл на утечки памяти — выполняется сокращённый цикл, фактическая длительность указана в отчёте."
+ ]
+}

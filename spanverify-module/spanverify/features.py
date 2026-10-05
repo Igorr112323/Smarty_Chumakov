@@ -27,7 +27,7 @@ from collections.abc import Sequence
 from dataclasses import dataclass, field
 from typing import Any
 
-from .core import Token, number_value, numbers_in, split_chunks
+from .core import Token, number_value, numbers_in, split_chunks, tokenize_with_offsets
 from .lexicon import BOILERPLATE_WORDS, PARAPHRASE_WORDS, STOPWORDS, find_phrase_hits
 from .vectors import hash_index, normalize
 

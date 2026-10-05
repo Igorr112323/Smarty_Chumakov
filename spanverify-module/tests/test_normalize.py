@@ -104,5 +104,5 @@ def test_iter_windows_covers_tail_with_overlap() -> None:
     windows = list(iter_windows(10, window=4, step=3))
     assert windows[0] == (0, 4)
     assert windows[-1][1] == 10
-    for (_start, end), (next_start, _next_end) in zip(windows, windows[1:]):
+    for (_start, end), (next_start, _next_end) in zip(windows, windows[1:], strict=False):
         assert next_start < end

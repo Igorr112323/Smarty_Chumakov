@@ -56,6 +56,9 @@ from .features import (
 from .participation import PARTICIPATION_FILENAME, ParticipationModel
 
 WEIGHTS_FILENAME = "config/weights.json"
+# Отдельные параметры для режима hf: признаки другой природы, и демо-веса в hf
+# дают вырожденный риск (аудит, пункт P0-1). Файл создаёт scripts/train_hf_bundle.py.
+HF_WEIGHTS_FILENAME = "config/weights_hf.json"
 HALLUCINATION_LABEL_RISK = 0.75
 TOP_SHARE = 0.2
 SMOOTH_WINDOW = 3
@@ -186,6 +189,14 @@ class WeightsBundle:
         return self.source in {"disk", "embedded"}
 
 
+def _hf_weights_available() -> bool:
+    """Есть ли на диске обученный набор параметров режима hf."""
+    for root in runtime_roots():
+        if (Path(root) / HF_WEIGHTS_FILENAME).is_file():
+            return True
+    return False
+
+
 class Verifier:
     """Проверка ответа относительно контекста и оценка доли участия ИИ."""
 
@@ -201,8 +212,20 @@ class Verifier:
         self.config = config or Config.load()
         # Явно переданные веса имеют приоритет: иначе обучение, которое считает
         # сквозные метрики «в памяти», случайно перечитало бы файл с диска.
-        self.bundle = weights if weights is not None else WeightsBundle.load(weights_path)
+        chosen_path = weights_path
+        mode_hint = (mode or "").lower()
+        if (
+            weights is None
+            and mode_hint == "hf"
+            and Path(str(weights_path)) == Path(WEIGHTS_FILENAME)
+            and _hf_weights_available()
+        ):
+            # Режим hf со своими параметрами: демо-веса здесь дают ложную
+            # «уверенность» (риск 1.0 на всех парах), поэтому берём hf-бандл.
+            chosen_path = HF_WEIGHTS_FILENAME
+        self.bundle = weights if weights is not None else WeightsBundle.load(chosen_path)
         self.weights_loaded = weights is not None or self.bundle.loaded
+        self.weights_path_used = str(chosen_path)
         self.mode = (mode or self.bundle.mode or self.config.backend or "demo").lower()
         self.model_name = model_name or getattr(self.config, "hf_model", "ai-forever/rugpt3small_based_on_gpt2")
         self._detector = detector

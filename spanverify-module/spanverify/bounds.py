@@ -113,11 +113,8 @@ def _number_mention_in(text: str, start: int, end: int) -> NumberMention | None:
         absolute_start = start + mention.start
         absolute_end = start + mention.end
         if mention.unit:
-            # Приклеиваем единицу измерения, если она идёт сразу за числом.
-            tail = text[absolute_end : absolute_end + 24]
-            lowered = tail.lower()
-            for stop in (" ", ",", ";", ".", ")"):
-                pass
+            # Единица измерения уже распознана парсером чисел (normalize.numbers_in_text):
+            # здесь она не пересчитывается повторно, чтобы не расходиться с ним.
             return NumberMention(
                 value=mention.value,
                 text=text[absolute_start:absolute_end],

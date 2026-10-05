@@ -1,0 +1,75 @@
+{
+ "generated_at": "2026-10-05T19:25:01.167374+00:00",
+ "items": [
+  {
+   "name": "Качество по токенам на отложенной части",
+   "target": "F1 >= 0.90",
+   "fact": null,
+   "achieved": false,
+   "comment": "Критерий ТЗ на демонстрационном корпусе (режим demo)."
+  },
+  {
+   "name": "Ложные срабатывания на верных ответах",
+   "target": "FPR <= 0.10",
+   "fact": null,
+   "achieved": false,
+   "comment": "Критерий ТЗ; фактическое значение зависит от корпуса и режима."
+  },
+  {
+   "name": "Покрытие автотестами",
+   "target": ">= 85 %",
+   "fact": null,
+   "achieved": false,
+   "comment": "Измеряется шагом «quality» в CI; значение — в логе job и reports/coverage.json."
+  },
+  {
+   "name": "Корпус реальных актов",
+   "target": ">= 120 актов, >= 1200 фактов, >= 1200 пар",
+   "fact": null,
+   "achieved": false,
+   "comment": "Сборка выполняется в CI (job npa-corpus)."
+  },
+  {
+   "name": "Доля чистых пар в корпусе",
+   "target": "40-50 %",
+   "fact": null,
+   "achieved": false,
+   "comment": "Проверяется манифестом корпуса."
+  },
+  {
+   "name": "Пары на каждый из восьми типов искажений",
+   "target": ">= 40 пар на тип",
+   "fact": null,
+   "achieved": false,
+   "comment": "Проверяется манифестом (balance.counts)."
+  },
+  {
+   "name": "Строгий span-F1 (IoU >= 0.5)",
+   "target": ">= 0.60",
+   "fact": null,
+   "achieved": false,
+   "comment": "Цель по доработке локализации; фактическое значение — в METRICS.json."
+  },
+  {
+   "name": "Ширина предсказанных фрагментов",
+   "target": "<= 2.0 от эталона",
+   "fact": null,
+   "achieved": false,
+   "comment": "Отношение ширины narrow-фрагмента к эталонному."
+  },
+  {
+   "name": "Контроль контраста в пилоте",
+   "target": "опора >= 80 %, без опоры <= 30 %",
+   "fact": null,
+   "achieved": false,
+   "comment": "Считается в scripts/pilot_rugpt3small.py и печатается в reports/pilot/pilot.md."
+  },
+  {
+   "name": "Прохождение барьера чисел",
+   "target": "0 расхождений",
+   "fact": null,
+   "achieved": false,
+   "comment": "python scripts/check_numbers.py перед итоговым отчётом."
+  }
+ ]
+}

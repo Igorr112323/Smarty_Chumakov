@@ -1,0 +1,85 @@
+{
+ "note": "Цели взяты из docs/ТЗ_и_календарный_план.md (раздел «Критерии приёмки») и из задания на доработку. Факты подставляет scripts/collect_status.py из reports/METRICS.json по указанному пути; отсутствие измерения даёт null и причину, а не «выполнено».",
+ "items": [
+  {
+   "name": "Качество по токенам на отложенной части",
+   "target": "F1 >= 0.90",
+   "target_value": 0.9,
+   "compare": ">=",
+   "metric_path": "corpora.A1.modes.demo.tokens.f1",
+   "comment": "Критерий ТЗ на демонстрационном корпусе (режим demo)."
+  },
+  {
+   "name": "Ложные срабатывания на верных ответах",
+   "target": "FPR <= 0.10",
+   "target_value": 0.1,
+   "compare": "<=",
+   "metric_path": "corpora.A1.modes.demo.verdicts.fpr",
+   "comment": "Критерий ТЗ; фактическое значение зависит от корпуса и режима."
+  },
+  {
+   "name": "Покрытие автотестами",
+   "target": ">= 85 %",
+   "target_value": 85,
+   "compare": ">=",
+   "metric_path": null,
+   "comment": "Измеряется шагом «quality» в CI; значение — в логе job и reports/coverage.json."
+  },
+  {
+   "name": "Корпус реальных актов",
+   "target": ">= 120 актов, >= 1200 фактов, >= 1200 пар",
+   "target_value": 1200,
+   "compare": ">=",
+   "metric_path": "corpora.A3.modes.demo.pairs",
+   "comment": "Сборка выполняется в CI (job npa-corpus)."
+  },
+  {
+   "name": "Доля чистых пар в корпусе",
+   "target": "40-50 %",
+   "target_value": 0.4,
+   "compare": ">=",
+   "metric_path": "corpora.A3.clean_share",
+   "comment": "Проверяется манифестом корпуса."
+  },
+  {
+   "name": "Пары на каждый из восьми типов искажений",
+   "target": ">= 40 пар на тип",
+   "target_value": 40,
+   "compare": ">=",
+   "metric_path": "corpora.A3.min_pairs_per_type",
+   "comment": "Проверяется манифестом (balance.counts)."
+  },
+  {
+   "name": "Строгий span-F1 (IoU >= 0.5)",
+   "target": ">= 0.60",
+   "target_value": 0.6,
+   "compare": ">=",
+   "metric_path": "corpora.A1.modes.demo.spans.f1",
+   "comment": "Цель по доработке локализации; фактическое значение — в METRICS.json."
+  },
+  {
+   "name": "Ширина предсказанных фрагментов",
+   "target": "<= 2.0 от эталона",
+   "target_value": 2.0,
+   "compare": "<=",
+   "metric_path": "corpora.A1.modes.demo.spans.mean_width_ratio",
+   "comment": "Отношение ширины narrow-фрагмента к эталонному."
+  },
+  {
+   "name": "Контроль контраста в пилоте",
+   "target": "опора >= 80 %, без опоры <= 30 %",
+   "target_value": 0.8,
+   "compare": ">=",
+   "metric_path": null,
+   "comment": "Считается в scripts/pilot_rugpt3small.py и печатается в reports/pilot/pilot.md."
+  },
+  {
+   "name": "Прохождение барьера чисел",
+   "target": "0 расхождений",
+   "target_value": 0,
+   "compare": "<=",
+   "metric_path": null,
+   "comment": "python scripts/check_numbers.py перед итоговым отчётом."
+  }
+ ]
+}

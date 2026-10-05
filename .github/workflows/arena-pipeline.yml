@@ -7,7 +7,9 @@
 # коммитятся обратно в ветку и выкладываются артефактами.
 #
 # Каждый шаг идемпотентен: повторный запуск не перекачивает уже скачанное
-# (кэш PDF, кэш весов), а источники сверяются по SHA256.
+# (кэш PDF, кэш весов), а источники сверяются по SHA256. Защита от петли:
+# коммиты самого конвейера (в сообщении есть «автоматический прогон CI»)
+# не запускают его заново.
 
 name: arena-pipeline
 
@@ -43,7 +45,7 @@ jobs:
     name: Реальные НПА и корпус A3
     runs-on: ubuntu-latest
     timeout-minutes: 340
-    if: ${{ github.event_name == 'push' || !inputs.tasks || contains(inputs.tasks, 'corpus') }}
+    if: ${{ (github.event_name != 'push' || !contains(github.event.head_commit.message, 'автоматический прогон CI')) && (github.event_name == 'push' || !inputs.tasks || contains(inputs.tasks, 'corpus')) }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -128,7 +130,7 @@ jobs:
     name: Реальная модель — пилот, признаки, эксперименты
     runs-on: ubuntu-latest
     timeout-minutes: 340
-    if: ${{ github.event_name == 'push' || !inputs.tasks || contains(inputs.tasks, 'hf') }}
+    if: ${{ (github.event_name != 'push' || !contains(github.event.head_commit.message, 'автоматический прогон CI')) && (github.event_name == 'push' || !inputs.tasks || contains(inputs.tasks, 'hf')) }}
     env:
       HF_HOME: ${{ github.workspace }}/spanverify-module/.hf-cache
     steps:
@@ -181,6 +183,17 @@ jobs:
               --dataset data/corpus_a3/pairs.jsonl --seed 42 --folds 5 \
               --out reports/experiments/hf_corpus_a3.json || true
           fi
+      - name: Параметры режима hf обучены на train-разбиении (тест не используется)
+        run: |
+          python scripts/train_hf_bundle.py --model "${PILOT_MODEL}" \
+            --splits data/corpus_a/splits --feature-cache data/cache/hf_features \
+            --out-json reports/hf_bundle_train.json
+      - name: Метрики dev и test в режиме hf (отдельные числа, по документам)
+        run: |
+          python scripts/evaluate_splits.py --mode hf --model "${PILOT_MODEL}" \
+            --weights config/weights_hf.json --feature-cache data/cache/hf_features \
+            --splits data/corpus_a/splits --splits-names dev,test \
+            --json --out reports/hf_splits.json
       - name: Устойчивость к искажениям (реальная модель)
         working-directory: spanverify-module
         run: |
@@ -215,12 +228,72 @@ jobs:
           path: spanverify-module/reports
           if-no-files-found: warn
 
+  # --------------------------------------------------- итоговый отчёт и качество
+  final-report:
+    name: Итоговый отчёт (12 разделов) и качество
+    runs-on: ubuntu-latest
+    timeout-minutes: 300
+    needs: [npa-corpus, hf-runs]
+    if: ${{ always() && (github.event_name == 'push' || !inputs.tasks || contains(inputs.tasks, 'corpus') || contains(inputs.tasks, 'hf')) }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Свежие результаты предыдущих задач
+        run: |
+          git config user.name "arena-pipeline"
+          git config user.email "arena-pipeline@users.noreply.github.com"
+          git pull --rebase --autostash origin "${GITHUB_REF_NAME}" || true
+      - name: Зависимости для тестов и покрытия
+        run: |
+          python -m pip install --quiet --upgrade pip
+          python -m pip install --quiet -r spanverify-module/requirements.txt pypdf
+      - name: Тесты с покрытием (число берётся из покрытия, не из головы)
+        working-directory: spanverify-module
+        run: |
+          python -m pytest -q --cov=spanverify --cov-report=json:reports/coverage.json --cov-report=term | tail -25
+      - name: Метрики в единый файл
+        working-directory: spanverify-module
+        run: python scripts/collect_metrics.py
+      - name: Состояние проекта (журнал аудита, цели, очередь проверки)
+        working-directory: spanverify-module
+        run: python scripts/collect_status.py
+      - name: Барьер чисел
+        working-directory: spanverify-module
+        run: python scripts/check_numbers.py
+      - name: Итоговый отчёт
+        working-directory: spanverify-module
+        run: python scripts/make_final_report.py --out reports/РЕЗУЛЬТАТЫ_ПРОГОНА.md
+      - name: Зафиксировать результаты в ветке
+        if: always()
+        run: |
+          git add -A spanverify-module/reports || true
+          if git diff --cached --quiet; then echo "изменений нет"; exit 0; fi
+          git commit -m "шаг ИТОГ-1: метрики, состояние и итоговый отчёт (автоматический прогон CI)"
+          for attempt in 1 2 3; do
+            git pull --rebase --autostash origin "${GITHUB_REF_NAME}" && git push origin "HEAD:${GITHUB_REF_NAME}" && break
+            sleep 5
+          done
+      - name: "Артефакт: итоговый отчёт"
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: final-report
+          path: |
+            spanverify-module/reports/РЕЗУЛЬТАТЫ_ПРОГОНА.md
+            spanverify-module/reports/METRICS.json
+            spanverify-module/reports/coverage.json
+          if-no-files-found: warn
+
   # ------------------------------------------------- документы, РИД, обзоры
   docs-rid:
     name: Документы, РИД, обзор аналогов
     runs-on: ubuntu-latest
     timeout-minutes: 150
-    if: ${{ github.event_name == 'push' || !inputs.tasks || contains(inputs.tasks, 'docs') }}
+    if: ${{ (github.event_name != 'push' || !contains(github.event.head_commit.message, 'автоматический прогон CI')) && (github.event_name == 'push' || !inputs.tasks || contains(inputs.tasks, 'docs')) }}
     steps:
       - uses: actions/checkout@v4
         with:

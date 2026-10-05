@@ -270,7 +270,7 @@ def render(report: dict) -> str:
         f"Исходная (до искажений) token F1 = {report['baseline']['token_f1']}, "
         f"вердикт F1 = {report['baseline']['verdict_f1']}, FPR = {report['baseline']['verdict_fpr']}.",
         "",
-        "| Искажение | Пар | Изменено ответов | token F1 после | Падение F1 | Доля не-«grounded» | Базовая доля |",
+        "| Искажение | Пар | Изменено ответов | Не-«grounded» до | Не-«grounded» после | Изменение | token F1 исходная |",
         "|---|---|---|---|---|---|---|",
     ]
     for item in report["distortions"]:
@@ -278,13 +278,22 @@ def render(report: dict) -> str:
             f"| {item['name']} | {item['pairs']} | {item['changed_answers']} | {item['flagged_share_before']} | "
             f"{item['flagged_share_after']} | {item['delta']:+} | {item['token_f1_before']} |"
         )
+    reasons = sorted(
+        {
+            str(item.get("token_f1_after_reason"))
+            for item in report["distortions"]
+            if item.get("token_f1_after") is None and item.get("token_f1_after_reason")
+        }
+    )
     lines += [
         "",
-        "Замечание: разметка относится к исходному ответу, поэтому токенную F1 после искажения",
-        "считать нельзя (в таблице — исходное значение). Измеряется способность конвейера",
-        "**заметить искажение**: доля ответов, переставших быть подтверждёнными (после) против",
-        "доли ложных срабатываний на тех же ответах до искажения.",
+        "Измеряется способность конвейера **заметить искажение**: доля ответов, переставших",
+        "быть подтверждёнными, против доли ложных срабатываний на тех же ответах до искажения.",
     ]
+    if reasons:
+        # Причина отсутствия метрики берётся из отчёта: она объясняет, почему в таблице
+        # стоит исходная token F1, а не значение после искажения.
+        lines += ["", "Token F1 после искажения: " + "; ".join(reasons) + "."]
     return "\n".join(lines)
 
 

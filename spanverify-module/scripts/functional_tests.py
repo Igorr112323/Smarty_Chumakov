@@ -371,7 +371,7 @@ def render(report: dict) -> str:
         "| Артефакт | Байт | Причина отсутствия |",
         "|---|---|---|",
     ]
-    for name, item in report["sizes"].items():
+    for _name, item in report["sizes"].items():
         lines.append(
             f"| {item['path']} | {item['bytes'] if item['bytes'] is not None else 'null'} | {item['reason'] or '—'} |"
         )

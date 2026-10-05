@@ -153,9 +153,9 @@ def main(argv: Sequence[str] | None = None) -> int:
     # долю и оценку модели (вне обучения порог не подбирается — оценивается модель).
     errors: list[float] = []
     by_group: dict[int, list[int]] = {}
-    for index, row in enumerate(rows):
+    for index, _row in enumerate(rows):
         by_group.setdefault(groups[index], []).append(index)
-    for index, indices in sorted(by_group.items()):
+    for _index, indices in sorted(by_group.items()):
         group_rows = [rows[i] for i in indices]
         scores = model.score_rows(group_rows)
         if not scores:

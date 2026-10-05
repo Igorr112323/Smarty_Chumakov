@@ -1,0 +1,13 @@
+{
+ "generated_at": "2026-10-05T19:25:01.167858+00:00",
+ "total": 18,
+ "checked": 0,
+ "files": [
+  {
+   "file": "corpus_a_10pct.jsonl",
+   "total": 18,
+   "checked": 0
+  }
+ ],
+ "note": "отметку ставит человек в scripts/review_server.py; число проверено — фактическое"
+}

@@ -202,7 +202,16 @@ def test_evaluate_warns_about_demo_mode(adapted_dir: Path) -> None:
     assert Verifier(mode="hf", model_name="BAAI/bge-m3").model_name == "BAAI/bge-m3"
     default = Verifier(mode="demo").model_name
     assert default == "ai-forever/rugpt3small_based_on_gpt2", "значение по умолчанию менять нельзя"
-    report_hf = run("ragtruth", "qa", "test", "hf", "BAAI/bge-m3", 2, adapted_dir) if _torch_available() else None
+    report_hf = None
+    if _torch_available():
+        from spanverify.backends.base import BackendUnavailable
+
+        try:
+            report_hf = run("ragtruth", "qa", "test", "hf", "BAAI/bge-m3", 2, adapted_dir)
+        except BackendUnavailable as error:
+            # Весов может не быть (нет сети/доступа): отказ должен быть явным и
+            # называть модель, а не подменять режим hf демо-признаками.
+            assert "bge-m3" in str(error) or "не удалось загрузить" in str(error), str(error)
     if report_hf is not None:
         assert report_hf["mode"] == "hf"
         assert report_hf["model"] == "BAAI/bge-m3"

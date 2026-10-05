@@ -88,6 +88,9 @@ def main(argv: list[str] | None = None) -> int:
     dataset = Path(args.dataset)
     records = load_records(dataset, args.pairs, 1312)
     started = time.time()
+    # Обучение идёт на той же модели, что и оценка: иначе в режиме hf признаки
+    # считались бы моделью по умолчанию, а число в отчёте относилось к --model.
+    training_verifier = Verifier(mode=args.mode, model_name=args.model)
     report = train(
         records,
         mode=args.mode,
@@ -95,6 +98,7 @@ def main(argv: list[str] | None = None) -> int:
         folds=args.folds,
         target_fpr=args.target_fpr,
         dataset_name=str(dataset),
+        verifier=training_verifier,
     )
     verifier = Verifier(mode=args.mode, weights=report.bundle, model_name=args.model)
     metrics = verifier.evaluate(records)

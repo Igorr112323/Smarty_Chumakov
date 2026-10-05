@@ -33,16 +33,27 @@ def main(argv: Sequence[str] | None = None) -> int:
     parser.add_argument("--splits", default="data/corpus_a/splits")
     parser.add_argument("--mode", choices=["demo", "hf"], default="demo")
     parser.add_argument("--model", default=None)
+    parser.add_argument("--weights", default="config/weights.json", help="файл параметров (для режима hf — config/weights_hf.json)")
+    parser.add_argument("--feature-cache", default=None, help="каталог кэша признаков hf (повторный прогон без модели)")
     parser.add_argument("--splits-names", default="dev,test")
     parser.add_argument("--json", action="store_true")
     parser.add_argument("--out", default=None)
     parser.add_argument("--limit", type=int, default=0, help="ограничить число пар в каждом разбиении")
     args = parser.parse_args(argv)
 
-    verifier = Verifier(mode=args.mode, model_name=args.model)
+    import dataclasses
+
+    from spanverify.config import Config
+
+    config = Config.load()
+    if args.feature_cache:
+        config = dataclasses.replace(config, hf_feature_cache=args.feature_cache)
+    verifier = Verifier(mode=args.mode, model_name=args.model, weights_path=args.weights, config=config)
     report: dict = {
         "mode": args.mode,
         "model": args.model,
+        "weights": args.weights,
+        "feature_cache": args.feature_cache,
         "splits": {},
         "started": time.strftime("%Y-%m-%dT%H:%M:%SZ"),
     }
