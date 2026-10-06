@@ -1,0 +1,61 @@
+{
+  "seed": 42,
+  "mode": "demo",
+  "corpus_a": {
+    "name": "data/demo_pairs.jsonl",
+    "pairs": 240,
+    "split": {
+      "grouped": true,
+      "train_pairs": 168,
+      "test_pairs": 72,
+      "shared_groups": 0
+    }
+  },
+  "corpus_b": {
+    "name": "alt-generator 1.0 (числа словами, другие шаблоны)",
+    "pairs": 240,
+    "seed": 4242
+  },
+  "in_corpus": {
+    "tokens": {
+      "precision": 0.9912,
+      "recall": 0.918,
+      "f1": 0.9532,
+      "fpr": 0.0021,
+      "auc": 0.998,
+      "n": 594
+    },
+    "spans": {
+      "strict_f1": 0.2796,
+      "coverage": 0.9783,
+      "soft_f1": 0.7957,
+      "width_ratio": 17.43
+    },
+    "answers": {
+      "f1": 1.0,
+      "fpr": 0.0
+    }
+  },
+  "cross_corpus": {
+    "tokens": {
+      "precision": 0.6011,
+      "recall": 0.9538,
+      "f1": 0.7374,
+      "fpr": 0.1451,
+      "auc": 0.944,
+      "n": 1855
+    },
+    "spans": {
+      "strict_f1": 0.3679,
+      "coverage": 1.0,
+      "soft_f1": 0.3472,
+      "width_ratio": 2.8
+    },
+    "answers": {
+      "f1": 0.8179,
+      "fpr": 0.5922
+    }
+  },
+  "note": "Корпуса A и B синтетические. Число «кросс-корпус» показывает перенос между генераторами; измерением на реальных регламентах оно не является.",
+  "token_f1_drop": 0.2158
+}

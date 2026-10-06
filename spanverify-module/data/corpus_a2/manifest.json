@@ -1,0 +1,10 @@
+{
+  "dataset_version": "corpus-a2.0-draft",
+  "role": "черновик: естественные ответы модели, разметка требует проверки человеком",
+  "tasks": 200,
+  "pairs": 0,
+  "status": "draft",
+  "needs_expert_review": true,
+  "dry_run": true,
+  "model": "ai-forever/rugpt3small_based_on_gpt2"
+}

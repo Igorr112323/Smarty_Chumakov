@@ -1,0 +1,66 @@
+{
+  "dataset": "ragtruth",
+  "task": "qa",
+  "split": "test",
+  "mode": "demo",
+  "model": null,
+  "device": "cpu (demo-режим не использует веса)",
+  "pairs": 875,
+  "pairs_total_in_file": 875,
+  "limit": null,
+  "source_file": "/home/runner/work/Smarty_Chumakov/Smarty_Chumakov/spanverify-module/data/external/adapted/ragtruth_qa_test.jsonl",
+  "duration_s": 46.6,
+  "label_origin": {
+    "human": 875
+  },
+  "labelled_pairs": 160,
+  "spans_reference": 235,
+  "unverified_spans": 0,
+  "our_metrics": {
+    "tokens": {
+      "precision": 0.1322,
+      "recall": 0.4512,
+      "f1": 0.2045,
+      "fpr": 0.1685,
+      "auc": 0.7167
+    },
+    "spans": {
+      "strict_f1_iou_0_5": 0.0357,
+      "coverage": 0.383,
+      "soft_f1_expanded": 0.0266,
+      "mean_width_ratio": 3.35
+    },
+    "answers": {
+      "precision": 0.2717,
+      "recall": 0.9,
+      "f1": 0.4174,
+      "fpr": 0.5399,
+      "auc": 0.6801
+    },
+    "verdicts": {
+      "tp": 160,
+      "fp": 706,
+      "fn": 0,
+      "tn": 9,
+      "precision": 0.1848,
+      "recall": 1.0,
+      "f1": 0.3119,
+      "fpr": 0.9874
+    }
+  },
+  "their_metrics": {
+    "rouge1": 0.104,
+    "rouge2": 0.0715,
+    "rougeL": 0.0797,
+    "accuracy": 0.0103,
+    "jaccard_score": 0.0106,
+    "hamming_loss": 0.1817,
+    "empty_reference": 715,
+    "pairs": 875
+  },
+  "baseline": {
+    "extracted": false,
+    "note": "Baseline статьи RAGTruth (ACL 2024) не извлечён: PDF недоступен в этой среде (arxiv.org закрыт), значения таблиц не парсились. Числа не выдумываются."
+  },
+  "disclaimer": "РЕЖИМ DEMO: признаки лексические, без весов языковой модели. Числа показывают работоспособность конвейера на внешнем наборе, но научным результатом не являются."
+}

@@ -1,0 +1,249 @@
+{
+  "base": "http://pravo.gov.ru",
+  "nd": "102078782",
+  "query": "персональные данные",
+  "card": {
+    "url": "http://pravo.gov.ru/proxy/ips/?docbody=&nd=102078782",
+    "status": 200,
+    "bytes": 27948,
+    "addresses": [
+      "?style.css",
+      "?style_sets.css",
+      "?layout.css",
+      "?json.js",
+      "?script.js",
+      "?pic_hide2left.gif",
+      "?pic_hide2right.gif",
+      "?start_search&fattrib=1",
+      "?pic_home.gif",
+      "?help_common.html",
+      "?pic_help.gif",
+      "?pic_doctext.gif",
+      "?pic_docinfo.gif",
+      "?pic_links_forw.gif",
+      "?pic_links_back.gif",
+      "/",
+      "?pic_doccomment.gif",
+      "?pic_print.gif",
+      "?savertf=&nd=102078782&page=all",
+      "?pic_rtf.gif",
+      "?pic_doc_find.gif",
+      "?pic_add_to_set.gif",
+      "?pic_add_bookmark.gif",
+      "?pic_compare.gif",
+      "javascript:;",
+      "?pic_style.gif",
+      "?pic_text.gif",
+      "images/pics/pic_style.gif",
+      "images/pics/pic_text.gif",
+      "javascript:void(0)",
+      "?but_close.gif",
+      "?pic_next.gif",
+      "?pic_prev.gif",
+      "?pic_markall.gif",
+      "blank.html",
+      "about:blank",
+      "?warnpic.gif",
+      "?pic_button_close.gif",
+      "?spinner.gif",
+      "?doc_itself=&nd=102078782&page=1&rdk=0"
+    ],
+    "framesets": [],
+    "frames": [],
+    "rdk_context": [
+      "</td> \t<td class=\"doc_editions\"> <select name=\"doc_editions\" onchange=\"ChangeSelRDK(this, document.all['last_select_ed'], '')\"><option value='0,102078782'  selecte",
+      "кумента\" \tclass=\"pic\" \tonClick='window.location.replace(\"?docbody=&nd=102078782&rdk=\")' /><img src=\"?pic_docinfo.gif\" \talt=\"Сведения о документе\" \ttitle=\"Сведения ",
+      "lass=\"pic\" \tonClick='window.location.replace(\"?docbody=&vkart=card&nd=102078782&rdk=\")' /><img src=\"?pic_links_forw.gif\" \talt=\"Сведения о связях\" \ttitle=\"Сведения "
+    ],
+    "text_chars": 862
+  },
+  "frames": [
+    {
+      "name": "rdk-0",
+      "url": "http://pravo.gov.ru/proxy/ips/?docbody=&nd=102078782&rdk=0",
+      "status": 200,
+      "bytes": 27958,
+      "text_chars": 862,
+      "text_head": "О Федеральном законе \"О ратификации Соглашения между Правительством Российской Федерации и Правительством Республики Узбекистан о принципах взимания косвенных налогов во взаимной торговле\" (проект N 235390-3) Текст документа: &nbsp; &nbsp; Исходная редакция &nbsp; --> --> Найти: --> &nbsp; Вниз по т",
+      "addresses": [
+        "?style.css",
+        "?style_sets.css",
+        "?layout.css",
+        "?json.js",
+        "?script.js",
+        "?pic_hide2left.gif",
+        "?pic_hide2right.gif",
+        "?start_search&fattrib=1",
+        "?pic_home.gif",
+        "?help_common.html"
+      ]
+    },
+    {
+      "name": "rdk-1",
+      "url": "http://pravo.gov.ru/proxy/ips/?docbody=&nd=102078782&rdk=1",
+      "status": 200,
+      "bytes": 28650,
+      "text_chars": 908,
+      "text_head": "О Федеральном законе \"О ратификации Соглашения между Правительством Российской Федерации и Правительством Республики Узбекистан о принципах взимания косвенных налогов во взаимной торговле\" (проект N 235390-3) Текст документа: &nbsp; &nbsp; Исходная редакция &nbsp; --> --> Найти: --> &nbsp; Вниз по т",
+      "addresses": [
+        "?style.css",
+        "?style_sets.css",
+        "?layout.css",
+        "?json.js",
+        "?script.js",
+        "?pic_hide2left.gif",
+        "?pic_hide2right.gif",
+        "?start_search&fattrib=1",
+        "?pic_home.gif",
+        "?help_common.html"
+      ]
+    },
+    {
+      "name": "rdk-0-first",
+      "url": "http://pravo.gov.ru/proxy/ips/?docbody=&nd=102078782&rdk=0&first=1",
+      "status": 200,
+      "bytes": 27966,
+      "text_chars": 862,
+      "text_head": "О Федеральном законе \"О ратификации Соглашения между Правительством Российской Федерации и Правительством Республики Узбекистан о принципах взимания косвенных налогов во взаимной торговле\" (проект N 235390-3) Текст документа: &nbsp; &nbsp; Исходная редакция &nbsp; --> --> Найти: --> &nbsp; Вниз по т",
+      "addresses": [
+        "?style.css",
+        "?style_sets.css",
+        "?layout.css",
+        "?json.js",
+        "?script.js",
+        "?pic_hide2left.gif",
+        "?pic_hide2right.gif",
+        "?start_search&fattrib=1",
+        "?pic_home.gif",
+        "?help_common.html"
+      ]
+    },
+    {
+      "name": "text",
+      "url": "http://pravo.gov.ru/proxy/ips/?docbody=&nd=102078782&text=1",
+      "status": 200,
+      "bytes": 27955,
+      "text_chars": 862,
+      "text_head": "О Федеральном законе \"О ратификации Соглашения между Правительством Российской Федерации и Правительством Республики Узбекистан о принципах взимания косвенных налогов во взаимной торговле\" (проект N 235390-3) Текст документа: &nbsp; &nbsp; Исходная редакция &nbsp; --> --> Найти: --> &nbsp; Вниз по т",
+      "addresses": [
+        "?style.css",
+        "?style_sets.css",
+        "?layout.css",
+        "?json.js",
+        "?script.js",
+        "?pic_hide2left.gif",
+        "?pic_hide2right.gif",
+        "?start_search&fattrib=1",
+        "?pic_home.gif",
+        "?help_common.html"
+      ]
+    },
+    {
+      "name": "intelsearch",
+      "url": "http://pravo.gov.ru/proxy/ips/?docbody=&nd=102078782&intelsearch=1",
+      "status": 200,
+      "bytes": 28700,
+      "text_chars": 862,
+      "text_head": "О Федеральном законе \"О ратификации Соглашения между Правительством Российской Федерации и Правительством Республики Узбекистан о принципах взимания косвенных налогов во взаимной торговле\" (проект N 235390-3) Текст документа: &nbsp; &nbsp; Исходная редакция &nbsp; --> --> Найти: --> &nbsp; Вниз по т",
+      "addresses": [
+        "?style.css",
+        "?style_sets.css",
+        "?layout.css",
+        "?json.js",
+        "?script.js",
+        "?pic_hide2left.gif",
+        "?pic_hide2right.gif",
+        "?start_search&fattrib=1",
+        "?pic_home.gif",
+        "?help_common.html"
+      ]
+    },
+    {
+      "name": "nd-only-start",
+      "url": "http://pravo.gov.ru/proxy/ips/?start=0&nd=102078782&rdk=0&intelsearch=1",
+      "status": 200,
+      "bytes": 4394,
+      "text_chars": 275,
+      "text_head": "&nbsp; &nbsp; Программа позволяет работать с&nbsp;ИПС «Законодательство России» (версия 3.1) без инсталляции системы на&nbsp;компьютер пользователя. Запуск осуществляется напрямую с&nbsp;носителя ( DVD-ROM , CD-ROM и т.п. ). Для запуска программы нажмите ссылку: Запуск Выход",
+      "addresses": [
+        "h_standalone.gif",
+        "?logo",
+        "?quit"
+      ]
+    }
+  ],
+  "searches": [
+    {
+      "name": "searchres-a0",
+      "url": "http://pravo.gov.ru/proxy/ips/?searchres=1&a0=%EF%E5%F0%F1%EE%ED%E0%EB%FC%ED%FB%E5%20%E4%E0%ED%ED%FB%E5",
+      "status": 200,
+      "bytes": 1321,
+      "text_chars": 133,
+      "nd_occurrences": 0,
+      "nd_examples": [],
+      "query_words_in_text": true,
+      "text_head": "Законодательство России. Поиск: Контекст: 'персональные данные' Для отображения этого сайта необходим браузер, поддерживающий фреймы.",
+      "addresses": [
+        "?style.css",
+        "?favicon.ico",
+        "?json.js",
+        "?script.js",
+        "?listsel.js",
+        "?searchlist=1&a0=%EF%E5%F0%F1%EE%ED%E0%EB%FC%ED%FB%E5%20%E4%E0%ED%ED%FB%E5",
+        "about:blank"
+      ]
+    },
+    {
+      "name": "a0-only",
+      "url": "http://pravo.gov.ru/proxy/ips/?a0=%EF%E5%F0%F1%EE%ED%E0%EB%FC%ED%FB%E5%20%E4%E0%ED%ED%FB%E5",
+      "status": 200,
+      "bytes": 142593,
+      "text_chars": 5196,
+      "nd_occurrences": 0,
+      "nd_examples": [],
+      "query_words_in_text": false,
+      "text_head": "Законодательство России. Расширенный поиск Законодательство России Подключение БПА Подключение БПА Отметить все Снять отметку со всех Федеральное законодательство Федеральное законодательство ФЕДЕРАЛЬНОЕ ЗАКОНОДАТЕЛЬСТВО Региональное законодательство Региональное законодательство Центральный Федеральный округ Центральный Федеральный округ БПА Белгородской области БПА Брянской области БПА Владимирс",
+      "addresses": [
+        "?style.css",
+        "?style_outer.css",
+        "?layout.css",
+        "?favicon.ico",
+        "?json.js",
+        "?script.js",
+        "?diprocessor.js",
+        "?fonts-min.css",
+        "?autocomplete.css",
+        "?yahoo-dom-event.js",
+        "?connection-min.js",
+        "?animation-min.js",
+        "?datasource-min.js",
+        "?autocomplete-min.js",
+        "?stub"
+      ]
+    },
+    {
+      "name": "searchres-a0-a1",
+      "url": "http://pravo.gov.ru/proxy/ips/?searchres=1&a0=%EF%E5%F0%F1%EE%ED%E0%EB%FC%ED%FB%E5%20%E4%E0%ED%ED%FB%E5&a1=1",
+      "status": null,
+      "bytes": 0,
+      "text_chars": 0,
+      "nd_occurrences": 0,
+      "nd_examples": [],
+      "query_words_in_text": false,
+      "text_head": "",
+      "addresses": []
+    },
+    {
+      "name": "searchres-a0-a16",
+      "url": "http://pravo.gov.ru/proxy/ips/?searchres=1&a0=%EF%E5%F0%F1%EE%ED%E0%EB%FC%ED%FB%E5%20%E4%E0%ED%ED%FB%E5&a16=1&a16type=1&a16value=%EF%E5%F0%F1%EE%ED%E0%EB%FC%ED%FB%E5%20%E4%E0%ED%ED%FB%E5",
+      "status": 200,
+      "bytes": 444,
+      "text_chars": 71,
+      "nd_occurrences": 0,
+      "nd_examples": [],
+      "query_words_in_text": false,
+      "text_head": "Ошибка: Не найдено ни одного документа, сформулируйте запрос по-другому",
+      "addresses": []
+    }
+  ]
+}

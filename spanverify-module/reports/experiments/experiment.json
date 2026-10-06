@@ -1,0 +1,172 @@
+{
+  "dataset": "data/demo_pairs.jsonl",
+  "mode": "demo",
+  "seed": 42,
+  "duration_s": 35.1,
+  "corpus": {
+    "pairs": 240,
+    "kinds": {
+      "faithful": 116,
+      "value_substitution": 85,
+      "fabrication": 39
+    },
+    "hallucination_rate": 0.4833,
+    "mean_answer_chars": 72.4,
+    "mean_context_chars": 101.9,
+    "flagged_share_of_answers": 0.1844,
+    "vocabulary": 130,
+    "dataset_version": "2.0-synthetic-pairs"
+  },
+  "metrics": {
+    "tokens": {
+      "precision": 0.9758308157099698,
+      "recall": 0.9281609195402298,
+      "f1": 0.9513991163475699,
+      "fpr": 0.004839685420447671,
+      "tp": 323,
+      "fp": 8,
+      "fn": 25,
+      "tn": 1645,
+      "auc": 0.9974028412291132
+    },
+    "spans": {
+      "precision": 0.31451612903225806,
+      "recall": 0.31451612903225806,
+      "f1": 0.31451612903225806,
+      "tp": 39,
+      "fp": 85,
+      "fn": 85,
+      "iou_threshold": 0.5,
+      "recall_containment": 1.0,
+      "f1_expanded_labels": 1.0,
+      "mean_width_ratio": 24.173387096774192
+    },
+    "answers": {
+      "threshold": 1.0,
+      "precision": 1.0,
+      "recall": 0.9919354838709677,
+      "f1": 0.9959514170040485,
+      "fpr": 0.0,
+      "auc": 0.9959677419354839,
+      "tp": 123,
+      "fp": 0,
+      "fn": 1,
+      "tn": 116
+    },
+    "pairs": 240,
+    "mode": "demo",
+    "warning": "ДЕМО-РЕЖИМ: признаки считаются лексическими суррогатами без весов языковой модели. Он проверяет работоспособность конвейера и интерфейса, а не достоверность ответа. Научные выводы возможны только в режиме 'hf'."
+  },
+  "bundle": {
+    "weights": {
+      "attention_entropy": 0.1,
+      "ctx_attention_mass": 0.9,
+      "embedding_density": 0.0
+    },
+    "threshold": 1.0,
+    "target_fpr": 0.1,
+    "span_z": 0.0,
+    "span_floor": 0.3,
+    "span_cap": 0.5,
+    "isotonic": {
+      "x": [
+        0.006012,
+        0.247385,
+        0.753739
+      ],
+      "y": [
+        0.0,
+        1.0,
+        1.0
+      ]
+    },
+    "head": {
+      "type": "logreg",
+      "file": "config/head.json"
+    },
+    "folds": [
+      {
+        "fold": 0,
+        "n_train": 1126,
+        "n_test": 281,
+        "auc": 0.9996362975086379
+      },
+      {
+        "fold": 1,
+        "n_train": 1126,
+        "n_test": 281,
+        "auc": 0.991434165442976
+      },
+      {
+        "fold": 2,
+        "n_train": 1126,
+        "n_test": 281,
+        "auc": 0.9955170352659892
+      },
+      {
+        "fold": 3,
+        "n_train": 1126,
+        "n_test": 281,
+        "auc": 0.9903455284552846
+      },
+      {
+        "fold": 4,
+        "n_train": 1124,
+        "n_test": 283,
+        "auc": 0.9862675360600672
+      }
+    ],
+    "seed": 42,
+    "version": "1.2.0",
+    "mode": "demo",
+    "meta": {
+      "dataset": "data/demo_pairs.jsonl",
+      "synthetic": true,
+      "signal": "logreg",
+      "note": "Демонстрационный корпус: параметры проверяют конвейер, а не качество на реальных документах. Для боевой калибровки используйте размеченные реальные пары в режиме hf.",
+      "participation": {
+        "type": "participation-logreg",
+        "auc_out_of_fold": 1.0,
+        "calibrated_on": "synthetic-participation-corpus 1.0 (два стиля, доля смеси известна)"
+      }
+    }
+  },
+  "folds": [
+    {
+      "fold": 0,
+      "n_train": 1126,
+      "n_test": 281,
+      "auc": 0.9996362975086379
+    },
+    {
+      "fold": 1,
+      "n_train": 1126,
+      "n_test": 281,
+      "auc": 0.991434165442976
+    },
+    {
+      "fold": 2,
+      "n_train": 1126,
+      "n_test": 281,
+      "auc": 0.9955170352659892
+    },
+    {
+      "fold": 3,
+      "n_train": 1126,
+      "n_test": 281,
+      "auc": 0.9903455284552846
+    },
+    {
+      "fold": 4,
+      "n_train": 1124,
+      "n_test": 283,
+      "auc": 0.9862675360600672
+    }
+  ],
+  "gate": "ДОСТИГНУТ",
+  "artifacts": {
+    "weights": "reports/experiments/weights.json",
+    "head": "reports/experiments/config/head.json",
+    "participation": "reports/experiments/config/participation.json"
+  }
+}

@@ -1,0 +1,54 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="620" viewBox="0 0 900 620" font-family="DejaVu Sans, Arial, sans-serif">
+<rect width="100%" height="100%" fill="#ffffff"/>
+<text x="60" y="34" font-size="17" font-weight="bold">Фиг. 2. Порядок работы устройства</text>
+<defs><marker id="arrow" markerWidth="9" markerHeight="9" refX="4" refY="3" orient="auto"><path d="M0,0 L0,6 L9,3 z" fill="#33475b"/></marker></defs>
+<circle cx="86" cy="107" r="15" fill="#eef3f8" stroke="#33475b" stroke-width="1.4"/>
+<text x="86" y="112" font-size="13" font-weight="bold" text-anchor="middle">А</text>
+<rect x="118" y="90" width="700" height="34" rx="5" fill="#f7f9fb" stroke="#c3ced9" stroke-width="1"/>
+<text x="132" y="112" font-size="12.5">приём документа-источника и ответа</text>
+<circle cx="86" cy="159" r="15" fill="#eef3f8" stroke="#33475b" stroke-width="1.4"/>
+<text x="86" y="164" font-size="13" font-weight="bold" text-anchor="middle">Б</text>
+<rect x="118" y="142" width="700" height="34" rx="5" fill="#f7f9fb" stroke="#c3ced9" stroke-width="1"/>
+<text x="132" y="164" font-size="12.5">токенизация ответа с сохранением смещений</text>
+<path d="M 86 124 L 86 140" stroke="#33475b" stroke-width="1.2" marker-end="url(#arrow)"/>
+<circle cx="86" cy="211" r="15" fill="#eef3f8" stroke="#33475b" stroke-width="1.4"/>
+<text x="86" y="216" font-size="13" font-weight="bold" text-anchor="middle">В</text>
+<rect x="118" y="194" width="700" height="34" rx="5" fill="#f7f9fb" stroke="#c3ced9" stroke-width="1"/>
+<text x="132" y="216" font-size="12.5">нормализация чисел, единиц измерения, дат</text>
+<path d="M 86 176 L 86 192" stroke="#33475b" stroke-width="1.2" marker-end="url(#arrow)"/>
+<circle cx="86" cy="263" r="15" fill="#eef3f8" stroke="#33475b" stroke-width="1.4"/>
+<text x="86" y="268" font-size="13" font-weight="bold" text-anchor="middle">Г</text>
+<rect x="118" y="246" width="700" height="34" rx="5" fill="#f7f9fb" stroke="#c3ced9" stroke-width="1"/>
+<text x="132" y="268" font-size="12.5">вычисление признаков каждого токена</text>
+<path d="M 86 228 L 86 244" stroke="#33475b" stroke-width="1.2" marker-end="url(#arrow)"/>
+<circle cx="86" cy="315" r="15" fill="#eef3f8" stroke="#33475b" stroke-width="1.4"/>
+<text x="86" y="320" font-size="13" font-weight="bold" text-anchor="middle">Д</text>
+<rect x="118" y="298" width="700" height="34" rx="5" fill="#f7f9fb" stroke="#c3ced9" stroke-width="1"/>
+<text x="132" y="320" font-size="12.5">привязка числа ответа к объекту документа</text>
+<path d="M 86 280 L 86 296" stroke="#33475b" stroke-width="1.2" marker-end="url(#arrow)"/>
+<circle cx="86" cy="367" r="15" fill="#eef3f8" stroke="#33475b" stroke-width="1.4"/>
+<text x="86" y="372" font-size="13" font-weight="bold" text-anchor="middle">Е</text>
+<rect x="118" y="350" width="700" height="34" rx="5" fill="#f7f9fb" stroke="#c3ced9" stroke-width="1"/>
+<text x="132" y="372" font-size="12.5">свёртка признаков в оценку риска токена</text>
+<path d="M 86 332 L 86 348" stroke="#33475b" stroke-width="1.2" marker-end="url(#arrow)"/>
+<circle cx="86" cy="419" r="15" fill="#eef3f8" stroke="#33475b" stroke-width="1.4"/>
+<text x="86" y="424" font-size="13" font-weight="bold" text-anchor="middle">Ж</text>
+<rect x="118" y="402" width="700" height="34" rx="5" fill="#f7f9fb" stroke="#c3ced9" stroke-width="1"/>
+<text x="132" y="424" font-size="12.5">калибровка оценки и порог решения</text>
+<path d="M 86 384 L 86 400" stroke="#33475b" stroke-width="1.2" marker-end="url(#arrow)"/>
+<circle cx="86" cy="471" r="15" fill="#eef3f8" stroke="#33475b" stroke-width="1.4"/>
+<text x="86" y="476" font-size="13" font-weight="bold" text-anchor="middle">З</text>
+<rect x="118" y="454" width="700" height="34" rx="5" fill="#f7f9fb" stroke="#c3ced9" stroke-width="1"/>
+<text x="132" y="476" font-size="12.5">выделение спорных фрагментов и сужение границ до клаузы</text>
+<path d="M 86 436 L 86 452" stroke="#33475b" stroke-width="1.2" marker-end="url(#arrow)"/>
+<circle cx="86" cy="523" r="15" fill="#eef3f8" stroke="#33475b" stroke-width="1.4"/>
+<text x="86" y="528" font-size="13" font-weight="bold" text-anchor="middle">И</text>
+<rect x="118" y="506" width="700" height="34" rx="5" fill="#f7f9fb" stroke="#c3ced9" stroke-width="1"/>
+<text x="132" y="528" font-size="12.5">оценка доли участия ИИ</text>
+<path d="M 86 488 L 86 504" stroke="#33475b" stroke-width="1.2" marker-end="url(#arrow)"/>
+<circle cx="86" cy="575" r="15" fill="#eef3f8" stroke="#33475b" stroke-width="1.4"/>
+<text x="86" y="580" font-size="13" font-weight="bold" text-anchor="middle">К</text>
+<rect x="118" y="558" width="700" height="34" rx="5" fill="#f7f9fb" stroke="#c3ced9" stroke-width="1"/>
+<text x="132" y="580" font-size="12.5">выдача вердикта, фрагментов со смещениями и оценки риска</text>
+<path d="M 86 540 L 86 556" stroke="#33475b" stroke-width="1.2" marker-end="url(#arrow)"/>
+</svg>

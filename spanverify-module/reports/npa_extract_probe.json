@@ -1,0 +1,311 @@
+{
+  "base": "http://publication.pravo.gov.ru",
+  "type_ids": {
+    "Федеральный закон": "82a8bf1c-3bc7-47ed-827f-7affd43a7f27",
+    "Указ": "0790e34b-784b-4372-884e-3282622a24bd",
+    "Постановление": "fd5a8766-f6fd-4ac2-8fd9-66f414d314ac",
+    "Распоряжение": "7ff5b3b5-3757-44f1-bb76-3766cabe3593",
+    "Приказ": "2dddb344-d3e2-4785-a899-7aa12bd47b6f",
+    "Положение": "a60db81f-1834-41fe-99dd-c8cf3746745d"
+  },
+  "params": [
+    {
+      "param": "PublishDateFrom",
+      "status": 200,
+      "recognized": false,
+      "body_head": "{\"items\":[{\"eoNumber\":\"0001202610050002\",\"hasSvg\":false,\"zipFileLength\":null,\"publishDateShort\":\"2026-10-05T00:00:00\",\"complexName\":\"Указ Президента Российской Федерации от 05.10.2026 № 716\\n \\\"Об автономной некоммерческой организации, обеспечивающей деятельность Уполномоченного при Президенте Росси"
+    },
+    {
+      "param": "PublishDateTo",
+      "status": 200,
+      "recognized": false,
+      "body_head": "{\"items\":[{\"eoNumber\":\"0001202610050002\",\"hasSvg\":false,\"zipFileLength\":null,\"publishDateShort\":\"2026-10-05T00:00:00\",\"complexName\":\"Указ Президента Российской Федерации от 05.10.2026 № 716\\n \\\"Об автономной некоммерческой организации, обеспечивающей деятельность Уполномоченного при Президенте Росси"
+    },
+    {
+      "param": "DocumentDateFrom",
+      "status": 200,
+      "recognized": false,
+      "body_head": "{\"items\":[{\"eoNumber\":\"0001202610050002\",\"hasSvg\":false,\"zipFileLength\":null,\"publishDateShort\":\"2026-10-05T00:00:00\",\"complexName\":\"Указ Президента Российской Федерации от 05.10.2026 № 716\\n \\\"Об автономной некоммерческой организации, обеспечивающей деятельность Уполномоченного при Президенте Росси"
+    },
+    {
+      "param": "DocumentDateTo",
+      "status": 200,
+      "recognized": false,
+      "body_head": "{\"items\":[{\"eoNumber\":\"0001202610050002\",\"hasSvg\":false,\"zipFileLength\":null,\"publishDateShort\":\"2026-10-05T00:00:00\",\"complexName\":\"Указ Президента Российской Федерации от 05.10.2026 № 716\\n \\\"Об автономной некоммерческой организации, обеспечивающей деятельность Уполномоченного при Президенте Росси"
+    },
+    {
+      "param": "JdRegDateFrom",
+      "status": 200,
+      "recognized": false,
+      "body_head": "{\"items\":[{\"eoNumber\":\"0001202610050002\",\"hasSvg\":false,\"zipFileLength\":null,\"publishDateShort\":\"2026-10-05T00:00:00\",\"complexName\":\"Указ Президента Российской Федерации от 05.10.2026 № 716\\n \\\"Об автономной некоммерческой организации, обеспечивающей деятельность Уполномоченного при Президенте Росси"
+    },
+    {
+      "param": "JdRegDateTo",
+      "status": 200,
+      "recognized": false,
+      "body_head": "{\"items\":[{\"eoNumber\":\"0001202610050002\",\"hasSvg\":false,\"zipFileLength\":null,\"publishDateShort\":\"2026-10-05T00:00:00\",\"complexName\":\"Указ Президента Российской Федерации от 05.10.2026 № 716\\n \\\"Об автономной некоммерческой организации, обеспечивающей деятельность Уполномоченного при Президенте Росси"
+    },
+    {
+      "param": "SignatoryAuthorityId",
+      "status": 400,
+      "recognized": true,
+      "body_head": "{\"type\":\"https://tools.ietf.org/html/rfc7231#section-6.5.1\",\"title\":\"One or more validation errors occurred.\",\"status\":400,\"traceId\":\"|5870ac25-47d3dbf587a3f56d.\",\"errors\":{\"SignatoryAuthorityId\":[\"The value 'неверное_значение' is not valid for SignatoryAuthorityId.\"]}}"
+    },
+    {
+      "param": "DocumentTypes",
+      "status": 400,
+      "recognized": true,
+      "body_head": "{\"type\":\"https://tools.ietf.org/html/rfc7231#section-6.5.1\",\"title\":\"One or more validation errors occurred.\",\"status\":400,\"traceId\":\"|d5adca9e-4d71c4d6a7267f4b.\",\"errors\":{\"DocumentTypes\":[\"The value 'неверное_значение' is not valid.\"]}}"
+    },
+    {
+      "param": "PageSize",
+      "status": 200,
+      "recognized": false,
+      "body_head": "{\"items\":[{\"eoNumber\":\"0001202610050002\",\"hasSvg\":false,\"zipFileLength\":null,\"publishDateShort\":\"2026-10-05T00:00:00\",\"complexName\":\"Указ Президента Российской Федерации от 05.10.2026 № 716\\n \\\"Об автономной некоммерческой организации, обеспечивающей деятельность Уполномоченного при Президенте Росси"
+    },
+    {
+      "param": "Index",
+      "status": 200,
+      "recognized": false,
+      "body_head": "{\"items\":[{\"eoNumber\":\"0001202610050002\",\"hasSvg\":false,\"zipFileLength\":null,\"publishDateShort\":\"2026-10-05T00:00:00\",\"complexName\":\"Указ Президента Российской Федерации от 05.10.2026 № 716\\n \\\"Об автономной некоммерческой организации, обеспечивающей деятельность Уполномоченного при Президенте Росси"
+    },
+    {
+      "param": "Block",
+      "status": 500,
+      "recognized": false,
+      "body_head": "{\"message\":\"Внутренняя ошибка сервера\"}"
+    },
+    {
+      "param": "Blocks",
+      "status": 200,
+      "recognized": false,
+      "body_head": "{\"items\":[{\"eoNumber\":\"0001202610050002\",\"hasSvg\":false,\"zipFileLength\":null,\"publishDateShort\":\"2026-10-05T00:00:00\",\"complexName\":\"Указ Президента Российской Федерации от 05.10.2026 № 716\\n \\\"Об автономной некоммерческой организации, обеспечивающей деятельность Уполномоченного при Президенте Росси"
+    },
+    {
+      "param": "SearchTerm",
+      "status": 200,
+      "recognized": false,
+      "body_head": "{\"items\":[{\"eoNumber\":\"0001202610050002\",\"hasSvg\":false,\"zipFileLength\":null,\"publishDateShort\":\"2026-10-05T00:00:00\",\"complexName\":\"Указ Президента Российской Федерации от 05.10.2026 № 716\\n \\\"Об автономной некоммерческой организации, обеспечивающей деятельность Уполномоченного при Президенте Росси"
+    },
+    {
+      "param": "SortBy",
+      "status": 200,
+      "recognized": false,
+      "body_head": "{\"items\":[{\"eoNumber\":\"0001202610050002\",\"hasSvg\":false,\"zipFileLength\":null,\"publishDateShort\":\"2026-10-05T00:00:00\",\"complexName\":\"Указ Президента Российской Федерации от 05.10.2026 № 716\\n \\\"Об автономной некоммерческой организации, обеспечивающей деятельность Уполномоченного при Президенте Росси"
+    },
+    {
+      "param": "OrderBy",
+      "status": 200,
+      "recognized": false,
+      "body_head": "{\"items\":[{\"eoNumber\":\"0001202610050002\",\"hasSvg\":false,\"zipFileLength\":null,\"publishDateShort\":\"2026-10-05T00:00:00\",\"complexName\":\"Указ Президента Российской Федерации от 05.10.2026 № 716\\n \\\"Об автономной некоммерческой организации, обеспечивающей деятельность Уполномоченного при Президенте Росси"
+    }
+  ],
+  "documents": [
+    {
+      "type_name": "Положение",
+      "type_id": "a60db81f-1834-41fe-99dd-c8cf3746745d",
+      "eoNumber": "0001202509260016",
+      "document_id": "fe8101cc-4369-48bd-80db-c8d57714965d",
+      "name": "Об утверждении Перечня документов, образующихся в процессе деятельности страховых организаций, с указанием сроков их хранения",
+      "number": "1/867-П",
+      "documentDate": "2025-08-27T00:00:00",
+      "pagesCount": 60,
+      "pdfFileLength": 2463172
+    },
+    {
+      "type_name": "Постановление",
+      "type_id": "fd5a8766-f6fd-4ac2-8fd9-66f414d314ac",
+      "eoNumber": "0001202610050016",
+      "document_id": "8bd9a825-9ee5-4168-a3d6-1cfd9af65923",
+      "name": "О внесении изменений в некоторые акты Правительства Российской Федерации",
+      "number": "1298",
+      "documentDate": "2026-10-05T00:00:00",
+      "pagesCount": 22,
+      "pdfFileLength": 4855884
+    },
+    {
+      "type_name": "Приказ",
+      "type_id": "2dddb344-d3e2-4785-a899-7aa12bd47b6f",
+      "eoNumber": "0001202610050012",
+      "document_id": "30f092e2-e7fe-4ce1-ad8b-35aa3beb7ca3",
+      "name": "Об установлении норм обеспечения кормами (продуктами) штатных животных учреждений уголовно-исполнительной системы Российской Федерации, норм замены одних кормов (продуктов) другими при обеспечении штатных животных учреждений уголовно-исполнительной системы Российской Федерации, нормы обеспечения подстилочными материалами штатных животных учреждений уголовно-исполнительной системы Российской Федерации, нормы замены одних подстилочных материалов другими при обеспечении штатных животных учреждений уголовно-исполнительной системы Российской Федерации",
+      "number": "547",
+      "documentDate": "2026-08-31T00:00:00",
+      "pagesCount": 21,
+      "pdfFileLength": 769789
+    },
+    {
+      "type_name": "Распоряжение",
+      "type_id": "7ff5b3b5-3757-44f1-bb76-3766cabe3593",
+      "eoNumber": "0001202610050003",
+      "document_id": "55affb0c-cab3-40e2-af3e-f32ba17b6774",
+      "name": "\"О специальном решении о реорганизации акционерного общества \"ЮниКредит Банк\" и совершении сделок с его акциями\"",
+      "number": "368-рп",
+      "documentDate": "2026-10-05T00:00:00",
+      "pagesCount": 1,
+      "pdfFileLength": 71243
+    },
+    {
+      "type_name": "Указ",
+      "type_id": "0790e34b-784b-4372-884e-3282622a24bd",
+      "eoNumber": "0001202610050002",
+      "document_id": "525bffbe-f7fd-448d-97a6-fc8babf74f82",
+      "name": "\"Об автономной некоммерческой организации, обеспечивающей деятельность Уполномоченного при Президенте Российской Федерации по защите прав предпринимателей\"",
+      "number": "716",
+      "documentDate": "2026-10-05T00:00:00",
+      "pagesCount": 3,
+      "pdfFileLength": 219035
+    },
+    {
+      "type_name": "Федеральный закон",
+      "type_id": "82a8bf1c-3bc7-47ed-827f-7affd43a7f27",
+      "eoNumber": "0001202608040078",
+      "document_id": "ac47584e-fc7c-485f-8552-9529d2bc85a7",
+      "name": "\"О внесении изменений в отдельные законодательные акты Российской Федерации\"",
+      "number": "334-ФЗ",
+      "documentDate": "2026-08-04T00:00:00",
+      "pagesCount": 45,
+      "pdfFileLength": 2408334
+    }
+  ],
+  "extraction": [
+    {
+      "type_name": "Положение",
+      "type_id": "a60db81f-1834-41fe-99dd-c8cf3746745d",
+      "eoNumber": "0001202509260016",
+      "document_id": "fe8101cc-4369-48bd-80db-c8d57714965d",
+      "name": "Об утверждении Перечня документов, образующихся в процессе деятельности страховых организаций, с указанием сроков их хранения",
+      "number": "1/867-П",
+      "documentDate": "2025-08-27T00:00:00",
+      "pagesCount": 60,
+      "pdfFileLength": 2463172,
+      "pdf_url": "http://publication.pravo.gov.ru/file/pdf?eoNumber=0001202509260016",
+      "pdf_status": 200,
+      "pdf_content_type": "application/octet-stream",
+      "pdf_bytes": 2463172,
+      "pdf_error": null,
+      "text_pages": 60,
+      "text_chars": 59,
+      "text_chars_per_page": 1.0,
+      "text_text_head": "",
+      "text_error": null,
+      "act_number_found": false,
+      "act_number_checked": "1/867-П"
+    },
+    {
+      "type_name": "Постановление",
+      "type_id": "fd5a8766-f6fd-4ac2-8fd9-66f414d314ac",
+      "eoNumber": "0001202610050016",
+      "document_id": "8bd9a825-9ee5-4168-a3d6-1cfd9af65923",
+      "name": "О внесении изменений в некоторые акты Правительства Российской Федерации",
+      "number": "1298",
+      "documentDate": "2026-10-05T00:00:00",
+      "pagesCount": 22,
+      "pdfFileLength": 4855884,
+      "pdf_url": "http://publication.pravo.gov.ru/file/pdf?eoNumber=0001202610050016",
+      "pdf_status": 200,
+      "pdf_content_type": "application/octet-stream",
+      "pdf_bytes": 4855884,
+      "pdf_error": null,
+      "text_pages": 22,
+      "text_chars": 21,
+      "text_chars_per_page": 1.0,
+      "text_text_head": "",
+      "text_error": null,
+      "act_number_found": false,
+      "act_number_checked": "1298"
+    },
+    {
+      "type_name": "Приказ",
+      "type_id": "2dddb344-d3e2-4785-a899-7aa12bd47b6f",
+      "eoNumber": "0001202610050012",
+      "document_id": "30f092e2-e7fe-4ce1-ad8b-35aa3beb7ca3",
+      "name": "Об установлении норм обеспечения кормами (продуктами) штатных животных учреждений уголовно-исполнительной системы Российской Федерации, норм замены одних кормов (продуктов) другими при обеспечении штатных животных учреждений уголовно-исполнительной системы Российской Федерации, нормы обеспечения подстилочными материалами штатных животных учреждений уголовно-исполнительной системы Российской Федерации, нормы замены одних подстилочных материалов другими при обеспечении штатных животных учреждений уголовно-исполнительной системы Российской Федерации",
+      "number": "547",
+      "documentDate": "2026-08-31T00:00:00",
+      "pagesCount": 21,
+      "pdfFileLength": 769789,
+      "pdf_url": "http://publication.pravo.gov.ru/file/pdf?eoNumber=0001202610050012",
+      "pdf_status": 200,
+      "pdf_content_type": "application/octet-stream",
+      "pdf_bytes": 769789,
+      "pdf_error": null,
+      "text_pages": 21,
+      "text_chars": 20,
+      "text_chars_per_page": 1.0,
+      "text_text_head": "",
+      "text_error": null,
+      "act_number_found": false,
+      "act_number_checked": "547"
+    },
+    {
+      "type_name": "Распоряжение",
+      "type_id": "7ff5b3b5-3757-44f1-bb76-3766cabe3593",
+      "eoNumber": "0001202610050003",
+      "document_id": "55affb0c-cab3-40e2-af3e-f32ba17b6774",
+      "name": "\"О специальном решении о реорганизации акционерного общества \"ЮниКредит Банк\" и совершении сделок с его акциями\"",
+      "number": "368-рп",
+      "documentDate": "2026-10-05T00:00:00",
+      "pagesCount": 1,
+      "pdfFileLength": 71243,
+      "pdf_url": "http://publication.pravo.gov.ru/file/pdf?eoNumber=0001202610050003",
+      "pdf_status": 200,
+      "pdf_content_type": "application/octet-stream",
+      "pdf_bytes": 71243,
+      "pdf_error": null,
+      "text_pages": 1,
+      "text_chars": 0,
+      "text_chars_per_page": 0.0,
+      "text_text_head": "",
+      "text_error": null,
+      "act_number_found": false,
+      "act_number_checked": "368-рп"
+    },
+    {
+      "type_name": "Указ",
+      "type_id": "0790e34b-784b-4372-884e-3282622a24bd",
+      "eoNumber": "0001202610050002",
+      "document_id": "525bffbe-f7fd-448d-97a6-fc8babf74f82",
+      "name": "\"Об автономной некоммерческой организации, обеспечивающей деятельность Уполномоченного при Президенте Российской Федерации по защите прав предпринимателей\"",
+      "number": "716",
+      "documentDate": "2026-10-05T00:00:00",
+      "pagesCount": 3,
+      "pdfFileLength": 219035,
+      "pdf_url": "http://publication.pravo.gov.ru/file/pdf?eoNumber=0001202610050002",
+      "pdf_status": 200,
+      "pdf_content_type": "application/octet-stream",
+      "pdf_bytes": 219035,
+      "pdf_error": null,
+      "text_pages": 3,
+      "text_chars": 2,
+      "text_chars_per_page": 0.7,
+      "text_text_head": "",
+      "text_error": null,
+      "act_number_found": false,
+      "act_number_checked": "716"
+    },
+    {
+      "type_name": "Федеральный закон",
+      "type_id": "82a8bf1c-3bc7-47ed-827f-7affd43a7f27",
+      "eoNumber": "0001202608040078",
+      "document_id": "ac47584e-fc7c-485f-8552-9529d2bc85a7",
+      "name": "\"О внесении изменений в отдельные законодательные акты Российской Федерации\"",
+      "number": "334-ФЗ",
+      "documentDate": "2026-08-04T00:00:00",
+      "pagesCount": 45,
+      "pdfFileLength": 2408334,
+      "pdf_url": "http://publication.pravo.gov.ru/file/pdf?eoNumber=0001202608040078",
+      "pdf_status": 200,
+      "pdf_content_type": "application/octet-stream",
+      "pdf_bytes": 2408334,
+      "pdf_error": null,
+      "text_pages": 45,
+      "text_chars": 44,
+      "text_chars_per_page": 1.0,
+      "text_text_head": "",
+      "text_error": null,
+      "act_number_found": false,
+      "act_number_checked": "334-ФЗ"
+    }
+  ]
+}
