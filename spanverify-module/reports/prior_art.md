@@ -1,6 +1,6 @@
 # Обзор аналогов и патентный поиск
 
-Дата запроса: 2026-10-05T19:23:05.541607+00:00. Результаты сохранены как есть, без интерпретации. Недоступность источника фиксируется кодом ответа и текстом ошибки; выводы делает человек.
+Дата запроса: 2026-10-06T01:03:51.230244+00:00. Результаты сохранены как есть, без интерпретации. Недоступность источника фиксируется кодом ответа и текстом ошибки; выводы делает человек.
 
 ## детекция галлюцинаций
 
@@ -72,7 +72,7 @@
 * An entropy model of decision uncertainty reveals that attention influences decisions but does not alter appearance 2021 — https://doi.org/10.31234/osf.io/hveac
 * Boosting Long-term Factuality in Large Language Model with Real-World Entity Queries 2024 — https://doi.org/10.21203/rs.3.rs-4834886/v1
 * An entropy model of decision uncertainty 2025 — https://doi.org/10.31234/osf.io/hveac_v4
-* An entropy model of decision uncertainty 2025 — https://doi.org/10.31234/osf.io/hveac_v2
+* An entropy model of decision uncertainty 2025 — https://doi.org/10.31234/osf.io/hveac_v3
 
 **GitHub** — статус 200, найдено 0.
 

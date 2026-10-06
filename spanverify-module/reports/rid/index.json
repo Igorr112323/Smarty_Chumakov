@@ -44,9 +44,9 @@
    "spanverify/backends/surrogate.py"
   ],
   "module_count": 34,
-  "lines": 10920,
-  "test_files": 31,
-  "script_files": 44
+  "lines": 10948,
+  "test_files": 34,
+  "script_files": 48
  },
  "human_fields_required": [
   "правообладатель",

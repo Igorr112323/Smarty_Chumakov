@@ -1,6 +1,6 @@
 {
  "version": "1.3.0",
- "generated_at": "2026-10-05T19:21:29Z",
+ "generated_at": "2026-10-06T01:02:14Z",
  "environment": {
   "os": "Linux 6.17.0-1022-azure",
   "python": "3.11.16",
@@ -30,16 +30,16 @@
    "chars": 561,
    "answer_chars": 110,
    "mode": "demo",
-   "seconds": 0.0194,
+   "seconds": 0.019,
    "verdict": "likely_hallucination",
    "spans": 1,
-   "peak_memory_mb": 26.6
+   "peak_memory_mb": 26.8
   },
   {
    "chars": 2006,
    "answer_chars": 111,
    "mode": "demo",
-   "seconds": 0.0418,
+   "seconds": 0.0416,
    "verdict": "likely_hallucination",
    "spans": 1,
    "peak_memory_mb": 26.8
@@ -48,19 +48,19 @@
    "chars": 10008,
    "answer_chars": 111,
    "mode": "demo",
-   "seconds": 0.2106,
+   "seconds": 0.1946,
    "verdict": "likely_hallucination",
    "spans": 1,
-   "peak_memory_mb": 28.6
+   "peak_memory_mb": 28.4
   },
   {
    "chars": 50064,
    "answer_chars": 111,
    "mode": "demo",
-   "seconds": 0.7655,
+   "seconds": 0.7723,
    "verdict": "doubtful",
    "spans": 1,
-   "peak_memory_mb": 37.7
+   "peak_memory_mb": 37.6
   }
  ],
  "max_length": {
@@ -69,14 +69,14 @@
     "chars": 100063,
     "status": "ok",
     "verdict": "doubtful",
-    "seconds": 1.361,
+    "seconds": 1.3847,
     "note": ""
    },
    {
     "chars": 200006,
     "status": "ok",
     "verdict": "doubtful",
-    "seconds": 2.564,
+    "seconds": 2.5801,
     "note": ""
    }
   ],
@@ -109,7 +109,7 @@
   }
  ],
  "smoke": {
-  "cold_start_seconds": 0.504,
+  "cold_start_seconds": 0.503,
   "health": {
    "status": "ok",
    "version": "1.3.0",
@@ -146,16 +146,16 @@
  },
  "leak": {
   "duration_seconds": 90.0,
-  "iterations": 2205,
-  "memory_first_mb": 71.9,
-  "memory_last_mb": 71.9,
+  "iterations": 2155,
+  "memory_first_mb": 72.0,
+  "memory_last_mb": 72.0,
   "growth_mb_per_minute": 0.0,
   "requested_duration_seconds": 90,
   "note": "сокращённый цикл вместо 8 часов — фактическая длительность указана"
  },
  "disk": {
-  "reports_mb": 0.72,
+  "reports_mb": 1.04,
   "data_mb": 7.78
  },
- "peak_memory_mb": 71.9
+ "peak_memory_mb": 72.0
 }

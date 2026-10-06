@@ -1,6 +1,6 @@
 # Протокол испытаний лабораторного образца SpanVerify
 
-Версия ПО: 1.3.0. Дата формирования: 2026-10-05.
+Версия ПО: 1.3.0. Дата формирования: 2026-10-06.
 
 Документ подготовлен автоматически как рабочий материал. Он не является официальной формой, не содержит подписей, печатей и номеров сертификатов и не подаётся от имени пользователя.
 
@@ -18,13 +18,15 @@
 
 | Показатель | Значение | Источник |
 |---|---|---|
-| Метрики | нет данных | reports/METRICS.json пуст |
+| A1 (синтетический корпус A, отложенный test) / demo | вердикт F1 0.9055, FPR 0.1358 | reports/METRICS.json |
+| A1 (синтетический корпус A, отложенный test) / hf | вердикт F1 0.6542, FPR 0.5556 | reports/METRICS.json |
+| демонстрационный корпус (data/demo_pairs.jsonl) / demo | вердикт F1 1.0, FPR 0.0 | reports/METRICS.json |
 
 ## 4. Функциональные проверки
 
 | Проверка | Результат | Источник |
 |---|---|---|
-| Холодный запуск до GET /health | 0.504 с | reports/functional_tests.json |
+| Холодный запуск до GET /health | 0.503 с | reports/functional_tests.json |
 | Поля контракта POST /v1/verify | {'score': True, 'spans': True, 'ai_share': True, 'ai_participation': True, 'threshold': True} | reports/functional_tests.json |
 | Максимальная длина текста | 200006 символов | reports/functional_tests.json |
 | Рост памяти на цикле | 0.0 МБ/мин | reports/functional_tests.json |
