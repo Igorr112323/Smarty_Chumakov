@@ -230,6 +230,9 @@ def collect_candidates(
     pause: float,
     robots: dict[str, dict],
     base: str = "http://publication.pravo.gov.ru",
+    page_from: int = 1,
+    page_to: int | None = None,
+    title_pattern: re.Pattern | None = None,
 ) -> tuple[list[dict], dict]:
     """Набрать кандидатов: документы наших тем, с метаданными карточки.
 
@@ -243,10 +246,13 @@ def collect_candidates(
         "documents_scanned": 0,
         "by_theme": {theme: 0 for theme, _ in THEMES},
         "by_type": {name: 0 for name in type_ids},
+        "title_filter": title_pattern.pattern if title_pattern else None,
+        "pages_range": [page_from, page_to or max_pages_per_type],
     }
     rules = robots.get("publication.pravo.gov.ru", {}).get("rules", {})
+    last_page = page_to or max_pages_per_type
     for type_name, type_id in type_ids.items():
-        for page in range(1, max_pages_per_type + 1):
+        for page in range(max(1, page_from), last_page + 1):
             url = f"{base}/api/Documents?pageSize={PAGE_SIZE}&index={page}&documentTypes={type_id}"
             if not is_allowed(url, {"*": rules.get("*", [])}):
                 stats.setdefault("skipped_by_robots", []).append(url)
@@ -266,6 +272,11 @@ def collect_candidates(
             for item in items:
                 stats["documents_scanned"] += 1
                 if not isinstance(item, dict) or not item.get("eoNumber"):
+                    continue
+                title_text = " ".join(str(item.get(key) or "") for key in ("name", "complexName", "signatoryAuthority"))
+                if title_pattern is not None and not title_pattern.search(title_text):
+                    # Срез по региону: документ не из нужного субъекта — не берём совсем.
+                    stats["skipped_by_title_filter"] = stats.get("skipped_by_title_filter", 0) + 1
                     continue
                 theme = theme_of(item.get("name") or item.get("complexName") or "")
                 if theme is None:
@@ -307,7 +318,7 @@ def ocr_available() -> dict[str, str | None]:
     return {name: shutil.which(name) for name in ("pdftoppm", "tesseract")}
 
 
-def ocr_pdf(path: Path, dpi: int = 200, max_pages: int = 20) -> dict:
+def ocr_pdf(path: Path, dpi: int = 200, max_pages: int = 20, psm: int = 6, oem: int = 1) -> dict:
     """OCR PDF: вернуть ``{text, pages, seconds, error}`` без интерпретаций.
 
     Текст собирается постранично (``pdftoppm -png`` → ``tesseract -l rus``), поэтому в
@@ -333,7 +344,7 @@ def ocr_pdf(path: Path, dpi: int = 200, max_pages: int = 20) -> dict:
         pieces: list[str] = []
         for image in sorted(Path(tmp).glob("page*.png")):
             result = subprocess.run(  # noqa: S603 - фиксированные аргументы
-                ["tesseract", str(image), "stdout", "-l", "rus"],
+                ["tesseract", str(image), "stdout", "-l", "rus", "--psm", str(psm), "--oem", str(oem)],
                 check=False,
                 capture_output=True,
             )
@@ -382,10 +393,10 @@ def pick_extraction(text_layer: dict, ocr: dict, min_chars_per_page: int = 120) 
     return "none"
 
 
-def extract_text(path: Path, dpi: int = 200, max_pages: int = 20) -> dict:
+def extract_text(path: Path, dpi: int = 200, max_pages: int = 20, psm: int = 6, oem: int = 1) -> dict:
     """Текст PDF: сначала текстовый слой, затем OCR. Возвращает факты, без догадок."""
     text_layer = pypdf_text(path)
-    ocr = ocr_pdf(path, dpi=dpi, max_pages=max_pages)
+    ocr = ocr_pdf(path, dpi=dpi, max_pages=max_pages, psm=psm, oem=oem)
     method = pick_extraction(text_layer, ocr)
     text = text_layer["text"] if method == "pypdf" else ocr["text"]
     return {
@@ -541,6 +552,20 @@ def main() -> int:
     parser.add_argument("--buffer", type=int, default=40, help="сколько кандидатов взять сверх цели (на брак)")
     parser.add_argument("--force", action="store_true", help="скачивать, даже если документов уже достаточно")
     parser.add_argument("--verify", action="store_true", help="только проверить хеши уже скачанных источников")
+    parser.add_argument(
+        "--types",
+        default="",
+        help="ограничить виды актов (через запятую): " + ", ".join(TYPES) + "; пусто = все виды",
+    )
+    parser.add_argument(
+        "--title-filter",
+        default="",
+        help="брать только акты, в названии которых есть это регулярное выражение (срез по региону)",
+    )
+    parser.add_argument("--page-from", type=int, default=1, help="с какой страницы выдачи начинать срез")
+    parser.add_argument("--page-to", type=int, default=None, help="какой страницей выдачи закончить срез")
+    parser.add_argument("--psm", type=int, default=6, help="режим разбиения страницы tesseract (--psm)")
+    parser.add_argument("--oem", type=int, default=1, help="движок tesseract (--oem)")
     args = parser.parse_args()
 
     out_dir: Path = args.out
@@ -582,11 +607,34 @@ def main() -> int:
                     type_ids[str(item["name"])] = str(item["id"])
         except json.JSONDecodeError:
             type_ids = {}
+    if args.types:
+        wanted = {name.strip() for name in args.types.split(",") if name.strip()}
+        unknown = sorted(wanted - set(TYPES))
+        if unknown:
+            print(f"ВНИМАНИЕ: неизвестные виды актов: {unknown}; доступные: {list(TYPES)}", file=sys.stderr)
+        type_ids = {name: tid for name, tid in type_ids.items() if name in wanted}
+    title_pattern = re.compile(args.title_filter, re.IGNORECASE) if args.title_filter else None
     print(f"видов актов доступно: {sorted(type_ids)}")
     print(f"::notice title=A3 виды актов::{sorted(type_ids)}")
     time.sleep(max(0.0, pause))
 
-    candidates, scan_stats = collect_candidates(type_ids, args.max_pages_per_type, pause, robots)
+    candidates, scan_stats = collect_candidates(
+        type_ids,
+        args.max_pages_per_type,
+        pause,
+        robots,
+        page_from=args.page_from,
+        page_to=args.page_to,
+        title_pattern=title_pattern,
+    )
+    print(
+        f"срез: страницы {max(1, args.page_from)}–{args.page_to or args.max_pages_per_type}, "
+        f"фильтр по названию: {args.title_filter or 'нет'}"
+    )
+    print(
+        f"::notice title=A3 срез::страницы={max(1, args.page_from)}-"
+        f"{args.page_to or args.max_pages_per_type} фильтр={args.title_filter or 'нет'}"
+    )
     existing_ids = {str(document["doc_id"]) for document in existing}
     needed = max(0, args.target_docs - len(existing))
     planned = plan_downloads(candidates, existing_ids, needed, buffer=args.buffer)
@@ -641,7 +689,7 @@ def main() -> int:
 
         with concurrent.futures.ThreadPoolExecutor(max_workers=max(1, args.workers)) as pool:
             futures = {
-                pool.submit(extract_text, Path(item["_pdf_path"]), args.dpi, args.max_pages): item
+                pool.submit(extract_text, Path(item["_pdf_path"]), args.dpi, args.max_pages, args.psm, args.oem): item
                 for item in downloaded
             }
             for future in concurrent.futures.as_completed(futures):
@@ -672,7 +720,7 @@ def main() -> int:
                     skipped.append({"doc_id": item["doc_id"], "reason": f"фактов {len(facts)} < {args.min_facts}"})
                     continue
                 new_documents.append(item)
-                if len(new_documents) % 10 == 0:
+                if len(new_documents) % 3 == 0:
                     # Пишем прогресс на диск: если прогон оборвётся (таймаут CI), уже
                     # распознанные документы не придётся распознавать заново.
                     write_sources(out_dir, sorted(existing + new_documents, key=lambda doc: doc["doc_id"]), manifest)
