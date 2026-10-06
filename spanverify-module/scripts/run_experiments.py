@@ -29,6 +29,7 @@ from spanverify.engine import Verifier, WeightsBundle  # noqa: E402
 from spanverify.features import (  # noqa: E402
     DEFAULT_WEIGHTS,
     HF_MODEL_DEFAULT,
+    feature_cache_key,
     load_feature_cache,
     set_feature_cache,
 )
@@ -117,12 +118,24 @@ def main(argv: list[str] | None = None) -> int:
     set_feature_cache(cache)
     if cache:
         print(f"кеш признаков: {len(cache)} ключей из {len(args.features_cache)} пути(ей)", flush=True)
-        if len(cache) < len(records):
-            print(
-                f"ВНИМАНИЕ: в кеше {len(cache)} ключей, а пар {len(records)}: "
-                "недостающие будут посчитаны моделью (медленно)",
-                flush=True,
-            )
+        if args.require_cache:
+            missing = []
+            for record in records:
+                data = record.to_dict() if hasattr(record, "to_dict") else record
+                key = feature_cache_key(
+                    str(data.get("answer", "")),
+                    data.get("context", ""),
+                    args.mode,
+                    args.model if args.mode == "hf" else "",
+                )
+                if key not in cache:
+                    missing.append(str(data.get("id", "?")))
+            if missing:
+                print(
+                    f"кеш неполон: нет {len(missing)} из {len(records)} " f"(первые: {', '.join(missing[:5])})",
+                    file=sys.stderr,
+                )
+                return 2
 
     started = time.time()
     # Верификатор с явным именем модели: иначе берётся config.hf_model

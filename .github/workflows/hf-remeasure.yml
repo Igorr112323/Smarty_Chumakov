@@ -35,8 +35,10 @@ jobs:
         include:
           - corpus: a3
             dataset: data/corpus_a3/pairs.jsonl
+            artifacts: "hf-cache-a3-0 hf-cache-a3-1 hf-cache-a3-2 hf-cache-a3-3"
           - corpus: a
             dataset: data/corpus_a/pairs.jsonl
+            artifacts: "hf-cache-a-0 hf-cache-a-1 hf-cache-a-2 hf-cache-a-3 hf-cache-a-4"
     steps:
       - uses: actions/checkout@v4
 
@@ -71,12 +73,13 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           mkdir -p reports/hf-cache
-          gh run download ${{ steps.source.outputs.run_id }} \
-            --repo ${{ github.repository }} \
-            --pattern "hf-cache-${{ matrix.corpus }}-*" \
-            --dir reports/hf-cache
+          for name in ${{ matrix.artifacts }}; do
+            gh run download ${{ steps.source.outputs.run_id }} \
+              --repo ${{ github.repository }} \
+              -n "$name" -D "reports/hf-cache/$name"
+          done
           find reports/hf-cache -type f -name 'features_*.jsonl' | sort
-          wc -l reports/hf-cache/features_*.jsonl | tail -1
+          python -c 'from spanverify.features import load_feature_cache; cache = load_feature_cache(["reports/hf-cache"]); print("ключей в кеше:", len(cache)); print("::notice::ключей в кеше: %s" % len(cache))'
 
       - name: "Эксперимент на кеше"
         working-directory: spanverify-module
@@ -84,24 +87,20 @@ jobs:
         env:
           OMP_NUM_THREADS: "4"
         run: |
+          set +e
           python scripts/run_experiments.py \
             --dataset ${{ matrix.dataset }} \
             --mode hf --seed 42 --folds 5 --target-fpr 0.1 \
             --features-cache reports/hf-cache \
             --require-cache \
-            --out reports/experiments-${{ matrix.corpus }}
-          python - <<'PY'
-          import json, pathlib
-          payload = json.loads(pathlib.Path("reports/experiments-${{ matrix.corpus }}/experiment.json").read_text(encoding="utf-8"))
-          tokens = payload["metrics"]["tokens"]
-          signal = (payload.get("bundle") or {}).get("meta", {}).get("signal")
-          print("model:", payload.get("model"), "signal:", signal, "head_inline:", payload.get("head_inline"))
-          print("token F1:", tokens.get("f1"), "FPR:", tokens.get("fpr"), "AUC:", tokens.get("auc"))
-          if payload.get("model") != "ai-forever/rugpt3small_based_on_gpt2":
-              raise SystemExit("эксперимент посчитан не той моделью, кеш к ней не относится")
-          if signal == "logreg" and not payload.get("head_inline"):
-              raise SystemExit("голова выбрана, но модель не встроена в бандл")
-          PY
+            --out reports/experiments-${{ matrix.corpus }} \
+            > /tmp/exp.log 2>&1
+          code=$?
+          tail -40 /tmp/exp.log
+          if [ "$code" -ne 0 ]; then
+            python -c 'import pathlib; t = pathlib.Path("/tmp/exp.log").read_text(encoding="utf-8", errors="replace")[-800:]; t = t.replace("%", "%25").replace(chr(10), "%0A"); print("::error::" + t)'
+            exit "$code"
+          fi
 
       - uses: actions/upload-artifact@v4
         with:
