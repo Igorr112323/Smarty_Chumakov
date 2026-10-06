@@ -23,6 +23,10 @@ import yaml
 REPO_ROOT = Path(__file__).resolve().parents[2]
 WORKFLOWS_DIR = REPO_ROOT / ".github" / "workflows"
 MAX_JOB_MINUTES = 40
+# Тяжёлый прогон hf — единственное исключение: лимиты заданы явно (пилот 90,
+# эксперименты 180, метрики 45), у каждого job'а есть timeout-minutes. Правило
+# 40 минут остаётся для ci.yml и остальных workflow: без него job висел часами.
+HEAVY_JOB_MINUTES = {"hf-runs.yml": 180}
 
 
 def _workflow_paths() -> list[Path]:
@@ -57,12 +61,13 @@ def test_every_job_has_timeout(path: Path) -> None:
 def test_no_job_is_longer_than_the_limit(path: Path) -> None:
     """Лимит 40 минут: «висение» должно заканчиваться за минуты, а не за часы."""
     data = yaml.safe_load(path.read_text(encoding="utf-8"))
+    limit = HEAVY_JOB_MINUTES.get(path.name, MAX_JOB_MINUTES)
     over = {
         name: job["timeout-minutes"]
         for name, job in (data.get("jobs") or {}).items()
-        if (job or {}).get("timeout-minutes", 0) > MAX_JOB_MINUTES
+        if (job or {}).get("timeout-minutes", 0) > limit
     }
-    assert not over, f"{path.name}: job'ы дольше {MAX_JOB_MINUTES} минут: {over}"
+    assert not over, f"{path.name}: job'ы дольше {limit} минут: {over}"
 
 
 @pytest.mark.parametrize("path", _workflow_paths(), ids=lambda p: p.name)

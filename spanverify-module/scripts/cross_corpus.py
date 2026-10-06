@@ -21,7 +21,8 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from spanverify.corpus_alt import generate_alt_pairs  # noqa: E402
 from spanverify.dataset import read_pairs  # noqa: E402
-from spanverify.engine import Verifier  # noqa: E402
+from spanverify.engine import Verifier, WeightsBundle  # noqa: E402
+from spanverify.features import DEFAULT_WEIGHTS, HF_MODEL_DEFAULT, load_feature_cache  # noqa: E402
 from spanverify.train import train  # noqa: E402
 
 
@@ -59,20 +60,47 @@ def main() -> int:
     parser.add_argument("--alt-seed", type=int, default=4242, help="seed корпуса B")
     parser.add_argument("--seed", type=int, default=42, help="seed обучения")
     parser.add_argument("--mode", default="demo", help="режим признаков (demo/hf)")
+    parser.add_argument("--model", default=None, help="модель режима hf; должна совпадать с кешем")
+    parser.add_argument(
+        "--features-cache",
+        action="append",
+        default=[],
+        metavar="PATH",
+        help="кеш признаков корпуса A: без него режим hf считает прямой проход в каждом фолде",
+    )
     parser.add_argument("--out", default="reports/cross_corpus.json", help="куда записать JSON")
     args = parser.parse_args()
 
     pairs_a = list(read_pairs(args.dataset))
-    report = train(pairs_a, mode=args.mode, seed=args.seed, dataset_name=str(args.dataset))
+    cache = load_feature_cache(args.features_cache, counting=True) if args.features_cache else None
+    model = args.model or (HF_MODEL_DEFAULT if args.mode == "hf" else None)
+    if cache is not None or args.mode == "hf":
+        train_verifier = Verifier(
+            mode=args.mode,
+            model_name=model,
+            features_cache=cache,
+            weights=WeightsBundle(weights=dict(DEFAULT_WEIGHTS), threshold=0.5, mode=args.mode),
+        )
+        report = train(
+            pairs_a,
+            mode=args.mode,
+            seed=args.seed,
+            dataset_name=str(args.dataset),
+            verifier=train_verifier,
+        )
+    else:
+        report = train(pairs_a, mode=args.mode, seed=args.seed, dataset_name=str(args.dataset))
     in_corpus = report.validation["end_to_end"]
 
     pairs_b = generate_alt_pairs(n_pairs=args.alt_pairs, seed=args.alt_seed)
-    verifier = Verifier(mode=args.mode, weights=report.bundle)
+    verifier = Verifier(mode=args.mode, model_name=model, weights=report.bundle, features_cache=cache)
     cross = verifier.evaluate(pairs_b)
 
     payload = {
         "seed": args.seed,
         "mode": args.mode,
+        "model": model,
+        "features_cache": bool(cache),
         "corpus_a": {
             "name": str(args.dataset),
             "pairs": len(pairs_a),
