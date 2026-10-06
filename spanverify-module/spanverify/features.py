@@ -34,6 +34,11 @@ from .normalize import numbers_to_digits, words_to_number
 from .vectors import hash_index, normalize
 
 FEATURE_NAMES = ("attention_entropy", "ctx_attention_mass", "embedding_density")
+# Признаки-кандидаты: считаются рядом с рабочими, но НЕ входят в итоговый риск
+# (в DEFAULT_WEIGHTS их нет). Они нужны, чтобы измерить на реальной модели,
+# даёт ли нормировка массы на длину контекста прибавку к AUC, и только после
+# измерения решать, переводить ли их в рабочие.
+DIAGNOSTIC_FEATURES = ("ctx_attention_mass_norm", "ctx_attention_mass_lift")
 MEASUREMENT_SUBJECT_WINDOW = 6  # сколько слов перед числом считаем его субъектом
 MEASUREMENT_MATCH_MIN = 0.5  # порог совпадения субъекта ответа с измерением контекста
 SCORED_MIN_LEN = 3
@@ -75,6 +80,10 @@ class FeatureMatrix:
     attention_entropy: list[float] = field(default_factory=list)
     ctx_attention_mass: list[float] = field(default_factory=list)
     embedding_density: list[float] = field(default_factory=list)
+    # Диагностические (не участвуют в риске): нормированная масса опоры.
+    ctx_mass_expected: list[float] = field(default_factory=list)
+    ctx_mass_norm: list[float] = field(default_factory=list)
+    ctx_mass_lift: list[float] = field(default_factory=list)
     token_risk: list[float] = field(default_factory=list)
     meta: dict[str, Any] = field(default_factory=dict)
 
@@ -110,6 +119,41 @@ def scale(values: Sequence[float]) -> list[float]:
     if high <= 1e-12:
         return [0.0] * len(values)
     return [min(1.0, max(0.0, value / high)) for value in values]
+
+
+def expected_context_mass(context_tokens: int, position: int) -> float:
+    """Доля контекстных позиций среди позиций, доступных causal-вниманию.
+
+    Сырая масса внимания на контекст несёт в себе артефакт длины: если контекст
+    занимает 90 % последовательности, то даже при полностью равномерном
+    внимании токен ответа «отдаст» контексту около 0,9. Сравнивать такие
+    величины между документами разной длины и между токенами на разном
+    удалении от начала ответа нельзя. Ожидаемая масса — это значение при
+    равномерном внимании: сколько контекстных позиций лежит в causal-префиксе
+    ``[0, position]``.
+    """
+    visible = position + 1
+    if visible <= 0 or context_tokens <= 0:
+        return 0.0
+    return min(1.0, context_tokens / float(visible))
+
+
+def normalised_context_mass(observed: float, expected: float, eps: float = 1e-9) -> float:
+    """Observed/Expected: во сколько раз масса выше равномерной.
+
+    1,0 — «как при равномерном внимании», > 1 — токен смотрит в контекст
+    больше случайного, < 1 — смотрит в собственный префикс ответа. Значение
+    не ограничено сверху: обрезка до [0, 1] съедала бы именно те сильные
+    случаи, которые мы ищем.
+    """
+    if expected <= eps:
+        return 0.0
+    return float(observed) / float(expected)
+
+
+def context_mass_lift(observed: float, expected: float) -> float:
+    """Аддитивная разность «наблюдаемая − ожидаемая» масса в [-1, 1]."""
+    return max(-1.0, min(1.0, float(observed) - float(expected)))
 
 
 def _clamp01(value: float) -> float:
@@ -832,6 +876,9 @@ def hf_features(
     entropy_values: list[float] = []
     mass_values: list[float] = []
     density_values: list[float] = []
+    mass_expected_values: list[float] = []
+    mass_norm_values: list[float] = []
+    mass_lift_values: list[float] = []
 
     # Векторы контекстных чанков и токенов — для плотности.
     context_token_embeddings: list[list[float]] = []
@@ -846,13 +893,25 @@ def hf_features(
             entropy_values.append(0.5)
             mass_values.append(0.0)
             density_values.append(0.0)
+            mass_expected_values.append(0.0)
+            mass_norm_values.append(0.0)
+            mass_lift_values.append(0.0)
             continue
         entropy_values.append(statistics.fmean(float(entropy[position].item()) for position in positions))
         mass_parts: list[float] = []
         density_parts: list[float] = []
+        norm_parts: list[float] = []
+        lift_parts: list[float] = []
         for position in positions:
             row = attentions[:, position, :].mean(dim=0)  # (seq,)
-            mass_parts.append(float(row[context_positions].sum().item()) if context_positions else 0.0)
+            observed = float(row[context_positions].sum().item()) if context_positions else 0.0
+            mass_parts.append(observed)
+            # Ожидаемая масса — сколько контекстных позиций доступно на этой
+            # позиции при равномерном внимании. Без этого сравнения длинные
+            # контексты кажутся «более поддержанными» просто за счёт размера.
+            expected = expected_context_mass(len(context_positions), position)
+            norm_parts.append(normalised_context_mass(observed, expected))
+            lift_parts.append(context_mass_lift(observed, expected))
             if hidden_cpu is not None and context_token_embeddings:
                 vector = hidden_cpu[position].tolist()
                 similarities = sorted(
@@ -865,11 +924,22 @@ def hf_features(
                 density_parts.append(0.0)
         mass_values.append(min(1.0, max(0.0, statistics.fmean(mass_parts))))
         density_values.append(min(1.0, max(0.0, statistics.fmean(density_parts))))
+        # Для токена, разбитого на несколько сабтокенов, ожидаемая масса
+        # считается по первой позиции: остальные имеют тот же префикс плюс
+        # свои собственные, уже принадлежащие ответу.
+        first_position = min(positions)
+        expected_token = expected_context_mass(len(context_positions), first_position)
+        mass_expected_values.append(expected_token)
+        mass_norm_values.append(statistics.fmean(norm_parts) if norm_parts else 0.0)
+        mass_lift_values.append(statistics.fmean(lift_parts) if lift_parts else 0.0)
 
     return FeatureMatrix(
         attention_entropy=entropy_values,
         ctx_attention_mass=mass_values,
         embedding_density=density_values,
+        ctx_mass_expected=mass_expected_values,
+        ctx_mass_norm=mass_norm_values,
+        ctx_mass_lift=mass_lift_values,
         meta={
             "backend": "hf",
             "model": model_name,

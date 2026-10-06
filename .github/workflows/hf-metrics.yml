@@ -12,6 +12,15 @@ name: Метрики hf (реальная модель)
 
 on:
   workflow_dispatch:
+    inputs:
+      mode:
+        description: "Что считать: только пилот или пилот и эксперименты"
+        required: false
+        default: "full"
+        type: choice
+        options:
+          - pilot
+          - full
   push:
     branches: ["arena/**"]
     paths:
@@ -25,10 +34,40 @@ permissions:
   contents: write
 
 jobs:
+  setup:
+    name: "Режим прогона"
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      run_experiments: ${{ steps.mode.outputs.run_experiments }}
+    steps:
+      - uses: actions/checkout@v4
+
+      # Режим читается из единственной строки .github/hf-metrics.trigger, а
+      # при ручном запуске — из входа. Иначе каждое измерение нового признака
+      # тащило бы за собой многочасовые эксперименты на корпусах.
+      - id: mode
+        run: |
+          requested="${{ github.event.inputs.mode }}"
+          if [ -z "$requested" ]; then
+            requested="$(head -n1 .github/hf-metrics.trigger 2>/dev/null | tr -d '[:space:]')"
+          fi
+          case "$requested" in
+            pilot|pilot-only)
+              echo "run_experiments=false" >> "$GITHUB_OUTPUT"
+              echo "режим: только пилот"
+              ;;
+            *)
+              echo "run_experiments=true" >> "$GITHUB_OUTPUT"
+              echo "режим: пилот и эксперименты"
+              ;;
+          esac
+
   pilot:
     name: "Пилот: AUC признаков по слоям"
     runs-on: ubuntu-latest
     timeout-minutes: 300
+    needs: setup
     permissions:
       contents: write
     steps:
@@ -69,6 +108,12 @@ jobs:
               m = re.search(r'"layer"\s*:\s*"' + re.escape(layer) + r'"(.{0,600}?)"auc"\s*:\s*([0-9.]+)', text, re.S)
               if m:
                   print(f"слой {layer}: AUC={m.group(2)}")
+          # Диагностические признаки-кандидаты: нормированная масса опоры.
+          for name in ("ctx_attention_mass", "ctx_attention_mass_norm", "ctx_attention_mass_lift"):
+              found = re.findall(r'"' + name + r'": \{[^{}]*?"auc_oriented": ([0-9.]+)', text, re.S)
+              if found:
+                  best = max(float(v) for v in found)
+                  print(f"признак {name}: лучший ориентированный AUC={best}")
           PY
 
       - uses: actions/upload-artifact@v4
@@ -100,8 +145,8 @@ jobs:
     name: Эксперименты hf на корпусах A3 и A
     runs-on: ubuntu-latest
     timeout-minutes: 300
-    needs: pilot
-    if: always()
+    needs: [setup, pilot]
+    if: always() && needs.setup.outputs.run_experiments == 'true'
     permissions:
       contents: write
     steps:
