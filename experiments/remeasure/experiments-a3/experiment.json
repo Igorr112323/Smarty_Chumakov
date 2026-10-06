@@ -3,7 +3,7 @@
   "mode": "hf",
   "model": "ai-forever/rugpt3small_based_on_gpt2",
   "seed": 42,
-  "duration_s": 433.2,
+  "duration_s": 542.64,
   "corpus": {
     "pairs": 1298,
     "kinds": {
@@ -18,27 +18,27 @@
   },
   "metrics": {
     "tokens": {
-      "precision": 0.18181818181818182,
-      "recall": 0.0009775171065493646,
-      "f1": 0.0019445794846864365,
-      "fpr": 0.00012127091923356779,
-      "tp": 2,
-      "fp": 9,
-      "fn": 2044,
-      "tn": 74205,
+      "precision": 0.1530958439355386,
+      "recall": 0.35288367546432065,
+      "f1": 0.21354628808044956,
+      "fpr": 0.05381733904654108,
+      "tp": 722,
+      "fp": 3994,
+      "fn": 1324,
+      "tn": 70220,
       "auc": 0.8508819940305783
     },
     "spans": {
-      "precision": 0.005971769815418024,
-      "recall": 0.015427769985974754,
-      "f1": 0.008610567514677104,
-      "tp": 11,
-      "fp": 1831,
-      "fn": 702,
+      "precision": 0.05672969966629588,
+      "recall": 0.2861150070126227,
+      "f1": 0.09468554188906937,
+      "tp": 204,
+      "fp": 3392,
+      "fn": 509,
       "iou_threshold": 0.5,
-      "recall_containment": 0.14305750350631136,
-      "f1_expanded_labels": 0.01643835616438356,
-      "mean_width_ratio": 21.23248608213892
+      "recall_containment": 0.4544179523141655,
+      "f1_expanded_labels": 0.04780691575771641,
+      "mean_width_ratio": 15.717392785170006
     },
     "answers": {
       "threshold": 0.5557046979865772,
@@ -53,15 +53,15 @@
       "tn": 582
     },
     "verdicts": {
-      "tp": 225,
-      "fp": 250,
-      "fn": 488,
-      "tn": 335,
-      "precision": 0.4737,
-      "recall": 0.3156,
-      "f1": 0.3788,
-      "fpr": 0.4274,
-      "flagged_share": 0.3659
+      "tp": 593,
+      "fp": 516,
+      "fn": 120,
+      "tn": 69,
+      "precision": 0.5347,
+      "recall": 0.8317,
+      "f1": 0.6509,
+      "fpr": 0.8821,
+      "flagged_share": 0.8544
     },
     "pairs": 1298,
     "mode": "hf",
@@ -75,8 +75,8 @@
     },
     "threshold": 0.555705,
     "target_fpr": 0.1,
-    "span_z": 0.0,
-    "span_floor": 0.25,
+    "span_z": 3.0,
+    "span_floor": 0.05,
     "span_cap": 0.5,
     "isotonic": {
       "x": [

@@ -3,7 +3,7 @@
   "mode": "hf",
   "model": "ai-forever/rugpt3small_based_on_gpt2",
   "seed": 42,
-  "duration_s": 67.28,
+  "duration_s": 74.41,
   "corpus": {
     "pairs": 1200,
     "kinds": {
