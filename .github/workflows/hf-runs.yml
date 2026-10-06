@@ -33,7 +33,6 @@ on:
     branches: ["arena/**"]
     paths:
       - .github/hf-runs.trigger
-      - .github/workflows/hf-runs.yml
 
 concurrency:
   group: hf-runs-${{ github.ref }}
@@ -253,26 +252,32 @@ jobs:
         env:
           OMP_NUM_THREADS: "4"
         run: |
-          echo "команда: python scripts/cross_corpus.py --dataset data/corpus_a/pairs.jsonl --mode hf --model $HF_MODEL --seed $SEED --alt-pairs 80 --alt-seed 4242 --features-cache reports/hf-cache-a --out reports/cross_corpus.json"
+          echo "команда: python scripts/cross_corpus.py --dataset data/corpus_a/pairs.jsonl --mode hf --model $HF_MODEL --seed $SEED --alt-pairs 80 --alt-seed 4242 --features-cache reports/hf-cache-a --out reports/cross_corpus_hf.json"
           echo "сокращение: alt-pairs 80 вместо 240, чтобы шаг уложился в 45 минут; корпус A считается по кешу, не заново"
+          echo "файл отдельный: reports/cross_corpus.json — demo, его нельзя затирать, иначе сверка документов падает"
           start=$(date -u +%s)
-          python scripts/cross_corpus.py --dataset data/corpus_a/pairs.jsonl --mode hf --model "$HF_MODEL" --seed "$SEED" --alt-pairs 80 --alt-seed 4242 --features-cache reports/hf-cache-a --out reports/cross_corpus.json
+          python scripts/cross_corpus.py --dataset data/corpus_a/pairs.jsonl --mode hf --model "$HF_MODEL" --seed "$SEED" --alt-pairs 80 --alt-seed 4242 --features-cache reports/hf-cache-a --out reports/cross_corpus_hf.json
           echo "длительность_с=$(( $(date -u +%s) - start ))"
       - name: "Собрать METRICS.json и сверить документы"
         working-directory: spanverify-module
         timeout-minutes: 15
         run: |
           python scripts/collect_metrics.py --seed "$SEED" --out reports/METRICS.json
-          python scripts/check_numbers.py
+          if ! python scripts/check_numbers.py; then
+            echo "::error::сверка чисел не сошлась, METRICS.json всё равно сохраняется артефактом"
+            exit 1
+          fi
           python -c "import json; d=json.load(open('reports/METRICS.json')); ext=d.get('external_tests') or {}; print('hf_runs', ext.get('hf_runs'))"
       - uses: actions/upload-artifact@v4
+        if: always()
         with:
           name: hf-runs-metrics
           path: |
             spanverify-module/reports/METRICS.json
-            spanverify-module/reports/cross_corpus.json
+            spanverify-module/reports/cross_corpus_hf.json
             spanverify-module/reports/external_tests.json
           retention-days: 14
+          if-no-files-found: warn
 
   publish:
     name: "Сохранить результаты"
@@ -321,7 +326,8 @@ jobs:
           name: hf-runs-a
           path: /tmp/hf-runs-a
       - uses: actions/download-artifact@v4
-        if: needs.metrics.result == 'success'
+        if: needs.metrics.result == 'success' || needs.metrics.result == 'failure'
+        continue-on-error: true
         with:
           name: hf-runs-metrics
           path: /tmp/hf-runs-metrics
@@ -343,7 +349,7 @@ jobs:
           metrics = Path("/tmp/hf-runs-metrics")
           if metrics.exists():
               for path in metrics.rglob("*"):
-                  if path.is_file() and path.name in {"METRICS.json", "cross_corpus.json", "external_tests.json"}:
+                  if path.is_file() and path.name in {"METRICS.json", "cross_corpus_hf.json", "external_tests.json"}:
                       shutil.copy2(path, root / path.name)
                       print("метрика", path.name)
           PY
@@ -351,7 +357,12 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          for path in spanverify-module/reports/experiments spanverify-module/reports/pilot spanverify-module/reports/METRICS.json spanverify-module/reports/cross_corpus.json spanverify-module/reports/external_tests.json spanverify-module/reports/ext_ragtruth_qa_hf.json; do
+          # reports/pilot/ в gitignore: git add без -f роняет весь шаг, и числа не коммитятся.
+          if [ -f spanverify-module/reports/pilot/pilot.json ]; then
+            mkdir -p spanverify-module/reports/experiments/pilot
+            cp spanverify-module/reports/pilot/pilot.json spanverify-module/reports/pilot/pilot.md spanverify-module/reports/experiments/pilot/
+          fi
+          for path in spanverify-module/reports/experiments spanverify-module/reports/METRICS.json spanverify-module/reports/cross_corpus_hf.json spanverify-module/reports/external_tests.json spanverify-module/reports/ext_ragtruth_qa_hf.json; do
             if [ -e "$path" ]; then
               git add -- "$path"
             fi
@@ -361,7 +372,8 @@ jobs:
             exit 0
           fi
           git commit -m "числа: прогон hf [skip ci]"
-          git push
+          git push origin "HEAD:${GITHUB_REF_NAME}"
+          echo "запушено ${GITHUB_REF_NAME}"
       - uses: actions/upload-artifact@v4
         if: always()
         with:

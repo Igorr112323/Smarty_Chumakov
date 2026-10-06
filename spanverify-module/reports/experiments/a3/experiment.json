@@ -1,0 +1,223 @@
+{
+  "dataset": "data/corpus_a3/pairs.jsonl",
+  "mode": "hf",
+  "model": "ai-forever/rugpt3small_based_on_gpt2",
+  "seed": 42,
+  "duration_s": 339.06,
+  "corpus": {
+    "pairs": 1200,
+    "kinds": {
+      "corpus_a3_real": 1200
+    },
+    "hallucination_rate": 0.0,
+    "mean_answer_chars": 525.4,
+    "mean_context_chars": 1069.3,
+    "flagged_share_of_answers": 0.0211,
+    "vocabulary": 13914,
+    "dataset_version": "2.0-synthetic-pairs"
+  },
+  "metrics": {
+    "tokens": {
+      "precision": 0.1408199643493761,
+      "recall": 0.36424180327868855,
+      "f1": 0.2031138408798743,
+      "fpr": 0.07008983390422026,
+      "tp": 711,
+      "fp": 4338,
+      "fn": 1241,
+      "tn": 57554,
+      "auc": 0.8445938855481203
+    },
+    "spans": {
+      "precision": 0.056384248210023864,
+      "recall": 0.2863636363636364,
+      "f1": 0.09421734795613161,
+      "tp": 189,
+      "fp": 3163,
+      "fn": 471,
+      "iou_threshold": 0.5,
+      "recall_containment": 0.47424242424242424,
+      "f1_expanded_labels": 0.04536390827517448,
+      "mean_width_ratio": 14.728947616293159
+    },
+    "answers": {
+      "threshold": 0.5654008448818565,
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1": 0.0,
+      "fpr": 0.0,
+      "auc": 0.5,
+      "tp": 0,
+      "fp": 0,
+      "fn": 660,
+      "tn": 540
+    },
+    "verdicts": {
+      "tp": 565,
+      "fp": 482,
+      "fn": 95,
+      "tn": 58,
+      "precision": 0.5396,
+      "recall": 0.8561,
+      "f1": 0.662,
+      "fpr": 0.8926,
+      "flagged_share": 0.8725
+    },
+    "pairs": 1200,
+    "mode": "hf",
+    "warning": ""
+  },
+  "bundle": {
+    "weights": {
+      "attention_entropy": 1.0,
+      "ctx_attention_mass": 0.0,
+      "embedding_density": 0.0
+    },
+    "threshold": 0.565401,
+    "target_fpr": 0.1,
+    "span_z": 2.0,
+    "span_floor": 0.05,
+    "span_cap": 0.5,
+    "isotonic": {
+      "x": [
+        0.03883,
+        0.181815
+      ],
+      "y": [
+        0.465116,
+        0.565401
+      ]
+    },
+    "head": {
+      "type": "logreg",
+      "file": "config/head.json",
+      "model": {
+        "weights": [
+          0.1377365173630991,
+          1.0602775060347207,
+          -0.5697945712244226,
+          0.06443400557791558,
+          0.7244403880441419,
+          -0.576705713226448
+        ],
+        "bias": -3.8919813803011785
+      },
+      "scaler": {
+        "means": [
+          0.555216218795962,
+          0.6433993233730569,
+          0.6324893074801734,
+          0.7979360986160163,
+          0.48401605379965873,
+          0.39316639846907303
+        ],
+        "scales": [
+          0.09689185287317087,
+          0.2707119627049141,
+          0.23937824565376878,
+          0.1371484146505287,
+          0.2874873705959905,
+          0.19420143282226765
+        ]
+      }
+    },
+    "folds": [
+      {
+        "fold": 0,
+        "n_train": 36789,
+        "n_test": 9197,
+        "auc": 0.8514336731987847
+      },
+      {
+        "fold": 1,
+        "n_train": 36789,
+        "n_test": 9197,
+        "auc": 0.8459437581388801
+      },
+      {
+        "fold": 2,
+        "n_train": 36789,
+        "n_test": 9197,
+        "auc": 0.8559366321523951
+      },
+      {
+        "fold": 3,
+        "n_train": 36789,
+        "n_test": 9197,
+        "auc": 0.8471470632250575
+      },
+      {
+        "fold": 4,
+        "n_train": 36788,
+        "n_test": 9198,
+        "auc": 0.8348390608326943
+      }
+    ],
+    "seed": 42,
+    "version": "1.3.0",
+    "mode": "hf",
+    "meta": {
+      "dataset": "data/corpus_a3/pairs.jsonl",
+      "synthetic": false,
+      "signal": "logreg",
+      "threshold_report": {
+        "threshold": 0.5654008448818565,
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0,
+        "fpr": 0.0,
+        "hdr": 1.0,
+        "accuracy": 0.45,
+        "tp": 0.0,
+        "fp": 0.0,
+        "tn": 378.0,
+        "fn": 462.0,
+        "constraint_met": 1.0
+      },
+      "note": "Демонстрационный корпус: параметры проверяют конвейер, а не качество на реальных документах. Для боевой калибровки используйте размеченные реальные пары в режиме hf.",
+      "participation": {
+        "type": "participation-logreg",
+        "auc_out_of_fold": 0.0,
+        "calibrated_on": "пропущено: кеш признаков не содержит корпус участия"
+      }
+    }
+  },
+  "folds": [
+    {
+      "fold": 0,
+      "n_train": 36789,
+      "n_test": 9197,
+      "auc": 0.8514336731987847
+    },
+    {
+      "fold": 1,
+      "n_train": 36789,
+      "n_test": 9197,
+      "auc": 0.8459437581388801
+    },
+    {
+      "fold": 2,
+      "n_train": 36789,
+      "n_test": 9197,
+      "auc": 0.8559366321523951
+    },
+    {
+      "fold": 3,
+      "n_train": 36789,
+      "n_test": 9197,
+      "auc": 0.8471470632250575
+    },
+    {
+      "fold": 4,
+      "n_train": 36788,
+      "n_test": 9198,
+      "auc": 0.8348390608326943
+    }
+  ],
+  "gate": "НЕ достигнут",
+  "head_inline": true,
+  "artifacts": {
+    "weights": "reports/experiments/a3/weights.json",
+    "head": "reports/experiments/a3/config/head.json"
+  }
+}
