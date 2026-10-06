@@ -61,7 +61,7 @@ jobs:
         with:
           python-version: "3.11"
 
-      - name: Зависимости и CPU-версия torch
+      - name: "Зависимости и CPU-версия torch"
         working-directory: spanverify-module
         timeout-minutes: 20
         run: |
@@ -70,7 +70,7 @@ jobs:
           python -m pip install -q "torch~=2.14" --index-url https://download.pytorch.org/whl/cpu
           python -m pip install -q -r requirements-hf.txt
 
-      - name: Предпосчёт признаков шарда
+      - name: "Предпосчёт признаков шарда"
         working-directory: spanverify-module
         timeout-minutes: 30
         env:
@@ -108,7 +108,7 @@ jobs:
         with:
           python-version: "3.11"
 
-      - name: Зависимости и CPU-версия torch
+      - name: "Зависимости и CPU-версия torch"
         working-directory: spanverify-module
         timeout-minutes: 20
         run: |
@@ -123,13 +123,13 @@ jobs:
           path: spanverify-module/reports/hf-cache
           merge-multiple: true
 
-      - name: Кеш признаков: сколько собралось
+      - name: "Кеш признаков: сколько собралось"
         working-directory: spanverify-module
         run: |
           ls -la reports/hf-cache
           wc -l reports/hf-cache/features_*.jsonl | tail -1
 
-      - name: Эксперимент (кросс-валидация на кеше)
+      - name: "Эксперимент (кросс-валидация на кеше)"
         working-directory: spanverify-module
         timeout-minutes: 35
         env:
@@ -169,14 +169,14 @@ jobs:
           path: spanverify-module/reports
           merge-multiple: true
 
-      - name: Зависимости
+      - name: "Зависимости"
         working-directory: spanverify-module
         timeout-minutes: 10
         run: |
           python -m pip install --upgrade pip
           python -m pip install -q -r requirements.txt
 
-      - name: Свести числа
+      - name: "Свести числа"
         working-directory: spanverify-module
         timeout-minutes: 10
         run: |
@@ -202,7 +202,7 @@ jobs:
           if-no-files-found: warn
           retention-days: 30
 
-      - name: Сохранить в ветку данных
+      - name: "Сохранить в ветку данных"
         working-directory: spanverify-module
         run: |
           mkdir -p /tmp/keepexp && rm -rf /tmp/keepexp/*

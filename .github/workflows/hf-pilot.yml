@@ -28,7 +28,7 @@ jobs:
   pilot:
     name: "Пилот: AUC признаков по слоям"
     runs-on: ubuntu-latest
-    timeout-minutes: 240
+    timeout-minutes: 40
     permissions:
       contents: write
     steps:
@@ -40,7 +40,7 @@ jobs:
 
       - name: Зависимости и CPU-версия torch
         working-directory: spanverify-module
-        timeout-minutes: 45
+        timeout-minutes: 20
         run: |
           python -m pip install --upgrade pip
           python -m pip install -q -r requirements.txt
@@ -50,7 +50,7 @@ jobs:
 
       - name: Пилот (48 пар, бутстрэп 5000)
         working-directory: spanverify-module
-        timeout-minutes: 150
+        timeout-minutes: 32
         env:
           OMP_NUM_THREADS: "4"
         run: |

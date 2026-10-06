@@ -30,7 +30,7 @@ jobs:
   slice:
     name: Срез «${{ matrix.title }}»
     runs-on: ubuntu-latest
-    timeout-minutes: 120
+    timeout-minutes: 40
     permissions:
       contents: read
     strategy:
@@ -123,7 +123,7 @@ jobs:
 
       - name: Загрузка и распознавание среза
         working-directory: spanverify-module
-        timeout-minutes: 70
+        timeout-minutes: 32
         env:
           OMP_THREAD_LIMIT: "1"
         run: |
@@ -195,7 +195,7 @@ jobs:
   bench-ocr:
     name: Замер скорости распознавания
     runs-on: ubuntu-latest
-    timeout-minutes: 60
+    timeout-minutes: 40
     permissions:
       contents: read
     # Только при ручном запуске: на каждой волне мерить незачем, это лишние минуты.

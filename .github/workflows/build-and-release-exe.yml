@@ -37,6 +37,7 @@ env:
 
 jobs:
   test:
+    timeout-minutes: 40
     name: Тесты (Python ${{ matrix.python }})
     runs-on: ubuntu-latest
     strategy:
@@ -67,6 +68,7 @@ jobs:
         run: python -m spanverify selftest
 
   windows-exe:
+    timeout-minutes: 40
     name: Сборка и проверка .exe
     needs: test
     runs-on: windows-latest
