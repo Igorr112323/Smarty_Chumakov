@@ -236,9 +236,13 @@ jobs:
 
       - uses: actions/download-artifact@v4
         with:
-          pattern: hf-experiment-*
-          path: spanverify-module/reports
-          merge-multiple: true
+          name: hf-experiment-a3
+          path: spanverify-module/reports/experiments-a3
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: hf-experiment-a
+          path: spanverify-module/reports/experiments-a
 
       - name: "Зависимости"
         working-directory: spanverify-module

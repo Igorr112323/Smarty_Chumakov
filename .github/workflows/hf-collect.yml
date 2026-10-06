@@ -1,0 +1,145 @@
+# Свести числа из уже готового прогона экспериментов, не пересчитывая признаки.
+#
+# Зачем отдельный workflow: артефакты GitHub Actions недоступны из среды
+# разработки (сеть не выпускается), поэтому прочитать результаты можно только
+# внутри раннера. Пересчитывать признаки ради этого нельзя — это 40 минут
+# работы модели. Здесь job только забирает готовые артефакты указанного прогона,
+# гонит collect_metrics.py и складывает результат в артефакты и в ветку данных.
+#
+# Запуск — правкой .github/hf-collect.trigger: в первой строке файла указывается
+# номер прогона, из которого брать артефакты. Если строка пустая или там не
+# число, берётся последний завершённый прогон «Эксперименты hf (корпуса A3 и A)».
+name: Свести числа экспериментов hf
+
+on:
+  push:
+    branches: ["arena/**"]
+    paths:
+      - .github/hf-collect.trigger
+
+concurrency:
+  group: hf-collect-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: write
+  actions: read
+
+jobs:
+  collect:
+    name: "Свести числа из прогона"
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    permissions:
+      contents: write
+      actions: read
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: "Зависимости"
+        working-directory: spanverify-module
+        timeout-minutes: 10
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -q -r requirements.txt
+
+      - name: "Определить прогон-источник"
+        id: source
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          requested="$(head -n1 .github/hf-collect.trigger 2>/dev/null | tr -d '[:space:]')"
+          if ! printf '%s' "$requested" | grep -qE '^[0-9]{6,}$'; then
+            requested="$(gh run list --repo ${{ github.repository }} \
+              --workflow hf-experiments.yml --status success --limit 1 \
+              --json databaseId --jq '.[0].databaseId')"
+            echo "номер не указан — берём последний успешный: $requested"
+          fi
+          echo "run_id=$requested" >> "$GITHUB_OUTPUT"
+          echo "источник артефактов: прогон $requested"
+
+      - name: "Забрать результаты экспериментов"
+        working-directory: spanverify-module
+        timeout-minutes: 10
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          mkdir -p reports/experiments-a3 reports/experiments-a
+          for corpus in a3 a; do
+            if gh run download ${{ steps.source.outputs.run_id }} \
+                 --repo ${{ github.repository }} \
+                 -n "hf-experiment-$corpus" -D "reports/experiments-$corpus"; then
+              echo "корпус $corpus: артефакт получен"
+            else
+              echo "корпус $corpus: артефакта нет или он пуст"
+            fi
+          done
+          find reports/experiments-a3 reports/experiments-a -type f | sort
+
+      - name: "Свести числа"
+        working-directory: spanverify-module
+        timeout-minutes: 10
+        run: |
+          python scripts/collect_metrics.py --out reports/METRICS.json
+          python scripts/cross_corpus.py --out reports/cross_corpus.json || true
+          python - <<'PY'
+          import json, pathlib
+          metrics = json.loads(pathlib.Path("reports/METRICS.json").read_text(encoding="utf-8"))
+          print("прогонов hf:", metrics.get("external_tests", {}).get("hf_runs"))
+          for key in ("corpus_a", "corpus_a3_real"):
+              modes = metrics.get(key, {}).get("by_mode", {})
+              for mode in ("demo", "hf"):
+                  test = modes.get(mode, {}).get("by_split", {}).get("test")
+                  if test:
+                      tokens = test.get("tokens", {})
+                      print(
+                          f"{key} {mode} test: n={test.get('n')} "
+                          f"P={tokens.get('precision')} R={tokens.get('recall')} "
+                          f"F1={tokens.get('f1')} FPR={tokens.get('fpr')} AUC={tokens.get('auc')}"
+                      )
+          PY
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: hf-collected-metrics
+          path: |
+            spanverify-module/reports/METRICS.json
+            spanverify-module/reports/cross_corpus.json
+            spanverify-module/reports/experiments-a3
+            spanverify-module/reports/experiments-a
+          if-no-files-found: warn
+          retention-days: 30
+
+      - name: "Сохранить в ветку данных"
+        working-directory: spanverify-module
+        timeout-minutes: 5
+        run: |
+          mkdir -p /tmp/keepcol && rm -rf /tmp/keepcol/*
+          cp -r reports /tmp/keepcol/reports 2>/dev/null || true
+          cd ..
+          git config user.name "spanverify-bot"
+          git config user.email "bot@spanverify.local"
+          git fetch origin data/metrics || true
+          git checkout -B data/metrics origin/data/metrics
+          rm -rf experiments
+          mkdir -p experiments
+          cp -r /tmp/keepcol/reports/experiments-a3 experiments/ 2>/dev/null || true
+          cp -r /tmp/keepcol/reports/experiments-a experiments/ 2>/dev/null || true
+          cp /tmp/keepcol/reports/METRICS.json experiments/METRICS-hf-${{ steps.source.outputs.run_id }}.json 2>/dev/null || true
+          git add -A experiments
+          git diff --cached --quiet && echo "изменений нет" && exit 0
+          git commit -m "hf: числа прогона ${{ steps.source.outputs.run_id }} [skip ci]"
+          for attempt in 1 2 3 4 5; do
+            if git push origin HEAD:data/metrics; then
+              echo "ветка данных обновлена с попытки $attempt"
+              break
+            fi
+            echo "пуш отклонён, попытка $attempt"
+            git fetch origin data/metrics
+            git rebase FETCH_HEAD || git rebase --abort
+            sleep $((attempt * 10))
+          done
