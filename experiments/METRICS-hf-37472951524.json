@@ -8,8 +8,8 @@
   },
   "meta": {
     "version": "1.3.0",
-    "commit": "e1322c7f41ed54a663db5b4082079e51644920a6",
-    "generated_at": "2026-10-06T14:26:16Z",
+    "commit": "0bfd6235b8559bb25d67dd4a6236aca87b005fef",
+    "generated_at": "2026-10-06T14:34:11Z",
     "seed": 42,
     "dataset": "data/demo_pairs.jsonl"
   },
@@ -995,5 +995,5 @@
   },
   "pilot": null,
   "release": null,
-  "duration_s": 107.5
+  "duration_s": 84.1
 }

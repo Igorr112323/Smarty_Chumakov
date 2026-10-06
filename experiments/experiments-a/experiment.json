@@ -1,0 +1,197 @@
+{
+  "dataset": "data/corpus_a/pairs.jsonl",
+  "mode": "hf",
+  "seed": 42,
+  "duration_s": 599.96,
+  "corpus": {
+    "pairs": 1200,
+    "kinds": {
+      "corpus_a": 1200
+    },
+    "hallucination_rate": 0.0,
+    "mean_answer_chars": 100.9,
+    "mean_context_chars": 1060.7,
+    "flagged_share_of_answers": 0.1149,
+    "vocabulary": 102,
+    "dataset_version": "2.0-synthetic-pairs"
+  },
+  "metrics": {
+    "tokens": {
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1": 0.0,
+      "fpr": 0.0,
+      "tp": 0,
+      "fp": 0,
+      "fn": 1674,
+      "tn": 11097,
+      "auc": 0.7718277750377388
+    },
+    "spans": {
+      "precision": 0.9885057471264368,
+      "recall": 0.13564668769716087,
+      "f1": 0.23855755894590844,
+      "tp": 86,
+      "fp": 1,
+      "fn": 548,
+      "iou_threshold": 0.5,
+      "recall_containment": 0.13564668769716087,
+      "f1_expanded_labels": 0.0,
+      "mean_width_ratio": 1.130479901615334
+    },
+    "answers": {
+      "threshold": 0.5172413793103449,
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1": 0.0,
+      "fpr": 0.0,
+      "auc": 0.5,
+      "tp": 0,
+      "fp": 0,
+      "fn": 634,
+      "tn": 566
+    },
+    "verdicts": {
+      "tp": 86,
+      "fp": 1,
+      "fn": 548,
+      "tn": 565,
+      "precision": 0.9885,
+      "recall": 0.1356,
+      "f1": 0.2386,
+      "fpr": 0.0018,
+      "flagged_share": 0.0725
+    },
+    "pairs": 1200,
+    "mode": "hf",
+    "warning": ""
+  },
+  "bundle": {
+    "weights": {
+      "attention_entropy": 0.0,
+      "ctx_attention_mass": 1.0,
+      "embedding_density": 0.0
+    },
+    "threshold": 0.517241,
+    "target_fpr": 0.1,
+    "span_z": 0.0,
+    "span_floor": 0.3,
+    "span_cap": 0.5,
+    "isotonic": {
+      "x": [
+        0.162931,
+        0.164793,
+        0.179919,
+        0.207156,
+        0.262614,
+        0.263471,
+        0.313005,
+        0.331311,
+        0.457802,
+        0.481948,
+        0.555678
+      ],
+      "y": [
+        0.360784,
+        0.375,
+        0.428571,
+        0.46729,
+        0.496933,
+        0.5,
+        0.517241,
+        0.7,
+        0.747253,
+        1.0,
+        1.0
+      ]
+    },
+    "head": {
+      "type": "logreg",
+      "file": "config/head.json"
+    },
+    "folds": [
+      {
+        "fold": 0,
+        "n_train": 6840,
+        "n_test": 1710,
+        "auc": 0.8956520344360972
+      },
+      {
+        "fold": 1,
+        "n_train": 6840,
+        "n_test": 1710,
+        "auc": 0.9107998557518933
+      },
+      {
+        "fold": 2,
+        "n_train": 6840,
+        "n_test": 1710,
+        "auc": 0.903071995118975
+      },
+      {
+        "fold": 3,
+        "n_train": 6840,
+        "n_test": 1710,
+        "auc": 0.9136319006222143
+      },
+      {
+        "fold": 4,
+        "n_train": 6840,
+        "n_test": 1710,
+        "auc": 0.9269425565711013
+      }
+    ],
+    "seed": 42,
+    "version": "1.3.0",
+    "mode": "hf",
+    "meta": {
+      "dataset": "data/corpus_a/pairs.jsonl",
+      "synthetic": false,
+      "signal": "logreg",
+      "note": "Демонстрационный корпус: параметры проверяют конвейер, а не качество на реальных документах. Для боевой калибровки используйте размеченные реальные пары в режиме hf.",
+      "participation": {
+        "type": "participation-logreg",
+        "auc_out_of_fold": 1.0,
+        "calibrated_on": "synthetic-participation-corpus 1.0 (два стиля, доля смеси известна)"
+      }
+    }
+  },
+  "folds": [
+    {
+      "fold": 0,
+      "n_train": 6840,
+      "n_test": 1710,
+      "auc": 0.8956520344360972
+    },
+    {
+      "fold": 1,
+      "n_train": 6840,
+      "n_test": 1710,
+      "auc": 0.9107998557518933
+    },
+    {
+      "fold": 2,
+      "n_train": 6840,
+      "n_test": 1710,
+      "auc": 0.903071995118975
+    },
+    {
+      "fold": 3,
+      "n_train": 6840,
+      "n_test": 1710,
+      "auc": 0.9136319006222143
+    },
+    {
+      "fold": 4,
+      "n_train": 6840,
+      "n_test": 1710,
+      "auc": 0.9269425565711013
+    }
+  ],
+  "gate": "НЕ достигнут",
+  "artifacts": {
+    "weights": "reports/experiments-a/weights.json",
+    "head": "reports/experiments-a/config/head.json",
+    "participation": "reports/experiments-a/config/participation.json"
+  }
+}

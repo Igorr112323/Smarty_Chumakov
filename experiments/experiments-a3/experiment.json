@@ -1,0 +1,197 @@
+{
+  "dataset": "data/corpus_a3/pairs.jsonl",
+  "mode": "hf",
+  "seed": 42,
+  "duration_s": 880.64,
+  "corpus": {
+    "pairs": 1298,
+    "kinds": {
+      "corpus_a3_real": 1298
+    },
+    "hallucination_rate": 0.0,
+    "mean_answer_chars": 551.7,
+    "mean_context_chars": 1189.1,
+    "flagged_share_of_answers": 0.0196,
+    "vocabulary": 15607,
+    "dataset_version": "2.0-synthetic-pairs"
+  },
+  "metrics": {
+    "tokens": {
+      "precision": 0.0075587334014300305,
+      "recall": 0.03616813294232649,
+      "f1": 0.01250422440013518,
+      "fpr": 0.13091869458592717,
+      "tp": 74,
+      "fp": 9716,
+      "fn": 1972,
+      "tn": 64498,
+      "auc": 0.617150697932778
+    },
+    "spans": {
+      "precision": 0.010353960992053936,
+      "recall": 0.06030855539971949,
+      "f1": 0.01767365392519523,
+      "tp": 43,
+      "fp": 4110,
+      "fn": 670,
+      "iou_threshold": 0.5,
+      "recall_containment": 0.17391304347826086,
+      "f1_expanded_labels": 0.016851623510069875,
+      "mean_width_ratio": 20.00572886717954
+    },
+    "answers": {
+      "threshold": 1.0,
+      "precision": 0.5,
+      "recall": 0.015427769985974754,
+      "f1": 0.029931972789115645,
+      "fpr": 0.018803418803418803,
+      "auc": 0.5647774541182676,
+      "tp": 11,
+      "fp": 11,
+      "fn": 702,
+      "tn": 574
+    },
+    "verdicts": {
+      "tp": 264,
+      "fp": 265,
+      "fn": 449,
+      "tn": 320,
+      "precision": 0.4991,
+      "recall": 0.3703,
+      "f1": 0.4251,
+      "fpr": 0.453,
+      "flagged_share": 0.4076
+    },
+    "pairs": 1298,
+    "mode": "hf",
+    "warning": ""
+  },
+  "bundle": {
+    "weights": {
+      "attention_entropy": 1.0,
+      "ctx_attention_mass": 0.0,
+      "embedding_density": 0.0
+    },
+    "threshold": 1.0,
+    "target_fpr": 0.1,
+    "span_z": 0.0,
+    "span_floor": 0.25,
+    "span_cap": 0.5,
+    "isotonic": {
+      "x": [
+        0.004592,
+        0.011677,
+        0.01278,
+        0.015387,
+        0.032402,
+        0.032573,
+        0.04024,
+        0.041475,
+        0.18462,
+        0.189167,
+        0.202668
+      ],
+      "y": [
+        0.0,
+        0.2,
+        0.333333,
+        0.4,
+        0.428571,
+        0.5,
+        0.511628,
+        0.538462,
+        0.555405,
+        1.0,
+        1.0
+      ]
+    },
+    "head": {
+      "type": "logreg",
+      "file": "config/head.json"
+    },
+    "folds": [
+      {
+        "fold": 0,
+        "n_train": 40603,
+        "n_test": 10150,
+        "auc": 0.8624235043603817
+      },
+      {
+        "fold": 1,
+        "n_train": 40603,
+        "n_test": 10150,
+        "auc": 0.861130601271746
+      },
+      {
+        "fold": 2,
+        "n_train": 40603,
+        "n_test": 10150,
+        "auc": 0.8538324729166977
+      },
+      {
+        "fold": 3,
+        "n_train": 40603,
+        "n_test": 10150,
+        "auc": 0.8531317758970414
+      },
+      {
+        "fold": 4,
+        "n_train": 40600,
+        "n_test": 10153,
+        "auc": 0.8480355227439299
+      }
+    ],
+    "seed": 42,
+    "version": "1.3.0",
+    "mode": "hf",
+    "meta": {
+      "dataset": "data/corpus_a3/pairs.jsonl",
+      "synthetic": false,
+      "signal": "logreg",
+      "note": "Демонстрационный корпус: параметры проверяют конвейер, а не качество на реальных документах. Для боевой калибровки используйте размеченные реальные пары в режиме hf.",
+      "participation": {
+        "type": "participation-logreg",
+        "auc_out_of_fold": 1.0,
+        "calibrated_on": "synthetic-participation-corpus 1.0 (два стиля, доля смеси известна)"
+      }
+    }
+  },
+  "folds": [
+    {
+      "fold": 0,
+      "n_train": 40603,
+      "n_test": 10150,
+      "auc": 0.8624235043603817
+    },
+    {
+      "fold": 1,
+      "n_train": 40603,
+      "n_test": 10150,
+      "auc": 0.861130601271746
+    },
+    {
+      "fold": 2,
+      "n_train": 40603,
+      "n_test": 10150,
+      "auc": 0.8538324729166977
+    },
+    {
+      "fold": 3,
+      "n_train": 40603,
+      "n_test": 10150,
+      "auc": 0.8531317758970414
+    },
+    {
+      "fold": 4,
+      "n_train": 40600,
+      "n_test": 10153,
+      "auc": 0.8480355227439299
+    }
+  ],
+  "gate": "НЕ достигнут",
+  "artifacts": {
+    "weights": "reports/experiments-a3/weights.json",
+    "head": "reports/experiments-a3/config/head.json",
+    "participation": "reports/experiments-a3/config/participation.json"
+  }
+}

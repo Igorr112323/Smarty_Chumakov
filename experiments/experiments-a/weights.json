@@ -1,0 +1,90 @@
+{
+  "weights": {
+    "attention_entropy": 0.0,
+    "ctx_attention_mass": 1.0,
+    "embedding_density": 0.0
+  },
+  "threshold": 0.517241,
+  "target_fpr": 0.1,
+  "span_z": 0.0,
+  "span_floor": 0.3,
+  "span_cap": 0.5,
+  "isotonic": {
+    "x": [
+      0.162931,
+      0.164793,
+      0.179919,
+      0.207156,
+      0.262614,
+      0.263471,
+      0.313005,
+      0.331311,
+      0.457802,
+      0.481948,
+      0.555678
+    ],
+    "y": [
+      0.360784,
+      0.375,
+      0.428571,
+      0.46729,
+      0.496933,
+      0.5,
+      0.517241,
+      0.7,
+      0.747253,
+      1.0,
+      1.0
+    ]
+  },
+  "head": {
+    "type": "logreg",
+    "file": "config/head.json"
+  },
+  "folds": [
+    {
+      "fold": 0,
+      "n_train": 6840,
+      "n_test": 1710,
+      "auc": 0.8956520344360972
+    },
+    {
+      "fold": 1,
+      "n_train": 6840,
+      "n_test": 1710,
+      "auc": 0.9107998557518933
+    },
+    {
+      "fold": 2,
+      "n_train": 6840,
+      "n_test": 1710,
+      "auc": 0.903071995118975
+    },
+    {
+      "fold": 3,
+      "n_train": 6840,
+      "n_test": 1710,
+      "auc": 0.9136319006222143
+    },
+    {
+      "fold": 4,
+      "n_train": 6840,
+      "n_test": 1710,
+      "auc": 0.9269425565711013
+    }
+  ],
+  "seed": 42,
+  "version": "1.3.0",
+  "mode": "hf",
+  "meta": {
+    "dataset": "data/corpus_a/pairs.jsonl",
+    "synthetic": false,
+    "signal": "logreg",
+    "note": "Демонстрационный корпус: параметры проверяют конвейер, а не качество на реальных документах. Для боевой калибровки используйте размеченные реальные пары в режиме hf.",
+    "participation": {
+      "type": "participation-logreg",
+      "auc_out_of_fold": 1.0,
+      "calibrated_on": "synthetic-participation-corpus 1.0 (два стиля, доля смеси известна)"
+    }
+  }
+}
