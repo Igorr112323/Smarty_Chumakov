@@ -1,0 +1,185 @@
+# Реальные метрики режима hf: пилот на ruGPT3-small и эксперименты на корпусах.
+#
+# Отдельный workflow, а не job в ci.yml: веса модели тянутся из интернета,
+# считается всё на CPU и занимает часы. На каждый пуш такое гонять нельзя,
+# поэтому запуск — правкой .github/hf-metrics.trigger либо вручную.
+#
+# Порядок шагов тот, что требует задание: сначала пилот (AUC признаков по слоям
+# с 95 % ДИ), затем эксперименты на корпусах A3 и A, затем сбор METRICS.json.
+# Числа складываются в артефакты и — чтобы их можно было прочитать без
+# скачивания — в отдельную ветку данных data/metrics, всегда с [skip ci].
+name: Метрики hf (реальная модель)
+
+on:
+  workflow_dispatch:
+  push:
+    branches: ["arena/**"]
+    paths:
+      - .github/hf-metrics.trigger
+
+concurrency:
+  group: hf-metrics-${{ github.ref }}
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  pilot:
+    name: "Пилот: AUC признаков по слоям"
+    runs-on: ubuntu-latest
+    timeout-minutes: 300
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Зависимости и CPU-версия torch
+        working-directory: spanverify-module
+        timeout-minutes: 45
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -q -r requirements.txt
+          python -m pip install -q "torch~=2.14" --index-url https://download.pytorch.org/whl/cpu
+          python -m pip install -q -r requirements-hf.txt
+          python -c "import torch, transformers; print('torch', torch.__version__, '| transformers', transformers.__version__, '| cuda', torch.cuda.is_available())"
+
+      - name: Пилот (48 пар, бутстрэп 5000)
+        working-directory: spanverify-module
+        timeout-minutes: 150
+        env:
+          OMP_NUM_THREADS: "4"
+        run: |
+          python scripts/pilot_rugpt3small.py --pairs 48 --bootstrap 5000 --out reports/pilot
+
+      - name: Ключевые числа пилота
+        working-directory: spanverify-module
+        run: |
+          python - <<'PY'
+          import pathlib, re
+          out = pathlib.Path("reports/pilot")
+          text = "\n".join(p.read_text(encoding="utf-8") for p in sorted(out.glob("*.json")))
+          aucs = re.findall(r'"auc"\s*:\s*([0-9.]+)', text)
+          print("найдено значений AUC:", len(aucs))
+          for layer in ("first", "middle", "-4", "last"):
+              m = re.search(r'"layer"\s*:\s*"' + re.escape(layer) + r'"(.{0,600}?)"auc"\s*:\s*([0-9.]+)', text, re.S)
+              if m:
+                  print(f"слой {layer}: AUC={m.group(2)}")
+          PY
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: hf-pilot
+          path: spanverify-module/reports/pilot
+          if-no-files-found: warn
+          retention-days: 30
+
+      - name: Сохранить черновые метрики в ветку данных
+        if: always()
+        run: |
+          # Сначала копируем во временное место: переключение ветки очистит
+          # рабочую копию, и путь spanverify-module/... исчезнет.
+          mkdir -p /tmp/keep && rm -rf /tmp/keep/pilot
+          cp -r spanverify-module/reports/pilot /tmp/keep/pilot 2>/dev/null || true
+          git config user.name "spanverify-bot"
+          git config user.email "bot@spanverify.local"
+          git fetch origin data/metrics || true
+          git checkout -B data/metrics origin/data/metrics
+          mkdir -p pilot
+          cp -r /tmp/keep/pilot/* pilot/ 2>/dev/null || true
+          git add -A pilot
+          git diff --cached --quiet && echo "изменений нет" && exit 0
+          git commit -m "hf: пилот после прогона ${{ github.run_number }} [skip ci]"
+          git push origin HEAD:data/metrics
+
+  experiments:
+    name: Эксперименты hf на корпусах A3 и A
+    runs-on: ubuntu-latest
+    timeout-minutes: 300
+    needs: pilot
+    if: always()
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Зависимости и CPU-версия torch
+        working-directory: spanverify-module
+        timeout-minutes: 45
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -q -r requirements.txt
+          python -m pip install -q "torch~=2.14" --index-url https://download.pytorch.org/whl/cpu
+          python -m pip install -q -r requirements-hf.txt
+
+      - name: Эксперимент на корпусе A3 (реальные акты)
+        working-directory: spanverify-module
+        timeout-minutes: 120
+        env:
+          OMP_NUM_THREADS: "4"
+        run: |
+          python scripts/run_experiments.py --dataset data/corpus_a3/pairs.jsonl \
+            --mode hf --seed 42 --folds 5 --target-fpr 0.1 --out reports/experiments
+
+      - name: Эксперимент на корпусе A (синтетика)
+        working-directory: spanverify-module
+        timeout-minutes: 120
+        env:
+          OMP_NUM_THREADS: "4"
+        run: |
+          python scripts/run_experiments.py --dataset data/corpus_a/pairs.jsonl \
+            --mode hf --seed 42 --folds 5 --target-fpr 0.1 --out reports/experiments
+
+      - name: Свести числа
+        working-directory: spanverify-module
+        timeout-minutes: 30
+        run: |
+          python scripts/collect_metrics.py --out reports/METRICS.json
+          python scripts/cross_corpus.py --out reports/cross_corpus.json || true
+          python - <<'PY'
+          import json, pathlib
+          m = json.loads(pathlib.Path("reports/METRICS.json").read_text(encoding="utf-8"))
+          ext = m.get("external_tests", {})
+          print("прогонов hf:", ext.get("hf_runs"))
+          for key in ("corpus_a", "corpus_a3_real"):
+              test = m.get(key, {}).get("by_split", {}).get("test")
+              if test:
+                  t = test.get("tokens", {})
+                  print(f"{key} test: F1={t.get('f1')} FPR={t.get('fpr')} AUC={t.get('auc')}")
+          PY
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: hf-experiments
+          path: |
+            spanverify-module/reports/experiments
+            spanverify-module/reports/METRICS.json
+            spanverify-module/reports/cross_corpus.json
+          if-no-files-found: warn
+          retention-days: 30
+
+      - name: Сохранить результаты в ветку данных
+        if: always()
+        run: |
+          mkdir -p /tmp/keep2 && rm -rf /tmp/keep2/experiments
+          cp -r spanverify-module/reports/experiments /tmp/keep2/experiments 2>/dev/null || true
+          cp spanverify-module/reports/METRICS.json /tmp/keep2/METRICS.json 2>/dev/null || true
+          git config user.name "spanverify-bot"
+          git config user.email "bot@spanverify.local"
+          git fetch origin data/metrics || true
+          git checkout -B data/metrics origin/data/metrics
+          mkdir -p experiments
+          cp -r /tmp/keep2/experiments/* experiments/ 2>/dev/null || true
+          cp /tmp/keep2/METRICS.json experiments/METRICS-hf-${{ github.run_number }}.json 2>/dev/null || true
+          git add -A experiments
+          git diff --cached --quiet && echo "изменений нет" && exit 0
+          git commit -m "hf: эксперименты после прогона ${{ github.run_number }} [skip ci]"
+          git push origin HEAD:data/metrics
