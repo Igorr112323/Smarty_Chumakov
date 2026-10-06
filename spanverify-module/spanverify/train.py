@@ -28,7 +28,7 @@ from pathlib import Path
 from typing import Any
 
 from ._version import __version__
-from .calibration import IsotonicCalibrator, choose_threshold, metrics_at
+from .calibration import IsotonicCalibrator, choose_threshold_report, metrics_at
 from .core import tokenize_with_offsets
 from .engine import (
     SMOOTH_WINDOW,
@@ -104,6 +104,7 @@ def collect_samples(
             features.ctx_attention_mass,
             features.embedding_density,
             verifier.bundle.weights,
+            entropy_quantile=verifier.entropy_quantile,
         )
 
         labels = [0] * len(tokens)
@@ -269,12 +270,20 @@ def shared_groups(train_pairs: Sequence[dict], test_pairs: Sequence[dict]) -> in
     return len({_group_key(pair) for pair in train_pairs} & {_group_key(pair) for pair in test_pairs})
 
 
-def _risk_for(samples: Sequence[TokenSample], weights: dict[str, float]) -> list[float]:
-    """Пересчитать риск по уже собранным признакам (без повторного расчёта)."""
+def _risk_for(
+    samples: Sequence[TokenSample],
+    weights: dict[str, float],
+    entropy_quantile: float = 1.0,
+) -> list[float]:
+    """Пересчитать риск по уже собранным признакам (без повторного расчёта).
+
+    ``entropy_quantile`` обязан совпадать с тем, что использует ``Verifier``:
+    иначе голова обучается на одном масштабе риска, а API считает другой.
+    """
     entropy = [sample.features["attention_entropy"] for sample in samples]
     mass = [sample.features["ctx_attention_mass"] for sample in samples]
     density = [sample.features["embedding_density"] for sample in samples]
-    return combine(entropy, mass, density, weights)
+    return combine(entropy, mass, density, weights, entropy_quantile=entropy_quantile)
 
 
 def _score_pairs(
@@ -534,22 +543,34 @@ def train(
     for sample in test_samples:
         test_by_pair.setdefault(sample.pair_id, []).append(sample)
 
+    # Квантиль энтропии берётся у верификатора: обучение и API обязаны
+    # нормировать риск одинаково, иначе голова видит не тот признак, который
+    # потом получит на входе.
+    entropy_quantile = verifier.entropy_quantile
+
     # 1. Веса признаков — по AUC на обучающей части (перебор сетки, сумма = 1).
     best_weights = dict(DEFAULT_WEIGHTS)
     best_auc = -1.0
     weight_table: list[dict[str, float]] = []
     for weights in _weight_grid():
-        risks = _risk_for(train_samples, weights)
+        risks = _risk_for(train_samples, weights, entropy_quantile=entropy_quantile)
         auc = auc_score([sample.label for sample in train_samples], risks)
         weight_table.append({**weights, "auc": auc})
         if not math.isnan(auc) and auc > best_auc:
             best_auc, best_weights = auc, weights
 
     def rule_risk(samples: Sequence[TokenSample]) -> list[float]:
-        return _risk_for(samples, best_weights)
+        return _risk_for(samples, best_weights, entropy_quantile=entropy_quantile)
 
     # 2. Голова: логистическая регрессия, 5-кратная кросс-валидация по парам.
-    head_report = _train_and_compare_head(train_samples, test_samples, best_weights, folds, seed)
+    head_report = _train_and_compare_head(
+        train_samples,
+        test_samples,
+        best_weights,
+        folds,
+        seed,
+        entropy_quantile=entropy_quantile,
+    )
     head_model = head_report.get("payload") or {}
 
     def head_risk_fn(samples: Sequence[TokenSample]) -> list[float]:
@@ -589,12 +610,37 @@ def train(
     train_metrics = _score_pairs(verifier, train_pairs, risk_fn, best_span, train_by_pair)
     calibrator = IsotonicCalibrator.fit(train_metrics["raw_scores"], train_metrics["answer_labels"])
     calibrated = calibrator.transform(train_metrics["raw_scores"])
-    threshold = choose_threshold(calibrated, train_metrics["answer_labels"], max_fpr=target_fpr)
+    threshold_report = choose_threshold_report(calibrated, train_metrics["answer_labels"], max_fpr=target_fpr)
+    threshold = float(threshold_report["threshold"])
+    if not threshold_report.get("constraint_met", True):
+        # Молчаливый порог (ничего не помечать) почти всегда укладывается в FPR,
+        # поэтому сюда попадаем только если ограничение невыполнимо совсем.
+        # Тогда берём максимум F1 и пишем фактический FPR, а не притворяемся,
+        # что целевой FPR достигнут.
+        print(
+            f"ВНИМАНИЕ: целевой FPR {target_fpr} на обучающей части недостижим; "
+            f"порог выбран по максимуму F1 ({threshold_report['f1']:.3f}), "
+            f"фактический FPR {threshold_report['fpr']:.3f}",
+            flush=True,
+        )
 
     validation = _score_pairs(verifier, test_pairs, risk_fn, best_span, test_by_pair)
     validation_at = metrics_at(calibrator.transform(validation["raw_scores"]), validation["answer_labels"], threshold)
 
-    saved_head = head_report["saved"] if candidate["signal"] == "logreg" else {"type": "none", "file": None}
+    # Модель встраивается в бандл, а не только путь к файлу. Иначе оценка
+    # читает config/head.json из поставки (демо-голова) и применяет её к
+    # признакам другой модели: в прогоне 37472951524 из-за этого token F1
+    # оказался 0,013 при AUC головы 0,85. Файл по-прежнему пишется — для
+    # перезапуска без бандла в памяти.
+    if candidate["signal"] == "logreg" and head_report.get("model"):
+        saved_head = {
+            "type": "logreg",
+            "file": "config/head.json",
+            "model": head_report["model"],
+            "scaler": head_report.get("scaler") or {},
+        }
+    else:
+        saved_head = {"type": "none", "file": None}
     bundle = WeightsBundle(
         weights=best_weights,
         threshold=float(threshold),
@@ -612,6 +658,12 @@ def train(
             "dataset": dataset_name or "inline",
             "synthetic": mode == "demo",
             "signal": candidate["signal"],
+            # Чтобы недостигнутое ограничение по FPR было видно в отчёте, а не
+            # только в логе: иначе порог 1,0 выглядит как «модель ничего не нашла».
+            "threshold_report": {
+                key: (float(value) if isinstance(value, (int, float)) else value)
+                for key, value in threshold_report.items()
+            },
             "note": (
                 "Демонстрационный корпус: параметры проверяют конвейер, а не качество "
                 "на реальных документах. Для боевой калибровки используйте размеченные "
@@ -707,10 +759,11 @@ def _train_and_compare_head(
     weights: dict[str, float],
     folds: int,
     seed: int,
+    entropy_quantile: float = 1.0,
 ) -> dict[str, Any]:
     """Обучить голову с кросс-валидацией и сравнить её с пороговым правилом."""
-    train_risks = _risk_for(train_samples, weights)
-    test_risks = _risk_for(test_samples, weights)
+    train_risks = _risk_for(train_samples, weights, entropy_quantile=entropy_quantile)
+    test_risks = _risk_for(test_samples, weights, entropy_quantile=entropy_quantile)
     train_rows, train_labels = _head_rows(train_samples, train_risks)
     test_rows, test_labels = _head_rows(test_samples, test_risks)
     train_scaled, means, scales = _standardize(train_rows)

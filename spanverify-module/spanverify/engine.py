@@ -230,6 +230,12 @@ class Verifier:
         # кросс-валидации каждая пара нужна в каждом фолде. Без кеша эксперимент
         # на корпусе A3 не укладывался в лимит job'а (прогон 37446204812).
         self.features_cache = features_cache
+        # Нормировка энтропии по квантили вместо максимума. В режиме hf
+        # распределение энтропии внимания имеет тяжёлый хвост: деление на
+        # максимум сжимало риск почти всех токенов к нулю, и маска переставала
+        # что-либо помечать (прог. 37472951524: recall 0,036 при AUC головы 0,85).
+        # В demo распределение без выбросов, поэтому поведение не меняется.
+        self.entropy_quantile = 0.95 if self.mode == "hf" else 1.0
         # Оценка доли участия ИИ (требование заявки) — отдельная голова; если
         # файла нет, поле остаётся нулевым и это видно в stats.
         self.participation = self._load_participation()
@@ -312,6 +318,7 @@ class Verifier:
             features.ctx_attention_mass,
             features.embedding_density,
             self.bundle.weights,
+            entropy_quantile=self.entropy_quantile,
         )
         if self.bundle.head and self.bundle.head.get("type") == "logreg":
             head_risk = _head_risk(self.bundle.head, features, risk, tokens)

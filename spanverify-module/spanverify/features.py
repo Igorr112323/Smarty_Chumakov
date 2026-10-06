@@ -220,6 +220,31 @@ def context_mass_lift(observed: float, expected: float) -> float:
     return max(-1.0, min(1.0, float(observed) - float(expected)))
 
 
+def scale_robust(values: Sequence[float], quantile: float = 1.0) -> list[float]:
+    """Нормировка по квантили вместо максимума: устойчивость к одиночному пику.
+
+    :func:`scale` делит на максимум, и этого достаточно, пока распределение без
+    тяжёлых хвостов. Энтропия внимания реальной модели часто имеет один
+    аномальный токен: деление на него сжимает риск остальных к нулю. Это
+    гипотеза, а не измеренная причина прогона 37472951524 (там оценка
+    подхватила чужую голову). Функция нужна, чтобы гипотезу можно было
+    включить и измерить отдельно.
+
+    ``quantile = 1.0`` — прежнее поведение (максимум), поэтому демонстрационный
+    режим и все прежние числа не меняются.
+    """
+    if not values:
+        return []
+    if quantile >= 1.0:
+        return scale(values)
+    ordered = sorted(float(value) for value in values)
+    index = min(len(ordered) - 1, max(0, int(round(quantile * (len(ordered) - 1)))))
+    high = ordered[index]
+    if high <= 1e-12:
+        return [0.0] * len(values)
+    return [min(1.0, max(0.0, value / high)) for value in values]
+
+
 def _clamp01(value: float) -> float:
     """Ограничить значение отрезком [0, 1] (NaN → 0)."""
     if value != value:  # NaN
@@ -236,6 +261,7 @@ def combine(
     mass: Sequence[float],
     density: Sequence[float],
     weights: dict[str, float] | None = None,
+    entropy_quantile: float = 1.0,
 ) -> list[float]:
     """Взвешенная комбинация признаков: r = w1·Ĥ + w2·(1 − m̂) + w3·d̂.
 
@@ -244,10 +270,14 @@ def combine(
     ``embedding_density`` имеют абсолютный смысл (0 = опоры нет, 1 = токен
     подтверждён), поэтому они НЕ делятся на собственный максимум: иначе ответ,
     где слабо поддержаны все токены, выглядел бы полностью подтверждённым.
+
+    ``entropy_quantile`` < 1 включает нормировку по квантили вместо максимума —
+    это нужно режиму ``hf`` (см. :func:`scale_robust`); значение 1.0 сохраняет
+    прежнее поведение.
     """
     weights = {**DEFAULT_WEIGHTS, **(weights or {})}
     total = sum(abs(weights.get(name, 0.0)) for name in FEATURE_NAMES) or 1.0
-    e_hat = scale(entropy)
+    e_hat = scale_robust(entropy, entropy_quantile)
     m_hat = [_clamp01(value) for value in mass]
     d_hat = [_clamp01(value) for value in density]
     out: list[float] = []
@@ -1160,7 +1190,8 @@ def load_feature_cache(paths: Any, counting: bool = False) -> dict[str, FeatureM
     for raw in paths or ():
         path = Path(raw)
         if path.is_dir():
-            files = sorted(path.glob("features_*.jsonl"))
+            # rglob: gh run download кладёт каждый артефакт в свой подкаталог.
+            files = sorted(path.rglob("features_*.jsonl"))
         else:
             files = [path]
         for file in files:

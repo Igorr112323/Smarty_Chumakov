@@ -90,6 +90,11 @@ def main(argv: list[str] | None = None) -> int:
         metavar="PATH",
         help="кеш предпосчитанных признаков (файл JSONL или каталог с шардами); " "можно указать несколько раз",
     )
+    parser.add_argument(
+        "--require-cache",
+        action="store_true",
+        help="завершиться с ошибкой, если хотя бы одна пара не нашлась в кеше",
+    )
     args = parser.parse_args(argv)
 
     dataset = Path(args.dataset)
@@ -118,6 +123,19 @@ def main(argv: list[str] | None = None) -> int:
         target_fpr=args.target_fpr,
         dataset_name=str(dataset),
     )
+    head = report.bundle.head or {}
+    head_inline = bool((head.get("model") or {}).get("weights"))
+    print(
+        "голова в оценке: " + ("модель встроена в бандл" if head_inline else "только файл " + str(head.get("file"))),
+        flush=True,
+    )
+    if cache is not None and args.require_cache and getattr(cache, "misses", 0):
+        print(
+            f"кеш неполон: промахов {cache.misses} ещё до оценки — эксперимент остановлен",
+            file=sys.stderr,
+        )
+        return 2
+
     verifier = Verifier(mode=args.mode, weights=report.bundle, features_cache=cache)
     metrics = verifier.evaluate(records)
     if cache is not None:
@@ -191,6 +209,7 @@ def main(argv: list[str] | None = None) -> int:
         "bundle": bundle.to_dict(),
         "folds": report.folds,
         "gate": gate,
+        "head_inline": head_inline,
         "artifacts": {name: str(path) for name, path in written.items()},
     }
     json_path = out_dir / "experiment.json"

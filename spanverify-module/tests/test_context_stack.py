@@ -745,6 +745,10 @@ def test_train_produces_valid_bundle():
     assert len(bundle.folds) == 5
     assert bundle.meta["synthetic"] is True
     assert bundle.span_floor < bundle.span_cap
+    # Если победила голова, её модель обязана лежать в бандле: иначе оценка
+    # прочитает config/head.json из поставки и применит чужие веса.
+    if (bundle.head or {}).get("type") == "logreg":
+        assert (bundle.head.get("model") or {}).get("weights"), "голова не встроена в бандл"
 
 
 def test_train_reports_validation_and_selection():

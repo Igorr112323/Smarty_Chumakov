@@ -1,0 +1,157 @@
+# Пересчёт эксперимента hf на уже готовом кеше признаков.
+#
+# Прямой проход модели по корпусам A3 и A уже посчитан (прогон 37472951524,
+# артефакты hf-cache-*). Повторять его незачем: меняется обучение и оценка,
+# а не признаки. Номер прогона-источника — первая строка
+# .github/hf-remeasure.trigger.
+#
+# Зачем отдельный workflow: в прогоне 37472951524 оценка прочитала демо-голову
+# из config/head.json вместо только что обученной. После исправления нужно
+# новое число, а не новый прямой проход (он занимает около 40 минут на корпус).
+name: Пересчёт hf на кеше признаков
+
+on:
+  push:
+    branches: ["arena/**"]
+    paths:
+      - .github/hf-remeasure.trigger
+
+concurrency:
+  group: hf-remeasure-${{ github.ref }}
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+  actions: read
+
+jobs:
+  experiment:
+    name: "Эксперимент ${{ matrix.corpus }} на кеше"
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - corpus: a3
+            dataset: data/corpus_a3/pairs.jsonl
+          - corpus: a
+            dataset: data/corpus_a/pairs.jsonl
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: "Зависимости"
+        working-directory: spanverify-module
+        timeout-minutes: 10
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -q -r requirements.txt
+
+      - name: "Номер прогона с кешем"
+        id: source
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          requested="$(head -n1 .github/hf-remeasure.trigger 2>/dev/null | tr -d '[:space:]')"
+          if ! printf '%s' "$requested" | grep -qE '^[0-9]{6,}$'; then
+            echo "::error::в .github/hf-remeasure.trigger нет номера прогона"
+            exit 1
+          fi
+          echo "run_id=$requested" >> "$GITHUB_OUTPUT"
+          echo "кеш берём из прогона $requested"
+
+      - name: "Забрать кеш признаков"
+        working-directory: spanverify-module
+        timeout-minutes: 10
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          mkdir -p reports/hf-cache
+          gh run download ${{ steps.source.outputs.run_id }} \
+            --repo ${{ github.repository }} \
+            --pattern "hf-cache-${{ matrix.corpus }}-*" \
+            --dir reports/hf-cache
+          find reports/hf-cache -type f -name 'features_*.jsonl' | sort
+          wc -l reports/hf-cache/features_*.jsonl | tail -1
+
+      - name: "Эксперимент на кеше"
+        working-directory: spanverify-module
+        timeout-minutes: 25
+        env:
+          OMP_NUM_THREADS: "4"
+        run: |
+          python scripts/run_experiments.py \
+            --dataset ${{ matrix.dataset }} \
+            --mode hf --seed 42 --folds 5 --target-fpr 0.1 \
+            --features-cache reports/hf-cache \
+            --require-cache \
+            --out reports/experiments-${{ matrix.corpus }}
+          python - <<'PY'
+          import json, pathlib
+          payload = json.loads(pathlib.Path("reports/experiments-${{ matrix.corpus }}/experiment.json").read_text(encoding="utf-8"))
+          tokens = payload["metrics"]["tokens"]
+          print("head_inline:", payload.get("head_inline"))
+          print("token F1:", tokens.get("f1"), "FPR:", tokens.get("fpr"), "AUC:", tokens.get("auc"))
+          if not payload.get("head_inline"):
+              raise SystemExit("голова не встроена в бандл — число снова будет от чужой модели")
+          PY
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: hf-remeasure-${{ matrix.corpus }}
+          path: spanverify-module/reports/experiments-${{ matrix.corpus }}
+          if-no-files-found: error
+          retention-days: 30
+
+  publish:
+    name: "Сохранить пересчёт"
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    needs: experiment
+    if: always()
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: hf-remeasure-a3
+          path: spanverify-module/reports/experiments-a3
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: hf-remeasure-a
+          path: spanverify-module/reports/experiments-a
+
+      - name: "Сохранить в ветку данных"
+        working-directory: spanverify-module
+        timeout-minutes: 8
+        run: |
+          mkdir -p /tmp/keeprem && rm -rf /tmp/keeprem/*
+          cp -r reports /tmp/keeprem/reports
+          cd ..
+          git config user.name "spanverify-bot"
+          git config user.email "bot@spanverify.local"
+          git fetch origin data/metrics || true
+          git checkout -B data/metrics origin/data/metrics
+          mkdir -p experiments/remeasure
+          cp -r /tmp/keeprem/reports/experiments-a3 experiments/remeasure/ 2>/dev/null || true
+          cp -r /tmp/keeprem/reports/experiments-a experiments/remeasure/ 2>/dev/null || true
+          git add -A experiments/remeasure
+          git diff --cached --quiet && echo "изменений нет" && exit 0
+          git commit -m "hf: пересчёт на кеше, прогон ${{ github.run_id }} [skip ci]"
+          for attempt in 1 2 3 4 5; do
+            if git push origin HEAD:data/metrics; then
+              echo "ветка данных обновлена с попытки $attempt"
+              break
+            fi
+            echo "пуш отклонён, попытка $attempt"
+            git fetch origin data/metrics
+            git rebase FETCH_HEAD || git rebase --abort
+            sleep $((attempt * 10))
+          done
