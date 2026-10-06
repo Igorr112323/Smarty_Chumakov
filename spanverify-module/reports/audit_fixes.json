@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-10-05T20:08:07.564413+00:00",
+ "generated_at": "2026-10-06T06:55:49.598982+00:00",
  "source": "audit_status_source.json",
  "items": [
   {
@@ -16,7 +16,7 @@
    "priority": "P0",
    "status": "частично",
    "evidence": "Пилот с 4 слоями, бутстрэпом 5000 и контролем контраста выполнен: reports/pilot_local/pilot.json (локально, MiniLM) и reports/pilot (CI, ruGPT3-small). Гипотеза «масса внимания на контекст информативнее энтропии» проверяется скриптом и печатается честно, включая отрицательный результат.",
-   "commit": "—"
+   "commit": "f13f8e5"
   },
   {
    "id": "P0-3",
@@ -40,7 +40,7 @@
    "priority": "P0",
    "status": "частично",
    "evidence": "Загрузчик реальных актов расширен (региональные квоты, кэш PDF, бюджет времени, записи unavailable с причиной) и запускается в CI: .github/workflows/arena-pipeline.yml, job npa-corpus. Числа — data/corpus_a3/sources/sources.json и reports/CORPUS_A3.md.",
-   "commit": "2eedcac"
+   "commit": "5cac1d2"
   },
   {
    "id": "P1-1",
@@ -64,7 +64,7 @@
    "priority": "P1",
    "status": "нет",
    "evidence": "Перенос на другой генератор и внешние наборы: адаптеры и оценка есть (scripts/external_eval.py, reports/external_tests.json), прогоны в режиме hf не выполнены.",
-   "commit": "—"
+   "commit": "525d349"
   },
   {
    "id": "P1-4",
@@ -112,7 +112,7 @@
    "priority": "P2",
    "status": "частично",
    "evidence": "Базовые уровни: в пилоте — случайное угадывание 0.5 и косинусная близость без внимания (embedding_density); извлечение таблиц статьи — scripts/extract_baseline_pdf.py, результаты в reports/ext_*.json.",
-   "commit": "—"
+   "commit": "525d349"
   },
   {
    "id": "P2-2",
@@ -128,7 +128,7 @@
    "priority": "P2",
    "status": "частично",
    "evidence": "Загрузчик расширен: региональные квоты и уровень акта по номеру публикации, кэш PDF, бюджет времени, явные записи unavailable с причиной, сверка SHA256 (scripts/fetch_npa_corpus.py, tests/test_fetch_npa_corpus.py).",
-   "commit": "—"
+   "commit": "203aa21"
   },
   {
    "id": "P2-4",
@@ -144,7 +144,7 @@
    "priority": "P2",
    "status": "закрыто",
    "evidence": "Документы сдачи и РИД: scripts/make_gost_docs.py (протокол, акт, ведомость, .docx) и scripts/make_rid_package.py (заявки на ПО и БД, опись депонирования, пометка «не подано»), reports/gost и reports/rid.",
-   "commit": "0f12f54"
+   "commit": "c2f3431"
   },
   {
    "id": "P2-6",
@@ -152,7 +152,7 @@
    "priority": "P2",
    "status": "закрыто",
    "evidence": "Патентный поиск и обзор аналогов: scripts/prior_art_search.py (OpenAlex, Crossref, GitHub, Google Patents), результаты без интерпретации — reports/prior_art.json и prior_art.md.",
-   "commit": "0f12f54"
+   "commit": "c2f3431"
   }
  ],
  "unfinished": [

@@ -1,7 +1,7 @@
 {
- "generated_at": "2026-10-05T20:08:08.334448+00:00",
+ "generated_at": "2026-10-06T06:55:51.443450+00:00",
  "extras": {
-  "coverage_percent": 87.02,
+  "coverage_percent": 86.48,
   "contrast_grounded": 1.0,
   "contrast_unsupported": 0.0,
   "check_numbers_output": "Числа сходятся с METRICS.json: проверено документов 10",
@@ -28,7 +28,7 @@
   {
    "name": "Покрытие автотестами",
    "target": ">= 85 %",
-   "fact": 87.02,
+   "fact": 86.48,
    "achieved": true,
    "reason": "",
    "comment": "Измеряется шагом «quality» в CI; значение — в логе job и reports/coverage.json."
