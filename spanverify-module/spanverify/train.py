@@ -827,7 +827,20 @@ def _train_and_compare_head(
 
 
 def _fit_participation(verifier: Verifier, seed: int, version: str) -> dict[str, Any]:
-    """Обучить оценку доли участия ИИ на синтетическом корпусе двух стилей."""
+    """Обучить оценку доли участия ИИ на синтетическом корпусе двух стилей.
+
+    Если признаки берутся из кеша эксперимента, синтетические тексты участия
+    в нём отсутствуют. Считать их моделью заново нельзя: это другой проход,
+    и без torch он роняет весь эксперимент (прогон 37499388752). Оценка
+    недостоверности от этой головы не зависит, поэтому пропуск честный.
+    """
+    if verifier.mode == "hf" and verifier.features_cache is not None:
+        return {
+            "type": "none",
+            "payload": None,
+            "auc_out_of_fold": 0.0,
+            "calibrated_on": "пропущено: кеш признаков не содержит корпус участия",
+        }
     samples = build_participation_corpus(count=240, seed=seed + 1985)
     rows, labels = corpus_rows_and_labels(verifier, samples)
     if not rows or len(set(labels)) < 2:
