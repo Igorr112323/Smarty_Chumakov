@@ -111,3 +111,15 @@ def test_cache_key_uses_the_model_the_experiment_names() -> None:
     assert feature_cache_key(answer, context, "hf", verifier.model_name) == feature_cache_key(
         answer, context, "hf", HF_MODEL_DEFAULT
     )
+
+
+def test_mask_floor_grid_can_sit_below_a_quarter() -> None:
+    """Пол маски должен доставать до шкалы вероятностей головы.
+
+    На корпусе A3 (прогон 37500309990) сетка начиналась с 0,25, голова
+    ранжировала токены (AUC 0,851), а маска почти ничего не помечала.
+    """
+    from spanverify.train import FLOOR_GRID
+
+    assert min(FLOOR_GRID) <= 0.10
+    assert 0.25 in FLOOR_GRID
