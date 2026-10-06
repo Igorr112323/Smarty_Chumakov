@@ -64,6 +64,8 @@ FEATURE_ATTRS = {
     "ctx_max_similarity": "ctx_max_similarity",
     "ctx_support_distance": "ctx_support_distance",
     "ctx_similarity_decay": "ctx_similarity_decay",
+    "ctx_sim_contrast": "ctx_sim_contrast",
+    "ctx_sim_margin": "ctx_sim_margin",
 }
 # Признаки, у которых большее значение означает БОЛЬШИЙ риск. Остальные
 # (масса опоры, похожесть на контекст) работают в обратную сторону. Знак нужен
@@ -435,7 +437,7 @@ def write_auc_png(payload: dict, path: Path, width: int = 640, height: int = 360
             value = max(0.0, min(1.0, value))
             x = left + 20 + (layer_index * len(features) + feature_index) * slot
             top = bottom - int((bottom - 20) * value)
-            bar(x, top, colors[feature_index], max(4, slot - 6))
+            bar(x, top, colors[feature_index % len(colors)], max(4, slot - 6))
 
     raw = b"".join(b"\x00" + bytes(channel for pixel in row for channel in pixel) for row in pixels)
 

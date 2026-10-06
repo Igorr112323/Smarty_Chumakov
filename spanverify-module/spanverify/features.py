@@ -45,6 +45,9 @@ DIAGNOSTIC_FEATURES = (
     "ctx_max_similarity",
     "ctx_support_distance",
     "ctx_similarity_decay",
+    # Итерация 3: выделенность максимума над фоном и над вторым источником.
+    "ctx_sim_contrast",
+    "ctx_sim_margin",
 )
 MEASUREMENT_SUBJECT_WINDOW = 6  # сколько слов перед числом считаем его субъектом
 MEASUREMENT_MATCH_MIN = 0.5  # порог совпадения субъекта ответа с измерением контекста
@@ -95,6 +98,8 @@ class FeatureMatrix:
     ctx_max_similarity: list[float] = field(default_factory=list)
     ctx_support_distance: list[float] = field(default_factory=list)
     ctx_similarity_decay: list[float] = field(default_factory=list)
+    ctx_sim_contrast: list[float] = field(default_factory=list)
+    ctx_sim_margin: list[float] = field(default_factory=list)
     token_risk: list[float] = field(default_factory=list)
     meta: dict[str, Any] = field(default_factory=dict)
 
@@ -160,6 +165,27 @@ def normalised_context_mass(observed: float, expected: float, eps: float = 1e-9)
     if expected <= eps:
         return 0.0
     return float(observed) / float(expected)
+
+
+def similarity_contrast(maximum: float, mean_value: float) -> float:
+    """Выделенность максимума над средним уровнем похожести по контексту.
+
+    Признак итерации 3. Сам по себе максимум похожести высок у «гладких»
+    документов, где любой токен похож на любой: это свойство текста, а не
+    признак опоры. Вычитание среднего уровня оставляет только превышение над
+    фоном, то есть именно наличие источника, а не общую похожесть документа.
+    """
+    return float(maximum) - float(mean_value)
+
+
+def similarity_margin(maximum: float, second: float) -> float:
+    """Отрыв лучшего источника от второго по силе.
+
+    Если максимум лишь немного выше второго, опора неопределённа: токен похож
+    на много мест сразу, и «подтверждение» ничем не выделяется. Большой отрыв
+    означает один явный источник.
+    """
+    return float(maximum) - float(second)
 
 
 def normalised_support_distance(distance: int, seq_len: int) -> float:
@@ -920,6 +946,8 @@ def hf_features(
     max_sim_values: list[float] = []
     support_distance_values: list[float] = []
     decay_values: list[float] = []
+    contrast_values: list[float] = []
+    margin_values: list[float] = []
 
     # Векторы контекстных чанков и токенов — для плотности.
     context_token_embeddings: list[list[float]] = []
@@ -940,6 +968,8 @@ def hf_features(
             max_sim_values.append(0.0)
             support_distance_values.append(0.0)
             decay_values.append(0.0)
+            contrast_values.append(0.0)
+            margin_values.append(0.0)
             continue
         entropy_values.append(statistics.fmean(float(entropy[position].item()) for position in positions))
         mass_parts: list[float] = []
@@ -949,6 +979,8 @@ def hf_features(
         max_sim_parts: list[float] = []
         distance_parts: list[float] = []
         decay_parts: list[float] = []
+        contrast_parts: list[float] = []
+        margin_parts: list[float] = []
         for position in positions:
             row = attentions[:, position, :].mean(dim=0)  # (seq,)
             observed = float(row[context_positions].sum().item()) if context_positions else 0.0
@@ -978,11 +1010,21 @@ def hf_features(
                 similarities = sorted((value for value, _position in scored), reverse=True)
                 top = similarities[: max(1, k)]
                 density_parts.append(sum(top) / len(top))
+                # Фон и второй источник — для признаков итерации 3: один и тот же
+                # максимум означает разное в «гладком» и в «рваном» документе.
+                mean_similarity = statistics.fmean(similarities) if similarities else 0.0
+                second_similarity = (
+                    similarities[1] if len(similarities) > 1 else (similarities[0] if similarities else 0.0)
+                )
+                contrast_parts.append(similarity_contrast(best_similarity, mean_similarity))
+                margin_parts.append(similarity_margin(best_similarity, second_similarity))
             else:  # pragma: no cover - модель без hidden_states
                 density_parts.append(0.0)
                 max_sim_parts.append(0.0)
                 distance_parts.append(0.0)
                 decay_parts.append(0.0)
+                contrast_parts.append(0.0)
+                margin_parts.append(0.0)
         mass_values.append(min(1.0, max(0.0, statistics.fmean(mass_parts))))
         density_values.append(min(1.0, max(0.0, statistics.fmean(density_parts))))
         # Для токена, разбитого на несколько сабтокенов, ожидаемая масса
@@ -996,6 +1038,8 @@ def hf_features(
         max_sim_values.append(statistics.fmean(max_sim_parts) if max_sim_parts else 0.0)
         support_distance_values.append(statistics.fmean(distance_parts) if distance_parts else 0.0)
         decay_values.append(statistics.fmean(decay_parts) if decay_parts else 0.0)
+        contrast_values.append(statistics.fmean(contrast_parts) if contrast_parts else 0.0)
+        margin_values.append(statistics.fmean(margin_parts) if margin_parts else 0.0)
 
     return FeatureMatrix(
         attention_entropy=entropy_values,
@@ -1007,6 +1051,8 @@ def hf_features(
         ctx_max_similarity=max_sim_values,
         ctx_support_distance=support_distance_values,
         ctx_similarity_decay=decay_values,
+        ctx_sim_contrast=contrast_values,
+        ctx_sim_margin=margin_values,
         meta={
             "backend": "hf",
             "model": model_name,
