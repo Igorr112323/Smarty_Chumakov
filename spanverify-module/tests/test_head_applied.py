@@ -93,3 +93,21 @@ def test_scale_robust_does_not_let_one_spike_zero_the_rest() -> None:
     assert naive[0] < 0.02
     assert robust[0] >= 0.5
     assert max(robust) == pytest.approx(1.0)
+
+
+def test_cache_key_uses_the_model_the_experiment_names() -> None:
+    """Ключ кеша обязан совпадать у предпосчёта и у оценки.
+
+    Иначе оценка тихо считает другую модель: в конфиге по умолчанию
+    rubert-tiny2, а кеш писался для rugpt3small.
+    """
+    from spanverify.engine import Verifier
+    from spanverify.features import HF_MODEL_DEFAULT, feature_cache_key
+
+    answer, context = "Срок хранения — пять лет", "Приказ. Срок хранения — пять лет."
+    verifier = Verifier(mode="hf", model_name=HF_MODEL_DEFAULT)
+    assert verifier.model_name == HF_MODEL_DEFAULT
+    assert verifier.model_name != "cointegrated/rubert-tiny2"
+    assert feature_cache_key(answer, context, "hf", verifier.model_name) == feature_cache_key(
+        answer, context, "hf", HF_MODEL_DEFAULT
+    )

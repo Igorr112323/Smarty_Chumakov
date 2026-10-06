@@ -49,9 +49,9 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 from spanverify.dataset import read_pairs  # noqa: E402
-from spanverify.features import extract_features, feature_cache_key  # noqa: E402
+from spanverify.features import HF_MODEL_DEFAULT, extract_features, feature_cache_key  # noqa: E402
 
-MODEL_DEFAULT = "ai-forever/rugpt3small_based_on_gpt2"
+MODEL_DEFAULT = HF_MODEL_DEFAULT
 PROGRESS_EVERY = 10
 
 

@@ -25,8 +25,13 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 from spanverify.dataset import corpus_statistics, generate_pairs, read_pairs, write_pairs  # noqa: E402
-from spanverify.engine import Verifier  # noqa: E402
-from spanverify.features import load_feature_cache, set_feature_cache  # noqa: E402
+from spanverify.engine import Verifier, WeightsBundle  # noqa: E402
+from spanverify.features import (  # noqa: E402
+    DEFAULT_WEIGHTS,
+    HF_MODEL_DEFAULT,
+    load_feature_cache,
+    set_feature_cache,
+)
 from spanverify.train import save_training_artifacts, train  # noqa: E402
 
 REPORT_TEMPLATE = """# Эксперимент: {dataset}
@@ -79,6 +84,11 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--dataset", default="data/demo_pairs.jsonl")
     parser.add_argument("--out", default="reports/experiments")
     parser.add_argument("--mode", choices=["demo", "hf"], default="demo")
+    parser.add_argument(
+        "--model",
+        default=HF_MODEL_DEFAULT,
+        help="модель режима hf; входит в ключ кеша и должна совпадать с предпосчётом",
+    )
     parser.add_argument("--seed", type=int, default=42)
     parser.add_argument("--folds", type=int, default=5)
     parser.add_argument("--target-fpr", type=float, default=0.1)
@@ -115,6 +125,16 @@ def main(argv: list[str] | None = None) -> int:
             )
 
     started = time.time()
+    # Верификатор с явным именем модели: иначе берётся config.hf_model
+    # (rubert-tiny2), ключ кеша не совпадает с предпосчётом (rugpt3small),
+    # и эксперимент либо считает другую модель, либо падает без torch.
+    train_verifier = Verifier(
+        mode=args.mode,
+        model_name=args.model,
+        features_cache=cache,
+        weights=WeightsBundle(weights=dict(DEFAULT_WEIGHTS), threshold=0.5, mode=args.mode),
+    )
+    print(f"модель признаков: {train_verifier.model_name}", flush=True)
     report = train(
         records,
         mode=args.mode,
@@ -122,6 +142,7 @@ def main(argv: list[str] | None = None) -> int:
         folds=args.folds,
         target_fpr=args.target_fpr,
         dataset_name=str(dataset),
+        verifier=train_verifier,
     )
     head = report.bundle.head or {}
     head_inline = bool((head.get("model") or {}).get("weights"))
@@ -136,7 +157,12 @@ def main(argv: list[str] | None = None) -> int:
         )
         return 2
 
-    verifier = Verifier(mode=args.mode, weights=report.bundle, features_cache=cache)
+    verifier = Verifier(
+        mode=args.mode,
+        model_name=args.model,
+        weights=report.bundle,
+        features_cache=cache,
+    )
     metrics = verifier.evaluate(records)
     if cache is not None:
         hits = getattr(cache, "hits", 0)
@@ -202,6 +228,7 @@ def main(argv: list[str] | None = None) -> int:
     payload = {
         "dataset": str(dataset),
         "mode": args.mode,
+        "model": args.model,
         "seed": args.seed,
         "duration_s": round(time.time() - started, 2),
         "corpus": stats,

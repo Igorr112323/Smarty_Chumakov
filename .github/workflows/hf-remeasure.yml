@@ -18,7 +18,7 @@ on:
 
 concurrency:
   group: hf-remeasure-${{ github.ref }}
-  cancel-in-progress: false
+  cancel-in-progress: true
 
 permissions:
   contents: write
@@ -94,10 +94,13 @@ jobs:
           import json, pathlib
           payload = json.loads(pathlib.Path("reports/experiments-${{ matrix.corpus }}/experiment.json").read_text(encoding="utf-8"))
           tokens = payload["metrics"]["tokens"]
-          print("head_inline:", payload.get("head_inline"))
+          signal = (payload.get("bundle") or {}).get("meta", {}).get("signal")
+          print("model:", payload.get("model"), "signal:", signal, "head_inline:", payload.get("head_inline"))
           print("token F1:", tokens.get("f1"), "FPR:", tokens.get("fpr"), "AUC:", tokens.get("auc"))
-          if not payload.get("head_inline"):
-              raise SystemExit("голова не встроена в бандл — число снова будет от чужой модели")
+          if payload.get("model") != "ai-forever/rugpt3small_based_on_gpt2":
+              raise SystemExit("эксперимент посчитан не той моделью, кеш к ней не относится")
+          if signal == "logreg" and not payload.get("head_inline"):
+              raise SystemExit("голова выбрана, но модель не встроена в бандл")
           PY
 
       - uses: actions/upload-artifact@v4

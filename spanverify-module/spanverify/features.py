@@ -1214,6 +1214,14 @@ def load_feature_cache(paths: Any, counting: bool = False) -> dict[str, FeatureM
     return cache
 
 
+# Модель, на которой считаются признаки режима hf в экспериментах и в кеше.
+# Должна совпадать у предпосчёта и у оценки: имя входит в ключ кеша. Расхождение
+# (в конфиге по умолчанию стоит rubert-tiny2, а кеш писался для rugpt3small)
+# давало тихий промах: оценка либо пересчитывала признаки другой моделью, либо
+# падала, если torch не установлен.
+HF_MODEL_DEFAULT = "ai-forever/rugpt3small_based_on_gpt2"
+
+
 def feature_cache_key(
     answer: str,
     context: str | Sequence[str] | None,
