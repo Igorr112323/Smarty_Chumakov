@@ -129,10 +129,10 @@ jobs:
         run: |
           python scripts/fetch_npa_corpus.py \
             --out data/corpus_a3_slice_${{ matrix.slice }} \
-            --target-docs 8 --buffer 4 \
+            --target-docs 20 --buffer 6 \
             --types "${{ matrix.types }}" \
             --title-filter "${{ matrix.title_filter }}" \
-            --max-pages-per-type 12 --max-pages 20 \
+            --max-pages-per-type 25 --max-pages 20 \
             --dpi 150 --psm 6 --oem 1 \
             --workers 4 --pause 1.5
 
