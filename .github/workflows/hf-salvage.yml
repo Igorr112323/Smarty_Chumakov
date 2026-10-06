@@ -1,0 +1,168 @@
+# Забрать уже посчитанные артефакты прогона 37532050295.
+# Песочница не скачивает blob-логи, раннер скачивает. Числа печатаются
+# аннотациями, файлы кладутся в ветку data/metrics с [skip ci].
+# Этот файл не входит в пути hf-runs.yml, полный пересчёт не запускает.
+name: Забрать числа hf
+
+on:
+  workflow_dispatch:
+  push:
+    branches: ["arena/**"]
+    paths:
+      - .github/hf-salvage.trigger
+
+concurrency:
+  group: hf-salvage-${{ github.ref }}
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  salvage:
+    name: "Забрать артефакты прогона"
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: "Скачать артефакты и напечатать числа"
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -o pipefail
+          gh run download 37532050295 --repo Igorr112323/Smarty_Chumakov --dir /tmp/arts
+          find /tmp/arts -type f | head -80
+          python3 - << 'PY'
+          import json
+          from pathlib import Path
+
+          def notice(title, message):
+              text = str(message).replace("\n", " ")[:500]
+              print(f"::notice title={title}::{text}")
+
+          root = Path("/tmp/arts")
+          experiments = list(root.rglob("experiment.json"))
+          print("experiment.json", len(experiments))
+          for path in experiments:
+              data = json.loads(path.read_text(encoding="utf-8"))
+              metrics = data.get("metrics") or {}
+              tokens = metrics.get("tokens") or {}
+              spans = metrics.get("spans") or {}
+              answers = metrics.get("answers") or {}
+              bundle = data.get("bundle") or {}
+              corpus = data.get("corpus") or {}
+              title = f"hf {path.parent.name}"
+              notice(
+                  title,
+                  (
+                      f"mode={data.get('mode')} model={data.get('model')} seed={data.get('seed')} "
+                      f"n={corpus.get('pairs')} duration_s={data.get('duration_s')} "
+                      f"P={tokens.get('precision')} R={tokens.get('recall')} F1={tokens.get('f1')} "
+                      f"FPR={tokens.get('fpr')} AUC={tokens.get('auc')} "
+                      f"span_f1={spans.get('f1')} answer_f1={answers.get('f1')} "
+                      f"threshold={bundle.get('threshold')} z={bundle.get('span_z')} "
+                      f"floor={bundle.get('span_floor')} cap={bundle.get('span_cap')} "
+                      f"gate={data.get('gate')}"
+                  ),
+              )
+          pilots = list(root.rglob("pilot.json"))
+          for path in pilots:
+              data = json.loads(path.read_text(encoding="utf-8"))
+              env = data.get("environment") or {}
+              auc = data.get("auc") or {}
+              control = data.get("control") or {}
+              parts = []
+              if isinstance(auc, dict):
+                  for layer, block in auc.items():
+                      if isinstance(block, dict):
+                          parts.append(f"{layer}={block.get('auc') or block.get('value')} ci={block.get('ci') or block.get('interval')}")
+                      else:
+                          parts.append(f"{layer}={block}")
+              notice(
+                  "пилот",
+                  (
+                      f"pairs={data.get('pairs')} seed={data.get('seed')} duration_s={data.get('duration_s')} "
+                      f"model={env.get('model')} torch={env.get('torch')} cuda={env.get('cuda')} "
+                      f"cores={env.get('cpu_count')} " + " ".join(parts) + " "
+                      f"contrast_ok={control.get('contrast_ok')}"
+                  ),
+              )
+          externals = list(root.rglob("ext_ragtruth_qa_hf.json")) + list(root.rglob("external_tests.json"))
+          for path in externals:
+              data = json.loads(path.read_text(encoding="utf-8"))
+              runs = data.get("runs") or {"self": data}
+              for key, run in runs.items():
+                  if not isinstance(run, dict):
+                      continue
+                  if run.get("mode") != "hf" and "hf" not in str(key):
+                      continue
+                  ours = (run.get("our_metrics") or {}).get("tokens") or {}
+                  notice(
+                      f"внешний {key}",
+                      (
+                          f"pairs={run.get('pairs')} limit={run.get('limit')} "
+                          f"note={run.get('note')} F1={ours.get('f1')} FPR={ours.get('fpr')} AUC={ours.get('auc')}"
+                      ),
+                  )
+          PY
+      - name: "Хвост упавших шагов"
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          python3 - << 'PY'
+          import os, subprocess
+          from pathlib import Path
+          token = os.environ["GH_TOKEN"]
+          env = {**os.environ, "GH_TOKEN": token}
+          for job, label in (("112536987919", "metrics"), ("112542526703", "publish")):
+              dest = Path(f"/tmp/{label}.log")
+              subprocess.run(
+                  ["gh", "api", f"repos/Igorr112323/Smarty_Chumakov/actions/jobs/{job}/logs"],
+                  check=False,
+                  stdout=dest.open("wb"),
+                  env=env,
+              )
+              text = dest.read_text(encoding="utf-8", errors="replace") if dest.exists() else ""
+              lines = [line for line in text.splitlines() if line.strip()]
+              tail = lines[-25:]
+              joined = " | ".join(tail)[:700]
+              print(f"::warning title={label} tail::{joined}")
+          PY
+      - name: "Положить файлы в data/metrics"
+        run: |
+          set -o pipefail
+          git fetch origin data/metrics
+          git checkout -B data/metrics origin/data/metrics
+          python3 - << 'PY'
+          import shutil
+          from pathlib import Path
+          dest = Path("experiments/hf-runs-37532050295")
+          dest.mkdir(parents=True, exist_ok=True)
+          root = Path("/tmp/arts")
+          wanted = {"experiment.json", "experiment.md", "pilot.json", "pilot.md", "ext_ragtruth_qa_hf.json", "external_tests.json"}
+          copied = 0
+          for path in root.rglob("*"):
+              if path.is_file() and path.name in wanted:
+                  target = dest / path.parent.name / path.name
+                  target.parent.mkdir(parents=True, exist_ok=True)
+                  shutil.copy2(path, target)
+                  copied += 1
+                  print("copied", target)
+          if copied == 0:
+              raise SystemExit("в артефактах нет файлов результатов")
+          PY
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -- experiments/hf-runs-37532050295
+          if git diff --cached --quiet; then
+            echo "нечего коммитить"
+            exit 0
+          fi
+          git commit -m "числа: прогон 37532050295, артефакты hf [skip ci]"
+          git push origin HEAD:data/metrics
