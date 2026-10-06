@@ -26,34 +26,18 @@ permissions:
   contents: write
 
 jobs:
-  precompute:
-    name: "Признаки: ${{ matrix.corpus }} (шард ${{ matrix.shard }}/${{ matrix.shards }})"
+  # Цепочки корпусов независимы: падение корпуса A не должно отменять
+  # уже посчитанный A3. Именно так и случилось в первый раз — шард A не влез
+  # в лимит (в корпусе A 1200 пар, а не 240), и experiment для A3 ушёл в skipped,
+  # хотя признаки для него были готовы полностью.
+  precompute-a3:
+    name: "Признаки A3 (шард ${{ matrix.shard }}/4)"
     runs-on: ubuntu-latest
     timeout-minutes: 35
     strategy:
       fail-fast: false
       matrix:
-        include:
-          - corpus: a3
-            dataset: data/corpus_a3/pairs.jsonl
-            shard: 0
-            shards: 4
-          - corpus: a3
-            dataset: data/corpus_a3/pairs.jsonl
-            shard: 1
-            shards: 4
-          - corpus: a3
-            dataset: data/corpus_a3/pairs.jsonl
-            shard: 2
-            shards: 4
-          - corpus: a3
-            dataset: data/corpus_a3/pairs.jsonl
-            shard: 3
-            shards: 4
-          - corpus: a
-            dataset: data/corpus_a/pairs.jsonl
-            shard: 0
-            shards: 1
+        shard: [0, 1, 2, 3]
     steps:
       - uses: actions/checkout@v4
 
@@ -77,30 +61,64 @@ jobs:
           OMP_NUM_THREADS: "4"
         run: |
           python scripts/precompute_features.py \
-            --dataset ${{ matrix.dataset }} \
-            --mode hf --shard ${{ matrix.shard }} --shards ${{ matrix.shards }} \
+            --dataset data/corpus_a3/pairs.jsonl \
+            --mode hf --shard ${{ matrix.shard }} --shards 4 \
             --out reports/hf-cache
 
       - uses: actions/upload-artifact@v4
         with:
-          name: hf-cache-${{ matrix.corpus }}-${{ matrix.shard }}
+          name: hf-cache-a3-${{ matrix.shard }}
           path: spanverify-module/reports/hf-cache
           if-no-files-found: error
           retention-days: 14
 
-  experiment:
-    name: "Эксперимент: ${{ matrix.corpus }}"
+  precompute-a:
+    name: "Признаки A (шард ${{ matrix.shard }}/5)"
     runs-on: ubuntu-latest
-    timeout-minutes: 40
-    needs: precompute
+    timeout-minutes: 35
     strategy:
       fail-fast: false
       matrix:
-        include:
-          - corpus: a3
-            dataset: data/corpus_a3/pairs.jsonl
-          - corpus: a
-            dataset: data/corpus_a/pairs.jsonl
+        shard: [0, 1, 2, 3, 4]
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: "Зависимости и CPU-версия torch"
+        working-directory: spanverify-module
+        timeout-minutes: 20
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -q -r requirements.txt
+          python -m pip install -q "torch~=2.14" --index-url https://download.pytorch.org/whl/cpu
+          python -m pip install -q -r requirements-hf.txt
+
+      - name: "Предпосчёт признаков шарда"
+        working-directory: spanverify-module
+        timeout-minutes: 30
+        env:
+          OMP_NUM_THREADS: "4"
+        run: |
+          python scripts/precompute_features.py \
+            --dataset data/corpus_a/pairs.jsonl \
+            --mode hf --shard ${{ matrix.shard }} --shards 5 \
+            --out reports/hf-cache
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: hf-cache-a-${{ matrix.shard }}
+          path: spanverify-module/reports/hf-cache
+          if-no-files-found: error
+          retention-days: 14
+
+  experiment-a3:
+    name: "Эксперимент A3 (реальные акты)"
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    needs: precompute-a3
     steps:
       - uses: actions/checkout@v4
 
@@ -119,7 +137,60 @@ jobs:
 
       - uses: actions/download-artifact@v4
         with:
-          pattern: hf-cache-${{ matrix.corpus }}-*
+          pattern: hf-cache-a3-*
+          path: spanverify-module/reports/hf-cache
+          merge-multiple: true
+
+      - name: "Кеш признаков: сколько собралось"
+        working-directory: spanverify-module
+        run: |
+          ls -la reports/hf-cache
+          cat reports/hf-cache/precompute_*.json
+          wc -l reports/hf-cache/features_*.jsonl | tail -1
+
+      - name: "Эксперимент: кросс-валидация на кеше"
+        working-directory: spanverify-module
+        timeout-minutes: 30
+        env:
+          OMP_NUM_THREADS: "4"
+        run: |
+          python scripts/run_experiments.py \
+            --dataset data/corpus_a3/pairs.jsonl \
+            --mode hf --seed 42 --folds 5 --target-fpr 0.1 \
+            --features-cache reports/hf-cache \
+            --out reports/experiments-a3
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: hf-experiment-a3
+          path: spanverify-module/reports/experiments-a3
+          if-no-files-found: warn
+          retention-days: 30
+
+  experiment-a:
+    name: "Эксперимент A (синтетика)"
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    needs: precompute-a
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: "Зависимости и CPU-версия torch"
+        working-directory: spanverify-module
+        timeout-minutes: 20
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -q -r requirements.txt
+          python -m pip install -q "torch~=2.14" --index-url https://download.pytorch.org/whl/cpu
+          python -m pip install -q -r requirements-hf.txt
+
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: hf-cache-a-*
           path: spanverify-module/reports/hf-cache
           merge-multiple: true
 
@@ -129,30 +200,30 @@ jobs:
           ls -la reports/hf-cache
           wc -l reports/hf-cache/features_*.jsonl | tail -1
 
-      - name: "Эксперимент (кросс-валидация на кеше)"
+      - name: "Эксперимент: кросс-валидация на кеше"
         working-directory: spanverify-module
-        timeout-minutes: 35
+        timeout-minutes: 30
         env:
           OMP_NUM_THREADS: "4"
         run: |
           python scripts/run_experiments.py \
-            --dataset ${{ matrix.dataset }} \
+            --dataset data/corpus_a/pairs.jsonl \
             --mode hf --seed 42 --folds 5 --target-fpr 0.1 \
             --features-cache reports/hf-cache \
-            --out reports/experiments-${{ matrix.corpus }}
+            --out reports/experiments-a
 
       - uses: actions/upload-artifact@v4
         with:
-          name: hf-experiment-${{ matrix.corpus }}
-          path: spanverify-module/reports/experiments-${{ matrix.corpus }}
+          name: hf-experiment-a
+          path: spanverify-module/reports/experiments-a
           if-no-files-found: warn
           retention-days: 30
 
   publish:
-    name: Свести числа и сохранить
+    name: "Свести числа и сохранить"
     runs-on: ubuntu-latest
     timeout-minutes: 20
-    needs: [precompute, experiment]
+    needs: [experiment-a3, experiment-a]
     if: always()
     permissions:
       contents: write
@@ -187,10 +258,12 @@ jobs:
           metrics = json.loads(pathlib.Path("reports/METRICS.json").read_text(encoding="utf-8"))
           print("прогонов hf:", metrics.get("external_tests", {}).get("hf_runs"))
           for key in ("corpus_a", "corpus_a3_real"):
-              test = metrics.get(key, {}).get("by_mode", {}).get("hf", {}).get("by_split", {}).get("test")
-              if test:
-                  tokens = test.get("tokens", {})
-                  print(f"{key} hf test: F1={tokens.get('f1')} FPR={tokens.get('fpr')} AUC={tokens.get('auc')}")
+              modes = metrics.get(key, {}).get("by_mode", {})
+              for mode in ("demo", "hf"):
+                  test = modes.get(mode, {}).get("by_split", {}).get("test")
+                  if test:
+                      tokens = test.get("tokens", {})
+                      print(f"{key} {mode} test: F1={tokens.get('f1')} FPR={tokens.get('fpr')} AUC={tokens.get('auc')}")
           PY
 
       - uses: actions/upload-artifact@v4
