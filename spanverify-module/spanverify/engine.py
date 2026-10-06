@@ -24,7 +24,7 @@ import json
 import re
 import sys
 import time
-from collections.abc import Sequence
+from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
@@ -55,6 +55,7 @@ from .features import (
     FeatureMatrix,
     combine,
     extract_features,
+    feature_cache_key,
     is_scored_token,
     number_attribution,
 )
@@ -204,6 +205,7 @@ class Verifier:
         weights_path: str | Path | None = WEIGHTS_FILENAME,
         *,
         coverage: bool = False,
+        features_cache: Mapping[str, FeatureMatrix] | None = None,
     ) -> None:
         self.config = config or Config.load()
         # Явно переданные веса имеют приоритет: иначе обучение, которое считает
@@ -224,6 +226,10 @@ class Verifier:
         # чтобы доработка шла с готового задела. Пункт B2/B3 реестра
         # TODO_AUDIT.md остаётся ОТКРЫТЫМ.
         self.coverage = coverage
+        # Кеш признаков: счёт на реальной модели занимает минуты на пару, а в
+        # кросс-валидации каждая пара нужна в каждом фолде. Без кеша эксперимент
+        # на корпусе A3 не укладывался в лимит job'а (прогон 37446204812).
+        self.features_cache = features_cache
         # Оценка доли участия ИИ (требование заявки) — отдельная голова; если
         # файла нет, поле остаётся нулевым и это видно в stats.
         self.participation = self._load_participation()
@@ -465,7 +471,15 @@ class Verifier:
         return self._features(answer, context, tokens or tokenize_with_offsets(answer))
 
     def _features(self, answer: str, context: str | Sequence[str] | None, tokens: Sequence[Token]) -> FeatureMatrix:
+        cache = self.features_cache
         if self.mode == "hf":
+            if cache is not None:
+                # Ключ считается здесь, а не внутри extract_features: модель
+                # известна наверняка только верификатору.
+                key = feature_cache_key(answer, context, "hf", self.model_name)
+                hit = cache.get(key)
+                if hit is not None:
+                    return hit
             return extract_features(answer, context, mode="hf", model_name=self.model_name, answer_tokens=tokens)
         return extract_features(answer, context, mode="demo", answer_tokens=tokens)
 

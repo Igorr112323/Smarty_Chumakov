@@ -24,7 +24,7 @@
 from __future__ import annotations
 
 import statistics
-from collections.abc import Sequence
+from collections.abc import Mapping, Sequence
 from dataclasses import dataclass, field
 from typing import Any
 
@@ -1103,13 +1103,132 @@ def _cosine_dense(a: Sequence[float], b: Sequence[float]) -> float:
     return max(0.0, numerator / (norm_a * norm_b))
 
 
+# Реестр активного кеша. Нужен потому, что признаки считаются не только из
+# Verifier, но и из обучения (train()), которое создаёт верификатор внутри себя:
+# явный параметр до туда не дошёл бы. Реестр — единственный способ покрыть все
+# пути без правки каждого вызывающего места. Тесты обязаны его очищать.
+_ACTIVE_FEATURE_CACHE: dict[str, FeatureMatrix] | None = None
+
+
+def set_feature_cache(cache: Mapping[str, FeatureMatrix] | None) -> None:
+    """Включить (или выключить при ``None``) глобальный кеш признаков."""
+    global _ACTIVE_FEATURE_CACHE  # noqa: PLW0603
+    _ACTIVE_FEATURE_CACHE = dict(cache) if cache is not None else None
+
+
+def get_feature_cache() -> Mapping[str, FeatureMatrix] | None:
+    """Текущий активный кеш признаков (``None`` — кеш выключен)."""
+    return _ACTIVE_FEATURE_CACHE
+
+
+class CountingFeatureCache(dict):
+    """Кеш признаков со счётчиком попаданий и промахов.
+
+    Промах опасен не ошибкой, а тишиной: если ключ не совпал, признаки молча
+    считаются моделью заново, эксперимент снова идёт часами, а в отчёте этого
+    не видно. Счётчик делает расхождение ключей видимым в логе job'а.
+    """
+
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
+        super().__init__(*args, **kwargs)
+        self.hits = 0
+        self.misses = 0
+
+    def get(self, key: str, default: Any = None) -> Any:
+        if dict.__contains__(self, key):
+            self.hits += 1
+            return dict.__getitem__(self, key)
+        self.misses += 1
+        return default
+
+    def __repr__(self) -> str:  # pragma: no cover - отладочное
+        return f"<CountingFeatureCache {len(self)} ключей, попаданий {self.hits}, промахов {self.misses}>"
+
+
+def load_feature_cache(paths: Any, counting: bool = False) -> dict[str, FeatureMatrix]:
+    """Прочитать кеш из файла(.ов) JSONL или из каталога с шардами.
+
+    Шарды пишутся независимыми job'ами в ``features_*.jsonl``; здесь они
+    склеиваются в один словарь. Порядок не важен: обращение по ключу.
+    """
+    import json  # noqa: PLC0415
+    from pathlib import Path  # noqa: PLC0415
+
+    if isinstance(paths, (str, Path)):
+        paths = [paths]
+    cache: dict[str, FeatureMatrix] = CountingFeatureCache() if counting else {}
+    for raw in paths or ():
+        path = Path(raw)
+        if path.is_dir():
+            files = sorted(path.glob("features_*.jsonl"))
+        else:
+            files = [path]
+        for file in files:
+            if not file.is_file():
+                continue
+            for line in file.read_text(encoding="utf-8").splitlines():
+                line = line.strip()
+                if not line:
+                    continue
+                row = json.loads(line)
+                key = row.get("key")
+                if not key:
+                    continue
+                cache[key] = FeatureMatrix(
+                    attention_entropy=[float(x) for x in row.get("attention_entropy", [])],
+                    ctx_attention_mass=[float(x) for x in row.get("ctx_attention_mass", [])],
+                    embedding_density=[float(x) for x in row.get("embedding_density", [])],
+                    meta={"from_cache": True, "pair_id": row.get("pair_id")},
+                )
+    return cache
+
+
+def feature_cache_key(
+    answer: str,
+    context: str | Sequence[str] | None,
+    mode: str,
+    model_name: str = "",
+) -> str:
+    """Ключ кеша признаков: ответ + контекст + режим + модель.
+
+    Счёт признаков на реальной модели занимает минуты на пару, и в
+    кросс-валидации каждая пара встречается в нескольких фолдах. Кеш делает
+    дорогой проход однократным. Ключ включает модель и режим: признаки разных
+    моделей несопоставимы, и подмена одного другим исказила бы результат.
+    """
+    import hashlib  # noqa: PLC0415
+
+    if isinstance(context, str):
+        context_text = context
+    elif context:
+        context_text = "\n".join(str(item) for item in context)
+    else:
+        context_text = ""
+    payload = f"{mode}|{model_name}|{answer}|{context_text}"
+    return hashlib.sha256(payload.encode("utf-8")).hexdigest()
+
+
 def extract_features(
     answer: str,
     context: str | Sequence[str] | None,
     mode: str = "demo",
+    cache: Mapping[str, FeatureMatrix] | None = None,
+    cache_key: str | None = None,
     **kwargs: Any,
 ) -> FeatureMatrix:
-    """Единая точка входа: признаки заказанного режима."""
+    """Единая точка входа: признаки заказанного режима, при `cache` — из кеша.
+
+    Кеш — единственный способ уложить эксперимент на реальной модели в разумное
+    время: `hf_features` делает прямой проход по модели, а в кросс-валидации
+    признаки каждой пары требуются в каждом фолде.
+    """
+    if cache is None:
+        cache = _ACTIVE_FEATURE_CACHE
+    if cache is not None:
+        key = cache_key or feature_cache_key(answer, context, mode, str(kwargs.get("model_name", "")))
+        cached = cache.get(key)
+        if cached is not None:
+            return cached
     if mode == "hf":
         return hf_features(answer, context, **kwargs)
     return demo_features(answer, context, **kwargs)

@@ -26,6 +26,7 @@ if str(ROOT) not in sys.path:
 
 from spanverify.dataset import corpus_statistics, generate_pairs, read_pairs, write_pairs  # noqa: E402
 from spanverify.engine import Verifier  # noqa: E402
+from spanverify.features import load_feature_cache, set_feature_cache  # noqa: E402
 from spanverify.train import save_training_artifacts, train  # noqa: E402
 
 REPORT_TEMPLATE = """# Эксперимент: {dataset}
@@ -82,10 +83,32 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--folds", type=int, default=5)
     parser.add_argument("--target-fpr", type=float, default=0.1)
     parser.add_argument("--pairs", type=int, default=240, help="сгенерировать, если файла нет")
+    parser.add_argument(
+        "--features-cache",
+        action="append",
+        default=[],
+        metavar="PATH",
+        help="кеш предпосчитанных признаков (файл JSONL или каталог с шардами); " "можно указать несколько раз",
+    )
     args = parser.parse_args(argv)
 
     dataset = Path(args.dataset)
     records = load_records(dataset, args.pairs, 1312)
+
+    # Кеш признаков: без него режим hf пересчитывает прямой проход модели в
+    # каждом фолде кросс-валидации, и эксперимент не укладывается в лимит job'а
+    # (прогон 37446204812 выбрал 120 минут целиком).
+    cache = load_feature_cache(args.features_cache, counting=True) if args.features_cache else None
+    set_feature_cache(cache)
+    if cache:
+        print(f"кеш признаков: {len(cache)} ключей из {len(args.features_cache)} пути(ей)", flush=True)
+        if len(cache) < len(records):
+            print(
+                f"ВНИМАНИЕ: в кеше {len(cache)} ключей, а пар {len(records)}: "
+                "недостающие будут посчитаны моделью (медленно)",
+                flush=True,
+            )
+
     started = time.time()
     report = train(
         records,
@@ -95,8 +118,19 @@ def main(argv: list[str] | None = None) -> int:
         target_fpr=args.target_fpr,
         dataset_name=str(dataset),
     )
-    verifier = Verifier(mode=args.mode, weights=report.bundle)
+    verifier = Verifier(mode=args.mode, weights=report.bundle, features_cache=cache)
     metrics = verifier.evaluate(records)
+    if cache is not None:
+        hits = getattr(cache, "hits", 0)
+        misses = getattr(cache, "misses", 0)
+        print(f"кеш признаков: попаданий {hits}, промахов {misses}", flush=True)
+        if misses:
+            print(
+                "ВНИМАНИЕ: часть пар считана моделью, а не из кеша — ключи разошлись "
+                "или кеш неполон; время прогона это покажет",
+                file=sys.stderr,
+                flush=True,
+            )
     bundle = report.bundle
 
     out_dir = Path(args.out)
