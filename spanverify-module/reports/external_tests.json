@@ -1,0 +1,271 @@
+{
+  "runs": {
+    "ragtruth_qa_test_demo": {
+      "dataset": "ragtruth",
+      "task": "qa",
+      "split": "test",
+      "mode": "demo",
+      "model": null,
+      "device": "cpu (demo-режим не использует веса)",
+      "pairs": 875,
+      "pairs_total_in_file": 875,
+      "limit": null,
+      "source_file": "/home/runner/work/Smarty_Chumakov/Smarty_Chumakov/spanverify-module/data/external/adapted/ragtruth_qa_test.jsonl",
+      "duration_s": 46.6,
+      "label_origin": {
+        "human": 875
+      },
+      "labelled_pairs": 160,
+      "spans_reference": 235,
+      "unverified_spans": 0,
+      "our_metrics": {
+        "tokens": {
+          "precision": 0.1322,
+          "recall": 0.4512,
+          "f1": 0.2045,
+          "fpr": 0.1685,
+          "auc": 0.7167
+        },
+        "spans": {
+          "strict_f1_iou_0_5": 0.0357,
+          "coverage": 0.383,
+          "soft_f1_expanded": 0.0266,
+          "mean_width_ratio": 3.35
+        },
+        "answers": {
+          "precision": 0.2717,
+          "recall": 0.9,
+          "f1": 0.4174,
+          "fpr": 0.5399,
+          "auc": 0.6801
+        },
+        "verdicts": {
+          "tp": 160,
+          "fp": 706,
+          "fn": 0,
+          "tn": 9,
+          "precision": 0.1848,
+          "recall": 1.0,
+          "f1": 0.3119,
+          "fpr": 0.9874
+        }
+      },
+      "their_metrics": {
+        "rouge1": 0.104,
+        "rouge2": 0.0715,
+        "rougeL": 0.0797,
+        "accuracy": 0.0103,
+        "jaccard_score": 0.0106,
+        "hamming_loss": 0.1817,
+        "empty_reference": 715,
+        "pairs": 875
+      },
+      "baseline": {
+        "extracted": false,
+        "note": "Baseline статьи RAGTruth (ACL 2024) не извлечён: PDF недоступен в этой среде (arxiv.org закрыт), значения таблиц не парсились. Числа не выдумываются."
+      },
+      "disclaimer": "РЕЖИМ DEMO: признаки лексические, без весов языковой модели. Числа показывают работоспособность конвейера на внешнем наборе, но научным результатом не являются."
+    },
+    "ragtruth_summary_test_demo": {
+      "dataset": "ragtruth",
+      "task": "summary",
+      "split": "test",
+      "mode": "demo",
+      "model": null,
+      "device": "cpu (demo-режим не использует веса)",
+      "pairs": 900,
+      "pairs_total_in_file": 900,
+      "limit": null,
+      "source_file": "/home/user/Smarty_Chumakov/spanverify-module/data/external/adapted/ragtruth_summary_test.jsonl",
+      "duration_s": 114.5,
+      "label_origin": {
+        "human": 900
+      },
+      "labelled_pairs": 204,
+      "spans_reference": 244,
+      "unverified_spans": 0,
+      "our_metrics": {
+        "tokens": {
+          "precision": 0.0724,
+          "recall": 0.2596,
+          "f1": 0.1133,
+          "fpr": 0.1023,
+          "auc": 0.644
+        },
+        "spans": {
+          "strict_f1_iou_0_5": 0.021,
+          "coverage": 0.873,
+          "soft_f1_expanded": 0.0605,
+          "mean_width_ratio": 14.24
+        },
+        "answers": {
+          "precision": 0.3086,
+          "recall": 0.5098,
+          "f1": 0.3845,
+          "fpr": 0.3348,
+          "auc": 0.5875
+        },
+        "verdicts": {
+          "tp": 204,
+          "fp": 683,
+          "fn": 0,
+          "tn": 13,
+          "precision": 0.23,
+          "recall": 1.0,
+          "f1": 0.374,
+          "fpr": 0.9813
+        }
+      },
+      "their_metrics": {
+        "rouge1": 0.0869,
+        "rouge2": 0.076,
+        "rougeL": 0.0786,
+        "accuracy": 0.0167,
+        "jaccard_score": 0.0167,
+        "hamming_loss": 0.2244,
+        "empty_reference": 696,
+        "pairs": 900
+      },
+      "baseline": {
+        "extracted": false,
+        "note": "Baseline статьи RAGTruth (ACL 2024) не извлечён: PDF недоступен в этой среде (arxiv.org закрыт), значения таблиц не парсились. Числа не выдумываются."
+      },
+      "disclaimer": "РЕЖИМ DEMO: признаки лексические, без весов языковой модели. Числа показывают работоспособность конвейера на внешнем наборе, но научным результатом не являются."
+    },
+    "ragtruth_data2txt_test_demo": {
+      "dataset": "ragtruth",
+      "task": "data2txt",
+      "split": "test",
+      "mode": "demo",
+      "model": null,
+      "device": "cpu (demo-режим не использует веса)",
+      "pairs": 900,
+      "pairs_total_in_file": 900,
+      "limit": null,
+      "source_file": "/home/user/Smarty_Chumakov/spanverify-module/data/external/adapted/ragtruth_data2txt_test.jsonl",
+      "duration_s": 126.1,
+      "label_origin": {
+        "human": 900
+      },
+      "labelled_pairs": 579,
+      "spans_reference": 1054,
+      "unverified_spans": 0,
+      "our_metrics": {
+        "tokens": {
+          "precision": 0.0571,
+          "recall": 0.4454,
+          "f1": 0.1013,
+          "fpr": 0.3293,
+          "auc": 0.591
+        },
+        "spans": {
+          "strict_f1_iou_0_5": 0.0,
+          "coverage": 0.9829,
+          "soft_f1_expanded": 0.0106,
+          "mean_width_ratio": 56.78
+        },
+        "answers": {
+          "precision": 0.6458,
+          "recall": 0.9983,
+          "f1": 0.7843,
+          "fpr": 0.9875,
+          "auc": 0.5054
+        },
+        "verdicts": {
+          "tp": 579,
+          "fp": 321,
+          "fn": 0,
+          "tn": 0,
+          "precision": 0.6433,
+          "recall": 1.0,
+          "f1": 0.783,
+          "fpr": 1.0
+        }
+      },
+      "their_metrics": {
+        "rouge1": 0.0657,
+        "rouge2": 0.06,
+        "rougeL": 0.063,
+        "accuracy": 0.0,
+        "jaccard_score": 0.0,
+        "hamming_loss": 0.6433,
+        "empty_reference": 321,
+        "pairs": 900
+      },
+      "baseline": {
+        "extracted": false,
+        "note": "Baseline статьи RAGTruth (ACL 2024) не извлечён: PDF недоступен в этой среде (arxiv.org закрыт), значения таблиц не парсились. Числа не выдумываются."
+      },
+      "disclaimer": "РЕЖИМ DEMO: признаки лексические, без весов языковой модели. Числа показывают работоспособность конвейера на внешнем наборе, но научным результатом не являются."
+    },
+    "rushallu_all_test_demo": {
+      "dataset": "rushallu",
+      "task": "all",
+      "split": "test",
+      "mode": "demo",
+      "model": null,
+      "device": "cpu (demo-режим не использует веса)",
+      "pairs": 1000,
+      "pairs_total_in_file": 1000,
+      "limit": null,
+      "source_file": "/home/runner/work/Smarty_Chumakov/Smarty_Chumakov/spanverify-module/data/external/adapted/rushallu.jsonl",
+      "duration_s": 61.6,
+      "label_origin": {
+        "human": 1000
+      },
+      "labelled_pairs": 333,
+      "spans_reference": 423,
+      "unverified_spans": 0,
+      "our_metrics": {
+        "tokens": {
+          "precision": 0.3611,
+          "recall": 0.0769,
+          "f1": 0.1269,
+          "fpr": 0.0644,
+          "auc": 0.5293
+        },
+        "spans": {
+          "strict_f1_iou_0_5": 0.0902,
+          "coverage": 0.0993,
+          "soft_f1_expanded": 0.0676,
+          "mean_width_ratio": 2.29
+        },
+        "answers": {
+          "precision": 0.3977,
+          "recall": 0.2042,
+          "f1": 0.2698,
+          "fpr": 0.1544,
+          "auc": 0.5249
+        },
+        "verdicts": {
+          "tp": 259,
+          "fp": 305,
+          "fn": 74,
+          "tn": 362,
+          "precision": 0.4592,
+          "recall": 0.7778,
+          "f1": 0.5775,
+          "fpr": 0.4573
+        }
+      },
+      "their_metrics": {
+        "rouge1": 0.4861,
+        "rouge2": 0.4609,
+        "rougeL": 0.4679,
+        "accuracy": 0.372,
+        "jaccard_score": 0.373,
+        "hamming_loss": 0.3205,
+        "empty_reference": 667,
+        "pairs": 1000
+      },
+      "baseline": {
+        "extracted": false,
+        "note": "Baseline статьи RusHallu-RAG (Диалог-2026) не извлечён: PDF недоступен в этой среде. Их метрики на наших предсказаниях посчитаны и приведены в their_metrics."
+      },
+      "disclaimer": "РЕЖИМ DEMO: признаки лексические, без весов языковой модели. Числа показывают работоспособность конвейера на внешнем наборе, но научным результатом не являются."
+    }
+  },
+  "rule": "внешние наборы — только тест; калибровка на корпусе A",
+  "generated_at": "2026-10-05T21:52:27Z",
+  "disclaimer": "Числа режима demo получены лексическими признаками и научным результатом не являются. Колонка label_origin указывает происхождение разметки: human / llm / auto."
+}

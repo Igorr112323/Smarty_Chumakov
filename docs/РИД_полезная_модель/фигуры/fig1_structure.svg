@@ -1,0 +1,57 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="840" viewBox="0 0 900 840" font-family="DejaVu Sans, Arial, sans-serif">
+<rect width="100%" height="100%" fill="#ffffff"/>
+<text x="60" y="34" font-size="17" font-weight="bold">Фиг. 1. Устройство проверки ответа по документу-источнику</text>
+<defs><marker id="arrow" markerWidth="9" markerHeight="9" refX="8" refY="3" orient="auto"><path d="M0,0 L0,6 L9,3 z" fill="#33475b"/></marker></defs>
+<rect x="60" y="100" width="250" height="46" rx="6" fill="#eef3f8" stroke="#33475b" stroke-width="1.4"/>
+<text x="72" y="121" font-size="13" font-weight="bold">1. блок ввода документа-источника и ответа</text>
+<text x="72" y="137" font-size="10.5" fill="#5b6b7c">cli.py, server.py, webui.py</text>
+<rect x="60" y="172" width="250" height="46" rx="6" fill="#eef3f8" stroke="#33475b" stroke-width="1.4"/>
+<text x="72" y="193" font-size="13" font-weight="bold">2. блок токенизации с сохранением символьных смещений</text>
+<text x="72" y="209" font-size="10.5" fill="#5b6b7c">core.py</text>
+<rect x="60" y="244" width="250" height="46" rx="6" fill="#eef3f8" stroke="#33475b" stroke-width="1.4"/>
+<text x="72" y="265" font-size="13" font-weight="bold">3. блок нормализации чисел, единиц измерения и дат</text>
+<text x="72" y="281" font-size="10.5" fill="#5b6b7c">normalize.py</text>
+<rect x="60" y="316" width="250" height="46" rx="6" fill="#eef3f8" stroke="#33475b" stroke-width="1.4"/>
+<text x="72" y="337" font-size="13" font-weight="bold">4. блок вычисления признаков токенов</text>
+<text x="72" y="353" font-size="10.5" fill="#5b6b7c">features.py, backends/hf.py</text>
+<rect x="60" y="388" width="250" height="46" rx="6" fill="#eef3f8" stroke="#33475b" stroke-width="1.4"/>
+<text x="72" y="409" font-size="13" font-weight="bold">5. блок привязки числа к объекту документа</text>
+<text x="72" y="425" font-size="10.5" fill="#5b6b7c">features.py::number_attribution</text>
+<rect x="60" y="460" width="250" height="46" rx="6" fill="#eef3f8" stroke="#33475b" stroke-width="1.4"/>
+<text x="72" y="481" font-size="13" font-weight="bold">6. блок свёртки признаков в оценку риска</text>
+<text x="72" y="497" font-size="10.5" fill="#5b6b7c">features.py::combine</text>
+<rect x="60" y="532" width="250" height="46" rx="6" fill="#eef3f8" stroke="#33475b" stroke-width="1.4"/>
+<text x="72" y="553" font-size="13" font-weight="bold">7. блок калибровки и порога решения</text>
+<text x="72" y="569" font-size="10.5" fill="#5b6b7c">calibration.py, train.py</text>
+<rect x="60" y="604" width="250" height="46" rx="6" fill="#eef3f8" stroke="#33475b" stroke-width="1.4"/>
+<text x="72" y="625" font-size="13" font-weight="bold">8. блок выделения спорных фрагментов и сужения их границ</text>
+<text x="72" y="641" font-size="10.5" fill="#5b6b7c">engine.py::_shrink_to_clause</text>
+<rect x="60" y="676" width="250" height="46" rx="6" fill="#eef3f8" stroke="#33475b" stroke-width="1.4"/>
+<text x="72" y="697" font-size="13" font-weight="bold">9. блок оценки доли участия ИИ</text>
+<text x="72" y="713" font-size="10.5" fill="#5b6b7c">participation.py, detector.py</text>
+<rect x="60" y="748" width="250" height="46" rx="6" fill="#eef3f8" stroke="#33475b" stroke-width="1.4"/>
+<text x="72" y="769" font-size="13" font-weight="bold">10. блок вывода результата</text>
+<text x="72" y="785" font-size="10.5" fill="#5b6b7c">engine.py::VerificationResult</text>
+<path d="M 310 123 L 400 123 L 400 195 L 54 195" fill="none" stroke="#33475b" stroke-width="1.2" marker-end="url(#arrow)"/>
+<text x="408" y="155" font-size="10" fill="#5b6b7c">документ и ответ</text>
+<path d="M 310 195 L 400 195 L 400 267 L 54 267" fill="none" stroke="#33475b" stroke-width="1.2" marker-end="url(#arrow)"/>
+<text x="408" y="227" font-size="10" fill="#5b6b7c">токены</text>
+<path d="M 310 267 L 400 267 L 400 339 L 54 339" fill="none" stroke="#33475b" stroke-width="1.2" marker-end="url(#arrow)"/>
+<text x="408" y="299" font-size="10" fill="#5b6b7c">нормализованные токены</text>
+<path d="M 310 339 L 400 339 L 400 411 L 54 411" fill="none" stroke="#33475b" stroke-width="1.2" marker-end="url(#arrow)"/>
+<text x="408" y="371" font-size="10" fill="#5b6b7c">признаки и числа</text>
+<path d="M 310 411 L 400 411 L 400 483 L 54 483" fill="none" stroke="#33475b" stroke-width="1.2" marker-end="url(#arrow)"/>
+<text x="408" y="443" font-size="10" fill="#5b6b7c">признанные и спорные числа</text>
+<path d="M 310 483 L 400 483 L 400 555 L 54 555" fill="none" stroke="#33475b" stroke-width="1.2" marker-end="url(#arrow)"/>
+<text x="408" y="515" font-size="10" fill="#5b6b7c">риск токена</text>
+<path d="M 310 555 L 400 555 L 400 627 L 54 627" fill="none" stroke="#33475b" stroke-width="1.2" marker-end="url(#arrow)"/>
+<text x="408" y="587" font-size="10" fill="#5b6b7c">порог решения</text>
+<path d="M 310 195 L 400 195 L 400 699 L 54 699" fill="none" stroke="#33475b" stroke-width="1.2" marker-end="url(#arrow)"/>
+<text x="408" y="443" font-size="10" fill="#5b6b7c">токены ответа</text>
+<path d="M 310 627 L 400 627 L 400 771 L 54 771" fill="none" stroke="#33475b" stroke-width="1.2" marker-end="url(#arrow)"/>
+<text x="408" y="695" font-size="10" fill="#5b6b7c">фрагменты со смещениями</text>
+<path d="M 310 699 L 400 699 L 400 771 L 54 771" fill="none" stroke="#33475b" stroke-width="1.2" marker-end="url(#arrow)"/>
+<text x="408" y="731" font-size="10" fill="#5b6b7c">доля участия ИИ</text>
+<path d="M 310 555 L 400 555 L 400 771 L 54 771" fill="none" stroke="#33475b" stroke-width="1.2" marker-end="url(#arrow)"/>
+<text x="408" y="659" font-size="10" fill="#5b6b7c">вердикт и оценка риска</text>
+</svg>

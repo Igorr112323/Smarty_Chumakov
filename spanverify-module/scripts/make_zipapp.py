@@ -1,0 +1,70 @@
+#!/usr/bin/env python3
+"""Сборка одного переносимого файла spanverify.pyz (zipapp).
+
+Конфигурация и калибратор упаковываются внутрь архива, приложение читает их
+оттуда, поэтому один файл работает сам по себе (нужен Python 3.10+).
+
+    python scripts/make_zipapp.py            # release/spanverify.pyz
+    python scripts/make_zipapp.py --out dist
+"""
+
+from __future__ import annotations
+
+import argparse
+import shutil
+import tempfile
+import zipapp
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parents[1]
+# В архив идёт только то, что нужно приложению: код, конфигурация и демонстрационный
+# корпус. Корпуса A/A2/B и внешние данные в .pyz не попадают: пользователю они не
+# нужны, а внешние ещё и нельзя распространять (лицензия не подтверждена).
+INCLUDE = ("spanverify", "config", "data/demo_pairs.jsonl")
+
+
+def build(out_dir: Path, name: str = "spanverify.pyz") -> Path:
+    out_dir.mkdir(parents=True, exist_ok=True)
+    target = out_dir / name
+    if target.exists():
+        target.unlink()
+
+    with tempfile.TemporaryDirectory() as tmp:
+        stage = Path(tmp) / "app"
+        stage.mkdir()
+        for item in INCLUDE:
+            source = ROOT / item
+            if not source.exists():
+                continue
+            if source.is_dir():
+                shutil.copytree(
+                    source,
+                    stage / item,
+                    ignore=shutil.ignore_patterns("__pycache__", "*.pyc"),
+                )
+            else:
+                (stage / item).parent.mkdir(parents=True, exist_ok=True)
+                shutil.copy2(source, stage / item)
+        # Точка входа — ``cli:run``: она поднимает SystemExit с кодом команды.
+        # С ``cli:main`` zipapp печатал результат, но всегда возвращал код 0,
+        # то есть контракт «0 / 1 / 2» на релизном .pyz не соблюдался.
+        zipapp.create_archive(stage, target, interpreter="/usr/bin/env python3", main="spanverify.cli:run")
+
+    target.chmod(0o755)
+    return target
+
+
+def main() -> int:
+    parser = argparse.ArgumentParser(description="Сборка spanverify.pyz")
+    parser.add_argument("--out", type=Path, default=ROOT / "release")
+    parser.add_argument("--name", default="spanverify.pyz")
+    args = parser.parse_args()
+
+    target = build(args.out, args.name)
+    size = target.stat().st_size / 1024
+    print(f"Готово: {target} ({size:.0f} КБ)")
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

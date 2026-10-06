@@ -1,0 +1,66 @@
+{
+  "dataset": "rushallu",
+  "task": "all",
+  "split": "test",
+  "mode": "demo",
+  "model": null,
+  "device": "cpu (demo-режим не использует веса)",
+  "pairs": 1000,
+  "pairs_total_in_file": 1000,
+  "limit": null,
+  "source_file": "/home/runner/work/Smarty_Chumakov/Smarty_Chumakov/spanverify-module/data/external/adapted/rushallu.jsonl",
+  "duration_s": 61.6,
+  "label_origin": {
+    "human": 1000
+  },
+  "labelled_pairs": 333,
+  "spans_reference": 423,
+  "unverified_spans": 0,
+  "our_metrics": {
+    "tokens": {
+      "precision": 0.3611,
+      "recall": 0.0769,
+      "f1": 0.1269,
+      "fpr": 0.0644,
+      "auc": 0.5293
+    },
+    "spans": {
+      "strict_f1_iou_0_5": 0.0902,
+      "coverage": 0.0993,
+      "soft_f1_expanded": 0.0676,
+      "mean_width_ratio": 2.29
+    },
+    "answers": {
+      "precision": 0.3977,
+      "recall": 0.2042,
+      "f1": 0.2698,
+      "fpr": 0.1544,
+      "auc": 0.5249
+    },
+    "verdicts": {
+      "tp": 259,
+      "fp": 305,
+      "fn": 74,
+      "tn": 362,
+      "precision": 0.4592,
+      "recall": 0.7778,
+      "f1": 0.5775,
+      "fpr": 0.4573
+    }
+  },
+  "their_metrics": {
+    "rouge1": 0.4861,
+    "rouge2": 0.4609,
+    "rougeL": 0.4679,
+    "accuracy": 0.372,
+    "jaccard_score": 0.373,
+    "hamming_loss": 0.3205,
+    "empty_reference": 667,
+    "pairs": 1000
+  },
+  "baseline": {
+    "extracted": false,
+    "note": "Baseline статьи RusHallu-RAG (Диалог-2026) не извлечён: PDF недоступен в этой среде. Их метрики на наших предсказаниях посчитаны и приведены в their_metrics."
+  },
+  "disclaimer": "РЕЖИМ DEMO: признаки лексические, без весов языковой модели. Числа показывают работоспособность конвейера на внешнем наборе, но научным результатом не являются."
+}

@@ -1,0 +1,216 @@
+# Корпус A3: загрузка реальных актов волнами, по срезам.
+#
+# Отдельный workflow, а не job в ci.yml: распознавание сканов стоит 580–2680 с
+# на документ (замер проекта), поэтому одной волной на 130 документов не вышло —
+# job не укладывался ни в какой разумный лимит. Здесь каждый срез — отдельный job
+# со своим лимитом, а результаты складываются в артефакты (в ветку не коммитим).
+#
+# Запуск: правкой файла .github/corpus-a3.trigger (ручной «Run workflow» доступен
+# только для workflow из ветки по умолчанию) либо вручную через workflow_dispatch.
+name: Корпус A3 (реальные акты, срезы)
+
+on:
+  workflow_dispatch:
+  push:
+    branches: ["arena/**"]
+    paths:
+      - .github/corpus-a3.trigger
+
+concurrency:
+  group: corpus-a3-${{ github.ref }}
+  # Прогоны идут по одному и не отменяют друг друга: срезы продолжают начатое.
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  slice:
+    name: Срез «${{ matrix.title }}»
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          # --- федеральный и ведомственный уровень: срез по виду акта ---
+          - slice: fz
+            title: Федеральный закон
+            types: "Федеральный закон"
+          - slice: ukaz
+            title: Указ
+            types: "Указ"
+          - slice: postanov
+            title: Постановление
+            types: "Постановление"
+          - slice: prikaz
+            title: Приказ
+            types: "Приказ"
+          - slice: polozhenie
+            title: Положение
+            types: "Положение"
+          - slice: rasporyazh
+            title: Распоряжение
+            types: "Распоряжение"
+          # --- региональный уровень: срез по названию акта ---
+          - slice: gubernator
+            title: Акты губернаторов
+            types: ""
+            title_filter: "губернатор"
+          - slice: krasnodar
+            title: Краснодарский край
+            types: ""
+            title_filter: "краснодарск"
+          - slice: moskva
+            title: Москва
+            types: ""
+            title_filter: "москв"
+          - slice: mosobl
+            title: Московская область
+            types: ""
+            title_filter: "московск\\w+\\s+обл"
+          - slice: spb
+            title: Санкт-Петербург
+            types: ""
+            title_filter: "санкт-петербург|петербург"
+          - slice: rostov
+            title: Ростовская область
+            types: ""
+            title_filter: "ростовск"
+          - slice: stavropol
+            title: Ставропольский край
+            types: ""
+            title_filter: "ставропольск"
+          - slice: sverdlovsk
+            title: Свердловская область
+            types: ""
+            title_filter: "свердловск"
+          - slice: tatarstan
+            title: Татарстан
+            types: ""
+            title_filter: "татарстан"
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Инструменты распознавания (tesseract с русским, poppler)
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq tesseract-ocr tesseract-ocr-rus poppler-utils
+          tesseract --version | head -1
+          pdftoppm -v 2>&1 | head -1
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Зависимости
+        working-directory: spanverify-module
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -q -r requirements.txt
+
+      - name: Кэш среза (что уже скачано и распознано в прошлых волнах)
+        uses: actions/cache@v4
+        with:
+          path: spanverify-module/data/corpus_a3_slice_${{ matrix.slice }}
+          key: corpus-a3-${{ matrix.slice }}-${{ github.run_id }}
+          restore-keys: |
+            corpus-a3-${{ matrix.slice }}-
+
+      - name: Загрузка и распознавание среза
+        working-directory: spanverify-module
+        timeout-minutes: 70
+        env:
+          OMP_THREAD_LIMIT: "1"
+        run: |
+          python scripts/fetch_npa_corpus.py \
+            --out data/corpus_a3_slice_${{ matrix.slice }} \
+            --target-docs 8 --buffer 4 \
+            --types "${{ matrix.types }}" \
+            --title-filter "${{ matrix.title_filter }}" \
+            --max-pages-per-type 12 --max-pages 20 \
+            --dpi 150 --psm 6 --oem 1 \
+            --workers 4 --pause 1.5
+
+      - name: Сколько получилось в срезе
+        working-directory: spanverify-module
+        run: |
+          d=data/corpus_a3_slice_${{ matrix.slice }}/sources
+          n=$(ls -1 "$d"/*.txt 2>/dev/null | wc -l)
+          echo "срез ${{ matrix.slice }}: документов с текстом: $n"
+          echo "docs=$n" >> "$GITHUB_STEP_SUMMARY"
+          ls -1 "$d" 2>/dev/null | head -20
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: corpus-a3-${{ matrix.slice }}
+          path: spanverify-module/data/corpus_a3_slice_${{ matrix.slice }}/sources/*.txt
+          if-no-files-found: warn
+          retention-days: 30
+
+  assemble:
+    name: Сборка волны
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    needs: slice
+    if: always()
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: wave
+          pattern: corpus-a3-*
+
+      - name: Свести срезы в один каталог
+        run: |
+          mkdir -p /tmp/wave_all
+          find wave -name '*.txt' -exec cp -n {} /tmp/wave_all/ \;
+          total=$(ls -1 /tmp/wave_all/*.txt 2>/dev/null | wc -l)
+          echo "итого документов в волне: $total"
+          echo "### Волна корпуса A3" >> "$GITHUB_STEP_SUMMARY"
+          echo "документов: **$total**" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          for d in wave/*/; do
+            n=$(ls -1 "$d"/*.txt 2>/dev/null | wc -l)
+            echo "  - $(basename "$d"): $n"
+            echo "- $(basename "$d"): $n" >> "$GITHUB_STEP_SUMMARY"
+          done
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: corpus-a3-wave
+          path: /tmp/wave_all/*.txt
+          if-no-files-found: warn
+          retention-days: 30
+
+  bench-ocr:
+    name: Замер скорости распознавания
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    # Только при ручном запуске: на каждой волне мерить незачем, это лишние минуты.
+    if: github.event_name == 'workflow_dispatch'
+    steps:
+      - uses: actions/checkout@v4
+      - name: Инструменты распознавания
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq tesseract-ocr tesseract-ocr-rus poppler-utils
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Зависимости
+        working-directory: spanverify-module
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -q -r requirements.txt
+      - name: Замер (200 dpi против 150 dpi, --psm 6 --oem 1)
+        working-directory: spanverify-module
+        run: |
+          python scripts/bench_ocr.py --out reports/OCR_BENCH.json || \
+            echo "скрипт замера отсутствует — замер не выполнен" >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: ocr-bench
+          path: spanverify-module/reports/OCR_BENCH.json
+          if-no-files-found: warn
+          retention-days: 30
