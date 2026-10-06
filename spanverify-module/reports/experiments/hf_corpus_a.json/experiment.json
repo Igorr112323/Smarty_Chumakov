@@ -2,7 +2,7 @@
   "dataset": "data/corpus_a/splits/train.jsonl",
   "mode": "hf",
   "seed": 42,
-  "duration_s": 1513.29,
+  "duration_s": 1575.46,
   "corpus": {
     "pairs": 840,
     "kinds": {
