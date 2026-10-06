@@ -38,7 +38,14 @@ FEATURE_NAMES = ("attention_entropy", "ctx_attention_mass", "embedding_density")
 # (в DEFAULT_WEIGHTS их нет). Они нужны, чтобы измерить на реальной модели,
 # даёт ли нормировка массы на длину контекста прибавку к AUC, и только после
 # измерения решать, переводить ли их в рабочие.
-DIAGNOSTIC_FEATURES = ("ctx_attention_mass_norm", "ctx_attention_mass_lift")
+DIAGNOSTIC_FEATURES = (
+    "ctx_attention_mass_norm",
+    "ctx_attention_mass_lift",
+    # Итерация 2: расстояние до подтверждающего фрагмента.
+    "ctx_max_similarity",
+    "ctx_support_distance",
+    "ctx_similarity_decay",
+)
 MEASUREMENT_SUBJECT_WINDOW = 6  # сколько слов перед числом считаем его субъектом
 MEASUREMENT_MATCH_MIN = 0.5  # порог совпадения субъекта ответа с измерением контекста
 SCORED_MIN_LEN = 3
@@ -84,6 +91,10 @@ class FeatureMatrix:
     ctx_mass_expected: list[float] = field(default_factory=list)
     ctx_mass_norm: list[float] = field(default_factory=list)
     ctx_mass_lift: list[float] = field(default_factory=list)
+    # Диагностические (итерация 2): максимум похожести и где он найден.
+    ctx_max_similarity: list[float] = field(default_factory=list)
+    ctx_support_distance: list[float] = field(default_factory=list)
+    ctx_similarity_decay: list[float] = field(default_factory=list)
     token_risk: list[float] = field(default_factory=list)
     meta: dict[str, Any] = field(default_factory=dict)
 
@@ -149,6 +160,33 @@ def normalised_context_mass(observed: float, expected: float, eps: float = 1e-9)
     if expected <= eps:
         return 0.0
     return float(observed) / float(expected)
+
+
+def normalised_support_distance(distance: int, seq_len: int) -> float:
+    """Расстояние до опорного токена контекста, нормированное на длину текста.
+
+    Признак итерации 2: важен не только сам максимум похожести, но и то, как
+    далеко в документе лежит подтверждающий фрагмент. Нормировка на длину
+    последовательности нужна, чтобы «200 токенов» в коротком и длинном акте
+    не означали разного.
+    """
+    if seq_len <= 1:
+        return 0.0
+    return min(1.0, max(0.0, float(distance) / float(seq_len - 1)))
+
+
+def distance_decay(similarity: float, distance: int, scale: float) -> float:
+    """Похожесть со штрафом за удалённость опоры: ``sim · exp(−d/τ)``.
+
+    Чем дальше подтверждающий фрагмент, тем меньше он годится как опора для
+    конкретного утверждения. Множитель сохраняет знак и шкалу похожести, поэтому
+    признак остаётся сопоставимым с плотностью.
+    """
+    if scale <= 0:
+        return 0.0
+    import math  # noqa: PLC0415
+
+    return float(similarity) * math.exp(-abs(int(distance)) / float(scale))
 
 
 def context_mass_lift(observed: float, expected: float) -> float:
@@ -879,6 +917,9 @@ def hf_features(
     mass_expected_values: list[float] = []
     mass_norm_values: list[float] = []
     mass_lift_values: list[float] = []
+    max_sim_values: list[float] = []
+    support_distance_values: list[float] = []
+    decay_values: list[float] = []
 
     # Векторы контекстных чанков и токенов — для плотности.
     context_token_embeddings: list[list[float]] = []
@@ -896,12 +937,18 @@ def hf_features(
             mass_expected_values.append(0.0)
             mass_norm_values.append(0.0)
             mass_lift_values.append(0.0)
+            max_sim_values.append(0.0)
+            support_distance_values.append(0.0)
+            decay_values.append(0.0)
             continue
         entropy_values.append(statistics.fmean(float(entropy[position].item()) for position in positions))
         mass_parts: list[float] = []
         density_parts: list[float] = []
         norm_parts: list[float] = []
         lift_parts: list[float] = []
+        max_sim_parts: list[float] = []
+        distance_parts: list[float] = []
+        decay_parts: list[float] = []
         for position in positions:
             row = attentions[:, position, :].mean(dim=0)  # (seq,)
             observed = float(row[context_positions].sum().item()) if context_positions else 0.0
@@ -914,14 +961,28 @@ def hf_features(
             lift_parts.append(context_mass_lift(observed, expected))
             if hidden_cpu is not None and context_token_embeddings:
                 vector = hidden_cpu[position].tolist()
-                similarities = sorted(
-                    (_cosine_dense(vector, other) for other in context_token_embeddings),
-                    reverse=True,
-                )
+                # Считаем похожесть вместе с позицией источника: для признаков
+                # итерации 2 важно не только значение максимума, но и где именно
+                # в документе лежит подтверждающий фрагмент.
+                scored = [
+                    (_cosine_dense(vector, other), source_position)
+                    for other, source_position in zip(context_token_embeddings, context_positions, strict=False)
+                ]
+                best_similarity, best_position = max(scored, key=lambda pair: pair[0])
+                distance = int(abs(position - best_position))
+                # Масштаб затухания — 10 % длины: устойчив к размеру документа.
+                decay_scale = max(1.0, 0.1 * seq_len)
+                max_sim_parts.append(float(best_similarity))
+                distance_parts.append(normalised_support_distance(distance, int(seq_len)))
+                decay_parts.append(distance_decay(best_similarity, distance, decay_scale))
+                similarities = sorted((value for value, _position in scored), reverse=True)
                 top = similarities[: max(1, k)]
                 density_parts.append(sum(top) / len(top))
             else:  # pragma: no cover - модель без hidden_states
                 density_parts.append(0.0)
+                max_sim_parts.append(0.0)
+                distance_parts.append(0.0)
+                decay_parts.append(0.0)
         mass_values.append(min(1.0, max(0.0, statistics.fmean(mass_parts))))
         density_values.append(min(1.0, max(0.0, statistics.fmean(density_parts))))
         # Для токена, разбитого на несколько сабтокенов, ожидаемая масса
@@ -932,6 +993,9 @@ def hf_features(
         mass_expected_values.append(expected_token)
         mass_norm_values.append(statistics.fmean(norm_parts) if norm_parts else 0.0)
         mass_lift_values.append(statistics.fmean(lift_parts) if lift_parts else 0.0)
+        max_sim_values.append(statistics.fmean(max_sim_parts) if max_sim_parts else 0.0)
+        support_distance_values.append(statistics.fmean(distance_parts) if distance_parts else 0.0)
+        decay_values.append(statistics.fmean(decay_parts) if decay_parts else 0.0)
 
     return FeatureMatrix(
         attention_entropy=entropy_values,
@@ -940,6 +1004,9 @@ def hf_features(
         ctx_mass_expected=mass_expected_values,
         ctx_mass_norm=mass_norm_values,
         ctx_mass_lift=mass_lift_values,
+        ctx_max_similarity=max_sim_values,
+        ctx_support_distance=support_distance_values,
+        ctx_similarity_decay=decay_values,
         meta={
             "backend": "hf",
             "model": model_name,
