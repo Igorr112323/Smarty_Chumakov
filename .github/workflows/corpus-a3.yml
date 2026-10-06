@@ -21,14 +21,18 @@ concurrency:
   # Прогоны идут по одному и не отменяют друг друга: срезы продолжают начатое.
   cancel-in-progress: false
 
+# Писать умеет только job архива — и только в отдельную ветку данных, всегда
+# с [skip ci]. В рабочую ветку из CI не коммитим никогда.
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   slice:
     name: Срез «${{ matrix.title }}»
     runs-on: ubuntu-latest
     timeout-minutes: 120
+    permissions:
+      contents: read
     strategy:
       fail-fast: false
       matrix:
@@ -133,17 +137,21 @@ jobs:
             --workers 4 --pause 1.5
 
       - name: Сколько получилось в срезе
+        id: count
         working-directory: spanverify-module
         run: |
           d=data/corpus_a3_slice_${{ matrix.slice }}/sources
           n=$(ls -1 "$d"/*.txt 2>/dev/null | wc -l)
           echo "срез ${{ matrix.slice }}: документов с текстом: $n"
           echo "docs=$n" >> "$GITHUB_STEP_SUMMARY"
+          echo "docs=$n" >> "$GITHUB_OUTPUT"
           ls -1 "$d" 2>/dev/null | head -20
 
       - uses: actions/upload-artifact@v4
         with:
-          name: corpus-a3-${{ matrix.slice }}
+          # Число документов — прямо в имени: содержимое артефакта снаружи
+          # не прочитать, а имена видны через API.
+          name: corpus-a3-${{ matrix.slice }}-документов-${{ steps.count.outputs.docs }}
           path: spanverify-module/data/corpus_a3_slice_${{ matrix.slice }}/sources/*.txt
           if-no-files-found: warn
           retention-days: 30
@@ -154,6 +162,8 @@ jobs:
     timeout-minutes: 15
     needs: slice
     if: always()
+    permissions:
+      contents: read
     steps:
       - uses: actions/download-artifact@v4
         with:
@@ -186,6 +196,8 @@ jobs:
     name: Замер скорости распознавания
     runs-on: ubuntu-latest
     timeout-minutes: 60
+    permissions:
+      contents: read
     # Только при ручном запуске: на каждой волне мерить незачем, это лишние минуты.
     if: github.event_name == 'workflow_dispatch'
     steps:
@@ -214,3 +226,54 @@ jobs:
           path: spanverify-module/reports/OCR_BENCH.json
           if-no-files-found: warn
           retention-days: 30
+
+  archive:
+    name: Архив волны в ветку данных
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    needs: assemble
+    if: always()
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: data/corpus-a3-raw
+
+      - uses: actions/download-artifact@v4
+        with:
+          path: wave
+          pattern: corpus-a3-*
+
+      - name: Сложить тексты и записать отчёт волны
+        run: |
+          mkdir -p acts reports
+          find wave -name '*.txt' -exec cp -n {} acts/ \;
+          n=$(ls -1 acts/*.txt 2>/dev/null | wc -l)
+          echo "документов в ветке данных: $n"
+          {
+            echo "# Волна корпуса A3 от $(date -u +%FT%H:%M:%SZ)"
+            echo
+            echo "документов в ветке данных: **$n**"
+            echo
+            echo "| срез | документов |"
+            echo "|---|---|"
+            for d in wave/*/; do
+              [ -d "$d" ] || continue
+              echo "| $(basename "$d") | $(ls -1 "$d"/*.txt 2>/dev/null | wc -l) |"
+            done
+          } > "reports/wave-$(date -u +%Y%m%dT%H%M%S).md"
+          echo "документов: $n" >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Коммит в ветку данных [skip ci]
+        run: |
+          n=$(ls -1 acts/*.txt 2>/dev/null | wc -l)
+          git config user.name "spanverify-bot"
+          git config user.email "bot@spanverify.local"
+          git add -A acts reports
+          if git diff --cached --quiet; then
+            echo "новых текстов нет — коммит не нужен"
+            exit 0
+          fi
+          git commit -m "корпус A3: волна от $(date -u +%F) — $n документов [skip ci]"
+          git push origin HEAD:data/corpus-a3-raw

@@ -1,0 +1,111 @@
+{
+  "measured_at": "2026-10-06T07:50:00Z",
+  "hardware": {
+    "platform": "Linux-6.1.158+-x86_64-with-glibc2.36",
+    "processor": "неизвестно",
+    "cpu_count": 2,
+    "python": "3.11.2",
+    "gpu": "отсутствует (nvidia-smi не найден)"
+  },
+  "method": {
+    "mode": "demo",
+    "repeats": 3,
+    "warmup": true,
+    "memory": "tracemalloc (память Python-объектов; RSS процесса не покрывается)",
+    "text_source": "/home/user/Smarty_Chumakov/АктыРеальны",
+    "acts_used": 20,
+    "corpus_chars": 201045
+  },
+  "by_size": [
+    {
+      "context_chars": 500,
+      "seconds_median": 0.011,
+      "seconds_min": 0.011,
+      "seconds_max": 0.011,
+      "peak_mb_median": 0.11,
+      "ms_per_1000_chars": 22.0,
+      "verdict": "likely_hallucination",
+      "synthetic_extension": false,
+      "repeats": 3
+    },
+    {
+      "context_chars": 2000,
+      "seconds_median": 0.036,
+      "seconds_min": 0.036,
+      "seconds_max": 0.037,
+      "peak_mb_median": 0.41,
+      "ms_per_1000_chars": 18.0,
+      "verdict": "likely_hallucination",
+      "synthetic_extension": false,
+      "repeats": 3
+    },
+    {
+      "context_chars": 10000,
+      "seconds_median": 0.165,
+      "seconds_min": 0.16,
+      "seconds_max": 0.176,
+      "peak_mb_median": 2.04,
+      "ms_per_1000_chars": 16.5,
+      "verdict": "likely_hallucination",
+      "synthetic_extension": false,
+      "repeats": 3
+    },
+    {
+      "context_chars": 50000,
+      "seconds_median": 0.966,
+      "seconds_min": 0.937,
+      "seconds_max": 0.995,
+      "peak_mb_median": 10.62,
+      "ms_per_1000_chars": 19.32,
+      "verdict": "grounded",
+      "synthetic_extension": false,
+      "repeats": 3
+    }
+  ],
+  "exit_codes": {
+    "0_grounded": 0,
+    "1_issues": 1,
+    "2_error": 2
+  },
+  "length_limit": {
+    "steps": [
+      {
+        "context_chars": 100000,
+        "ok": true,
+        "seconds": 2.073,
+        "peak_mb": 21.62,
+        "error": null
+      },
+      {
+        "context_chars": 200000,
+        "ok": true,
+        "seconds": 3.819,
+        "peak_mb": 42.94,
+        "error": null
+      },
+      {
+        "context_chars": 500000,
+        "ok": true,
+        "seconds": 10.027,
+        "peak_mb": 107.52,
+        "error": null
+      },
+      {
+        "context_chars": 1000000,
+        "ok": true,
+        "seconds": 19.288,
+        "peak_mb": 214.59,
+        "error": null
+      },
+      {
+        "context_chars": 2000000,
+        "ok": true,
+        "seconds": 39.557,
+        "peak_mb": 429.32,
+        "error": null
+      }
+    ],
+    "max_ok_chars": 2000000,
+    "time_limit_seconds": 60.0
+  }
+}
