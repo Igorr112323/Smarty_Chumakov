@@ -80,6 +80,37 @@ def build_report(corpus_dir: Path) -> tuple[str, dict]:
         lines.append("**Корпус не собран:** файла `manifest.json` нет.")
         return "\n".join(lines) + "\n", {"available": False}
 
+    provenance = sources.get("provenance") or {}
+    if provenance:
+        lines.append("## 0. Происхождение переноса")
+        lines.append("")
+        lines.append(
+            "Тексты и манифест источников получены в ветке "
+            f"`{provenance.get('donor_branch', '—')}`, коммит `{provenance.get('donor_commit', '—')}` "
+            f"({provenance.get('donor_date', 'дата не записана')}). "
+            f"Файлов корпуса в той ветке: {provenance.get('donor_files', '—')}, "
+            f"из них текстов: {provenance.get('donor_texts', '—')}. "
+            "Содержимое этих текстов перенесено без изменения байтов "
+            f"(побайтовых расхождений: {provenance.get('donor_byte_mismatches', '—')})."
+        )
+        lines.append("")
+        lines.append(
+            f"Свой корпус рабочей ветки сохранён в `{provenance.get('local_backup', '—')}` "
+            f"({provenance.get('local_documents', '—')} документов, {provenance.get('local_pairs', '—')} пар; "
+            "в задании фигурировало 70 документов и 1075 пар — это устаревшая оценка, фактическое число иное). "
+            f"Слияние по SHA256 текста: добавлено {provenance.get('added', '—')}, "
+            f"дублей отброшено {provenance.get('duplicates_dropped', '—')}, "
+            f"совпадений идентификатора при другом тексте {provenance.get('id_conflicts', '—')} "
+            "(сохранены под суффиксом `-local159`, файл соседней ветки не перезаписывался)."
+        )
+        lines.append("")
+        lines.append(
+            "Пары пересобраны командой `"
+            f"{provenance.get('rebuild_command', '—')}` "
+            f"(seed {provenance.get('seed', '—')}). "
+            f"Общих документов между частями: {provenance.get('shared_groups', '—')}."
+        )
+        lines.append("")
     lines.append("## 1. Откуда взяты документы")
     lines.append("")
     lines.append("| Источник | Скачано документов | С текстом | Примечание |")
@@ -199,10 +230,11 @@ def build_report(corpus_dir: Path) -> tuple[str, dict]:
     for item in sources.get("sources", []):
         host = item.get("host")
         host_docs = {doc_id for doc_id, value in host_of_doc.items() if value == host}
+        host_in_pairs = {doc_id for doc_id in host_docs if pairs_per_doc.get(doc_id)}
         host_pairs = sum(count for doc_id, count in pairs_per_doc.items() if doc_id in host_docs)
         lines.append(
             f"| `{host}` | {item.get('documents_downloaded')} | {item.get('documents_with_text')} | "
-            f"{len(host_docs)} | {host_pairs} |"
+            f"{len(host_in_pairs)} | {host_pairs} |"
         )
     lines.append("")
     lines.append("**2) Есть ли расхождения `context` пар с исходными документами.**")
@@ -240,8 +272,16 @@ def build_report(corpus_dir: Path) -> tuple[str, dict]:
     lines.append("")
     not_done: list[str] = []
     for item in sources.get("sources", []):
-        if not item.get("documents_downloaded"):
+        # Ноль скачанных и ноль текстов — источник пуст. Ноль скачанных при уже
+        # лежащих текстах — не провал загрузки, а перенос готового корпуса.
+        if not item.get("documents_downloaded") and not item.get("documents_with_text"):
             not_done.append(f"из `{item.get('host')}` документов нет: {item.get('note', 'причина не записана')}")
+    missing_meta = sum(1 for meta in documents.values() if meta.get("act_type") == "метаданные не перенесены")
+    if missing_meta:
+        not_done.append(
+            f"у {missing_meta} документов нет карточки источника (вид, номер, дата): "
+            "тексты перенесены из локального корпуса, PDF в этом заходе не скачивался"
+        )
     if manifest.get("pairs", 0) < manifest.get("target", 0):
         not_done.append(
             f"пар меньше цели: {manifest.get('pairs')} из {manifest.get('target')} "
