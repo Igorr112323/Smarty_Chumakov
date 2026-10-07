@@ -260,6 +260,15 @@ jobs:
           for path in hit.parent.iterdir():
               if path.is_file():
                   shutil.copy2(path, dest / path.name)
+          # То же правило для корпуса A: свежий experiment.json — в дерево
+          # до сборки METRICS.json, а не после.
+          hit_a = next((p for p in Path("spanverify-module/reports/from-a").rglob("experiment.json")), None)
+          if hit_a is not None:
+              dest = root / "experiments" / "a"
+              dest.mkdir(parents=True, exist_ok=True)
+              for path in hit_a.parent.iterdir():
+                  if path.is_file():
+                      shutil.copy2(path, dest / path.name)
           # Пилот: свежий pilot.json кладём в reports/pilot (gitignore),
           # именно его читает collect_metrics. Если пилот не дошёл — блок
           # пилота останется пустым, как раньше, а не упадёт.
