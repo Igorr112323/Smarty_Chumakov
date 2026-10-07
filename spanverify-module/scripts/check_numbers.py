@@ -227,6 +227,78 @@ def _allowed(metrics: dict) -> dict[str, set[str]]:
                 if isinstance(value, (int, float)):
                     auc_values.append(float(value))
 
+    # Эксперименты из reports/experiments/*/experiment.json и внешние срезы hf:
+    # эти числа уже лежат в файлах прогонов и попадают в документы только через
+    # METRICS.json, поэтому здесь они становятся законными значениями.
+    experiments = metrics.get("hf_experiments") or {}
+    for run in (experiments.get("runs") or {}).values():
+        if run.get("kind") == "pilot":
+            continue
+        blocks = [run]
+        for key in ("test_official", "dev_official"):
+            if isinstance(run.get(key), dict):
+                blocks.append(run[key])
+        for block in blocks:
+            for group in ("tokens", "answers", "verdicts"):
+                values = block.get(group) or {}
+                for key in ("precision", "recall", "f1"):
+                    if isinstance(values.get(key), (int, float)):
+                        f1_values.append(float(values[key]))
+                if isinstance(values.get("fpr"), (int, float)):
+                    fpr_values.append(float(values["fpr"]))
+                if isinstance(values.get("auc"), (int, float)):
+                    auc_values.append(float(values["auc"]))
+            spans = block.get("spans") or {}
+            for key in ("strict_f1", "strict_f1_iou_0_5", "coverage"):
+                if isinstance(spans.get(key), (int, float)):
+                    f1_values.append(float(spans[key]))
+        for row in (run.get("by_type_test") or {}).values():
+            for key in ("token_precision", "token_recall", "token_f1", "span_coverage", "verdict_recall"):
+                if isinstance(row.get(key), (int, float)):
+                    f1_values.append(float(row[key]))
+            if isinstance(row.get("verdict_fpr"), (int, float)):
+                fpr_values.append(float(row["verdict_fpr"]))
+        clean = run.get("clean_pairs") or {}
+        for key in ("token_fpr", "verdict_fpr", "flagged_share"):
+            if isinstance(clean.get(key), (int, float)):
+                fpr_values.append(float(clean[key]))
+        scan = run.get("mask_scan") or {}
+        for point in (scan.get("selected"), scan.get("best_within_target")):
+            if not isinstance(point, dict):
+                continue
+            for key in ("token_f1", "token_recall", "token_precision"):
+                if isinstance(point.get(key), (int, float)):
+                    f1_values.append(float(point[key]))
+            if isinstance(point.get("token_fpr"), (int, float)):
+                fpr_values.append(float(point["token_fpr"]))
+        comparison = run.get("verdict_rule_comparison") or {}
+        for rule_key in ("rule_any_span", "rule_min_two_tokens"):
+            values = comparison.get(rule_key) or {}
+            for key in ("precision", "recall", "f1"):
+                if isinstance(values.get(key), (int, float)):
+                    f1_values.append(float(values[key]))
+            if isinstance(values.get("fpr"), (int, float)):
+                fpr_values.append(float(values["fpr"]))
+    slices_block = metrics.get("hf_external_slices") or {}
+    for item in (slices_block.get("slices") or {}).values():
+        for group in ("tokens", "answers", "verdicts"):
+            values = item.get(group) or {}
+            for key in ("precision", "recall", "f1"):
+                if isinstance(values.get(key), (int, float)):
+                    f1_values.append(float(values[key]))
+            if isinstance(values.get("fpr"), (int, float)):
+                fpr_values.append(float(values["fpr"]))
+            if isinstance(values.get("auc"), (int, float)):
+                auc_values.append(float(values["auc"]))
+        spans = item.get("spans") or {}
+        for key in ("strict_f1_iou_0_5", "coverage", "soft_f1_expanded"):
+            if isinstance(spans.get(key), (int, float)):
+                f1_values.append(float(spans[key]))
+        their = item.get("their") or {}
+        for key in ("accuracy", "jaccard_score", "hamming_loss", "rouge1", "rouge2", "rougeL"):
+            if isinstance(their.get(key), (int, float)):
+                f1_values.append(float(their[key]))
+
     allowed = {
         "token_f1": {form for value in f1_values if isinstance(value, (int, float)) for form in _roundings(value)},
         "fpr": {form for value in fpr_values if isinstance(value, (int, float)) for form in _roundings(value)},

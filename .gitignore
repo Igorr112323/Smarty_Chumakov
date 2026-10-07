@@ -1,3 +1,8 @@
 
 # Внешние данные бенчмарка: не коммитятся (лицензия не подтверждена), см. scripts/fetch_rushallu.py
 spanverify-module/data/external/
+
+# Служебные файлы тестов и окружения: в релиз не попадают
+spanverify-module/.coverage
+.coverage
+.venv/

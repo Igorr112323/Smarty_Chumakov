@@ -487,6 +487,70 @@ def _select_mask(
     return best_params, best_metrics
 
 
+# Публичные обёртки: тот же подбор маски нужен отчётам вне ``train()``
+# (кривая маски на официальной обучающей части в ``scripts/run_experiments.py``),
+# а дублировать сетку — значит получать другие числа.
+select_mask = _select_mask
+
+
+def mask_curve(
+    verifier: Verifier,
+    pairs: Sequence[dict],
+    risk_fn,
+    samples_by_pair: dict[str, list[TokenSample]],
+    target_fpr: float,
+) -> list[dict[str, Any]]:
+    """Кривая маски: все точки сетки z/floor/cap и их метрики на данной части.
+
+    Те же числа, что использует подбор маски, поэтому кривая честно показывает,
+    что видел перебор. Точки отсортированы по убыванию F1; ``within_target``
+    отмечает точки с FPR ≤ target.
+    """
+    points: list[dict[str, Any]] = []
+    for span_z in Z_GRID:
+        for floor in FLOOR_GRID:
+            for cap in CAP_GRID:
+                if floor >= cap:
+                    continue
+                metrics = _score_pairs(verifier, pairs, risk_fn, (span_z, floor, cap), samples_by_pair)
+                points.append(
+                    {
+                        "span_z": span_z,
+                        "span_floor": floor,
+                        "span_cap": cap,
+                        "token_f1": round(metrics["f1"], 4),
+                        "token_precision": round(metrics["precision"], 4),
+                        "token_recall": round(metrics["recall"], 4),
+                        "token_fpr": round(metrics["fpr"], 4),
+                        "within_target": bool(metrics["fpr"] <= target_fpr),
+                    }
+                )
+    points.sort(key=lambda point: (-point["token_f1"], point["token_fpr"]))
+    return points
+
+
+def build_risk_fn(bundle: WeightsBundle, entropy_quantile: float = 1.0) -> tuple[str, Any]:
+    """Функция риска выбранного сигнала (голова или правило) по готовому бандлу.
+
+    Возвращает ``(имя сигнала, функция)``; функция отображает список токенных
+    сэмплов в список рисков той же арифметикой, что обучение и движок. Нужно,
+    чтобы кривая маски в отчёте считалась ровно по тому сигналу, который
+    выбран в бандле, а не по правилу «вообще».
+    """
+
+    def rule_risk(samples: Sequence[TokenSample]) -> list[float]:
+        return _risk_for(samples, bundle.weights, entropy_quantile=entropy_quantile)
+
+    head = bundle.head or {}
+    if head.get("type") == "logreg" and (head.get("model") or {}).get("weights"):
+
+        def head_risk(samples: Sequence[TokenSample]) -> list[float]:
+            return _head_scores(samples, head, rule_risk(samples))
+
+        return "logreg", head_risk
+    return "rule", rule_risk
+
+
 def _head_scores(samples: Sequence[TokenSample], payload: dict[str, Any], rule_risks: Sequence[float]) -> list[float]:
     """Вероятности головы по сэмплам (та же арифметика, что в движке)."""
     model = (payload or {}).get("model") or {}

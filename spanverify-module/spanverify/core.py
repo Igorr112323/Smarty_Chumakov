@@ -213,6 +213,12 @@ class SpanResult:
     risk: float
     label: str  # "likely_hallucination" | "doubtful"
     n_tokens: int = 0
+    # Откуда фрагмент: "mask" — статистическая маска; "attribution" — правило
+    # привязки числа к объекту (дефект D); "coverage" — покрытие фактов;
+    # "rule" — склейка фрагментов разного происхождения. Текстовые правила —
+    # целенаправленные находки, поэтому вердикт реагирует на них даже при
+    # одном токене, а на одиночный токен маски — нет (см. ``_verdict``).
+    source: str = "mask"
 
     def to_dict(self) -> dict[str, Any]:
         return {
@@ -222,6 +228,7 @@ class SpanResult:
             "risk": round(self.risk, 4),
             "label": self.label,
             "n_tokens": self.n_tokens,
+            "source": self.source,
         }
 
 
@@ -282,6 +289,7 @@ class VerificationResult:
                     risk=float(item.get("risk", 0.0)),
                     label=str(item.get("label", "doubtful")),
                     n_tokens=int(item.get("n_tokens", 0)),
+                    source=str(item.get("source", "mask")),
                 )
                 for item in data.get("spans", [])
             ],

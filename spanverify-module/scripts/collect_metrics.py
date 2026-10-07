@@ -9,7 +9,16 @@
 * оценку доли участия ИИ (AUC вне выборки) — калибровка на синтетике;
 * кросс-корпусный тест из ``reports/cross_corpus.json`` (создаёт ``scripts/cross_corpus.py``);
 * числа пилота из ``reports/pilot/pilot.json`` (создаёт ``scripts/pilot_rugpt3small.py``);
-* размеры и SHA256 артефактов релиза, если они лежат в ``release/``.
+* размеры и SHA256 артефактов релиза, если они лежат в ``release/``;
+* эксперименты из ``reports/experiments/*/experiment.json`` (создаёт
+  ``scripts/run_experiments.py``): режим, модель, метрики всего корпуса и
+  официального теста, кривая маски, сравнение правила вердикта;
+* внешние срезы режима hf из ``reports/ext_*_hf.json`` (создаёт
+  ``scripts/external_eval.py``).
+
+Пока число не лежит в этом файле, документам (README, ИТОГ, ТЗ) брать его
+больше неоткуда. Журналы (PROGRESS, AUDIT) могут цитировать файл эксперимента
+только вместе с номером прогона.
 
 Запуск::
 
@@ -424,6 +433,176 @@ def _external_tests_block() -> dict:
     return summary
 
 
+def _round_or_none(value: object, digits: int = 4) -> object:
+    """Округление для отчёта; ``None`` и NaN не превращаются в число."""
+    if not isinstance(value, (int, float)):
+        return None
+    if isinstance(value, float) and value != value:
+        return None
+    return round(float(value), digits)
+
+
+def _experiment_block(payload: dict) -> dict:
+    """Один файл ``experiment.json`` → числа для единого файла метрик."""
+    metrics = payload.get("metrics") or {}
+    bundle = payload.get("bundle") or {}
+    block: dict = {
+        "dataset": payload.get("dataset"),
+        "mode": payload.get("mode"),
+        "model": payload.get("model"),
+        "seed": payload.get("seed"),
+        "run_id": payload.get("run_id"),
+        "git_commit": payload.get("git_commit"),
+        "duration_s": payload.get("duration_s"),
+        "pairs": (payload.get("corpus") or {}).get("pairs"),
+        "gate": payload.get("gate"),
+        "tokens": {
+            key: _round_or_none(metrics.get("tokens", {}).get(key))
+            for key in ("precision", "recall", "f1", "fpr", "auc")
+        },
+        "spans": {
+            "strict_f1": _round_or_none(metrics.get("spans", {}).get("f1")),
+            "coverage": _round_or_none(metrics.get("spans", {}).get("recall_containment")),
+            "width_ratio": _round_or_none(metrics.get("spans", {}).get("mean_width_ratio"), 2),
+        },
+        "answers": {
+            key: _round_or_none(metrics.get("answers", {}).get(key))
+            for key in ("precision", "recall", "f1", "fpr", "auc", "threshold")
+        },
+        "verdicts": {
+            key: metrics.get("verdicts", {}).get(key)
+            for key in ("tp", "fp", "fn", "tn", "precision", "recall", "f1", "fpr", "flagged_share")
+        },
+        "bundle": {
+            "threshold": bundle.get("threshold"),
+            "span_z": bundle.get("span_z"),
+            "span_floor": bundle.get("span_floor"),
+            "span_cap": bundle.get("span_cap"),
+            "weights": bundle.get("weights"),
+            "signal": (bundle.get("meta") or {}).get("signal"),
+        },
+    }
+    splits = payload.get("splits")
+    if splits:
+        block["splits"] = {"sizes": splits.get("sizes"), "rule": splits.get("rule")}
+    test_official = payload.get("test_official")
+    if test_official:
+        block["test_official"] = {
+            "pairs": test_official.get("pairs"),
+            "tokens": test_official.get("tokens"),
+            "spans": test_official.get("spans"),
+            "answers": test_official.get("answers"),
+            "verdicts": test_official.get("verdicts"),
+        }
+        block["gate_test_official"] = payload.get("gate_test_official")
+    if payload.get("dev_official"):
+        block["dev_official"] = payload["dev_official"]
+    if payload.get("by_type_test"):
+        block["by_type_test"] = payload["by_type_test"]
+    if payload.get("clean_pairs"):
+        block["clean_pairs"] = payload["clean_pairs"]
+    if payload.get("mask_scan"):
+        scan = payload["mask_scan"]
+        block["mask_scan"] = {
+            "signal": scan.get("signal"),
+            "target_fpr": scan.get("target_fpr"),
+            "points_total": scan.get("points_total"),
+            "points_within_target": scan.get("points_within_target"),
+            "selected": scan.get("selected"),
+            "best_within_target": scan.get("best_within_target"),
+            "adopted": scan.get("adopted"),
+            "statement": scan.get("statement"),
+        }
+    if payload.get("verdict_rule_comparison"):
+        block["verdict_rule_comparison"] = payload["verdict_rule_comparison"]
+    return block
+
+
+def _hf_experiments_block() -> dict | None:
+    """Файлы прогонов ``reports/experiments/*``: hf-эксперименты и пилот.
+
+    Эти числа уже измерены на раннере и лежат в файлах; блок делает их частью
+    единого файла метрик, чтобы документы сверялись с ними, а не с текстом
+    журналов. Корпуса и прогоны не смешиваются: каждый файл — отдельная запись.
+    """
+    root = ROOT / "reports" / "experiments"
+    if not root.is_dir():
+        return None
+    runs: dict[str, dict] = {}
+    for path in sorted(root.rglob("*.json")):
+        try:
+            payload = json.loads(path.read_text(encoding="utf-8"))
+        except (OSError, json.JSONDecodeError):
+            continue
+        key = str(path.parent.relative_to(root))
+        if path.name == "pilot.json":
+            runs[key if key != "." else path.stem] = {
+                "kind": "pilot",
+                "status": payload.get("status"),
+                "published": payload.get("published"),
+                "wording": payload.get("wording"),
+                "pairs": payload.get("pairs"),
+                "tokens": payload.get("tokens"),
+                "bootstrap_iterations": payload.get("bootstrap_iterations"),
+                "seed": payload.get("seed"),
+                "contrast": payload.get("contrast"),
+            }
+        elif path.name == "experiment.json":
+            block = _experiment_block(payload)
+            block["kind"] = "experiment"
+            runs[key if key != "." else path.stem] = block
+    if not runs:
+        return None
+    return {
+        "available": True,
+        "runs": runs,
+        "hf_runs": sum(1 for run in runs.values() if run.get("mode") == "hf"),
+        "note": (
+            "числа взяты из файлов прогонов reports/experiments/*/; в документы "
+            "попадают только через reports/METRICS.json"
+        ),
+    }
+
+
+def _hf_external_slices_block() -> dict | None:
+    """Внешние срезы режима hf: ``reports/ext_*_hf.json``.
+
+    Срез — не весь набор, это прямо записано в каждом файле (``note``). Блок
+    переносит числа среза в единый файл метрик вместе с оговорками.
+    """
+    slices: dict[str, dict] = {}
+    for path in sorted(ROOT.glob("reports/ext_*_hf.json")):
+        try:
+            payload = json.loads(path.read_text(encoding="utf-8"))
+        except (OSError, json.JSONDecodeError):
+            continue
+        our = payload.get("our_metrics") or {}
+        slices[path.name] = {
+            "dataset": payload.get("dataset"),
+            "task": payload.get("task"),
+            "split": payload.get("split"),
+            "mode": payload.get("mode"),
+            "model": payload.get("model"),
+            "pairs": payload.get("pairs"),
+            "pairs_total_in_file": payload.get("pairs_total_in_file"),
+            "limit": payload.get("limit"),
+            "note": payload.get("note"),
+            "duration_s": payload.get("duration_s"),
+            "tokens": our.get("tokens"),
+            "spans": our.get("spans"),
+            "answers": our.get("answers"),
+            "verdicts": our.get("verdicts"),
+            "their": payload.get("their_metrics"),
+        }
+    if not slices:
+        return None
+    return {
+        "available": True,
+        "slices": slices,
+        "rule": "срез не равен всему набору: лимит и оговорка обязательны",
+    }
+
+
 def collect(dataset: str, seed: int, release_dir: Path, coverage_json: Path) -> dict:
     """Собрать METRICS.json целиком (каждое число — из прогона, а не из памяти)."""
     started = time.time()
@@ -498,6 +677,8 @@ def collect(dataset: str, seed: int, release_dir: Path, coverage_json: Path) -> 
         "corpus_a3_real": _corpus_a3_block(verifier),
         "corpus_b": _corpus_b_block(),
         "external_tests": _external_tests_block(),
+        "hf_experiments": _hf_experiments_block(),
+        "hf_external_slices": _hf_external_slices_block(),
         "cross_corpus": None,
         "pilot": None,
         "release": _release_info(release_dir),
@@ -610,6 +791,37 @@ def main() -> int:
         )
     else:
         print(f"  внешние наборы: {external['note']}")
+    experiments = payload.get("hf_experiments")
+    if experiments:
+        for key, run in experiments["runs"].items():
+            if run.get("kind") == "pilot":
+                print(f"  эксперименты: пилот ({key}): статус {run.get('status')}, пар {run.get('pairs')}")
+                continue
+            test = run.get("test_official") or {}
+            test_tokens = test.get("tokens") or {}
+            line = (
+                f"  эксперименты: {key} ({run.get('mode')}, {run.get('model')}, seed {run.get('seed')}): "
+                f"весь корпус token F1={run['tokens']['f1']}"
+            )
+            if test_tokens:
+                line += f"; официальный test ({test.get('pairs')} пар) token F1={test_tokens.get('f1')}"
+            run_id = run.get("run_id")
+            if run_id:
+                line += f"; прогон {run_id}"
+            print(line)
+    else:
+        print("  эксперименты: файлов прогонов в reports/experiments нет")
+    slices_block = payload.get("hf_external_slices")
+    if slices_block:
+        for name, item in slices_block["slices"].items():
+            tokens = item.get("tokens") or {}
+            print(
+                f"  внешний срез {name}: {item.get('pairs')} пар "
+                f"(из {item.get('pairs_total_in_file')}), token F1={tokens.get('f1')}, "
+                f"AUC={tokens.get('auc')}"
+            )
+    else:
+        print("  внешние срезы hf: файлов reports/ext_*_hf.json нет")
     if payload["cross_corpus"]:
         cross = payload["cross_corpus"]
         print(

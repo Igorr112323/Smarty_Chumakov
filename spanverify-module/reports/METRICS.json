@@ -8,14 +8,14 @@
   },
   "meta": {
     "version": "1.3.0",
-    "commit": "54b1b267b1587f77bf9444ae2108226a4c4ff581",
-    "generated_at": "2026-10-06T21:03:31Z",
+    "commit": "e0a475a37ad02cd8000baa8c6297e1b9caf350c6",
+    "generated_at": "2026-10-07T07:45:52Z",
     "seed": 42,
     "dataset": "data/demo_pairs.jsonl"
   },
   "disclaimer": "Демонстрационные метрики получены на синтетическом корпусе и научным результатом не являются. Для подтверждения требуются 1200 пар «вопрос–ответ» с экспертной разметкой на реальных регламентах организации.",
   "tests": {
-    "collected": 489,
+    "collected": 510,
     "coverage_percent": null,
     "coverage_gate_percent": 85
   },
@@ -115,13 +115,13 @@
         "threshold": 1.0
       },
       "verdicts": {
-        "tp": 124,
+        "tp": 123,
         "fp": 0,
-        "fn": 0,
+        "fn": 1,
         "tn": 116,
         "precision": 1.0,
-        "recall": 1.0,
-        "f1": 1.0,
+        "recall": 0.9919,
+        "f1": 0.996,
         "fpr": 0.0
       }
     },
@@ -232,13 +232,13 @@
           "threshold": 1.0
         },
         "verdicts": {
-          "tp": 47,
+          "tp": 45,
           "fp": 0,
-          "fn": 45,
+          "fn": 47,
           "tn": 88,
           "precision": 1.0,
-          "recall": 0.5109,
-          "f1": 0.6763,
+          "recall": 0.4891,
+          "f1": 0.6569,
           "fpr": 0.0
         }
       },
@@ -266,13 +266,13 @@
           "threshold": 1.0
         },
         "verdicts": {
-          "tp": 63,
+          "tp": 57,
           "fp": 0,
-          "fn": 36,
+          "fn": 42,
           "tn": 81,
           "precision": 1.0,
-          "recall": 0.6364,
-          "f1": 0.7778,
+          "recall": 0.5758,
+          "f1": 0.7308,
           "fpr": 0.0
         }
       }
@@ -280,7 +280,7 @@
     "by_mode": {
       "contradiction": {
         "pairs": 26,
-        "verdict_recall": 0.8077,
+        "verdict_recall": 0.5769,
         "verdict_fpr": 0.0,
         "token_f1": 0.6269,
         "span_coverage": 0.8077
@@ -439,13 +439,13 @@
           "threshold": 1.0
         },
         "verdicts": {
-          "tp": 85,
+          "tp": 73,
           "fp": 31,
-          "fn": 11,
+          "fn": 23,
           "tn": 54,
-          "precision": 0.7328,
-          "recall": 0.8854,
-          "f1": 0.8019,
+          "precision": 0.7019,
+          "recall": 0.7604,
+          "f1": 0.73,
           "fpr": 0.3647
         }
       },
@@ -473,13 +473,13 @@
           "threshold": 1.0
         },
         "verdicts": {
-          "tp": 87,
+          "tp": 69,
           "fp": 31,
-          "fn": 10,
+          "fn": 28,
           "tn": 49,
-          "precision": 0.7373,
-          "recall": 0.8969,
-          "f1": 0.8093,
+          "precision": 0.69,
+          "recall": 0.7113,
+          "f1": 0.7005,
           "fpr": 0.3875
         }
       }
@@ -487,7 +487,7 @@
     "by_mode": {
       "contradiction": {
         "pairs": 18,
-        "verdict_recall": 1.0,
+        "verdict_recall": 0.8333,
         "verdict_fpr": 0.0,
         "token_f1": 0.8254,
         "span_coverage": 0.9444
@@ -508,14 +508,14 @@
       },
       "missing": {
         "pairs": 10,
-        "verdict_recall": 1.0,
+        "verdict_recall": 0.4,
         "verdict_fpr": 0.0,
         "token_f1": 0.6667,
         "span_coverage": 1.0
       },
       "number_attribution": {
         "pairs": 27,
-        "verdict_recall": 0.8148,
+        "verdict_recall": 0.4815,
         "verdict_fpr": 0.0,
         "token_f1": 0.6761,
         "span_coverage": 0.6667
@@ -1014,6 +1014,255 @@
     "demo_runs": 4,
     "hf_runs": 0
   },
+  "hf_experiments": {
+    "available": true,
+    "runs": {
+      "a": {
+        "dataset": "data/corpus_a/pairs.jsonl",
+        "mode": "hf",
+        "model": "ai-forever/rugpt3small_based_on_gpt2",
+        "seed": 42,
+        "run_id": null,
+        "git_commit": null,
+        "duration_s": 98.13,
+        "pairs": 1200,
+        "gate": "НЕ достигнут",
+        "tokens": {
+          "precision": 0.5943,
+          "recall": 0.5723,
+          "f1": 0.5831,
+          "fpr": 0.0589,
+          "auc": 0.9055
+        },
+        "spans": {
+          "strict_f1": 0.5349,
+          "coverage": 0.5946,
+          "width_ratio": 1.61
+        },
+        "answers": {
+          "precision": 0.863,
+          "recall": 0.2981,
+          "f1": 0.4431,
+          "fpr": 0.053,
+          "auc": 0.6648,
+          "threshold": 0.5172
+        },
+        "verdicts": {
+          "tp": 418,
+          "fp": 220,
+          "fn": 216,
+          "tn": 346,
+          "precision": 0.6552,
+          "recall": 0.6593,
+          "f1": 0.6572,
+          "fpr": 0.3887,
+          "flagged_share": 0.5317
+        },
+        "bundle": {
+          "threshold": 0.517241,
+          "span_z": 0.0,
+          "span_floor": 0.3,
+          "span_cap": 0.5,
+          "weights": {
+            "attention_entropy": 0.0,
+            "ctx_attention_mass": 1.0,
+            "embedding_density": 0.0
+          },
+          "signal": "logreg"
+        },
+        "kind": "experiment"
+      },
+      "a3": {
+        "dataset": "data/corpus_a3/pairs.jsonl",
+        "mode": "hf",
+        "model": "ai-forever/rugpt3small_based_on_gpt2",
+        "seed": 42,
+        "run_id": null,
+        "git_commit": null,
+        "duration_s": 339.06,
+        "pairs": 1200,
+        "gate": "НЕ достигнут",
+        "tokens": {
+          "precision": 0.1408,
+          "recall": 0.3642,
+          "f1": 0.2031,
+          "fpr": 0.0701,
+          "auc": 0.8446
+        },
+        "spans": {
+          "strict_f1": 0.0942,
+          "coverage": 0.4742,
+          "width_ratio": 14.73
+        },
+        "answers": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "fpr": 0.0,
+          "auc": 0.5,
+          "threshold": 0.5654
+        },
+        "verdicts": {
+          "tp": 565,
+          "fp": 482,
+          "fn": 95,
+          "tn": 58,
+          "precision": 0.5396,
+          "recall": 0.8561,
+          "f1": 0.662,
+          "fpr": 0.8926,
+          "flagged_share": 0.8725
+        },
+        "bundle": {
+          "threshold": 0.565401,
+          "span_z": 2.0,
+          "span_floor": 0.05,
+          "span_cap": 0.5,
+          "weights": {
+            "attention_entropy": 1.0,
+            "ctx_attention_mass": 0.0,
+            "embedding_density": 0.0
+          },
+          "signal": "logreg"
+        },
+        "kind": "experiment"
+      },
+      "experiment": {
+        "dataset": "data/demo_pairs.jsonl",
+        "mode": "demo",
+        "model": null,
+        "seed": 42,
+        "run_id": null,
+        "git_commit": null,
+        "duration_s": 35.1,
+        "pairs": 240,
+        "gate": "ДОСТИГНУТ",
+        "tokens": {
+          "precision": 0.9758,
+          "recall": 0.9282,
+          "f1": 0.9514,
+          "fpr": 0.0048,
+          "auc": 0.9974
+        },
+        "spans": {
+          "strict_f1": 0.3145,
+          "coverage": 1.0,
+          "width_ratio": 24.17
+        },
+        "answers": {
+          "precision": 1.0,
+          "recall": 0.9919,
+          "f1": 0.996,
+          "fpr": 0.0,
+          "auc": 0.996,
+          "threshold": 1.0
+        },
+        "verdicts": {
+          "tp": null,
+          "fp": null,
+          "fn": null,
+          "tn": null,
+          "precision": null,
+          "recall": null,
+          "f1": null,
+          "fpr": null,
+          "flagged_share": null
+        },
+        "bundle": {
+          "threshold": 1.0,
+          "span_z": 0.0,
+          "span_floor": 0.3,
+          "span_cap": 0.5,
+          "weights": {
+            "attention_entropy": 0.1,
+            "ctx_attention_mass": 0.9,
+            "embedding_density": 0.0
+          },
+          "signal": "logreg"
+        },
+        "kind": "experiment"
+      },
+      "pilot": {
+        "kind": "pilot",
+        "status": "ok",
+        "published": true,
+        "wording": "пилот на малой модели (ruGPT3-small) на синтетических промтах: модель реальная, корпус промтов синтетический",
+        "pairs": 96,
+        "tokens": 2408,
+        "bootstrap_iterations": 5000,
+        "seed": 42,
+        "contrast": {
+          "grounded_pairs": 48,
+          "unsupported_pairs": 48,
+          "grounded_value_copy_rate": 1.0,
+          "unsupported_value_copy_rate": 0.0,
+          "grounded_overlap_mean": 0.8544890873015873,
+          "unsupported_overlap_mean": 0.6473875661375661,
+          "contrast_ok": true
+        }
+      }
+    },
+    "hf_runs": 2,
+    "note": "числа взяты из файлов прогонов reports/experiments/*/; в документы попадают только через reports/METRICS.json"
+  },
+  "hf_external_slices": {
+    "available": true,
+    "slices": {
+      "ext_ragtruth_qa_hf.json": {
+        "dataset": "ragtruth",
+        "task": "qa",
+        "split": "test",
+        "mode": "hf",
+        "model": "ai-forever/rugpt3small_based_on_gpt2",
+        "pairs": 40,
+        "pairs_total_in_file": 875,
+        "limit": 40,
+        "note": "ЭТО СРЕЗ: 40 пар из 875. Числа относятся только к срезу, не ко всему набору.",
+        "duration_s": 1059.9,
+        "tokens": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "fpr": 0.0,
+          "auc": 0.7975
+        },
+        "spans": {
+          "strict_f1_iou_0_5": 0.0,
+          "coverage": 0.0,
+          "soft_f1_expanded": 0.0,
+          "mean_width_ratio": 0.0
+        },
+        "answers": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "fpr": 0.0,
+          "auc": 0.5
+        },
+        "verdicts": {
+          "tp": 3,
+          "fp": 15,
+          "fn": 1,
+          "tn": 21,
+          "precision": 0.1667,
+          "recall": 0.75,
+          "f1": 0.2727,
+          "fpr": 0.4167
+        },
+        "their": {
+          "rouge1": 0.5442,
+          "rouge2": 0.5372,
+          "rougeL": 0.5415,
+          "accuracy": 0.525,
+          "jaccard_score": 0.525,
+          "hamming_loss": 0.1,
+          "empty_reference": 36,
+          "pairs": 40
+        }
+      }
+    },
+    "rule": "срез не равен всему набору: лимит и оговорка обязательны"
+  },
   "cross_corpus": {
     "in_corpus_f1": 0.9532,
     "cross_corpus_f1": 0.7374,
@@ -1027,5 +1276,5 @@
   },
   "pilot": null,
   "release": null,
-  "duration_s": 47.5
+  "duration_s": 49.1
 }
