@@ -3,7 +3,9 @@
   "mode": "hf",
   "model": "ai-forever/rugpt3small_based_on_gpt2",
   "seed": 42,
-  "duration_s": 339.06,
+  "run_id": "37593829810",
+  "git_commit": "6ac38801490ae1822a7a8b66223fdf7bda9abb2b",
+  "duration_s": 458.58,
   "corpus": {
     "pairs": 1200,
     "kinds": {
@@ -16,56 +18,386 @@
     "vocabulary": 13914,
     "dataset_version": "2.0-synthetic-pairs"
   },
+  "splits": {
+    "source": "data/corpus_a3/splits",
+    "sizes": {
+      "train": 842,
+      "dev": 181,
+      "test": 177
+    },
+    "rule": "порог и маска выбраны только на официальной обучающей части; тест в выборе не участвовал"
+  },
   "metrics": {
     "tokens": {
-      "precision": 0.1408199643493761,
-      "recall": 0.36424180327868855,
-      "f1": 0.2031138408798743,
-      "fpr": 0.07008983390422026,
-      "tp": 711,
-      "fp": 4338,
-      "fn": 1241,
-      "tn": 57554,
-      "auc": 0.8445938855481203
+      "precision": 0.1363095238095238,
+      "recall": 0.3519467213114754,
+      "f1": 0.19651029748283752,
+      "fpr": 0.07033219155949072,
+      "tp": 687,
+      "fp": 4353,
+      "fn": 1265,
+      "tn": 57539,
+      "auc": 0.8421285254761599
     },
     "spans": {
-      "precision": 0.056384248210023864,
-      "recall": 0.2863636363636364,
-      "f1": 0.09421734795613161,
-      "tp": 189,
-      "fp": 3163,
-      "fn": 471,
+      "precision": 0.05311847209788123,
+      "recall": 0.2696969696969697,
+      "f1": 0.08875592121665421,
+      "tp": 178,
+      "fp": 3173,
+      "fn": 482,
       "iou_threshold": 0.5,
-      "recall_containment": 0.47424242424242424,
-      "f1_expanded_labels": 0.04536390827517448,
-      "mean_width_ratio": 14.728947616293159
+      "recall_containment": 0.4590909090909091,
+      "f1_expanded_labels": 0.043380703066566946,
+      "mean_width_ratio": 15.27518039303433
     },
     "answers": {
-      "threshold": 0.5654008448818565,
+      "threshold": 0.5846774203548387,
       "precision": 0.0,
       "recall": 0.0,
       "f1": 0.0,
       "fpr": 0.0,
-      "auc": 0.5,
+      "auc": 0.4983164983164983,
       "tp": 0,
       "fp": 0,
       "fn": 660,
       "tn": 540
     },
     "verdicts": {
-      "tp": 565,
-      "fp": 482,
-      "fn": 95,
-      "tn": 58,
-      "precision": 0.5396,
-      "recall": 0.8561,
-      "f1": 0.662,
-      "fpr": 0.8926,
-      "flagged_share": 0.8725
+      "tp": 493,
+      "fp": 433,
+      "fn": 167,
+      "tn": 107,
+      "precision": 0.5324,
+      "recall": 0.747,
+      "f1": 0.6217,
+      "fpr": 0.8019,
+      "flagged_share": 0.7717
     },
     "pairs": 1200,
     "mode": "hf",
     "warning": ""
+  },
+  "test_official": {
+    "pairs": 177,
+    "tokens": {
+      "precision": 0.1431,
+      "recall": 0.3488,
+      "f1": 0.2029,
+      "fpr": 0.0653,
+      "auc": 0.8507,
+      "tp": 98,
+      "fp": 587,
+      "fn": 183,
+      "tn": 8400
+    },
+    "spans": {
+      "strict_f1_iou_0_5": 0.1193,
+      "coverage": 0.4227,
+      "soft_f1_expanded": 0.0398,
+      "mean_width_ratio": 9.12
+    },
+    "answers": {
+      "threshold": 0.5847,
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1": 0.0,
+      "fpr": 0.0,
+      "auc": 0.4469
+    },
+    "verdicts": {
+      "tp": 69,
+      "fp": 62,
+      "fn": 28,
+      "tn": 18,
+      "precision": 0.5267,
+      "recall": 0.7113,
+      "f1": 0.6053,
+      "fpr": 0.775,
+      "flagged_share": 0.7401
+    }
+  },
+  "dev_official": {
+    "pairs": 181,
+    "tokens": {
+      "precision": 0.1433,
+      "recall": 0.3415,
+      "f1": 0.2019,
+      "fpr": 0.0763,
+      "auc": 0.821,
+      "tp": 98,
+      "fp": 586,
+      "fn": 189,
+      "tn": 7096
+    },
+    "spans": {
+      "strict_f1_iou_0_5": 0.0998,
+      "coverage": 0.4688,
+      "soft_f1_expanded": 0.0555,
+      "mean_width_ratio": 16.1
+    },
+    "answers": {
+      "threshold": 0.5847,
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1": 0.0,
+      "fpr": 0.0,
+      "auc": 0.4547
+    },
+    "verdicts": {
+      "tp": 73,
+      "fp": 64,
+      "fn": 23,
+      "tn": 21,
+      "precision": 0.5328,
+      "recall": 0.7604,
+      "f1": 0.6266,
+      "fpr": 0.7529,
+      "flagged_share": 0.7569
+    }
+  },
+  "by_type_test": {
+    "contradiction": {
+      "pairs": 18,
+      "token_precision": 0.1163,
+      "token_recall": 0.3125,
+      "token_f1": 0.1695,
+      "span_coverage": 0.3333,
+      "verdict_recall": 0.7222,
+      "verdict_fpr": 0.0
+    },
+    "excess": {
+      "pairs": 9,
+      "token_precision": 0.4429,
+      "token_recall": 0.6327,
+      "token_f1": 0.521,
+      "span_coverage": 0.0,
+      "verdict_recall": 0.7778,
+      "verdict_fpr": 0.0
+    },
+    "faithful": {
+      "pairs": 80,
+      "token_precision": 0.0,
+      "token_recall": 0.0,
+      "token_f1": 0.0,
+      "span_coverage": 0.0,
+      "verdict_recall": 0.0,
+      "verdict_fpr": 0.775
+    },
+    "missing": {
+      "pairs": 10,
+      "token_precision": 0.6154,
+      "token_recall": 0.4,
+      "token_f1": 0.4848,
+      "span_coverage": 0.8,
+      "verdict_recall": 0.3,
+      "verdict_fpr": 0.0
+    },
+    "number_attribution": {
+      "pairs": 27,
+      "token_precision": 0.0977,
+      "token_recall": 0.2889,
+      "token_f1": 0.1461,
+      "span_coverage": 0.3704,
+      "verdict_recall": 0.8519,
+      "verdict_fpr": 0.0
+    },
+    "oversight": {
+      "pairs": 13,
+      "token_precision": 0.9444,
+      "token_recall": 0.3269,
+      "token_f1": 0.4857,
+      "span_coverage": 0.5385,
+      "verdict_recall": 0.5385,
+      "verdict_fpr": 0.0
+    },
+    "partial": {
+      "pairs": 10,
+      "token_precision": 0.0645,
+      "token_recall": 0.0769,
+      "token_f1": 0.0702,
+      "span_coverage": 0.4,
+      "verdict_recall": 0.8,
+      "verdict_fpr": 0.0
+    },
+    "unconfirmed": {
+      "pairs": 10,
+      "token_precision": 0.85,
+      "token_recall": 0.2982,
+      "token_f1": 0.4416,
+      "span_coverage": 0.6,
+      "verdict_recall": 0.8,
+      "verdict_fpr": 0.0
+    }
+  },
+  "clean_pairs": {
+    "pairs": 540,
+    "token_fpr": 0.0739,
+    "verdict_fpr": 0.8019,
+    "flagged_pairs": 433,
+    "flagged_share": 0.8019,
+    "note": "чистые пары всего корпуса (без фрагментов недостоверности в разметке); числа — измерение фиксированным бандлом, не подбор"
+  },
+  "mask_scan": {
+    "signal": "logreg",
+    "split": "official_train",
+    "target_fpr": 0.1,
+    "points_total": 343,
+    "points_within_target": 323,
+    "selected": {
+      "span_z": 2.0,
+      "span_floor": 0.05,
+      "span_cap": 0.5,
+      "token_f1": 0.212,
+      "token_precision": 0.1356,
+      "token_recall": 0.4848,
+      "token_fpr": 0.0946,
+      "within_target": true
+    },
+    "best_within_target": {
+      "span_z": 2.0,
+      "span_floor": 0.05,
+      "span_cap": 0.5,
+      "token_f1": 0.212,
+      "token_precision": 0.1356,
+      "token_recall": 0.4848,
+      "token_fpr": 0.0946,
+      "within_target": true
+    },
+    "adopted": false,
+    "statement": "Точка лучше текущей при FPR ≤ 0.1 на обучающей части не найдена: выбранная точка остаётся.",
+    "curve_top": [
+      {
+        "span_z": 2.0,
+        "span_floor": 0.05,
+        "span_cap": 0.5,
+        "token_f1": 0.212,
+        "token_precision": 0.1356,
+        "token_recall": 0.4848,
+        "token_fpr": 0.0946,
+        "within_target": true
+      },
+      {
+        "span_z": 2.0,
+        "span_floor": 0.05,
+        "span_cap": 0.55,
+        "token_f1": 0.212,
+        "token_precision": 0.1356,
+        "token_recall": 0.4848,
+        "token_fpr": 0.0946,
+        "within_target": true
+      },
+      {
+        "span_z": 2.0,
+        "span_floor": 0.05,
+        "span_cap": 0.6,
+        "token_f1": 0.212,
+        "token_precision": 0.1356,
+        "token_recall": 0.4848,
+        "token_fpr": 0.0946,
+        "within_target": true
+      },
+      {
+        "span_z": 2.0,
+        "span_floor": 0.05,
+        "span_cap": 0.7,
+        "token_f1": 0.212,
+        "token_precision": 0.1356,
+        "token_recall": 0.4848,
+        "token_fpr": 0.0946,
+        "within_target": true
+      },
+      {
+        "span_z": 2.0,
+        "span_floor": 0.05,
+        "span_cap": 0.8,
+        "token_f1": 0.212,
+        "token_precision": 0.1356,
+        "token_recall": 0.4848,
+        "token_fpr": 0.0946,
+        "within_target": true
+      },
+      {
+        "span_z": 0.5,
+        "span_floor": 0.05,
+        "span_cap": 0.5,
+        "token_f1": 0.2229,
+        "token_precision": 0.1375,
+        "token_recall": 0.5889,
+        "token_fpr": 0.1131,
+        "within_target": false
+      },
+      {
+        "span_z": 0.5,
+        "span_floor": 0.05,
+        "span_cap": 0.55,
+        "token_f1": 0.2229,
+        "token_precision": 0.1375,
+        "token_recall": 0.5889,
+        "token_fpr": 0.1131,
+        "within_target": false
+      },
+      {
+        "span_z": 0.5,
+        "span_floor": 0.05,
+        "span_cap": 0.6,
+        "token_f1": 0.2229,
+        "token_precision": 0.1375,
+        "token_recall": 0.5889,
+        "token_fpr": 0.1131,
+        "within_target": false
+      },
+      {
+        "span_z": 0.5,
+        "span_floor": 0.05,
+        "span_cap": 0.7,
+        "token_f1": 0.2229,
+        "token_precision": 0.1375,
+        "token_recall": 0.5889,
+        "token_fpr": 0.1131,
+        "within_target": false
+      },
+      {
+        "span_z": 0.5,
+        "span_floor": 0.05,
+        "span_cap": 0.8,
+        "token_f1": 0.2229,
+        "token_precision": 0.1375,
+        "token_recall": 0.5889,
+        "token_fpr": 0.1131,
+        "within_target": false
+      }
+    ]
+  },
+  "verdict_rule_comparison": {
+    "test_pairs": 177,
+    "rule_any_span": {
+      "tp": 80,
+      "fp": 69,
+      "fn": 17,
+      "tn": 11,
+      "precision": 0.5369,
+      "recall": 0.8247,
+      "f1": 0.6504,
+      "fpr": 0.8625,
+      "flagged_share": 0.8418
+    },
+    "rule_min_two_tokens": {
+      "tp": 69,
+      "fp": 62,
+      "fn": 28,
+      "tn": 18,
+      "precision": 0.5267,
+      "recall": 0.7113,
+      "f1": 0.6053,
+      "fpr": 0.775,
+      "flagged_share": 0.7401
+    },
+    "flagged_answers": {
+      "any_span": 149,
+      "min_two_tokens": 131
+    },
+    "tokens_identical": true
   },
   "bundle": {
     "weights": {
@@ -73,19 +405,23 @@
       "ctx_attention_mass": 0.0,
       "embedding_density": 0.0
     },
-    "threshold": 0.565401,
+    "threshold": 0.584677,
     "target_fpr": 0.1,
     "span_z": 2.0,
     "span_floor": 0.05,
     "span_cap": 0.5,
     "isotonic": {
       "x": [
-        0.03883,
-        0.181815
+        0.03522,
+        0.03848,
+        0.039005,
+        0.165705
       ],
       "y": [
-        0.465116,
-        0.565401
+        0.459016,
+        0.56,
+        0.571429,
+        0.584677
       ]
     },
     "head": {
@@ -93,85 +429,85 @@
       "file": "config/head.json",
       "model": {
         "weights": [
-          0.1377365173630991,
-          1.0602775060347207,
-          -0.5697945712244226,
-          0.06443400557791558,
-          0.7244403880441419,
-          -0.576705713226448
+          0.10224622588818309,
+          1.0201484283100184,
+          -0.4507321466752343,
+          0.032004582533293725,
+          0.7209491477983301,
+          -0.6082302925136255
         ],
-        "bias": -3.8919813803011785
+        "bias": -3.9186138466638862
       },
       "scaler": {
         "means": [
-          0.555216218795962,
-          0.6433993233730569,
-          0.6324893074801734,
-          0.7979360986160163,
-          0.48401605379965873,
-          0.39316639846907303
+          0.5530642646995302,
+          0.6201410952845368,
+          0.6108264876357214,
+          0.7958563883827644,
+          0.4855991899923061,
+          0.391755866611771
         ],
         "scales": [
-          0.09689185287317087,
-          0.2707119627049141,
-          0.23937824565376878,
-          0.1371484146505287,
-          0.2874873705959905,
-          0.19420143282226765
+          0.09643587245169434,
+          0.2943455937264188,
+          0.25804608243922866,
+          0.1367090834721634,
+          0.2874505711412228,
+          0.19464741362952337
         ]
       }
     },
     "folds": [
       {
         "fold": 0,
-        "n_train": 36789,
-        "n_test": 9197,
-        "auc": 0.8514336731987847
+        "n_train": 27205,
+        "n_test": 6801,
+        "auc": 0.8537265748642933
       },
       {
         "fold": 1,
-        "n_train": 36789,
-        "n_test": 9197,
-        "auc": 0.8459437581388801
+        "n_train": 27205,
+        "n_test": 6801,
+        "auc": 0.8583051926376177
       },
       {
         "fold": 2,
-        "n_train": 36789,
-        "n_test": 9197,
-        "auc": 0.8559366321523951
+        "n_train": 27205,
+        "n_test": 6801,
+        "auc": 0.8385522069682219
       },
       {
         "fold": 3,
-        "n_train": 36789,
-        "n_test": 9197,
-        "auc": 0.8471470632250575
+        "n_train": 27205,
+        "n_test": 6801,
+        "auc": 0.8554937221511577
       },
       {
         "fold": 4,
-        "n_train": 36788,
-        "n_test": 9198,
-        "auc": 0.8348390608326943
+        "n_train": 27204,
+        "n_test": 6802,
+        "auc": 0.8222270306545401
       }
     ],
     "seed": 42,
     "version": "1.3.0",
     "mode": "hf",
     "meta": {
-      "dataset": "data/corpus_a3/pairs.jsonl",
+      "dataset": "data/corpus_a3/pairs.jsonl (официальная обучающая часть)",
       "synthetic": false,
       "signal": "logreg",
       "threshold_report": {
-        "threshold": 0.5654008448818565,
+        "threshold": 0.5846774203548387,
         "precision": 0.0,
         "recall": 0.0,
         "f1": 0.0,
         "fpr": 0.0,
         "hdr": 1.0,
-        "accuracy": 0.45,
+        "accuracy": 0.4295415959252971,
         "tp": 0.0,
         "fp": 0.0,
-        "tn": 378.0,
-        "fn": 462.0,
+        "tn": 253.0,
+        "fn": 336.0,
         "constraint_met": 1.0
       },
       "note": "Демонстрационный корпус: параметры проверяют конвейер, а не качество на реальных документах. Для боевой калибровки используйте размеченные реальные пары в режиме hf.",
@@ -185,36 +521,37 @@
   "folds": [
     {
       "fold": 0,
-      "n_train": 36789,
-      "n_test": 9197,
-      "auc": 0.8514336731987847
+      "n_train": 27205,
+      "n_test": 6801,
+      "auc": 0.8537265748642933
     },
     {
       "fold": 1,
-      "n_train": 36789,
-      "n_test": 9197,
-      "auc": 0.8459437581388801
+      "n_train": 27205,
+      "n_test": 6801,
+      "auc": 0.8583051926376177
     },
     {
       "fold": 2,
-      "n_train": 36789,
-      "n_test": 9197,
-      "auc": 0.8559366321523951
+      "n_train": 27205,
+      "n_test": 6801,
+      "auc": 0.8385522069682219
     },
     {
       "fold": 3,
-      "n_train": 36789,
-      "n_test": 9197,
-      "auc": 0.8471470632250575
+      "n_train": 27205,
+      "n_test": 6801,
+      "auc": 0.8554937221511577
     },
     {
       "fold": 4,
-      "n_train": 36788,
-      "n_test": 9198,
-      "auc": 0.8348390608326943
+      "n_train": 27204,
+      "n_test": 6802,
+      "auc": 0.8222270306545401
     }
   ],
   "gate": "НЕ достигнут",
+  "gate_test_official": "НЕ достигнут",
   "head_inline": true,
   "artifacts": {
     "weights": "reports/experiments/a3/weights.json",
