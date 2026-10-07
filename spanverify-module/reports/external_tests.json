@@ -263,9 +263,76 @@
         "note": "Baseline статьи RusHallu-RAG (Диалог-2026) не извлечён: PDF недоступен в этой среде. Их метрики на наших предсказаниях посчитаны и приведены в their_metrics."
       },
       "disclaimer": "РЕЖИМ DEMO: признаки лексические, без весов языковой модели. Числа показывают работоспособность конвейера на внешнем наборе, но научным результатом не являются."
+    },
+    "ragtruth_qa_test_hf": {
+      "dataset": "ragtruth",
+      "task": "qa",
+      "split": "test",
+      "mode": "hf",
+      "model": "ai-forever/rugpt3small_based_on_gpt2",
+      "device": "cpu (demo-режим не использует веса)",
+      "pairs": 40,
+      "pairs_total_in_file": 875,
+      "limit": 40,
+      "source_file": "data/external/adapted/ragtruth_qa_test.jsonl",
+      "duration_s": 675.6,
+      "label_origin": {
+        "human": 40
+      },
+      "labelled_pairs": 4,
+      "spans_reference": 8,
+      "unverified_spans": 0,
+      "our_metrics": {
+        "tokens": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "fpr": 0.0,
+          "auc": 0.7975
+        },
+        "spans": {
+          "strict_f1_iou_0_5": 0.0,
+          "coverage": 0.0,
+          "soft_f1_expanded": 0.0,
+          "mean_width_ratio": 0.0
+        },
+        "answers": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "fpr": 0.0,
+          "auc": 0.5
+        },
+        "verdicts": {
+          "tp": 3,
+          "fp": 15,
+          "fn": 1,
+          "tn": 21,
+          "precision": 0.1667,
+          "recall": 0.75,
+          "f1": 0.2727,
+          "fpr": 0.4167
+        }
+      },
+      "their_metrics": {
+        "rouge1": 0.5442,
+        "rouge2": 0.5372,
+        "rougeL": 0.5415,
+        "accuracy": 0.525,
+        "jaccard_score": 0.525,
+        "hamming_loss": 0.1,
+        "empty_reference": 36,
+        "pairs": 40
+      },
+      "baseline": {
+        "extracted": false,
+        "note": "Baseline статьи RAGTruth (ACL 2024) не извлечён: PDF недоступен в этой среде (arxiv.org закрыт), значения таблиц не парсились. Числа не выдумываются."
+      },
+      "disclaimer": "Режим hf: признаки считаются на весах языковой модели.",
+      "note": "ЭТО СРЕЗ: 40 пар из 875. Числа относятся только к срезу, не ко всему набору."
     }
   },
   "rule": "внешние наборы — только тест; калибровка на корпусе A",
-  "generated_at": "2026-10-05T21:52:27Z",
+  "generated_at": "2026-10-07T10:54:50Z",
   "disclaimer": "Числа режима demo получены лексическими признаками и научным результатом не являются. Колонка label_origin указывает происхождение разметки: human / llm / auto."
 }

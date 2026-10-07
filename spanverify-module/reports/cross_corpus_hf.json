@@ -1,0 +1,63 @@
+{
+  "seed": 42,
+  "mode": "hf",
+  "model": "ai-forever/rugpt3small_based_on_gpt2",
+  "features_cache": true,
+  "corpus_a": {
+    "name": "data/corpus_a/pairs.jsonl",
+    "pairs": 1200,
+    "split": {
+      "grouped": true,
+      "train_pairs": 820,
+      "test_pairs": 380,
+      "shared_groups": 0
+    }
+  },
+  "corpus_b": {
+    "name": "alt-generator 1.0 (числа словами, другие шаблоны)",
+    "pairs": 80,
+    "seed": 4242
+  },
+  "in_corpus": {
+    "tokens": {
+      "precision": 0.5632,
+      "recall": 0.5664,
+      "f1": 0.5648,
+      "fpr": 0.0638,
+      "auc": 0.8966,
+      "n": 4221
+    },
+    "spans": {
+      "strict_f1": 0.5318,
+      "coverage": 0.6059,
+      "soft_f1": 0.1882,
+      "width_ratio": 1.57
+    },
+    "answers": {
+      "f1": 0.4444,
+      "fpr": 0.0395
+    }
+  },
+  "cross_corpus": {
+    "tokens": {
+      "precision": 0.3283,
+      "recall": 0.4924,
+      "f1": 0.3939,
+      "fpr": 0.2714,
+      "auc": 0.6591,
+      "n": 622
+    },
+    "spans": {
+      "strict_f1": 0.4029,
+      "coverage": 1.0,
+      "soft_f1": 0.2878,
+      "width_ratio": 2.76
+    },
+    "answers": {
+      "f1": 0.75,
+      "fpr": 1.0
+    }
+  },
+  "note": "Корпуса A и B синтетические. Число «кросс-корпус» показывает перенос между генераторами; измерением на реальных регламентах оно не является.",
+  "token_f1_drop": 0.1709
+}

@@ -33,7 +33,7 @@
 
 | Слой | Признак | AUC | 95 % ДИ | Токенов |
 | --- | --- | --- | --- | --- |
-| first | attention_entropy | 0.492 | [0.447; 0.538] | 602 |
+| first | attention_entropy | 0.492 | [0.447; 0.539] | 602 |
 | first | ctx_attention_mass | 0.501 | [0.455; 0.548] | 602 |
 | first | embedding_density | 0.452 | [0.408; 0.499] | 602 |
 | first | ctx_attention_mass_norm | 0.503 | [0.456; 0.551] | 602 |

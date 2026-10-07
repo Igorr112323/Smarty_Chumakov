@@ -66,6 +66,19 @@ HALLUCINATION_LABEL_RISK = 0.75
 TOP_SHARE = 0.2
 SMOOTH_WINDOW = 3
 
+# Правила вердикта уровня ответа:
+# * "any_span" — историческое: любой фрагмент делает ответ «спорным». На
+#   корпусе A3 (прогон 37532050295) это пометило 1047 ответов из 1200
+#   (вердикт FPR 0.893): один случайный токен маски обвинял весь ответ.
+# * "min_two_tokens" — фрагменты текстовых правил (привязка числа к объекту,
+#   покрытие фактов) по-прежнему решают даже в одиночку, но одиночный токен
+#   статистической маски ответ «спорным» больше не делает: нужен хотя бы
+#   второй помеченный токен либо скор ответа выше порога.
+VERDICT_ANY_SPAN = "any_span"
+VERDICT_MIN_TWO_TOKENS = "min_two_tokens"
+VERDICT_RULES = (VERDICT_ANY_SPAN, VERDICT_MIN_TWO_TOKENS)
+DEFAULT_VERDICT_RULE = VERDICT_MIN_TWO_TOKENS
+
 
 @dataclass
 class WeightsBundle:
@@ -206,8 +219,12 @@ class Verifier:
         *,
         coverage: bool = False,
         features_cache: Mapping[str, FeatureMatrix] | None = None,
+        verdict_rule: str = DEFAULT_VERDICT_RULE,
     ) -> None:
         self.config = config or Config.load()
+        if verdict_rule not in VERDICT_RULES:
+            raise ValueError(f"неизвестное правило вердикта: {verdict_rule!r}, допустимо {VERDICT_RULES}")
+        self.verdict_rule = verdict_rule
         # Явно переданные веса имеют приоритет: иначе обучение, которое считает
         # сквозные метрики «в памяти», случайно перечитало бы файл с диска.
         self.bundle = weights if weights is not None else WeightsBundle.load(weights_path)
@@ -390,7 +407,7 @@ class Verifier:
             latency_ms=(time.perf_counter() - started) * 1000,
             mode=self.mode,
             warning=self.warning,
-            verdict=_verdict(score, threshold, spans),
+            verdict=_verdict(score, threshold, spans, self.verdict_rule),
         )
 
     # ---------------------------------------------------------------- оценка
@@ -576,6 +593,7 @@ class Verifier:
                     risk=risk_value,
                     label="likely_hallucination" if risk_value >= HALLUCINATION_LABEL_RISK else "doubtful",
                     n_tokens=len(token_risk),
+                    source="attribution",
                 )
             )
         return found
@@ -632,6 +650,7 @@ class Verifier:
                     risk=risk_value,
                     label="likely_hallucination" if risk_value >= HALLUCINATION_LABEL_RISK else "doubtful",
                     n_tokens=len(fragment.split()),
+                    source="coverage",
                 )
             )
         return found
@@ -681,6 +700,7 @@ class Verifier:
                     risk=risk_value,
                     label=label,
                     n_tokens=len(group),
+                    source="mask",
                 )
             )
         return _merge_spans(spans)
@@ -1039,6 +1059,10 @@ def _merge_spans(spans: Sequence[SpanResult]) -> list[SpanResult]:
     for span in ordered:
         if merged and span.start <= merged[-1].end:
             previous = merged[-1]
+            # При склейке фрагментов разного происхождения источник «правило»:
+            # вердикт обязан реагировать на текстовую находку даже внутри
+            # более длинного масочного фрагмента.
+            source = previous.source if previous.source == span.source else "rule"
             merged[-1] = SpanResult(
                 start=previous.start,
                 end=max(previous.end, span.end),
@@ -1048,6 +1072,7 @@ def _merge_spans(spans: Sequence[SpanResult]) -> list[SpanResult]:
                     "likely_hallucination" if "likely_hallucination" in (previous.label, span.label) else "doubtful"
                 ),
                 n_tokens=previous.n_tokens + span.n_tokens,
+                source=source,
             )
         else:
             merged.append(span)
@@ -1085,15 +1110,31 @@ def _token_payload(
     return rows
 
 
-def _verdict(score: float, threshold: float, spans: Sequence[SpanResult]) -> str:
-    """Вердикт: недостоверно → спорно → подтверждено контекстом."""
+def _verdict(
+    score: float,
+    threshold: float,
+    spans: Sequence[SpanResult],
+    rule: str = DEFAULT_VERDICT_RULE,
+) -> str:
+    """Вердикт: недостоверно → спорно → подтверждено контекстом.
+
+    Правило ``any_span`` (историческое): любой фрагмент делает ответ спорным,
+    даже один токен маски. Правило ``min_two_tokens`` (текущее): фрагменты
+    текстовых правил по-прежнему решают в одиночку, но одиночный токен
+    статистической маски спорным ответ больше не делает — иначе почти каждый
+    ответ оказывался «спорным» (прогон 37532050295: помечено 1047 из 1200,
+    вердикт FPR 0.893).
+    """
     if score >= threshold:
         return "likely_hallucination"
-    if any(span.label == "likely_hallucination" for span in spans):
+    if not spans:
+        return "grounded"
+    if rule == VERDICT_ANY_SPAN:
         return "doubtful"
-    if spans:
+    if any(span.source != "mask" for span in spans):
         return "doubtful"
-    return "grounded"
+    flagged_tokens = sum(span.n_tokens for span in spans)
+    return "doubtful" if flagged_tokens >= 2 else "grounded"
 
 
 def verify_text(

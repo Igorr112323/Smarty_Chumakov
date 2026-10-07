@@ -222,6 +222,15 @@ jobs:
           path: spanverify-module/reports/from-a
       - uses: actions/download-artifact@v4
         with:
+          name: hf-runs-a3
+          path: spanverify-module/reports/from-a3
+      - uses: actions/download-artifact@v4
+        continue-on-error: true
+        with:
+          name: hf-runs-pilot
+          path: spanverify-module/reports/from-pilot
+      - uses: actions/download-artifact@v4
+        with:
           name: hf-runs-external
           path: spanverify-module/reports/from-external
       - name: "Разложить артефакты"
@@ -240,11 +249,44 @@ jobs:
                   target = dest / path.relative_to(cache_src)
                   target.parent.mkdir(parents=True, exist_ok=True)
                   shutil.copy2(path, target)
+          # Новый отчёт A3 обязан попасть в METRICS.json этого же шага,
+          # а не только в коммит публикации: иначе единый файл чисел
+          # расходится с reports/experiments/a3/experiment.json.
+          hit = next(Path("spanverify-module/reports/from-a3").rglob("experiment.json"), None)
+          if hit is None:
+              raise SystemExit("в артефакте A3 нет experiment.json")
+          dest = root / "experiments" / "a3"
+          dest.mkdir(parents=True, exist_ok=True)
+          for path in hit.parent.iterdir():
+              if path.is_file():
+                  shutil.copy2(path, dest / path.name)
+          # То же правило для корпуса A: свежий experiment.json — в дерево
+          # до сборки METRICS.json, а не после.
+          hit_a = next((p for p in Path("spanverify-module/reports/from-a").rglob("experiment.json")), None)
+          if hit_a is not None:
+              dest = root / "experiments" / "a"
+              dest.mkdir(parents=True, exist_ok=True)
+              for path in hit_a.parent.iterdir():
+                  if path.is_file():
+                      shutil.copy2(path, dest / path.name)
+          # Пилот: свежий pilot.json кладём в reports/pilot (gitignore),
+          # именно его читает collect_metrics. Если пилот не дошёл — блок
+          # пилота останется пустым, как раньше, а не упадёт.
+          pilot = next(Path("spanverify-module/reports/from-pilot").rglob("pilot.json"), None) if Path("spanverify-module/reports/from-pilot").is_dir() else None
+          if pilot is not None:
+              dest = root / "pilot"
+              dest.mkdir(parents=True, exist_ok=True)
+              for path in pilot.parent.iterdir():
+                  if path.is_file():
+                      shutil.copy2(path, dest / path.name)
           external = next(Path("spanverify-module/reports/from-external").rglob("external_tests.json"), None)
           if external is None:
               raise SystemExit("нет external_tests.json")
           shutil.copy2(external, root / "external_tests.json")
-          print("кеш", dest, "файлов", sum(1 for _ in dest.rglob('*') if _.is_file()))
+          # Свежие срезы режима hf: единый файл чисел читает именно их.
+          for path in Path("spanverify-module/reports/from-external").rglob("ext_*_hf.json"):
+              shutil.copy2(path, root / path.name)
+          print("кеш", root / "hf-cache-a", "файлов", sum(1 for _ in (root / "hf-cache-a").rglob("*") if _.is_file()))
           PY
       - name: "Кросс-корпус hf на кеше A, корпус B сокращён до 80 пар"
         working-directory: spanverify-module
