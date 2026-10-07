@@ -275,7 +275,7 @@
       "pairs_total_in_file": 875,
       "limit": 40,
       "source_file": "data/external/adapted/ragtruth_qa_test.jsonl",
-      "duration_s": 1001.7,
+      "duration_s": 675.6,
       "label_origin": {
         "human": 40
       },
@@ -333,6 +333,6 @@
     }
   },
   "rule": "внешние наборы — только тест; калибровка на корпусе A",
-  "generated_at": "2026-10-07T08:44:40Z",
+  "generated_at": "2026-10-07T10:54:50Z",
   "disclaimer": "Числа режима demo получены лексическими признаками и научным результатом не являются. Колонка label_origin указывает происхождение разметки: human / llm / auto."
 }

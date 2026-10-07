@@ -3,9 +3,9 @@
   "mode": "hf",
   "model": "ai-forever/rugpt3small_based_on_gpt2",
   "seed": 42,
-  "run_id": "37593829810",
-  "git_commit": "6ac38801490ae1822a7a8b66223fdf7bda9abb2b",
-  "duration_s": 458.58,
+  "run_id": "37609202780",
+  "git_commit": "39a0ad4858f7278335b9f0ef94bc405485a78b4a",
+  "duration_s": 463.68,
   "corpus": {
     "pairs": 1200,
     "kinds": {
