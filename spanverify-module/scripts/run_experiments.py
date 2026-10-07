@@ -342,6 +342,16 @@ def main(argv: list[str] | None = None) -> int:
         action="store_true",
         help="завершиться с ошибкой, если хотя бы одна пара не нашлась в кеше",
     )
+    parser.add_argument(
+        "--compare-span-filter-chars",
+        type=int,
+        default=0,
+        help=(
+            "сравнить на обучающей части два варианта маски: текущий и вариант, в котором "
+            "фрагмент короче стольких знаков без числа, даты или денежной суммы не помечается; "
+            "0 — сравнение выключено; порог не подбирается по тесту"
+        ),
+    )
     args = parser.parse_args(argv)
 
     dataset = Path(args.dataset)
@@ -434,7 +444,11 @@ def main(argv: list[str] | None = None) -> int:
     # лучше выбранной при FPR ≤ target, берём её (подбор по-прежнему не выходит
     # за пределы обучающей части).
     mask_scan: dict | None = None
+    span_filter_chars = int(args.compare_span_filter_chars or 0)
+    span_filter_comparison: dict | None = None
+    chosen_span_filter = 0
     if splits:
+        base_span_params = (bundle.span_z, bundle.span_floor, bundle.span_cap)
         verifier_for_scan = Verifier(
             mode=args.mode,
             model_name=args.model,
@@ -443,12 +457,72 @@ def main(argv: list[str] | None = None) -> int:
         )
         mask_scan = _mask_scan(verifier_for_scan, splits["train"], bundle, args.target_fpr)
         print(mask_scan["statement"], flush=True)
+        baseline_statement = mask_scan["statement"]
+        if span_filter_chars > 0:
+            # Сравнение двух вариантов маски — только на обучающей части.
+            # Вариант 1 (базовый) просканирован выше; перед вторым сканом
+            # параметры бандла возвращаются к обученным.
+            bundle.span_z, bundle.span_floor, bundle.span_cap = base_span_params
+            verifier_filtered_scan = Verifier(
+                mode=args.mode,
+                model_name=args.model,
+                weights=bundle,
+                features_cache=cache,
+                span_filter_min_chars=span_filter_chars,
+            )
+            filtered_scan = _mask_scan(verifier_filtered_scan, splits["train"], bundle, args.target_fpr)
+            print("вариант с фильтром коротких фрагментов: " + filtered_scan["statement"], flush=True)
+            baseline_best = mask_scan["best_within_target"]
+            filtered_best = filtered_scan["best_within_target"]
+
+            def _point_key(point: dict | None) -> tuple[float, float]:
+                return (point["token_f1"], -point["token_fpr"]) if point else (float("-inf"), float("-inf"))
+
+            # Выбор: выше токены F1 при FPR ≤ target; при равенстве — ниже FPR;
+            # при равенстве и этого остаётся базовый вариант. Тест в выборе не
+            # участвует. Порог длины фрагмента фиксирован и не подбирается.
+            selected = "filtered" if _point_key(filtered_best) > _point_key(baseline_best) else "baseline"
+            chosen_scan = filtered_scan if selected == "filtered" else mask_scan
+            chosen_span_filter = span_filter_chars if selected == "filtered" else 0
+            bundle.span_z, bundle.span_floor, bundle.span_cap = base_span_params
+            chosen_best = chosen_scan["best_within_target"]
+            if chosen_scan["adopted"] and chosen_best is not None:
+                bundle.span_z = chosen_best["span_z"]
+                bundle.span_floor = chosen_best["span_floor"]
+                bundle.span_cap = chosen_best["span_cap"]
+            mask_scan = chosen_scan
+            span_filter_comparison = {
+                "filter_min_chars": span_filter_chars,
+                "rule": (
+                    "фрагмент маски короче порога без числа, даты или денежной суммы не помечается; "
+                    "порог фиксирован и не подбирался; выбор варианта — только на обучающей части "
+                    "при прежнем ограничении token FPR ≤ target"
+                ),
+                "target_fpr": args.target_fpr,
+                "selected": selected,
+                "baseline": {
+                    "best_within_target": baseline_best,
+                    "statement": baseline_statement,
+                },
+                "filtered": {
+                    "best_within_target": filtered_best,
+                    "statement": filtered_scan["statement"],
+                },
+                "selection_key": "max token_f1, затем минимальный token_fpr; тест не участвовал",
+            }
+            print(
+                f"выбран вариант маски: {selected} "
+                f"(train: базовый F1={_point_key(baseline_best)[0]:.4f}, "
+                f"с фильтром F1={_point_key(filtered_best)[0]:.4f})",
+                flush=True,
+            )
 
     verifier = Verifier(
         mode=args.mode,
         model_name=args.model,
         weights=bundle,
         features_cache=cache,
+        span_filter_min_chars=chosen_span_filter,
     )
     metrics = verifier.evaluate(records)
     if cache is not None:
@@ -485,6 +559,7 @@ def main(argv: list[str] | None = None) -> int:
                 weights=bundle,
                 features_cache=cache,
                 verdict_rule=VERDICT_ANY_SPAN,
+                span_filter_min_chars=chosen_span_filter,
             )
             legacy_metrics = legacy.evaluate(test_pairs)
             legacy_flagged = legacy_metrics["verdicts"]["tp"] + legacy_metrics["verdicts"]["fp"]
@@ -649,6 +724,7 @@ def main(argv: list[str] | None = None) -> int:
         "by_type_test": by_type,
         "clean_pairs": clean_block,
         "mask_scan": mask_scan,
+        "span_filter_comparison": span_filter_comparison,
         "verdict_rule_comparison": verdict_comparison,
         "bundle": bundle.to_dict(),
         "folds": report.folds,

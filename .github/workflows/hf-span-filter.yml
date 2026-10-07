@@ -1,0 +1,185 @@
+# Одна проверка гипотезы из разбора чистых пар (кеш прогона 37609202780):
+# ложные пометки — длинные канцелярские обороты и заголовки, не одиночные
+# токены. Сравниваются ровно два варианта маски, выбор — только на обучающей
+# части при прежнем ограничении token FPR ≤ 0.1; тест снимается один раз той
+# же командой, что прогон 37609202780 (тот же кеш, модель, seed 42), с
+# добавленным флагом сравнения. Порог длины фрагмента (40 знаков) фиксирован
+# и по тесту не подбирается. Повторных прогонов «дожать» не предусмотрено.
+name: "Маска: сравнение варианта с фильтром коротких фрагментов"
+
+on:
+  workflow_dispatch:
+    inputs:
+      run_id:
+        description: "Прогон Тяжёлых прогонов hf, из которого брать кеш A3"
+        default: "37609202780"
+  push:
+    branches: ["arena/**"]
+    paths:
+      - .github/hf-span-filter.trigger
+
+concurrency:
+  group: hf-span-filter-${{ github.ref }}
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+env:
+  RUN_ID: ${{ github.event.inputs.run_id || '37609202780' }}
+  HF_MODEL: ai-forever/rugpt3small_based_on_gpt2
+  SEED: "42"
+
+jobs:
+  compare-span-filter:
+    name: "Сравнение двух вариантов маски на кеше (выбор по train)"
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: "Зависимости (без torch: работают только кеш и стандартная библиотека)"
+        working-directory: spanverify-module
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -q -r requirements.txt
+      - name: "Кеш признаков из прогона"
+        uses: actions/download-artifact@v4
+        with:
+          name: hf-runs-a3
+          run-id: ${{ env.RUN_ID }}
+          path: /tmp/hf-span-filter-dl
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+      - name: "Разложить кеш"
+        run: |
+          python3 - << 'PY'
+          import shutil
+          from pathlib import Path
+          src = next((p for p in Path("/tmp/hf-span-filter-dl").rglob("*") if p.is_dir() and p.name == "hf-cache-a3"), None)
+          if src is None:
+              raise SystemExit("в артефакте нет каталога hf-cache-a3")
+          dest = Path("spanverify-module/reports/hf-cache-a3")
+          dest.mkdir(parents=True, exist_ok=True)
+          count = 0
+          for path in src.rglob("*"):
+              if path.is_file():
+                  target = dest / path.relative_to(src)
+                  target.parent.mkdir(parents=True, exist_ok=True)
+                  shutil.copy2(path, target)
+                  count += 1
+          print("файлов кеша:", count)
+          PY
+      - name: "Один прогон: выбор по train, снятие test той же командой"
+        working-directory: spanverify-module
+        timeout-minutes: 35
+        run: |
+          echo "команда: python scripts/run_experiments.py --mode hf --dataset data/corpus_a3/pairs.jsonl --model $HF_MODEL --seed $SEED --folds 5 --target-fpr 0.1 --features-cache reports/hf-cache-a3 --require-cache --compare-span-filter-chars 40 --out reports/comparisons/a3-span-filter"
+          python scripts/run_experiments.py \
+            --mode hf --dataset data/corpus_a3/pairs.jsonl \
+            --model "$HF_MODEL" --seed "$SEED" --folds 5 --target-fpr 0.1 \
+            --features-cache reports/hf-cache-a3 --require-cache \
+            --compare-span-filter-chars 40 \
+            --out reports/comparisons/a3-span-filter
+      - name: "Таблица до/после в data/metrics"
+        working-directory: spanverify-module
+        run: |
+          python3 - << 'PY'
+          import json
+          from pathlib import Path
+
+          before = json.loads(Path("reports/experiments/a3/experiment.json").read_text(encoding="utf-8"))
+          after = json.loads(Path("reports/comparisons/a3-span-filter/experiment.json").read_text(encoding="utf-8"))
+          cmp = after.get("span_filter_comparison") or {}
+          tb, ta = before["test_official"], after["test_official"]
+          cb, ca = before.get("clean_pairs") or {}, after.get("clean_pairs") or {}
+          sel = cmp.get("selected", "?")
+
+          def row(name, exp, test, clean):
+              tokens = test["tokens"]
+              spans = test["spans"]
+              verdicts = test["verdicts"]
+              return (
+                  f"| {name} | {tokens['f1']:.4f} | {tokens['fpr']:.4f} "
+                  f"| {spans['strict_f1_iou_0_5']:.4f} | {verdicts['fpr']:.3f} "
+                  f"| {clean.get('verdict_fpr', 0):.4f} |"
+              )
+
+          delta = ta["tokens"]["f1"] - tb["tokens"]["f1"]
+          verdict_delta = (
+              f"token F1 вырос на {delta:.4f}" if delta > 0 else
+              f"token F1 не вырос (изменение {delta:+.4f})"
+          )
+          lines = [
+              "# Вариант маски с фильтром коротких фрагментов: до и после (корпус A3)",
+              "",
+              f"До — прогон раннера `{before.get('run_id')}`; после — прогон раннера "
+              f"`{after.get('run_id')}`. Модель `{after.get('model')}`, CPU, seed {after.get('seed')}. "
+              "Кеш признаков один и тот же (артефакт прогона 37609202780); тест снят один раз, "
+              "той же командой, что прогон 37609202780, с добавленным флагом сравнения "
+              "`--compare-span-filter-chars 40`. Выбор варианта — только на обучающей части при "
+              "ограничении token FPR ≤ 0.1; порог длины фрагмента 40 знаков фиксирован и не "
+              "подбирался. Файлы: `reports/experiments/a3/experiment.json` и "
+              "`reports/comparisons/a3-span-filter/experiment.json`.",
+              "",
+              "## Выбор на обучающей части",
+              "",
+              f"Выбран вариант: **{sel}**.",
+              "",
+              "| Вариант | Лучшая точка при FPR ≤ 0.1 на train | Итог по формулировке |",
+              "| --- | --- | --- |",
+          ]
+          for name, block in (("baseline", cmp.get("baseline") or {}), ("filtered", cmp.get("filtered") or {})):
+              best = block.get("best_within_target")
+              best_text = (
+                  f"z={best['span_z']}, floor={best['span_floor']}, cap={best['span_cap']}: "
+                  f"F1 {best['token_f1']:.4f}, FPR {best['token_fpr']:.4f}"
+                  if best else "нет точки в ограничении"
+              )
+              lines.append(f"| {name} | {best_text} | {block.get('statement', '')} |")
+          lines += [
+              "",
+              "## Тест (177 пар) и чистые ответы: до и после",
+              "",
+              "| Вариант | Тест: token F1 | Тест: token FPR | Тест: строгий span-F1 "
+              "| Тест: доля помеченных чистых ответов | Весь корпус, чистые 540: доля помеченных |",
+              "| --- | --- | --- | --- | --- | --- |",
+              row("до (прогон 37609202780)", before, tb, cb),
+              row("после (выбран " + sel + ")", after, ta, ca),
+              "",
+              f"**{verdict_delta}.** Доля помеченных чистых ответов теста: "
+              f"{tb['verdicts']['fpr']:.3f} → {ta['verdicts']['fpr']:.3f}. "
+              "Новый порог по тесту не подбирался; повторного прогона «дожать» нет.",
+              "",
+          ]
+          out = Path("data/metrics/span_filter_a3.md")
+          out.write_text("\n".join(lines), encoding="utf-8")
+          print(out.read_text(encoding="utf-8"))
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: span-filter-comparison
+          path: |
+            spanverify-module/reports/comparisons/a3-span-filter
+            spanverify-module/data/metrics/span_filter_a3.md
+          if-no-files-found: warn
+          retention-days: 30
+      - name: "Коммит таблицы в data/metrics"
+        if: always()
+        run: |
+          if [ ! -f spanverify-module/data/metrics/span_filter_a3.md ]; then
+            echo "таблицы нет — коммитить нечего"
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -- spanverify-module/data/metrics/span_filter_a3.md
+          if git diff --cached --quiet; then
+            echo "нечего коммитить"
+            exit 0
+          fi
+          git commit -m "числа: сравнение варианта маски с фильтром коротких фрагментов (кеш прогона $RUN_ID) [skip ci]"
+          git push origin "HEAD:${GITHUB_REF_NAME}"
+          echo "запушено ${GITHUB_REF_NAME}"
