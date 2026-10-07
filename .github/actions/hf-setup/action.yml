@@ -1,0 +1,40 @@
+name: Зависимости hf и снимок среды
+description: Ставит torch CPU и печатает версии, железо, имя и ревизию модели.
+runs:
+  using: composite
+  steps:
+    - name: "Зависимости режима hf"
+      shell: bash
+      working-directory: spanverify-module
+      run: |
+        python -m pip install --upgrade pip
+        python -m pip install -q -r requirements.txt
+        python -m pip install -q "torch~=2.14" --index-url https://download.pytorch.org/whl/cpu
+        python -m pip install -q -r requirements-hf.txt
+    - name: "Снимок среды"
+      shell: bash
+      working-directory: spanverify-module
+      run: |
+        python - << 'PY'
+        import os
+        import torch
+        import transformers
+        from spanverify.features import HF_MODEL_DEFAULT
+        print("torch", torch.__version__)
+        print("transformers", transformers.__version__)
+        print("cuda", torch.cuda.is_available())
+        print("cores", os.cpu_count())
+        try:
+            for line in open("/proc/meminfo", encoding="utf-8"):
+                if line.startswith("MemTotal"):
+                    print("ram", line.strip())
+                    break
+        except OSError as exc:
+            print("ram", exc)
+        print("model", HF_MODEL_DEFAULT)
+        try:
+            from huggingface_hub import model_info
+            print("revision", model_info(HF_MODEL_DEFAULT).sha)
+        except Exception as exc:
+            print("revision", type(exc).__name__, exc)
+        PY

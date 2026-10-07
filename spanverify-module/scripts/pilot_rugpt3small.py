@@ -42,9 +42,36 @@ if str(ROOT) not in sys.path:
 
 from spanverify.core import tokenize_with_offsets  # noqa: E402
 from spanverify.dataset import FAQ_TEMPLATES, SUBJECTS, unit_form  # noqa: E402
-from spanverify.features import FEATURE_NAMES, _stem, hf_features, is_scored_token  # noqa: E402
+from spanverify.features import (  # noqa: E402
+    DIAGNOSTIC_FEATURES,
+    FEATURE_NAMES,
+    _stem,
+    hf_features,
+    is_scored_token,
+)
 
 LAYERS = ("first", "middle", "-4", "last")
+# Рабочие признаки плюс кандидаты. Кандидаты измеряются теми же данными и тем
+# же бутстрэпом, но в итоговый риск не входят: решение о переводе в рабочие
+# принимается только после измерения.
+MEASURED_FEATURES = tuple(FEATURE_NAMES) + tuple(DIAGNOSTIC_FEATURES)
+FEATURE_ATTRS = {
+    "attention_entropy": "attention_entropy",
+    "ctx_attention_mass": "ctx_attention_mass",
+    "embedding_density": "embedding_density",
+    "ctx_attention_mass_norm": "ctx_mass_norm",
+    "ctx_attention_mass_lift": "ctx_mass_lift",
+    "ctx_max_similarity": "ctx_max_similarity",
+    "ctx_support_distance": "ctx_support_distance",
+    "ctx_similarity_decay": "ctx_similarity_decay",
+    "ctx_sim_contrast": "ctx_sim_contrast",
+    "ctx_sim_margin": "ctx_sim_margin",
+}
+# Признаки, у которых большее значение означает БОЛЬШИЙ риск. Остальные
+# (масса опоры, похожесть на контекст) работают в обратную сторону. Знак нужен
+# только для ориентированного AUC: ранжирование не зависит от монотонности,
+# но сравнение признаков между собой — зависит.
+RISK_UP = frozenset({"attention_entropy", "embedding_density", "ctx_support_distance"})
 MODEL_DEFAULT = "ai-forever/rugpt3small_based_on_gpt2"
 POSITIVE_LABEL = 1
 
@@ -184,7 +211,7 @@ def collect_rows(pairs: list[dict], model_name: str, max_length: int) -> list[To
                 layer=layer,
                 max_length=max_length,
             )
-            matrix_by_layer[layer] = {name: list(getattr(matrix, name)) for name in FEATURE_NAMES}
+            matrix_by_layer[layer] = {name: list(getattr(matrix, FEATURE_ATTRS[name])) for name in MEASURED_FEATURES}
         label = int(pair["label"])
         # Токен числового значения — единственное место, которое отличается в
         # контрастной паре. Отдельная разметка нужна для парного анализа:
@@ -200,7 +227,7 @@ def collect_rows(pairs: list[dict], model_name: str, max_length: int) -> list[To
                         pair_id=str(pair["id"]),
                         layer=layer,
                         text=tokens[index].text,
-                        features={name: float(values[name][index]) for name in FEATURE_NAMES},
+                        features={name: float(values[name][index]) for name in MEASURED_FEATURES},
                         label=label,
                         role="fact" if index in fact_indices else "other",
                     )
@@ -248,15 +275,19 @@ def analyse(rows: list[TokenRow], iterations: int) -> dict:
             continue
         labels = [row.label for row in layer_rows]
         report[layer] = {}
-        for name in FEATURE_NAMES:
+        for name in MEASURED_FEATURES:
             scores = [row.features[name] for row in layer_rows]
             value = auc(labels, scores)
             low, high = bootstrap_ci(labels, scores, iterations=iterations)
             # Для «сырой» энтропии высокий балл означает риск, для массы опоры
             # знак обратный — приводим к «чем выше, тем недостовернее».
-            orient = -1.0 if name == "ctx_attention_mass" else 1.0
+            orient = 1.0 if name in RISK_UP else -1.0
             oriented = [orient * score for score in scores]
             oriented_auc = auc(labels, oriented)
+            # Доверительный интервал считается по ориентированным значениям:
+            # иначе при orient = -1 печатался бы интервал вокруг 1 - AUC, и
+            # число оказывалось бы вне собственного интервала.
+            oriented_low, oriented_high = bootstrap_ci(labels, oriented, iterations=iterations)
             fact_rows = [row for row in layer_rows if row.role == "fact"]
             fact_labels = [row.label for row in fact_rows]
             fact_scores = [row.features[name] for row in fact_rows]
@@ -272,6 +303,8 @@ def analyse(rows: list[TokenRow], iterations: int) -> dict:
                 "auc_oriented": oriented_auc,
                 "ci_low": low,
                 "ci_high": high,
+                "ci_oriented_low": oriented_low,
+                "ci_oriented_high": oriented_high,
                 "tokens": len(scores),
                 "auc_fact": fact_auc,
                 "auc_fact_oriented": orient * fact_auc if fact_auc is not None else None,
@@ -363,8 +396,17 @@ def write_auc_png(payload: dict, path: Path, width: int = 640, height: int = 360
     import zlib  # noqa: PLC0415
 
     layers = list(payload.get("auc", {}))
-    features = ["attention_entropy", "ctx_attention_mass", "embedding_density"]
-    colors = [(214, 96, 77), (77, 132, 214), (110, 168, 96)]
+    features = list(MEASURED_FEATURES)
+    colors = [
+        (214, 96, 77),
+        (77, 132, 214),
+        (110, 168, 96),
+        (150, 110, 190),
+        (200, 150, 60),
+        (120, 120, 120),
+        (180, 90, 140),
+        (90, 160, 160),
+    ]
     pixels = [[(255, 255, 255) for _ in range(width)] for _ in range(height)]
 
     def line(x0: int, y0: int, x1: int, y1: int, color: tuple[int, int, int]) -> None:
@@ -395,7 +437,7 @@ def write_auc_png(payload: dict, path: Path, width: int = 640, height: int = 360
             value = max(0.0, min(1.0, value))
             x = left + 20 + (layer_index * len(features) + feature_index) * slot
             top = bottom - int((bottom - 20) * value)
-            bar(x, top, colors[feature_index], max(4, slot - 6))
+            bar(x, top, colors[feature_index % len(colors)], max(4, slot - 6))
 
     raw = b"".join(b"\x00" + bytes(channel for pixel in row for channel in pixel) for row in pixels)
 
@@ -447,7 +489,7 @@ def render_markdown(payload: dict) -> str:
         for name, values in features.items():
             lines.append(
                 f"| {layer} | {name} | {values['auc_oriented']:.3f} | "
-                f"[{values['ci_low']:.3f}; {values['ci_high']:.3f}] | {values['tokens']} |"
+                f"[{values['ci_oriented_low']:.3f}; {values['ci_oriented_high']:.3f}] | {values['tokens']} |"
             )
             if values["auc_oriented"] > best[0]:
                 best = (values["auc_oriented"], layer, name)

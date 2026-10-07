@@ -1,0 +1,112 @@
+# Быстрый пилот признаков на реальной модели (ruGPT3-small, CPU).
+#
+# Отдельный workflow, а не job внутри hf-metrics.yml: итерации над признаками
+# идут чаще, чем эксперименты на корпусах, и не должны ждать, пока освободится
+# общая concurrency-группа (эксперименты занимают часы). Здесь своя группа,
+# поэтому пилот запускается сразу.
+#
+# Результаты — в артефакт hf-pilot и в ветку данных data/metrics, в те же пути
+# pilot/*, что и полный прогон: это единственная точка истины по числам пилота.
+# Запуск — правкой .github/hf-pilot.trigger либо вручную.
+name: Пилот hf (признаки, реальная модель)
+
+on:
+  workflow_dispatch:
+  push:
+    branches: ["arena/**"]
+    paths:
+      - .github/hf-pilot.trigger
+
+concurrency:
+  group: hf-pilot-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: write
+
+jobs:
+  pilot:
+    name: "Пилот: AUC признаков по слоям"
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Зависимости и CPU-версия torch
+        working-directory: spanverify-module
+        timeout-minutes: 20
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -q -r requirements.txt
+          python -m pip install -q "torch~=2.14" --index-url https://download.pytorch.org/whl/cpu
+          python -m pip install -q -r requirements-hf.txt
+          python -c "import torch, transformers; print('torch', torch.__version__, '| transformers', transformers.__version__, '| cuda', torch.cuda.is_available())"
+
+      - name: Пилот (48 пар, бутстрэп 5000)
+        working-directory: spanverify-module
+        timeout-minutes: 32
+        env:
+          OMP_NUM_THREADS: "4"
+        run: |
+          python scripts/pilot_rugpt3small.py --pairs 48 --bootstrap 5000 --out reports/pilot
+
+      - name: Ключевые числа пилота
+        working-directory: spanverify-module
+        run: |
+          python - <<'PY'
+          import pathlib, re
+          out = pathlib.Path("reports/pilot")
+          text = "\n".join(p.read_text(encoding="utf-8") for p in sorted(out.glob("*.json")))
+          aucs = re.findall(r'"auc"\s*:\s*([0-9.]+)', text)
+          print("найдено значений AUC:", len(aucs))
+          for layer in ("first", "middle", "-4", "last"):
+              m = re.search(r'"layer"\s*:\s*"' + re.escape(layer) + r'"(.{0,600}?)"auc"\s*:\s*([0-9.]+)', text, re.S)
+              if m:
+                  print(f"слой {layer}: AUC={m.group(2)}")
+          # Диагностические признаки-кандидаты: нормированная масса опоры.
+          for name in ("ctx_attention_mass", "ctx_attention_mass_norm", "ctx_attention_mass_lift"):
+              found = re.findall(r'"' + name + r'": \{[^{}]*?"auc_oriented": ([0-9.]+)', text, re.S)
+              if found:
+                  best = max(float(v) for v in found)
+                  print(f"признак {name}: лучший ориентированный AUC={best}")
+          PY
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: hf-pilot
+          path: spanverify-module/reports/pilot
+          if-no-files-found: warn
+          retention-days: 30
+
+      - name: Сохранить черновые метрики в ветку данных
+        if: always()
+        run: |
+          # Сначала копируем во временное место: переключение ветки очистит
+          # рабочую копию, и путь spanverify-module/... исчезнет.
+          mkdir -p /tmp/keep && rm -rf /tmp/keep/pilot
+          cp -r spanverify-module/reports/pilot /tmp/keep/pilot 2>/dev/null || true
+          git config user.name "spanverify-bot"
+          git config user.email "bot@spanverify.local"
+          git fetch origin data/metrics || true
+          git checkout -B data/metrics origin/data/metrics
+          mkdir -p pilot
+          cp -r /tmp/keep/pilot/* pilot/ 2>/dev/null || true
+          git add -A pilot
+          git diff --cached --quiet && echo "изменений нет" && exit 0
+          git commit -m "hf: пилот после прогона ${{ github.run_number }} [skip ci]"
+          for attempt in 1 2 3 4 5; do
+            if git push origin HEAD:data/metrics; then
+              echo "ветка данных обновлена с попытки $attempt"
+              break
+            fi
+            echo "пуш отклонён (параллельный прогон), попытка $attempt"
+            git fetch origin data/metrics
+            git rebase FETCH_HEAD || git rebase --abort
+            sleep $((attempt * 10))
+          done

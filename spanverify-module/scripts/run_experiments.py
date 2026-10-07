@@ -25,7 +25,14 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 from spanverify.dataset import corpus_statistics, generate_pairs, read_pairs, write_pairs  # noqa: E402
-from spanverify.engine import Verifier  # noqa: E402
+from spanverify.engine import Verifier, WeightsBundle  # noqa: E402
+from spanverify.features import (  # noqa: E402
+    DEFAULT_WEIGHTS,
+    HF_MODEL_DEFAULT,
+    feature_cache_key,
+    load_feature_cache,
+    set_feature_cache,
+)
 from spanverify.train import save_training_artifacts, train  # noqa: E402
 
 REPORT_TEMPLATE = """# Эксперимент: {dataset}
@@ -78,15 +85,69 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--dataset", default="data/demo_pairs.jsonl")
     parser.add_argument("--out", default="reports/experiments")
     parser.add_argument("--mode", choices=["demo", "hf"], default="demo")
+    parser.add_argument(
+        "--model",
+        default=HF_MODEL_DEFAULT,
+        help="модель режима hf; входит в ключ кеша и должна совпадать с предпосчётом",
+    )
     parser.add_argument("--seed", type=int, default=42)
     parser.add_argument("--folds", type=int, default=5)
     parser.add_argument("--target-fpr", type=float, default=0.1)
     parser.add_argument("--pairs", type=int, default=240, help="сгенерировать, если файла нет")
+    parser.add_argument(
+        "--features-cache",
+        action="append",
+        default=[],
+        metavar="PATH",
+        help="кеш предпосчитанных признаков (файл JSONL или каталог с шардами); " "можно указать несколько раз",
+    )
+    parser.add_argument(
+        "--require-cache",
+        action="store_true",
+        help="завершиться с ошибкой, если хотя бы одна пара не нашлась в кеше",
+    )
     args = parser.parse_args(argv)
 
     dataset = Path(args.dataset)
     records = load_records(dataset, args.pairs, 1312)
+
+    # Кеш признаков: без него режим hf пересчитывает прямой проход модели в
+    # каждом фолде кросс-валидации, и эксперимент не укладывается в лимит job'а
+    # (прогон 37446204812 выбрал 120 минут целиком).
+    cache = load_feature_cache(args.features_cache, counting=True) if args.features_cache else None
+    set_feature_cache(cache)
+    if cache:
+        print(f"кеш признаков: {len(cache)} ключей из {len(args.features_cache)} пути(ей)", flush=True)
+        if args.require_cache:
+            missing = []
+            for record in records:
+                data = record.to_dict() if hasattr(record, "to_dict") else record
+                key = feature_cache_key(
+                    str(data.get("answer", "")),
+                    data.get("context", ""),
+                    args.mode,
+                    args.model if args.mode == "hf" else "",
+                )
+                if key not in cache:
+                    missing.append(str(data.get("id", "?")))
+            if missing:
+                print(
+                    f"кеш неполон: нет {len(missing)} из {len(records)} " f"(первые: {', '.join(missing[:5])})",
+                    file=sys.stderr,
+                )
+                return 2
+
     started = time.time()
+    # Верификатор с явным именем модели: иначе берётся config.hf_model
+    # (rubert-tiny2), ключ кеша не совпадает с предпосчётом (rugpt3small),
+    # и эксперимент либо считает другую модель, либо падает без torch.
+    train_verifier = Verifier(
+        mode=args.mode,
+        model_name=args.model,
+        features_cache=cache,
+        weights=WeightsBundle(weights=dict(DEFAULT_WEIGHTS), threshold=0.5, mode=args.mode),
+    )
+    print(f"модель признаков: {train_verifier.model_name}", flush=True)
     report = train(
         records,
         mode=args.mode,
@@ -94,9 +155,39 @@ def main(argv: list[str] | None = None) -> int:
         folds=args.folds,
         target_fpr=args.target_fpr,
         dataset_name=str(dataset),
+        verifier=train_verifier,
     )
-    verifier = Verifier(mode=args.mode, weights=report.bundle)
+    head = report.bundle.head or {}
+    head_inline = bool((head.get("model") or {}).get("weights"))
+    print(
+        "голова в оценке: " + ("модель встроена в бандл" if head_inline else "только файл " + str(head.get("file"))),
+        flush=True,
+    )
+    if cache is not None and args.require_cache and getattr(cache, "misses", 0):
+        print(
+            f"кеш неполон: промахов {cache.misses} ещё до оценки — эксперимент остановлен",
+            file=sys.stderr,
+        )
+        return 2
+
+    verifier = Verifier(
+        mode=args.mode,
+        model_name=args.model,
+        weights=report.bundle,
+        features_cache=cache,
+    )
     metrics = verifier.evaluate(records)
+    if cache is not None:
+        hits = getattr(cache, "hits", 0)
+        misses = getattr(cache, "misses", 0)
+        print(f"кеш признаков: попаданий {hits}, промахов {misses}", flush=True)
+        if misses:
+            print(
+                "ВНИМАНИЕ: часть пар считана моделью, а не из кеша — ключи разошлись "
+                "или кеш неполон; время прогона это покажет",
+                file=sys.stderr,
+                flush=True,
+            )
     bundle = report.bundle
 
     out_dir = Path(args.out)
@@ -150,6 +241,7 @@ def main(argv: list[str] | None = None) -> int:
     payload = {
         "dataset": str(dataset),
         "mode": args.mode,
+        "model": args.model,
         "seed": args.seed,
         "duration_s": round(time.time() - started, 2),
         "corpus": stats,
@@ -157,6 +249,7 @@ def main(argv: list[str] | None = None) -> int:
         "bundle": bundle.to_dict(),
         "folds": report.folds,
         "gate": gate,
+        "head_inline": head_inline,
         "artifacts": {name: str(path) for name, path in written.items()},
     }
     json_path = out_dir / "experiment.json"

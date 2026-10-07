@@ -19,6 +19,7 @@ __all__ = [
     "pava",
     "IsotonicCalibrator",
     "choose_threshold",
+    "choose_threshold_report",
     "metrics_at",
     "cross_validate",
 ]
@@ -190,35 +191,71 @@ def metrics_at(probs: Sequence[float], labels: Sequence[int], threshold: float) 
     }
 
 
-def choose_threshold(
+def choose_threshold_report(
     probs: Sequence[float],
     labels: Sequence[int],
     max_fpr: float = 0.10,
     candidates: int = 200,
-) -> float:
-    """Порог, максимизирующий F1 при ограничении FPR <= max_fpr.
+) -> dict[str, float | bool]:
+    """Подобрать порог ответа: максимум F1 при ограничении FPR <= max_fpr.
 
-    Если ограничение невыполнимо, возвращается порог с минимальным FPR.
+    Возвращает порог и метрики на нём, включая признак ``constraint_met`` —
+    достижимо ли ограничение. Признак нужен, потому что недостижимость не редкость,
+    а нормальный исход на слабом разделении, и скрывать её нельзя.
+
+    Историческая ошибка, которую здесь исправляет fallback: раньше при
+    недостижимом ограничении брался порог с минимальным FPR, а это всегда
+    максимальный порог — конвейер переставал помечать что-либо вообще. В прогоне
+    37472951524 на корпусе A3 это дало порог 1,0, recall 0,036 и token F1 0,013
+    при том, что кросс-валидация головы показывала AUC 0,85: признаки работали,
+    а порог их гасил. Теперь берётся порог с максимальным F1, а фактический FPR
+    честно попадает в отчёт.
     """
+    empty: dict[str, float | bool] = {
+        "threshold": 0.5,
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0,
+        "fpr": 0.0,
+        "constraint_met": False,
+    }
     if not probs:
-        return 0.5
+        return empty
     uniq = sorted(set(float(p) for p in probs))
     if len(uniq) > candidates:
         step = len(uniq) / candidates
         uniq = [uniq[int(i * step)] for i in range(candidates)]
     grid = sorted(set(uniq + [max(uniq) + 1e-9]))
 
-    best_f1 = -1.0
-    best_f1_thr = grid[0]
-    best_min_fpr = 1.0
-    best_min_fpr_thr = grid[0]
+    best_constrained: tuple[float, float, dict] = (-1.0, -1.0, empty)
+    best_free: tuple[float, float, dict] = (-1.0, -1.0, empty)
     for thr in grid:
         m = metrics_at(probs, labels, thr)
-        if m["fpr"] <= max_fpr and m["f1"] > best_f1:
-            best_f1, best_f1_thr = m["f1"], thr
-        if m["fpr"] < best_min_fpr or (m["fpr"] == best_min_fpr and m["f1"] > best_f1):
-            best_min_fpr, best_min_fpr_thr = m["fpr"], thr
-    return float(best_f1_thr if best_f1 >= 0 else best_min_fpr_thr)
+        f1, fpr = m["f1"], m["fpr"]
+        if fpr <= max_fpr and (f1 > best_constrained[0] or (f1 == best_constrained[0] and -fpr > best_constrained[1])):
+            best_constrained = (f1, -fpr, dict(m, constraint_met=True))
+        if f1 > best_free[0] or (f1 == best_free[0] and -fpr > best_free[1]):
+            best_free = (f1, -fpr, dict(m, constraint_met=False))
+
+    if best_constrained[0] >= 0:
+        return best_constrained[2]
+    # Ограничение недостижимо: не молчим, а берём лучший F1 и фиксируем FPR.
+    return dict(best_free[2])
+
+
+def choose_threshold(
+    probs: Sequence[float],
+    labels: Sequence[int],
+    max_fpr: float = 0.10,
+    candidates: int = 200,
+) -> float:
+    """Порог ответа: максимум F1 при ограничении FPR, иначе максимум F1.
+
+    Если ограничение недостижимо, возвращается порог с лучшим F1, а не «порог с
+    минимальным FPR» (то есть максимум шкалы, при котором конвейер не помечает
+    ничего). Подробности — в :func:`choose_threshold_report`.
+    """
+    return float(choose_threshold_report(probs, labels, max_fpr=max_fpr, candidates=candidates)["threshold"])
 
 
 def cross_validate(

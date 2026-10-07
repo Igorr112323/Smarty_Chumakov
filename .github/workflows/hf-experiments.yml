@@ -1,0 +1,308 @@
+# Реальные метрики режима hf на корпусах A3 и A.
+#
+# Почему так, а не одним job'ом: прогон 37446204812 выбрал 120 минут и был снят
+# по таймауту, потому что считал признаки реальной моделью в каждом из пяти
+# фолдов кросс-валидации — один и тот же прямой проход пять раз. Теперь признаки
+# считаются один раз (job precompute) и складываются в кеш, а эксперимент
+# читает готовое. Шарды нужны, чтобы и этот единственный проход уложился в лимит
+# job'а: четыре части корпуса A3 считаются параллельно.
+#
+# Запуск — правкой .github/hf-experiments.trigger либо вручную (workflow_dispatch).
+# Результаты — в артефакты и в ветку данных data/metrics, всегда с [skip ci].
+name: Эксперименты hf (корпуса A3 и A)
+
+on:
+  workflow_dispatch:
+  push:
+    branches: ["arena/**"]
+    paths:
+      - .github/hf-experiments.trigger
+
+concurrency:
+  group: hf-experiments-${{ github.ref }}
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  # Цепочки корпусов независимы: падение корпуса A не должно отменять
+  # уже посчитанный A3. Именно так и случилось в первый раз — шард A не влез
+  # в лимит (в корпусе A 1200 пар, а не 240), и experiment для A3 ушёл в skipped,
+  # хотя признаки для него были готовы полностью.
+  precompute-a3:
+    name: "Признаки A3 (шард ${{ matrix.shard }}/4)"
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [0, 1, 2, 3]
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: "Зависимости и CPU-версия torch"
+        working-directory: spanverify-module
+        timeout-minutes: 20
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -q -r requirements.txt
+          python -m pip install -q "torch~=2.14" --index-url https://download.pytorch.org/whl/cpu
+          python -m pip install -q -r requirements-hf.txt
+
+      - name: "Предпосчёт признаков шарда"
+        working-directory: spanverify-module
+        timeout-minutes: 30
+        env:
+          OMP_NUM_THREADS: "4"
+        run: |
+          python scripts/precompute_features.py \
+            --dataset data/corpus_a3/pairs.jsonl \
+            --mode hf --shard ${{ matrix.shard }} --shards 4 \
+            --out reports/hf-cache
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: hf-cache-a3-${{ matrix.shard }}
+          path: spanverify-module/reports/hf-cache
+          if-no-files-found: error
+          retention-days: 14
+
+  precompute-a:
+    name: "Признаки A (шард ${{ matrix.shard }}/5)"
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [0, 1, 2, 3, 4]
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: "Зависимости и CPU-версия torch"
+        working-directory: spanverify-module
+        timeout-minutes: 20
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -q -r requirements.txt
+          python -m pip install -q "torch~=2.14" --index-url https://download.pytorch.org/whl/cpu
+          python -m pip install -q -r requirements-hf.txt
+
+      - name: "Предпосчёт признаков шарда"
+        working-directory: spanverify-module
+        timeout-minutes: 30
+        env:
+          OMP_NUM_THREADS: "4"
+        run: |
+          python scripts/precompute_features.py \
+            --dataset data/corpus_a/pairs.jsonl \
+            --mode hf --shard ${{ matrix.shard }} --shards 5 \
+            --out reports/hf-cache
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: hf-cache-a-${{ matrix.shard }}
+          path: spanverify-module/reports/hf-cache
+          if-no-files-found: error
+          retention-days: 14
+
+  experiment-a3:
+    name: "Эксперимент A3 (реальные акты)"
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    needs: precompute-a3
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: "Зависимости и CPU-версия torch"
+        working-directory: spanverify-module
+        timeout-minutes: 20
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -q -r requirements.txt
+          python -m pip install -q "torch~=2.14" --index-url https://download.pytorch.org/whl/cpu
+          python -m pip install -q -r requirements-hf.txt
+
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: hf-cache-a3-*
+          path: spanverify-module/reports/hf-cache
+          merge-multiple: true
+
+      - name: "Кеш признаков: сколько собралось"
+        working-directory: spanverify-module
+        run: |
+          ls -la reports/hf-cache
+          cat reports/hf-cache/precompute_*.json
+          wc -l reports/hf-cache/features_*.jsonl | tail -1
+
+      - name: "Эксперимент: кросс-валидация на кеше"
+        working-directory: spanverify-module
+        timeout-minutes: 30
+        env:
+          OMP_NUM_THREADS: "4"
+        run: |
+          python scripts/run_experiments.py \
+            --dataset data/corpus_a3/pairs.jsonl \
+            --mode hf --seed 42 --folds 5 --target-fpr 0.1 \
+            --features-cache reports/hf-cache \
+            --out reports/experiments-a3
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: hf-experiment-a3
+          path: spanverify-module/reports/experiments-a3
+          if-no-files-found: warn
+          retention-days: 30
+
+  experiment-a:
+    name: "Эксперимент A (синтетика)"
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    needs: precompute-a
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: "Зависимости и CPU-версия torch"
+        working-directory: spanverify-module
+        timeout-minutes: 20
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -q -r requirements.txt
+          python -m pip install -q "torch~=2.14" --index-url https://download.pytorch.org/whl/cpu
+          python -m pip install -q -r requirements-hf.txt
+
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: hf-cache-a-*
+          path: spanverify-module/reports/hf-cache
+          merge-multiple: true
+
+      - name: "Кеш признаков: сколько собралось"
+        working-directory: spanverify-module
+        run: |
+          ls -la reports/hf-cache
+          wc -l reports/hf-cache/features_*.jsonl | tail -1
+
+      - name: "Эксперимент: кросс-валидация на кеше"
+        working-directory: spanverify-module
+        timeout-minutes: 30
+        env:
+          OMP_NUM_THREADS: "4"
+        run: |
+          python scripts/run_experiments.py \
+            --dataset data/corpus_a/pairs.jsonl \
+            --mode hf --seed 42 --folds 5 --target-fpr 0.1 \
+            --features-cache reports/hf-cache \
+            --out reports/experiments-a
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: hf-experiment-a
+          path: spanverify-module/reports/experiments-a
+          if-no-files-found: warn
+          retention-days: 30
+
+  publish:
+    name: "Свести числа и сохранить"
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    needs: [experiment-a3, experiment-a]
+    if: always()
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: hf-experiment-a3
+          path: spanverify-module/reports/experiments-a3
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: hf-experiment-a
+          path: spanverify-module/reports/experiments-a
+
+      - name: "Зависимости"
+        working-directory: spanverify-module
+        timeout-minutes: 10
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -q -r requirements.txt
+
+      - name: "Свести числа"
+        working-directory: spanverify-module
+        timeout-minutes: 10
+        run: |
+          python scripts/collect_metrics.py --out reports/METRICS.json
+          python scripts/cross_corpus.py --out reports/cross_corpus.json || true
+          python - <<'PY'
+          import json, pathlib
+          metrics = json.loads(pathlib.Path("reports/METRICS.json").read_text(encoding="utf-8"))
+          print("прогонов hf:", metrics.get("external_tests", {}).get("hf_runs"))
+          for key in ("corpus_a", "corpus_a3_real"):
+              modes = metrics.get(key, {}).get("by_mode", {})
+              for mode in ("demo", "hf"):
+                  test = modes.get(mode, {}).get("by_split", {}).get("test")
+                  if test:
+                      tokens = test.get("tokens", {})
+                      print(f"{key} {mode} test: F1={tokens.get('f1')} FPR={tokens.get('fpr')} AUC={tokens.get('auc')}")
+          PY
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: hf-metrics-summary
+          path: |
+            spanverify-module/reports/METRICS.json
+            spanverify-module/reports/cross_corpus.json
+          if-no-files-found: warn
+          retention-days: 30
+
+      - name: "Сохранить в ветку данных"
+        working-directory: spanverify-module
+        run: |
+          mkdir -p /tmp/keepexp && rm -rf /tmp/keepexp/*
+          cp -r reports /tmp/keepexp/reports 2>/dev/null || true
+          cd ..
+          git config user.name "spanverify-bot"
+          git config user.email "bot@spanverify.local"
+          git fetch origin data/metrics || true
+          git checkout -B data/metrics origin/data/metrics
+          mkdir -p experiments
+          cp -r /tmp/keepexp/reports/experiments-a3 experiments/ 2>/dev/null || true
+          cp -r /tmp/keepexp/reports/experiments-a experiments/ 2>/dev/null || true
+          cp /tmp/keepexp/reports/METRICS.json experiments/METRICS-hf-${{ github.run_number }}.json 2>/dev/null || true
+          git add -A experiments
+          git diff --cached --quiet && echo "изменений нет" && exit 0
+          git commit -m "hf: эксперименты с кешем признаков, прогон ${{ github.run_number }} [skip ci]"
+          for attempt in 1 2 3 4 5; do
+            if git push origin HEAD:data/metrics; then
+              echo "ветка данных обновлена с попытки $attempt"
+              break
+            fi
+            echo "пуш отклонён, попытка $attempt"
+            git fetch origin data/metrics
+            git rebase FETCH_HEAD || git rebase --abort
+            sleep $((attempt * 10))
+          done

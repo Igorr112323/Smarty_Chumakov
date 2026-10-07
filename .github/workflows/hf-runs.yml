@@ -1,0 +1,383 @@
+# Тяжёлый прогон режима hf: пилот, эксперименты на корпусах, сбор чисел.
+#
+# Признаки считаются один раз и читаются из кеша. Без этого прямой проход
+# повторяется в каждом фолде, и job не укладывается в лимит (прогон 37446204812
+# был снят на 120-й минуте). Корпус A3 после слияния другой, старый кеш к нему
+# не подходит — предпосчёт входит в job эксперимента.
+#
+# Запуск: workflow_dispatch или пуш .github/hf-runs.trigger / этого файла.
+# Коммит результатов — только здесь и только с [skip ci]. ci.yml по-прежнему
+# ничего в ветку не пишет.
+name: Тяжёлые прогоны hf
+
+on:
+  workflow_dispatch:
+    inputs:
+      corpus:
+        description: "Какой корпус считать: a3, a или both"
+        default: both
+        type: choice
+        options: [both, a3, a]
+      pairs:
+        description: "Сколько контрастных пар в пилоте"
+        default: "48"
+      mode:
+        description: "Режим признаков"
+        default: hf
+        type: choice
+        options: [hf]
+      seed:
+        description: "Seed обучения и пилота"
+        default: "42"
+  push:
+    branches: ["arena/**"]
+    paths:
+      - .github/hf-runs.trigger
+
+concurrency:
+  group: hf-runs-${{ github.ref }}
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+env:
+  HF_MODEL: ai-forever/rugpt3small_based_on_gpt2
+  SEED: ${{ github.event.inputs.seed || '42' }}
+  PILOT_PAIRS: ${{ github.event.inputs.pairs || '48' }}
+  CORPUS: ${{ github.event.inputs.corpus || 'both' }}
+
+jobs:
+  pilot:
+    name: "Пилот hf"
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: "Кэш весов модели"
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/huggingface
+          key: hf-${{ runner.os }}-rugpt3small-v1
+      - name: "Зависимости и среда"
+        uses: ./.github/actions/hf-setup
+      - name: "Пилот"
+        working-directory: spanverify-module
+        timeout-minutes: 70
+        env:
+          OMP_NUM_THREADS: "4"
+        run: |
+          echo "команда: python scripts/pilot_rugpt3small.py --pairs $PILOT_PAIRS --bootstrap 5000 --seed $SEED --model $HF_MODEL --out reports/pilot"
+          start=$(date -u +%s)
+          python scripts/pilot_rugpt3small.py --pairs "$PILOT_PAIRS" --bootstrap 5000 --seed "$SEED" --model "$HF_MODEL" --out reports/pilot
+          echo "длительность_с=$(( $(date -u +%s) - start ))"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: hf-runs-pilot
+          path: spanverify-module/reports/pilot
+          if-no-files-found: error
+          retention-days: 14
+
+  experiment-a3:
+    name: "Эксперимент hf, корпус A3"
+    if: github.event_name == 'push' || github.event.inputs.corpus == 'both' || github.event.inputs.corpus == 'a3'
+    runs-on: ubuntu-latest
+    timeout-minutes: 180
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: "Кэш весов модели"
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/huggingface
+          key: hf-${{ runner.os }}-rugpt3small-v1
+      - name: "Зависимости и среда"
+        uses: ./.github/actions/hf-setup
+      - name: "Признаки один раз, затем эксперимент"
+        working-directory: spanverify-module
+        timeout-minutes: 160
+        env:
+          OMP_NUM_THREADS: "4"
+        run: |
+          echo "команда предпосчёта: python scripts/precompute_features.py --dataset data/corpus_a3/pairs.jsonl --mode hf --model $HF_MODEL --shards 1 --out reports/hf-cache-a3"
+          start=$(date -u +%s)
+          python scripts/precompute_features.py --dataset data/corpus_a3/pairs.jsonl --mode hf --model "$HF_MODEL" --shards 1 --out reports/hf-cache-a3
+          echo "предпосчёт_с=$(( $(date -u +%s) - start ))"
+          echo "команда эксперимента: python scripts/run_experiments.py --mode hf --dataset data/corpus_a3/pairs.jsonl --model $HF_MODEL --seed $SEED --folds 5 --target-fpr 0.1 --features-cache reports/hf-cache-a3 --require-cache --out reports/experiments/a3"
+          start=$(date -u +%s)
+          python scripts/run_experiments.py --mode hf --dataset data/corpus_a3/pairs.jsonl --model "$HF_MODEL" --seed "$SEED" --folds 5 --target-fpr 0.1 --features-cache reports/hf-cache-a3 --require-cache --out reports/experiments/a3
+          echo "эксперимент_с=$(( $(date -u +%s) - start ))"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: hf-runs-a3
+          path: |
+            spanverify-module/reports/experiments/a3
+            spanverify-module/reports/hf-cache-a3
+          if-no-files-found: error
+          retention-days: 14
+
+  experiment-a:
+    name: "Эксперимент hf, корпус A"
+    if: github.event_name == 'push' || github.event.inputs.corpus == 'both' || github.event.inputs.corpus == 'a'
+    runs-on: ubuntu-latest
+    timeout-minutes: 180
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: "Кэш весов модели"
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/huggingface
+          key: hf-${{ runner.os }}-rugpt3small-v1
+      - name: "Зависимости и среда"
+        uses: ./.github/actions/hf-setup
+      - name: "Признаки один раз, затем эксперимент"
+        working-directory: spanverify-module
+        timeout-minutes: 160
+        env:
+          OMP_NUM_THREADS: "4"
+        run: |
+          echo "команда предпосчёта: python scripts/precompute_features.py --dataset data/corpus_a/pairs.jsonl --mode hf --model $HF_MODEL --shards 1 --out reports/hf-cache-a"
+          start=$(date -u +%s)
+          python scripts/precompute_features.py --dataset data/corpus_a/pairs.jsonl --mode hf --model "$HF_MODEL" --shards 1 --out reports/hf-cache-a
+          echo "предпосчёт_с=$(( $(date -u +%s) - start ))"
+          echo "команда эксперимента: python scripts/run_experiments.py --mode hf --dataset data/corpus_a/pairs.jsonl --model $HF_MODEL --seed $SEED --folds 5 --target-fpr 0.1 --features-cache reports/hf-cache-a --require-cache --out reports/experiments/a"
+          start=$(date -u +%s)
+          python scripts/run_experiments.py --mode hf --dataset data/corpus_a/pairs.jsonl --model "$HF_MODEL" --seed "$SEED" --folds 5 --target-fpr 0.1 --features-cache reports/hf-cache-a --require-cache --out reports/experiments/a
+          echo "эксперимент_с=$(( $(date -u +%s) - start ))"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: hf-runs-a
+          path: |
+            spanverify-module/reports/experiments/a
+            spanverify-module/reports/hf-cache-a
+          if-no-files-found: error
+          retention-days: 14
+
+  external-hf:
+    name: "Внешний срез hf"
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: "Кэш весов модели"
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/huggingface
+          key: hf-${{ runner.os }}-rugpt3small-v1
+      - name: "Зависимости и среда"
+        uses: ./.github/actions/hf-setup
+      - name: "RAGTruth QA, срез 40 пар, режим hf"
+        working-directory: spanverify-module
+        timeout-minutes: 70
+        env:
+          OMP_NUM_THREADS: "4"
+        run: |
+          python scripts/fetch_external_tests.py --dataset ragtruth --verify --adapt --out data/external
+          echo "команда: python scripts/external_eval.py --dataset ragtruth --task qa --split test --mode hf --model $HF_MODEL --limit 40 --out data/external"
+          start=$(date -u +%s)
+          python scripts/external_eval.py --dataset ragtruth --task qa --split test --mode hf --model "$HF_MODEL" --limit 40 --out data/external --json reports/ext_ragtruth_qa_hf.json
+          echo "длительность_с=$(( $(date -u +%s) - start ))"
+          echo "ЭТО СРЕЗ: 40 пар, не весь набор. hf_runs считается по этому прогону."
+      - uses: actions/upload-artifact@v4
+        with:
+          name: hf-runs-external
+          path: |
+            spanverify-module/reports/external_tests.json
+            spanverify-module/reports/ext_ragtruth_qa_hf.json
+          if-no-files-found: error
+          retention-days: 14
+
+  metrics:
+    name: "Сбор чисел"
+    needs: [experiment-a3, experiment-a, external-hf]
+    if: always() && needs.experiment-a3.result == 'success' && needs.experiment-a.result == 'success' && needs.external-hf.result == 'success'
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: "Кэш весов модели"
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/huggingface
+          key: hf-${{ runner.os }}-rugpt3small-v1
+      - name: "Зависимости и среда"
+        uses: ./.github/actions/hf-setup
+      - uses: actions/download-artifact@v4
+        with:
+          name: hf-runs-a
+          path: spanverify-module/reports/from-a
+      - uses: actions/download-artifact@v4
+        with:
+          name: hf-runs-external
+          path: spanverify-module/reports/from-external
+      - name: "Разложить артефакты"
+        run: |
+          python3 - << 'PY'
+          import shutil
+          from pathlib import Path
+          root = Path("spanverify-module/reports")
+          cache_src = next((p for p in Path("spanverify-module/reports/from-a").rglob("*") if p.is_dir() and p.name == "hf-cache-a"), None)
+          if cache_src is None:
+              raise SystemExit("в артефакте A нет каталога hf-cache-a")
+          dest = root / "hf-cache-a"
+          dest.mkdir(parents=True, exist_ok=True)
+          for path in cache_src.rglob("*"):
+              if path.is_file():
+                  target = dest / path.relative_to(cache_src)
+                  target.parent.mkdir(parents=True, exist_ok=True)
+                  shutil.copy2(path, target)
+          external = next(Path("spanverify-module/reports/from-external").rglob("external_tests.json"), None)
+          if external is None:
+              raise SystemExit("нет external_tests.json")
+          shutil.copy2(external, root / "external_tests.json")
+          print("кеш", dest, "файлов", sum(1 for _ in dest.rglob('*') if _.is_file()))
+          PY
+      - name: "Кросс-корпус hf на кеше A, корпус B сокращён до 80 пар"
+        working-directory: spanverify-module
+        timeout-minutes: 25
+        env:
+          OMP_NUM_THREADS: "4"
+        run: |
+          echo "команда: python scripts/cross_corpus.py --dataset data/corpus_a/pairs.jsonl --mode hf --model $HF_MODEL --seed $SEED --alt-pairs 80 --alt-seed 4242 --features-cache reports/hf-cache-a --out reports/cross_corpus_hf.json"
+          echo "сокращение: alt-pairs 80 вместо 240, чтобы шаг уложился в 45 минут; корпус A считается по кешу, не заново"
+          echo "файл отдельный: reports/cross_corpus.json — demo, его нельзя затирать, иначе сверка документов падает"
+          start=$(date -u +%s)
+          python scripts/cross_corpus.py --dataset data/corpus_a/pairs.jsonl --mode hf --model "$HF_MODEL" --seed "$SEED" --alt-pairs 80 --alt-seed 4242 --features-cache reports/hf-cache-a --out reports/cross_corpus_hf.json
+          echo "длительность_с=$(( $(date -u +%s) - start ))"
+      - name: "Собрать METRICS.json и сверить документы"
+        working-directory: spanverify-module
+        timeout-minutes: 15
+        run: |
+          python scripts/collect_metrics.py --seed "$SEED" --out reports/METRICS.json
+          if ! python scripts/check_numbers.py; then
+            echo "::error::сверка чисел не сошлась, METRICS.json всё равно сохраняется артефактом"
+            exit 1
+          fi
+          python -c "import json; d=json.load(open('reports/METRICS.json')); ext=d.get('external_tests') or {}; print('hf_runs', ext.get('hf_runs'))"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: hf-runs-metrics
+          path: |
+            spanverify-module/reports/METRICS.json
+            spanverify-module/reports/cross_corpus_hf.json
+            spanverify-module/reports/external_tests.json
+          retention-days: 14
+          if-no-files-found: warn
+
+  publish:
+    name: "Сохранить результаты"
+    needs: [pilot, experiment-a3, experiment-a, external-hf, metrics]
+    if: always() && needs.experiment-a3.result == 'success'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref_name }}
+          token: ${{ secrets.GITHUB_TOKEN }}
+      - uses: actions/download-artifact@v4
+        with:
+          name: hf-runs-a3
+          path: /tmp/hf-runs-a3
+      - name: "Положить отчёт A3"
+        run: |
+          python3 - << 'PY'
+          import shutil
+          from pathlib import Path
+          src = Path("/tmp/hf-runs-a3")
+          hits = list(src.rglob("experiment.json"))
+          if not hits:
+              raise SystemExit(f"нет experiment.json в {src}")
+          dest = Path("spanverify-module/reports/experiments/a3")
+          dest.mkdir(parents=True, exist_ok=True)
+          folder = hits[0].parent
+          for path in folder.iterdir():
+              if path.is_file():
+                  shutil.copy2(path, dest / path.name)
+          print("скопировано", folder)
+          PY
+      - name: "Положить остальные отчёты, если job'ы прошли"
+        if: needs.metrics.result == 'success' && needs.pilot.result == 'success'
+        run: |
+          echo "метрики и пилот забираются отдельными шагами ниже"
+      - uses: actions/download-artifact@v4
+        if: needs.pilot.result == 'success'
+        with:
+          name: hf-runs-pilot
+          path: spanverify-module/reports/pilot
+      - uses: actions/download-artifact@v4
+        if: needs.experiment-a.result == 'success'
+        with:
+          name: hf-runs-a
+          path: /tmp/hf-runs-a
+      - uses: actions/download-artifact@v4
+        if: needs.metrics.result == 'success' || needs.metrics.result == 'failure'
+        continue-on-error: true
+        with:
+          name: hf-runs-metrics
+          path: /tmp/hf-runs-metrics
+      - name: "Сложить файлы результатов"
+        run: |
+          python3 - << 'PY'
+          import shutil
+          from pathlib import Path
+          root = Path("spanverify-module/reports")
+          a = Path("/tmp/hf-runs-a")
+          if a.exists():
+              hits = list(a.rglob("experiment.json"))
+              if hits:
+                  dest = root / "experiments" / "a"
+                  dest.mkdir(parents=True, exist_ok=True)
+                  for path in hits[0].parent.iterdir():
+                      if path.is_file():
+                          shutil.copy2(path, dest / path.name)
+          metrics = Path("/tmp/hf-runs-metrics")
+          if metrics.exists():
+              for path in metrics.rglob("*"):
+                  if path.is_file() and path.name in {"METRICS.json", "cross_corpus_hf.json", "external_tests.json"}:
+                      shutil.copy2(path, root / path.name)
+                      print("метрика", path.name)
+          PY
+      - name: "Коммит результатов"
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          # reports/pilot/ в gitignore: git add без -f роняет весь шаг, и числа не коммитятся.
+          if [ -f spanverify-module/reports/pilot/pilot.json ]; then
+            mkdir -p spanverify-module/reports/experiments/pilot
+            cp spanverify-module/reports/pilot/pilot.json spanverify-module/reports/pilot/pilot.md spanverify-module/reports/experiments/pilot/
+          fi
+          for path in spanverify-module/reports/experiments spanverify-module/reports/METRICS.json spanverify-module/reports/cross_corpus_hf.json spanverify-module/reports/external_tests.json spanverify-module/reports/ext_ragtruth_qa_hf.json; do
+            if [ -e "$path" ]; then
+              git add -- "$path"
+            fi
+          done
+          if git diff --cached --quiet; then
+            echo "нечего коммитить"
+            exit 0
+          fi
+          git commit -m "числа: прогон hf [skip ci]"
+          git push origin "HEAD:${GITHUB_REF_NAME}"
+          echo "запушено ${GITHUB_REF_NAME}"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: hf-runs-published
+          path: spanverify-module/reports
+          if-no-files-found: warn
+          retention-days: 14

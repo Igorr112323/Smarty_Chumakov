@@ -12,3 +12,4 @@ pytest-cov~=7.1      # покрытие (порог 85 % в CI)
 ruff~=0.16           # линтер
 black~=26.5          # форматирование
 pyinstaller~=6.22    # сборка .exe / zipapp-обвязка (scripts/make_exe.ps1)
+pyyaml~=6.0          # разбор workflow в tests/test_workflow_limits.py (в CI нет отдельной установки)

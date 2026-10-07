@@ -11,9 +11,21 @@ on:
     branches: [main, "arena/**"]
   pull_request:
   workflow_dispatch:
+  # Полная матрица тестов, пилот на реальной модели и внешние наборы
+  # запускаются ночью: на каждый push они не нужны и занимают часы.
+  schedule:
+    - cron: "30 2 * * *"
 
+# Новый пуш отменяет предыдущий прогон той же ветки. Без этого каждый коммит
+# плодил полный прогон, старые продолжали работать, и очередь не рассасывалась.
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+# CI ничего не пишет обратно в ветку: коммиты бота были источником
+# rebase-конфликтов и петель. Результаты уходят в артефакты.
 permissions:
-  contents: write
+  contents: read
 
 env:
   PYTHONUTF8: "1"
@@ -23,6 +35,10 @@ jobs:
   quality:
     name: Линтер, форматирование, покрытие
     runs-on: ubuntu-latest
+    # В job'е не только линтер, но и прогон с покрытием, воспроизводимость
+    # обучения и чистая установка в отдельный venv: 20 минут не хватило
+    # (job снимался на 20-й минуте), сорок — с запасом.
+    timeout-minutes: 40
     defaults:
       run:
         working-directory: spanverify-module
@@ -96,11 +112,13 @@ jobs:
   tests:
     name: Тесты (Python ${{ matrix.python }}, ${{ matrix.os }})
     runs-on: ${{ matrix.os }}
+    timeout-minutes: 30
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, windows-latest]
-        python: ["3.10", "3.11", "3.12"]
+        # На каждый push — две контрольные комбинации. Полная матрица
+        # (3 версии Python x 2 системы) идёт по расписанию и при ручном запуске.
+        include: ${{ github.event_name == 'push' && fromJSON('[{"os":"ubuntu-latest","python":"3.11"},{"os":"windows-latest","python":"3.12"}]') || fromJSON('[{"os":"ubuntu-latest","python":"3.10"},{"os":"ubuntu-latest","python":"3.11"},{"os":"ubuntu-latest","python":"3.12"},{"os":"windows-latest","python":"3.10"},{"os":"windows-latest","python":"3.11"},{"os":"windows-latest","python":"3.12"}]') }}
     defaults:
       run:
         working-directory: spanverify-module
@@ -116,7 +134,7 @@ jobs:
       - name: Зависимости тестов
         run: |
           python -m pip install --upgrade pip
-          python -m pip install pytest
+          python -m pip install pytest "pyyaml~=6.0"
 
       - name: Тесты
         run: python -m pytest -q
@@ -154,6 +172,10 @@ jobs:
   pilot:
     name: Пилот на реальной модели (rugpt3small, CPU)
     runs-on: ubuntu-latest
+    # Качает веса модели и считает на CPU — 22-32 минуты. На каждый push
+    # это незачем: только вручную или по ночному расписанию.
+    if: github.event_name == 'workflow_dispatch' || github.event_name == 'schedule'
+    timeout-minutes: 40
     needs: quality
     defaults:
       run:
@@ -238,6 +260,7 @@ jobs:
   metrics:
     name: Единый файл чисел (METRICS.json) и сверка документов
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     needs: [quality, pilot, external]
     defaults:
       run:
@@ -286,28 +309,6 @@ jobs:
       - name: Сверить числа в документах с METRICS.json
         run: python scripts/check_numbers.py --metrics reports/METRICS.json
 
-      - name: Закоммитить METRICS.json и отчёты (числа A3 появляются после сборки корпуса)
-        if: always()
-        working-directory: .
-        run: |
-          git config user.name "spanverify-bot"
-          git config user.email "actions@users.noreply.github.com"
-          git add -f spanverify-module/reports/METRICS.json spanverify-module/reports/cross_corpus.json spanverify-module/reports/CORPUS_REPORT.md || true
-          if git diff --cached --quiet; then
-            echo "нечего коммитить"
-            exit 0
-          fi
-          git commit -m "числа: METRICS.json с корпусом A3 и отчёты [skip ci]"
-          for attempt in 1 2 3; do
-            if git pull --rebase --autostash -q origin "${GITHUB_REF_NAME}" && git push; then
-              echo "числа закоммичены (попытка $attempt)"
-              exit 0
-            fi
-            sleep 5
-          done
-          echo "::warning title=Числа::не удалось закоммитить METRICS.json за 3 попытки"
-          exit 0
-
       - name: Артефакт чисел
         if: always()
         uses: actions/upload-artifact@v4
@@ -316,11 +317,16 @@ jobs:
           path: |
             spanverify-module/reports/METRICS.json
             spanverify-module/reports/cross_corpus.json
+            spanverify-module/reports/CORPUS_REPORT.md
           retention-days: 90
 
   external:
     name: Внешние размеченные наборы (скачивание, контрольные числа, оценка)
     runs-on: ubuntu-latest
+    # Скачивание внешних наборов занимает десятки минут: только вручную
+    # или по ночному расписанию.
+    if: github.event_name == 'workflow_dispatch' || github.event_name == 'schedule'
+    timeout-minutes: 40
     needs: quality
     defaults:
       run:
@@ -372,28 +378,6 @@ jobs:
           # текстов с числами выполняет job «Единый файл чисел» (check_numbers.py).
           python scripts/make_external_report.py
 
-      - name: Закоммитить отчёт по baseline и внешним наборам
-        if: always()
-        working-directory: .
-        run: |
-          git config user.name "spanverify-bot"
-          git config user.email "actions@users.noreply.github.com"
-          git add -f spanverify-module/reports/baseline_from_article.json spanverify-module/reports/rus_hallu_eval.json spanverify-module/reports/external_tests.json spanverify-module/reports/EXTERNAL_TESTS.md spanverify-module/reports/ext_ragtruth_qa.json spanverify-module/reports/ext_rushallu.json || true
-          if git diff --cached --quiet; then
-            echo "нечего коммитить"
-            exit 0
-          fi
-          git commit -m "внешние наборы: baseline статьи и числа оценки [skip ci]"
-          for attempt in 1 2 3; do
-            if git pull --rebase --autostash -q origin "${GITHUB_REF_NAME}" && git push; then
-              echo "отчёты закоммичены (попытка $attempt)"
-              exit 0
-            fi
-            sleep 5
-          done
-          echo "::warning title=Внешние::не удалось закоммитить отчёты за 3 попытки"
-          exit 0
-
       - name: Артефакт отчётов по внешним наборам
         if: always()
         uses: actions/upload-artifact@v4
@@ -412,91 +396,14 @@ jobs:
   # скачивание официальных PDF и распознавание сканов. Результат (тексты источников,
   # пары, манифест, отчёт) коммитится в main — иначе его не увидеть из окружения
   # разработки, а проверяющему нужны сами документы для выборочной сверки.
-  corpus-a3:
-    name: "Корпус A3: реальные акты (скачивание, распознавание, сборка)"
-    runs-on: ubuntu-latest
-    timeout-minutes: 150
-    defaults:
-      run:
-        working-directory: spanverify-module
-    steps:
-      - uses: actions/checkout@v4
-
-      - uses: actions/setup-python@v5
-        with:
-          python-version: "3.11"
-
-      - name: Зависимости
-        run: |
-          python -m pip install --upgrade pip
-          python -m pip install -r requirements.txt
-          python -m pip install --disable-pip-version-check "pypdf~=6.1"
-
-      # Официальные PDF публикации — сканы без текстового слоя, поэтому нужен OCR.
-      - name: Поставить OCR (poppler + tesseract с русским)
-        run: |
-          sudo apt-get update -qq
-          sudo apt-get install -y -qq poppler-utils tesseract-ocr tesseract-ocr-rus
-
-      # Повторный прогон ничего не скачивает: если документов уже достаточно,
-      # загрузчик только сверяет хеши (проверено: 0 сетевых запросов в этом случае).
-      - name: Источники корпуса A3 (robots.txt, пауза ≥1 с, UA с контактом)
-        continue-on-error: true
-        run: |
-          # Параметры подобраны по факту: OCR — самая долгая часть (на 2 ядрах раннера
-          # ~2.5 с на страницу), поэтому распознаются первые страницы каждого акта;
-          # в манифесте у таких документов text_truncated=true. Прогресс пишется на диск
-          # по ходу, поэтому повторный запуск продолжает с места остановки.
-          python scripts/fetch_npa_corpus.py --out data/corpus_a3 --target-docs 130 --max-pages-per-type 8 --max-pages 6 --buffer 20 --pause 1.5 --workers 4
-
-      - name: Собрать корпус A3 (пары на реальных фрагментах)
-        id: build_a3
-        continue-on-error: true
-        run: python scripts/build_corpus_a.py --docs data/corpus_a3/sources --out data/corpus_a3 --target 1200 --seed 43 --real
-
-      - name: Проверки корпуса A3 (контексты, спаны, атрибуция числа, сплиты, хеши)
-        continue-on-error: true
-        run: python -m pytest tests/test_corpus_a3.py -q
-
-      - name: Отчёт по корпусу A3
-        if: always()
-        run: python scripts/make_corpus_a3_report.py
-
-      - name: Артефакт корпуса A3 (на случай, если коммит не пройдёт)
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: corpus-a3
-          path: |
-            spanverify-module/data/corpus_a3
-            spanverify-module/reports/CORPUS_A3.md
-          retention-days: 90
-
-      # Коммит без [skip ci]: следующий прогон увидит корпус и посчитает METRICS с ним.
-      - name: Закоммитить источники, пары и отчёт A3
-        if: always()
-        run: |
-          git config user.name "spanverify-bot"
-          git config user.email "actions@users.noreply.github.com"
-          git add -f data/corpus_a3 reports/CORPUS_A3.md reports/CORPUS_REPORT.md || true
-          if git diff --cached --quiet; then
-            echo "нечего коммитить"
-            exit 0
-          fi
-          git commit -m "корпус A3: источники реальных актов, пары и отчёт"
-          for attempt in 1 2 3; do
-            if git pull --rebase --autostash -q origin "${GITHUB_REF_NAME}" && git push; then
-              echo "корпус A3 закоммичен (попытка $attempt)"
-              exit 0
-            fi
-            sleep 5
-          done
-          echo "::warning title=A3::не удалось закоммитить корпус за 3 попытки"
-          exit 0
-
   probe-sources:
     name: Разведка официальных источников (не блокирует CI)
     runs-on: ubuntu-latest
+    timeout-minutes: 40
+    # Отключено по той же причине, что и corpus-a3: акты загружены вручную,
+    # разведка доступности источников больше не нужна, а job без таймаута
+    # висел до шести часов на запросах к недоступным сайтам.
+    if: false
     continue-on-error: true
     steps:
       - uses: actions/checkout@v4
@@ -579,30 +486,6 @@ jobs:
         working-directory: spanverify-module
         run: python scripts/probe_ips_final.py --out reports/ips_final_probe.json
 
-      # Результат разведки коммитится: артефакты GitHub не читаются из окружения
-      # разработки, а факты об API нужны в репозитории. [skip ci] не даёт запустить
-      # новый прогон от этого коммита.
-      - name: Закоммитить результат разведки
-        if: always()
-        run: |
-          git config user.name "spanverify-bot"
-          git config user.email "actions@users.noreply.github.com"
-          git add -f spanverify-module/reports/probe_sources.json spanverify-module/reports/npa_probe.json spanverify-module/reports/npa_probe2.json spanverify-module/reports/npa_probe3.json spanverify-module/reports/npa_text_probe.json spanverify-module/reports/npa_extract_probe.json spanverify-module/reports/npa_svg_probe.json spanverify-module/reports/ips_probe.json spanverify-module/reports/ips_text_probe.json spanverify-module/reports/ips_export_probe.json spanverify-module/reports/ips_list_probe.json spanverify-module/reports/ips_final_probe.json || true
-          if git diff --cached --quiet; then
-            echo "нечего коммитить"
-            exit 0
-          fi
-          git commit -m "разведка источников: факты доступности и API [skip ci]"
-          # Ветка main может уйти вперёд (параллельные прогоны): перебазируемся и повторяем push.
-          for attempt in 1 2 3; do
-            if git pull --rebase --autostash -q origin "${GITHUB_REF_NAME}" && git push; then
-              echo "разведка закоммичена (попытка $attempt)"
-              exit 0
-            fi
-            sleep 5
-          done
-          echo "::warning title=Разведка::не удалось закоммитить результат за 3 попытки"
-          exit 0
 
       - name: Артефакт разведки
         if: always()

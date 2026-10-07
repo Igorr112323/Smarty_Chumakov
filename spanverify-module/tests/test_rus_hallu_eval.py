@@ -60,11 +60,25 @@ def test_evaluate_reports_both_metric_groups(tmp_path: Path) -> None:
 
 
 def test_baseline_comparison_is_not_invented(tmp_path: Path) -> None:
-    """Пока числа статьи не извлечены, сравнение с baseline = null, и это сказано словами."""
+    """Числа статьи нельзя выдумать: либо их нет, либо у них есть источник.
+
+    Раньше числа статьи ещё не были извлечены, и проверка требовала пустого
+    поля. Теперь они извлечены из PDF статьи, поэтому проверка требует другого:
+    у каждого числа должен быть адрес источника и прямое указание, что числа
+    взяты из текста статьи, а не пересчитаны нашей программой. Выдать чужие
+    числа за результат своего измерения — ровно то, от чего эта проверка
+    и была задумана.
+    """
     _write_pairs(tmp_path / "pairs.jsonl")
     report = evaluate(tmp_path, mode="demo")
-    assert report["baseline_comparison"] is None
-    assert "не извлечены" in report["baseline_note"]
+    comparison = report["baseline_comparison"]
+    if comparison is None:
+        assert "не извлечены" in report["baseline_note"]
+        return
+    assert comparison.get("article_url"), "у чисел baseline должен быть адрес источника"
+    assert "без пересчёта" in (
+        comparison.get("note") or ""
+    ), "числа статьи нельзя выдавать за пересчитанные своей программой"
 
 
 def test_evaluate_handles_clean_pairs_without_labels(tmp_path: Path) -> None:

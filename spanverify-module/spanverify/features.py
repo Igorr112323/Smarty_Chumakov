@@ -24,15 +24,31 @@
 from __future__ import annotations
 
 import statistics
-from collections.abc import Sequence
+from collections.abc import Mapping, Sequence
 from dataclasses import dataclass, field
 from typing import Any
 
 from .core import Token, number_value, numbers_in, split_chunks
 from .lexicon import BOILERPLATE_WORDS, PARAPHRASE_WORDS, STOPWORDS, find_phrase_hits
+from .normalize import numbers_to_digits, words_to_number
 from .vectors import hash_index, normalize
 
 FEATURE_NAMES = ("attention_entropy", "ctx_attention_mass", "embedding_density")
+# Признаки-кандидаты: считаются рядом с рабочими, но НЕ входят в итоговый риск
+# (в DEFAULT_WEIGHTS их нет). Они нужны, чтобы измерить на реальной модели,
+# даёт ли нормировка массы на длину контекста прибавку к AUC, и только после
+# измерения решать, переводить ли их в рабочие.
+DIAGNOSTIC_FEATURES = (
+    "ctx_attention_mass_norm",
+    "ctx_attention_mass_lift",
+    # Итерация 2: расстояние до подтверждающего фрагмента.
+    "ctx_max_similarity",
+    "ctx_support_distance",
+    "ctx_similarity_decay",
+    # Итерация 3: выделенность максимума над фоном и над вторым источником.
+    "ctx_sim_contrast",
+    "ctx_sim_margin",
+)
 MEASUREMENT_SUBJECT_WINDOW = 6  # сколько слов перед числом считаем его субъектом
 MEASUREMENT_MATCH_MIN = 0.5  # порог совпадения субъекта ответа с измерением контекста
 SCORED_MIN_LEN = 3
@@ -74,6 +90,16 @@ class FeatureMatrix:
     attention_entropy: list[float] = field(default_factory=list)
     ctx_attention_mass: list[float] = field(default_factory=list)
     embedding_density: list[float] = field(default_factory=list)
+    # Диагностические (не участвуют в риске): нормированная масса опоры.
+    ctx_mass_expected: list[float] = field(default_factory=list)
+    ctx_mass_norm: list[float] = field(default_factory=list)
+    ctx_mass_lift: list[float] = field(default_factory=list)
+    # Диагностические (итерация 2): максимум похожести и где он найден.
+    ctx_max_similarity: list[float] = field(default_factory=list)
+    ctx_support_distance: list[float] = field(default_factory=list)
+    ctx_similarity_decay: list[float] = field(default_factory=list)
+    ctx_sim_contrast: list[float] = field(default_factory=list)
+    ctx_sim_margin: list[float] = field(default_factory=list)
     token_risk: list[float] = field(default_factory=list)
     meta: dict[str, Any] = field(default_factory=dict)
 
@@ -111,6 +137,114 @@ def scale(values: Sequence[float]) -> list[float]:
     return [min(1.0, max(0.0, value / high)) for value in values]
 
 
+def expected_context_mass(context_tokens: int, position: int) -> float:
+    """Доля контекстных позиций среди позиций, доступных causal-вниманию.
+
+    Сырая масса внимания на контекст несёт в себе артефакт длины: если контекст
+    занимает 90 % последовательности, то даже при полностью равномерном
+    внимании токен ответа «отдаст» контексту около 0,9. Сравнивать такие
+    величины между документами разной длины и между токенами на разном
+    удалении от начала ответа нельзя. Ожидаемая масса — это значение при
+    равномерном внимании: сколько контекстных позиций лежит в causal-префиксе
+    ``[0, position]``.
+    """
+    visible = position + 1
+    if visible <= 0 or context_tokens <= 0:
+        return 0.0
+    return min(1.0, context_tokens / float(visible))
+
+
+def normalised_context_mass(observed: float, expected: float, eps: float = 1e-9) -> float:
+    """Observed/Expected: во сколько раз масса выше равномерной.
+
+    1,0 — «как при равномерном внимании», > 1 — токен смотрит в контекст
+    больше случайного, < 1 — смотрит в собственный префикс ответа. Значение
+    не ограничено сверху: обрезка до [0, 1] съедала бы именно те сильные
+    случаи, которые мы ищем.
+    """
+    if expected <= eps:
+        return 0.0
+    return float(observed) / float(expected)
+
+
+def similarity_contrast(maximum: float, mean_value: float) -> float:
+    """Выделенность максимума над средним уровнем похожести по контексту.
+
+    Признак итерации 3. Сам по себе максимум похожести высок у «гладких»
+    документов, где любой токен похож на любой: это свойство текста, а не
+    признак опоры. Вычитание среднего уровня оставляет только превышение над
+    фоном, то есть именно наличие источника, а не общую похожесть документа.
+    """
+    return float(maximum) - float(mean_value)
+
+
+def similarity_margin(maximum: float, second: float) -> float:
+    """Отрыв лучшего источника от второго по силе.
+
+    Если максимум лишь немного выше второго, опора неопределённа: токен похож
+    на много мест сразу, и «подтверждение» ничем не выделяется. Большой отрыв
+    означает один явный источник.
+    """
+    return float(maximum) - float(second)
+
+
+def normalised_support_distance(distance: int, seq_len: int) -> float:
+    """Расстояние до опорного токена контекста, нормированное на длину текста.
+
+    Признак итерации 2: важен не только сам максимум похожести, но и то, как
+    далеко в документе лежит подтверждающий фрагмент. Нормировка на длину
+    последовательности нужна, чтобы «200 токенов» в коротком и длинном акте
+    не означали разного.
+    """
+    if seq_len <= 1:
+        return 0.0
+    return min(1.0, max(0.0, float(distance) / float(seq_len - 1)))
+
+
+def distance_decay(similarity: float, distance: int, scale: float) -> float:
+    """Похожесть со штрафом за удалённость опоры: ``sim · exp(−d/τ)``.
+
+    Чем дальше подтверждающий фрагмент, тем меньше он годится как опора для
+    конкретного утверждения. Множитель сохраняет знак и шкалу похожести, поэтому
+    признак остаётся сопоставимым с плотностью.
+    """
+    if scale <= 0:
+        return 0.0
+    import math  # noqa: PLC0415
+
+    return float(similarity) * math.exp(-abs(int(distance)) / float(scale))
+
+
+def context_mass_lift(observed: float, expected: float) -> float:
+    """Аддитивная разность «наблюдаемая − ожидаемая» масса в [-1, 1]."""
+    return max(-1.0, min(1.0, float(observed) - float(expected)))
+
+
+def scale_robust(values: Sequence[float], quantile: float = 1.0) -> list[float]:
+    """Нормировка по квантили вместо максимума: устойчивость к одиночному пику.
+
+    :func:`scale` делит на максимум, и этого достаточно, пока распределение без
+    тяжёлых хвостов. Энтропия внимания реальной модели часто имеет один
+    аномальный токен: деление на него сжимает риск остальных к нулю. Это
+    гипотеза, а не измеренная причина прогона 37472951524 (там оценка
+    подхватила чужую голову). Функция нужна, чтобы гипотезу можно было
+    включить и измерить отдельно.
+
+    ``quantile = 1.0`` — прежнее поведение (максимум), поэтому демонстрационный
+    режим и все прежние числа не меняются.
+    """
+    if not values:
+        return []
+    if quantile >= 1.0:
+        return scale(values)
+    ordered = sorted(float(value) for value in values)
+    index = min(len(ordered) - 1, max(0, int(round(quantile * (len(ordered) - 1)))))
+    high = ordered[index]
+    if high <= 1e-12:
+        return [0.0] * len(values)
+    return [min(1.0, max(0.0, value / high)) for value in values]
+
+
 def _clamp01(value: float) -> float:
     """Ограничить значение отрезком [0, 1] (NaN → 0)."""
     if value != value:  # NaN
@@ -127,6 +261,7 @@ def combine(
     mass: Sequence[float],
     density: Sequence[float],
     weights: dict[str, float] | None = None,
+    entropy_quantile: float = 1.0,
 ) -> list[float]:
     """Взвешенная комбинация признаков: r = w1·Ĥ + w2·(1 − m̂) + w3·d̂.
 
@@ -135,10 +270,14 @@ def combine(
     ``embedding_density`` имеют абсолютный смысл (0 = опоры нет, 1 = токен
     подтверждён), поэтому они НЕ делятся на собственный максимум: иначе ответ,
     где слабо поддержаны все токены, выглядел бы полностью подтверждённым.
+
+    ``entropy_quantile`` < 1 включает нормировку по квантили вместо максимума —
+    это нужно режиму ``hf`` (см. :func:`scale_robust`); значение 1.0 сохраняет
+    прежнее поведение.
     """
     weights = {**DEFAULT_WEIGHTS, **(weights or {})}
     total = sum(abs(weights.get(name, 0.0)) for name in FEATURE_NAMES) or 1.0
-    e_hat = scale(entropy)
+    e_hat = scale_robust(entropy, entropy_quantile)
     m_hat = [_clamp01(value) for value in mass]
     d_hat = [_clamp01(value) for value in density]
     out: list[float] = []
@@ -178,7 +317,9 @@ def demo_features(
     context_tokens = tokenize_with_offsets(chunks.text) if chunks.text else []
 
     # --- контекстные слова (для лексической поддержки и словаря опоры) ---
-    context_numbers = numbers_in(chunks.text) if chunks.text else set()
+    # Контекст нормализуется: иначе «25» в документе и «двадцать пять» в ответе
+    # не совпадали, и корректный ответ получал ложное замечание.
+    context_numbers = numbers_in(numbers_to_digits(chunks.text)) if chunks.text else set()
     context_words: list[tuple[str, frozenset[str]]] = [
         (token.word, _trigrams(token.word)) for token in context_tokens if _is_content(token)
     ]
@@ -190,6 +331,9 @@ def demo_features(
     mass: list[float] = []
     density: list[float] = []
 
+    # Числа прописью занимают несколько токенов («двадцать» + «пять»), поэтому
+    # значение считается для группы целиком, а не по отдельному токену.
+    token_values = _group_number_values(tokens)
     for index, token in enumerate(tokens):
         word = token.word.lower()
         content = _is_content(token)
@@ -209,7 +353,7 @@ def demo_features(
         support = 0.0
         if content and context_words:
             support = _support_overlap(word, context_words)
-        value = number_value(token)
+        value = token_values[index] if index < len(token_values) else None
         if value is not None and context_numbers:
             # Число подтверждено, только если такое же значение есть в контексте.
             support = 1.0 if value in context_numbers else 0.0
@@ -248,6 +392,38 @@ def demo_features(
             "k": k,
         },
     )
+
+
+def _group_number_values(tokens: Sequence[Token]) -> list[str | None]:
+    """Каноническое значение числа для каждого токена с учётом группы токенов.
+
+    «двадцать пять» — два токена, но одно число. Раньше каждый токен
+    сравнивался с контекстом отдельно, и корректный ответ с числом прописью
+    получал нулевую опору: в документе «25», а в ответе токены «20» и «5».
+    Отсюда ложные замечания на чистых парах и провал на кросс-корпусе, где
+    генератор пишет числа словами.
+    """
+    values: list[str | None] = [None] * len(tokens)
+    index = 0
+    while index < len(tokens):
+        if number_value(tokens[index]) is None:
+            index += 1
+            continue
+        end = index
+        group: list[str] = []
+        while end < len(tokens) and number_value(tokens[end]) is not None:
+            group.append(tokens[end].word.lower().replace("ё", "е"))
+            end += 1
+        if all(item.isdigit() for item in group):
+            joined = "".join(group)
+            value: str | None = str(int(joined)) if joined.isdigit() else None
+        else:
+            total = words_to_number(group)
+            value = str(total) if total is not None else None
+        for position in range(index, end):
+            values[position] = value
+        index = end
+    return values
 
 
 def _trigrams(text: str, n: int = 3) -> frozenset[str]:
@@ -539,8 +715,13 @@ def _attribute_tokens(tokens: Sequence[Token], measurements: Sequence[Measuremen
         return []
     distinctive = _distinctive_measurements(measurements)
     results: list[NumberAttribution] = []
+    # Значение берётся для группы токенов: «двадцать пять» — одно число, а не
+    # «20» и «5». Иначе число прописью не совпадало бы с «25» в документе и
+    # обвинялось бы в заимствовании у чужого объекта — отсюда ложные
+    # замечания на совершенно корректных ответах (исправление B4).
+    group_values = _group_number_values(tokens)
     for index, token in enumerate(tokens):
-        value = number_value(token)
+        value = group_values[index] if index < len(group_values) else None
         if value is None:
             continue
         subject = _subject_words(tokens, index)
@@ -603,8 +784,16 @@ def _apply_number_consistency(tokens: Sequence[Token], context_numbers: set[str]
     """
     if not context_numbers:
         return
+    # Значение берётся для группы токенов, а не по одному токену: иначе
+    # «двадцать пять» распадается на «20» и «5», которых в документе нет,
+    # и корректный ответ с числом прописью получает нулевую опору.
+    # Тот же дефект, что закрывался в _attribute_tokens (B4), но в этой
+    # функции он оставался незамеченным.
+    group_values = _group_number_values(tokens)
     for index, token in enumerate(tokens):
-        value = number_value(token)
+        value = group_values[index] if index < len(group_values) else None
+        if value is None:
+            value = number_value(token)
         if value is not None and value not in context_numbers:
             mass[index] = 0.0
 
@@ -689,11 +878,21 @@ def hf_features(
     пилоту: он сравнивает информативность признаков по слоям и не должен
     зависеть от того, что «полезный» слой оказался не последним.
     """
+    from .backends.base import BackendUnavailable  # noqa: PLC0415
+
+    # Зависимости проверяются до импорта torch: иначе при их отсутствии вылетал
+    # бы голый ModuleNotFoundError, и пользователь не понимал бы, что делать.
+    # Тихая подмена hf на demo здесь запрещена: если запрошен реальный режим,
+    # ответ должен быть либо реальным, либо явной ошибкой (дефект A3 реестра).
+    from .backends.hf import HFBackend  # noqa: PLC0415
+    from .core import tokenize_with_offsets  # noqa: PLC0415
+
+    ok, reason = HFBackend.dependencies()
+    if not ok:
+        raise BackendUnavailable(reason)
+
     import torch  # noqa: PLC0415
     from transformers import AutoModelForCausalLM, AutoTokenizer  # noqa: PLC0415
-
-    from .backends.base import BackendUnavailable  # noqa: PLC0415
-    from .core import tokenize_with_offsets  # noqa: PLC0415
 
     tokens = list(answer_tokens) if answer_tokens is not None else tokenize_with_offsets(answer)
     if not tokens:
@@ -771,6 +970,14 @@ def hf_features(
     entropy_values: list[float] = []
     mass_values: list[float] = []
     density_values: list[float] = []
+    mass_expected_values: list[float] = []
+    mass_norm_values: list[float] = []
+    mass_lift_values: list[float] = []
+    max_sim_values: list[float] = []
+    support_distance_values: list[float] = []
+    decay_values: list[float] = []
+    contrast_values: list[float] = []
+    margin_values: list[float] = []
 
     # Векторы контекстных чанков и токенов — для плотности.
     context_token_embeddings: list[list[float]] = []
@@ -785,30 +992,97 @@ def hf_features(
             entropy_values.append(0.5)
             mass_values.append(0.0)
             density_values.append(0.0)
+            mass_expected_values.append(0.0)
+            mass_norm_values.append(0.0)
+            mass_lift_values.append(0.0)
+            max_sim_values.append(0.0)
+            support_distance_values.append(0.0)
+            decay_values.append(0.0)
+            contrast_values.append(0.0)
+            margin_values.append(0.0)
             continue
         entropy_values.append(statistics.fmean(float(entropy[position].item()) for position in positions))
         mass_parts: list[float] = []
         density_parts: list[float] = []
+        norm_parts: list[float] = []
+        lift_parts: list[float] = []
+        max_sim_parts: list[float] = []
+        distance_parts: list[float] = []
+        decay_parts: list[float] = []
+        contrast_parts: list[float] = []
+        margin_parts: list[float] = []
         for position in positions:
             row = attentions[:, position, :].mean(dim=0)  # (seq,)
-            mass_parts.append(float(row[context_positions].sum().item()) if context_positions else 0.0)
+            observed = float(row[context_positions].sum().item()) if context_positions else 0.0
+            mass_parts.append(observed)
+            # Ожидаемая масса — сколько контекстных позиций доступно на этой
+            # позиции при равномерном внимании. Без этого сравнения длинные
+            # контексты кажутся «более поддержанными» просто за счёт размера.
+            expected = expected_context_mass(len(context_positions), position)
+            norm_parts.append(normalised_context_mass(observed, expected))
+            lift_parts.append(context_mass_lift(observed, expected))
             if hidden_cpu is not None and context_token_embeddings:
                 vector = hidden_cpu[position].tolist()
-                similarities = sorted(
-                    (_cosine_dense(vector, other) for other in context_token_embeddings),
-                    reverse=True,
-                )
+                # Считаем похожесть вместе с позицией источника: для признаков
+                # итерации 2 важно не только значение максимума, но и где именно
+                # в документе лежит подтверждающий фрагмент.
+                scored = [
+                    (_cosine_dense(vector, other), source_position)
+                    for other, source_position in zip(context_token_embeddings, context_positions, strict=False)
+                ]
+                best_similarity, best_position = max(scored, key=lambda pair: pair[0])
+                distance = int(abs(position - best_position))
+                # Масштаб затухания — 10 % длины: устойчив к размеру документа.
+                decay_scale = max(1.0, 0.1 * seq_len)
+                max_sim_parts.append(float(best_similarity))
+                distance_parts.append(normalised_support_distance(distance, int(seq_len)))
+                decay_parts.append(distance_decay(best_similarity, distance, decay_scale))
+                similarities = sorted((value for value, _position in scored), reverse=True)
                 top = similarities[: max(1, k)]
                 density_parts.append(sum(top) / len(top))
+                # Фон и второй источник — для признаков итерации 3: один и тот же
+                # максимум означает разное в «гладком» и в «рваном» документе.
+                mean_similarity = statistics.fmean(similarities) if similarities else 0.0
+                second_similarity = (
+                    similarities[1] if len(similarities) > 1 else (similarities[0] if similarities else 0.0)
+                )
+                contrast_parts.append(similarity_contrast(best_similarity, mean_similarity))
+                margin_parts.append(similarity_margin(best_similarity, second_similarity))
             else:  # pragma: no cover - модель без hidden_states
                 density_parts.append(0.0)
+                max_sim_parts.append(0.0)
+                distance_parts.append(0.0)
+                decay_parts.append(0.0)
+                contrast_parts.append(0.0)
+                margin_parts.append(0.0)
         mass_values.append(min(1.0, max(0.0, statistics.fmean(mass_parts))))
         density_values.append(min(1.0, max(0.0, statistics.fmean(density_parts))))
+        # Для токена, разбитого на несколько сабтокенов, ожидаемая масса
+        # считается по первой позиции: остальные имеют тот же префикс плюс
+        # свои собственные, уже принадлежащие ответу.
+        first_position = min(positions)
+        expected_token = expected_context_mass(len(context_positions), first_position)
+        mass_expected_values.append(expected_token)
+        mass_norm_values.append(statistics.fmean(norm_parts) if norm_parts else 0.0)
+        mass_lift_values.append(statistics.fmean(lift_parts) if lift_parts else 0.0)
+        max_sim_values.append(statistics.fmean(max_sim_parts) if max_sim_parts else 0.0)
+        support_distance_values.append(statistics.fmean(distance_parts) if distance_parts else 0.0)
+        decay_values.append(statistics.fmean(decay_parts) if decay_parts else 0.0)
+        contrast_values.append(statistics.fmean(contrast_parts) if contrast_parts else 0.0)
+        margin_values.append(statistics.fmean(margin_parts) if margin_parts else 0.0)
 
     return FeatureMatrix(
         attention_entropy=entropy_values,
         ctx_attention_mass=mass_values,
         embedding_density=density_values,
+        ctx_mass_expected=mass_expected_values,
+        ctx_mass_norm=mass_norm_values,
+        ctx_mass_lift=mass_lift_values,
+        ctx_max_similarity=max_sim_values,
+        ctx_support_distance=support_distance_values,
+        ctx_similarity_decay=decay_values,
+        ctx_sim_contrast=contrast_values,
+        ctx_sim_margin=margin_values,
         meta={
             "backend": "hf",
             "model": model_name,
@@ -859,13 +1133,141 @@ def _cosine_dense(a: Sequence[float], b: Sequence[float]) -> float:
     return max(0.0, numerator / (norm_a * norm_b))
 
 
+# Реестр активного кеша. Нужен потому, что признаки считаются не только из
+# Verifier, но и из обучения (train()), которое создаёт верификатор внутри себя:
+# явный параметр до туда не дошёл бы. Реестр — единственный способ покрыть все
+# пути без правки каждого вызывающего места. Тесты обязаны его очищать.
+_ACTIVE_FEATURE_CACHE: dict[str, FeatureMatrix] | None = None
+
+
+def set_feature_cache(cache: Mapping[str, FeatureMatrix] | None) -> None:
+    """Включить (или выключить при ``None``) глобальный кеш признаков."""
+    global _ACTIVE_FEATURE_CACHE  # noqa: PLW0603
+    _ACTIVE_FEATURE_CACHE = dict(cache) if cache is not None else None
+
+
+def get_feature_cache() -> Mapping[str, FeatureMatrix] | None:
+    """Текущий активный кеш признаков (``None`` — кеш выключен)."""
+    return _ACTIVE_FEATURE_CACHE
+
+
+class CountingFeatureCache(dict):
+    """Кеш признаков со счётчиком попаданий и промахов.
+
+    Промах опасен не ошибкой, а тишиной: если ключ не совпал, признаки молча
+    считаются моделью заново, эксперимент снова идёт часами, а в отчёте этого
+    не видно. Счётчик делает расхождение ключей видимым в логе job'а.
+    """
+
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
+        super().__init__(*args, **kwargs)
+        self.hits = 0
+        self.misses = 0
+
+    def get(self, key: str, default: Any = None) -> Any:
+        if dict.__contains__(self, key):
+            self.hits += 1
+            return dict.__getitem__(self, key)
+        self.misses += 1
+        return default
+
+    def __repr__(self) -> str:  # pragma: no cover - отладочное
+        return f"<CountingFeatureCache {len(self)} ключей, попаданий {self.hits}, промахов {self.misses}>"
+
+
+def load_feature_cache(paths: Any, counting: bool = False) -> dict[str, FeatureMatrix]:
+    """Прочитать кеш из файла(.ов) JSONL или из каталога с шардами.
+
+    Шарды пишутся независимыми job'ами в ``features_*.jsonl``; здесь они
+    склеиваются в один словарь. Порядок не важен: обращение по ключу.
+    """
+    import json  # noqa: PLC0415
+    from pathlib import Path  # noqa: PLC0415
+
+    if isinstance(paths, (str, Path)):
+        paths = [paths]
+    cache: dict[str, FeatureMatrix] = CountingFeatureCache() if counting else {}
+    for raw in paths or ():
+        path = Path(raw)
+        if path.is_dir():
+            # rglob: gh run download кладёт каждый артефакт в свой подкаталог.
+            files = sorted(path.rglob("features_*.jsonl"))
+        else:
+            files = [path]
+        for file in files:
+            if not file.is_file():
+                continue
+            for line in file.read_text(encoding="utf-8").splitlines():
+                line = line.strip()
+                if not line:
+                    continue
+                row = json.loads(line)
+                key = row.get("key")
+                if not key:
+                    continue
+                cache[key] = FeatureMatrix(
+                    attention_entropy=[float(x) for x in row.get("attention_entropy", [])],
+                    ctx_attention_mass=[float(x) for x in row.get("ctx_attention_mass", [])],
+                    embedding_density=[float(x) for x in row.get("embedding_density", [])],
+                    meta={"from_cache": True, "pair_id": row.get("pair_id")},
+                )
+    return cache
+
+
+# Модель, на которой считаются признаки режима hf в экспериментах и в кеше.
+# Должна совпадать у предпосчёта и у оценки: имя входит в ключ кеша. Расхождение
+# (в конфиге по умолчанию стоит rubert-tiny2, а кеш писался для rugpt3small)
+# давало тихий промах: оценка либо пересчитывала признаки другой моделью, либо
+# падала, если torch не установлен.
+HF_MODEL_DEFAULT = "ai-forever/rugpt3small_based_on_gpt2"
+
+
+def feature_cache_key(
+    answer: str,
+    context: str | Sequence[str] | None,
+    mode: str,
+    model_name: str = "",
+) -> str:
+    """Ключ кеша признаков: ответ + контекст + режим + модель.
+
+    Счёт признаков на реальной модели занимает минуты на пару, и в
+    кросс-валидации каждая пара встречается в нескольких фолдах. Кеш делает
+    дорогой проход однократным. Ключ включает модель и режим: признаки разных
+    моделей несопоставимы, и подмена одного другим исказила бы результат.
+    """
+    import hashlib  # noqa: PLC0415
+
+    if isinstance(context, str):
+        context_text = context
+    elif context:
+        context_text = "\n".join(str(item) for item in context)
+    else:
+        context_text = ""
+    payload = f"{mode}|{model_name}|{answer}|{context_text}"
+    return hashlib.sha256(payload.encode("utf-8")).hexdigest()
+
+
 def extract_features(
     answer: str,
     context: str | Sequence[str] | None,
     mode: str = "demo",
+    cache: Mapping[str, FeatureMatrix] | None = None,
+    cache_key: str | None = None,
     **kwargs: Any,
 ) -> FeatureMatrix:
-    """Единая точка входа: признаки заказанного режима."""
+    """Единая точка входа: признаки заказанного режима, при `cache` — из кеша.
+
+    Кеш — единственный способ уложить эксперимент на реальной модели в разумное
+    время: `hf_features` делает прямой проход по модели, а в кросс-валидации
+    признаки каждой пары требуются в каждом фолде.
+    """
+    if cache is None:
+        cache = _ACTIVE_FEATURE_CACHE
+    if cache is not None:
+        key = cache_key or feature_cache_key(answer, context, mode, str(kwargs.get("model_name", "")))
+        cached = cache.get(key)
+        if cached is not None:
+            return cached
     if mode == "hf":
         return hf_features(answer, context, **kwargs)
     return demo_features(answer, context, **kwargs)
