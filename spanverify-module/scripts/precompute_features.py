@@ -106,7 +106,7 @@ def dump_matrix(key: str, matrix, pair_id: str, mode: str = "hf", model: str = "
     return row
 
 
-def dump_grid_row(key: str, pair_id: str, result: dict, model: str) -> dict:
+def dump_grid_row(key: str, pair_id: str, result: dict, model: str, revision: str = "") -> dict:
     """Строка кеша сетки (v3): признаки, токены ответа и метаданные прогона.
 
     ``tokens`` пишутся вместе с массивами намеренно: потребитель, который
@@ -120,6 +120,9 @@ def dump_grid_row(key: str, pair_id: str, result: dict, model: str) -> dict:
         "grid_format": GRID_CACHE_FORMAT,
         "cache_format": GRID_CACHE_FORMAT,
         "model": model,
+        # Revision весов рядом с признаками: числа протокола обязаны быть
+        # привязаны к конкретной ревизии модели, а не только к её имени.
+        "revision": str(revision or ""),
         "arrays": {name: [float(value) for value in result["arrays"].get(name, [])] for name in GRID_FEATURE_NAMES},
         "tokens": list(result["tokens"]),
         "meta": dict(result["meta"]),
@@ -342,7 +345,7 @@ def _run_grid(args, dataset: Path) -> int:
                     window=args.window,
                 )
                 key = feature_cache_key(answer, context, "hf", args.model)
-                row = dump_grid_row(key, pair_id, result, args.model)
+                row = dump_grid_row(key, pair_id, result, args.model, str(info.get("revision") or ""))
                 handle.write(json.dumps(row, ensure_ascii=False) + "\n")
                 handle.flush()
                 done += 1
@@ -379,7 +382,10 @@ def _run_grid(args, dataset: Path) -> int:
         "seconds": round(elapsed, 1),
         "seconds_per_pair": round(elapsed / max(1, done + skipped), 3),
     }
-    (out_dir / f"grid_summary_{suffix}.json").write_text(
+    # Имя сводки включает части прогона: артефакты шардов и корпусов сливаются в
+    # один каталог (`merge-multiple: true`), и одинаковые имена затёрли бы друг друга.
+    labels = "_".join(str(name) for name, _records in targets if name) or "pairs"
+    (out_dir / f"grid_summary_{suffix}_{labels}.json").write_text(
         json.dumps(summary, ensure_ascii=False, indent=2), encoding="utf-8"
     )
     print(json.dumps(summary, ensure_ascii=False, indent=2), flush=True)

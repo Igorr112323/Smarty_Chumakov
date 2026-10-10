@@ -53,7 +53,7 @@ from spanverify.core import tokenize_with_offsets  # noqa: E402
 from spanverify.dataset import read_pairs  # noqa: E402
 from spanverify.engine import _answer_metrics, _span_f1, _token_metrics  # noqa: E402
 from spanverify.features import is_scored_token  # noqa: E402
-from spanverify.hf_grid import GRID_CACHE_FORMAT, GRID_FEATURE_NAMES  # noqa: E402
+from spanverify.hf_grid import GRID_CACHE_FORMAT, GRID_FEATURE_NAMES, grid_model_revision  # noqa: E402
 from spanverify.logreg import standardize, train_logreg  # noqa: E402
 
 MAX_EXPERIMENTS = 10
@@ -287,6 +287,34 @@ def load_grid_cache(paths: Sequence[Path]) -> dict[str, dict[str, Any]]:
     if not cache:
         raise SystemExit("кеш сетки пуст: укажите --grid-cache (результат precompute_features.py --grid)")
     return cache
+
+
+def cache_model_provenance(cache: dict[str, dict[str, Any]]) -> dict[str, Any]:
+    """Модель и revision — из строк кеша; имена весов, на которых посчитаны признаки.
+
+    Шаг 3 модель не загружает (признаки взяты из кеша), поэтому id и revision
+    берутся из самих строк кеша, а при их отсутствии — из хаба одним запросом.
+    """
+    models = sorted({str(row.get("model") or "") for row in cache.values()} - {""})
+    if len(models) > 1:
+        # Смешать в одном измерении признаки разных моделей нельзя: модель — часть
+        # определения метрики, а не деталь реализации.
+        raise SystemExit(f"кеш сетки построен разными моделями {models}: пересоберите кеш одной")
+    revisions = sorted({str(row.get("revision") or "") for row in cache.values()} - {""})
+    model_id = models[0] if len(models) == 1 else "+".join(models)
+    revision = revisions[0] if len(revisions) == 1 else "+".join(revisions)
+    if not revision and len(models) == 1:
+        try:
+            revision = grid_model_revision(models[0])
+        except Exception as exc:  # noqa: BLE001 - отсутствие сети не валит прогон
+            revision = f"не получена: {type(exc).__name__}"
+    return {
+        "id": model_id or "неизвестно",
+        "revision": revision or "не записана в кеше",
+        "models_seen": models,
+        "revisions_seen": revisions,
+        "rows": len(cache),
+    }
 
 
 def _cache_paths(directory: Path) -> list[Path]:
@@ -943,8 +971,16 @@ def run_experiment(
     seed: int,
     *,
     keep_rows: bool = False,
+    fixed_threshold: float | None = None,
 ) -> dict[str, Any]:
-    """Один эксперимент: обучение на fit-части, оценка на eval-части, порог с CV по fit."""
+    """Один эксперимент: обучение на fit-части, оценка на eval-части, порог с CV по fit.
+
+    ``fixed_threshold`` — заморозка порога для шага 3: порог один раз выбран
+    групповой CV по документам на обучающей части (seed 42) и более не
+    переселекцируется. Иначе каждый seed подбирал бы свой порог по своей модели,
+    и зафиксированное ДО шага 3 число нельзя было бы сверить с манифестом — а
+    именно эта сверка и есть запрет подгонки порога по тесту.
+    """
     names = entry["features"]
     fit_rows = prepare(fit_records, cache, names)
     eval_rows = prepare(eval_records, cache, names)
@@ -961,6 +997,10 @@ def run_experiment(
         seed,
         int(entry["window"]),
     )
+    frozen = fixed_threshold is not None
+    if frozen:
+        threshold = float(fixed_threshold)
+        details = {**(details or {}), "source": "frozen-before-step-3"}
     for row, value in zip(eval_rows, model.scores(feature_matrix(eval_rows, names)), strict=True):
         row["score"] = float(value)
     groups = group_by_pair(eval_rows)
@@ -970,7 +1010,12 @@ def run_experiment(
     block = {
         "threshold": round(float(threshold), 6),
         "threshold_selection": details,
-        "threshold_scale": "вероятность модели; порог подобран по out-of-fold оценкам того же масштаба и с тем же сглаживанием",
+        "threshold_frozen": bool(frozen),
+        "threshold_scale": (
+            "вероятность модели; порог подобран по out-of-fold оценкам того же масштаба и с тем же сглаживанием"
+            if not frozen
+            else "вероятность модели; порог заморожен до шага 3 (config/hf_final_config.json), scale и сглаживание — как при его отборе"
+        ),
         "fit": _plain(
             _token_metrics(
                 [int(row["gold"]) for row in fit_rows],
@@ -1061,6 +1106,7 @@ def command_sweep(args: argparse.Namespace) -> int:
         "best_reaches_criterion_on_val": bool(best and (best["selection"]["token_f1_val"] or 0.0) >= CRITERION_F1),
         "experiments": results,
         "hardware": hardware_manifest(),
+        "model": cache_model_provenance(cache),
         "code_commit": _git_commit(),
         "duration_s": round(time.time() - started, 2),
     }
@@ -1216,8 +1262,20 @@ def command_final(args: argparse.Namespace) -> int:
     seeds = [int(value) for value in str(args.seeds).split(",") if value.strip()]
     per_seed: list[dict[str, Any]] = []
     predictions: list[dict[str, Any]] = []
+    frozen_threshold = config.get("threshold")
+    if frozen_threshold is not None:
+        frozen_threshold = float(frozen_threshold)
+        print(f"порог заморожен до шага 3: {frozen_threshold} (config/{config_path.name})")
     for seed in seeds:
-        block = run_experiment(cache, list(train) + list(val), test, entry, seed, keep_rows=True)
+        block = run_experiment(
+            cache,
+            list(train) + list(val),
+            test,
+            entry,
+            seed,
+            keep_rows=True,
+            fixed_threshold=frozen_threshold,
+        )
         if "error" in block:
             raise SystemExit(f"seed {seed}: {block['error']}")
         threshold = float(block["threshold"])
@@ -1281,7 +1339,14 @@ def command_final(args: argparse.Namespace) -> int:
         "seeds": seeds,
         "seed_rule": "seed'ы зафиксированы до запуска; лучший не выбирается — среднее по всем",
         "threshold": aggregate.get("threshold"),
-        "threshold_source": "CV по обучающей части (docs/METRIC_SPEC.md, раздел «отбор»)",
+        "threshold_source": (
+            f"заморожен до шага 3 в {config_path.name} (групповая CV по документам на train, seed {seeds[0]}); "
+            "применён ко всем seed'ам без переселекции"
+            if frozen_threshold is not None
+            else "CV по обучающей части (docs/METRIC_SPEC.md, раздел «отбор»)"
+        ),
+        "threshold_frozen": frozen_threshold is not None,
+        "model": cache_model_provenance(cache),
         "per_seed": per_seed,
         "metrics_mean_std": aggregate,
         "criterion": status,

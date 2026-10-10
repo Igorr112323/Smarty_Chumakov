@@ -402,6 +402,11 @@ def test_grid_row_writer_contract() -> None:
     row = module.dump_grid_row("key-1", "pair-1", result, "model-x")
     assert row["grid_format"] == 3 and row["cache_format"] == 3
     assert row["pair_id"] == "pair-1" and row["model"] == "model-x"
+    # Модель и её revision — часть определения признака: шаг 3 weights не грузит,
+    # поэтому ревизия обязана читаться из самой строки кеша.
+    assert row["revision"] == "", "без ревизии поле пустое: выдумывать её нельзя"
+    with_revision = module.dump_grid_row("key-1", "pair-1", result, "model-x", "rev-77")
+    assert with_revision["revision"] == "rev-77", "revision весов обязана попадать в строку кеша"
     assert set(row["arrays"]) == set(GRID_FEATURE_NAMES)
     assert row["arrays"]["mass_last"] == [0.25, 0.5]
     assert row["tokens"][0]["text"] == "срок"
