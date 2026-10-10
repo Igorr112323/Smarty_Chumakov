@@ -155,7 +155,11 @@ python scripts/hf_protocol.py verify-manifest --manifest reports/hf_final/manife
 
 | Метрика | Значение | Уровень | Выборка | Файл-источник | Подтверждающий тест |
 | --- | --- | --- | --- | --- | --- |
-| F1 / FPR | не измерено | токены | test (a3) | `reports/hf_final/manifest.json` | `tests/test_reported_metrics.py`, `tests/test_criterion_hf.py` |
+| F1 токены (mean ± std по 5 seed'ам) | 0,595041 ± 0,000000 | токены | test (a3) | `reports/hf_final/manifest.json` | `tests/test_reported_metrics.py`, `tests/test_criterion_hf.py` |
+| FPR токены | 0,006565 | токены | test (a3) | `reports/hf_final/manifest.json` | `tests/test_reported_metrics.py` |
+| F1 ответы (вердикт) | 0,648045 | ответы | test (a3) | `reports/hf_final/manifest.json` | `tests/test_reported_metrics.py` |
+| F1 фрагменты (IoU ≥ 0,5) | 0,256881 | фрагменты | test (a3) | `reports/hf_final/manifest.json` | `tests/test_reported_metrics.py` |
+| Статус критерия | **NOT MET** | токены | test (a3) | `reports/hf_final/manifest.json` | `tests/test_criterion_hf.py` |
 
 ## Отступления
 
@@ -195,7 +199,7 @@ CV не выполняется (`scripts/hf_protocol.py`), лимит `final` п
 Не-числа теперь пишутся в манифест как `null` с счётчиком `_not_computed`, а не
 как «0,0» и не как битый JSON.
 
-Третья попытка — тот же замороженный конфиг (sha256 `1b0e3502df6dea0c…`), тот же
+Третья попытка — тот же замороженный конфиг (sha256 файла `a45d49b4328fee34…`), тот же
 порог 0,1106, те же seed'ы 42–46, никаких изменений признаков и окна: по числам
 второй попытки ориентир не достигнут (0,595041 < 0,60), и после этого конфиг не
 менялся — переподбор по уже прочитанному тесту обнулил бы измерение. Повтор нужен
@@ -253,3 +257,47 @@ CV не выполняется (`scripts/hf_protocol.py`), лимит `final` п
 - Файл конфигурации: `config/hf_final_config.json` (sha256 `a45d49b4328fee340088ae5c473f1c81274ee7867ff412e215a98c1cafc4250c`).
 - Отступления: шаги 1–2 выполнены одним прогоном по заранее зафиксированной сетке config/hf_experiments.json (sha256 a7eb9b7a59e3f6b271248841055f11f1da23c460ce47b6f0187cbf1439442062), а не десятью отдельными коммитами: каждый из 10 экспериментов записан в docs/EXPERIMENTS.md и в reports/hf_protocol/sweep.json, включая отклонённые и вырожденные (F1=0); шаг 3 запускается пушем с меткой [hf-final] вместо workflow_dispatch: у токена песочницы нет права actions:write (403), а единственный запуск обязан быть воспроизводим и ограничен механизмом; в том же прогоне дополнительно измеряется корпус A1 тем же замороженным конфигом и теми же seed'ами (reports/hf_final_a1) — вторичное измерение, объявлено ДО запуска, источником отбора не является; артефакты публикуются в ветку data/metrics через Contents API: логи и артефакты CI из песочницы недоступны (result-хост вне списка разрешённых), иначе числа нельзя было бы перепроверить; порог зафиксирован числом и применён ко всем seed'ам шага 3 без переселекции (шаг 0 требует «порог — только на train, зафиксирован до шага 3»)
 - Команда шага 3: `python scripts/hf_protocol.py final --config config/hf_final_config.json --grid-cache reports/hf-grid --splits data/corpus_a3/splits --corpus-name a3 --seeds 42,43,44,45,46 --include-val --out reports/hf_final`
+
+
+## Шаг 3 — итог измерения (манифест получен)
+
+Прогон `38069737913` (код `39dffafe98591af0ceab41aa987452b81a92bcf0`), корпус **a3**,
+выборка **test** (177 пар, 64 документа, сокращений не было), обучение на
+`train+val`, пороги 0.1106 (заморожен до шага 3), seed'ы
+42, 43, 44, 45, 46. Длительность шага — 1080.58 с.
+Железо: AMD EPYC 7763 64-Core Processor, 4 CPU, RAM 15.61 ГБ,
+torch 2.14.1+cpu, transformers 5.19.0, python 3.11.17.
+Модель: `ai-forever/rugpt3small_based_on_gpt2` @ `a9307e696cd3…`.
+
+| Метрика | Значение | Уровень | Выборка | Файл-источник | Подтверждающий тест |
+| --- | --- | --- | --- | --- | --- |
+| F1 (mean ± std по 5 seed'ам) | 0.595041 ± 0.000000 | токены | test (a3) | `reports/hf_final/manifest.json` | `tests/test_reported_metrics.py`, `tests/test_criterion_hf.py` |
+| Precision | 0.709360 | токены | test (a3) | `reports/hf_final/manifest.json` | `tests/test_reported_metrics.py` |
+| Recall | 0.512456 | токены | test (a3) | `reports/hf_final/manifest.json` | `tests/test_reported_metrics.py` |
+| FPR | 0.006565 | токены | test (a3) | `reports/hf_final/manifest.json` | `tests/test_reported_metrics.py` |
+| AUC (справочно) | 0.952672 | токены | test (a3) | `reports/hf_final/manifest.json` | `tests/test_reported_metrics.py` |
+| TP / FP / FN / TN | 144 / 59 / 137 / 8928 | токены | test (a3) | `reports/hf_final/manifest.json` | `tests/test_reported_metrics.py` |
+| F1 | 0.648045 | ответы (вердикт) | test (a3) | `reports/hf_final/manifest.json` | `tests/test_reported_metrics.py` |
+| FPR | 0.300000 | ответы (вердикт) | test (a3) | `reports/hf_final/manifest.json` | `tests/test_reported_metrics.py` |
+| F1 | 0.256881 | фрагменты, IoU ≥ 0,5 | test (a3) | `reports/hf_final/manifest.json` | `tests/test_reported_metrics.py` |
+| Статус критерия ТЗ | **NOT MET** (F1 0.595041 при требовании ≥ 0,60; FPR 0.006565 при ≤ 0,40; разрыв 0.004959) | токены | test (a3) | `reports/hf_final/manifest.json` | `tests/test_criterion_hf.py` |
+
+Числа пересчитаны из `predictions_test.jsonl.gz` и `gold_test.jsonl.gz` независимо
+(`python scripts/hf_protocol.py verify-manifest --manifest reports/hf_final/manifest.json
+--predictions reports/hf_final/predictions_test.jsonl.gz --check-splits`):
+«числа воспроизведены: строк 46340, seed'ов 5»,
+расхождений нет; тестовая выборка сверена с заморозкой шага 0
+(`tests/test_no_test_leakage.py`, sha256 test `232d2583480f…`).
+
+Что честно надо сказать про разброс: `f1_std = 0.000000` — пять seed'ов дали
+**одинаковые** числа. Линейная модель обучается полным пакетом без перемешивания,
+seed меняет только инициализацию, и сходится в одно и то же решение. Значит
+этот прогон даёт одну точку, а не пять независимых подтверждений; заявлять
+«устойчивость» по нему нельзя.
+
+Test оказался **лучше** val (0,595041 против 0,515702 на отобранной части) — это
+совпадение распределений, а не результат подгонки: конфигурация, признаки, порог и
+окно были зафиксированы до запуска и после чтения test не менялись. Ориентир
+0,60 не достигнут на 0.004959 (0,83 % относительно), и осознанно не
+«дожимается»: единственный способ его «достичь» теперь — подобрать порог или
+признаки по уже прочитанному тесту, что обнулило бы измерение.
