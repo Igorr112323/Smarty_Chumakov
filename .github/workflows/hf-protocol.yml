@@ -418,6 +418,16 @@ jobs:
             --manifest reports/hf_final/manifest.json \
             --predictions reports/hf_final/predictions_test.jsonl.gz \
             --check-splits
+      - name: "Блок критерия в README — из манифеста, не от руки"
+        # До измерения в README стоит отметка «не измерено»: переписывать числа
+        # от руки запрещено, поэтому блок генерируется из только что полученного
+        # манифеста и тут же сверяется генератором и check_numbers. В ветку блок
+        # попадает следующим коммитом — вместе с артефактами прогона.
+        working-directory: spanverify-module
+        run: |
+          python scripts/render_hf_table.py --readme ../README.md --write
+          python scripts/render_hf_table.py --readme ../README.md
+          python scripts/check_numbers.py --metrics reports/METRICS.json
       - uses: actions/upload-artifact@v4
         with:
           name: "hf-protocol-final"
