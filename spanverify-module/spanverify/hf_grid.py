@@ -331,7 +331,16 @@ def compute_grid(  # pragma: no cover - требует torch и весов: unit
     encoded = {key: value.to(loaded.device) for key, value in encoded.items() if hasattr(value, "to")}
     seq_len = int(encoded["attention_mask"].sum().item())
     with torch.no_grad():
-        outputs = loaded.model(**encoded)
+        # Флаги передаются и в конфиг (при загрузке), и в вызов: transformers 5.x
+        # вправе игнорировать конфигурационные, а пустой attentions означал бы
+        # молча нулевые признаки — этого допускать нельзя.
+        outputs = loaded.model(**encoded, output_attentions=True, output_hidden_states=True)
+    attentions = tuple(outputs.attentions or ())
+    if not attentions:
+        raise RuntimeError(
+            "модель не вернула attention-веса: сетка признаков не построена; "
+            "продолжать прогон с нулевыми признаками запрещено протоколом"
+        )
 
     offsets, offsets_mode = _offsets_of_model_tokens(loaded.tokenizer, prompt, max_length)
     model_spans = [
@@ -344,7 +353,6 @@ def compute_grid(  # pragma: no cover - требует torch и весов: unit
     context_positions = list(range(first_answer))[:seq_len]
     token_positions = map_token_positions([(token.start, token.end) for token in tokens], model_spans, answer_start)
 
-    attentions = tuple(outputs.attentions)  # (layers,) × (1, heads, seq, seq)
     layers = len(attentions)
     layer_roles = {role: resolve_layer(role, layers) for role in ("first", "middle", "last", "m4")}
     log_scale = max(1e-9, math.log(max(2, seq_len)))
@@ -357,6 +365,12 @@ def compute_grid(  # pragma: no cover - требует torch и весов: unit
     mass_head_max: list[list[float]] = []
     disagreement: list[float] | None = None
     for layer_attentions in attentions:
+        # Attention приходит батчем (1, heads, seq, seq); редукции ниже — по
+        # головам, поэтому размерность батча снимается сразу. Без этого
+        # «среднее по головам» оказывается формой (heads, seq), и обращение
+        # table[position] отдаёт список вместо числа.
+        if layer_attentions.dim() == 4:
+            layer_attentions = layer_attentions[0]
         probabilities = layer_attentions.clamp_min(1e-9)
         entropy = -(probabilities * probabilities.log()).sum(dim=-1) / log_scale  # (heads, seq)
         if context_positions:

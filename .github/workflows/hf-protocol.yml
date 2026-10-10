@@ -80,6 +80,12 @@ jobs:
         env:
           OMP_NUM_THREADS: "4"
         run: |
+          # Логи job'а из песочницы не читаются (result-хост не в списке разрешённых),
+          # поэтому вывод шага пишется в файл, а при падении его последние строки
+          # публикуются аннотацией: аннотации отдаёт Checks API, они доступны всегда.
+          diag="$RUNNER_TEMP/hf-diag.log"; : > "$diag"
+          trap 'sleep 2; tail -c 2500 "$diag" | sed -e "s/[[:cntrl:]]/ /g" -e "s/%/%25/g" -e "s|^|::error::[grid ${{ matrix.corpus }} шард ${{ matrix.shard }}] |"' ERR
+          exec > >(tee -a "$diag") 2>&1
           corpus="${{ matrix.corpus }}"
           case "$corpus" in
             a3) dir="data/corpus_a3/splits" ;;
@@ -125,6 +131,12 @@ jobs:
         env:
           OMP_NUM_THREADS: "4"
         run: |
+          # Логи job'а из песочницы не читаются (result-хост не в списке разрешённых),
+          # поэтому вывод шага пишется в файл, а при падении его последние строки
+          # публикуются аннотацией: аннотации отдаёт Checks API, они доступны всегда.
+          diag="$RUNNER_TEMP/hf-diag.log"; : > "$diag"
+          trap 'sleep 2; tail -c 2500 "$diag" | sed -e "s/[[:cntrl:]]/ /g" -e "s/%/%25/g" -e "s|^|::error::[feat-cache ${{ matrix.corpus }} шард ${{ matrix.shard }}] |"' ERR
+          exec > >(tee -a "$diag") 2>&1
           corpus="${{ matrix.corpus }}"
           case "$corpus" in
             a3) dir="data/corpus_a3/splits" ;;
@@ -192,6 +204,12 @@ jobs:
         env:
           OMP_NUM_THREADS: "4"
         run: |
+          # Логи job'а из песочницы не читаются (result-хост не в списке разрешённых),
+          # поэтому вывод шага пишется в файл, а при падении его последние строки
+          # публикуются аннотацией: аннотации отдаёт Checks API, они доступны всегда.
+          diag="$RUNNER_TEMP/hf-diag.log"; : > "$diag"
+          trap 'sleep 2; tail -c 2500 "$diag" | sed -e "s/[[:cntrl:]]/ /g" -e "s/%/%25/g" -e "s|^|::error::[baseline] |"' ERR
+          exec > >(tee -a "$diag") 2>&1
           set -x
           python scripts/hf_protocol.py baseline \
             --corpus "a3=data/corpus_a3/splits;a1=data/corpus_a/splits" \
@@ -201,6 +219,12 @@ jobs:
       - name: "Шаг 2: перебор не более 10 конфигураций на val"
         working-directory: spanverify-module
         run: |
+          # Логи job'а из песочницы не читаются (result-хост не в списке разрешённых),
+          # поэтому вывод шага пишется в файл, а при падении его последние строки
+          # публикуются аннотацией: аннотации отдаёт Checks API, они доступны всегда.
+          diag="$RUNNER_TEMP/hf-diag.log"; : > "$diag"
+          trap 'sleep 2; tail -c 2500 "$diag" | sed -e "s/[[:cntrl:]]/ /g" -e "s/%/%25/g" -e "s|^|::error::[sweep] |"' ERR
+          exec > >(tee -a "$diag") 2>&1
           set -x
           python scripts/hf_protocol.py sweep \
             --grid config/hf_experiments.json \
@@ -300,6 +324,12 @@ jobs:
         env:
           OMP_NUM_THREADS: "4"
         run: |
+          # Логи job'а из песочницы не читаются (result-хост не в списке разрешённых),
+          # поэтому вывод шага пишется в файл, а при падении его последние строки
+          # публикуются аннотацией: аннотации отдаёт Checks API, они доступны всегда.
+          diag="$RUNNER_TEMP/hf-diag.log"; : > "$diag"
+          trap 'sleep 2; tail -c 2500 "$diag" | sed -e "s/[[:cntrl:]]/ /g" -e "s/%/%25/g" -e "s|^|::error::[grid-test ${{ matrix.corpus }} шард ${{ matrix.shard }}] |"' ERR
+          exec > >(tee -a "$diag") 2>&1
           corpus="${{ matrix.corpus }}"
           case "$corpus" in
             a3) dir="data/corpus_a3/splits" ;;
@@ -362,6 +392,12 @@ jobs:
       - name: "Финальный прогон"
         working-directory: spanverify-module
         run: |
+          # Логи job'а из песочницы не читаются (result-хост не в списке разрешённых),
+          # поэтому вывод шага пишется в файл, а при падении его последние строки
+          # публикуются аннотацией: аннотации отдаёт Checks API, они доступны всегда.
+          diag="$RUNNER_TEMP/hf-diag.log"; : > "$diag"
+          trap 'sleep 2; tail -c 2500 "$diag" | sed -e "s/[[:cntrl:]]/ /g" -e "s/%/%25/g" -e "s|^|::error::[final] |"' ERR
+          exec > >(tee -a "$diag") 2>&1
           set -x
           python scripts/hf_protocol.py final \
             --config config/hf_final_config.json \
