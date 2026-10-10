@@ -8,14 +8,91 @@
   },
   "meta": {
     "version": "1.3.0",
-    "commit": "39a0ad4858f7278335b9f0ef94bc405485a78b4a",
-    "generated_at": "2026-10-07T12:45:15Z",
+    "commit": "6ab4385e85180ff3526718d85886a7ffee38278d",
+    "generated_at": "2026-10-10T08:07:05Z",
     "seed": 42,
     "dataset": "data/demo_pairs.jsonl"
   },
   "disclaimer": "Демонстрационные метрики получены на синтетическом корпусе и научным результатом не являются. Для подтверждения требуются 1200 пар «вопрос–ответ» с экспертной разметкой на реальных регламентах организации.",
+  "facts_coverage": {
+    "source": "reports/coverage_facts.json",
+    "available": true,
+    "corpora": {
+      "a1_full_1200": {
+        "coverage_recall_missing": 0.7719,
+        "coverage_precision_missing": 1.0,
+        "coverage_recall_partial": 0.0,
+        "coverage_precision_partial": null,
+        "coverage_fpr_clean": 0.0,
+        "pairs_with_context": 1200,
+        "clean_pairs": 566,
+        "token_f1": 0.7258,
+        "verdict_f1": 0.0612
+      },
+      "a1_test_180": {
+        "coverage_recall_missing": 0.6,
+        "coverage_precision_missing": 1.0,
+        "coverage_recall_partial": 0.0,
+        "coverage_precision_partial": null,
+        "coverage_fpr_clean": 0.0,
+        "pairs_with_context": 180,
+        "clean_pairs": 81,
+        "token_f1": 0.7806,
+        "verdict_f1": 0.0777
+      },
+      "a3_full_1200": {
+        "coverage_recall_missing": 0.0278,
+        "coverage_precision_missing": 0.0116,
+        "coverage_recall_partial": 0.3241,
+        "coverage_precision_partial": 0.7609,
+        "coverage_fpr_clean": 0.0519,
+        "pairs_with_context": 1200,
+        "clean_pairs": 540,
+        "token_f1": 0.447,
+        "verdict_f1": 0.0826
+      },
+      "a3_test_177": {
+        "coverage_recall_missing": 0.0,
+        "coverage_precision_missing": 0.0,
+        "coverage_recall_partial": 0.5,
+        "coverage_precision_partial": 1.0,
+        "coverage_fpr_clean": 0.05,
+        "pairs_with_context": 177,
+        "clean_pairs": 80,
+        "token_f1": 0.5297,
+        "verdict_f1": 0.0962
+      },
+      "demo_240": {
+        "coverage_recall_missing": null,
+        "coverage_precision_missing": 0.0,
+        "coverage_recall_partial": null,
+        "coverage_precision_partial": null,
+        "coverage_fpr_clean": 0.0,
+        "pairs_with_context": 240,
+        "clean_pairs": 116,
+        "token_f1": 0.9514,
+        "verdict_f1": 0.996
+      },
+      "demo_240_untrained": {
+        "coverage_recall_missing": null,
+        "coverage_precision_missing": 0.0,
+        "coverage_recall_partial": null,
+        "coverage_precision_partial": null,
+        "coverage_fpr_clean": 0.0,
+        "pairs_with_context": 240,
+        "clean_pairs": 116,
+        "token_f1": 0.9357,
+        "verdict_f1": 0.3896
+      }
+    },
+    "commands": [
+      "python -m spanverify evaluate --dataset data/corpus_a/splits/test.jsonl --mode demo",
+      "python -m spanverify evaluate --dataset data/corpus_a3/splits/test.jsonl --mode demo",
+      "python -m spanverify evaluate --dataset data/demo_pairs.jsonl --mode demo"
+    ]
+  },
   "tests": {
-    "collected": 510,
+    "collected": 550,
     "coverage_percent": null,
     "coverage_gate_percent": 85
   },
@@ -218,10 +295,10 @@
           "n": 1900
         },
         "spans": {
-          "strict_f1": 0.6763,
-          "coverage": 0.5109,
-          "soft_f1": 0.2014,
-          "width_ratio": 1.06
+          "strict_f1": 0.6267,
+          "coverage": 0.6304,
+          "soft_f1": 0.3333,
+          "width_ratio": 2.2
         },
         "answers": {
           "precision": 1.0,
@@ -232,13 +309,13 @@
           "threshold": 1.0
         },
         "verdicts": {
-          "tp": 45,
+          "tp": 56,
           "fp": 0,
-          "fn": 47,
+          "fn": 36,
           "tn": 88,
           "precision": 1.0,
-          "recall": 0.4891,
-          "f1": 0.6569,
+          "recall": 0.6087,
+          "f1": 0.7568,
           "fpr": 0.0
         }
       },
@@ -252,10 +329,10 @@
           "n": 1868
         },
         "spans": {
-          "strict_f1": 0.7778,
-          "coverage": 0.6364,
-          "soft_f1": 0.1235,
-          "width_ratio": 1.09
+          "strict_f1": 0.75,
+          "coverage": 0.697,
+          "soft_f1": 0.1905,
+          "width_ratio": 1.6
         },
         "answers": {
           "precision": 1.0,
@@ -266,13 +343,13 @@
           "threshold": 1.0
         },
         "verdicts": {
-          "tp": 57,
+          "tp": 63,
           "fp": 0,
-          "fn": 42,
+          "fn": 36,
           "tn": 81,
           "precision": 1.0,
-          "recall": 0.5758,
-          "f1": 0.7308,
+          "recall": 0.6364,
+          "f1": 0.7778,
           "fpr": 0.0
         }
       }
@@ -301,10 +378,10 @@
       },
       "missing": {
         "pairs": 10,
-        "verdict_recall": 0.0,
+        "verdict_recall": 0.6,
         "verdict_fpr": 0.0,
         "token_f1": 0.0,
-        "span_coverage": 0.0
+        "span_coverage": 0.6
       },
       "number_attribution": {
         "pairs": 13,
@@ -425,10 +502,10 @@
           "n": 7969
         },
         "spans": {
-          "strict_f1": 0.2682,
-          "coverage": 0.75,
-          "soft_f1": 0.1458,
-          "width_ratio": 10.32
+          "strict_f1": 0.2584,
+          "coverage": 0.7917,
+          "soft_f1": 0.1629,
+          "width_ratio": 17.37
         },
         "answers": {
           "precision": 0.9512,
@@ -439,14 +516,14 @@
           "threshold": 1.0
         },
         "verdicts": {
-          "tp": 73,
-          "fp": 31,
-          "fn": 23,
-          "tn": 54,
-          "precision": 0.7019,
-          "recall": 0.7604,
-          "f1": 0.73,
-          "fpr": 0.3647
+          "tp": 80,
+          "fp": 35,
+          "fn": 16,
+          "tn": 50,
+          "precision": 0.6957,
+          "recall": 0.8333,
+          "f1": 0.7583,
+          "fpr": 0.4118
         }
       },
       "test": {
@@ -459,10 +536,10 @@
           "n": 9268
         },
         "spans": {
-          "strict_f1": 0.2704,
-          "coverage": 0.732,
-          "soft_f1": 0.1258,
-          "width_ratio": 14.19
+          "strict_f1": 0.2622,
+          "coverage": 0.7629,
+          "soft_f1": 0.1768,
+          "width_ratio": 19.96
         },
         "answers": {
           "precision": 0.9737,
@@ -473,21 +550,21 @@
           "threshold": 1.0
         },
         "verdicts": {
-          "tp": 69,
-          "fp": 31,
-          "fn": 28,
-          "tn": 49,
-          "precision": 0.69,
-          "recall": 0.7113,
-          "f1": 0.7005,
-          "fpr": 0.3875
+          "tp": 81,
+          "fp": 34,
+          "fn": 16,
+          "tn": 46,
+          "precision": 0.7043,
+          "recall": 0.8351,
+          "f1": 0.7642,
+          "fpr": 0.425
         }
       }
     },
     "by_mode": {
       "contradiction": {
         "pairs": 18,
-        "verdict_recall": 0.8333,
+        "verdict_recall": 0.9444,
         "verdict_fpr": 0.0,
         "token_f1": 0.8254,
         "span_coverage": 0.9444
@@ -502,7 +579,7 @@
       "faithful": {
         "pairs": 80,
         "verdict_recall": 0.0,
-        "verdict_fpr": 0.3875,
+        "verdict_fpr": 0.425,
         "token_f1": 0.0,
         "span_coverage": 0.0
       },
@@ -515,7 +592,7 @@
       },
       "number_attribution": {
         "pairs": 27,
-        "verdict_recall": 0.4815,
+        "verdict_recall": 0.7407,
         "verdict_fpr": 0.0,
         "token_f1": 0.6761,
         "span_coverage": 0.6667
@@ -529,10 +606,10 @@
       },
       "partial": {
         "pairs": 10,
-        "verdict_recall": 0.5,
+        "verdict_recall": 0.8,
         "verdict_fpr": 0.0,
         "token_f1": 0.0645,
-        "span_coverage": 0.3
+        "span_coverage": 0.6
       },
       "unconfirmed": {
         "pairs": 10,
@@ -1715,7 +1792,7 @@
         "pairs_total_in_file": 875,
         "limit": 40,
         "note": "ЭТО СРЕЗ: 40 пар из 875. Числа относятся только к срезу, не ко всему набору.",
-        "duration_s": 675.6,
+        "duration_s": 1059.9,
         "tokens": {
           "precision": 0.0,
           "recall": 0.0,
@@ -1771,753 +1848,7 @@
       "seed": 4242
     }
   },
-  "pilot": {
-    "status": "ok",
-    "published": true,
-    "wording": "пилот на малой модели (ruGPT3-small) на синтетических промтах: модель реальная, корпус промтов синтетический",
-    "control": {
-      "grounded_copy_min": 0.8,
-      "unsupported_copy_max": 0.3,
-      "grounded_copy_rate": 1.0,
-      "unsupported_copy_rate": 0.0,
-      "grounded_ok": true,
-      "unsupported_ok": true,
-      "contrast_ok": true
-    },
-    "pairs": 96,
-    "tokens": 2408,
-    "bootstrap_iterations": 5000,
-    "auc": {
-      "first": {
-        "attention_entropy": {
-          "auc_oriented": 0.49229037207094845,
-          "ci": [
-            0.4473643307576161,
-            0.5385022960084775
-          ],
-          "auc_fact_oriented": 0.4361979166666667,
-          "fact_ci": [
-            0.3208695652173913,
-            0.5552173913043478
-          ],
-          "delta_mean": -0.0014533928285042446,
-          "delta_ci": [
-            -0.003383596117297808,
-            0.0004042734702428182
-          ],
-          "delta_significant": false
-        },
-        "ctx_attention_mass": {
-          "auc_oriented": 0.50104303484509,
-          "ci": [
-            0.45195070733863835,
-            0.544648672517525
-          ],
-          "auc_fact_oriented": -0.5026041666666666,
-          "fact_ci": [
-            0.3862847222222222,
-            0.6161220043572985
-          ],
-          "delta_mean": 4.808511584997177e-05,
-          "delta_ci": [
-            -0.003116259972254435,
-            0.0032270122319459915
-          ],
-          "delta_significant": false
-        },
-        "embedding_density": {
-          "auc_oriented": 0.4524342998421651,
-          "ci": [
-            0.4080849889624724,
-            0.49879559341885726
-          ],
-          "auc_fact_oriented": 0.2009548611111111,
-          "fact_ci": [
-            0.11713286713286714,
-            0.296875
-          ],
-          "delta_mean": -0.014262074525163633,
-          "delta_ci": [
-            -0.01779825693178575,
-            -0.011007930138789803
-          ],
-          "delta_significant": true
-        },
-        "ctx_attention_mass_norm": {
-          "auc_oriented": 0.503272590810256,
-          "ci": [
-            0.44928360120098904,
-            0.5435778550532648
-          ],
-          "auc_fact_oriented": -0.4978298611111111,
-          "fact_ci": [
-            0.3825708061002179,
-            0.6130434782608696
-          ],
-          "delta_mean": -6.011990896939481e-05,
-          "delta_ci": [
-            -0.004955359225900099,
-            0.004857009921657371
-          ],
-          "delta_significant": false
-        },
-        "ctx_attention_mass_lift": {
-          "auc_oriented": 0.5034050396794737,
-          "ci": [
-            0.4498534373098833,
-            0.5434451471903043
-          ],
-          "auc_fact_oriented": -0.5030381944444444,
-          "fact_ci": [
-            0.3900134952766532,
-            0.6185185185185185
-          ],
-          "delta_mean": 4.808511584997177e-05,
-          "delta_ci": [
-            -0.003116259972254435,
-            0.0032270122319459915
-          ],
-          "delta_significant": false
-        },
-        "ctx_max_similarity": {
-          "auc_oriented": 0.6063398858732244,
-          "ci": [
-            0.3491697774626981,
-            0.43916755013693787
-          ],
-          "auc_fact_oriented": -0.0,
-          "fact_ci": [
-            0.0,
-            0.0
-          ],
-          "delta_mean": -0.058378111157726766,
-          "delta_ci": [
-            -0.06365730595365965,
-            -0.053387955443659395
-          ],
-          "delta_significant": true
-        },
-        "ctx_support_distance": {
-          "auc_oriented": 0.5084325780068653,
-          "ci": [
-            0.46253974562798095,
-            0.5527681183418889
-          ],
-          "auc_fact_oriented": 0.5594618055555556,
-          "fact_ci": [
-            0.4429193899782135,
-            0.669675925925926
-          ],
-          "delta_mean": 0.018218790736906677,
-          "delta_ci": [
-            0.003858024691358023,
-            0.03397937274748868
-          ],
-          "delta_significant": true
-        },
-        "ctx_similarity_decay": {
-          "auc_oriented": 0.5196962505932605,
-          "ci": [
-            0.435943808417676,
-            0.5266942604856513
-          ],
-          "auc_fact_oriented": -0.3806423611111111,
-          "fact_ci": [
-            0.2724879333040807,
-            0.4943576388888889
-          ],
-          "delta_mean": -0.0016276224052402218,
-          "delta_ci": [
-            -0.002337569895562677,
-            -0.0010708943053281167
-          ],
-          "delta_significant": true
-        },
-        "ctx_sim_contrast": {
-          "auc_oriented": 0.5574441783203276,
-          "ci": [
-            0.3957597173144876,
-            0.48859128628412946
-          ],
-          "auc_fact_oriented": -0.03602430555555555,
-          "fact_ci": [
-            0.007982261640798226,
-            0.07410714285714286
-          ],
-          "delta_mean": -0.05188941395055449,
-          "delta_ci": [
-            -0.055601355170108814,
-            -0.04836105241510744
-          ],
-          "delta_significant": true
-        },
-        "ctx_sim_margin": {
-          "auc_oriented": 0.5394200947009415,
-          "ci": [
-            0.4147495495097118,
-            0.5067402570137347
-          ],
-          "auc_fact_oriented": -0.07074652777777778,
-          "fact_ci": [
-            0.027789839339991317,
-            0.1246119733924612
-          ],
-          "delta_mean": -0.052104023464595715,
-          "delta_ci": [
-            -0.05775696118385576,
-            -0.04656546347296436
-          ],
-          "delta_significant": true
-        }
-      },
-      "middle": {
-        "attention_entropy": {
-          "auc_oriented": 0.5089678921866204,
-          "ci": [
-            0.4633873086305286,
-            0.5555684326710817
-          ],
-          "auc_fact_oriented": 0.6341145833333334,
-          "fact_ci": [
-            0.5241071428571429,
-            0.7438271604938271
-          ],
-          "delta_mean": 0.011774444331725439,
-          "delta_ci": [
-            0.00914915930479765,
-            0.01424147499104341
-          ],
-          "delta_significant": true
-        },
-        "ctx_attention_mass": {
-          "auc_oriented": 0.4994426110087085,
-          "ci": [
-            0.4540948275862069,
-            0.5456692826473283
-          ],
-          "auc_fact_oriented": -0.48828125,
-          "fact_ci": [
-            0.3723214285714286,
-            0.6052287581699346
-          ],
-          "delta_mean": -0.0011513431866963704,
-          "delta_ci": [
-            -0.005122539276878039,
-            0.002771737053990364
-          ],
-          "delta_significant": false
-        },
-        "embedding_density": {
-          "auc_oriented": 0.4707563934172912,
-          "ci": [
-            0.4249335106382979,
-            0.5171012473460722
-          ],
-          "auc_fact_oriented": 0.2378472222222222,
-          "fact_ci": [
-            0.14553376906318083,
-            0.3420479302832244
-          ],
-          "delta_mean": -0.00567940115678493,
-          "delta_ci": [
-            -0.007051236708264137,
-            -0.00437291907796198
-          ],
-          "delta_significant": true
-        },
-        "ctx_attention_mass_norm": {
-          "auc_oriented": 0.49958609728369446,
-          "ci": [
-            0.45394184916990465,
-            0.5460433244916003
-          ],
-          "auc_fact_oriented": -0.4926215277777778,
-          "fact_ci": [
-            0.3736979166666667,
-            0.612679114198871
-          ],
-          "delta_mean": -0.0018978563191724234,
-          "delta_ci": [
-            -0.008255760149212693,
-            0.004374292649228832
-          ],
-          "delta_significant": false
-        },
-        "ctx_attention_mass_lift": {
-          "auc_oriented": 0.4992770499221863,
-          "ci": [
-            0.45425354924578526,
-            0.54684740374426
-          ],
-          "auc_fact_oriented": -0.4908854166666667,
-          "fact_ci": [
-            0.3734259661311333,
-            0.6097883597883598
-          ],
-          "delta_mean": -0.0011513431866963704,
-          "delta_ci": [
-            -0.005122539276878039,
-            0.002771737053990364
-          ],
-          "delta_significant": false
-        },
-        "ctx_max_similarity": {
-          "auc_oriented": 0.5885475877749694,
-          "ci": [
-            0.36775874249381846,
-            0.45714016995662565
-          ],
-          "auc_fact_oriented": -0.04600694444444445,
-          "fact_ci": [
-            0.01652173913043478,
-            0.08468626590609916
-          ],
-          "delta_mean": -0.026742891735526658,
-          "delta_ci": [
-            -0.029691190139158524,
-            -0.023919308895709385
-          ],
-          "delta_significant": true
-        },
-        "ctx_support_distance": {
-          "auc_oriented": 0.5,
-          "ci": [
-            0.45452888947786907,
-            0.5452309902740937
-          ],
-          "auc_fact_oriented": 0.5,
-          "fact_ci": [
-            0.3847155883630048,
-            0.6167178587099605
-          ],
-          "delta_mean": 0.0,
-          "delta_ci": [
-            0.0,
-            0.0
-          ],
-          "delta_significant": false
-        },
-        "ctx_similarity_decay": {
-          "auc_oriented": 0.5088133685058663,
-          "ci": [
-            0.44539839338791837,
-            0.53732406027488
-          ],
-          "auc_fact_oriented": -0.44921875,
-          "fact_ci": [
-            0.33507625272331154,
-            0.5668402777777778
-          ],
-          "delta_mean": -0.00044831834839857357,
-          "delta_ci": [
-            -0.0005479864740105463,
-            -0.00036115424985803035
-          ],
-          "delta_significant": true
-        },
-        "ctx_sim_contrast": {
-          "auc_oriented": 0.5460315007560623,
-          "ci": [
-            0.4092585435874786,
-            0.5010548173674851
-          ],
-          "auc_fact_oriented": -0.1332465277777778,
-          "fact_ci": [
-            0.07006651884700665,
-            0.20872694556905083
-          ],
-          "delta_mean": -0.02232751364742049,
-          "delta_ci": [
-            -0.025141793800313398,
-            -0.019650594744442345
-          ],
-          "delta_significant": true
-        },
-        "ctx_sim_margin": {
-          "auc_oriented": 0.5410757055661637,
-          "ci": [
-            0.4140641386543026,
-            0.5051503709591945
-          ],
-          "auc_fact_oriented": -0.1970486111111111,
-          "fact_ci": [
-            0.11582167832167832,
-            0.2902097902097902
-          ],
-          "delta_mean": -0.029058050356785724,
-          "delta_ci": [
-            -0.0343850103120168,
-            -0.02403648343214591
-          ],
-          "delta_significant": true
-        }
-      },
-      "-4": {
-        "attention_entropy": {
-          "auc_oriented": 0.4927539431132107,
-          "ci": [
-            0.44660103089369874,
-            0.5391620222929936
-          ],
-          "auc_fact_oriented": 0.4696180555555556,
-          "fact_ci": [
-            0.355188884064264,
-            0.5849748053137883
-          ],
-          "delta_mean": -0.0006340515489379565,
-          "delta_ci": [
-            -0.003792216069996357,
-            0.0027565291772286096
-          ],
-          "delta_significant": false
-        },
-        "ctx_attention_mass": {
-          "auc_oriented": 0.49036986346729067,
-          "ci": [
-            0.46203831502235965,
-            0.5547938400397416
-          ],
-          "auc_fact_oriented": -0.5850694444444444,
-          "fact_ci": [
-            0.46830357142857143,
-            0.6971153846153846
-          ],
-          "delta_mean": 0.012298745413621267,
-          "delta_ci": [
-            0.008621168012420336,
-            0.016016590719421703
-          ],
-          "delta_significant": true
-        },
-        "embedding_density": {
-          "auc_oriented": 0.49866999260493816,
-          "ci": [
-            0.452900273057917,
-            0.5440801457194899
-          ],
-          "auc_fact_oriented": 0.4618055555555556,
-          "fact_ci": [
-            0.3459201388888889,
-            0.5818497611810681
-          ],
-          "delta_mean": -0.0012056464768059906,
-          "delta_ci": [
-            -0.0025208196197817174,
-            0.00011730334371986655
-          ],
-          "delta_significant": false
-        },
-        "ctx_attention_mass_norm": {
-          "auc_oriented": 0.4652597653447534,
-          "ci": [
-            0.4884197695035461,
-            0.5811490542467692
-          ],
-          "auc_fact_oriented": -0.64453125,
-          "fact_ci": [
-            0.5289760348583878,
-            0.7533651758575771
-          ],
-          "delta_mean": 0.019562353253745095,
-          "delta_ci": [
-            0.013841911460523985,
-            0.02550265270729164
-          ],
-          "delta_significant": true
-        },
-        "ctx_attention_mass_lift": {
-          "auc_oriented": 0.46726857319455634,
-          "ci": [
-            0.48715102924286596,
-            0.5796308576480991
-          ],
-          "auc_fact_oriented": -0.65625,
-          "fact_ci": [
-            0.5419043440105309,
-            0.762962962962963
-          ],
-          "delta_mean": 0.012298745413621267,
-          "delta_ci": [
-            0.008621168012420336,
-            0.016016590719421703
-          ],
-          "delta_significant": true
-        },
-        "ctx_max_similarity": {
-          "auc_oriented": 0.5208993278219887,
-          "ci": [
-            0.43445436584585156,
-            0.5250409690849499
-          ],
-          "auc_fact_oriented": -0.2877604166666667,
-          "fact_ci": [
-            0.19130434782608696,
-            0.3975694444444444
-          ],
-          "delta_mean": -0.013675601003386828,
-          "delta_ci": [
-            -0.017123360234308094,
-            -0.010353746852739954
-          ],
-          "delta_significant": true
-        },
-        "ctx_support_distance": {
-          "auc_oriented": 0.5025220472180219,
-          "ci": [
-            0.45795626567662234,
-            0.5475401872460696
-          ],
-          "auc_fact_oriented": 0.5171440972222222,
-          "fact_ci": [
-            0.39956427015250545,
-            0.6325954861111112
-          ],
-          "delta_mean": 0.003968253968253968,
-          "delta_ci": [
-            0.0,
-            0.011904761904761904
-          ],
-          "delta_significant": false
-        },
-        "ctx_similarity_decay": {
-          "auc_oriented": 0.5033608900564012,
-          "ci": [
-            0.4520606944076332,
-            0.5415562328827634
-          ],
-          "auc_fact_oriented": -0.4565972222222222,
-          "fact_ci": [
-            0.3409390083369899,
-            0.5739130434782609
-          ],
-          "delta_mean": -0.00047902850431145023,
-          "delta_ci": [
-            -0.001005512329978925,
-            -0.00017981039867143484
-          ],
-          "delta_significant": true
-        },
-        "ctx_sim_contrast": {
-          "auc_oriented": 0.5113409344267723,
-          "ci": [
-            0.44326710816777043,
-            0.5352574016791869
-          ],
-          "auc_fact_oriented": -0.4036458333333333,
-          "fact_ci": [
-            0.29196428571428573,
-            0.5204036858271172
-          ],
-          "delta_mean": -0.011095246901702197,
-          "delta_ci": [
-            -0.01465380142903431,
-            -0.0075991653141516706
-          ],
-          "delta_significant": true
-        },
-        "ctx_sim_margin": {
-          "auc_oriented": 0.5157779715455679,
-          "ci": [
-            0.439023178807947,
-            0.5309554590557011
-          ],
-          "auc_fact_oriented": -0.3472222222222222,
-          "fact_ci": [
-            0.24088541666666666,
-            0.4597902097902098
-          ],
-          "delta_mean": -0.017444992617332584,
-          "delta_ci": [
-            -0.022839664258784528,
-            -0.012423576004480172
-          ],
-          "delta_significant": true
-        }
-      },
-      "last": {
-        "attention_entropy": {
-          "auc_oriented": 0.4957119678590744,
-          "ci": [
-            0.4505603710042511,
-            0.5407615894039736
-          ],
-          "auc_fact_oriented": 0.4752604166666667,
-          "fact_ci": [
-            0.35692574902301344,
-            0.5973392461197339
-          ],
-          "delta_mean": -0.0041297972202301025,
-          "delta_ci": [
-            -0.007684963755309582,
-            -0.0007270968829592069
-          ],
-          "delta_significant": true
-        },
-        "ctx_attention_mass": {
-          "auc_oriented": 0.4976987008973411,
-          "ci": [
-            0.4559239610963749,
-            0.5483596785588132
-          ],
-          "auc_fact_oriented": -0.5186631944444444,
-          "fact_ci": [
-            0.3986105080330004,
-            0.6357142857142857
-          ],
-          "delta_mean": 0.0018441521873076756,
-          "delta_ci": [
-            -0.001454088216026624,
-            0.00499889999628067
-          ],
-          "delta_significant": false
-        },
-        "embedding_density": {
-          "auc_oriented": 0.4965287358859174,
-          "ci": [
-            0.4507433398742808,
-            0.5412433451641526
-          ],
-          "auc_fact_oriented": 0.46484375,
-          "fact_ci": [
-            0.3498910675381264,
-            0.5807622504537205
-          ],
-          "delta_mean": -0.0012416741161041384,
-          "delta_ci": [
-            -0.003385070065818091,
-            0.0011779741294449114
-          ],
-          "delta_significant": false
-        },
-        "ctx_attention_mass_norm": {
-          "auc_oriented": 0.4992108254875774,
-          "ci": [
-            0.45497519890808613,
-            0.5470821329624601
-          ],
-          "auc_fact_oriented": -0.5208333333333334,
-          "fact_ci": [
-            0.40515734265734266,
-            0.6378636561007381
-          ],
-          "delta_mean": 0.0032640981935306962,
-          "delta_ci": [
-            -0.0017465717660033718,
-            0.00819566588697065
-          ],
-          "delta_significant": false
-        },
-        "ctx_attention_mass_lift": {
-          "auc_oriented": 0.4983167956203574,
-          "ci": [
-            0.4556521449507061,
-            0.5481099656357389
-          ],
-          "auc_fact_oriented": -0.5121527777777778,
-          "fact_ci": [
-            0.3951219512195122,
-            0.6279379157427938
-          ],
-          "delta_mean": 0.0018441521873076756,
-          "delta_ci": [
-            -0.001454088216026624,
-            0.00499889999628067
-          ],
-          "delta_significant": false
-        },
-        "ctx_max_similarity": {
-          "auc_oriented": 0.5087250692597212,
-          "ci": [
-            0.44535525166653767,
-            0.5376003099230726
-          ],
-          "auc_fact_oriented": -0.41796875,
-          "fact_ci": [
-            0.30589293747188484,
-            0.5352173913043479
-          ],
-          "delta_mean": -0.014515416974359293,
-          "delta_ci": [
-            -0.022090089010285002,
-            -0.0071607211933917185
-          ],
-          "delta_significant": true
-        },
-        "ctx_support_distance": {
-          "auc_oriented": 0.5,
-          "ci": [
-            0.4553358373840035,
-            0.5455524469313439
-          ],
-          "auc_fact_oriented": 0.5,
-          "fact_ci": [
-            0.3847155883630048,
-            0.6167178587099605
-          ],
-          "delta_mean": 0.0,
-          "delta_ci": [
-            0.0,
-            0.0
-          ],
-          "delta_significant": false
-        },
-        "ctx_similarity_decay": {
-          "auc_oriented": 0.5011423714970034,
-          "ci": [
-            0.4532490476453376,
-            0.5440215471564818
-          ],
-          "auc_fact_oriented": -0.4835069444444444,
-          "fact_ci": [
-            0.3686495874945723,
-            0.5987841945288754
-          ],
-          "delta_mean": -0.000303302562513561,
-          "delta_ci": [
-            -0.00047598869842581447,
-            -0.00014461993463360312
-          ],
-          "delta_significant": true
-        },
-        "ctx_sim_contrast": {
-          "auc_oriented": 0.5093542013885056,
-          "ci": [
-            0.4438936781609195,
-            0.5383039579468151
-          ],
-          "auc_fact_oriented": -0.4227430555555556,
-          "fact_ci": [
-            0.30959617889709073,
-            0.5382608695652173
-          ],
-          "delta_mean": -0.013484151543503362,
-          "delta_ci": [
-            -0.02116534315351982,
-            -0.006120432763244983
-          ],
-          "delta_significant": true
-        },
-        "ctx_sim_margin": {
-          "auc_oriented": 0.5117051688171212,
-          "ci": [
-            0.4422255340288127,
-            0.5343476867658921
-          ],
-          "auc_fact_oriented": -0.3862847222222222,
-          "fact_ci": [
-            0.27572731220147634,
-            0.5030381944444444
-          ],
-          "delta_mean": -0.022243472453568475,
-          "delta_ci": [
-            -0.03213585771793035,
-            -0.013057559517246983
-          ],
-          "delta_significant": true
-        }
-      }
-    }
-  },
+  "pilot": null,
   "release": null,
-  "duration_s": 44.8
+  "duration_s": 100.5
 }

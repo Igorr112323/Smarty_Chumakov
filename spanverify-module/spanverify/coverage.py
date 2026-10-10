@@ -198,6 +198,43 @@ class FactCoverage:
     subject_end: int = -1
 
 
+# Союзы и предлоги, которые не входят в значение, но прилипали к хвосту
+# `text_after_verb` и превращали корректный ответ в «пропущенный факт».
+_VALUE_TAIL_STOP = frozenset(
+    {"если", "когда", "иное", "при", "в", "во", "по", "и", "а", "но", "либо", "кроме", "том", "числе", "чтобы"}
+)
+
+
+# Маркеры перечисления и отсылки к номеру нормы: «1) фамилия», «2. дата»,
+# «п. 7», «ст. 12». Одиночная цифра в юридическом тексте почти всегда они, а не
+# значение факта: у неё нет ни единицы меры, ни даты, ни суммы. Без этого правила
+# OCR-перечисления корпуса A3 давали «пропущенные» и «подменённые» факты в
+# дословно корректных ответах (ложные срабатывания на чистых парах).
+_MARKER_AFTER_RE = re.compile(r"\s*[).]")
+_MARKER_BEFORE_RE = re.compile(r"(?:^|[\s(,;])(?:пп?|п|ст|гл|ч|разд|пункт|статья)\.?\s*$", re.IGNORECASE)
+
+
+# Составной номер нормы («1.16.4.2.», «п. 2.1»): части такого номера — не значения.
+_DOTTED_NUMBER_BEFORE_RE = re.compile(r"\d\s*[.,]\s*$")
+_DOTTED_NUMBER_AFTER_RE = re.compile(r"^\s*[.,]\s*\d")
+
+
+def _is_number_marker(sentence: str, start: int, end: int) -> bool:
+    """Цифра — маркер перечисления, номер нормы или часть составного номера.
+
+    Три случая, в которых число не является значением факта: маркер
+    перечисления («1) фамилия», «2. дата»), отсылка к номеру нормы («п. 7»,
+    «ст. 12») и составной номер («1.16.4.2.» — в OCR-текстах постановлений он
+    встречается в конце каждой правки). Во всех трёх «пропущенное» или
+    «подменённое» число означало бы ложную галлюцинацию в корректном ответе.
+    """
+    if _MARKER_AFTER_RE.match(sentence, end):
+        return True
+    if _DOTTED_NUMBER_BEFORE_RE.search(sentence[:start]) or _DOTTED_NUMBER_AFTER_RE.match(sentence[end:]):
+        return True
+    return bool(_MARKER_BEFORE_RE.search(sentence[:start]))
+
+
 def _find_values(sentence: str) -> list[tuple[int, int, str, str]]:
     """Значения предложения: ``(начало, конец, текст, вид)`` без пересечений."""
     matches: list[tuple[int, int, str, str, int]] = []
@@ -207,6 +244,25 @@ def _find_values(sentence: str) -> list[tuple[int, int, str, str]]:
             if not text:
                 continue
             matches.append((found.start(), found.end(), text, kind, order))
+    cleaned: list[tuple[int, int, str, str, int]] = []
+    for begin, finish, text, kind, order in matches:
+        if kind in ("single_number", "count", "section_ref") and _is_number_marker(sentence, begin, finish):
+            continue
+        if kind == "text_after_verb":
+            # Хвост из слов после глагола не должен уносить в себя союзы и
+            # предлоги: «составляет десять мегабайт если» — это значение плюс
+            # начало оговорки, и такое значение «не найдено» в корректном ответе.
+            words = text.split()
+            while words and words[-1].lower().rstrip(".,;:") in _VALUE_TAIL_STOP:
+                words.pop()
+            while words and words[0].lower().rstrip(".,;:") in _VALUE_TAIL_STOP:
+                words.pop(0)
+            if not words:
+                continue
+            text = " ".join(words)
+            finish = begin + len(text)
+        cleaned.append((begin, finish, text, kind, order))
+    matches = cleaned
     matches.sort(key=lambda item: (item[0], item[4], -(item[1] - item[0])))
     chosen: list[tuple[int, int, str, str, int]] = []
     for candidate in matches:
@@ -251,11 +307,24 @@ def _condition_of(sentence: str) -> str:
     return sentence[best[0] : best[1]].strip(" ,.;:")
 
 
-def extract_facts(context: str, min_words: int = 5, max_facts: int = 60) -> list[Fact]:
-    """Собрать факты документа: предложения со значениями.
+def extract_facts(
+    context: str,
+    min_words: int = 5,
+    max_facts: int = 60,
+    max_values_per_sentence: int = 4,
+) -> list[Fact]:
+    """Собрать факты документа: значения предложений вместе с их предметом.
 
     Ограничения нужны, чтобы один длинный акт не перевесил остальные: не более
     ``max_facts`` фактов и не короче ``min_words`` слов в предложении.
+
+    Важная деталь (именно на ней держался нулевой ``recall_missing``): раньше на
+    предложение приходился один факт — бралось первое значение. Юридическое
+    предложение обычно содержит несколько: «до 1 января 2030 г. … составляет
+    более 350 процентов». Если ответ вырезал второе, механизм его не видел вовсе
+    и не мог назвать пропуск. Теперь факт строится на каждое содержательное
+    значение (не более ``max_values_per_sentence`` на предложение), а «голые»
+    числа и счётчики отходят на второй план: даты, сроки и суммы информативнее.
     """
     facts: list[Fact] = []
     if not context:
@@ -269,21 +338,25 @@ def extract_facts(context: str, min_words: int = 5, max_facts: int = 60) -> list
             continue
         # Предпочитаем содержательные значения: даты, сроки, суммы полезнее голых цифр.
         detailed = [item for item in values if item[3] not in {"count", "single_number"}]
-        value_start, value_end, value_text, value_kind = (detailed or values)[0]
-        facts.append(
-            Fact(
-                sentence=sentence,
-                sentence_start=start,
-                value=value_text,
-                value_start=start + value_start,
-                value_end=start + value_end,
-                kind=value_kind,
-                subject=_subject_of(sentence, value_start),
-                condition=_condition_of(sentence),
+        chosen = detailed or values
+        # Предмет считается по словам слева от каждого значения: у второго
+        # значения в предложении он свой, и именно это различие отличает
+        # «ответ про один объект» от «ответ пропал второй объект».
+        for value_start, value_end, value_text, value_kind in chosen[:max_values_per_sentence]:
+            facts.append(
+                Fact(
+                    sentence=sentence,
+                    sentence_start=start,
+                    value=value_text,
+                    value_start=start + value_start,
+                    value_end=start + value_end,
+                    kind=value_kind,
+                    subject=_subject_of(sentence, value_start),
+                    condition=_condition_of(sentence),
+                )
             )
-        )
-        if len(facts) >= max_facts:
-            break
+            if len(facts) >= max_facts:
+                return facts
     return facts
 
 
@@ -331,6 +404,177 @@ def _subject_position(answer: str, subject: str) -> tuple[int, int]:
     return first, last
 
 
+# Сказуемые, которые обещают значение и не называют его: «срок установлен»,
+# «порядок определён», «ответственность предусмотрена». Это и есть текстовый
+# признак пропущенной обязательной детали (тип ``missing``): предложение построено
+# вокруг предмета, глагол требует значения, а значения нет. Порог по схожести
+# строк такого пропуска не ловил никогда — ловила именно эта семантика.
+OMISSION_PREDICATES: frozenset[str] = frozenset(
+    {
+        "установлен",
+        "установлена",
+        "установлено",
+        "установлены",
+        "определен",
+        "определена",
+        "определено",
+        "определены",
+        "предусмотрен",
+        "предусмотрена",
+        "предусмотрено",
+        "предусмотрены",
+        "закреплен",
+        "закреплена",
+        "закреплено",
+        "закреплены",
+        "назначен",
+        "назначена",
+        "назначено",
+        "назначены",
+        "утвержден",
+        "утверждена",
+        "утверждено",
+        "утверждены",
+        "не указан",
+        "не указана",
+        "не указано",
+        "не уточнен",
+        "не уточнена",
+    }
+)
+
+
+def _content_stems(text: str) -> set[str]:
+    """Стемы слов без «чисел»: цифры — то, что подменяется, а не контекст фразы.
+
+    Нужно для проверки «ответ пересказал это предложение документа»: сравнение
+    со стемами вместе с числами штрафовало бы как раз подмену значения, то есть
+    тот самый дефект, который ветка DISTORTED и обязана находить.
+    """
+    return {stem for stem in stem_text(text) if not stem.isdigit()}
+
+
+def _frame_stems(text: str) -> set[str]:
+    """Стемы «каркаса» предложения: без значений (число/дата/сумма/срок вместе с единицей).
+
+    Сравнение ответов и предложений документа по каркасу — то, что отличает
+    пересказ того же факта от разговора о другом объекте. Числа и единицы
+    измерения из сравнения исключаются на обеих сторонах: подменённое значение —
+    предмет проверки, а не причина отказать в похожести («10 лет» и «3 года» —
+    один и тот же каркас «срок … составляет»).
+    """
+    skeleton = text
+    for start, end, _value, _kind in reversed(_find_values(text)):
+        skeleton = skeleton[:start] + " " + skeleton[end:]
+    return _content_stems(skeleton)
+
+
+def _omission_predicates(answer: str) -> list[tuple[int, int]]:
+    """Позиции сказуемых «значение обещано, но не названо» в ответе."""
+    found: list[tuple[int, int]] = []
+    lowered = answer.lower().replace("ё", "е")
+    for predicate in OMISSION_PREDICATES:
+        pattern = r"\b" + re.escape(predicate.lower().replace("ё", "е")) + r"\b"
+        for match in re.finditer(pattern, lowered):
+            found.append((match.start(), match.end()))
+    found.sort()
+    return found
+
+
+_CLAUSE_SPLIT = re.compile(r"[,;:.!?\u2026()]+")
+
+
+def _sentence_info(answer: str) -> list[dict[str, object]]:
+    """По каждому предложению ответа: клаузы, сказуемые-«обещания» и значения.
+
+    Считается один раз на ответ: фактов документа десятки, и искать по строке на
+    каждый факт было бы квадратично. Разбор идёт до уровня клауз, а не
+    предложений: замечание должно указывать на ту часть ответа, где предмет
+    назван, а значение — нет. Если мерить всем предложением, ложные срастания
+    росли бы на длинных перечислениях (измерено на A1 и A3).
+    """
+    info: list[dict[str, object]] = []
+    for start, end in split_sentences(answer):
+        sentence = answer[start:end]
+        clauses: list[dict[str, object]] = []
+        cursor = 0
+        for match in _CLAUSE_SPLIT.finditer(sentence):
+            if match.start() > cursor:
+                clauses.append(
+                    {"text": sentence[cursor : match.start()], "start": start + cursor, "end": start + match.start()}
+                )
+            cursor = match.end()
+        if cursor < len(sentence):
+            clauses.append({"text": sentence[cursor:], "start": start + cursor, "end": end})
+        if not clauses:
+            clauses = [{"text": sentence, "start": start, "end": end}]
+        info.append(
+            {
+                "start": start,
+                "end": end,
+                "clauses": clauses,
+                "predicates": _omission_predicates(sentence),
+                "kinds": {kind for _s, _e, _text, kind in _find_values(sentence)},
+                "stems": set(stem_text(sentence)),
+            }
+        )
+    return info
+
+
+def _omission_span(
+    sentence_info: list[dict[str, object]],
+    stems_fact: list[str],
+    subject: str,
+) -> tuple[int, int] | None:
+    """Где в ответе стоит сказуемое «значение обещано, но не названо».
+
+    Требования к клаузе ответа (все три, иначе правило стреляет по чистым
+    ответам): в ней есть сказуемое из :data:`OMISSION_PREDICATES`; в ней нет ни
+    одного значения — «срок установлен 5 лет» пропуском не является; и в ней же
+    стоят слова предмета факта, то есть сказуемое относится именно к этому
+    факту, а не к соседнему перечислению. Возвращаем ``(начало, конец)`` от
+    сказуемого до конца клаузы: на это место и надо указать проверяющему.
+    """
+    fact_stems = set(stems_fact)
+    subject_stems = set(stem_text(subject)) if subject else set()
+    for info in sentence_info:
+        for clause in info["clauses"] or []:  # type: ignore[union-attr]
+            text = str(clause["text"])
+            # Numbers are deliberately ignored in the share checks below (см. _content_stems).
+            if not text.strip():
+                continue
+            predicates = _omission_predicates(text)
+            if not predicates:
+                continue
+            if _find_values(text):
+                continue
+            # Сказуемое внутри условия — не обещание значения, а часть оговорки:
+            # «если иное не установлено договором» есть в корректных ответах
+            # корпуса A1 и давало 100 % ложных замечаний без этой проверки.
+            lowered_clause = text.lower()
+            predicate_at = int(predicates[0][0])
+            if any(
+                lowered_clause.find(marker) not in (-1,) and lowered_clause.find(marker) < predicate_at
+                for marker in CONDITION_MARKERS
+            ):
+                continue
+            clause_stems = _frame_stems(text)
+            if not clause_stems or not fact_stems:
+                continue
+            # Сказуемое относится к этому факту: слова предмета в той же клаузе
+            # (или клауза целиком собрана из слов предложения документа).
+            if subject_stems and not (subject_stems & clause_stems):
+                if len(clause_stems & fact_stems) / max(1, len(clause_stems)) < 0.8:
+                    continue
+            # Клауза не про другой объект документа: её слова принадлежат
+            # предложению факта хотя бы наполовину.
+            if len(clause_stems & fact_stems) / max(1, len(clause_stems)) < 0.5:
+                continue
+            predicate_start = clause["start"] + predicates[0][0]
+            return int(predicate_start), int(clause["end"])
+    return None
+
+
 def cover_facts(
     answer: str,
     context: str,
@@ -338,6 +582,7 @@ def cover_facts(
     omit_overlap: float = 0.55,
     subject_threshold: float = 0.6,
     omit_subject_threshold: float = 1.0,
+    omit_answer_share: float = 0.9,
 ) -> list[FactCoverage]:
     """Сверить факты документа с ответом.
 
@@ -353,6 +598,14 @@ def cover_facts(
     совпадение по общим словам («срок», «хранения», «документов») и требовал бы
     упоминания вторичных. Проверено тестом
     ``test_number_from_own_object_is_grounded``.
+
+    ``omit_answer_share`` — второй угол того же сравнения: какая доля слов
+    выбранного предложения ответа принадлежит предложению факта. Пропуск — это
+    «ответ воспроизвёл предложение документа и выбросил значение», а не «в
+    ответе этого факта нет вовсе». Без этой проверки ответ-выдержка обвинялся в
+    пропуске каждого факта, который в выдержку не вошёл: на корпусе A3 это
+    измерялось как 0,157 ложных замечаний на чистых парах при нулевой пользе
+    (см. ``reports/COVERAGE_REPORT.md``).
     """
     coverages: list[FactCoverage] = []
     if not answer or not context:
@@ -361,24 +614,36 @@ def cover_facts(
     norm_answer = normalize_for_match(answer)
     norm_answer_words = set(norm_answer.split())
     answer_sentences = list(split_sentences(answer))
+    sentence_info = _sentence_info(answer)
 
     for fact in extract_facts(context):
         norm_value = fact.norm_value
         value_present = bool(norm_value) and norm_value in norm_answer
         stems_fact = stem_text(fact.sentence)
 
-        # Ищем предложение ответа, наиболее похожее на предложение факта.
+        # Ищем предложение ответа, наиболее похожее на предложение факта, и заодно
+        # обратную долю: сколько слов ответа принадлежит предложению факта.
         best_span = (-1, -1)
         best_overlap = 0.0
+        best_answer_share = 0.0
+        stems_fact_frame = _frame_stems(fact.sentence)
         for start, end in answer_sentences:
-            overlap = _overlap(stem_text(answer[start:end]), stems_fact)
+            stems_answer = stem_text(answer[start:end])
+            overlap = _overlap(stems_answer, stems_fact)
             if overlap > best_overlap:
                 best_overlap, best_span = overlap, (start, end)
+                explained = _frame_stems(answer[start:end])
+                if explained:
+                    best_answer_share = len(explained & stems_fact_frame) / len(explained)
 
         subject_stems = stem_text(fact.subject)
         subject_here = _subject_in(fact.subject, list(norm_answer_words), subject_threshold)
         # Для пропуска предмет должен присутствовать целиком (см. доку строку).
         subject_full = _subject_in(fact.subject, list(norm_answer_words), omit_subject_threshold)
+        # Ответ близко пересказал предложение документа и не добавил своего:
+        # только в этом случае отсутствие значения — пропуск, а не «факт не вошёл
+        # в выдержку».
+        reproduced = best_answer_share >= omit_answer_share
 
         if value_present:
             status = STATUS_MENTIONED
@@ -387,9 +652,9 @@ def cover_facts(
                 condition_stems = stem_text(fact.condition)
                 condition_hits = sum(1 for stem in condition_stems if stem in norm_answer_words)
                 condition_ratio = condition_hits / max(1, len(condition_stems))
-                if condition_ratio < 0.5:
+                if condition_ratio < 0.5 and reproduced:
                     status = STATUS_PARTIAL
-        elif subject_full and best_overlap >= omit_overlap:
+        elif subject_full and best_overlap >= omit_overlap and reproduced:
             # Ответ пересказывает предложение факта, но значения в нём нет.
             # Если при этом в ответе стоит другое значение того же вида — это
             # подмена (distorted), а не пропуск: так contradiction не попадает
@@ -403,18 +668,35 @@ def cover_facts(
                 if any(normalize_for_match(item[2]) != norm_value for item in same_kind):
                     status = STATUS_DISTORTED
         elif (
-            subject_here >= 0
+            subject_here
             and best_overlap >= omit_overlap
+            and reproduced
             and _subject_in(fact.subject, list(norm_answer_words), 0.8)
         ):
             # Ответ говорит об этом же предмете, но значение другое. Порог к
             # предмету строже, чем для подмены числом: иначе ответ про один
             # объект документа получал бы замечания за все остальные объекты.
+            #
+            # Раньше первым условием стояло «subject_here >= 0» — сравнение
+            # булева с нулём, которое истинно всегда: ветка срабатывала на
+            # любом совпадении похожести и приносила на корпусе A3 0,148 ложных
+            # замечаний на чистых парах. Теперь требуется и то, что ответ
+            # пересказал предложение документа (reproduced).
             status = STATUS_DISTORTED
-        elif subject_full and best_overlap >= omit_overlap:
+        elif subject_full and best_overlap >= omit_overlap and reproduced:
             status = STATUS_OMITTED
         else:
-            status = STATUS_IRRELEVANT
+            # Пропущенная обязательная деталь, которую схожесть строк не видит:
+            # предложение ответа построено вокруг предмета факта, содержит
+            # сказуемое «установлен / определён / предусмотрено» и не содержит
+            # значения. Указываем на само сказуемое — именно там ответ
+            # «обещает» деталь и не приводит её.
+            omission = _omission_span(sentence_info, sorted(_frame_stems(fact.sentence)), fact.subject)
+            if omission is None or not subject_here:
+                status = STATUS_IRRELEVANT
+            else:
+                status = STATUS_OMITTED
+                best_span = omission
 
         if status == STATUS_IRRELEVANT:
             coverages.append(FactCoverage(fact, status, -1, -1, round(best_overlap, 4)))
