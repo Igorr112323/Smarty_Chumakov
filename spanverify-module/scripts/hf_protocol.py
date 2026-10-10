@@ -185,6 +185,16 @@ def hardware_manifest() -> dict[str, Any]:
             info[f"{module}_version"] = str(getattr(package, "__version__", "без версии"))
         except ImportError:
             info[f"{module}_version"] = "не установлен"
+    # Сырые вывода `lscpu` и `free -h`: по требованию протокола ограничения
+    # «CPU ≤ 16 GB, без GPU» должны проверяться по тем же командам, что их
+    # формулирует заявка, а не по производной от /proc/meminfo оценке.
+    for key, command in (("lscpu", ("lscpu",)), ("free_h", ("free", "-h"))):
+        try:
+            completed = subprocess.run(command, capture_output=True, text=True, timeout=10, check=False)
+            text = (completed.stdout or "").strip()
+            info[key] = text[:2000] if text else "недоступно"
+        except (OSError, subprocess.SubprocessError):
+            info[key] = "недоступно"
     return info
 
 

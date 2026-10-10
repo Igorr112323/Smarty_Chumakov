@@ -145,9 +145,24 @@ def test_test_split_is_not_used_for_selection() -> None:
     text = sweep.read_text(encoding="utf-8")
     payload = json.loads(text)
     assert payload.get("run_count", 0) <= 10, "нарушен лимит десяти экспериментов"
+    best = payload.get("best")
+    journal = (ROOT / "docs" / "EXPERIMENTS.md").read_text(encoding="utf-8")
     for item in payload.get("experiments", []):
-        for corpus, numbers in (item.get("per_corpus") or {}).items():
+        name = str(item.get("name") or "")
+        errors = {
+            corpus: numbers.get("error")
+            for corpus, numbers in (item.get("per_corpus") or {}).items()
+            if numbers.get("error")
+        }
+        for corpus in item.get("per_corpus") or {}:
             assert "test" not in str(corpus).lower(), f"отбор по test: {corpus}"
-            assert numbers.get("error") is None, f"{item.get('name')}/{corpus}: {numbers.get('error')}"
+        if name == best:
+            # Ошибки в ВЫБРАННОЙ конфигурации не прощаются: по ней считается финал.
+            assert not errors, f"финальная конфигурация {name} получена с ошибками: {errors}"
+        elif errors:
+            # Упавший и отклонённый эксперимент обязан остаться в журнале — иначе
+            # неудобный прогон исчезает из отчётности вместе с причиной.
+            assert name and name in journal, f"{name}: ошибка {errors} и нет записи в docs/EXPERIMENTS.md"
+            continue
         assert (item.get("selection") or {}).get("token_f1_val") is not None, "отбор не по val"
     assert "val" in str(payload.get("rule", "")).lower(), "в правиле отбора нет val"

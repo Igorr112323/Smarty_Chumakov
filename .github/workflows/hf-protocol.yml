@@ -369,10 +369,14 @@ jobs:
           path: spanverify-module/reports/hf-grid
           merge-multiple: true
       - name: "Взять сводку шага 2 (для сверки источника выбора конфигурации)"
+        # Артефакт собран из reports/hf_protocol/ и reports/hf_baseline/, то есть
+        # его корень — spanverify-module: распаковываем в него, иначе тесты
+        # шага 3 не увидят reports/hf_protocol/sweep.json (откуда конфигурация)
+        # и останутся без manifest_val.json.
         uses: actions/download-artifact@v4
         with:
           name: "hf-protocol-sweep"
-          path: spanverify-module/reports/hf-protocol-val
+          path: spanverify-module
       - name: "Зависимости и среда"
         uses: ./.github/actions/hf-setup
       - name: "Проверка, что конфигурация зафиксирована"
