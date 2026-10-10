@@ -75,3 +75,72 @@ Legacy внутренний CV головы делит токены и оста�
 AUC-ablation — проверка информативности, не обещание конечного token F1.
 Положительный эффект потребует отдельной backward-compatible интеграции и
 повторной сквозной проверки. Цель F1/FPR остаётся критерием, не измерением.
+
+## Дополнительная проверка входных утечек
+
+Реальное пересечение ключей exact `(answer, context, mode, model)` обнаружило
+**один** общий вход train/test при разных `doc_id`; запись идентификаторов и
+ключа: `task1_input_overlap.json`. Всего A3 имеет 1195 уникальных входов на
+1200 записей. Официальный document split не гарантирует input-disjoint split.
+Официальные данные не изменены и не удалены. Даже высокий будущий F1 на таком
+срезе сам по себе не докажет чистую приёмочную оценку: нужна дополнительная
+оценка без пересекающихся входов или согласованное новое разбиение.
+
+## Сверка и CI
+
+Завершённый `collect_metrics.py`: `tests.collected=544`, coverage `null`
+(полный coverage-run ещё не завершён), `hf_a3_acceptance.status=blocked`.
+`check_numbers.py`: «Числа сходятся с METRICS.json: проверено документов 10», код 0;
+`task1_collect_metrics_current.log`, `task1_check_numbers_current.log`.
+В README/ИТОГ/шаблоне отчёта старое число тестов сохранено как историческое,
+а не подменено утверждением, что все новые тесты уже прошли.
+
+Запущенные Actions (статус на момент записи — in_progress, артефакты ожидаются):
+- HF A3: https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/38026979871
+- CI: https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/38026979832
+
+Реальная установка HF-зависимостей на четырёх feature-job Actions завершилась
+успешно, предпосчёт идёт. Результаты качества и финальный зелёный CI пока
+не утверждаются. По задаче 1 требуется дождаться результатов, проверить
+AUC-ablation, затем интегрировать только подтверждённые признаки и повторить
+сквозной запуск. Автоматического обещания продолжения после конца ответа нет.
+
+## Файлы текущего расширения
+
+- `"\320\230\320\242\320\236\320\223.md"`
+- `"docs/\320\236\320\242\320\247\320\201\320\242_\320\276_\320\235\320\230\320\240_\321\210\320\260\320\261\320\273\320\276\320\275.md"`
+- `.github/hf-a3-acceptance.trigger`
+- `.github/workflows/hf-a3-acceptance.yml`
+- `.gitignore`
+- `PROGRESS.md`
+- `README.md`
+- `spanverify-module/README.md`
+- `spanverify-module/reports/METRICS.json`
+- `spanverify-module/reports/TASK1_STATUS.md`
+- `spanverify-module/reports/experiments/hf_a3_experiment.md`
+- `spanverify-module/reports/hf_a3_eval.md`
+- `spanverify-module/reports/hf_a3_run.json`
+- `spanverify-module/reports/hf_a3_train.log`
+- `spanverify-module/reports/task1_baseline_tests.log`
+- `spanverify-module/reports/task1_check_numbers.log`
+- `spanverify-module/reports/task1_check_numbers_current.log`
+- `spanverify-module/reports/task1_ci_runs.json`
+- `spanverify-module/reports/task1_collect_metrics.log`
+- `spanverify-module/reports/task1_collect_metrics_current.log`
+- `spanverify-module/reports/task1_focused_tests.log`
+- `spanverify-module/reports/task1_full_tests.log`
+- `spanverify-module/reports/task1_hf_evaluate.log`
+- `spanverify-module/reports/task1_hf_invocation.log`
+- `spanverify-module/reports/task1_input_overlap.json`
+- `spanverify-module/reports/task1_lint.log`
+- `spanverify-module/reports/task1_selftest.log`
+- `spanverify-module/reports/task1_test_collection.log`
+- `spanverify-module/scripts/collect_metrics.py`
+- `spanverify-module/scripts/hf_feature_ablation.py`
+- `spanverify-module/scripts/precompute_features.py`
+- `spanverify-module/scripts/run_experiments.py`
+- `spanverify-module/scripts/train_hf_a3.py`
+- `spanverify-module/spanverify/engine.py`
+- `spanverify-module/spanverify/features.py`
+- `spanverify-module/spanverify/train.py`
+- `spanverify-module/tests/test_hf_a3_pipeline.py`

@@ -1,0 +1,16 @@
+{
+  "command": "read_pairs + feature_cache_key intersections",
+  "train_test_shared_exact_inputs": [
+    {
+      "key": "101af4e04c5b00734362f47500d382a17153c21910dded6e34f384067f35a589",
+      "train_ids": [
+        "corpus-a3-00116"
+      ],
+      "test_ids": [
+        "corpus-a3-00232"
+      ]
+    }
+  ],
+  "count": 1,
+  "note": "Different document IDs do not exclude identical answer/context leakage; official test is not fully input-disjoint."
+}
