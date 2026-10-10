@@ -1,0 +1,1613 @@
+{
+ "best": "wide-linear",
+ "best_reaches_criterion_on_val": false,
+ "best_selection": {
+  "auc_val": 0.92464,
+  "corpus": "a3",
+  "token_f1_val": 0.515702,
+  "token_fpr_val": 0.021088
+ },
+ "code_commit": "c7c64bd8d0acbc95d5f2eec0ca044e8ca0f79988",
+ "criterion": {
+  "token_f1_min": 0.6,
+  "token_fpr_max": 0.4
+ },
+ "duration_s": 3106.53,
+ "experiments": [
+  {
+   "change": "Никаких изменений кода: состав признаков повторён из продукта, логистическая регрессия продукта, сглаживания нет.",
+   "classifier": "logreg",
+   "features": [
+    "entropy_last",
+    "mass_last",
+    "density_k1_last"
+   ],
+   "hypothesis": "Три рабочих признака продукта (энтропия последнего слоя, масса внимания на документ, плотность k=1) на той же модели дают на A3 уровень не хуже уже известного: проверка, что харнесс измеряет то же самое, а не новую метрику.",
+   "merge_gap": 2,
+   "name": "baseline-grid",
+   "number": 1,
+   "params": {
+    "classifier": "logreg",
+    "epochs": 600,
+    "folds": 5,
+    "l2": 0.01
+   },
+   "per_corpus": {
+    "a1": {
+     "answers": {
+      "auc": 0.74895,
+      "f1": 0.601399,
+      "fn": 49.0,
+      "fp": 8.0,
+      "fpr": 0.090909,
+      "precision": 0.843137,
+      "recall": 0.467391,
+      "threshold": 0.306936,
+      "tn": 80.0,
+      "tp": 43.0
+     },
+     "criterion": {
+      "f1_gap": -0.091076,
+      "fpr_gap": -0.382948,
+      "status": "PASS",
+      "target": "F1 ≥ 0.6 при FPR ≤ 0.4 (токены, hf, отложенный test)",
+      "token_f1": 0.691076,
+      "token_fpr": 0.017052
+     },
+     "error": null,
+     "model_sha256": "53e1127c66ec945e52667dd8a69265329a1ba4be0cce212061650f5709029b49",
+     "positive_rows": 258,
+     "rows": 1900,
+     "spans": {
+      "f1": 0.441718,
+      "fn": 56.0,
+      "fp": 35.0,
+      "iou_threshold": 0.5,
+      "precision": 0.507042,
+      "recall": 0.391304,
+      "tp": 36.0
+     },
+     "threshold": 0.306936,
+     "threshold_selection": {
+      "folds": 5,
+      "oof_rows": 9003,
+      "selection": {
+       "f1": 0.639958,
+       "fpr": 0.017577,
+       "precision": 0.814765
+      },
+      "smoothing_radius": 0,
+      "threshold": 0.30693589236040236
+     },
+     "tokens": {
+      "auc": 0.810404,
+      "f1": 0.691076,
+      "fn": 107.0,
+      "fp": 28.0,
+      "fpr": 0.017052,
+      "precision": 0.843575,
+      "recall": 0.585271,
+      "tn": 1614.0,
+      "tp": 151.0
+     }
+    },
+    "a3": {
+     "answers": {
+      "auc": 0.621324,
+      "f1": 0.697479,
+      "fn": 13.0,
+      "fp": 59.0,
+      "fpr": 0.694118,
+      "precision": 0.584507,
+      "recall": 0.864583,
+      "threshold": 0.046582,
+      "tn": 26.0,
+      "tp": 83.0
+     },
+     "criterion": {
+      "f1_gap": 0.461083,
+      "fpr_gap": -0.318771,
+      "status": "NOT MET",
+      "target": "F1 ≥ 0.6 при FPR ≤ 0.4 (токены, hf, отложенный test)",
+      "token_f1": 0.138917,
+      "token_fpr": 0.081229
+     },
+     "error": null,
+     "model_sha256": "46724a23c1e2bbd42be955e13e0fe0fc5d5382676e27848127095c83e5d0923d",
+     "positive_rows": 287,
+     "rows": 7969,
+     "spans": {
+      "f1": 0.024055,
+      "fn": 89.0,
+      "fp": 479.0,
+      "iou_threshold": 0.5,
+      "precision": 0.014403,
+      "recall": 0.072917,
+      "tp": 7.0
+     },
+     "threshold": 0.046582,
+     "threshold_selection": {
+      "folds": 5,
+      "oof_rows": 46607,
+      "selection": {
+       "f1": 0.151069,
+       "fpr": 0.055459,
+       "precision": 0.112527
+      },
+      "smoothing_radius": 0,
+      "threshold": 0.0465821684580247
+     },
+     "tokens": {
+      "auc": 0.716464,
+      "f1": 0.138917,
+      "fn": 219.0,
+      "fp": 624.0,
+      "fpr": 0.081229,
+      "precision": 0.098266,
+      "recall": 0.236934,
+      "tn": 7058.0,
+      "tp": 68.0
+     }
+    }
+   },
+   "selection": {
+    "auc_val": 0.716464,
+    "corpus": "a3",
+    "token_f1_val": 0.138917,
+    "token_fpr_val": 0.081229
+   },
+   "window": 0
+  },
+  {
+   "change": "Вместо entropy_last — четыре конкретных слоя (первый, средний, m/4, последний) плюс среднее и максимум по всем слоям.",
+   "classifier": "logreg",
+   "features": [
+    "entropy_last",
+    "entropy_first",
+    "entropy_middle",
+    "entropy_m4",
+    "entropy_mean_layers",
+    "entropy_max_layers"
+   ],
+   "hypothesis": "Один последний слой слишком груб: сигнал «значение подменено» распределён по слоям, и максимум/среднее по слоям добавляет то, что последний слой теряет.",
+   "merge_gap": 2,
+   "name": "all-layer-entropy",
+   "number": 2,
+   "params": {
+    "classifier": "logreg",
+    "epochs": 600,
+    "folds": 5,
+    "l2": 0.01
+   },
+   "per_corpus": {
+    "a1": {
+     "answers": {
+      "auc": 0.703557,
+      "f1": 0.69962,
+      "fn": 0.0,
+      "fp": 79.0,
+      "fpr": 0.897727,
+      "precision": 0.538012,
+      "recall": 1.0,
+      "threshold": 0.145509,
+      "tn": 9.0,
+      "tp": 92.0
+     },
+     "criterion": {
+      "f1_gap": 0.289008,
+      "fpr_gap": -0.173447,
+      "status": "NOT MET",
+      "target": "F1 ≥ 0.6 при FPR ≤ 0.4 (токены, hf, отложенный test)",
+      "token_f1": 0.310992,
+      "token_fpr": 0.226553
+     },
+     "error": null,
+     "model_sha256": "fe08b6707cf7308ad11511147c1f384ce5a58d941440529f300932af7b210779",
+     "positive_rows": 258,
+     "rows": 1900,
+     "spans": {
+      "f1": 0.110638,
+      "fn": 66.0,
+      "fp": 352.0,
+      "iou_threshold": 0.5,
+      "precision": 0.068783,
+      "recall": 0.282609,
+      "tp": 26.0
+     },
+     "threshold": 0.145509,
+     "threshold_selection": {
+      "folds": 5,
+      "oof_rows": 9003,
+      "selection": {
+       "f1": 0.300966,
+       "fpr": 0.256655,
+       "precision": 0.21778
+      },
+      "smoothing_radius": 0,
+      "threshold": 0.14550866041936159
+     },
+     "tokens": {
+      "auc": 0.659431,
+      "f1": 0.310992,
+      "fn": 142.0,
+      "fp": 372.0,
+      "fpr": 0.226553,
+      "precision": 0.237705,
+      "recall": 0.449612,
+      "tn": 1270.0,
+      "tp": 116.0
+     }
+    },
+    "a3": {
+     "answers": {
+      "auc": 0.519485,
+      "f1": 0.606061,
+      "fn": 26.0,
+      "fp": 65.0,
+      "fpr": 0.764706,
+      "precision": 0.518519,
+      "recall": 0.729167,
+      "threshold": 0.064224,
+      "tn": 20.0,
+      "tp": 70.0
+     },
+     "criterion": {
+      "f1_gap": 0.409955,
+      "fpr_gap": -0.307186,
+      "status": "NOT MET",
+      "target": "F1 ≥ 0.6 при FPR ≤ 0.4 (токены, hf, отложенный test)",
+      "token_f1": 0.190045,
+      "token_fpr": 0.092814
+     },
+     "error": null,
+     "model_sha256": "ba9b73477b1c77687570fec51026aa3f623429632e25b18b47dacd358a458a54",
+     "positive_rows": 287,
+     "rows": 7969,
+     "spans": {
+      "f1": 0.052533,
+      "fn": 82.0,
+      "fp": 423.0,
+      "iou_threshold": 0.5,
+      "precision": 0.032037,
+      "recall": 0.145833,
+      "tp": 14.0
+     },
+     "threshold": 0.064224,
+     "threshold_selection": {
+      "folds": 5,
+      "oof_rows": 46607,
+      "selection": {
+       "f1": 0.178531,
+       "fpr": 0.076333,
+       "precision": 0.120734
+      },
+      "smoothing_radius": 0,
+      "threshold": 0.0642237786027371
+     },
+     "tokens": {
+      "auc": 0.726441,
+      "f1": 0.190045,
+      "fn": 182.0,
+      "fp": 713.0,
+      "fpr": 0.092814,
+      "precision": 0.128362,
+      "recall": 0.365854,
+      "tn": 6969.0,
+      "tp": 105.0
+     }
+    }
+   },
+   "selection": {
+    "auc_val": 0.726441,
+    "corpus": "a3",
+    "token_f1_val": 0.190045,
+    "token_fpr_val": 0.092814
+   },
+   "window": 0
+  },
+  {
+   "change": "Признаки по головам: максимум по головам, среднее по слоям, нормированная масса и lift, несогласие голов по энтропии.",
+   "classifier": "logreg",
+   "features": [
+    "mass_last",
+    "mass_max_head",
+    "mass_mean_layers",
+    "mass_max_layers",
+    "mass_norm_last",
+    "mass_lift_last",
+    "entropy_head_disagreement"
+   ],
+   "hypothesis": "Масса внимания на документ концентрируется в нескольких головах, а усреднение по всем головам её размывает; нормировка на ожидаемую долю и «подъём» относительно фона убирают зависимость от длины контекста.",
+   "merge_gap": 2,
+   "name": "head-aggregation",
+   "number": 3,
+   "params": {
+    "classifier": "logreg",
+    "epochs": 600,
+    "folds": 5,
+    "l2": 0.01
+   },
+   "per_corpus": {
+    "a1": {
+     "answers": {
+      "auc": 0.623703,
+      "f1": 0.577778,
+      "fn": 40.0,
+      "fp": 36.0,
+      "fpr": 0.409091,
+      "precision": 0.590909,
+      "recall": 0.565217,
+      "threshold": 0.306452,
+      "tn": 52.0,
+      "tp": 52.0
+     },
+     "criterion": {
+      "f1_gap": -0.048,
+      "fpr_gap": -0.351279,
+      "status": "PASS",
+      "target": "F1 ≥ 0.6 при FPR ≤ 0.4 (токены, hf, отложенный test)",
+      "token_f1": 0.648,
+      "token_fpr": 0.048721
+     },
+     "error": null,
+     "model_sha256": "bc8e7988393389109a78a5fab90c37610a797c818ebf5f1140fa0a09bba99655",
+     "positive_rows": 258,
+     "rows": 1900,
+     "spans": {
+      "f1": 0.344186,
+      "fn": 55.0,
+      "fp": 86.0,
+      "iou_threshold": 0.5,
+      "precision": 0.300813,
+      "recall": 0.402174,
+      "tp": 37.0
+     },
+     "threshold": 0.306452,
+     "threshold_selection": {
+      "folds": 5,
+      "oof_rows": 9003,
+      "selection": {
+       "f1": 0.630137,
+       "fpr": 0.044326,
+       "precision": 0.66474
+      },
+      "smoothing_radius": 0,
+      "threshold": 0.3064524197443679
+     },
+     "tokens": {
+      "auc": 0.922258,
+      "f1": 0.648,
+      "fn": 96.0,
+      "fp": 80.0,
+      "fpr": 0.048721,
+      "precision": 0.669421,
+      "recall": 0.627907,
+      "tn": 1562.0,
+      "tp": 162.0
+     }
+    },
+    "a3": {
+     "answers": {
+      "auc": 0.428186,
+      "f1": 0.688406,
+      "fn": 1.0,
+      "fp": 85.0,
+      "fpr": 1.0,
+      "precision": 0.527778,
+      "recall": 0.989583,
+      "threshold": 0.035277,
+      "tn": 0.0,
+      "tp": 95.0
+     },
+     "criterion": {
+      "f1_gap": 0.504094,
+      "fpr_gap": -0.013512,
+      "status": "NOT MET",
+      "target": "F1 ≥ 0.6 при FPR ≤ 0.4 (токены, hf, отложенный test)",
+      "token_f1": 0.095906,
+      "token_fpr": 0.386488
+     },
+     "error": null,
+     "model_sha256": "273260c9de0e14c4d66170264aaee0f15d0ea2a20d494ad9d4071a78a745a06f",
+     "positive_rows": 287,
+     "rows": 7969,
+     "spans": {
+      "f1": 0.0336,
+      "fn": 75.0,
+      "fp": 1133.0,
+      "iou_threshold": 0.5,
+      "precision": 0.018198,
+      "recall": 0.21875,
+      "tp": 21.0
+     },
+     "threshold": 0.035277,
+     "threshold_selection": {
+      "folds": 5,
+      "oof_rows": 46607,
+      "selection": {
+       "f1": 0.087695,
+       "fpr": 0.34551,
+       "precision": 0.047546
+      },
+      "smoothing_radius": 0,
+      "threshold": 0.0352771898241742
+     },
+     "tokens": {
+      "auc": 0.611818,
+      "f1": 0.095906,
+      "fn": 123.0,
+      "fp": 2969.0,
+      "fpr": 0.386488,
+      "precision": 0.052346,
+      "recall": 0.571429,
+      "tn": 4713.0,
+      "tp": 164.0
+     }
+    }
+   },
+   "selection": {
+    "auc_val": 0.611818,
+    "corpus": "a3",
+    "token_f1_val": 0.095906,
+    "token_fpr_val": 0.386488
+   },
+   "window": 0
+  },
+  {
+   "change": "Плотность при k=1/3/5 на последнем слое и k=3 на среднем, плюс максимум похожести, контраст, отступ, расстояние до опоры и спад по расстоянию.",
+   "classifier": "logreg",
+   "features": [
+    "density_k1_last",
+    "density_k3_last",
+    "density_k5_last",
+    "density_k3_middle",
+    "sim_max_last",
+    "sim_contrast_last",
+    "sim_margin_last",
+    "sim_distance_last",
+    "sim_decay_last"
+   ],
+   "hypothesis": "Плотность k=1 ловит «токен похож ровно на одно слово документа», из-за чего правдоподобные подмены (число из другого пункта) выглядят поддержанными; k=3 и k=5 плюс контраст и отступ до второго кандидата разделяют «есть опора» и «есть близкий фон».",
+   "merge_gap": 2,
+   "name": "density-multi-k",
+   "number": 4,
+   "params": {
+    "classifier": "logreg",
+    "epochs": 600,
+    "folds": 5,
+    "l2": 0.01
+   },
+   "per_corpus": {
+    "a1": {
+     "answers": {
+      "auc": 0.69559,
+      "f1": 0.607407,
+      "fn": 51.0,
+      "fp": 2.0,
+      "fpr": 0.022727,
+      "precision": 0.953488,
+      "recall": 0.445652,
+      "threshold": 0.414056,
+      "tn": 86.0,
+      "tp": 41.0
+     },
+     "criterion": {
+      "f1_gap": -0.092494,
+      "fpr_gap": -0.392692,
+      "status": "PASS",
+      "target": "F1 ≥ 0.6 при FPR ≤ 0.4 (токены, hf, отложенный test)",
+      "token_f1": 0.692494,
+      "token_fpr": 0.007308
+     },
+     "error": null,
+     "model_sha256": "5209198924553dba172e4fe093f1691916a9fe5b0b12204854574615f537653f",
+     "positive_rows": 258,
+     "rows": 1900,
+     "spans": {
+      "f1": 0.418301,
+      "fn": 60.0,
+      "fp": 29.0,
+      "iou_threshold": 0.5,
+      "precision": 0.52459,
+      "recall": 0.347826,
+      "tp": 32.0
+     },
+     "threshold": 0.414056,
+     "threshold_selection": {
+      "folds": 5,
+      "oof_rows": 9003,
+      "selection": {
+       "f1": 0.638561,
+       "fpr": 0.007515,
+       "precision": 0.905901
+      },
+      "smoothing_radius": 0,
+      "threshold": 0.4140559380389109
+     },
+     "tokens": {
+      "auc": 0.872743,
+      "f1": 0.692494,
+      "fn": 115.0,
+      "fp": 12.0,
+      "fpr": 0.007308,
+      "precision": 0.922581,
+      "recall": 0.554264,
+      "tn": 1630.0,
+      "tp": 143.0
+     }
+    },
+    "a3": {
+     "answers": {
+      "auc": 0.766299,
+      "f1": 0.666667,
+      "fn": 41.0,
+      "fp": 14.0,
+      "fpr": 0.164706,
+      "precision": 0.797101,
+      "recall": 0.572917,
+      "threshold": 0.069225,
+      "tn": 71.0,
+      "tp": 55.0
+     },
+     "criterion": {
+      "f1_gap": 0.321831,
+      "fpr_gap": -0.373705,
+      "status": "NOT MET",
+      "target": "F1 ≥ 0.6 при FPR ≤ 0.4 (токены, hf, отложенный test)",
+      "token_f1": 0.278169,
+      "token_fpr": 0.026295
+     },
+     "error": null,
+     "model_sha256": "335e04127c2acff2366668bba4e45d61903e1f71c1f6817e59c9161f108c1b38",
+     "positive_rows": 287,
+     "rows": 7969,
+     "spans": {
+      "f1": 0.039735,
+      "fn": 90.0,
+      "fp": 200.0,
+      "iou_threshold": 0.5,
+      "precision": 0.029126,
+      "recall": 0.0625,
+      "tp": 6.0
+     },
+     "threshold": 0.069225,
+     "threshold_selection": {
+      "folds": 5,
+      "oof_rows": 46607,
+      "selection": {
+       "f1": 0.183108,
+       "fpr": 0.03171,
+       "precision": 0.165308
+      },
+      "smoothing_radius": 0,
+      "threshold": 0.06922473644303673
+     },
+     "tokens": {
+      "auc": 0.758308,
+      "f1": 0.278169,
+      "fn": 208.0,
+      "fp": 202.0,
+      "fpr": 0.026295,
+      "precision": 0.281139,
+      "recall": 0.275261,
+      "tn": 7480.0,
+      "tp": 79.0
+     }
+    }
+   },
+   "selection": {
+    "auc_val": 0.758308,
+    "corpus": "a3",
+    "token_f1_val": 0.278169,
+    "token_fpr_val": 0.026295
+   },
+   "window": 0
+  },
+  {
+   "change": "Только лексико-числовые признаки: совпадение стемма, совпадение числа, триграммная близость, флаги правила привязки чисел (заимствовано/подтверждено).",
+   "classifier": "logreg",
+   "features": [
+    "lex_match",
+    "num_match",
+    "trigram_match",
+    "attrib_borrowed",
+    "attrib_supported"
+   ],
+   "hypothesis": "В A3 искажения — это подменные значения (числа, даты, номера актов), а они узнаются совпадением с документом: лексическое совпадение по стемму, непрерывное совпадение по триграммам, совпадение числа и признак «число взято из другого объекта» должны дать то, чего не видит внимание.",
+   "merge_gap": 2,
+   "name": "lexical-numeric",
+   "number": 5,
+   "params": {
+    "classifier": "logreg",
+    "epochs": 600,
+    "folds": 5,
+    "l2": 0.01
+   },
+   "per_corpus": {
+    "a1": {
+     "answers": {
+      "auc": 0.645813,
+      "f1": 0.680162,
+      "fn": 8.0,
+      "fp": 71.0,
+      "fpr": 0.806818,
+      "precision": 0.541935,
+      "recall": 0.913043,
+      "threshold": 0.16708,
+      "tn": 17.0,
+      "tp": 84.0
+     },
+     "criterion": {
+      "f1_gap": -0.008558,
+      "fpr_gap": -0.289769,
+      "status": "PASS",
+      "target": "F1 ≥ 0.6 при FPR ≤ 0.4 (токены, hf, отложенный test)",
+      "token_f1": 0.608558,
+      "token_fpr": 0.110231
+     },
+     "error": null,
+     "model_sha256": "4ca2545dcc62ce7b3cec141902e079cd83582eec55aa52821e8ae1496d2e5cb4",
+     "positive_rows": 258,
+     "rows": 1900,
+     "spans": {
+      "f1": 0.303725,
+      "fn": 39.0,
+      "fp": 204.0,
+      "iou_threshold": 0.5,
+      "precision": 0.206226,
+      "recall": 0.576087,
+      "tp": 53.0
+     },
+     "threshold": 0.16708,
+     "threshold_selection": {
+      "folds": 5,
+      "oof_rows": 9003,
+      "selection": {
+       "f1": 0.579419,
+       "fpr": 0.105592,
+       "precision": 0.493586
+      },
+      "smoothing_radius": 0,
+      "threshold": 0.1670800531937479
+     },
+     "tokens": {
+      "auc": 0.807607,
+      "f1": 0.608558,
+      "fn": 66.0,
+      "fp": 181.0,
+      "fpr": 0.110231,
+      "precision": 0.514745,
+      "recall": 0.744186,
+      "tn": 1461.0,
+      "tp": 192.0
+     }
+    },
+    "a3": {
+     "answers": {
+      "auc": 0.627145,
+      "f1": 0.731915,
+      "fn": 10.0,
+      "fp": 53.0,
+      "fpr": 0.623529,
+      "precision": 0.618705,
+      "recall": 0.895833,
+      "threshold": 0.059281,
+      "tn": 32.0,
+      "tp": 86.0
+     },
+     "criterion": {
+      "f1_gap": 0.097717,
+      "fpr_gap": -0.351966,
+      "status": "NOT MET",
+      "target": "F1 ≥ 0.6 при FPR ≤ 0.4 (токены, hf, отложенный test)",
+      "token_f1": 0.502283,
+      "token_fpr": 0.048034
+     },
+     "error": null,
+     "model_sha256": "3c0906eac1ea86a4d84a4c4018b337f4d970fcb4a8872987cfb9d3721d1283df",
+     "positive_rows": 287,
+     "rows": 7969,
+     "spans": {
+      "f1": 0.170778,
+      "fn": 51.0,
+      "fp": 386.0,
+      "iou_threshold": 0.5,
+      "precision": 0.104408,
+      "recall": 0.46875,
+      "tp": 45.0
+     },
+     "threshold": 0.059281,
+     "threshold_selection": {
+      "folds": 5,
+      "oof_rows": 46607,
+      "selection": {
+       "f1": 0.365459,
+       "fpr": 0.072154,
+       "precision": 0.241516
+      },
+      "smoothing_radius": 0,
+      "threshold": 0.05928108135685346
+     },
+     "tokens": {
+      "auc": 0.917065,
+      "f1": 0.502283,
+      "fn": 67.0,
+      "fp": 369.0,
+      "fpr": 0.048034,
+      "precision": 0.373514,
+      "recall": 0.766551,
+      "tn": 7313.0,
+      "tp": 220.0
+     }
+    }
+   },
+   "selection": {
+    "auc_val": 0.917065,
+    "corpus": "a3",
+    "token_f1_val": 0.502283,
+    "token_fpr_val": 0.048034
+   },
+   "window": 0
+  },
+  {
+   "change": "Признаки соседства и уровня предложения: поддержка предложения документом, позиция в предложении, глобальная позиция, длина токена, сглаженная масса и энтропия по окну ±1.",
+   "classifier": "logreg",
+   "features": [
+    "sentence_support",
+    "sentence_position",
+    "position",
+    "length",
+    "mass_win3",
+    "entropy_win3"
+   ],
+   "hypothesis": "Ложные срабатывания концентрируются в канцелярских предложениях-шаблонах, где любое число «похоже на подтверждённое»; поддержка на уровне предложения и позиция внутри него отделяют шаблон от содержательного утверждения.",
+   "merge_gap": 2,
+   "name": "sentence-context",
+   "number": 6,
+   "params": {
+    "classifier": "logreg",
+    "epochs": 600,
+    "folds": 5,
+    "l2": 0.01
+   },
+   "per_corpus": {
+    "a1": {
+     "answers": {
+      "auc": 0.797493,
+      "f1": 0.671141,
+      "fn": 42.0,
+      "fp": 7.0,
+      "fpr": 0.079545,
+      "precision": 0.877193,
+      "recall": 0.543478,
+      "threshold": 0.40084,
+      "tn": 81.0,
+      "tp": 50.0
+     },
+     "criterion": {
+      "f1_gap": -0.131377,
+      "fpr_gap": -0.385993,
+      "status": "PASS",
+      "target": "F1 ≥ 0.6 при FPR ≤ 0.4 (токены, hf, отложенный test)",
+      "token_f1": 0.731377,
+      "token_fpr": 0.014007
+     },
+     "error": null,
+     "model_sha256": "33496ea33de4b805b6cb19a5ed62367552b77f96cf01a93168d95636d4714e07",
+     "positive_rows": 258,
+     "rows": 1900,
+     "spans": {
+      "f1": 0.45283,
+      "fn": 56.0,
+      "fp": 31.0,
+      "iou_threshold": 0.5,
+      "precision": 0.537313,
+      "recall": 0.391304,
+      "tp": 36.0
+     },
+     "threshold": 0.40084,
+     "threshold_selection": {
+      "folds": 5,
+      "oof_rows": 9003,
+      "selection": {
+       "f1": 0.715005,
+       "fpr": 0.015794,
+       "precision": 0.851319
+      },
+      "smoothing_radius": 0,
+      "threshold": 0.40084021213800797
+     },
+     "tokens": {
+      "auc": 0.947244,
+      "f1": 0.731377,
+      "fn": 96.0,
+      "fp": 23.0,
+      "fpr": 0.014007,
+      "precision": 0.875676,
+      "recall": 0.627907,
+      "tn": 1619.0,
+      "tp": 162.0
+     }
+    },
+    "a3": {
+     "answers": {
+      "auc": 0.587255,
+      "f1": 0.362205,
+      "fn": 73.0,
+      "fp": 8.0,
+      "fpr": 0.094118,
+      "precision": 0.741935,
+      "recall": 0.239583,
+      "threshold": 0.176241,
+      "tn": 77.0,
+      "tp": 23.0
+     },
+     "criterion": {
+      "f1_gap": 0.268763,
+      "fpr_gap": -0.385551,
+      "status": "NOT MET",
+      "target": "F1 ≥ 0.6 при FPR ≤ 0.4 (токены, hf, отложенный test)",
+      "token_f1": 0.331237,
+      "token_fpr": 0.014449
+     },
+     "error": null,
+     "model_sha256": "eb73a70260e48d7b5de4e9fbb3fad75aa3e52becc254efae0a88a33832e67724",
+     "positive_rows": 287,
+     "rows": 7969,
+     "spans": {
+      "f1": 0.186667,
+      "fn": 82.0,
+      "fp": 40.0,
+      "iou_threshold": 0.5,
+      "precision": 0.259259,
+      "recall": 0.145833,
+      "tp": 14.0
+     },
+     "threshold": 0.176241,
+     "threshold_selection": {
+      "folds": 5,
+      "oof_rows": 46607,
+      "selection": {
+       "f1": 0.339538,
+       "fpr": 0.001946,
+       "precision": 0.773779
+      },
+      "smoothing_radius": 0,
+      "threshold": 0.17624109538502558
+     },
+     "tokens": {
+      "auc": 0.825564,
+      "f1": 0.331237,
+      "fn": 208.0,
+      "fp": 111.0,
+      "fpr": 0.014449,
+      "precision": 0.415789,
+      "recall": 0.275261,
+      "tn": 7571.0,
+      "tp": 79.0
+     }
+    }
+   },
+   "selection": {
+    "auc_val": 0.825564,
+    "corpus": "a3",
+    "token_f1_val": 0.331237,
+    "token_fpr_val": 0.014449
+   },
+   "window": 0
+  },
+  {
+   "change": "Все 36 признаков сетки, логистическая регрессия продукта, l2 усилена (признаков больше, чем пар в пятифолдовом CV по 265 документам).",
+   "classifier": "logreg",
+   "features": [
+    "entropy_last",
+    "entropy_first",
+    "entropy_middle",
+    "entropy_m4",
+    "entropy_mean_layers",
+    "entropy_max_layers",
+    "entropy_head_max",
+    "entropy_head_disagreement",
+    "mass_last",
+    "mass_first",
+    "mass_middle",
+    "mass_mean_layers",
+    "mass_max_layers",
+    "mass_max_head",
+    "mass_norm_last",
+    "mass_lift_last",
+    "density_k1_last",
+    "density_k3_last",
+    "density_k5_last",
+    "density_k3_middle",
+    "sim_max_last",
+    "sim_contrast_last",
+    "sim_margin_last",
+    "sim_distance_last",
+    "sim_decay_last",
+    "lex_match",
+    "num_match",
+    "trigram_match",
+    "attrib_borrowed",
+    "attrib_supported",
+    "mass_win3",
+    "entropy_win3",
+    "position",
+    "length",
+    "sentence_position",
+    "sentence_support"
+   ],
+   "hypothesis": "Линейная модель на полном наборе сетки — потолок для «просто сложить все признаки»: если отдельная группа признаков работает, а полная комбинация нет, мешает не состав, а линейность.",
+   "merge_gap": 2,
+   "name": "wide-linear",
+   "number": 7,
+   "params": {
+    "classifier": "logreg",
+    "epochs": 800,
+    "folds": 5,
+    "l2": 0.1
+   },
+   "per_corpus": {
+    "a1": {
+     "answers": {
+      "auc": 0.836524,
+      "f1": 0.77095,
+      "fn": 23.0,
+      "fp": 18.0,
+      "fpr": 0.204545,
+      "precision": 0.793103,
+      "recall": 0.75,
+      "threshold": 0.250262,
+      "tn": 70.0,
+      "tp": 69.0
+     },
+     "criterion": {
+      "f1_gap": -0.193319,
+      "fpr_gap": -0.381121,
+      "status": "PASS",
+      "target": "F1 ≥ 0.6 при FPR ≤ 0.4 (токены, hf, отложенный test)",
+      "token_f1": 0.793319,
+      "token_fpr": 0.018879
+     },
+     "error": null,
+     "model_sha256": "b94c679555d41703d4dad98225dd37c083306128f5d3669694cf8ace346ad2e9",
+     "positive_rows": 258,
+     "rows": 1900,
+     "spans": {
+      "f1": 0.553846,
+      "fn": 38.0,
+      "fp": 49.0,
+      "iou_threshold": 0.5,
+      "precision": 0.524272,
+      "recall": 0.586957,
+      "tp": 54.0
+     },
+     "threshold": 0.250262,
+     "threshold_selection": {
+      "folds": 5,
+      "oof_rows": 9003,
+      "selection": {
+       "f1": 0.770704,
+       "fpr": 0.016813,
+       "precision": 0.859125
+      },
+      "smoothing_radius": 0,
+      "threshold": 0.2502619988012479
+     },
+     "tokens": {
+      "auc": 0.959518,
+      "f1": 0.793319,
+      "fn": 68.0,
+      "fp": 31.0,
+      "fpr": 0.018879,
+      "precision": 0.859729,
+      "recall": 0.736434,
+      "tn": 1611.0,
+      "tp": 190.0
+     }
+    },
+    "a3": {
+     "answers": {
+      "auc": 0.675368,
+      "f1": 0.621469,
+      "fn": 41.0,
+      "fp": 26.0,
+      "fpr": 0.305882,
+      "precision": 0.679012,
+      "recall": 0.572917,
+      "threshold": 0.1106,
+      "tn": 59.0,
+      "tp": 55.0
+     },
+     "criterion": {
+      "f1_gap": 0.084298,
+      "fpr_gap": -0.378912,
+      "status": "NOT MET",
+      "target": "F1 ≥ 0.6 при FPR ≤ 0.4 (токены, hf, отложенный test)",
+      "token_f1": 0.515702,
+      "token_fpr": 0.021088
+     },
+     "error": null,
+     "model_sha256": "1efc3b4b06514fa164c5b358d5f40500720d9c9c939c4bf14f023bc7cd6350c1",
+     "positive_rows": 287,
+     "rows": 7969,
+     "spans": {
+      "f1": 0.233766,
+      "fn": 69.0,
+      "fp": 108.0,
+      "iou_threshold": 0.5,
+      "precision": 0.2,
+      "recall": 0.28125,
+      "tp": 27.0
+     },
+     "threshold": 0.1106,
+     "threshold_selection": {
+      "folds": 5,
+      "oof_rows": 46607,
+      "selection": {
+       "f1": 0.574183,
+       "fpr": 0.00701,
+       "precision": 0.683633
+      },
+      "smoothing_radius": 0,
+      "threshold": 0.11059968556898622
+     },
+     "tokens": {
+      "auc": 0.92464,
+      "f1": 0.515702,
+      "fn": 131.0,
+      "fp": 162.0,
+      "fpr": 0.021088,
+      "precision": 0.490566,
+      "recall": 0.543554,
+      "tn": 7520.0,
+      "tp": 156.0
+     }
+    }
+   },
+   "selection": {
+    "auc_val": 0.92464,
+    "corpus": "a3",
+    "token_f1_val": 0.515702,
+    "token_fpr_val": 0.021088
+   },
+   "window": 0
+  },
+  {
+   "change": "Тот же полный набор признаков, но классификатор — свой градиентный бустинг пней (60 раундов, шаг 0,2, минимум 20 объектов в листе).",
+   "classifier": "boost",
+   "features": [
+    "entropy_last",
+    "entropy_first",
+    "entropy_middle",
+    "entropy_m4",
+    "entropy_mean_layers",
+    "entropy_max_layers",
+    "entropy_head_max",
+    "entropy_head_disagreement",
+    "mass_last",
+    "mass_first",
+    "mass_middle",
+    "mass_mean_layers",
+    "mass_max_layers",
+    "mass_max_head",
+    "mass_norm_last",
+    "mass_lift_last",
+    "density_k1_last",
+    "density_k3_last",
+    "density_k5_last",
+    "density_k3_middle",
+    "sim_max_last",
+    "sim_contrast_last",
+    "sim_margin_last",
+    "sim_distance_last",
+    "sim_decay_last",
+    "lex_match",
+    "num_match",
+    "trigram_match",
+    "attrib_borrowed",
+    "attrib_supported",
+    "mass_win3",
+    "entropy_win3",
+    "position",
+    "length",
+    "sentence_position",
+    "sentence_support"
+   ],
+   "hypothesis": "Взаимодействия «число не подтверждено И attention размыт» линейно не складываются: аддитивная модель на пнях должна превзойти линейную на том же наборе признаков.",
+   "merge_gap": 2,
+   "name": "wide-boost",
+   "number": 8,
+   "params": {
+    "classifier": "boost",
+    "folds": 5,
+    "leaf_steps": 16,
+    "learning_rate": 0.2,
+    "min_leaf": 20,
+    "rounds": 60
+   },
+   "per_corpus": {
+    "a1": {
+     "answers": {
+      "auc": 0.656744,
+      "f1": 0.577778,
+      "fn": 53.0,
+      "fp": 4.0,
+      "fpr": 0.045455,
+      "precision": 0.906977,
+      "recall": 0.423913,
+      "threshold": 0.418861,
+      "tn": 84.0,
+      "tp": 39.0
+     },
+     "criterion": {
+      "f1_gap": -0.1277,
+      "fpr_gap": -0.392083,
+      "status": "PASS",
+      "target": "F1 ≥ 0.6 при FPR ≤ 0.4 (токены, hf, отложенный test)",
+      "token_f1": 0.7277,
+      "token_fpr": 0.007917
+     },
+     "error": null,
+     "model_sha256": "85874b3285318b57235b95d42e942a568fa75f642e9df71b0c3e437e5539d4c3",
+     "positive_rows": 258,
+     "rows": 1900,
+     "spans": {
+      "f1": 0.510067,
+      "fn": 54.0,
+      "fp": 19.0,
+      "iou_threshold": 0.5,
+      "precision": 0.666667,
+      "recall": 0.413043,
+      "tp": 38.0
+     },
+     "threshold": 0.418861,
+     "threshold_selection": {
+      "folds": 5,
+      "oof_rows": 9003,
+      "selection": {
+       "f1": 0.670698,
+       "fpr": 0.00726,
+       "precision": 0.914543
+      },
+      "smoothing_radius": 0,
+      "threshold": 0.41886142756765044
+     },
+     "tokens": {
+      "auc": 0.926527,
+      "f1": 0.7277,
+      "fn": 103.0,
+      "fp": 13.0,
+      "fpr": 0.007917,
+      "precision": 0.922619,
+      "recall": 0.600775,
+      "tn": 1629.0,
+      "tp": 155.0
+     }
+    },
+    "a3": {
+     "answers": {
+      "auc": 0.5,
+      "f1": 0.0,
+      "fn": 96.0,
+      "fp": 0.0,
+      "fpr": 0.0,
+      "precision": 0.0,
+      "recall": 0.0,
+      "threshold": 0.073396,
+      "tn": 85.0,
+      "tp": 0.0
+     },
+     "criterion": {
+      "f1_gap": 0.6,
+      "fpr_gap": -0.4,
+      "status": "NOT MET",
+      "target": "F1 ≥ 0.6 при FPR ≤ 0.4 (токены, hf, отложенный test)",
+      "token_f1": 0.0,
+      "token_fpr": 0.0
+     },
+     "error": null,
+     "model_sha256": "d15b1c2cdb5910b0c0feff012a75bee3d72b8bf5cd356d49d5bcf5ad0b27fa12",
+     "positive_rows": 287,
+     "rows": 7969,
+     "spans": {
+      "f1": 0.0,
+      "fn": 96.0,
+      "fp": 0.0,
+      "iou_threshold": 0.5,
+      "precision": 0.0,
+      "recall": 0.0,
+      "tp": 0.0
+     },
+     "threshold": 0.073396,
+     "threshold_selection": {
+      "folds": 5,
+      "oof_rows": 46607,
+      "selection": {
+       "f1": 0.143347,
+       "fpr": 0.02324,
+       "precision": 0.151735
+      },
+      "smoothing_radius": 0,
+      "threshold": 0.07339589339288202
+     },
+     "tokens": {
+      "auc": 0.85808,
+      "f1": 0.0,
+      "fn": 287.0,
+      "fp": 0.0,
+      "fpr": 0.0,
+      "precision": 0.0,
+      "recall": 0.0,
+      "tn": 7682.0,
+      "tp": 0.0
+     }
+    }
+   },
+   "selection": {
+    "auc_val": 0.85808,
+    "corpus": "a3",
+    "token_f1_val": 0.0,
+    "token_fpr_val": 0.0
+   },
+   "window": 0
+  },
+  {
+   "change": "Полный набор + бустинг, радиус сглаживания 1 токен (применяется и в CV-пороге, и к оценкам val), merge_gap 8 символов для фрагментного уровня.",
+   "classifier": "boost",
+   "features": [
+    "entropy_last",
+    "entropy_middle",
+    "entropy_mean_layers",
+    "entropy_max_layers",
+    "mass_last",
+    "mass_mean_layers",
+    "mass_max_head",
+    "mass_norm_last",
+    "mass_lift_last",
+    "density_k1_last",
+    "density_k3_last",
+    "density_k5_last",
+    "sim_max_last",
+    "sim_contrast_last",
+    "sim_margin_last",
+    "sim_distance_last",
+    "sim_decay_last",
+    "lex_match",
+    "num_match",
+    "trigram_match",
+    "attrib_borrowed",
+    "attrib_supported",
+    "sentence_support",
+    "sentence_position",
+    "position",
+    "length"
+   ],
+   "hypothesis": "Решение по отдельному токену рвёт значения на части: сглаживание по соседним токенам того же ответа и склейка маски в интервалы с зазором до 8 символов поднимут точность фрагментного уровня и уменьшат число ложных одиночных токенов.",
+   "merge_gap": 8,
+   "name": "wide-boost-smoothed",
+   "number": 9,
+   "params": {
+    "classifier": "boost",
+    "folds": 5,
+    "leaf_steps": 16,
+    "learning_rate": 0.2,
+    "min_leaf": 20,
+    "rounds": 60
+   },
+   "per_corpus": {
+    "a1": {
+     "answers": {
+      "auc": 0.676877,
+      "f1": 0.569231,
+      "fn": 55.0,
+      "fp": 1.0,
+      "fpr": 0.011364,
+      "precision": 0.973684,
+      "recall": 0.402174,
+      "threshold": 0.461808,
+      "tn": 87.0,
+      "tp": 37.0
+     },
+     "criterion": {
+      "f1_gap": -0.089655,
+      "fpr_gap": -0.383557,
+      "status": "PASS",
+      "target": "F1 ≥ 0.6 при FPR ≤ 0.4 (токены, hf, отложенный test)",
+      "token_f1": 0.689655,
+      "token_fpr": 0.016443
+     },
+     "error": null,
+     "model_sha256": "7af1ac4383e25ed275a1258025b87da306d9ec78457cb042a150c4a4b38b1a56",
+     "positive_rows": 258,
+     "rows": 1900,
+     "spans": {
+      "f1": 0.507692,
+      "fn": 59.0,
+      "fp": 5.0,
+      "iou_threshold": 0.5,
+      "precision": 0.868421,
+      "recall": 0.358696,
+      "tp": 33.0
+     },
+     "threshold": 0.461808,
+     "threshold_selection": {
+      "folds": 5,
+      "oof_rows": 9003,
+      "selection": {
+       "f1": 0.64203,
+       "fpr": 0.010062,
+       "precision": 0.880484
+      },
+      "smoothing_radius": 1,
+      "threshold": 0.46180820967309727
+     },
+     "tokens": {
+      "auc": 0.911767,
+      "f1": 0.689655,
+      "fn": 108.0,
+      "fp": 27.0,
+      "fpr": 0.016443,
+      "precision": 0.847458,
+      "recall": 0.581395,
+      "tn": 1615.0,
+      "tp": 150.0
+     }
+    },
+    "a3": {
+     "answers": {
+      "auc": 0.640319,
+      "f1": 0.0,
+      "fn": 96.0,
+      "fp": 0.0,
+      "fpr": 0.0,
+      "precision": 0.0,
+      "recall": 0.0,
+      "threshold": 0.073396,
+      "tn": 85.0,
+      "tp": 0.0
+     },
+     "criterion": {
+      "f1_gap": 0.6,
+      "fpr_gap": -0.4,
+      "status": "NOT MET",
+      "target": "F1 ≥ 0.6 при FPR ≤ 0.4 (токены, hf, отложенный test)",
+      "token_f1": 0.0,
+      "token_fpr": 0.0
+     },
+     "error": null,
+     "model_sha256": "21caafd093640954863871728966f7db18f84080dba22a531193ffbdf19ae62b",
+     "positive_rows": 287,
+     "rows": 7969,
+     "spans": {
+      "f1": 0.0,
+      "fn": 96.0,
+      "fp": 0.0,
+      "iou_threshold": 0.5,
+      "precision": 0.0,
+      "recall": 0.0,
+      "tp": 0.0
+     },
+     "threshold": 0.073396,
+     "threshold_selection": {
+      "folds": 5,
+      "oof_rows": 46607,
+      "selection": {
+       "f1": 0.131343,
+       "fpr": 0.004002,
+       "precision": 0.378007
+      },
+      "smoothing_radius": 1,
+      "threshold": 0.07339589339288202
+     },
+     "tokens": {
+      "auc": 0.922476,
+      "f1": 0.0,
+      "fn": 287.0,
+      "fp": 0.0,
+      "fpr": 0.0,
+      "precision": 0.0,
+      "recall": 0.0,
+      "tn": 7682.0,
+      "tp": 0.0
+     }
+    }
+   },
+   "selection": {
+    "auc_val": 0.922476,
+    "corpus": "a3",
+    "token_f1_val": 0.0,
+    "token_fpr_val": 0.0
+   },
+   "window": 1
+  },
+  {
+   "change": "Отбор по 9 признакам, охватывающим три группы (агрегаты внимания, плотность/похожесть, лексика и предложение), бустинг с более сильной регуляризацией (25 раундов, шаг 0,15, минимум 40 объектов в листе).",
+   "classifier": "boost",
+   "features": [
+    "entropy_mean_layers",
+    "entropy_max_layers",
+    "mass_max_head",
+    "mass_lift_last",
+    "density_k5_last",
+    "sim_margin_last",
+    "num_match",
+    "attrib_borrowed",
+    "sentence_support"
+   ],
+   "hypothesis": "Из широкого набора только горстка признаков несёт сигнал, остальное в CV на 265 документах — шум и переобучение; компактный нелинейный набор (агрегаты внимания + подтверждённость числа + поддержка предложения) устойчивее.",
+   "merge_gap": 2,
+   "name": "compact-nonlinear",
+   "number": 10,
+   "params": {
+    "classifier": "boost",
+    "folds": 5,
+    "leaf_steps": 12,
+    "learning_rate": 0.15,
+    "min_leaf": 40,
+    "rounds": 25
+   },
+   "per_corpus": {
+    "a1": {
+     "answers": {
+      "auc": 0.632164,
+      "f1": 0.569697,
+      "fn": 45.0,
+      "fp": 26.0,
+      "fpr": 0.295455,
+      "precision": 0.643836,
+      "recall": 0.51087,
+      "threshold": 0.18172,
+      "tn": 62.0,
+      "tp": 47.0
+     },
+     "criterion": {
+      "f1_gap": -0.020545,
+      "fpr_gap": -0.35676,
+      "status": "PASS",
+      "target": "F1 ≥ 0.6 при FPR ≤ 0.4 (токены, hf, отложенный test)",
+      "token_f1": 0.620545,
+      "token_fpr": 0.04324
+     },
+     "error": null,
+     "model_sha256": "80f6a7e4fe5be2307e9a797ed2c03d0cbf05c2556d9e5cc5c271834b7f8b1156",
+     "positive_rows": 258,
+     "rows": 1900,
+     "spans": {
+      "f1": 0.35,
+      "fn": 57.0,
+      "fp": 73.0,
+      "iou_threshold": 0.5,
+      "precision": 0.324074,
+      "recall": 0.380435,
+      "tp": 35.0
+     },
+     "threshold": 0.18172,
+     "threshold_selection": {
+      "folds": 5,
+      "oof_rows": 9003,
+      "selection": {
+       "f1": 0.59761,
+       "fpr": 0.032607,
+       "precision": 0.700935
+      },
+      "smoothing_radius": 0,
+      "threshold": 0.1817202382819909
+     },
+     "tokens": {
+      "auc": 0.810338,
+      "f1": 0.620545,
+      "fn": 110.0,
+      "fp": 71.0,
+      "fpr": 0.04324,
+      "precision": 0.675799,
+      "recall": 0.573643,
+      "tn": 1571.0,
+      "tp": 148.0
+     }
+    },
+    "a3": {
+     "answers": {
+      "auc": 0.47212,
+      "f1": 0.651341,
+      "fn": 11.0,
+      "fp": 80.0,
+      "fpr": 0.941176,
+      "precision": 0.515152,
+      "recall": 0.885417,
+      "threshold": 0.029918,
+      "tn": 5.0,
+      "tp": 85.0
+     },
+     "criterion": {
+      "f1_gap": 0.43223,
+      "fpr_gap": -0.221271,
+      "status": "NOT MET",
+      "target": "F1 ≥ 0.6 при FPR ≤ 0.4 (токены, hf, отложенный test)",
+      "token_f1": 0.16777,
+      "token_fpr": 0.178729
+     },
+     "error": null,
+     "model_sha256": "07a96297716b3c540369e602950f8a80bde1c1fbae89fc0f2430559caa4e496f",
+     "positive_rows": 287,
+     "rows": 7969,
+     "spans": {
+      "f1": 0.052692,
+      "fn": 73.0,
+      "fp": 754.0,
+      "iou_threshold": 0.5,
+      "precision": 0.029601,
+      "recall": 0.239583,
+      "tp": 23.0
+     },
+     "threshold": 0.029918,
+     "threshold_selection": {
+      "folds": 5,
+      "oof_rows": 46607,
+      "selection": {
+       "f1": 0.153056,
+       "fpr": 0.156182,
+       "precision": 0.090171
+      },
+      "smoothing_radius": 0,
+      "threshold": 0.02991817062333793
+     },
+     "tokens": {
+      "auc": 0.675444,
+      "f1": 0.16777,
+      "fn": 135.0,
+      "fp": 1373.0,
+      "fpr": 0.178729,
+      "precision": 0.099672,
+      "recall": 0.529617,
+      "tn": 6309.0,
+      "tp": 152.0
+     }
+    }
+   },
+   "selection": {
+    "auc_val": 0.675444,
+    "corpus": "a3",
+    "token_f1_val": 0.16777,
+    "token_fpr_val": 0.178729
+   },
+   "window": 0
+  }
+ ],
+ "grid_file": "config/hf_experiments.json",
+ "grid_sha256": "a7eb9b7a59e3f6b271248841055f11f1da23c460ce47b6f0187cbf1439442062",
+ "hardware": {
+  "cpu_mhz": "2445.429",
+  "cpu_model": "AMD EPYC 7763 64-Core Processor",
+  "cpu_processors": 4,
+  "free_h": "total        used        free      shared  buff/cache   available\nMem:            15Gi       1.4Gi        10Gi        48Mi       4.2Gi        14Gi\nSwap:          3.0Gi          0B       3.0Gi",
+  "lscpu": "Architecture:                            x86_64\nCPU op-mode(s):                          32-bit, 64-bit\nAddress sizes:                           48 bits physical, 48 bits virtual\nByte Order:                              Little Endian\nCPU(s):                                  4\nOn-line CPU(s) list:                     0-3\nVendor ID:                               AuthenticAMD\nModel name:                              AMD EPYC 7763 64-Core Processor\nCPU family:                              25\nModel:                                   1\nThread(s) per core:                      2\nCore(s) per socket:                      2\nSocket(s):                               1\nStepping:                                1\nBogoMIPS:                                4890.85\nFlags:                                   fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush mmx fxsr sse sse2 ht syscall nx mmxext fxsr_opt pdpe1gb rdtscp lm constant_tsc rep_good nopl tsc_reliable nonstop_tsc cpuid extd_apicid aperfmperf tsc_known_freq pni pclmulqdq ssse3 fma cx16 pcid sse4_1 sse4_2 movbe popcnt aes xsave avx f16c rdrand hypervisor lahf_lm cmp_legacy svm cr8_legacy abm sse4a misalignsse 3dnowprefetch osvw topoext vmmcall fsgsbase bmi1 avx2 smep bmi2 erms invpcid rdseed adx smap clflushopt clwb sha_ni xsaveopt xsavec xgetbv1 xsaves user_shstk clzero xsaveerptr rdpru arat npt nrip_save tsc_scale vmcb_clean flushbyasid decodeassists pausefilter pfthreshold v_vmsave_vmload umip vaes vpclmulqdq rdpid fsrm\nVirtualization:                          AMD-V\nHypervisor vendor:                       Microsoft\nVirtualization type:                     full\nL1d cache:                               64 KiB (2 instances)\nL1i cache:                               64 KiB (2 instances)\nL2 cache:                                1 MiB (2 instances)\nL3 cache:                                32 MiB (1 instance)\nNUMA node(s):                            1\nNUMA node0 CPU(s):                       0-3\nVulnerab",
+  "machine": "x86_64",
+  "numpy_version": "2.4.6",
+  "python": "3.11.17",
+  "ram_total_gb": 15.61,
+  "ram_total_kb": 16373452,
+  "system": "Linux",
+  "torch_version": "2.14.1+cpu",
+  "transformers_version": "5.19.0"
+ },
+ "limit": 10,
+ "model": {
+  "id": "ai-forever/rugpt3small_based_on_gpt2",
+  "models_seen": [
+   "ai-forever/rugpt3small_based_on_gpt2"
+  ],
+  "revision": "a9307e696cd3c5b7f953ff4cb19d76a4d81821d5",
+  "revisions_seen": [
+   "a9307e696cd3c5b7f953ff4cb19d76a4d81821d5"
+  ],
+  "rows": 2043
+ },
+ "predictions_val_rows": 7969,
+ "primary_corpus": "a3",
+ "protocol": "hf-criterion-v1",
+ "rule": "выбирается конфигурация с максимальным token_f1 на val при token_fpr ≤ 0,40; ties → меньший FPR",
+ "run_count": 10,
+ "seed": 42,
+ "step": "sweep"
+}
