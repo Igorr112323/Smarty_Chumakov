@@ -7,12 +7,12 @@
   "token_f1_val": 0.515702,
   "token_fpr_val": 0.021088
  },
- "code_commit": "39dffafe98591af0ceab41aa987452b81a92bcf0",
+ "code_commit": "d5dc9a5386977e022336d47e9dd1ca90d011bb72",
  "criterion": {
   "token_f1_min": 0.6,
   "token_fpr_max": 0.4
  },
- "duration_s": 2383.38,
+ "duration_s": 3071.67,
  "experiments": [
   {
    "change": "Никаких изменений кода: состав признаков повторён из продукта, логистическая регрессия продукта, сглаживания нет.",
@@ -35,7 +35,7 @@
    "per_corpus": {
     "a1": {
      "answers": {
-      "auc": 0.74895,
+      "auc": 0.749012,
       "f1": 0.601399,
       "fn": 49.0,
       "fp": 8.0,
@@ -55,7 +55,7 @@
       "token_fpr": 0.017052
      },
      "error": null,
-     "model_sha256": "e6615b63ab3ee01f97563650d9390dd87c94e482ad4893f79fe854f2a0e87144",
+     "model_sha256": "8d6bbf03f62a22f09c32df43651d8558871931ee5bf89f458e163820d98dd0c8",
      "positive_rows": 258,
      "rows": 1900,
      "spans": {
@@ -77,7 +77,7 @@
        "precision": 0.814765
       },
       "smoothing_radius": 0,
-      "threshold": 0.306935812442461
+      "threshold": 0.30693590532089904
      },
      "tokens": {
       "auc": 0.810403,
@@ -113,7 +113,7 @@
       "token_fpr": 0.081229
      },
      "error": null,
-     "model_sha256": "bf2932b0bff6086476063479ceac44968db30ac92aba1f8087f56848061dcc91",
+     "model_sha256": "c20ccf80ee0509b917483938839813bb4d499d7d74aeb0910f5a8c666482a9bd",
      "positive_rows": 287,
      "rows": 7969,
      "spans": {
@@ -135,7 +135,7 @@
        "precision": 0.112527
       },
       "smoothing_radius": 0,
-      "threshold": 0.04658216235238495
+      "threshold": 0.04658216271825211
      },
      "tokens": {
       "auc": 0.716464,
@@ -182,7 +182,7 @@
    "per_corpus": {
     "a1": {
      "answers": {
-      "auc": 0.703804,
+      "auc": 0.703557,
       "f1": 0.69962,
       "fn": 0.0,
       "fp": 79.0,
@@ -202,7 +202,7 @@
       "token_fpr": 0.226553
      },
      "error": null,
-     "model_sha256": "0567fdc3f76ebcccc8ccdecedebe63def57368c982fb913119925e283571912e",
+     "model_sha256": "1b406ca3751ba675e71b42b0b98d1bbeb3b7cd76985b36842725a8dadb47d96f",
      "positive_rows": 258,
      "rows": 1900,
      "spans": {
@@ -224,10 +224,10 @@
        "precision": 0.21778
       },
       "smoothing_radius": 0,
-      "threshold": 0.14550867236074427
+      "threshold": 0.1455086441447142
      },
      "tokens": {
-      "auc": 0.659429,
+      "auc": 0.659427,
       "f1": 0.310992,
       "fn": 142.0,
       "fp": 372.0,
@@ -260,7 +260,7 @@
       "token_fpr": 0.092814
      },
      "error": null,
-     "model_sha256": "e36f8c29718503a49629de5acef67b8f7b885eea4e890be629f1fbe20d553523",
+     "model_sha256": "fdd2a095502bc1ca8614c963c750b3e31e62f64a811deeffafb026d9b3bb63f2",
      "positive_rows": 287,
      "rows": 7969,
      "spans": {
@@ -282,7 +282,7 @@
        "precision": 0.120734
       },
       "smoothing_radius": 0,
-      "threshold": 0.06422377373378574
+      "threshold": 0.06422376200185854
      },
      "tokens": {
       "auc": 0.726442,
@@ -330,7 +330,7 @@
    "per_corpus": {
     "a1": {
      "answers": {
-      "auc": 0.623765,
+      "auc": 0.623518,
       "f1": 0.577778,
       "fn": 40.0,
       "fp": 36.0,
@@ -350,7 +350,7 @@
       "token_fpr": 0.048721
      },
      "error": null,
-     "model_sha256": "0674cfd0abdd5870d761fd2cd02251e491719318de32b40b517f99d5957c6529",
+     "model_sha256": "febeaee3bceb6098bcd3234fb091c8070c5293d81c012c7acaa3b53bf7e21912",
      "positive_rows": 258,
      "rows": 1900,
      "spans": {
@@ -372,10 +372,10 @@
        "precision": 0.66474
       },
       "smoothing_radius": 0,
-      "threshold": 0.30645246596039527
+      "threshold": 0.30645232366810465
      },
      "tokens": {
-      "auc": 0.922242,
+      "auc": 0.922236,
       "f1": 0.648,
       "fn": 96.0,
       "fp": 80.0,
@@ -408,7 +408,7 @@
       "token_fpr": 0.386488
      },
      "error": null,
-     "model_sha256": "395394b3bba3dd32778e90a41c98494168bc6db84d770dda6aaf194ca241d7bf",
+     "model_sha256": "392f964f68cf1b07d3f8be5451d59aab38df4fb91f8ece637006a7df877d5ee5",
      "positive_rows": 287,
      "rows": 7969,
      "spans": {
@@ -430,7 +430,7 @@
        "precision": 0.047546
       },
       "smoothing_radius": 0,
-      "threshold": 0.035277188078552554
+      "threshold": 0.03527718816081221
      },
      "tokens": {
       "auc": 0.611818,
@@ -480,14 +480,14 @@
    "per_corpus": {
     "a1": {
      "answers": {
-      "auc": 0.69559,
+      "auc": 0.695529,
       "f1": 0.607407,
       "fn": 51.0,
       "fp": 2.0,
       "fpr": 0.022727,
       "precision": 0.953488,
       "recall": 0.445652,
-      "threshold": 0.414055,
+      "threshold": 0.414056,
       "tn": 86.0,
       "tp": 41.0
      },
@@ -500,7 +500,7 @@
       "token_fpr": 0.007308
      },
      "error": null,
-     "model_sha256": "9e78413569b2358517268bd8d5c78818da368c850e2f4dee4ccff94cc1c7e29d",
+     "model_sha256": "190c0b10738f2f194cd9dbce3f8b43b4fcbe41d86ab74771a171e465438210b7",
      "positive_rows": 258,
      "rows": 1900,
      "spans": {
@@ -512,7 +512,7 @@
       "recall": 0.347826,
       "tp": 32.0
      },
-     "threshold": 0.414055,
+     "threshold": 0.414056,
      "threshold_selection": {
       "folds": 5,
       "oof_rows": 9003,
@@ -522,7 +522,7 @@
        "precision": 0.905901
       },
       "smoothing_radius": 0,
-      "threshold": 0.41405539383794826
+      "threshold": 0.4140559449041468
      },
      "tokens": {
       "auc": 0.872745,
@@ -558,7 +558,7 @@
       "token_fpr": 0.026295
      },
      "error": null,
-     "model_sha256": "8979b53f6837e5ea02def2524b27dd7ecbca0fa000ddd73f1f4b111e36cde167",
+     "model_sha256": "8b1576459c86c41f8f2532f20af8e25dd57c5a4d7e7b46545606ecea40d6b029",
      "positive_rows": 287,
      "rows": 7969,
      "spans": {
@@ -580,7 +580,7 @@
        "precision": 0.165308
       },
       "smoothing_radius": 0,
-      "threshold": 0.06922473552176647
+      "threshold": 0.06922473143248692
      },
      "tokens": {
       "auc": 0.758308,
@@ -773,7 +773,7 @@
    "per_corpus": {
     "a1": {
      "answers": {
-      "auc": 0.797431,
+      "auc": 0.797493,
       "f1": 0.671141,
       "fn": 42.0,
       "fp": 7.0,
@@ -793,7 +793,7 @@
       "token_fpr": 0.014007
      },
      "error": null,
-     "model_sha256": "728dfeec6db8717614046b6f897e99d1400c0c88cd85bd54745db8e0af806526",
+     "model_sha256": "00056027e17fb4054d574001257fec62bcba860e8e4187e5eee591b50f4b8ce5",
      "positive_rows": 258,
      "rows": 1900,
      "spans": {
@@ -815,10 +815,10 @@
        "precision": 0.851319
       },
       "smoothing_radius": 0,
-      "threshold": 0.40084021967874406
+      "threshold": 0.4008401182986172
      },
      "tokens": {
-      "auc": 0.947242,
+      "auc": 0.947245,
       "f1": 0.731377,
       "fn": 96.0,
       "fp": 23.0,
@@ -851,7 +851,7 @@
       "token_fpr": 0.014449
      },
      "error": null,
-     "model_sha256": "cbae7ba6621681defbea4586ca7974a00e7e2757ea1a7e50a3afb778040c9d2a",
+     "model_sha256": "90bbe0f67b5a8c5f1db8930ecb52ffe2234d49f5d53e2eadbee295f54729a41b",
      "positive_rows": 287,
      "rows": 7969,
      "spans": {
@@ -873,7 +873,7 @@
        "precision": 0.773779
       },
       "smoothing_radius": 0,
-      "threshold": 0.17624111607184004
+      "threshold": 0.17624114557874504
      },
      "tokens": {
       "auc": 0.825564,
@@ -950,7 +950,7 @@
    "per_corpus": {
     "a1": {
      "answers": {
-      "auc": 0.836462,
+      "auc": 0.836524,
       "f1": 0.77095,
       "fn": 23.0,
       "fp": 18.0,
@@ -970,7 +970,7 @@
       "token_fpr": 0.018879
      },
      "error": null,
-     "model_sha256": "3908baebafee92670cb989fc7873236c28ce8d3ece9710e4ee305eb21c39c40c",
+     "model_sha256": "29aaefd5df6cc9ef3a42626d9f38fbd169fb0c7edfa776ba85f8bd0e2cf44f44",
      "positive_rows": 258,
      "rows": 1900,
      "spans": {
@@ -992,10 +992,10 @@
        "precision": 0.859125
       },
       "smoothing_radius": 0,
-      "threshold": 0.25026211825282774
+      "threshold": 0.2502619877369709
      },
      "tokens": {
-      "auc": 0.959517,
+      "auc": 0.959519,
       "f1": 0.793319,
       "fn": 68.0,
       "fp": 31.0,
@@ -1028,7 +1028,7 @@
       "token_fpr": 0.021088
      },
      "error": null,
-     "model_sha256": "bfc4c12728411d73cd6b863fcac1b65d4e704a0d3d13d28b858b116252c68a8a",
+     "model_sha256": "f9795874edab582c288a8190987bde615985afd65912667cbf6c40b9b542bc52",
      "positive_rows": 287,
      "rows": 7969,
      "spans": {
@@ -1050,7 +1050,7 @@
        "precision": 0.683633
       },
       "smoothing_radius": 0,
-      "threshold": 0.11059967454017075
+      "threshold": 0.1105996749699828
      },
      "tokens": {
       "auc": 0.92464,
@@ -1136,7 +1136,7 @@
       "fpr": 0.045455,
       "precision": 0.906977,
       "recall": 0.423913,
-      "threshold": 0.42141,
+      "threshold": 0.418876,
       "tn": 84.0,
       "tp": 39.0
      },
@@ -1149,7 +1149,7 @@
       "token_fpr": 0.007917
      },
      "error": null,
-     "model_sha256": "66309301c4d5644f9cc06d5f80505d6c2a72554f3d72a2521e3dd678d006183d",
+     "model_sha256": "5dee59e1fe6e3837d3648d3c605b744ad780345cde7ef16137321b3bc6ff0cfa",
      "positive_rows": 258,
      "rows": 1900,
      "spans": {
@@ -1161,7 +1161,7 @@
       "recall": 0.413043,
       "tp": 38.0
      },
-     "threshold": 0.42141,
+     "threshold": 0.418876,
      "threshold_selection": {
       "folds": 5,
       "oof_rows": 9003,
@@ -1171,7 +1171,7 @@
        "precision": 0.914543
       },
       "smoothing_radius": 0,
-      "threshold": 0.4214101900987508
+      "threshold": 0.41887627604959365
      },
      "tokens": {
       "auc": 0.926527,
@@ -1207,7 +1207,7 @@
       "token_fpr": 0.0
      },
      "error": null,
-     "model_sha256": "9e700973d30e2fa1b93532359507672cf31695b480d39180e2833c9ad300cac9",
+     "model_sha256": "661b017a698723c6059a130b0144965f01da20754ea3422a5fe5bf40f1285af3",
      "positive_rows": 287,
      "rows": 7969,
      "spans": {
@@ -1305,7 +1305,7 @@
       "fpr": 0.011364,
       "precision": 0.973684,
       "recall": 0.402174,
-      "threshold": 0.462235,
+      "threshold": 0.461808,
       "tn": 87.0,
       "tp": 37.0
      },
@@ -1318,7 +1318,7 @@
       "token_fpr": 0.016443
      },
      "error": null,
-     "model_sha256": "d2a55d4bcf81a1031b6e5588c1bc2f6c62dd0a5d14045aee32c1e3ffa3553d2e",
+     "model_sha256": "c8e87b99247e2ed3f917544d7867a33b3a3a631ea35b2e99759d1ed7c79026d5",
      "positive_rows": 258,
      "rows": 1900,
      "spans": {
@@ -1330,7 +1330,7 @@
       "recall": 0.358696,
       "tp": 33.0
      },
-     "threshold": 0.462235,
+     "threshold": 0.461808,
      "threshold_selection": {
       "folds": 5,
       "oof_rows": 9003,
@@ -1340,7 +1340,7 @@
        "precision": 0.880484
       },
       "smoothing_radius": 1,
-      "threshold": 0.4622350662419688
+      "threshold": 0.46180820967309727
      },
      "tokens": {
       "auc": 0.911767,
@@ -1376,7 +1376,7 @@
       "token_fpr": 0.0
      },
      "error": null,
-     "model_sha256": "2c36d04c266c328ce31243d8599cb338346e57bed7648fa09e7af05eb45a7920",
+     "model_sha256": "57b86b409101648f9f6dd46442617b3b1fc5124f3e928a66ef81fefdb716a7ac",
      "positive_rows": 287,
      "rows": 7969,
      "spans": {
@@ -1457,7 +1457,7 @@
       "fpr": 0.295455,
       "precision": 0.643836,
       "recall": 0.51087,
-      "threshold": 0.181508,
+      "threshold": 0.181487,
       "tn": 62.0,
       "tp": 47.0
      },
@@ -1470,7 +1470,7 @@
       "token_fpr": 0.04324
      },
      "error": null,
-     "model_sha256": "bec4ebfa74ea7c4ba13fbe6777a5a5f2cafc336f8ee3cf11d234e49bf66cbce0",
+     "model_sha256": "820ca1b127bb1c8b546d11bdb4b20ad473d160dc39115d886ade8caca15bacc2",
      "positive_rows": 258,
      "rows": 1900,
      "spans": {
@@ -1482,7 +1482,7 @@
       "recall": 0.380435,
       "tp": 35.0
      },
-     "threshold": 0.181508,
+     "threshold": 0.181487,
      "threshold_selection": {
       "folds": 5,
       "oof_rows": 9003,
@@ -1492,7 +1492,7 @@
        "precision": 0.700935
       },
       "smoothing_radius": 0,
-      "threshold": 0.1815075483612991
+      "threshold": 0.18148749327826402
      },
      "tokens": {
       "auc": 0.810338,
@@ -1528,7 +1528,7 @@
       "token_fpr": 0.178729
      },
      "error": null,
-     "model_sha256": "b8b681ff4db22dad75f9f48fb61bed04f14746640e1e2600229cc93601a376c0",
+     "model_sha256": "0c964ca8eafba8af1ffb44f2f6e69fc9c2541d02ef9c1cfcbfeab4598b86b592",
      "positive_rows": 287,
      "rows": 7969,
      "spans": {
@@ -1577,11 +1577,11 @@
  "grid_file": "config/hf_experiments.json",
  "grid_sha256": "a7eb9b7a59e3f6b271248841055f11f1da23c460ce47b6f0187cbf1439442062",
  "hardware": {
-  "cpu_mhz": "2596.141",
-  "cpu_model": "AMD EPYC 9V74 80-Core Processor",
+  "cpu_mhz": "2445.432",
+  "cpu_model": "AMD EPYC 7763 64-Core Processor",
   "cpu_processors": 4,
-  "free_h": "total        used        free      shared  buff/cache   available\nMem:            15Gi       1.4Gi        10Gi        51Mi       4.2Gi        14Gi\nSwap:          3.0Gi          0B       3.0Gi",
-  "lscpu": "Architecture:                            x86_64\nCPU op-mode(s):                          32-bit, 64-bit\nAddress sizes:                           48 bits physical, 48 bits virtual\nByte Order:                              Little Endian\nCPU(s):                                  4\nOn-line CPU(s) list:                     0-3\nVendor ID:                               AuthenticAMD\nModel name:                              AMD EPYC 9V74 80-Core Processor\nCPU family:                              25\nModel:                                   17\nThread(s) per core:                      2\nCore(s) per socket:                      2\nSocket(s):                               1\nStepping:                                1\nBogoMIPS:                                5192.28\nFlags:                                   fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush mmx fxsr sse sse2 ht syscall nx mmxext fxsr_opt pdpe1gb rdtscp lm constant_tsc rep_good nopl xtopology tsc_reliable nonstop_tsc cpuid extd_apicid aperfmperf tsc_known_freq pni pclmulqdq ssse3 fma cx16 pcid sse4_1 sse4_2 movbe popcnt aes xsave avx f16c rdrand hypervisor lahf_lm cmp_legacy svm cr8_legacy abm sse4a misalignsse 3dnowprefetch osvw topoext vmmcall fsgsbase bmi1 avx2 smep bmi2 erms invpcid avx512f avx512dq rdseed adx smap avx512ifma clflushopt clwb avx512cd sha_ni avx512bw avx512vl xsaveopt xsavec xgetbv1 xsaves user_shstk avx512_bf16 clzero xsaveerptr rdpru arat npt nrip_save tsc_scale vmcb_clean flushbyasid decodeassists pausefilter pfthreshold v_vmsave_vmload avx512vbmi umip avx512_vbmi2 gfni vaes vpclmulqdq avx512_vnni avx512_bitalg avx512_vpopcntdq rdpid fsrm\nVirtualization:                          AMD-V\nHypervisor vendor:                       Microsoft\nVirtualization type:                     full\nL1d cache:                               64 KiB (2 instances)\nL1i cache:                               64 KiB (2 instances)\nL2 cache:                                2 MiB (2 instances)\nL3 cach",
+  "free_h": "total        used        free      shared  buff/cache   available\nMem:            15Gi       1.4Gi        10Gi        50Mi       4.2Gi        14Gi\nSwap:          3.0Gi          0B       3.0Gi",
+  "lscpu": "Architecture:                            x86_64\nCPU op-mode(s):                          32-bit, 64-bit\nAddress sizes:                           48 bits physical, 48 bits virtual\nByte Order:                              Little Endian\nCPU(s):                                  4\nOn-line CPU(s) list:                     0-3\nVendor ID:                               AuthenticAMD\nModel name:                              AMD EPYC 7763 64-Core Processor\nCPU family:                              25\nModel:                                   1\nThread(s) per core:                      2\nCore(s) per socket:                      2\nSocket(s):                               1\nStepping:                                1\nBogoMIPS:                                4890.86\nFlags:                                   fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush mmx fxsr sse sse2 ht syscall nx mmxext fxsr_opt pdpe1gb rdtscp lm constant_tsc rep_good nopl tsc_reliable nonstop_tsc cpuid extd_apicid aperfmperf tsc_known_freq pni pclmulqdq ssse3 fma cx16 pcid sse4_1 sse4_2 movbe popcnt aes xsave avx f16c rdrand hypervisor lahf_lm cmp_legacy svm cr8_legacy abm sse4a misalignsse 3dnowprefetch osvw topoext vmmcall fsgsbase bmi1 avx2 smep bmi2 erms invpcid rdseed adx smap clflushopt clwb sha_ni xsaveopt xsavec xgetbv1 xsaves user_shstk clzero xsaveerptr rdpru arat npt nrip_save tsc_scale vmcb_clean flushbyasid decodeassists pausefilter pfthreshold v_vmsave_vmload umip vaes vpclmulqdq rdpid fsrm\nVirtualization:                          AMD-V\nHypervisor vendor:                       Microsoft\nVirtualization type:                     full\nL1d cache:                               64 KiB (2 instances)\nL1i cache:                               64 KiB (2 instances)\nL2 cache:                                1 MiB (2 instances)\nL3 cache:                                32 MiB (1 instance)\nNUMA node(s):                            1\nNUMA node0 CPU(s):                       0-3\nVulnerab",
   "machine": "x86_64",
   "numpy_version": "2.4.6",
   "python": "3.11.17",
