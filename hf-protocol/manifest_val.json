@@ -1,6 +1,6 @@
 {
  "classifier": "logreg",
- "code_commit": "c7c64bd8d0acbc95d5f2eec0ca044e8ca0f79988",
+ "code_commit": "bb5a1dc6c8a337e21ae64ad20cc4bbb9e0699608",
  "criterion": {
   "f1_gap": 0.084298,
   "fpr_gap": -0.378912,
@@ -83,7 +83,7 @@
   ],
   "fpr_std": 0.0,
   "model_sha256_per_seed": [
-   "1efc3b4b06514fa164c5b358d5f40500720d9c9c939c4bf14f023bc7cd6350c1"
+   "85a9bde6980a0cc2a247d1ffd37337fdfa16cccdd1aef3f8993c31dcb8db76fe"
   ],
   "positive_rows": 287,
   "precision": 0.490566,
@@ -135,7 +135,7 @@
     "tn": 59.0,
     "tp": 55.0
    },
-   "model_sha256": "1efc3b4b06514fa164c5b358d5f40500720d9c9c939c4bf14f023bc7cd6350c1",
+   "model_sha256": "85a9bde6980a0cc2a247d1ffd37337fdfa16cccdd1aef3f8993c31dcb8db76fe",
    "positive_rows": 287,
    "rows": 7969,
    "seed": 42,
