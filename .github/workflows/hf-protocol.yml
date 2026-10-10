@@ -244,15 +244,31 @@ jobs:
           python - << 'PY'
           import json
           data = json.loads(open("reports/hf_protocol/sweep.json", encoding="utf-8").read())
-          print("лучшая конфигурация:", data.get("best"))
-          print("правило:", data["rule"])
+          primary = data.get("primary_corpus")
+
+
+          def notice(text: str) -> None:
+              # Логи job'а из песочницы не читаются (result-хост недоступен), а
+              # числа шага 2 нужны дважды: для фиксации конфигурации ДО шага 3 и
+              # для отчёта. Аннотации отдаёт Checks API — это второй канал, кроме
+              # публикации в ветку данных, и он не зависит от git.
+              safe = str(text).replace("\r", " ").replace("\n", " ").replace("%", "%25")
+              print("::notice::[sweep] " + safe[:900])
+
+
+          notice(
+              f"лучшая конфигурация: {data.get('best')} | прогонов: {data.get('run_count')} | "
+              f"правило: {data['rule']}"
+          )
           for item in data["experiments"]:
               for corpus, numbers in sorted(item["per_corpus"].items()):
                   tokens = numbers.get("tokens") or {}
-                  print(
-                      f"{item['number']:>2} {item['name']:<24} {corpus}: "
-                      f"F1 {tokens.get('f1')} FPR {tokens.get('fpr')} AUC {tokens.get('auc')}"
+                  notice(
+                      f"{item['number']:>2} {item['name']} · {corpus}: "
+                      f"F1(val) {tokens.get('f1')} FPR(val) {tokens.get('fpr')} AUC {tokens.get('auc')} "
+                      f"порог {numbers.get('threshold')}" + (" · выбран" if corpus == primary else "")
                   )
+          print("таблица шага 2 опубликована аннотациями")
           PY
       - uses: actions/upload-artifact@v4
         with:
@@ -263,38 +279,23 @@ jobs:
           retention-days: 90
           if-no-files-found: error
       - name: "Опубликовать в ветку данных"
+        # Contents API вместо `git checkout -B`: прогон 38043189316 потерял числа
+        # именно здесь — переключение рабочего дерева CI на другую ветку падает на
+        # совпадении путей и на гонке двух job'ов, а артефакты читаются с хоста,
+        # недоступного проверяющему. Публикация файлов по одному запросу этого не
+        # требует, а повтор при 409 разрешает гонку.
+        working-directory: spanverify-module
+        env:
+          # `gh` берёт токен и из GITHUB_TOKEN, но явное GH_TOKEN исключает
+          # ситуации, когда на раннере уже лежит другой профиль аутентификации.
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          mkdir -p /tmp/keep
-          cp -r spanverify-module/reports/hf_protocol /tmp/keep/hf_protocol
-          cp -r spanverify-module/reports/hf_baseline /tmp/keep/hf_baseline
-          git config user.name "spanverify-bot"
-          git config user.email "bot@spanverify.local"
-          git fetch origin data/metrics || true
-          git checkout -B data/metrics FETCH_HEAD 2>/dev/null || git checkout -B data/metrics
-          mkdir -p hf-protocol
-          cp -r /tmp/keep/hf_protocol/. hf-protocol/
-          mkdir -p hf-baseline
-          cp -r /tmp/keep/hf_baseline/. hf-baseline/
-          git add -A hf-protocol hf-baseline
-          if git diff --cached --quiet; then
-            echo "изменений нет, коммит не нужен"
-            exit 0
-          fi
-          git commit -m "hf протокол: шаг 0-2, прогон ${{ github.run_number }} [skip ci]"
-          for attempt in 1 2 3 4 5; do
-            if git push origin HEAD:data/metrics; then
-              echo "ветка данных обновлена с попытки $attempt"
-              break
-            fi
-            echo "пуш отклонён, попытка $attempt"
-            git fetch origin data/metrics
-            git rebase FETCH_HEAD || git rebase --abort
-            sleep $((attempt * 10))
-            if [ "$attempt" = 5 ]; then
-              echo "не удалось опубликовать ветку данных за 5 попыток" >&2
-              exit 1
-            fi
-          done
+          python scripts/publish_reports.py --branch data/metrics --dest hf-protocol \
+            --report reports/hf_protocol \
+            --message "hf протокол: шаг 0-2, прогон ${{ github.run_number }} [skip ci]"
+          python scripts/publish_reports.py --branch data/metrics --dest hf-baseline \
+            --report reports/hf_baseline \
+            --message "hf протокол: базовая линия, прогон ${{ github.run_number }} [skip ci]"
 
   grid-test:
     name: "Сетка признаков test, ${{ matrix.corpus }}, шард ${{ matrix.shard }}"
@@ -435,22 +436,17 @@ jobs:
           retention-days: 90
           if-no-files-found: error
       - name: "Опубликовать в ветку данных"
+        # Манифест, предсказания и gold — в ветку данных: только так их может
+        # перепроверить тот, у кого нет доступа к артефактам. Сюда же кладутся
+        # сгенерированный блок README и журнал: их числа обязаны совпасть с
+        # манифестом буквально, байт в байт.
+        working-directory: spanverify-module
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          mkdir -p /tmp/keep-final
-          cp -r spanverify-module/reports/hf_final/. /tmp/keep-final/
-          git config user.name "spanverify-bot"
-          git config user.email "bot@spanverify.local"
-          git fetch origin data/metrics || true
-          git checkout -B data/metrics FETCH_HEAD 2>/dev/null || git checkout -B data/metrics
-          mkdir -p hf-final
-          cp -r /tmp/keep-final/. hf-final/
-          git add -A hf-final
-          if git diff --cached --quiet; then
-            echo "изменений нет, коммит не нужен"
-            exit 0
-          fi
-          git commit -m "hf протокол: шаг 3, критерий на test, прогон ${{ github.run_number }} [skip ci]"
-          git push origin HEAD:data/metrics
+          python scripts/publish_reports.py --branch data/metrics --dest hf-final \
+            --report reports/hf_final --report ../README.md --report docs/EXPERIMENTS.md \
+            --message "hf протокол: шаг 3, критерий на test, прогон ${{ github.run_number }} [skip ci]"
       - name: "Подтверждающие тесты (падение = критерий не выполнен)"
         working-directory: spanverify-module
         run: |
