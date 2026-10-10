@@ -52,7 +52,8 @@ def _manifest() -> dict:
     if not (MANIFEST.is_file() and PREDICTIONS.is_file()):
         pytest.fail(
             "ИЗМЕРЕНИЕ НЕ ВЫПОЛНЕНО: нет reports/hf_final/manifest.json (или предсказаний). "
-            f"Команда шага 3: {COMMAND}. Прогон — workflow «Протокол hf (критерий ТЗ)» с run_final=true."
+            f"Команда шага 3: {COMMAND}. Прогон — workflow «Протокол hf (критерий ТЗ)»: "
+            "run_final=true при dispatch либо пуш с меткой [hf-final] (см. docs/EXPERIMENTS.md)."
         )
     return json.loads(MANIFEST.read_text(encoding="utf-8"))
 
