@@ -1990,7 +1990,7 @@ token F1 0,2029 при FPR 0,0653, корпус A 0,6083 при 0,0237, выво
   `sweep` (шаги 0–2) → `grid-test`/`final` (шаг 3, только с `run_final=true`);
   артефакты публикуются в ветку `data/metrics`.
 * Тесты: `tests/test_metric_spec.py` (25 — формулы спеки против кода продукта и
-  харнесса), `tests/test_no_test_leakage.py` (5 — непересечение документов и
+  харнесса), `tests/test_no_test_leakage.py` (7 — непересечение документов и
   паров, отсутствие разметки в `hf_grid`, хеш теста и порог из манифеста),
   `tests/test_reported_metrics.py` (4 — пересчёт манифеста из предсказаний и
   сверка блока README), `tests/test_criterion_hf.py` (5 — статус критерия,

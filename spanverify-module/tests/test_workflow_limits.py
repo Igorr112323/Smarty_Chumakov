@@ -37,6 +37,37 @@ HEAVY_JOB_MINUTES = {
 }
 
 
+def _load_strict(path: Path) -> object:
+    """Загрузить YAML с запретом дублирующихся ключей.
+
+    Обычный ``yaml.safe_load`` повторяющийся ключ молча «схлопывает» (последнее
+    значение выигрывает) — так же молча GitHub отклоняет workflow, и job вообще
+    не стартует. Прогон `38042202834` упал ровно на этом: у шага оказалось два
+    ``uses``. Проверка делает класс ошибок локальным.
+    """
+
+    class Strict(yaml.SafeLoader):
+        pass
+
+    def no_duplicates(loader, node, deep=False):
+        mapping: dict = {}
+        for key_node, value_node in node.value:
+            key = loader.construct_object(key_node, deep=deep)
+            if key in mapping:
+                raise ValueError(f"дублирующийся ключ {key!r} (строка {key_node.start_mark.line + 1}) в {path.name}")
+            mapping[key] = loader.construct_object(value_node, deep=deep)
+        return mapping
+
+    Strict.add_constructor(yaml.resolver.BaseResolver.DEFAULT_MAPPING_TAG, no_duplicates)
+    return yaml.load(path.read_text(encoding="utf-8"), Loader=Strict)
+
+
+def test_workflow_yaml_has_no_duplicate_keys() -> None:
+    """Каждый workflow читается строго: два одинаковых ключа в映射 — это битый CI."""
+    for path in _workflow_paths():
+        _load_strict(path)  # падает с указанием файла и строки
+
+
 def _workflow_paths() -> list[Path]:
     return sorted(WORKFLOWS_DIR.glob("*.yml"))
 
