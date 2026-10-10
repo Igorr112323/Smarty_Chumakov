@@ -49,6 +49,101 @@ DIAGNOSTIC_FEATURES = (
     "ctx_sim_contrast",
     "ctx_sim_margin",
 )
+# ---------------------------------------------------------------- признаки головы
+#
+# Голова (логистическая регрессия ``train._train_and_compare_head``) получает на
+# вход не только три рабочих признака, но и производные строки ответа, и — с этой
+# итерации — диагностику итераций 2–3. Список имён сохраняется в ``head.json`` в
+# поле ``features``, поэтому применение головы обязано собирать строку по именам,
+# а не по позициям: иначе голова, обученная на восьми признаках, молча
+# применилась бы к шести (именно так терялись числа в прогоне 37472951524).
+HEAD_FEATURE_DERIVED = ("risk", "position", "length")
+HEAD_FEATURE_BASE: tuple[str, ...] = (*FEATURE_NAMES, *HEAD_FEATURE_DERIVED)
+# Имя признака головы -> поле FeatureMatrix. Производные (risk/position/length)
+# здесь отсутствуют сознательно: они вычисляются, а не хранятся.
+HEAD_FEATURE_FIELDS: dict[str, str] = {
+    "attention_entropy": "attention_entropy",
+    "ctx_attention_mass": "ctx_attention_mass",
+    "embedding_density": "embedding_density",
+    "ctx_attention_mass_norm": "ctx_mass_norm",
+    "ctx_attention_mass_lift": "ctx_mass_lift",
+    "ctx_mass_norm": "ctx_mass_norm",
+    "ctx_mass_lift": "ctx_mass_lift",
+    "ctx_mass_expected": "ctx_mass_expected",
+    "ctx_max_similarity": "ctx_max_similarity",
+    "ctx_support_distance": "ctx_support_distance",
+    "ctx_similarity_decay": "ctx_similarity_decay",
+    "ctx_sim_contrast": "ctx_sim_contrast",
+    "ctx_sim_margin": "ctx_sim_margin",
+}
+# Кандидаты в голову: диагностику включаем только после измерения AUC на
+# валидации (см. scripts/train_hf_a3.py). Порядок фиксирован — он определяет
+# порядок перебора при отборе признаков и должен быть воспроизводим.
+HEAD_FEATURE_CANDIDATES: tuple[str, ...] = (
+    "ctx_attention_mass_norm",
+    "ctx_attention_mass_lift",
+    "ctx_max_similarity",
+    "ctx_support_distance",
+    "ctx_similarity_decay",
+    "ctx_sim_contrast",
+    "ctx_sim_margin",
+)
+
+
+def head_feature_series(features: FeatureMatrix, name: str) -> list[float]:
+    """Значения признака головы по имени (пустой список, если поля нет)."""
+    field = HEAD_FEATURE_FIELDS.get(name)
+    if field is None:
+        return []
+    return [float(value) for value in (getattr(features, field, None) or [])]
+
+
+def head_feature_vector(
+    features: FeatureMatrix,
+    risk: Sequence[float],
+    index: int,
+    total: int,
+    token: Token | None,
+    names: Sequence[str] = HEAD_FEATURE_BASE,
+) -> list[float]:
+    """Строка признаков головы для токена ``index`` в порядке имён ``names``.
+
+    Единая функция для обучения и применения: если они построят строку каждая по
+    своему, голова начнёт получать перепутанные признаки, и это не будет видно
+    ни в каких метриках обучения.
+    """
+    row: list[float] = []
+    for name in names:
+        if name == "risk":
+            row.append(float(risk[index]) if index < len(risk) else 0.0)
+        elif name == "position":
+            row.append(index / max(1, total))
+        elif name == "length":
+            text = token.text.strip() if token is not None else ""
+            row.append(min(1.0, len(text) / 20))
+        else:
+            series = head_feature_series(features, name)
+            row.append(float(series[index]) if index < len(series) else 0.0)
+    return row
+
+
+def has_head_features(matrix: FeatureMatrix, names: Sequence[str]) -> bool:
+    """Есть ли в матрице все признаки головы (кроме производных).
+
+    Нужна для проверки кеша: кеш старого формата содержит только три рабочих
+    признака, и голова с восемью признаками получила бы нули вместо диагностики
+    — метрики упали бы без единого сообщения об ошибке.
+    """
+    for name in names:
+        if name in HEAD_FEATURE_DERIVED:
+            continue
+        if name not in HEAD_FEATURE_FIELDS:
+            return False
+        if not head_feature_series(matrix, name):
+            return False
+    return True
+
+
 MEASUREMENT_SUBJECT_WINDOW = 6  # сколько слов перед числом считаем его субъектом
 MEASUREMENT_MATCH_MIN = 0.5  # порог совпадения субъекта ответа с измерением контекста
 SCORED_MIN_LEN = 3
@@ -299,6 +394,46 @@ def _is_content(token: Token) -> bool:
     return bool(word) and (len(word) >= _CONTENT_MIN_LEN or word.isdigit())
 
 
+def _chunk_support_profile(
+    word: str,
+    grams: frozenset[str],
+    context_words: Sequence[tuple[str, frozenset[str]]],
+    word_chunk: Sequence[int],
+    chunk_total: int,
+) -> tuple[float, float, float, int]:
+    """Профиль похожести токена на чанки контекста: (макс, второй, средний, чанк-источник).
+
+    Лексический аналог признаков итераций 2–3: в режиме ``hf`` те же величины
+    считаются по скрытым состояниям (косинус эмбеддинга токена с эмбеддингами
+    контекстных позиций, см. :func:`hf_features`). Похожесть на чанк — максимум
+    по словам чанка: подтверждение может дать и одно слово. «Фон» — среднее по
+    непустым чанкам, из него вычитается максимум (признак ``ctx_sim_contrast``),
+    чтобы отсечь «гладкие» документы, где похожи все на всех.
+    """
+    stem = _stem(word)
+    best_per_chunk: dict[int, float] = {}
+    for (context_word, context_grams), chunk_index in zip(context_words, word_chunk, strict=False):
+        if _stem(context_word) == stem:
+            similarity = 1.0
+        else:
+            similarity = 0.7 * _jaccard(grams, context_grams)
+        current = best_per_chunk.get(chunk_index, 0.0)
+        if similarity > current:
+            best_per_chunk[chunk_index] = similarity
+    if not best_per_chunk:
+        return 0.0, 0.0, 0.0, -1
+    ordered = sorted(best_per_chunk.values(), reverse=True)
+    maximum = ordered[0]
+    second = ordered[1] if len(ordered) > 1 else 0.0
+    # Средний уровень считаем по всем чанкам документа, а не только по тем, где
+    # что-то нашлось: иначе «фон» зависел бы от числа совпадений и признак
+    # превращался бы в повтор максимума.
+    denominator = max(1, chunk_total)
+    mean_value = sum(ordered) / denominator
+    best_chunk = max(best_per_chunk.items(), key=lambda pair: (pair[1], -pair[0]))[0]
+    return maximum, second, mean_value, best_chunk
+
+
 def demo_features(
     answer: str,
     context: str | Sequence[str] | None,
@@ -323,6 +458,32 @@ def demo_features(
     context_words: list[tuple[str, frozenset[str]]] = [
         (token.word, _trigrams(token.word)) for token in context_tokens if _is_content(token)
     ]
+    # Индекс чанка для каждого содержательного слова и число токенов в чанках —
+    # нужно признакам итераций 2–3 (где именно в документе стоит опора).
+    word_chunk: list[int] = []
+    chunk_word_count: list[int] = []
+    chunk_total = len(chunks.chunks)
+    if chunk_total:
+        chunk_word_count = [0] * chunk_total
+        boundaries = [(start, start + len(chunk)) for start, chunk in zip(chunks.positions, chunks.chunks, strict=False)]
+        chunk_index = 0
+        for token in context_tokens:
+            if not _is_content(token):
+                continue
+            while chunk_index + 1 < len(boundaries) and token.start >= boundaries[chunk_index + 1][0]:
+                chunk_index += 1
+            while chunk_index > 0 and token.start < boundaries[chunk_index][0]:
+                chunk_index -= 1
+            word_chunk.append(chunk_index)
+            chunk_word_count[chunk_index] += 1
+        chunk_total = len(boundaries)
+    # Начало каждого чанка в координатах «число содержательных слов контекста» —
+    # по нему считается расстояние до подтверждающего фрагмента.
+    chunk_start_tokens: list[int] = []
+    running = 0
+    for count in chunk_word_count:
+        chunk_start_tokens.append(running)
+        running += count
 
     # --- признаки ---
     phrase_hits = find_phrase_hits([token.text for token in tokens])
@@ -330,6 +491,14 @@ def demo_features(
     entropy: list[float] = []
     mass: list[float] = []
     density: list[float] = []
+    # Диагностика итераций 2–3: заполняется рядом с рабочими признаками, но в
+    # итоговый риск не входит — в голову её добавляет только отбор по AUC.
+    max_similarity_values: list[float] = []
+    support_distance_values: list[float] = []
+    decay_values: list[float] = []
+    contrast_values: list[float] = []
+    margin_values: list[float] = []
+
 
     # Числа прописью занимают несколько токенов («двадцать» + «пять»), поэтому
     # значение считается для группы целиком, а не по отдельному токену.
@@ -376,19 +545,56 @@ def demo_features(
         else:
             density.append(0.0)
 
+        # Диагностика итераций 2–3: где в документе лежит опора и насколько она
+        # выделена на фоне остальных чанков. Позиция токена ответа отсчитывается
+        # после контекста — так же, как в режиме hf (там одна последовательность
+        # «контекст + ответ», и расстояние считается по позициям модели).
+        if grams and context_words:
+            max_similarity, second_similarity, mean_similarity, best_chunk = _chunk_support_profile(
+                token.word, grams, context_words, word_chunk, chunk_total
+            )
+        else:
+            max_similarity, second_similarity, mean_similarity, best_chunk = 0.0, 0.0, 0.0, -1
+        sequence_len = max(1, len(context_tokens) + len(tokens))
+        if 0 <= best_chunk < len(chunk_start_tokens):
+            center = chunk_start_tokens[best_chunk] + chunk_word_count[best_chunk] // 2
+            support_gap = abs(len(context_tokens) + index - center)
+        else:
+            support_gap = sequence_len
+        max_similarity_values.append(max_similarity)
+        support_distance_values.append(normalised_support_distance(support_gap, sequence_len))
+        decay_values.append(distance_decay(max_similarity, support_gap, max(1.0, 0.1 * sequence_len)))
+        contrast_values.append(similarity_contrast(max_similarity, mean_similarity))
+        margin_values.append(similarity_margin(max_similarity, second_similarity))
+
     _apply_number_consistency(tokens, context_numbers, mass)
     # Дефект D: число проверяется внутри своего объекта, а не «где-то в контексте».
     _apply_number_attribution(tokens, answer, chunks.text, mass)
+    # Нормировка и «подъём» массы — по уже исправленной массе, иначе голова
+    # получала бы признак, вычисленный до коррекции чисел.
+    mean_mass = statistics.fmean(mass) if mass else 0.0
+    mass_expected_values = [1.0] * len(mass)
+    mass_norm_values = list(mass)
+    mass_lift_values = [value - mean_mass for value in mass]
 
     return FeatureMatrix(
         attention_entropy=entropy,
         ctx_attention_mass=mass,
         embedding_density=density,
+        ctx_mass_expected=mass_expected_values,
+        ctx_mass_norm=mass_norm_values,
+        ctx_mass_lift=mass_lift_values,
+        ctx_max_similarity=max_similarity_values,
+        ctx_support_distance=support_distance_values,
+        ctx_similarity_decay=decay_values,
+        ctx_sim_contrast=contrast_values,
+        ctx_sim_margin=margin_values,
         meta={
             "backend": "demo",
             "token_count": len(tokens),
             "context_tokens": len(context_tokens),
             "context_numbers": sorted(context_numbers),
+            "context_chunks": chunk_total,
             "k": k,
         },
     )
@@ -1143,7 +1349,112 @@ _ACTIVE_FEATURE_CACHE: dict[str, FeatureMatrix] | None = None
 def set_feature_cache(cache: Mapping[str, FeatureMatrix] | None) -> None:
     """Включить (или выключить при ``None``) глобальный кеш признаков."""
     global _ACTIVE_FEATURE_CACHE  # noqa: PLW0603
-    _ACTIVE_FEATURE_CACHE = dict(cache) if cache is not None else None
+    if cache is None:
+        _ACTIVE_FEATURE_CACHE = None
+    elif isinstance(cache, (CataloguedFeatureCache, CountingFeatureCache)):
+        # Копировать нельзя: вместе с dict() потерялся бы реестр модели, и
+        # проверка «кешь принадлежит этой модели» перестала бы что-либо видеть.
+        _ACTIVE_FEATURE_CACHE = cache
+    else:
+        _ACTIVE_FEATURE_CACHE = dict(cache)
+
+
+def feature_cache_models(cache: Mapping[str, FeatureMatrix] | None) -> set[str]:
+    """Модели, которым принадлежат строки кеша (пустое множество — реестра нет)."""
+    info = getattr(cache, "info", None) if cache is not None else None
+    if not info:
+        return set()
+    return {str(model) for model in info.get("models", ())}
+
+
+def feature_cache_fields(cache: Mapping[str, FeatureMatrix] | None) -> set[str]:
+    """Признаки, реально сохранённые в строках кеша."""
+    info = getattr(cache, "info", None) if cache is not None else None
+    if not info:
+        return set()
+    return {str(name) for name in info.get("fields", ())}
+
+
+def validate_feature_cache(
+    cache: Mapping[str, FeatureMatrix] | None,
+    mode: str,
+    model_name: str = "",
+    head_features: Sequence[str] = (),
+    sample_size: int = 32,
+) -> dict[str, Any]:
+    """Явная проверка: годится ли этот кеш для запрошенного режима и модели.
+
+    Промах по ключу опасен не ошибкой, а тишиной: признаки молча считаются
+    заново другой моделью (часы вместо секунд) либо, что хуже, голова получает
+    нули вместо признаков, которых в кеш не писали. Поэтому несоответствие
+    превращается здесь в :class:`BackendUnavailable` (текст содержит
+    ``model mismatch``) или :class:`ValueError` — с командами на исправление.
+
+    Проверка стоит один раз на кеш (результат отмечается на объекте кеша), а не
+    на каждую пару: в кросс-валидации ``extract_features`` вызывают тысячи раз.
+    """
+    from .backends.base import BackendUnavailable  # noqa: PLC0415 - ленивый импорт, как в hf_features
+
+    if cache is None or not len(cache):
+        return {"checked": False, "reason": "кеш пуст или выключен"}
+
+    marker = (mode, model_name, tuple(head_features))
+    validated = getattr(cache, "validated", None)
+    if validated is not None and marker in validated:
+        return {"checked": True, "reason": "уже проверено", "models": feature_cache_models(cache)}
+
+    models = feature_cache_models(cache)
+    fields = feature_cache_fields(cache)
+    if mode == "hf" and models and model_name and model_name not in models:
+        raise BackendUnavailable(
+            f"HF cache model mismatch: запрошена модель {model_name!r}, "
+            f"а кеш посчитан для {', '.join(sorted(models))!r}. "
+            "Очистите кеш или передайте то же --model, что использовалось при "
+            "предпосчёте (scripts/precompute_features.py). Ключей в кеше: "
+            f"{len(cache)}. "
+            f"Проверка выборки: {_cache_key_sample(cache, sample_size)}"
+        )
+    if mode == "hf" and not models and model_name:
+        # Кеш формата v1: имя модели в строках не сохранялось. Сам по себе он
+        # не противоречив, но проверить принадлежность модели нельзя — значит,
+        # признаки может считать и другая модель. Говорим об этом прямо.
+        raise BackendUnavailable(
+            f"HF cache model mismatch: кеш не содержит имени модели (формат v1), "
+            f"а запрошена {model_name!r}. Пересоберите кеш: "
+            "python scripts/precompute_features.py --dataset <корпус> --mode hf "
+            f"--model {model_name} --out <каталог>. Ключей в кеше: {len(cache)}. "
+            "Признаки режима hf из кеша v1 доступны только в объёме трёх рабочих "
+            "признаков — этого недостаточно для головы с диагностикой."
+        )
+    missing = [name for name in head_features if name not in HEAD_FEATURE_DERIVED and name not in fields]
+    if missing:
+        raise ValueError(
+            "HF cache mismatch: в кеше нет строк признаков "
+            + ", ".join(sorted(missing))
+            + ". Предпосчёт писал кеш старого формата (только три рабочих "
+            "признака). Пересоберите кеш этой же версией скрипта: "
+            "python scripts/precompute_features.py --dataset <корпус> --mode hf "
+            f"--model {model_name or '<модель>'} --out <каталог>. "
+            f"Полей в кеше: {len(fields) or 3}."
+        )
+    if validated is not None:
+        validated.add(marker)
+    return {
+        "checked": True,
+        "models": sorted(models),
+        "fields": sorted(fields),
+        "rows": len(cache),
+    }
+
+
+def _cache_key_sample(cache: Mapping[str, FeatureMatrix], limit: int = 32) -> str:
+    """Несколько ключей кеша для диагностики (префиксы, не содержимое)."""
+    try:
+        keys = [str(key) for key in list(iter(cache))[:limit]]
+    except TypeError:  # pragma: no cover - некартиноподобный кеш
+        return "ключи недоступны"
+    return "префиксы ключей: " + ", ".join(key[:12] for key in keys[:4]) + "…"
+
 
 
 def get_feature_cache() -> Mapping[str, FeatureMatrix] | None:
@@ -1163,6 +1474,16 @@ class CountingFeatureCache(dict):
         super().__init__(*args, **kwargs)
         self.hits = 0
         self.misses = 0
+        # Реестр происхождения строк — см. CataloguedFeatureCache: считающий кеш
+        # тоже обязан проходить проверку модели, а не только считать попадания.
+        self.info: dict[str, Any] = {
+            "models": set(),
+            "modes": set(),
+            "formats": set(),
+            "fields": set(),
+            "rows": 0,
+        }
+        self.validated: set[tuple[str, str]] = set()
 
     def get(self, key: str, default: Any = None) -> Any:
         if dict.__contains__(self, key):
@@ -1180,13 +1501,19 @@ def load_feature_cache(paths: Any, counting: bool = False) -> dict[str, FeatureM
 
     Шарды пишутся независимыми job'ами в ``features_*.jsonl``; здесь они
     склеиваются в один словарь. Порядок не важен: обращение по ключу.
+
+    Формат строки кеша — v2: кроме трёх рабочих признаков сохраняются все
+    диагностические массивы и служебные поля (``model``, ``mode``,
+    ``cache_format``, ``layer``). Поля v1 (только три признака) читаются как
+    раньше: устаревший кеш не роняет прогон, но не даёт диагностики — и это
+    проверяется явно (см. :func:`validate_feature_cache`), а не тихо.
     """
     import json  # noqa: PLC0415
     from pathlib import Path  # noqa: PLC0415
 
     if isinstance(paths, (str, Path)):
         paths = [paths]
-    cache: dict[str, FeatureMatrix] = CountingFeatureCache() if counting else {}
+    cache: dict[str, FeatureMatrix] = CountingFeatureCache() if counting else CataloguedFeatureCache()
     for raw in paths or ():
         path = Path(raw)
         if path.is_dir():
@@ -1205,13 +1532,73 @@ def load_feature_cache(paths: Any, counting: bool = False) -> dict[str, FeatureM
                 key = row.get("key")
                 if not key:
                     continue
+                arrays: dict[str, list[float]] = {}
+                for name, attribute in CACHE_ARRAY_FIELDS.items():
+                    values = row.get(name)
+                    if values:
+                        arrays[attribute] = [float(value) for value in values]
                 cache[key] = FeatureMatrix(
-                    attention_entropy=[float(x) for x in row.get("attention_entropy", [])],
-                    ctx_attention_mass=[float(x) for x in row.get("ctx_attention_mass", [])],
-                    embedding_density=[float(x) for x in row.get("embedding_density", [])],
-                    meta={"from_cache": True, "pair_id": row.get("pair_id")},
+                    **arrays,
+                    meta={
+                        "from_cache": True,
+                        "pair_id": row.get("pair_id"),
+                        "model": row.get("model"),
+                        "mode": row.get("mode"),
+                        "cache_format": row.get("cache_format"),
+                        "layer": row.get("layer"),
+                    },
                 )
+                info = getattr(cache, "info", None)
+                if info is not None:
+                    if row.get("model"):
+                        info["models"].add(str(row["model"]))
+                    if row.get("mode"):
+                        info["modes"].add(str(row["mode"]))
+                    if row.get("cache_format") is not None:
+                        info["formats"].add(str(row["cache_format"]))
+                    info["rows"] += 1
+                    for name in row:
+                        if name in CACHE_ARRAY_FIELDS:
+                            info["fields"].add(name)
     return cache
+
+
+# Поле строки кеша -> атрибут FeatureMatrix. Единый источник для записи
+# (scripts/precompute_features.py) и чтения: расхождение здесь проявилось бы как
+# «признак внезапно равен нулю», то есть как испорченный результат, а не ошибка.
+CACHE_ARRAY_FIELDS: dict[str, str] = {
+    "attention_entropy": "attention_entropy",
+    "ctx_attention_mass": "ctx_attention_mass",
+    "embedding_density": "embedding_density",
+    "ctx_mass_expected": "ctx_mass_expected",
+    "ctx_mass_norm": "ctx_mass_norm",
+    "ctx_mass_lift": "ctx_mass_lift",
+    "ctx_max_similarity": "ctx_max_similarity",
+    "ctx_support_distance": "ctx_support_distance",
+    "ctx_similarity_decay": "ctx_similarity_decay",
+    "ctx_sim_contrast": "ctx_sim_contrast",
+    "ctx_sim_margin": "ctx_sim_margin",
+}
+
+
+class CataloguedFeatureCache(dict):
+    """Кеш с реестром происхождения строк (модель, режим, формат, поля).
+
+    Нужен, чтобы несовпадение кеша и запроса превращалось в ошибку при старте,
+    а не в тихий пересчёт модели посреди кросс-валидации или в нулевые признаки
+    у обученной головы.
+    """
+
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
+        super().__init__(*args, **kwargs)
+        self.info: dict[str, Any] = {
+            "models": set(),
+            "modes": set(),
+            "formats": set(),
+            "fields": set(),
+            "rows": 0,
+        }
+        self.validated: set[tuple[str, str]] = set()
 
 
 # Модель, на которой считаются признаки режима hf в экспериментах и в кеше.
@@ -1264,6 +1651,11 @@ def extract_features(
     if cache is None:
         cache = _ACTIVE_FEATURE_CACHE
     if cache is not None:
+        if getattr(cache, "info", None):
+            # Кеш с реестром: сначала явная проверка модели, потом чтение. Так
+            # расхождение «кеш посчитан другой моделью» видно в момент первого
+            # обращения, а не по испорченным метрикам в конце прогона.
+            validate_feature_cache(cache, mode, str(kwargs.get("model_name", "")))
         key = cache_key or feature_cache_key(answer, context, mode, str(kwargs.get("model_name", "")))
         cached = cache.get(key)
         if cached is not None:

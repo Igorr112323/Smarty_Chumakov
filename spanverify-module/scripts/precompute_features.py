@@ -49,21 +49,46 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 from spanverify.dataset import read_pairs  # noqa: E402
-from spanverify.features import HF_MODEL_DEFAULT, extract_features, feature_cache_key  # noqa: E402
+from spanverify.features import (  # noqa: E402
+    CACHE_ARRAY_FIELDS,
+    HF_MODEL_DEFAULT,
+    extract_features,
+    feature_cache_key,
+)
 
 MODEL_DEFAULT = HF_MODEL_DEFAULT
 PROGRESS_EVERY = 10
 
 
-def dump_matrix(key: str, matrix, pair_id: str) -> dict:
-    """Строка кеша: ключ и три рабочих признака."""
-    return {
+def dump_matrix(key: str, matrix, pair_id: str, mode: str = "hf", model: str = "") -> dict:
+    """Строка кеша: ключ и признаки.
+
+    Формат v2 — сохранены все посчитанные массивы, а не только три рабочих
+    признака. Это то, что делает отбор признаков на реальной модели вообще
+    возможным: прямой проход по весам считается часами, и менять состав
+    признаков, перезапуская его на каждый вариант, nobody может. Плюс
+    служебные поля (режим, модель, формат, слой), по которым проверяется
+    соответствие кеша запросу: кеш, посчитанный другой моделью или старой
+    версией скрипта, должен быть отвергнут явно (см. validate_feature_cache).
+    """
+    row: dict = {
         "key": key,
         "pair_id": pair_id,
-        "attention_entropy": [float(x) for x in matrix.attention_entropy],
-        "ctx_attention_mass": [float(x) for x in matrix.ctx_attention_mass],
-        "embedding_density": [float(x) for x in matrix.embedding_density],
+        "mode": mode,
+        "cache_format": 2,
     }
+    if model:
+        row["model"] = model
+    for name, field in CACHE_ARRAY_FIELDS.items():
+        values = getattr(matrix, field, None) or []
+        if values:
+            row[name] = [float(x) for x in values]
+    # Слой внимания: признаки разных слоёв несопоставимы, и в отчёте это должно
+    # быть видно даже если meta матрицы потерялась (кеш читается без модели).
+    layer = (getattr(matrix, "meta", None) or {}).get("layer")
+    if layer is not None:
+        row["layer"] = layer
+    return row
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -76,6 +101,12 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--shards", type=int, default=1)
     parser.add_argument("--limit", type=int, default=0, help="взять только первые N пар (0 — все)")
     parser.add_argument("--progress-every", type=int, default=PROGRESS_EVERY)
+    parser.add_argument(
+        "--participation",
+        action="store_true",
+        help="дополнительно посчитать признаки синтетического корпуса доли участия ИИ "
+        "(240样本) — без них обучение головы участия в режиме hf пропускается",
+    )
     args = parser.parse_args(argv)
 
     if args.shards < 1 or not (0 <= args.shard < args.shards):
@@ -89,6 +120,18 @@ def main(argv: list[str] | None = None) -> int:
     records = list(read_pairs(dataset))
     if args.limit:
         records = records[: args.limit]
+    if args.participation:
+        # Корпус участия ИИ — свои тексты, и в кеше их нет: обучение головы
+        # участия в режиме hf тогда пропускается (считать их моделью посреди
+        # обучения — второй проход, которого кеш как раз и избегает). Предпосчитанные
+        # здесь, они дают participation_hf.json без единого лишнего прохода.
+        from spanverify.participation import build_participation_corpus
+
+        extra = [
+            {"id": f"participation-{index:04d}", "answer": item["text"], "context": item["context"]}
+            for index, item in enumerate(build_participation_corpus(count=240, seed=42 + 1985))
+        ]
+        records = records + extra
     selected = [(index, record) for index, record in enumerate(records) if index % args.shards == args.shard]
 
     out_dir = Path(args.out)
@@ -120,7 +163,8 @@ def main(argv: list[str] | None = None) -> int:
             try:
                 matrix = extract_features(answer, context, mode=args.mode, **call_kwargs)
                 key = feature_cache_key(answer, context, args.mode, model_name)
-                out.write(json.dumps(dump_matrix(key, matrix, pair_id), ensure_ascii=False) + "\n")
+                row = dump_matrix(key, matrix, pair_id, mode=args.mode, model=model_name)
+                out.write(json.dumps(row, ensure_ascii=False) + "\n")
                 out.flush()
                 done += 1
             except Exception as exc:  # noqa: BLE001 - причина записывается в файл пропусков
@@ -149,6 +193,8 @@ def main(argv: list[str] | None = None) -> int:
         "dataset": str(dataset),
         "mode": args.mode,
         "model": args.model,
+        "cache_format": 2,
+        "fields": sorted(CACHE_ARRAY_FIELDS),
         "shard": args.shard,
         "shards": args.shards,
         "pairs_total": len(records),

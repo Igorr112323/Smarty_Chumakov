@@ -131,6 +131,24 @@ def _load_dataset(path: str | Path, pairs: int = 0, seed: int = 1312) -> list[di
 # ------------------------------------------------------------------ команды
 
 
+def _verifier_from_args(args: argparse.Namespace) -> Verifier:
+    """Собрать верификатор по аргументам команды (общий путь для verify/evaluate).
+
+    Флаги additive: без них поведение ровно прежнее — режим из ``--mode``/
+    ``--backend``, веса из ``--weights``, покрытие включено, кеш не используется.
+    """
+    from .features import load_feature_cache
+
+    cache = load_feature_cache(args.features_cache, counting=True) if getattr(args, "features_cache", None) else None
+    return Verifier(
+        mode=_mode(args),
+        model_name=getattr(args, "model", None),
+        weights_path=args.weights,
+        features_cache=cache,
+        coverage=bool(getattr(args, "coverage", True)),
+    )
+
+
 def cmd_verify(args: argparse.Namespace) -> int:
     """Проверить один ответ относительно контекста."""
     answer = args.answer
@@ -144,7 +162,7 @@ def cmd_verify(args: argparse.Namespace) -> int:
     if args.context_file:
         context = Path(args.context_file).read_text(encoding="utf-8")
 
-    verifier = Verifier(mode=_mode(args), weights_path=args.weights)
+    verifier = _verifier_from_args(args)
     result = verifier.verify(answer, context, with_tokens=args.tokens)
     return _print_result(result, as_json=args.json, tokens=args.tokens)
 
@@ -222,7 +240,7 @@ def cmd_calibrate(args: argparse.Namespace) -> int:
 def cmd_evaluate(args: argparse.Namespace) -> int:
     """Показать метрики конвейера на размеченном корпусе."""
     records = _load_dataset(args.dataset, pairs=args.make_dataset, seed=args.seed)
-    verifier = Verifier(mode=_mode(args), weights_path=args.weights)
+    verifier = _verifier_from_args(args)
     metrics = verifier.evaluate(records)
     if args.json:
         _print_json(metrics)
@@ -245,8 +263,22 @@ def cmd_evaluate(args: argparse.Namespace) -> int:
         f"F1={answers['f1']:.3f} FPR={answers['fpr']:.3f} AUC={answers['auc']:.3f} "
         f"(порог {answers['threshold']:.3f})"
     )
+    coverage = metrics.get("coverage") or {}
+    if coverage:
+        def _fmt(value: object) -> str:
+            return "н/д" if value is None else f"{value:.3f}"
+
+        print(
+            f"Покрытие фактов (включено: {coverage.get('enabled')}): "
+            f"coverage_recall_missing={_fmt(coverage.get('recall_missing'))} "
+            f"coverage_precision_missing={_fmt(coverage.get('precision_missing'))} "
+            f"coverage_recall_partial={_fmt(coverage.get('recall_partial'))} "
+            f"coverage_precision_partial={_fmt(coverage.get('precision_partial'))} "
+            f"coverage_fpr_clean={_fmt(coverage.get('fpr_clean'))} "
+            f"(пар с контекстом {coverage.get('pairs_with_context')}, чистых {coverage.get('clean_pairs')})"
+        )
     gate = tokens["f1"] >= 0.90 and tokens["fpr"] <= 0.10
-    print(f"Критерий качества (token F1 ≥ 0.90 при FPR ≤ 0.10): {'ДОСТИГНУТ' if gate else 'НЕ достигнут'}")
+    print(f"Критерий качества (token F1 ≥ 0.90 при FPR ≤ 0.10): {'выполнен' if gate else 'не выполнен'}")
     if metrics["warning"]:
         print(f"ВНИМАНИЕ: {metrics['warning']}")
     return EXIT_OK
@@ -424,6 +456,35 @@ def build_parser() -> argparse.ArgumentParser:
         sub.add_argument("--mode", choices=["demo", "surrogate", "hf"], default=argparse.SUPPRESS)
         sub.add_argument("--backend", choices=BACKENDS, default=argparse.SUPPRESS, help="историческое имя режима")
         sub.add_argument("--weights", default=WEIGHTS_FILENAME)
+        sub.add_argument(
+            "--model",
+            default=None,
+            help="модель режима hf; по умолчанию берётся из обученного бандла "
+            "(meta.model), а затем из config — иначе ключ кеша признаков не совпадёт",
+        )
+        sub.add_argument(
+            "--features-cache",
+            action="append",
+            default=[],
+            metavar="PATH",
+            help="каталог или файл кеша предпосчитанных признаков режима hf "
+            "(scripts/precompute_features.py); можно указать несколько раз",
+        )
+        coverage_group = sub.add_mutually_exclusive_group()
+        coverage_group.add_argument(
+            "--coverage",
+            dest="coverage",
+            action="store_true",
+            default=argparse.SUPPRESS,
+            help="включить проверку покрытия фактов (по умолчанию включена)",
+        )
+        coverage_group.add_argument(
+            "--no-coverage",
+            dest="coverage",
+            action="store_false",
+            default=argparse.SUPPRESS,
+            help="выключить проверку покрытия фактов (историческое поведение до v1.4)",
+        )
 
     verify = subparsers.add_parser("verify", help="проверить ответ относительно контекста")
     verify.add_argument("--answer", default=None, help="текст ответа")

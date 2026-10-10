@@ -87,6 +87,50 @@ def _test_count() -> int | None:
     return total or None
 
 
+# Именованные метрики проверки покрытия фактов (задача 5): их берём из
+# отчёта прогонов `reports/coverage_facts.json`, который пишет прогон
+# `python -m spanverify evaluate` по корпусам (см. reports/COVERAGE_REPORT.md).
+# Это НЕ процент покрытия тестами: он живёт в reports/coverage.json (pytest-cov).
+FACTS_COVERAGE_METRICS = (
+    "recall_missing",
+    "precision_missing",
+    "recall_partial",
+    "precision_partial",
+    "fpr_clean",
+)
+
+
+def _facts_coverage(path: Path) -> dict:
+    """Метрики покрытия фактов по корпусам, в именованном виде ТЗ."""
+    if not path.is_file():
+        return {"source": str(path), "available": False, "corpora": {}}
+    try:
+        payload = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, ValueError) as exc:
+        return {"source": str(path), "available": False, "error": f"{type(exc).__name__}: {exc}", "corpora": {}}
+    corpora = {}
+    for name, block in sorted(payload.items()):
+        coverage = block.get("coverage") if isinstance(block, dict) else None
+        if not isinstance(coverage, dict):
+            continue
+        row = {f"coverage_{key}": coverage.get(key) for key in FACTS_COVERAGE_METRICS}
+        row["pairs_with_context"] = coverage.get("pairs_with_context")
+        row["clean_pairs"] = coverage.get("clean_pairs")
+        row["token_f1"] = block.get("token_f1")
+        row["verdict_f1"] = block.get("verdict_f1")
+        corpora[name] = row
+    return {
+        "source": str(path),
+        "available": bool(corpora),
+        "corpora": corpora,
+        "commands": [
+            "python -m spanverify evaluate --dataset data/corpus_a/splits/test.jsonl --mode demo",
+            "python -m spanverify evaluate --dataset data/corpus_a3/splits/test.jsonl --mode demo",
+            "python -m spanverify evaluate --dataset data/demo_pairs.jsonl --mode demo",
+        ],
+    }
+
+
 def _coverage_percent(path: Path) -> float | None:
     """Покрытие в процентах из отчёта coverage.json (если он есть)."""
     if not path.is_file():
@@ -603,7 +647,9 @@ def _hf_external_slices_block() -> dict | None:
     }
 
 
-def collect(dataset: str, seed: int, release_dir: Path, coverage_json: Path) -> dict:
+def collect(
+    dataset: str, seed: int, release_dir: Path, coverage_json: Path, facts_coverage_json: Path | None = None
+) -> dict:
     """Собрать METRICS.json целиком (каждое число — из прогона, а не из памяти)."""
     started = time.time()
     pairs = list(read_pairs(dataset))
@@ -630,6 +676,7 @@ def collect(dataset: str, seed: int, release_dir: Path, coverage_json: Path) -> 
             "dataset": dataset,
         },
         "disclaimer": DISCLAIMER,
+        "facts_coverage": _facts_coverage(facts_coverage_json or Path("reports/coverage_facts.json")),
         "tests": {
             "collected": _test_count(),
             "coverage_percent": _coverage_percent(coverage_json),
@@ -733,9 +780,20 @@ def main() -> int:
     parser.add_argument("--out", default="reports/METRICS.json")
     parser.add_argument("--release-dir", default="release")
     parser.add_argument("--coverage-json", default="reports/coverage.json")
+    parser.add_argument(
+        "--facts-coverage-json",
+        default="reports/coverage_facts.json",
+        help="отчёт метрик проверки покрытия фактов (reports/COVERAGE_REPORT.md)",
+    )
     args = parser.parse_args()
 
-    payload = collect(args.dataset, args.seed, Path(args.release_dir), Path(args.coverage_json))
+    payload = collect(
+        args.dataset,
+        args.seed,
+        Path(args.release_dir),
+        Path(args.coverage_json),
+        Path(args.facts_coverage_json),
+    )
     out = Path(args.out)
     out.parent.mkdir(parents=True, exist_ok=True)
     out.write_text(json.dumps(payload, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")

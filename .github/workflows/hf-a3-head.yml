@@ -1,0 +1,239 @@
+# Обучение и оценка режима hf на корпусе A3 с отбором признаков головы.
+#
+# Зачем отдельный workflow: ЗАДАЧА 1 требует измерить качество режима hf на
+# реальных актах (1200 пар корпуса A3) и поднять его доработкой признаков, а не
+# подбором порога. Признаки режима hf — это прямой проход по языковой модели
+# (секунды на пару), поэтому дорогой проход выполняется один раз (job precompute,
+# четыре шарда параллельно), складывается в кеш, а обучение и оценка читают кеш.
+# Отбор признаков (жадный поиск по AUC на валидации) работает поверх кеша и стоит
+# минуты, поэтому его можно повторять столько, сколько нужно.
+#
+# Запуск: workflow_dispatch (ручной) или пуш файла .github/hf-a3-head.trigger
+# (его содержимое — номер замера; меняется — запускается прогон).
+#
+# Результаты: артефакты прогона + коммит в ветку данных data/metrics (всегда с
+# [skip ci], чтобы не разгонять петли). Ci.yml в ветку не пишет ничего.
+name: Обучение hf на A3 (отбор признаков)
+
+on:
+  workflow_dispatch:
+    inputs:
+      select_pairs:
+        description: "Размер подвыборки для отбора признаков (0 — вся обучающая часть)"
+        default: "300"
+      rounds:
+        description: "Число раундов жадного отбора"
+        default: "3"
+      folds:
+        description: "Число фолдов кросс-валидации головы"
+        default: "5"
+  push:
+    branches: ["arena/**"]
+    paths:
+      - .github/hf-a3-head.trigger
+
+concurrency:
+  group: hf-a3-head-${{ github.ref }}
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+env:
+  PYTHONUTF8: "1"
+  PYTHONIOENCODING: "utf-8"
+  HF_MODEL: ai-forever/rugpt3small_based_on_gpt2
+  SEED: "42"
+
+jobs:
+  precompute:
+    name: "Признаки A3, шард ${{ matrix.shard }}/4"
+    runs-on: ubuntu-latest
+    # 50 минут на шард: 300 пар корпуса A3 при прямом проходе по модели
+    # ~4 с/пару = 20 минут, плюс ~60 строк корпуса участия, плюс загрузка модели.
+    timeout-minutes: 50
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [0, 1, 2, 3]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: "Кэш весов модели"
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/huggingface
+          key: hf-${{ runner.os }}-rugpt3small-v1
+      - name: "Зависимости и среда"
+        uses: ./.github/actions/hf-setup
+      - name: "Предпосчёт признаков (формат v2: диагностика + корпус участия)"
+        working-directory: spanverify-module
+        timeout-minutes: 40
+        env:
+          OMP_NUM_THREADS: "4"
+        run: |
+          echo "команда: python scripts/precompute_features.py --dataset data/corpus_a3/pairs.jsonl --mode hf --model $HF_MODEL --shard ${{ matrix.shard }} --shards 4 --participation --out reports/hf-cache"
+          start=$(date -u +%s)
+          python scripts/precompute_features.py \
+            --dataset data/corpus_a3/pairs.jsonl \
+            --mode hf --model "$HF_MODEL" \
+            --shard ${{ matrix.shard }} --shards 4 \
+            --participation \
+            --out reports/hf-cache
+          echo "длительность_шарда_с=$(( $(date -u +%s) - start ))"
+          wc -l reports/hf-cache/features_*.jsonl
+      - uses: actions/upload-artifact@v4
+        with:
+          name: hf-a3-cache-${{ matrix.shard }}
+          path: spanverify-module/reports/hf-cache
+          if-no-files-found: error
+          retention-days: 14
+
+  train:
+    name: "Отбор признаков, обучение и оценка на A3"
+    runs-on: ubuntu-latest
+    # 150 минут: отбор — это 8 запусков train() на кеше (по 3–4 минуты) плюс
+    # финальное обучение и три оценки на полном корпусе.
+    timeout-minutes: 150
+    needs: precompute
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: "Кэш весов модели"
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/huggingface
+          key: hf-${{ runner.os }}-rugpt3small-v1
+      - name: "Зависимости и среда"
+        uses: ./.github/actions/hf-setup
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: hf-a3-cache-*
+          path: spanverify-module/reports/hf-cache
+          merge-multiple: true
+      - name: "Кеш признаков: сколько собралось"
+        working-directory: spanverify-module
+        run: |
+          ls -la reports/hf-cache
+          cat reports/hf-cache/precompute_*.json 2>/dev/null || true
+          wc -l reports/hf-cache/features_*.jsonl | tail -1
+      - name: "Обучение с отбором признаков (критерий — AUC на валидации)"
+        working-directory: spanverify-module
+        timeout-minutes: 130
+        env:
+          OMP_NUM_THREADS: "4"
+        run: |
+          echo "команда: python scripts/train_hf_a3.py --dataset data/corpus_a3/pairs.jsonl --out config/weights_hf.json --mode hf --model $HF_MODEL --seed $SEED --folds ${{ github.event.inputs.folds || '5' }} --target-fpr 0.1 --select-pairs ${{ github.event.inputs.select_pairs || '300' }} --rounds ${{ github.event.inputs.rounds || '3' }} --features-cache reports/hf-cache --require-cache --participation-from-cache --run-id $GITHUB_RUN_ID"
+          python scripts/train_hf_a3.py \
+            --dataset data/corpus_a3/pairs.jsonl \
+            --out config/weights_hf.json \
+            --mode hf --model "$HF_MODEL" \
+            --seed "$SEED" \
+            --folds ${{ github.event.inputs.folds || '5' }} \
+            --target-fpr 0.1 \
+            --select-pairs ${{ github.event.inputs.select_pairs || '300' }} \
+            --rounds ${{ github.event.inputs.rounds || '3' }} \
+            --features-cache reports/hf-cache \
+            --require-cache \
+            --log reports/hf_a3_train.log \
+            --report-md reports/hf_a3_eval.md \
+            --report-json reports/hf_a3_eval.json \
+            --run-id "$GITHUB_RUN_ID"
+      - name: "Оценка готовым путём CLI (тот же контракт, что в README)"
+        working-directory: spanverify-module
+        timeout-minutes: 25
+        env:
+          OMP_NUM_THREADS: "4"
+        run: |
+          python -m spanverify evaluate \
+            --dataset data/corpus_a3/pairs.jsonl \
+            --mode hf --model "$HF_MODEL" \
+            --weights config/weights_hf.json \
+            --features-cache reports/hf-cache \
+            --json | tee reports/hf_a3_cli_eval.json
+      - name: "Сводка чисел в лог job'а"
+        working-directory: spanverify-module
+        run: |
+          python - <<'PY'
+          import json, pathlib
+          report = json.loads(pathlib.Path("reports/hf_a3_eval.json").read_text(encoding="utf-8"))
+          print("режим:", report["mode"], "модель:", report["model"])
+          print("отбор:", report["selection"]["selected"])
+          for row in report["metrics"]:
+              print(f"{row['split']}: token F1 {row['token_f1']} FPR {row['token_fpr']} AUC {row['token_auc']} "
+                    f"вердикт F1 {row['verdict_f1']} FPR {row['verdict_fpr']}")
+          print("критерий:", report["gate_statement"])
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: hf-a3-head
+          path: |
+            spanverify-module/config/weights_hf.json
+            spanverify-module/config/head_hf.json
+            spanverify-module/config/participation_hf.json
+            spanverify-module/reports/hf_a3_eval.md
+            spanverify-module/reports/hf_a3_eval.json
+            spanverify-module/reports/hf_a3_train.log
+            spanverify-module/reports/hf_a3_cli_eval.json
+            spanverify-module/reports/hf_a3_cli_eval.txt
+          if-no-files-found: warn
+          retention-days: 30
+
+  publish:
+    name: "Свести числа и сохранить в ветку данных"
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    needs: train
+    if: always()
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - uses: actions/download-artifact@v4
+        with:
+          name: hf-a3-head
+          path: out
+      - name: "Зависимости"
+        working-directory: spanverify-module
+        run: python -m pip install --upgrade pip && python -m pip install -q -r requirements.txt
+      - name: "Метрики и проверка чисел"
+        working-directory: spanverify-module
+        run: |
+          python scripts/collect_metrics.py --out reports/METRICS.json || true
+          python - <<'PY'
+          import json, pathlib
+          for name in ("reports/hf_a3_eval.json", "reports/METRICS.json"):
+              path = pathlib.Path(name)
+              if path.is_file():
+                  print(name, "размер", path.stat().st_size)
+          PY
+      - name: "Сохранить в ветку данных"
+        run: |
+          mkdir -p /tmp/keep && rm -rf /tmp/keep/*
+          cp -r out /tmp/keep/out 2>/dev/null || true
+          git config user.name "spanverify-bot"
+          git config user.email "bot@spanverify.local"
+          git fetch origin data/metrics || true
+          git checkout -B data/metrics origin/data/metrics || git checkout -B data/metrics
+          mkdir -p hf-a3-head
+          cp -r /tmp/keep/out/. hf-a3-head/ 2>/dev/null || true
+          git add -A hf-a3-head
+          git diff --cached --quiet && echo "изменений нет" && exit 0
+          git commit -m "hf A3: обучение с отбором признаков, прогон ${{ github.run_number }} [skip ci]"
+          for attempt in 1 2 3 4 5; do
+            if git push origin HEAD:data/metrics; then
+              echo "ветка данных обновлена с попытки $attempt"
+              break
+            fi
+            echo "пуш отклонён, попытка $attempt"
+            git fetch origin data/metrics
+            git rebase FETCH_HEAD || git rebase --abort
+            sleep $((attempt * 10))
+          done
