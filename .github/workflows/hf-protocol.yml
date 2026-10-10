@@ -8,7 +8,10 @@
 # а шаг 3 (`final`) догружает признаки test и считает финал ровно один раз.
 #
 # Запуск: workflow_dispatch (шаг 2 — всегда; шаг 3 — только с run_final=true) или
-# пуш файла .github/hf-protocol.trigger (номер замера в содержимом).
+# пуш файла .github/hf-protocol.trigger (номер замера в содержимом). Шаг 3 таким
+# пушем запускается только если в сообщении коммита есть метка [hf-final]:
+# dispatch требует права actions:write, которого у тожена песочницы нет, а шаг 3
+# обязан выполняться ровно один раз и только после фиксации конфигурации.
 #
 # Почему test считается отдельным job'ом: признаки test физически не попадают в
 # кеш шага 2, поэтому перебрать конфигурации на test невозможно даже случайно.
@@ -271,7 +274,7 @@ jobs:
 
   grid-test:
     name: "Сетка признаков test, ${{ matrix.corpus }}, шард ${{ matrix.shard }}"
-    if: ${{ github.event_name == 'workflow_dispatch' && inputs.run_final }}
+    if: ${{ (github.event_name == 'workflow_dispatch' && inputs.run_final) || (github.event_name == 'push' && contains(github.event.head_commit.message, '[hf-final]')) }}
     needs: sweep
     runs-on: ubuntu-latest
     timeout-minutes: 45
@@ -320,7 +323,7 @@ jobs:
 
   final:
     name: "Шаг 3: финальная оценка на test (один раз)"
-    if: ${{ github.event_name == 'workflow_dispatch' && inputs.run_final }}
+    if: ${{ (github.event_name == 'workflow_dispatch' && inputs.run_final) || (github.event_name == 'push' && contains(github.event.head_commit.message, '[hf-final]')) }}
     needs: [sweep, grid-test]
     runs-on: ubuntu-latest
     timeout-minutes: 40
