@@ -1,0 +1,178 @@
+{
+ "classifier": "logreg",
+ "code_commit": "c7c64bd8d0acbc95d5f2eec0ca044e8ca0f79988",
+ "criterion": {
+  "f1_gap": 0.084298,
+  "fpr_gap": -0.378912,
+  "status": "NOT MET",
+  "target": "F1 ≥ 0.6 при FPR ≤ 0.4 (токены, hf, отложенный test)",
+  "token_f1": 0.515702,
+  "token_fpr": 0.021088
+ },
+ "criterion_note": "это val, а не test: статус показывает, достигнут ли ориентир на отобранной части, и не является ответом по договору",
+ "features": [
+  "entropy_last",
+  "entropy_first",
+  "entropy_middle",
+  "entropy_m4",
+  "entropy_mean_layers",
+  "entropy_max_layers",
+  "entropy_head_max",
+  "entropy_head_disagreement",
+  "mass_last",
+  "mass_first",
+  "mass_middle",
+  "mass_mean_layers",
+  "mass_max_layers",
+  "mass_max_head",
+  "mass_norm_last",
+  "mass_lift_last",
+  "density_k1_last",
+  "density_k3_last",
+  "density_k5_last",
+  "density_k3_middle",
+  "sim_max_last",
+  "sim_contrast_last",
+  "sim_margin_last",
+  "sim_distance_last",
+  "sim_decay_last",
+  "lex_match",
+  "num_match",
+  "trigram_match",
+  "attrib_borrowed",
+  "attrib_supported",
+  "mass_win3",
+  "entropy_win3",
+  "position",
+  "length",
+  "sentence_position",
+  "sentence_support"
+ ],
+ "grid_sha256": "a7eb9b7a59e3f6b271248841055f11f1da23c460ce47b6f0187cbf1439442062",
+ "hypothesis": "Линейная модель на полном наборе сетки — потолок для «просто сложить все признаки»: если отдельная группа признаков работает, а полная комбинация нет, мешает не состав, а линейность.",
+ "merge_gap": 2,
+ "metrics_mean_std": {
+  "answer_auc": 0.675368,
+  "answer_f1": 0.621469,
+  "answer_fpr": 0.305882,
+  "answer_precision": 0.679012,
+  "answer_recall": 0.572917,
+  "auc": 0.92464,
+  "auc_per_seed": [
+   0.92464
+  ],
+  "auc_std": 0.0,
+  "f1": 0.515702,
+  "f1_per_seed": [
+   0.515702
+  ],
+  "f1_std": 0.0,
+  "fn": 131.0,
+  "fn_per_seed": [
+   131.0
+  ],
+  "fn_std": 0.0,
+  "fp": 162.0,
+  "fp_per_seed": [
+   162.0
+  ],
+  "fp_std": 0.0,
+  "fpr": 0.021088,
+  "fpr_per_seed": [
+   0.021088
+  ],
+  "fpr_std": 0.0,
+  "model_sha256_per_seed": [
+   "1efc3b4b06514fa164c5b358d5f40500720d9c9c939c4bf14f023bc7cd6350c1"
+  ],
+  "positive_rows": 287,
+  "precision": 0.490566,
+  "precision_per_seed": [
+   0.490566
+  ],
+  "precision_std": 0.0,
+  "recall": 0.543554,
+  "recall_per_seed": [
+   0.543554
+  ],
+  "recall_std": 0.0,
+  "rows": 7969,
+  "span_f1": 0.233766,
+  "span_precision": 0.2,
+  "span_recall": 0.28125,
+  "threshold": 0.1106,
+  "thresholds_per_seed": [
+   0.1106
+  ],
+  "tn": 7520.0,
+  "tn_per_seed": [
+   7520.0
+  ],
+  "tn_std": 0.0,
+  "tp": 156.0,
+  "tp_per_seed": [
+   156.0
+  ],
+  "tp_std": 0.0
+ },
+ "params": {
+  "classifier": "logreg",
+  "epochs": 800,
+  "folds": 5,
+  "l2": 0.1
+ },
+ "per_seed": [
+  {
+   "answers": {
+    "auc": 0.675368,
+    "f1": 0.621469,
+    "fn": 41.0,
+    "fp": 26.0,
+    "fpr": 0.305882,
+    "precision": 0.679012,
+    "recall": 0.572917,
+    "threshold": 0.1106,
+    "tn": 59.0,
+    "tp": 55.0
+   },
+   "model_sha256": "1efc3b4b06514fa164c5b358d5f40500720d9c9c939c4bf14f023bc7cd6350c1",
+   "positive_rows": 287,
+   "rows": 7969,
+   "seed": 42,
+   "spans": {
+    "f1": 0.233766,
+    "fn": 69.0,
+    "fp": 108.0,
+    "iou_threshold": 0.5,
+    "precision": 0.2,
+    "recall": 0.28125,
+    "tp": 27.0
+   },
+   "threshold": 0.1106,
+   "tokens": {
+    "auc": 0.92464,
+    "f1": 0.515702,
+    "fn": 131.0,
+    "fp": 162.0,
+    "fpr": 0.021088,
+    "precision": 0.490566,
+    "recall": 0.543554,
+    "tn": 7520.0,
+    "tp": 156.0
+   }
+  }
+ ],
+ "protocol": "hf-criterion-v1",
+ "rows": 7969,
+ "selected_by": "wide-linear",
+ "selection_corpus": "a3",
+ "splits_dir": "data/corpus_a3/splits",
+ "splits_sha256": {
+  "test": "232d2583480f2237fc48d10eb4413043bf35f59be5a10138fbf53235ce83ba88",
+  "train": "75c2504acefb6a3c325f8b3b94c1e4da9ec441d9440c1cfd07c16eb8e49040a2",
+  "val": "cba705f836d9c25f28fc162b5cbf89b52bfabe7c47c56e2a4d6d652cded2c2dd"
+ },
+ "step": "sweep-best-on-val",
+ "threshold": 0.1106,
+ "window": 0
+}
