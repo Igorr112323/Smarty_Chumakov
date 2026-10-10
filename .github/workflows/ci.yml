@@ -63,7 +63,26 @@ jobs:
         run: python -m black --check .
 
       - name: Тесты с порогом покрытия 85 %
-        run: python -m pytest --cov=spanverify --cov-report=term --cov-report=json:reports/coverage.json --cov-fail-under=85
+        run: |
+          set -o pipefail
+          log="$RUNNER_TEMP/pytest.log"
+          if python -m pytest --cov=spanverify --cov-report=term --cov-report=json:reports/coverage.json --cov-fail-under=85 2>&1 | tee "$log"; then
+            exit 0
+          fi
+
+          # Красный CI без имени теста ничего не объясняет: логи job'ов извне
+          # недоступны (result-хост вне списка разрешённых), поэтому список упавших
+          # тестов уходит аннотациями и в summary шага. Статус шага это не меняет:
+          # падение остаётся падением, смягчения проверок здесь нет.
+          grep -E "^(FAILED|ERROR)" "$log" | tr -d '\r' | head -40 | sed -e 's/%/%25/g' -e 's|^|::error::[pytest] |'
+          {
+            echo "## Упавшие тесты (с порогом покрытия)"
+            echo '```'
+            grep -E "^(FAILED|ERROR)" "$log" | tr -d '\r' | head -40
+            tail -n 3 "$log" | tr -d '\r'
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+          exit 1
 
       - name: Воспроизводимость обучения (один seed → один результат)
         run: |
@@ -137,7 +156,30 @@ jobs:
           python -m pip install pytest "pyyaml~=6.0"
 
       - name: Тесты
-        run: python -m pytest -q
+        # Явный bash: шаг одинаково ведёт себя на ubuntu и windows-latest
+        # (обёртка с tee/pipefail — shell-специфичная, на pwsh она бы просто
+        # сломалась, и красный CI стал бы непонятно про что).
+        shell: bash
+        run: |
+          set -o pipefail
+          log="$RUNNER_TEMP/pytest.log"
+          if python -m pytest -q 2>&1 | tee "$log"; then
+            exit 0
+          fi
+
+          # Красный CI без имени теста ничего не объясняет: логи job'ов извне
+          # недоступны (result-хост вне списка разрешённых), поэтому список упавших
+          # тестов уходит аннотациями и в summary шага. Статус шага это не меняет:
+          # падение остаётся падением, смягчения проверок здесь нет.
+          grep -E "^(FAILED|ERROR)" "$log" | tr -d '\r' | head -40 | sed -e 's/%/%25/g' -e 's|^|::error::[pytest] |'
+          {
+            echo "## Упавшие тесты (без покрытия)"
+            echo '```'
+            grep -E "^(FAILED|ERROR)" "$log" | tr -d '\r' | head -40
+            tail -n 3 "$log" | tr -d '\r'
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+          exit 1
 
       - name: Само-проверка конвейера
         run: python -m spanverify selftest
