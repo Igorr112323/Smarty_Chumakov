@@ -8,7 +8,7 @@
   },
   "meta": {
     "version": "1.3.0",
-    "commit": "44182cc10d5ae766c26b39230eb2790ea9c88bd6",
+    "commit": "797d69b99e9929015773ea21768073499a7b040b",
     "generated_at": "2026-10-10T05:38:41Z",
     "seed": 42,
     "dataset": "data/demo_pairs.jsonl"
