@@ -7,6 +7,14 @@
     GET  /v1/config     — действующие параметры (содержимое weights.json)
     GET  /v1/model      — сведения о модели/режиме и обученной голове
     POST /v1/verify     — {"answer": "...", "context": "...", ...} → вердикт
+    GET  /metrics       — метрики Prometheus (текстовая экспозиция, задача 4)
+
+Промышленный контур (задача 4): при переданном файле ключей (``--api-keys`` или
+``SPANVERIFY_API_KEYS``) все маршруты, кроме ``GET /health`` и веб-интерфейса,
+требуют заголовок ``X-API-Key``; права по ролям — в :mod:`spanverify.auth`.
+Каждый запрос попадает в метрики (длительность, код, вердикт), а каждая проверка
+и каждый отказ — в JSONL-журнал аудита (``--audit-log``), где вместо текста ответа
+лежит его ``sha256``.
 
 Сервер построен на стандартной библиотеке (``http.server``): он запускается и
 из исходников, и из собранного .exe, не требуя uvicorn/fastapi. Это осознанный
@@ -18,6 +26,7 @@
 from __future__ import annotations
 
 import json
+import os
 import socket
 import threading
 import time
@@ -27,7 +36,9 @@ from typing import Any
 from urllib.parse import urlparse
 
 from . import __version__
+from .auth import AuditLog, AuthError, KeyStore, Principal, load_keystore
 from .engine import WEIGHTS_FILENAME, Verifier
+from .metrics import global_metrics
 from .webui import INDEX_HTML
 
 MAX_BODY = 4 * 1024 * 1024  # 4 МБ на запрос
@@ -43,11 +54,18 @@ class Service:
         mode: str = DEFAULT_MODE,
         weights_path: str | Path | None = WEIGHTS_FILENAME,
         model_name: str | None = None,
+        auth: KeyStore | None = None,
+        audit: AuditLog | Path | str | None = None,
     ) -> None:
         self.mode = mode
         self.weights_path = weights_path
         self.model_name = model_name
         self.started_at = time.time()
+        self.auth = auth if auth is not None else KeyStore()
+        self.audit = audit if isinstance(audit, AuditLog) else (AuditLog(audit) if audit else AuditLog(None))
+        self.metrics = global_metrics()
+        self.metrics.mode = mode
+        self.metrics.version = __version__
         self._verifier: Verifier | None = None
         self._lock = threading.Lock()
 
@@ -85,7 +103,16 @@ class Service:
             "uptime_s": round(time.time() - self.started_at, 1),
             "weights_source": self.verifier.bundle.source,
             "warning": verifier.warning,
+            # Аддитивные поля промышленного контура (задача 4): видны в /health,
+            # чтобы пробва и человек видели, включён ли доступ и журнал.
+            "auth": {"enabled": self.auth.enabled, "source": self.auth.source, "keys": len(self.auth)},
+            "audit": {"enabled": self.audit.enabled, "path": str(self.audit.path) if self.audit.path else None},
         }
+
+    def metrics_text(self) -> str:
+        """Текст для ``GET /metrics`` (Prometheus text format 1.0.0)."""
+        self.metrics.mode = self.verifier.mode
+        return self.metrics.render()
 
     def config(self) -> dict[str, Any]:
         """Действующая конфигурация: то, чем реально считается ответ."""
@@ -134,8 +161,13 @@ class Service:
 
     # ------------------------------------------------------------ проверка
 
-    def verify(self, payload: dict[str, Any]) -> dict[str, Any]:
-        """Разобрать запрос контракта и вернуть ответ контракта."""
+    def verify(self, payload: dict[str, Any], principal: Principal | None = None) -> dict[str, Any]:
+        """Разобрать запрос контракта и вернуть ответ контракта.
+
+        Считает длительность, обновляет метрики и пишет событие аудита. Поле
+        ``latency_ms`` в ответе — аддитивное: старые клиенты его игнорируют.
+        """
+        started = time.perf_counter()
         if not isinstance(payload, dict):
             raise ValueError("тело запроса должно быть объектом JSON")
         answer = payload.get("answer")
@@ -158,6 +190,20 @@ class Service:
         )
         body = result.to_dict(with_tokens=bool(payload.get("with_tokens", False)))
         body["mode"] = self.mode
+        latency_ms = (time.perf_counter() - started) * 1000.0
+        body["latency_ms"] = round(latency_ms, 3)
+        self.metrics.observe("/v1/verify", 200, latency_ms / 1000.0, str(body.get("verdict", "")), self.verifier.mode)
+        if self.audit.enabled:
+            self.audit.verify(
+                answer=answer,
+                verdict=str(body.get("verdict", "")),
+                score=float(body.get("score", 0.0)),
+                threshold=float(body.get("threshold", 0.0)),
+                latency_ms=latency_ms,
+                principal=principal,
+                route="/v1/verify",
+                mode=self.verifier.mode,
+            )
         return body
 
 
@@ -167,6 +213,9 @@ def make_handler(service: Service):
     class Handler(BaseHTTPRequestHandler):
         server_version = f"SpanVerify/{__version__}"
         protocol_version = "HTTP/1.1"
+        # Код последнего отправленного ответа — нужен, чтобы записать запрос в
+        # метрики по тому же коду, который увидел клиент (в /metrics и 404).
+        _status_of_last_response = 200
 
         # -------------------------------------------------------- утилиты
 
@@ -176,6 +225,7 @@ def make_handler(service: Service):
             print(f"[spanverify] {self.address_string()} {fmt % args}", flush=True)
 
         def _send(self, status: int, body: bytes, content_type: str) -> None:
+            self._status_of_last_response = status
             self.send_response(status)
             self.send_header("Content-Type", content_type)
             self.send_header("Content-Length", str(len(body)))
@@ -212,6 +262,37 @@ def make_handler(service: Service):
 
         # -------------------------------------------------------- маршруты
 
+        # --------------------------------------------------- доступ и метрики
+
+        def _presented_key(self) -> str | None:
+            """Ключ из X-API-Key или из Authorization: Bearer … (что удобнее клиенту)."""
+            return self.headers.get("X-API-Key") or self.headers.get("Authorization")
+
+        def _guard(self, permission: str, path: str) -> Principal | None:
+            """Проверить право; None — доступ включён не был (роль не требуется).
+
+            При отказе ответ и событие журнала уже отправлены, вызывающий код
+            обязан остановиться. Открытым остаётся только ``/health`` и
+            веб-интерфейс: пробы живости Kubernetes не умеют заголовки.
+            """
+            if not service.auth.enabled:
+                return None
+            if permission == "metrics" and os.environ.get("SPANVERIFY_METRICS_PUBLIC") == "1":
+                return None
+            try:
+                result = service.auth.require(self._presented_key(), permission)
+            except AuthError as error:
+                service.audit.denial(
+                    reason=error.message, status=error.status, route=path, presented_key=self._presented_key()
+                )
+                service.metrics.observe(path, error.status, 0.0, "", service.verifier.mode)
+                self._json(error.status, error.to_dict())
+                return None
+            return result.principal
+
+        def _finish(self, path: str, status: int, started: float) -> None:
+            service.metrics.observe(path, status, (time.perf_counter() - started), "", service.verifier.mode)
+
         def do_OPTIONS(self) -> None:  # noqa: N802
             self._send(204, b"", "text/plain; charset=utf-8")
 
@@ -219,36 +300,55 @@ def make_handler(service: Service):
             self.do_GET()
 
         def do_GET(self) -> None:  # noqa: N802
+            started = time.perf_counter()
             path = urlparse(self.path).path.rstrip("/") or "/"
             if path in ("/", "/index.html"):
                 self._send(200, INDEX_HTML.encode("utf-8"), "text/html; charset=utf-8")
             elif path == "/health":
                 self._json(200, service.health())
+            elif path == "/metrics":
+                if self._guard("metrics", path) is None and service.auth.enabled:
+                    return
+                body = service.metrics_text().encode("utf-8")
+                self._send(200, body, "text/plain; version=0.0.4; charset=utf-8")
             elif path == "/v1/config":
+                if self._guard("config", path) is None and service.auth.enabled:
+                    return
                 self._json(200, service.config())
             elif path == "/v1/model":
+                if self._guard("model", path) is None and service.auth.enabled:
+                    return
                 self._json(200, service.model())
             elif path == "/favicon.ico":
                 self._send(204, b"", "image/x-icon")
             else:
                 self._error(404, f"маршрут {path} не найден")
+            self._finish(path, self._status_of_last_response, started)
 
         def do_POST(self) -> None:  # noqa: N802
+            started = time.perf_counter()
             path = urlparse(self.path).path.rstrip("/")
             if path not in ("/v1/verify", "/verify"):
                 self._error(404, f"маршрут {path} не найден")
+                self._finish(path, 404, started)
+                return
+            principal = self._guard("verify", path)
+            if service.auth.enabled and principal is None:
                 return
             try:
                 payload = self._read_json()
             except ValueError as error:
                 self._error(400, str(error))
+                self._finish(path, 400, started)
                 return
             try:
-                self._json(200, service.verify(payload))
+                self._json(200, service.verify(payload, principal=principal))
             except ValueError as error:
                 self._error(400, str(error))
+                self._finish(path, 400, started)
             except Exception as error:  # noqa: BLE001 - сервер не должен падать
                 self._error(500, f"внутренняя ошибка: {type(error).__name__}: {error}")
+                self._finish(path, 500, started)
 
     return Handler
 
@@ -261,9 +361,17 @@ def serve(
     model_name: str | None = None,
     quiet: bool = False,
     warmup: bool = True,
+    api_keys: str | Path | None = None,
+    audit_log: str | Path | None = None,
 ) -> None:
-    """Запустить сервис (блокирующий вызов)."""
-    service = Service(mode=mode, weights_path=weights_path, model_name=model_name)
+    """Запустить сервис (блокирующий вызов).
+
+    ``api_keys`` — путь к ``keys.json`` (или ``None``: тогда только переменная
+    ``SPANVERIFY_API_KEYS``), ``audit_log`` — путь JSONL-журнала. Оба параметра
+    аддитивны: без них поведение ровно прежнее — доступ открыт, журнал не пишется.
+    """
+    auth = load_keystore(api_keys)
+    service = Service(mode=mode, weights_path=weights_path, model_name=model_name, auth=auth, audit=audit_log)
     if warmup:
         try:
             service.verifier.verify("Прогрев конвейера.", "Прогрев конвейера.")
@@ -278,6 +386,14 @@ def serve(
         f"(режим: {service.verifier.mode}, порог: {service.verifier.bundle.threshold:.4f})",
         flush=True,
     )
+    if auth.enabled:
+        print(f"[spanverify] доступ по ключам включён: {auth.source}, ключей {len(auth)}", flush=True)
+    else:
+        print("[spanverify] доступ по ключам выключен (keys.json/SPANVERIFY_API_KEYS не заданы)", flush=True)
+    if service.audit.enabled:
+        print(f"[spanverify] журнал аудита: {service.audit.path}", flush=True)
+    for notice in auth.warnings:
+        print(f"[spanverify] keys: {notice}", flush=True)
     if service.verifier.warning:
         print(f"[spanverify] {service.verifier.warning}", flush=True)
     try:

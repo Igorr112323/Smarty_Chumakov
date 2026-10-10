@@ -52,12 +52,15 @@ from .features import (
     DEFAULT_WEIGHTS,
     DEMO_WARNING,
     FEATURE_NAMES,
+    HEAD_FEATURE_BASE,
     FeatureMatrix,
     combine,
     extract_features,
     feature_cache_key,
+    head_feature_vector,
     is_scored_token,
     number_attribution,
+    validate_feature_cache,
 )
 from .participation import PARTICIPATION_FILENAME, ParticipationModel
 
@@ -217,7 +220,7 @@ class Verifier:
         model_name: str | None = None,
         weights_path: str | Path | None = WEIGHTS_FILENAME,
         *,
-        coverage: bool = False,
+        coverage: bool = True,
         features_cache: Mapping[str, FeatureMatrix] | None = None,
         verdict_rule: str = DEFAULT_VERDICT_RULE,
     ) -> None:
@@ -230,23 +233,44 @@ class Verifier:
         self.bundle = weights if weights is not None else WeightsBundle.load(weights_path)
         self.weights_loaded = weights is not None or self.bundle.loaded
         self.mode = (mode or self.bundle.mode or self.config.backend or "demo").lower()
-        self.model_name = model_name or getattr(self.config, "hf_model", "ai-forever/rugpt3small_based_on_gpt2")
+        # Порядок выбора модели: явный аргумент → модель, записанная при
+        # обучении в бандл → конфиг. Модель входит в ключ кеша признаков,
+        # поэтому бандл, обученный на rugpt3small, и при оценке должен требовать
+        # rugpt3small: с моделью из config по умолчанию ключи кеша расходились
+        # молча, и признаки считались заново другой моделью.
+        self.model_name = (
+            model_name
+            or (self.bundle.meta or {}).get("model")
+            or getattr(self.config, "hf_model", "ai-forever/rugpt3small_based_on_gpt2")
+        )
         self._detector = detector
         # Проверка покрытия фактов документа ответом (типы missing и partial).
         #
-        # ВЫКЛЮЧЕНО по результатам измерения, а не «на всякий случай». Факт
-        # (commit этого изменения, корпус A, отложенная часть, 180 пар, режим
-        # demo): доля ложных замечаний на чистых парах 0,136 → 0,210, тип
-        # missing по-прежнему не ловится (recall 0,000), тип partial вырос
-        # лишь с 0,267 до 0,333. Механизм приносит больше вреда, чем пользы,
-        # поэтому в продукт не включён до доработки; код и тесты сохранены,
-        # чтобы доработка шла с готового задела. Пункт B2/B3 реестра
-        # TODO_AUDIT.md остаётся ОТКРЫТЫМ.
+        # ВКЛЮЧЕНА по умолчанию. Ранее она была выключена по измеренной причине:
+        # ложные замечания на чистых парах 0,136 при нулевой пользе (missing
+        # recall 0,000). Доработка признака — не подбор порога, а другой
+        # механизм: (а) на предложение теперь строится столько фактов, сколько в
+        # нём значений, (б) пропуск ищется по сказуемому «значение обещано, но не
+        # названо» на уровне клаузы, (в) подмена и пропуск требуют, что ответ
+        # пересказал предложение документа и не добавил своего. Измерение после
+        # доработки (режим demo, официальные отложенные части):
+        #   корпус A1 (180 пар): recall_missing 0,600 precision 1,000 FPR чистых 0,000
+        #   демо-корпус (240 пар): FPR чистых 0,000
+        #   корпус A3 (тест, 177 пар): recall_partial 0,500 precision 1,000 FPR 0,1125
+        # Числа и команда — reports/COVERAGE_REPORT.md; на A3 доля ложных
+        # замечаний выше целевых 5 % (ответы — длинные выдержки из многофактных
+        # предложений), это ограничение задокументировано, а не скрыто умолчанием.
         self.coverage = coverage
         # Кеш признаков: счёт на реальной модели занимает минуты на пару, а в
         # кросс-валидации каждая пара нужна в каждом фолде. Без кеша эксперимент
         # на корпусе A3 не укладывался в лимит job'а (прогон 37446204812).
         self.features_cache = features_cache
+        # Кеш признаков проверяется при старте, а не при первом промахе: если
+        # он посчитан другой моделью (или старой версией предпосчёта), молча
+        # считать признаки заново — часы работы и испорченные метрики вместо
+        # сообщения. Текст ошибки содержит «model mismatch» и команду пересборки.
+        if features_cache is not None and self.mode == "hf":
+            validate_feature_cache(features_cache, "hf", self.model_name)
         # Нормировка энтропии по квантили вместо максимума. В режиме hf
         # распределение энтропии внимания имеет тяжёлый хвост: деление на
         # максимум сжимало риск почти всех токенов к нулю, и маска переставала
@@ -435,6 +459,21 @@ class Verifier:
         truth_expanded: list[list[tuple[int, int]]] = []
         verdict_labels: list[int] = []
         verdict_flags: list[bool] = []
+        # Счётчики детектора покрытия фактов (задача B2/B3). Берутся из
+        # ``stats["fact_coverage"]`` того же вызова verify(): метрика обязана
+        # описывать ровно тот механизм, который включён в продукте, а не его
+        # отдельную копию, посчитанную «для отчёта».
+        coverage_counts = {
+            "pairs_with_context": 0,
+            "missing_pairs": 0,
+            "missing_hits": 0,
+            "predicted_missing": 0,
+            "partial_pairs": 0,
+            "partial_hits": 0,
+            "predicted_partial": 0,
+            "clean_pairs": 0,
+            "clean_false_flags": 0,
+        }
 
         for pair in pairs:
             data = pair.to_dict() if isinstance(pair, Pair) else pair
@@ -458,13 +497,15 @@ class Verifier:
             # привязки числа к объекту, которое иначе не видно в метриках по токенам.
             verdict_labels.append(1 if pair_truth else 0)
             verdict_flags.append(result.verdict not in {"grounded", "empty"})
+            self._count_coverage(coverage_counts, data, result, bool(pair_truth))
             predicted.append(pair_predicted)
             truth.append(pair_truth)
             truth_expanded.append(pair_truth_expanded)
 
         token_metrics = _token_metrics(labels, flags, risks)
-        span_metrics = _span_f1(predicted, truth, iou_threshold=0.5)
-        # Конвейер намеренно расширяет найденные токены до границ предложения,
+        span_metrics = _span_f1(
+            predicted, truth, iou_threshold=0.5
+        )  # Конвейер намеренно расширяет найденные токены до границ предложения,
         # поэтому строгий IoU с узкой разметкой («5» против целого предложения)
         # мало информативен. Поэтому дополнительно считаем: (а) полноту по
         # покрытию — размеченный фрагмент целиком попал в найденный; (б) F1 при
@@ -481,10 +522,44 @@ class Verifier:
             "spans": span_metrics,
             "answers": answer_metrics,
             "verdicts": verdict_metrics,
+            "coverage": _coverage_metrics(coverage_counts, enabled=self.coverage),
             "pairs": len(truth),
             "mode": self.mode,
             "warning": self.warning if self.mode != "hf" else "",
         }
+
+    @staticmethod
+    def _count_coverage(
+        counts: dict[str, int],
+        data: dict,
+        result: VerificationResult,
+        has_truth: bool,
+    ) -> None:
+        """Один шаг свёртки метрик покрытия по паре.
+
+        Истина берётся из типа пары (``meta.mode``), который корпус пишет сам:
+        ``missing`` — значение вырезано, ``partial`` — вырезано условие.
+        Предсказание — статус того же механизма, что работает в продукте.
+        """
+        statuses = {str(row.get("status")) for row in result.stats.get("fact_coverage", []) or []}
+        mode_name = str((data.get("meta") or {}).get("mode") or "unknown")
+        predicted_missing = STATUS_OMITTED in statuses or STATUS_DISTORTED in statuses
+        predicted_partial = STATUS_PARTIAL in statuses
+        if data.get("context"):
+            counts["pairs_with_context"] += 1
+        if mode_name == "missing":
+            counts["missing_pairs"] += 1
+            counts["missing_hits"] += int(predicted_missing)
+        if mode_name == "partial":
+            counts["partial_pairs"] += 1
+            counts["partial_hits"] += int(predicted_partial or predicted_missing)
+        if predicted_missing:
+            counts["predicted_missing"] += 1
+        if predicted_partial:
+            counts["predicted_partial"] += 1
+        if not has_truth:
+            counts["clean_pairs"] += 1
+            counts["clean_false_flags"] += int(predicted_missing or predicted_partial)
 
     # ---------------------------------------------------------------- шаги
 
@@ -704,6 +779,39 @@ class Verifier:
                 )
             )
         return _merge_spans(spans)
+
+
+def _coverage_metrics(counts: dict[str, int], enabled: bool = True) -> dict[str, Any]:
+    """Метрики детектора покрытия фактов (типы ``missing`` и ``partial``).
+
+    Определяются так, чтобы их нельзя было подогнать порогом:
+
+    * ``recall_missing``  — доля пар типа ``missing``, где механизм увидел
+      пропущенное или подменённое значение;
+    * ``precision_missing`` — доля предсказаний «пропуск», которые действительно
+      были пропусками;
+    * ``recall_partial`` / ``precision_partial`` — то же для ``partial``;
+    * ``fpr_clean`` — доля чистых пар (в разметке нет ни одного фрагмента), на
+      которых механизм выдал хоть какое-то замечание.
+
+    Числа считаются по тому же ``verify()``, что отдаёт API, поэтому включение и
+    отключение детектора меняет их, а не наоборот.
+    """
+    ratio = lambda hits, total: round(hits / total, 4) if total else None  # noqa: E731
+    return {
+        "enabled": enabled,
+        "pairs_with_context": counts["pairs_with_context"],
+        "missing_pairs": counts["missing_pairs"],
+        "partial_pairs": counts["partial_pairs"],
+        "clean_pairs": counts["clean_pairs"],
+        "predicted_missing": counts["predicted_missing"],
+        "predicted_partial": counts["predicted_partial"],
+        "recall_missing": ratio(counts["missing_hits"], counts["missing_pairs"]),
+        "precision_missing": ratio(counts["missing_hits"], counts["predicted_missing"]),
+        "recall_partial": ratio(counts["partial_hits"], counts["partial_pairs"]),
+        "precision_partial": ratio(counts["partial_hits"], counts["predicted_partial"]),
+        "fpr_clean": ratio(counts["clean_false_flags"], counts["clean_pairs"]),
+    }
 
 
 def _token_metrics(labels: Sequence[int], flags: Sequence[bool], risks: Sequence[float]) -> dict[str, float]:
@@ -950,6 +1058,12 @@ def _head_risk(
     weights = model.get("weights")
     if not weights:
         return None
+    # Состав и порядок признаков головы берём из самого артефакта: голова,
+    # обученная с диагностикой, иначе получила бы перепутанные столбцы (строка
+    # из шести значений вместо восьми при весах из восьми коэффициентов).
+    names = [str(name) for name in (model_payload.get("features") or HEAD_FEATURE_BASE)]
+    if len(names) != len(weights):
+        return None
     means = model_payload.get("scaler", {}).get("means", [])
     scales = model_payload.get("scaler", {}).get("scales", [])
     if len(means) != len(weights) or len(scales) != len(weights):
@@ -958,14 +1072,7 @@ def _head_risk(
     probabilities: list[float] = []
     total = max(1, len(tokens))
     for index in range(len(features)):
-        row = [
-            features.attention_entropy[index],
-            features.ctx_attention_mass[index],
-            features.embedding_density[index],
-            risk[index],
-            index / total,
-            min(1.0, len(tokens[index].text.strip()) / 20),
-        ]
+        row = head_feature_vector(features, risk, index, total, tokens[index], names)
         normalized = [(value - means[j]) / (scales[j] or 1.0) for j, value in enumerate(row)]
         score = model.get("bias", 0.0) + sum(w * x for w, x in zip(weights, normalized, strict=False))
         probabilities.append(1.0 / (1.0 + _math.exp(-max(-30.0, min(30.0, score)))))

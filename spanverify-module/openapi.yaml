@@ -1,0 +1,541 @@
+openapi: 3.0.3
+
+# Контракт HTTP-API SpanVerify (задача 4, промышленный контур).
+#
+# Файл — описание того, что уже реализовано в spanverify/server.py: он не вводит
+# новых полей и новых маршрутов. Проверка в CI:
+#   openapi-spec-validator openapi.yaml
+#   python scripts/check_openapi.py          # маршруты и поля сверяются с кодом
+#
+# Публичный контракт (POST /v1/verify) остаётся прежним: новые поля ответа
+# (coverage, latency_ms) аддитивны, старые не удалены и не переименованы.
+
+info:
+  title: SpanVerify API
+  version: "1.4.0"
+  description: |
+    Проверка достоверности ответа относительно контекста: признаки языковой
+    модели (или лексические суррогаты в демо-режиме) → риск по токенам →
+    фрагменты-объяснения → калибровка → вердикт всего ответа.
+
+    Доступ (задача 4): если сервис запущен с `--api-keys` или переменной
+    `SPANVERIFY_API_KEYS`, все маршруты, кроме `GET /health` и веб-интерфейса,
+    требуют заголовок `X-API-Key`. Роли: `admin` (verify, config, model, metrics,
+    shutdown), `operator` (verify, config, model), `viewer` (config, model,
+    metrics). Ключ также принимается как `Authorization: Bearer <ключ>`.
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+  contact:
+    name: SpanVerify (проект Фонда поддержки интеллектуальных инициатив «Умник»)
+    url: https://github.com/Igorr112323/Smarty_Chumakov
+
+externalDocs:
+  description: Руководство по развёртыванию в промышленном контуре
+  url: https://github.com/Igorr112323/Smarty_Chumakov/blob/main/spanverify-module/docs/ДЕПЛОЙ_ENTERPRISE.md
+
+servers:
+  - url: http://127.0.0.1:8765
+    description: Локальный запуск (python -m spanverify server)
+  - url: http://localhost:8000
+    description: Контейнер (docker-compose, порт 8000)
+  - url: https://spanverify.internal.example
+    description: Контур заказчика (ingress из k8s/)
+
+tags:
+  - name: verify
+    description: Проверка ответа
+  - name: ops
+    description: Состояние сервиса, конфигурация, метрики
+
+security:
+  - ApiKeyAuth: []
+
+paths:
+  /health:
+    get:
+      tags: [ops]
+      summary: Работоспособность, режим, порог, версия
+      description: |
+        Единственный маршрут, доступный без ключа доступа: пробы живости
+        Kubernetes (Kubelet) не отправляют заголовков. Ответ содержит сведения о
+        доступе (`auth`) и журнале аудита (`audit`) — без секретов.
+      operationId: getHealth
+      security: []
+      responses:
+        "200":
+          description: Сервис жив
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Health"
+
+  /metrics:
+    get:
+      tags: [ops]
+      summary: Метрики Prometheus (текстовая экспозиция 1.0.0)
+      description: |
+        Имена метрик: `spanverify_requests_total`,
+        `spanverify_latency_seconds_bucket` (плюс `_sum`/`_count`),
+        `spanverify_verdict_total`, `spanverify_model_mode`,
+        `spanverify_uptime_seconds`. Доступна роли `viewer` и выше;
+        `SPANVERIFY_METRICS_PUBLIC=1` открывает метрики без ключа (только для
+        кластерной сети).
+      operationId: getMetrics
+      responses:
+        "200":
+          description: Текст метрик
+          content:
+            text/plain:
+              schema:
+                type: string
+              example: |
+                # TYPE spanverify_requests_total counter
+                spanverify_requests_total{route="/v1/verify",status="200",mode="demo"} 12
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+  /v1/config:
+    get:
+      tags: [ops]
+      summary: Действующие параметры (содержимое weights.json плюс runtime)
+      operationId: getConfig
+      responses:
+        "200":
+          description: Конфигурация
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Config"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+
+  /v1/model:
+    get:
+      tags: [ops]
+      summary: Сведения о модели, режиме, голове и мерах
+      operationId: getModel
+      responses:
+        "200":
+          description: Сведения о модели
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Model"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+  /v1/verify:
+    post:
+      tags: [verify]
+      summary: Проверить ответ относительно контекста
+      description: |
+        Требует роль `admin` или `operator`. Каждое обращение попадает в журнал
+        аудита: вердикт, оценка, длительность и `sha256` ответа — текст ответа в
+        журнал не пишется.
+
+        Предупреждение режима (`warning`) и сводка покрытия фактов в ответе этого
+        маршрута нет: `warning` отдаёт `GET /health` (он говорит о состоянии
+        сервиса, а не об одном ответе), а покрытие фактов складывается в
+        `spans` — отдельным полем оно доступно в `evaluate()` и CLI
+        (`python -m spanverify evaluate --dataset …`), см. reports/COVERAGE_REPORT.md.
+      operationId: verifyAnswer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/VerifyRequest"
+      responses:
+        "200":
+          description: Вердикт и разбор
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/VerifyResult"
+        "400":
+          description: Некорректное тело запроса (не JSON, нет поля answer, слишком большое)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "413":
+          description: Тело запроса больше лимита (4 МиБ)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "500":
+          description: Внутренняя ошибка движка (сервис не падает, код возвращает)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  /verify:
+    post:
+      tags: [verify]
+      summary: Проверить ответ (исторический псевдоним /v1/verify)
+      description: Маршрут сохранён для совместимости; тело и ответ идентичны.
+      operationId: verifyAnswerAlias
+      deprecated: true
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/VerifyRequest"
+      responses:
+        "200":
+          description: Вердикт и разбор
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/VerifyResult"
+        "400":
+          description: Некорректное тело запроса
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+components:
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: X-API-Key
+      description: |
+        Ключ из файла `keys.json` (роли admin/operator/viewer) или из
+        `SPANVERIFY_API_KEYS`. Сервис хранит и сравнивает только `sha256` ключа.
+
+  responses:
+    Unauthorized:
+      description: Ключ не передан, не проходит формат или не найден
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+          example:
+            error: "нет заголовка X-API-Key (или Authorization: Bearer …)"
+            status: 401
+    Forbidden:
+      description: Ключ верный, но роль не даёт это право
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+          example:
+            error: "роли 'viewer' не разрешено действие 'verify'"
+            status: 403
+
+  schemas:
+    Error:
+      type: object
+      required: [error, status]
+      properties:
+        error:
+          type: string
+          description: Причина человеческим языком (без секретов и без текста ответа)
+        status:
+          type: integer
+          description: HTTP-код, тот же, что в статусной строке
+
+    VerifyRequest:
+      type: object
+      required: [answer]
+      properties:
+        answer:
+          type: string
+          description: Текст ответа, который проверяется
+          example: "Срок хранения первичных документов составляет 10 лет."
+        text:
+          type: string
+          description: Исторический псевдоним поля answer (сохранён для совместимости)
+        context:
+          type: string
+          description: Документ-источник (или список фрагментов в `context[]`)
+          example: "Регламент 343: срок хранения первичных документов составляет 10 лет."
+        prompt:
+          type: string
+          description: Исторический псевдоним поля context
+        with_tokens:
+          type: boolean
+          default: false
+          description: Добавить в ответ разбор по токенам (массив `tokens`)
+      additionalProperties: false
+
+    Span:
+      type: object
+      required: [start, end, text]
+      properties:
+        start:
+          type: integer
+          description: Начало фрагмента в символах от начала ответа
+        end:
+          type: integer
+          description: Конец фрагмента (не включительно)
+        text:
+          type: string
+          description: Текст фрагмента-объяснения
+        reason:
+          type: string
+          description: Почему фрагмент помечен (подмена значения, отсутствие опоры и т. п.)
+
+    TokenFeature:
+      type: object
+      required: [token, score]
+      properties:
+        token:
+          type: string
+        start:
+          type: integer
+        end:
+          type: integer
+        score:
+          type: number
+          format: float
+          minimum: 0
+          maximum: 1
+          description: Оценка недостоверности токена
+        flagged:
+          type: boolean
+          description: Превысил ли токен порог маски
+
+    CoverageFact:
+      type: object
+      description: Факт документа и чем его закрыл ответ (покрытие включено по умолчанию)
+      required: [value, status]
+      properties:
+        value:
+          type: string
+          description: Значение факта в документе («10 лет», «31 декабря 2024 года»)
+        kind:
+          type: string
+          description: Вид значения (digit_term, date, money, …)
+        status:
+          type: string
+          enum: [mentioned, omitted, partial, distorted, irrelevant]
+          description: >
+            mentioned — названо; omitted — факт не приведён вовсе;
+            partial — приведён без условия; distorted — приведено другое значение;
+            irrelevant — факт не относится к ответу
+        span:
+          type: array
+          items:
+            type: integer
+          description: Границы в ответе (или [-1, -1], если указать некуда)
+
+    VerifyResult:
+      type: object
+      required: [verdict, score, threshold, spans, mode, is_hallucination]
+      properties:
+        verdict:
+          type: string
+          enum: [grounded, doubtful, likely_hallucination]
+        is_hallucination:
+          type: boolean
+        score:
+          type: number
+          format: float
+          minimum: 0
+          maximum: 1
+          description: Оценка недостоверности ответа по документу-контексту
+        threshold:
+          type: number
+          format: float
+          description: Порог решения, калиброванный под целевой FPR
+        ai_share:
+          type: number
+          format: float
+          description: Доля спорного текста (мягкая оценка)
+        ai_share_hard:
+          type: number
+          format: float
+          description: Доля содержательных токенов выше порога маски
+        ai_share_soft:
+          type: number
+          format: float
+        ai_participation:
+          type: number
+          format: float
+          nullable: true
+          description: Оценка доли участия ИИ; null, если голова участия не обучена
+        spans:
+          type: array
+          items:
+            $ref: "#/components/schemas/Span"
+        tokens:
+          type: array
+          description: "Разбор по токенам — только при `with_tokens: true`"
+          items:
+            $ref: "#/components/schemas/TokenFeature"
+        stats:
+          type: object
+          description: Служебные счётчики прогона (число токенов, длина контекста)
+          additionalProperties: true
+        mode:
+          type: string
+          enum: [demo, surrogate, hf]
+        latency_ms:
+          type: number
+          format: float
+          description: Длительность обработки на сервере, миллисекунды
+    Health:
+      type: object
+      required: [status, version, mode, threshold]
+      properties:
+        status:
+          type: string
+          enum: [ok]
+        version:
+          type: string
+        mode:
+          type: string
+        backend:
+          type: string
+        calibrated:
+          type: boolean
+        threshold:
+          type: number
+          format: float
+        weights:
+          type: object
+          additionalProperties:
+            type: number
+            format: float
+        span_threshold:
+          type: object
+          properties:
+            z:
+              type: number
+            floor:
+              type: number
+            cap:
+              type: number
+        head:
+          type: string
+        synthetic:
+          type: boolean
+        uptime_s:
+          type: number
+          format: float
+        weights_source:
+          type: string
+        auth:
+          type: object
+          properties:
+            enabled:
+              type: boolean
+            source:
+              type: string
+            keys:
+              type: integer
+        audit:
+          type: object
+          properties:
+            enabled:
+              type: boolean
+            path:
+              type: string
+              nullable: true
+        warning:
+          type: string
+
+    Config:
+      type: object
+      description: То же, что в weights.json, плюс блок runtime
+      properties:
+        weights:
+          type: object
+          additionalProperties:
+            type: number
+            format: float
+        threshold:
+          type: number
+          format: float
+        span_z:
+          type: number
+        span_floor:
+          type: number
+        span_cap:
+          type: number
+        seed:
+          type: integer
+        version:
+          type: string
+        runtime:
+          type: object
+          properties:
+            weights_path:
+              type: string
+              nullable: true
+            weights_found:
+              type: boolean
+            weights_source:
+              type: string
+            dataset:
+              type: string
+              nullable: true
+            mode:
+              type: string
+            version:
+              type: string
+
+    Model:
+      type: object
+      properties:
+        mode:
+          type: string
+        model_name:
+          type: string
+        features:
+          type: array
+          items:
+            type: string
+        head:
+          type: object
+          additionalProperties: true
+        head_auc_out_of_fold:
+          type: number
+          format: float
+          nullable: true
+        folds:
+          type: array
+          items:
+            type: object
+            additionalProperties: true
+        seed:
+          type: integer
+        version:
+          type: string
+        synthetic:
+          type: boolean
+        measures:
+          type: object
+          additionalProperties:
+            type: string
+        participation:
+          type: object
+          properties:
+            loaded:
+              type: boolean
+            auc_out_of_fold:
+              type: number
+              format: float
+              nullable: true
+            calibrated_on:
+              type: string
+              nullable: true
+            features:
+              type: array
+              items:
+                type: string
+        warning:
+          type: string

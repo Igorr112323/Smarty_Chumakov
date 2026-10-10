@@ -38,7 +38,7 @@ from .engine import (
     _smooth,
     span_threshold_for,
 )
-from .features import DEFAULT_WEIGHTS, combine, is_scored_token
+from .features import DEFAULT_WEIGHTS, HEAD_FEATURE_CANDIDATES, combine, head_feature_series, is_scored_token
 from .logreg import (
     probabilities as _head_probabilities,
 )
@@ -68,6 +68,60 @@ Z_GRID = (0.0, 0.5, 1.0, 1.5, 2.0, 2.5, 3.0)
 FLOOR_GRID = (0.05, 0.10, 0.15, 0.20, 0.25, 0.3, 0.35, 0.4, 0.45, 0.5)
 CAP_GRID = (0.5, 0.55, 0.6, 0.7, 0.8)
 HEAD_FEATURES = ("attention_entropy", "ctx_attention_mass", "embedding_density", "risk", "position", "length")
+
+
+def _sample_features(matrix, index: int, risk: Sequence[float]) -> dict[str, float]:
+    """Признаки токена для головы: рабочие + вся доступная диагностика.
+
+    Диагностика добавляется в словарь, но в голову попадает только то, что
+    отобрано по AUC на валидации (см. ``head_features`` у :func:`train`): поле
+    ``features`` артефакта головы задаёт и состав, и порядок столбцов. Так
+    признак либо доказывает свою полезность измерением, либо не участвует.
+    """
+    values: dict[str, float] = {
+        "attention_entropy": matrix.attention_entropy[index] if index < len(matrix.attention_entropy) else 0.0,
+        "ctx_attention_mass": matrix.ctx_attention_mass[index] if index < len(matrix.ctx_attention_mass) else 0.0,
+        "embedding_density": matrix.embedding_density[index] if index < len(matrix.embedding_density) else 0.0,
+        "risk": risk[index] if index < len(risk) else 0.0,
+    }
+    for name in HEAD_FEATURE_CANDIDATES:
+        series = head_feature_series(matrix, name)
+        values[name] = float(series[index]) if index < len(series) else 0.0
+    return values
+
+
+def _head_row(sample: TokenSample, rule_risk: float, names: Sequence[str]) -> list[float]:
+    """Строка головы по именам признаков — та же арифметика, что в движке.
+
+    Порядок столбцов задаёт список ``names`` (он же лежит в артефакте головы),
+    поэтому голова, обученная с диагностикой, применяется к тем же признакам, а
+    не к первым шести попавшимся.
+    """
+    row: list[float] = []
+    for name in names:
+        if name == "risk":
+            row.append(float(rule_risk))
+        elif name == "position":
+            row.append(sample.index / max(1, sample.total))
+        elif name == "length":
+            row.append(min(1.0, len(sample.text) / 20))
+        else:
+            row.append(float(sample.features.get(name, 0.0)))
+    return row
+
+
+def head_feature_names(extra: Sequence[str] = ()) -> list[str]:
+    """Состав признаков головы: база плюс отобранные кандидаты (без повторов)."""
+    names = list(HEAD_FEATURES)
+    for name in extra or ():
+        if name in names:
+            continue
+        if name not in HEAD_FEATURE_CANDIDATES:
+            raise ValueError(
+                f"признак {name!r} нельзя добавить в голову: допустимы только {list(HEAD_FEATURE_CANDIDATES)}"
+            )
+        names.append(name)
+    return names
 
 
 @dataclass
@@ -127,12 +181,7 @@ def collect_samples(
                     index=index,
                     total=len(tokens),
                     text=token.text.strip(),
-                    features={
-                        "attention_entropy": features.attention_entropy[index],
-                        "ctx_attention_mass": features.ctx_attention_mass[index],
-                        "embedding_density": features.embedding_density[index],
-                        "risk": risk[index],
-                    },
+                    features=_sample_features(features, index, risk),
                     label=labels[index],
                 )
             )
@@ -381,20 +430,17 @@ def _span_f1_from_indices(
 # ---------------------------------------------------------------- голова
 
 
-def _head_rows(samples: Sequence[TokenSample], risks: Sequence[float], with_label: bool = True):
+def _head_rows(
+    samples: Sequence[TokenSample],
+    risks: Sequence[float],
+    with_label: bool = True,
+    feature_names: Sequence[str] = HEAD_FEATURES,
+):
+    """Строки и метки для головы; состав столбцов задаёт ``feature_names``."""
     rows: list[list[float]] = []
     labels: list[int] = []
     for sample, risk in zip(samples, risks, strict=False):
-        rows.append(
-            [
-                sample.features["attention_entropy"],
-                sample.features["ctx_attention_mass"],
-                sample.features["embedding_density"],
-                risk,
-                sample.index / max(1, sample.total),
-                min(1.0, len(sample.text) / 20),
-            ]
-        )
+        rows.append(_head_row(sample, risk, feature_names))
         labels.append(sample.label)
     return (rows, labels) if with_label else rows
 
@@ -557,23 +603,19 @@ def _head_scores(samples: Sequence[TokenSample], payload: dict[str, Any], rule_r
     weights = model.get("weights")
     if not weights:
         return list(rule_risks)
+    # Состав столбцов читаем из артефакта: голова с диагностикой иначе получила
+    # бы первые шесть признаков вместо восьми.
+    names = [str(name) for name in (payload.get("features") or HEAD_FEATURES)]
     means = payload.get("scaler", {}).get("means", [])
     scales = payload.get("scaler", {}).get("scales", [])
-    if len(weights) != len(HEAD_FEATURES) or len(means) != len(weights) or len(scales) != len(weights):
+    if len(weights) != len(names) or len(means) != len(weights) or len(scales) != len(weights):
         # Артефакт не той размерности (например, обучен на другом наборе
         # признаков): честно откатываемся к правилу, а не падаем с IndexError.
         return list(rule_risks)
 
     out: list[float] = []
     for sample, rule_risk in zip(samples, rule_risks, strict=False):
-        row = [
-            sample.features["attention_entropy"],
-            sample.features["ctx_attention_mass"],
-            sample.features["embedding_density"],
-            rule_risk,
-            sample.index / max(1, sample.total),
-            min(1.0, len(sample.text) / 20),
-        ]
+        row = _head_row(sample, rule_risk, names)
         normalized = [(value - means[j]) / (scales[j] or 1.0) for j, value in enumerate(row)]
         score = model.get("bias", 0.0) + sum(w * x for w, x in zip(weights, normalized, strict=False))
         out.append(1.0 / (1.0 + math.exp(-max(-30.0, min(30.0, score)))))
@@ -591,8 +633,15 @@ def train(
     verifier: Verifier | None = None,
     version: str = __version__,
     group_split: bool = True,
+    head_features: Sequence[str] = (),
 ) -> TrainReport:
-    """Обучить веса, пороги, голову и калибровку; вернуть отчёт."""
+    """Обучить веса, пороги, голову и калибровку; вернуть отчёт.
+
+    ``head_features`` — дополнительные признаки головы (диагностика итераций
+    2–3, см. :func:`head_feature_names`). Пусто по умолчанию: прежнее поведение
+    сохраняется, новые признаки включаются только после отбора по AUC на
+    валидации — подбором порога качество не достигается сознательно.
+    """
     verifier = verifier or Verifier(
         mode=mode, weights=WeightsBundle(weights=dict(DEFAULT_WEIGHTS), threshold=0.5, mode=mode)
     )
@@ -637,6 +686,7 @@ def train(
         folds,
         seed,
         entropy_quantile=entropy_quantile,
+        head_features=tuple(head_features or ()),
     )
     head_model = head_report.get("payload") or {}
 
@@ -703,6 +753,7 @@ def train(
         saved_head = {
             "type": "logreg",
             "file": "config/head.json",
+            "features": head_report.get("features") or list(HEAD_FEATURES),
             "model": head_report["model"],
             "scaler": head_report.get("scaler") or {},
         }
@@ -725,6 +776,11 @@ def train(
             "dataset": dataset_name or "inline",
             "synthetic": mode == "demo",
             "signal": candidate["signal"],
+            # Состав признаков головы — часть воспроизводимости: без него нельзя
+            # проверить, что оценка применила ровно ту голову, что обучили.
+            "head_features": list(head_report.get("features") or HEAD_FEATURES),
+            "head_extra_features": list(head_report.get("extra_features") or []),
+            "head_auc_out_of_fold": head_report.get("auc_out_of_fold", 0.0),
             # Чтобы недостигнутое ограничение по FPR было видно в отчёте, а не
             # только в логе: иначе порог 1,0 выглядит как «модель ничего не нашла».
             "threshold_report": {
@@ -827,12 +883,18 @@ def _train_and_compare_head(
     folds: int,
     seed: int,
     entropy_quantile: float = 1.0,
+    head_features: Sequence[str] = (),
 ) -> dict[str, Any]:
-    """Обучить голову с кросс-валидацией и сравнить её с пороговым правилом."""
+    """Обучить голову с кросс-валидацией и сравнить её с пороговым правилом.
+
+    ``head_features`` — дополнительные признаки-кандидаты (диагностика итераций
+    2–3). По умолчанию пусто: поведение обучения прежнее, шесть столбцов.
+    """
+    names = head_feature_names(head_features)
     train_risks = _risk_for(train_samples, weights, entropy_quantile=entropy_quantile)
     test_risks = _risk_for(test_samples, weights, entropy_quantile=entropy_quantile)
-    train_rows, train_labels = _head_rows(train_samples, train_risks)
-    test_rows, test_labels = _head_rows(test_samples, test_risks)
+    train_rows, train_labels = _head_rows(train_samples, train_risks, feature_names=names)
+    test_rows, test_labels = _head_rows(test_samples, test_risks, feature_names=names)
     train_scaled, means, scales = _standardize(train_rows)
     test_scaled = [[(row[j] - means[j]) / (scales[j] or 1.0) for j in range(len(row))] for row in test_rows]
 
@@ -871,7 +933,7 @@ def _train_and_compare_head(
 
     payload = {
         "type": "logreg",
-        "features": list(HEAD_FEATURES),
+        "features": list(names),
         "scaler": {"means": means, "scales": scales},
         "model": final_model,
         "auc_out_of_fold": head_auc,
@@ -888,7 +950,9 @@ def _train_and_compare_head(
         "folds": fold_reports,
         "scaler": payload["scaler"],
         "model": final_model,
-        "features": list(HEAD_FEATURES),
+        "features": list(names),
+        "base_features": list(HEAD_FEATURES),
+        "extra_features": [name for name in names if name not in HEAD_FEATURES],
         "payload": payload,
     }
 

@@ -9,6 +9,7 @@
 from __future__ import annotations
 
 import json
+import math
 from pathlib import Path
 
 import pytest
@@ -669,7 +670,25 @@ def test_collect_samples_matches_labels():
     samples, stats = collect_samples(make_verifier(), [pair.to_dict() for pair in pairs])
     assert stats["pairs"] == 20
     assert stats["positive"] == sum(sample.label for sample in samples)
-    assert all(0.0 <= value <= 1.0 for sample in samples for value in sample.features.values())
+    working = ("attention_entropy", "ctx_attention_mass", "embedding_density", "risk")
+    assert all(0.0 <= sample.features[name] <= 1.0 for sample in samples for name in working)
+    # Диагностика итераций 2–3 (отбор по AUC) обязана быть конечной, но не
+    # обязана лежать в [0, 1]: например, «подъём» массы — отклонение от
+    # среднего по ответу, оно бывает отрицательным. Голова стандартизует
+    # столбцы, поэтому шкала признака на качество не влияет.
+    diagnostics = tuple(name for name in samples[0].features if name not in working)
+    assert diagnostics
+    assert all(math.isfinite(sample.features[name]) for sample in samples for name in diagnostics)
+
+
+def test_collect_samples_carries_head_feature_candidates():
+    """Каждый кандидат головы доезжает до сэмпла — иначе отбор признаков слепой."""
+    from spanverify.features import HEAD_FEATURE_CANDIDATES
+
+    pairs = generate_pairs(6, seed=5)
+    samples, _ = collect_samples(make_verifier(), [pair.to_dict() for pair in pairs])
+    for name in HEAD_FEATURE_CANDIDATES:
+        assert all(name in sample.features for sample in samples), name
 
 
 def test_standardize_gives_zero_mean():
