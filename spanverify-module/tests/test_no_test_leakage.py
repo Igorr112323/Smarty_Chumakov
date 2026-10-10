@@ -183,6 +183,33 @@ def test_manifest_test_hash_matches_the_file() -> None:
     ), "gold-записей меньше, чем пар test: уровни ответов и фрагментов посчитаны не по всей выборке"
 
 
+def test_checkout_keeps_lf_for_hashed_files() -> None:
+    """Хеши сверяются на ubuntu и windows-latest, поэтому checkout обязан быть LF.
+
+    На windows-раннере git по умолчанию ставит CRLF, и проверки «конфигурация не
+    менялась после фиксации» и «sha256 test совпадает» падали бы на переводе строк:
+    красный CI означал бы подмену, хотя данные целые. `.gitattributes` это
+    исключает, а тест не даёт правилу тихо исчезнуть; заодно проверяются реальные
+    байты хешируемых файлов.
+    """
+    attributes = REPO_ROOT / ".gitattributes"
+    assert attributes.is_file(), "нет .gitattributes: побайтовая сверка хешей непереносима"
+    text = attributes.read_text(encoding="utf-8")
+    assert re.search(
+        r"^\*\s+text=auto\s+eol=lf$", text, flags=re.MULTILINE
+    ), "в .gitattributes нет `* text=auto eol=lf`: на windows-latest checkout получит CRLF"
+    hashed = (
+        FINAL_CONFIG,
+        ROOT / "docs" / "METRIC_SPEC.md",
+        CORPORA["a3"] / "test.jsonl",
+        CORPORA["a3"] / "train.jsonl",
+    )
+    for path in hashed:
+        if not path.is_file():
+            continue
+        assert b"\r" not in path.read_bytes(), f"{path.name}: в хешируемом файле есть CR — checkout не LF"
+
+
 def test_threshold_is_the_one_frozen_before_step_three() -> None:
     """Порог финала = порог из зафиксированной конфигурации и записи в EXPERIMENTS.md.
 

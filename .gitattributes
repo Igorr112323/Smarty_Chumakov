@@ -1,0 +1,32 @@
+# Перевод строк зафиксирован намеренно: хеши файлов участвуют в проверках
+# протокола измерения (sha256 замороженной конфигурации, спецификации метрик и
+# файлов разбиения в `tests/test_no_test_leakage.py`). На windows-latest git по
+# умолчанию конвертирует LF → CRLF при checkout, и проверка «конфигурация не
+# менялась после фиксации» падала бы на переводе строк — то есть красный CI
+# означал бы не подмену данных, а разницу платформ. Фиксируем LF для всех текстовых
+# файлов, чтобы checkout был побайтово одинаковым на ubuntu, windows и macOS.
+* text=auto eol=lf
+
+# Бинарное не нормализуется: эти файлы хешируются, публикуются и читаются как есть.
+*.gz binary
+*.docx binary
+*.xlsx binary
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.ico binary
+*.pdf binary
+*.zip binary
+
+# Shell-скрипты обязаны оставаться LF и на Windows (bash их иначе не запускает).
+*.sh text eol=lf
+*.bash text eol=lf
+
+# Данные и отчёты, которые сверяются по sha256.
+*.json text eol=lf
+*.jsonl text eol=lf
+*.md text eol=lf
+*.toml text eol=lf
+*.yaml text eol=lf
+*.yml text eol=lf
+*.txt text eol=lf
