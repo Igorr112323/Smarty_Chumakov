@@ -260,14 +260,19 @@ jobs:
               f"лучшая конфигурация: {data.get('best')} | прогонов: {data.get('run_count')} | "
               f"правило: {data['rule']}"
           )
+          # Одна аннотация на эксперимент:Annotations урезаются по количеству,
+          # и построчный вывод по корпусу терял последние эксперименты.
           for item in data["experiments"]:
+              parts = []
               for corpus, numbers in sorted(item["per_corpus"].items()):
                   tokens = numbers.get("tokens") or {}
-                  notice(
-                      f"{item['number']:>2} {item['name']} · {corpus}: "
-                      f"F1(val) {tokens.get('f1')} FPR(val) {tokens.get('fpr')} AUC {tokens.get('auc')} "
-                      f"порог {numbers.get('threshold')}" + (" · выбран" if corpus == primary else "")
+                  mark = " [основной]" if corpus == primary else ""
+                  parts.append(
+                      f"{corpus}{mark}: F1(val) {tokens.get('f1')} FPR(val) {tokens.get('fpr')} "
+                      f"AUC {tokens.get('auc')} порог {numbers.get('threshold')}"
                   )
+              chosen = " → ВЫБРАНА" if item.get("name") == data.get("best") else ""
+              notice(f"{item['number']:>2} {item['name']}: " + " | ".join(parts) + chosen)
           print("таблица шага 2 опубликована аннотациями")
           PY
       - uses: actions/upload-artifact@v4
@@ -411,6 +416,7 @@ jobs:
             --corpus-name a3 \
             --seeds 42,43,44,45,46 \
             --include-val \
+            --freeze reports/hf_protocol/freeze.json \
             --out reports/hf_final
       - name: "Пересчёт чисел из предсказаний"
         working-directory: spanverify-module
@@ -419,6 +425,32 @@ jobs:
             --manifest reports/hf_final/manifest.json \
             --predictions reports/hf_final/predictions_test.jsonl.gz \
             --check-splits
+      - name: "Вторичное измерение: тот же замороженный конфиг на A1"
+        # Объявлено ДО запуска (docs/EXPERIMENTS.md, отступления фиксации): это не
+        # переподбор параметров, а то же самое измерение на втором корпусе. Не
+        # влияет на статус критерия и не может его изменить, поэтому падение
+        # вторичного шага — предупреждение, а не красный прогон.
+        working-directory: spanverify-module
+        run: |
+          set +e
+          python scripts/hf_protocol.py final \
+            --config config/hf_final_config.json \
+            --grid-cache reports/hf-grid \
+            --splits data/corpus_a/splits \
+            --corpus-name a1 \
+            --seeds 42,43,44,45,46 \
+            --include-val \
+            --freeze reports/hf_protocol/freeze.json \
+            --out reports/hf_final_a1
+          code=$?
+          if [ "$code" -ne 0 ]; then
+            echo "::warning::[secondary a1] вторичное измерение не выполнено (код $code); статус критерия не затронут"
+            exit 0
+          fi
+          python scripts/hf_protocol.py verify-manifest \
+            --manifest reports/hf_final_a1/manifest.json \
+            --predictions reports/hf_final_a1/predictions_test.jsonl.gz \
+            --check-splits || echo "::warning::[secondary a1] пересчёт манифеста не сошёлся (код $?)"
       - name: "Блок критерия в README — из манифеста, не от руки"
         # До измерения в README стоит отметка «не измерено»: переписывать числа
         # от руки запрещено, поэтому блок генерируется из только что полученного
@@ -447,6 +479,10 @@ jobs:
           python scripts/publish_reports.py --branch data/metrics --dest hf-final \
             --report reports/hf_final --report ../README.md --report docs/EXPERIMENTS.md \
             --message "hf протокол: шаг 3, критерий на test, прогон ${{ github.run_number }} [skip ci]"
+          python scripts/publish_reports.py --branch data/metrics --dest hf-final-a1 \
+            --report reports/hf_final_a1 \
+            --message "hf протокол: шаг 3, вторичное измерение A1, прогон ${{ github.run_number }} [skip ci]" \
+            || echo "::warning::[publish] вторичные артефакты не опубликованы"
       - name: "Подтверждающие тесты (падение = критерий не выполнен)"
         working-directory: spanverify-module
         run: |

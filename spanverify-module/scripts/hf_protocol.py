@@ -1169,7 +1169,7 @@ def _best_predictions(
                 "start": row["start"],
                 "end": row["end"],
                 "gold": int(row["gold"]),
-                "score": round(float(row["score"]), 8),
+                "score": round(float(row["score"]), 12),
                 "pred": int(float(row["score"]) >= threshold),
             }
         )
@@ -1303,7 +1303,10 @@ def command_final(args: argparse.Namespace) -> int:
                     "start": row["start"],
                     "end": row["end"],
                     "gold": int(row["gold"]),
-                    "score": round(float(row["score"]), 8),
+                    # 12 знаков: пересчёт сравнивает `score` с порогом, и
+                    # округление до 8 перевернуло бы `pred` у строки ровно на
+                    # границе — расхождение стало бы артефактом формата.
+                    "score": round(float(row["score"]), 12),
                     "pred": int(float(row["score"]) >= threshold),
                 }
             )
