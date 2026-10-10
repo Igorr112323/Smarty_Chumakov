@@ -482,7 +482,10 @@ jobs:
     # Объявлено ДО запуска (отступления в docs/EXPERIMENTS.md): это то же
     # измерение на втором корпусе, а не переподбор параметров; статусом критерия
     # не является и изменить его не может.
-    if: ${{ (github.event_name == 'workflow_dispatch' && inputs.run_final) || (github.event_name == 'push' && contains(github.event.head_commit.message, '[hf-final]')) }}
+    # `!cancelled()`: у `final` по протоколу может быть красный шаг подтверждающих
+    # тестов (невыполненный критерий показывается падением, а не skip), и это не
+    # повод отменять вторичное измерение A1 — оно объявлено до запуска.
+    if: ${{ !cancelled() && ((github.event_name == 'workflow_dispatch' && inputs.run_final) || (github.event_name == 'push' && contains(github.event.head_commit.message, '[hf-final]'))) }}
     needs: final
     runs-on: ubuntu-latest
     timeout-minutes: 45

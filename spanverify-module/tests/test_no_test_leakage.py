@@ -149,12 +149,38 @@ def _require_manifest_or_pending() -> dict | None:
 
 
 def test_manifest_test_hash_matches_the_file() -> None:
-    """sha256 файла test == записанный в манифесте (подмена выборки видна)."""
-    if _require_manifest_or_pending() is None:
+    """sha256 файла test == записанный в манифесте и в заморозке шага 0.
+
+    Плюс сверка объёма: прогон обязан измерить все 177 пар test и 64 документа,
+    иначе «улучшение» можно получить просто выкинув трудные пары (срезка выборки
+    запрещена протоколом). ``check_splits`` возвращает ``(числа, проблемы)`` —
+    перепутать их местами значит вечно проверять не то, поэтому здесь числа
+    используются явно.
+    """
+    manifest = _require_manifest_or_pending()
+    if manifest is None:
         return
     harness = _harness()
-    problems, _numbers = harness.check_splits(MANIFEST)
+    numbers, problems = harness.check_splits(MANIFEST)
     assert not problems, "разбиение разошлось с манифестом:\n  " + "\n  ".join(problems)
+    actual = harness.sha256_file(Path(str(manifest["splits_dir"])) / "test.jsonl")
+    assert numbers["test_sha256"] == actual, "в манифесте sha256 теста не тот, что у файла"
+    freeze = ROOT / "reports" / "hf_protocol" / "freeze.json"
+    if not freeze.is_file():
+        return
+    recorded = json.loads(freeze.read_text(encoding="utf-8"))
+    part = ((recorded.get("corpora") or {}).get(str(manifest.get("corpus"))) or {}).get("parts") or {}
+    test_part = part.get("test") or {}
+    assert test_part.get("sha256") == actual, "sha256 test разошёлся с заморозкой шага 0"
+    assert int(manifest.get("pairs", {}).get("test") or 0) == int(
+        test_part.get("pairs") or 0
+    ), "число пар test в прогоне меньше зафиксированного: выборку сокращать нельзя"
+    assert int(numbers["documents"]["test"]) == int(
+        test_part.get("documents") or 0
+    ), "число документов test разошлось с заморозкой шага 0"
+    assert int(manifest.get("gold_rows") or 0) == int(
+        test_part.get("pairs") or 0
+    ), "gold-записей меньше, чем пар test: уровни ответов и фрагментов посчитаны не по всей выборке"
 
 
 def test_threshold_is_the_one_frozen_before_step_three() -> None:

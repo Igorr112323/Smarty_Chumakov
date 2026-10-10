@@ -163,7 +163,12 @@ def render(manifest: dict[str, Any] | None, corpus: str) -> str:
 
 
 def manifest_numbers(manifest: dict[str, Any]) -> set[str]:
-    """Все числа, которые манифест разрешает писать в README (в формате таблицы)."""
+    """Все числа, которые манифест разрешает писать в README (в формате таблицы).
+
+    Форматов несколько, потому что таблица печатает шесть знаков, а в манифесте
+    число может стоять и как ``144.0``, и как ``144``: сверять надо значение, а не
+    способ его записи.
+    """
     allowed: set[str] = set()
 
     def walk(node: Any) -> None:
@@ -173,14 +178,37 @@ def manifest_numbers(manifest: dict[str, Any]) -> set[str]:
         elif isinstance(node, list):
             for value in node:
                 walk(value)
+        elif isinstance(node, bool):
+            return
         elif isinstance(node, float):
             allowed.add(f"{node:.6f}")
             allowed.add(f"{node:.4f}")
-        elif isinstance(node, int) and not isinstance(node, bool):
+            if node.is_integer():
+                allowed.add(str(int(node)))
+            allowed.add(str(node))
+        elif isinstance(node, int):
             allowed.add(str(node))
 
     walk(manifest)
     return allowed
+
+
+def value_cells(block: str) -> list[str]:
+    """Только колонка «Значение» таблицы: именно в неё подсовывают числа от руки.
+
+    Проше и заголовки, и строки железа сверяются равенством блока с тем, что
+    рендеряется из манифеста (см. ``check_or_write``), а перебор чисел оставлен
+    для клеток метрик — там расхождение значит «число придумали».
+    """
+    cells: list[str] = []
+    for line in block.splitlines():
+        stripped = line.strip()
+        if not stripped.startswith("|") or stripped.startswith("| ---"):
+            continue
+        parts = [item.strip() for item in stripped.strip("|").split("|")]
+        if len(parts) >= 2 and parts[0] not in {"Метрика"}:
+            cells.append(parts[1])
+    return cells
 
 
 def extract_block(text: str) -> str | None:
@@ -214,16 +242,28 @@ def check_or_write(target: Path, manifest_path: Path, corpus: str, write: bool) 
             return 1
         print("блок критерия: измерение ещё не выполнено, в README стоит «не измерено» — расхождения нет")
         return 0
+    if current.strip() != block.strip():
+        print(
+            f"РАСХОЖДЕНИЕ: блок в {target.name} не совпадает с тем, что даёт манифест.\n"
+            "  Числа в этот блок вписывать руками нельзя — пересоберите: "
+            f"python scripts/render_hf_table.py --readme {target} --write",
+            file=sys.stderr,
+        )
+        return 1
     allowed = manifest_numbers(manifest)
     problems: list[str] = []
-    for value in re.findall(r"\d\.\d{4,6}|\b\d{2,}\b", current):
-        if value in allowed:
+    for cell in value_cells(current):
+        if PLACEHOLDER_TEXT in cell:
             continue
-        if re.fullmatch(r"\d{2,}", value) and int(value) <= 2029 and len(value) == 4:
-            continue  # годы и номера разделов — не метрики
-        problems.append(value)
+        for value in re.findall(r"-?\d+\.\d+|-?\d+", cell):
+            if value in allowed:
+                continue
+            problems.append(f"{cell}: {value}")
     if problems:
-        print(f"РАСХОЖДЕНИЕ: в блоке README числа нет в манифесте: {sorted(set(problems))}", file=sys.stderr)
+        print(
+            f"РАСХОЖДЕНИЕ: в блоке README есть числа, которых нет в манифесте: {sorted(set(problems))}",
+            file=sys.stderr,
+        )
         return 1
     required = []
     for key in ("f1", "fpr", "precision", "recall"):

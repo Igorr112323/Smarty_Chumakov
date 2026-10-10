@@ -187,10 +187,18 @@ A3 построен обрезкой реальных OCR-выписок: гра
 
 | Метрика | Значение | Уровень | Выборка | Файл-источник | Подтверждающий тест |
 | --- | --- | --- | --- | --- | --- |
-| F1 | не измерено | токены | test (a3) | `reports/hf_final/manifest.json` | `tests/test_criterion_hf.py` |
-| FPR | не измерено | токены | test (a3) | `reports/hf_final/manifest.json` | `tests/test_criterion_hf.py` |
+| F1 (mean ± std по 5 seed'ам) | 0.595041 ± 0.000000 | токены | test (a3) | `metrics_mean_std.f1` | `tests/test_reported_metrics.py` |
+| FPR | 0.006565 | токены | test (a3) | `metrics_mean_std.fpr` | `tests/test_reported_metrics.py` |
+| Precision | 0.709360 | токены | test (a3) | `metrics_mean_std.precision` | `tests/test_reported_metrics.py` |
+| Recall | 0.512456 | токены | test (a3) | `metrics_mean_std.recall` | `tests/test_reported_metrics.py` |
+| TP / FP / FN / TN | 144.000000 / 59.000000 / 137.000000 / 8928.000000 | токены | test (a3) | `metrics_mean_std` | `tests/test_reported_metrics.py` |
+| F1 | 0.648045 | ответы | test (a3) | `metrics_mean_std.answer_f1` | `tests/test_reported_metrics.py` |
+| FPR | 0.300000 | ответы | test (a3) | `metrics_mean_std.answer_fpr` | `tests/test_reported_metrics.py` |
+| F1 | 0.256881 | фрагменты (IoU ≥ 0,5) | test (a3) | `metrics_mean_std.span_f1` | `tests/test_reported_metrics.py` |
+| Статус критерия | **NOT MET** | токены | test (a3) | `criterion.status` | `tests/test_criterion_hf.py` |
 
-Измерение ещё не выполнено: прогон — workflow «Протокол hf (критерий ТЗ)», шаг 3 — и детали протокола: `spanverify-module/docs/METRIC_SPEC.md`, `spanverify-module/docs/EXPERIMENTS.md`.
+Время прогона: 1080.580000 с; железо: AMD EPYC 7763 64-Core Processor · 15.610000 ГБ RAM · torch 2.14.1+cpu, transformers 5.19.0.
+Конфигурация: `wide-linear` (sha256 `a45d49b4328fee34…`), пороги и гиперпараметры — из CV по train; отступления: 5 (см. docs/EXPERIMENTS.md).
 <!-- HF-CRITERION:END -->
 
 Команды: `scripts/fetch_external_tests.py --all --verify --adapt` (скачивание с

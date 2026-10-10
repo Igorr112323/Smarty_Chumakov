@@ -1,0 +1,553 @@
+{
+ "code_commit": "39dffafe98591af0ceab41aa987452b81a92bcf0",
+ "config": {
+  "classifier": "logreg",
+  "deviations": [
+   "шаги 1–2 выполнены одним прогоном по заранее зафиксированной сетке config/hf_experiments.json (sha256 a7eb9b7a59e3f6b271248841055f11f1da23c460ce47b6f0187cbf1439442062), а не десятью отдельными коммитами: каждый из 10 экспериментов записан в docs/EXPERIMENTS.md и в reports/hf_protocol/sweep.json, включая отклонённые и вырожденные (F1=0)",
+   "шаг 3 запускается пушем с меткой [hf-final] вместо workflow_dispatch: у токена песочницы нет права actions:write (403), а единственный запуск обязан быть воспроизводим и ограничен механизмом",
+   "в том же прогоне дополнительно измеряется корпус A1 тем же замороженным конфигом и теми же seed'ами (reports/hf_final_a1) — вторичное измерение, объявлено ДО запуска, источником отбора не является",
+   "артефакты публикуются в ветку data/metrics через Contents API: логи и артефакты CI из песочницы недоступны (result-хост вне списка разрешённых), иначе числа нельзя было бы перепроверить",
+   "порог зафиксирован числом и применён ко всем seed'ам шага 3 без переселекции (шаг 0 требует «порог — только на train, зафиксирован до шага 3»)"
+  ],
+  "features": [
+   "entropy_last",
+   "entropy_first",
+   "entropy_middle",
+   "entropy_m4",
+   "entropy_mean_layers",
+   "entropy_max_layers",
+   "entropy_head_max",
+   "entropy_head_disagreement",
+   "mass_last",
+   "mass_first",
+   "mass_middle",
+   "mass_mean_layers",
+   "mass_max_layers",
+   "mass_max_head",
+   "mass_norm_last",
+   "mass_lift_last",
+   "density_k1_last",
+   "density_k3_last",
+   "density_k5_last",
+   "density_k3_middle",
+   "sim_max_last",
+   "sim_contrast_last",
+   "sim_margin_last",
+   "sim_distance_last",
+   "sim_decay_last",
+   "lex_match",
+   "num_match",
+   "trigram_match",
+   "attrib_borrowed",
+   "attrib_supported",
+   "mass_win3",
+   "entropy_win3",
+   "position",
+   "length",
+   "sentence_position",
+   "sentence_support"
+  ],
+  "final_command": "python scripts/hf_protocol.py final --config config/hf_final_config.json --grid-cache reports/hf-grid --splits data/corpus_a3/splits --corpus-name a3 --seeds 42,43,44,45,46 --include-val --out reports/hf_final",
+  "frozen_at": "2026-10-10T12:42:57Z",
+  "frozen_by": "scripts/freeze_final_config.py",
+  "merge_gap": 2,
+  "model": {
+   "id": "ai-forever/rugpt3small_based_on_gpt2",
+   "models_seen": [
+    "ai-forever/rugpt3small_based_on_gpt2"
+   ],
+   "revision": "a9307e696cd3c5b7f953ff4cb19d76a4d81821d5",
+   "revisions_seen": [
+    "a9307e696cd3c5b7f953ff4cb19d76a4d81821d5"
+   ],
+   "rows": 2043
+  },
+  "name": "wide-linear",
+  "number": 7,
+  "params": {
+   "classifier": "logreg",
+   "epochs": 800,
+   "folds": 5,
+   "l2": 0.1
+  },
+  "primary_corpus": "a3",
+  "protocol": "hf-criterion-v1",
+  "seeds": [
+   42,
+   43,
+   44,
+   45,
+   46
+  ],
+  "selection": {
+   "auc_val": 0.92464,
+   "corpus": "a3",
+   "token_f1_val": 0.515702,
+   "token_fpr_val": 0.021088
+  },
+  "selection_rule": "выбирается конфигурация с максимальным token_f1 на val при token_fpr ≤ 0,40; ties → меньший FPR",
+  "source": {
+   "ci_run": "38048107448",
+   "grid_config_sha256": "a7eb9b7a59e3f6b271248841055f11f1da23c460ce47b6f0187cbf1439442062",
+   "sweep_code_commit": "c7c64bd8d0acbc95d5f2eec0ca044e8ca0f79988",
+   "sweep_duration_s": 3106.53,
+   "sweep_file": "reports/hf_protocol/sweep.json",
+   "sweep_sha256": "c1071f979125301a99b8933f399c3acdbe339bb4a53c54160158326e4adb2956"
+  },
+  "splits_dir": "data/corpus_a3/splits",
+  "step": "final-config",
+  "threshold": 0.1106,
+  "threshold_source": "групповая CV по документам на обучающей части, seed 42 (sweep.json, корпус a3)",
+  "val_numbers": {
+   "answers": {
+    "auc": 0.675368,
+    "f1": 0.621469,
+    "fn": 41.0,
+    "fp": 26.0,
+    "fpr": 0.305882,
+    "precision": 0.679012,
+    "recall": 0.572917,
+    "threshold": 0.1106,
+    "tn": 59.0,
+    "tp": 55.0
+   },
+   "criterion": {
+    "f1_gap": 0.084298,
+    "fpr_gap": -0.378912,
+    "status": "NOT MET",
+    "target": "F1 ≥ 0.6 при FPR ≤ 0.4 (токены, hf, отложенный test)",
+    "token_f1": 0.515702,
+    "token_fpr": 0.021088
+   },
+   "spans": {
+    "f1": 0.233766,
+    "fn": 69.0,
+    "fp": 108.0,
+    "iou_threshold": 0.5,
+    "precision": 0.2,
+    "recall": 0.28125,
+    "tp": 27.0
+   },
+   "tokens": {
+    "auc": 0.92464,
+    "f1": 0.515702,
+    "fn": 131.0,
+    "fp": 162.0,
+    "fpr": 0.021088,
+    "precision": 0.490566,
+    "recall": 0.543554,
+    "tn": 7520.0,
+    "tp": 156.0
+   }
+  },
+  "window": 0
+ },
+ "config_file": "config/hf_final_config.json",
+ "config_sha256": "a45d49b4328fee340088ae5c473f1c81274ee7867ff412e215a98c1cafc4250c",
+ "corpus": "a3",
+ "criterion": {
+  "f1_gap": 0.004959,
+  "fpr_gap": -0.393435,
+  "status": "NOT MET",
+  "target": "F1 ≥ 0.6 при FPR ≤ 0.4 (токены, hf, отложенный test)",
+  "token_f1": 0.595041,
+  "token_fpr": 0.006565
+ },
+ "deviations": [
+  "шаги 1–2 выполнены одним прогоном по заранее зафиксированной сетке config/hf_experiments.json (sha256 a7eb9b7a59e3f6b271248841055f11f1da23c460ce47b6f0187cbf1439442062), а не десятью отдельными коммитами: каждый из 10 экспериментов записан в docs/EXPERIMENTS.md и в reports/hf_protocol/sweep.json, включая отклонённые и вырожденные (F1=0)",
+  "шаг 3 запускается пушем с меткой [hf-final] вместо workflow_dispatch: у токена песочницы нет права actions:write (403), а единственный запуск обязан быть воспроизводим и ограничен механизмом",
+  "в том же прогоне дополнительно измеряется корпус A1 тем же замороженным конфигом и теми же seed'ами (reports/hf_final_a1) — вторичное измерение, объявлено ДО запуска, источником отбора не является",
+  "артефакты публикуются в ветку data/metrics через Contents API: логи и артефакты CI из песочницы недоступны (result-хост вне списка разрешённых), иначе числа нельзя было бы перепроверить",
+  "порог зафиксирован числом и применён ко всем seed'ам шага 3 без переселекции (шаг 0 требует «порог — только на train, зафиксирован до шага 3»)"
+ ],
+ "documents": {
+  "test": 64,
+  "train": 265
+ },
+ "duration_s": 1080.58,
+ "fit_on": "train+val",
+ "freeze_file": "reports/hf_protocol/freeze.json",
+ "freeze_sha256": "1052c294eaa64a84e0f590de0daa2df273b01b7e3b0251e6d47d7b424aaff92a",
+ "gold_file": "gold_test.jsonl.gz",
+ "gold_rows": 177,
+ "gold_sha256": "6354406911c8d5fc36dc93e8639c9cfa9906a5b0ea1235f417f655de838343c0",
+ "hardware": {
+  "cpu_mhz": "3302.303",
+  "cpu_model": "AMD EPYC 7763 64-Core Processor",
+  "cpu_processors": 4,
+  "free_h": "total        used        free      shared  buff/cache   available\nMem:            15Gi       1.5Gi        10Gi        47Mi       4.2Gi        14Gi\nSwap:          3.0Gi          0B       3.0Gi",
+  "lscpu": "Architecture:                            x86_64\nCPU op-mode(s):                          32-bit, 64-bit\nAddress sizes:                           48 bits physical, 48 bits virtual\nByte Order:                              Little Endian\nCPU(s):                                  4\nOn-line CPU(s) list:                     0-3\nVendor ID:                               AuthenticAMD\nModel name:                              AMD EPYC 7763 64-Core Processor\nCPU family:                              25\nModel:                                   1\nThread(s) per core:                      2\nCore(s) per socket:                      2\nSocket(s):                               1\nStepping:                                1\nBogoMIPS:                                4890.86\nFlags:                                   fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush mmx fxsr sse sse2 ht syscall nx mmxext fxsr_opt pdpe1gb rdtscp lm constant_tsc rep_good nopl tsc_reliable nonstop_tsc cpuid extd_apicid aperfmperf tsc_known_freq pni pclmulqdq ssse3 fma cx16 pcid sse4_1 sse4_2 movbe popcnt aes xsave avx f16c rdrand hypervisor lahf_lm cmp_legacy svm cr8_legacy abm sse4a misalignsse 3dnowprefetch osvw topoext vmmcall fsgsbase bmi1 avx2 smep bmi2 erms invpcid rdseed adx smap clflushopt clwb sha_ni xsaveopt xsavec xgetbv1 xsaves user_shstk clzero xsaveerptr rdpru arat npt nrip_save tsc_scale vmcb_clean flushbyasid decodeassists pausefilter pfthreshold v_vmsave_vmload umip vaes vpclmulqdq rdpid fsrm\nVirtualization:                          AMD-V\nHypervisor vendor:                       Microsoft\nVirtualization type:                     full\nL1d cache:                               64 KiB (2 instances)\nL1i cache:                               64 KiB (2 instances)\nL2 cache:                                1 MiB (2 instances)\nL3 cache:                                32 MiB (1 instance)\nNUMA node(s):                            1\nNUMA node0 CPU(s):                       0-3\nVulnerab",
+  "machine": "x86_64",
+  "numpy_version": "2.4.6",
+  "python": "3.11.17",
+  "ram_total_gb": 15.61,
+  "ram_total_kb": 16373452,
+  "system": "Linux",
+  "torch_version": "2.14.1+cpu",
+  "transformers_version": "5.19.0"
+ },
+ "metric_spec": "docs/METRIC_SPEC.md",
+ "metric_spec_sha256": "dfc5ba969cb0c2f031b3bc4a8ab0ea7b63e07865dc7c700ecc93cd19b5c55f3c",
+ "metrics_mean_std": {
+  "answer_auc": 0.709021,
+  "answer_auc_std": 0.0,
+  "answer_f1": 0.648045,
+  "answer_f1_std": 0.0,
+  "answer_fpr": 0.3,
+  "answer_fpr_std": 0.0,
+  "answer_precision": 0.707317,
+  "answer_precision_std": 0.0,
+  "answer_recall": 0.597938,
+  "answer_recall_std": 0.0,
+  "auc": 0.952672,
+  "auc_per_seed": [
+   0.952672,
+   0.952672,
+   0.952672,
+   0.952672,
+   0.952672
+  ],
+  "auc_std": 0.0,
+  "f1": 0.595041,
+  "f1_per_seed": [
+   0.595041,
+   0.595041,
+   0.595041,
+   0.595041,
+   0.595041
+  ],
+  "f1_std": 0.0,
+  "fn": 137.0,
+  "fn_per_seed": [
+   137.0,
+   137.0,
+   137.0,
+   137.0,
+   137.0
+  ],
+  "fn_std": 0.0,
+  "fp": 59.0,
+  "fp_per_seed": [
+   59.0,
+   59.0,
+   59.0,
+   59.0,
+   59.0
+  ],
+  "fp_std": 0.0,
+  "fpr": 0.006565,
+  "fpr_per_seed": [
+   0.006565,
+   0.006565,
+   0.006565,
+   0.006565,
+   0.006565
+  ],
+  "fpr_std": 0.0,
+  "model_sha256_per_seed": [
+   "94a3922a75cad7e9909505fef38d458451c312fa2772536ccdd5fc8fd9316aef",
+   "94a3922a75cad7e9909505fef38d458451c312fa2772536ccdd5fc8fd9316aef",
+   "94a3922a75cad7e9909505fef38d458451c312fa2772536ccdd5fc8fd9316aef",
+   "94a3922a75cad7e9909505fef38d458451c312fa2772536ccdd5fc8fd9316aef",
+   "94a3922a75cad7e9909505fef38d458451c312fa2772536ccdd5fc8fd9316aef"
+  ],
+  "positive_rows": 281,
+  "precision": 0.70936,
+  "precision_per_seed": [
+   0.70936,
+   0.70936,
+   0.70936,
+   0.70936,
+   0.70936
+  ],
+  "precision_std": 0.0,
+  "recall": 0.512456,
+  "recall_per_seed": [
+   0.512456,
+   0.512456,
+   0.512456,
+   0.512456,
+   0.512456
+  ],
+  "recall_std": 0.0,
+  "rows": 9268,
+  "span_f1": 0.256881,
+  "span_f1_std": 0.0,
+  "span_precision": 0.231405,
+  "span_precision_std": 0.0,
+  "span_recall": 0.28866,
+  "span_recall_std": 0.0,
+  "threshold": 0.1106,
+  "thresholds_per_seed": [
+   0.1106,
+   0.1106,
+   0.1106,
+   0.1106,
+   0.1106
+  ],
+  "tn": 8928.0,
+  "tn_per_seed": [
+   8928.0,
+   8928.0,
+   8928.0,
+   8928.0,
+   8928.0
+  ],
+  "tn_std": 0.0,
+  "tp": 144.0,
+  "tp_per_seed": [
+   144.0,
+   144.0,
+   144.0,
+   144.0,
+   144.0
+  ],
+  "tp_std": 0.0
+ },
+ "model": {
+  "id": "ai-forever/rugpt3small_based_on_gpt2",
+  "models_seen": [
+   "ai-forever/rugpt3small_based_on_gpt2"
+  ],
+  "revision": "a9307e696cd3c5b7f953ff4cb19d76a4d81821d5",
+  "revisions_seen": [
+   "a9307e696cd3c5b7f953ff4cb19d76a4d81821d5"
+  ],
+  "rows": 2400
+ },
+ "pairs": {
+  "test": 177,
+  "train": 842,
+  "val": 181
+ },
+ "per_seed": [
+  {
+   "answers": {
+    "auc": 0.709021,
+    "f1": 0.648045,
+    "fn": 39.0,
+    "fp": 24.0,
+    "fpr": 0.3,
+    "precision": 0.707317,
+    "recall": 0.597938,
+    "threshold": 0.1106,
+    "tn": 56.0,
+    "tp": 58.0
+   },
+   "model_sha256": "94a3922a75cad7e9909505fef38d458451c312fa2772536ccdd5fc8fd9316aef",
+   "positive_rows": 281,
+   "rows": 9268,
+   "seed": 42,
+   "spans": {
+    "f1": 0.256881,
+    "fn": 69.0,
+    "fp": 93.0,
+    "iou_threshold": 0.5,
+    "precision": 0.231405,
+    "recall": 0.28866,
+    "tp": 28.0
+   },
+   "threshold": 0.1106,
+   "tokens": {
+    "auc": 0.952672,
+    "f1": 0.595041,
+    "fn": 137.0,
+    "fp": 59.0,
+    "fpr": 0.006565,
+    "precision": 0.70936,
+    "recall": 0.512456,
+    "tn": 8928.0,
+    "tp": 144.0
+   }
+  },
+  {
+   "answers": {
+    "auc": 0.709021,
+    "f1": 0.648045,
+    "fn": 39.0,
+    "fp": 24.0,
+    "fpr": 0.3,
+    "precision": 0.707317,
+    "recall": 0.597938,
+    "threshold": 0.1106,
+    "tn": 56.0,
+    "tp": 58.0
+   },
+   "model_sha256": "94a3922a75cad7e9909505fef38d458451c312fa2772536ccdd5fc8fd9316aef",
+   "positive_rows": 281,
+   "rows": 9268,
+   "seed": 43,
+   "spans": {
+    "f1": 0.256881,
+    "fn": 69.0,
+    "fp": 93.0,
+    "iou_threshold": 0.5,
+    "precision": 0.231405,
+    "recall": 0.28866,
+    "tp": 28.0
+   },
+   "threshold": 0.1106,
+   "tokens": {
+    "auc": 0.952672,
+    "f1": 0.595041,
+    "fn": 137.0,
+    "fp": 59.0,
+    "fpr": 0.006565,
+    "precision": 0.70936,
+    "recall": 0.512456,
+    "tn": 8928.0,
+    "tp": 144.0
+   }
+  },
+  {
+   "answers": {
+    "auc": 0.709021,
+    "f1": 0.648045,
+    "fn": 39.0,
+    "fp": 24.0,
+    "fpr": 0.3,
+    "precision": 0.707317,
+    "recall": 0.597938,
+    "threshold": 0.1106,
+    "tn": 56.0,
+    "tp": 58.0
+   },
+   "model_sha256": "94a3922a75cad7e9909505fef38d458451c312fa2772536ccdd5fc8fd9316aef",
+   "positive_rows": 281,
+   "rows": 9268,
+   "seed": 44,
+   "spans": {
+    "f1": 0.256881,
+    "fn": 69.0,
+    "fp": 93.0,
+    "iou_threshold": 0.5,
+    "precision": 0.231405,
+    "recall": 0.28866,
+    "tp": 28.0
+   },
+   "threshold": 0.1106,
+   "tokens": {
+    "auc": 0.952672,
+    "f1": 0.595041,
+    "fn": 137.0,
+    "fp": 59.0,
+    "fpr": 0.006565,
+    "precision": 0.70936,
+    "recall": 0.512456,
+    "tn": 8928.0,
+    "tp": 144.0
+   }
+  },
+  {
+   "answers": {
+    "auc": 0.709021,
+    "f1": 0.648045,
+    "fn": 39.0,
+    "fp": 24.0,
+    "fpr": 0.3,
+    "precision": 0.707317,
+    "recall": 0.597938,
+    "threshold": 0.1106,
+    "tn": 56.0,
+    "tp": 58.0
+   },
+   "model_sha256": "94a3922a75cad7e9909505fef38d458451c312fa2772536ccdd5fc8fd9316aef",
+   "positive_rows": 281,
+   "rows": 9268,
+   "seed": 45,
+   "spans": {
+    "f1": 0.256881,
+    "fn": 69.0,
+    "fp": 93.0,
+    "iou_threshold": 0.5,
+    "precision": 0.231405,
+    "recall": 0.28866,
+    "tp": 28.0
+   },
+   "threshold": 0.1106,
+   "tokens": {
+    "auc": 0.952672,
+    "f1": 0.595041,
+    "fn": 137.0,
+    "fp": 59.0,
+    "fpr": 0.006565,
+    "precision": 0.70936,
+    "recall": 0.512456,
+    "tn": 8928.0,
+    "tp": 144.0
+   }
+  },
+  {
+   "answers": {
+    "auc": 0.709021,
+    "f1": 0.648045,
+    "fn": 39.0,
+    "fp": 24.0,
+    "fpr": 0.3,
+    "precision": 0.707317,
+    "recall": 0.597938,
+    "threshold": 0.1106,
+    "tn": 56.0,
+    "tp": 58.0
+   },
+   "model_sha256": "94a3922a75cad7e9909505fef38d458451c312fa2772536ccdd5fc8fd9316aef",
+   "positive_rows": 281,
+   "rows": 9268,
+   "seed": 46,
+   "spans": {
+    "f1": 0.256881,
+    "fn": 69.0,
+    "fp": 93.0,
+    "iou_threshold": 0.5,
+    "precision": 0.231405,
+    "recall": 0.28866,
+    "tp": 28.0
+   },
+   "threshold": 0.1106,
+   "tokens": {
+    "auc": 0.952672,
+    "f1": 0.595041,
+    "fn": 137.0,
+    "fp": 59.0,
+    "fpr": 0.006565,
+    "precision": 0.70936,
+    "recall": 0.512456,
+    "tn": 8928.0,
+    "tp": 144.0
+   }
+  }
+ ],
+ "prediction_rows": 46340,
+ "predictions": "predictions_test.jsonl.gz",
+ "predictions_format": [
+  "id",
+  "level",
+  "seed",
+  "token",
+  "start",
+  "end",
+  "gold",
+  "score",
+  "pred"
+ ],
+ "protocol": "hf-criterion-v1",
+ "seed_rule": "seed'ы зафиксированы до запуска; лучший не выбирается — среднее по всем",
+ "seeds": [
+  42,
+  43,
+  44,
+  45,
+  46
+ ],
+ "splits_dir": "data/corpus_a3/splits",
+ "splits_sha256": {
+  "test": "232d2583480f2237fc48d10eb4413043bf35f59be5a10138fbf53235ce83ba88",
+  "train": "75c2504acefb6a3c325f8b3b94c1e4da9ec441d9440c1cfd07c16eb8e49040a2",
+  "val": "cba705f836d9c25f28fc162b5cbf89b52bfabe7c47c56e2a4d6d652cded2c2dd"
+ },
+ "started_at": "2026-10-10T17:59:50Z",
+ "step": "final",
+ "threshold": 0.1106,
+ "threshold_frozen": true,
+ "threshold_source": "заморожен до шага 3 в hf_final_config.json (групповая CV по документам на train, seed 42); применён ко всем seed'ам без переселекции"
+}
