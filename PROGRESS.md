@@ -2038,13 +2038,13 @@ METRICS.json» в job'е «Единый файл чисел»; остальны�
 
 ### Что сделано
 
-* Числа в документах приведены к измеренным: **531 тест** (515 на `main`
+* Числа в документах приведены к измеренным: **532 теста** (515 на `main`
   + 5 параметризованных проверок воркфлоу на восстановленный
-  `hf-span-filter.yml` + 8 тестов шага 32 + 3 новых теста сверки) и
+  `hf-span-filter.yml` + 8 тестов шага 32 + 4 новых теста сверки и воркфлоу) и
   **покрытие 88 %** (87,51 %; 537 непокрытых строк из 4298). Правки:
   `README.md`, `ИТОГ.md` (три места), `docs/ОТЧЁТ_о_НИР_шаблон.md` (два места),
   `spanverify-module/README.md` (два места).
-* В `reports/METRICS.json` блок `tests` записан измеренным (531 / 87.51), а не
+* В `reports/METRICS.json` блок `tests` записан измеренным (532 / 87.51), а не
   `null`; `meta.commit` и `meta.generated_at` указывают состояние кода, для
   которого сделано измерение. Остальные блоки не тронуты намеренно: локальный
   пересчёт `collect_metrics.py` обнуляет `pilot` (каталог `reports/pilot/` в
@@ -2072,13 +2072,25 @@ METRICS.json» в job'е «Единый файл чисел»; остальны�
   вместе с веткой) — закрыты; в A2b дописан результат одной проверки шага 32.
   Сводка пересчитана: 35 пунктов, 15 закрыто.
 
+* Сверка чисел вынесена на каждый пуш. У job'а «Единый файл чисел» в `ci.yml`
+  добавлено условие `if: ${{ !cancelled() && needs.quality.result == 'success' }}`:
+  пропущенные `pilot` и `external` (на пуш они не запускаются) больше не
+  пропускают зависимый job, а числа не собираются после проваленного прогона с
+  покрытием. Скачивание артефактов пилота и внешних наборов сделано
+  необязательным (`continue-on-error: true`) — на пуш их нет, блоки берутся из
+  закоммиченных файлов (локально проверено: при `pilot = null` нарушений сверки
+  0). Проверка `test_metrics_job_runs_on_every_push_not_only_at_night` в
+  `tests/test_workflow_limits.py` держит и условие, и необязательность шагов:
+  без неё расхождение документов с METRICS.json снова всплывало бы раз в сутки
+  и не блокировало слияние — ровно так в `main` и уехали 510 против 515.
+
 ### Проверка (выполнено, а не пересказано)
 
 ```
 cd spanverify-module
 python -m ruff check .                    # All checks passed!
 python -m black --check .                 # 121 files would be left unchanged
-python -m pytest --collect-only -q        # 531 (scripts/collect_metrics.py::_test_count)
+python -m pytest --collect-only -q        # 532 (scripts/collect_metrics.py::_test_count)
 python -m pytest --cov=spanverify --cov-report=json:reports/coverage.json
 python scripts/check_numbers.py --metrics reports/METRICS.json
 python scripts/collect_metrics.py --out /tmp/METRICS.sim.json --coverage-json reports/coverage.json
@@ -2097,7 +2109,7 @@ python scripts/check_numbers.py --metrics /tmp/METRICS.sim.json
 прогона 37911250513).
 
 Полный прогон тестов в песочнице (Linux, Python 3.11.2, 2 ядра, `pytest
---cov=spanverify --cov-report=json -q -rs`): собран **531 тест**, падений нет —
+--cov=spanverify --cov-report=json -q -rs`) для состава 531 тест: падений нет —
 в сводке прогона ровно две строки пропуска (`torch и transformers не
 установлены`, `библиотека rouge_score не установлены`), значит обе сверки числа
 тестов выполнены, а не пропущены. Покрытие **87,51 %** (4298 операторов,
@@ -2107,7 +2119,7 @@ python scripts/check_numbers.py --metrics /tmp/METRICS.sim.json
 числом пройденных тестов в лог песочницы не попала (процесс завершился сразу
 после записи отчёта покрытия), поэтому число пройденных подтверждено отдельно
 прогоном CI на раннере — он же пересчитывает покрытие и сверяет документы
-(RUN_ID_PLACEHOLDER).
+(прогон ветки — в статусе pull request; номер и числа дописаны следующим коммитом журнала).
 
 ### Чего этот шаг не делает
 
@@ -2118,8 +2130,10 @@ python scripts/check_numbers.py --metrics /tmp/METRICS.sim.json
 * Покрытие измерено в песочнице (Linux, Python 3.11.2, 2 ядра); CI измеряет его
   заново на каждом прогоне. Значение 87,51 % стоит на границе округления до
   88 %: если раннер насчитает 87,49 %, документы придётся поправить на 87 %.
-  Проверяется первым же прогоном job'а «Единый файл чисел» (расписание или
-  `workflow_dispatch`).
+  После выноса сверки на каждый пуш это видно в прогоне самой ветки, а не
+  ночью на `main`. `workflow_dispatch` из песочницы недоступен (403
+  `Resource not accessible by integration`), поэтому проверка раннером — только
+  прогоном на пуш.
 * `.exe` не пересобирался и релиз не публиковался: релизный воркфлоу не
   запускался. Восстановленный код шага 32 по умолчанию выключен
   (`span_filter_min_chars = 0`), поведение поставки не меняет.
