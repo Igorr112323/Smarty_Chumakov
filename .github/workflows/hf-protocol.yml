@@ -84,7 +84,7 @@ jobs:
           # поэтому вывод шага пишется в файл, а при падении его последние строки
           # публикуются аннотацией: аннотации отдаёт Checks API, они доступны всегда.
           diag="$RUNNER_TEMP/hf-diag.log"; : > "$diag"
-          trap 'sleep 2; tail -c 2500 "$diag" | sed -e "s/[[:cntrl:]]/ /g" -e "s/%/%25/g" -e "s|^|::error::[grid ${{ matrix.corpus }} шард ${{ matrix.shard }}] |"' ERR
+          trap 'sync; sleep 6; tail -c 4000 "$diag" | sed -e "s/[[:cntrl:]]/ /g" -e "s/%/%25/g" -e "s|^|::error::[grid ${{ matrix.corpus }} шард ${{ matrix.shard }}] |"; tail -n 60 "$diag" >> "$GITHUB_STEP_SUMMARY" 2>/dev/null || true' ERR
           exec > >(tee -a "$diag") 2>&1
           corpus="${{ matrix.corpus }}"
           case "$corpus" in
@@ -135,7 +135,7 @@ jobs:
           # поэтому вывод шага пишется в файл, а при падении его последние строки
           # публикуются аннотацией: аннотации отдаёт Checks API, они доступны всегда.
           diag="$RUNNER_TEMP/hf-diag.log"; : > "$diag"
-          trap 'sleep 2; tail -c 2500 "$diag" | sed -e "s/[[:cntrl:]]/ /g" -e "s/%/%25/g" -e "s|^|::error::[feat-cache ${{ matrix.corpus }} шард ${{ matrix.shard }}] |"' ERR
+          trap 'sync; sleep 6; tail -c 4000 "$diag" | sed -e "s/[[:cntrl:]]/ /g" -e "s/%/%25/g" -e "s|^|::error::[feat-cache ${{ matrix.corpus }} шард ${{ matrix.shard }}] |"; tail -n 60 "$diag" >> "$GITHUB_STEP_SUMMARY" 2>/dev/null || true' ERR
           exec > >(tee -a "$diag") 2>&1
           corpus="${{ matrix.corpus }}"
           case "$corpus" in
@@ -208,7 +208,7 @@ jobs:
           # поэтому вывод шага пишется в файл, а при падении его последние строки
           # публикуются аннотацией: аннотации отдаёт Checks API, они доступны всегда.
           diag="$RUNNER_TEMP/hf-diag.log"; : > "$diag"
-          trap 'sleep 2; tail -c 2500 "$diag" | sed -e "s/[[:cntrl:]]/ /g" -e "s/%/%25/g" -e "s|^|::error::[baseline] |"' ERR
+          trap 'sync; sleep 6; tail -c 4000 "$diag" | sed -e "s/[[:cntrl:]]/ /g" -e "s/%/%25/g" -e "s|^|::error::[baseline] |"; tail -n 60 "$diag" >> "$GITHUB_STEP_SUMMARY" 2>/dev/null || true' ERR
           exec > >(tee -a "$diag") 2>&1
           set -x
           python scripts/hf_protocol.py baseline \
@@ -223,7 +223,7 @@ jobs:
           # поэтому вывод шага пишется в файл, а при падении его последние строки
           # публикуются аннотацией: аннотации отдаёт Checks API, они доступны всегда.
           diag="$RUNNER_TEMP/hf-diag.log"; : > "$diag"
-          trap 'sleep 2; tail -c 2500 "$diag" | sed -e "s/[[:cntrl:]]/ /g" -e "s/%/%25/g" -e "s|^|::error::[sweep] |"' ERR
+          trap 'sync; sleep 6; tail -c 4000 "$diag" | sed -e "s/[[:cntrl:]]/ /g" -e "s/%/%25/g" -e "s|^|::error::[sweep] |"; tail -n 60 "$diag" >> "$GITHUB_STEP_SUMMARY" 2>/dev/null || true' ERR
           exec > >(tee -a "$diag") 2>&1
           set -x
           python scripts/hf_protocol.py sweep \
@@ -334,7 +334,7 @@ jobs:
           # поэтому вывод шага пишется в файл, а при падении его последние строки
           # публикуются аннотацией: аннотации отдаёт Checks API, они доступны всегда.
           diag="$RUNNER_TEMP/hf-diag.log"; : > "$diag"
-          trap 'sleep 2; tail -c 2500 "$diag" | sed -e "s/[[:cntrl:]]/ /g" -e "s/%/%25/g" -e "s|^|::error::[grid-test ${{ matrix.corpus }} шард ${{ matrix.shard }}] |"' ERR
+          trap 'sync; sleep 6; tail -c 4000 "$diag" | sed -e "s/[[:cntrl:]]/ /g" -e "s/%/%25/g" -e "s|^|::error::[grid-test ${{ matrix.corpus }} шард ${{ matrix.shard }}] |"; tail -n 60 "$diag" >> "$GITHUB_STEP_SUMMARY" 2>/dev/null || true' ERR
           exec > >(tee -a "$diag") 2>&1
           corpus="${{ matrix.corpus }}"
           case "$corpus" in
@@ -412,7 +412,7 @@ jobs:
           # поэтому вывод шага пишется в файл, а при падении его последние строки
           # публикуются аннотацией: аннотации отдаёт Checks API, они доступны всегда.
           diag="$RUNNER_TEMP/hf-diag.log"; : > "$diag"
-          trap 'sleep 2; tail -c 2500 "$diag" | sed -e "s/[[:cntrl:]]/ /g" -e "s/%/%25/g" -e "s|^|::error::[final] |"' ERR
+          trap 'sync; sleep 6; tail -c 4000 "$diag" | sed -e "s/[[:cntrl:]]/ /g" -e "s/%/%25/g" -e "s|^|::error::[final] |"; tail -n 60 "$diag" >> "$GITHUB_STEP_SUMMARY" 2>/dev/null || true' ERR
           exec > >(tee -a "$diag") 2>&1
           set -x
           python scripts/hf_protocol.py final \

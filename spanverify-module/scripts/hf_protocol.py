@@ -102,9 +102,26 @@ def write_jsonl(path: Path, rows: Iterable[dict[str, Any]]) -> int:
     return total
 
 
+def _json_safe(value: Any) -> Any:
+    """Не-числа (NaN, ±Inf) в манифест недопустимы: строгий JSON их не описывает.
+
+    Появляются они там, где метрика не вычисляется (например, AUC на выборке из
+    одного класса).  Пишем ``null`` — «не вычислено», а не выдуманное число и не
+    битый файл, который нельзя прочитать стандартным парсером.
+    """
+    if isinstance(value, float):
+        return value if math.isfinite(value) else None
+    if isinstance(value, dict):
+        return {key: _json_safe(item) for key, item in value.items()}
+    if isinstance(value, list):
+        return [_json_safe(item) for item in value]
+    return value
+
+
 def write_json(path: Path, payload: dict[str, Any]) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(json.dumps(payload, ensure_ascii=False, indent=1, sort_keys=True) + "\n", encoding="utf-8")
+    text = json.dumps(_json_safe(payload), ensure_ascii=False, indent=1, sort_keys=True) + "\n"
+    path.write_text(text, encoding="utf-8")
 
 
 def document_of(record: dict[str, Any]) -> str:
@@ -1387,6 +1404,10 @@ def command_final(args: argparse.Namespace) -> int:
         seen_ids.add(identifier)
         gold_rows.append({"id": identifier, "spans": [list(span) for span in spans_of(record)]})
     rows_written = write_jsonl(out / "predictions_test.jsonl.gz", predictions)
+    # Gold-границы пишутся до вычисления sha256 и до `verify-manifest`: без них
+    # уровни ответов и фрагментов нечего пересчитывать, а «нельзя пересчитать» —
+    # не то же самое, что «совпало».
+    write_jsonl(out / "gold_test.jsonl.gz", gold_rows)
     payload["prediction_rows"] = rows_written
     payload["gold_rows"] = len(gold_rows)
     payload["gold_sha256"] = sha256_file(out / "gold_test.jsonl.gz")
@@ -1398,6 +1419,29 @@ def command_final(args: argparse.Namespace) -> int:
     return 0
 
 
+def _mean_std(values: Sequence[float]) -> tuple[float | None, float | None]:
+    """Среднее и СКО популяции, устойчивые к не-числам.
+
+    ``statistics.pstdev`` на CPython 3.11 падает с ``AttributeError: 'float'
+    object has no attribute 'numerator'``, если среди значений есть NaN — а NaN
+    там появляется законно: AUC не вычисляется на выборке из одного класса.  Шаг 3
+    обязан дописать манифест после измерения, а не упасть на агрегате, поэтому
+    не-числа отбрасываются заранее, а среднее считается явно по остальным.  Если
+    числовых значений нет — ``None`` («не вычислено»), а не ноль.
+    """
+    finite = [float(value) for value in values if math.isfinite(float(value))]
+    if not finite:
+        return None, None
+    mean = math.fsum(finite) / len(finite)
+    std = math.sqrt(math.fsum((value - mean) ** 2 for value in finite) / len(finite)) if len(finite) > 1 else 0.0
+    return mean, std
+
+
+def _rounded(values: Sequence[float]) -> list[float | None]:
+    """Значения по seed'ам: не-числа → ``null`` (манифест остаётся строгим JSON)."""
+    return [round(value, 6) if math.isfinite(float(value)) else None for value in values]
+
+
 def aggregate_seeds(per_seed: Sequence[dict[str, Any]]) -> dict[str, Any]:
     """mean ± std по seed'ам; худший и лучший не выбираются (протокол)."""
     out: dict[str, Any] = {}
@@ -1405,9 +1449,15 @@ def aggregate_seeds(per_seed: Sequence[dict[str, Any]]) -> dict[str, Any]:
         return out
     for key in ("f1", "precision", "recall", "fpr", "auc", "tp", "fp", "fn", "tn"):
         values = [float((item.get("tokens") or {}).get(key, 0.0) or 0.0) for item in per_seed]
-        out[key] = round(statistics.fmean(values), 6)
-        out[f"{key}_std"] = round(statistics.pstdev(values), 6) if len(values) > 1 else 0.0
-        out[f"{key}_per_seed"] = [round(value, 6) for value in values]
+        mean, std = _mean_std(values)
+        out[key] = round(mean, 6) if mean is not None else None
+        out[f"{key}_std"] = round(std, 6) if std is not None else None
+        out[f"{key}_per_seed"] = _rounded(values)
+        missing = sum(1 for value in values if not math.isfinite(value))
+        if missing:
+            # Среднее считается по вычисленным seed'ам — читатель обязан видеть,
+            # что часть значений не вычислена, а не принять 1 seed за 5.
+            out[f"{key}_not_computed"] = missing
     prefixes = {"answers": "answer", "spans": "span"}
     # Контейнмент и ширина фрагмента — у product-оценки (engine.evaluate);
     # харнесс их не воспроизводит, и «придумать» их формулой нельзя: в манифест
@@ -1418,9 +1468,13 @@ def aggregate_seeds(per_seed: Sequence[dict[str, Any]]) -> dict[str, Any]:
     ):
         for key in keys:
             values = [float((item.get(level) or {}).get(key, 0.0) or 0.0) for item in per_seed]
-            out[f"{prefixes[level]}_{key}"] = round(statistics.fmean(values), 6)
+            mean, std = _mean_std(values)
+            out[f"{prefixes[level]}_{key}"] = round(mean, 6) if mean is not None else None
             if len(values) > 1:
-                out[f"{prefixes[level]}_{key}_std"] = round(statistics.pstdev(values), 6)
+                out[f"{prefixes[level]}_{key}_std"] = round(std, 6) if std is not None else None
+            missing = sum(1 for value in values if not math.isfinite(value))
+            if missing:
+                out[f"{prefixes[level]}_{key}_not_computed"] = missing
     out["threshold"] = float(per_seed[0].get("threshold", 0.0))
     out["thresholds_per_seed"] = [float(item.get("threshold", 0.0)) for item in per_seed]
     out["model_sha256_per_seed"] = [str(item.get("model_sha256", "")) for item in per_seed]
