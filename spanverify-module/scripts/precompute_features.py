@@ -25,6 +25,20 @@
 используется верификатором при чтении, поэтому расхождение невозможно: считать
 и читать будет один и тот же код.
 
+Режим сетки (``--grid``)
+-----------------------
+
+Для протокола измерения (``docs/METRIC_SPEC.md``) нужны широкие признаки —
+несколько слоёв, агрегации по головам, разные ``k`` плотности, лексика и числа.
+Один проход по модели отдаёт их все сразу (``spanverify.hf_grid``), поэтому
+флаг ``--grid`` пишет формат v3: ``grid_*.jsonl`` с полями ``arrays`` (36
+массивов по токенам ответа), ``tokens`` (текст и смещения — чтобы сопоставить
+признаки с разметкой, не пересобирая токенизатор) и ``meta`` (слой, длина
+последовательности, число несопоставленных токенов, revision модели). Строки
+раскладываются по файлам частей разбиения (``--split-files``), потому что
+обучающая часть и отложенный test считаются разными job'ами и в разном порядке
+доступа: test появляется только в шаге 3.
+
 Выход
 -----
 
@@ -55,6 +69,7 @@ from spanverify.features import (  # noqa: E402
     extract_features,
     feature_cache_key,
 )
+from spanverify.hf_grid import GRID_CACHE_FORMAT, GRID_FEATURE_NAMES  # noqa: E402
 
 MODEL_DEFAULT = HF_MODEL_DEFAULT
 PROGRESS_EVERY = 10
@@ -91,6 +106,41 @@ def dump_matrix(key: str, matrix, pair_id: str, mode: str = "hf", model: str = "
     return row
 
 
+def dump_grid_row(key: str, pair_id: str, result: dict, model: str) -> dict:
+    """Строка кеша сетки (v3): признаки, токены ответа и метаданные прогона.
+
+    ``tokens`` пишутся вместе с массивами намеренно: потребитель, который
+    пересобирает токенизатор сам, рискует разъехаться с признаками на один
+    токен — и метрики при этом выглядят правдоподобно.
+    """
+    row: dict = {
+        "key": key,
+        "pair_id": pair_id,
+        "mode": "hf",
+        "grid_format": GRID_CACHE_FORMAT,
+        "cache_format": GRID_CACHE_FORMAT,
+        "model": model,
+        "arrays": {name: [float(value) for value in result["arrays"].get(name, [])] for name in GRID_FEATURE_NAMES},
+        "tokens": list(result["tokens"]),
+        "meta": dict(result["meta"]),
+    }
+    return row
+
+
+def parse_split_files(spec: str) -> list[tuple[str, Path]]:
+    """``train=path,dev=path`` → [(имя части, файл)]. Имя входит в имя файла выхода."""
+    out: list[tuple[str, Path]] = []
+    for item in str(spec or "").split(","):
+        item = item.strip()
+        if not item:
+            continue
+        name, _, path = item.partition("=")
+        if not path:
+            raise SystemExit(f"--split-files ждёт формат имя=путь, получено «{item}»")
+        out.append((name.strip(), Path(path.strip())))
+    return out
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description="Предпосчёт признаков режима hf в кеш")
     parser.add_argument("--dataset", default="data/corpus_a3/pairs.jsonl")
@@ -105,8 +155,21 @@ def main(argv: list[str] | None = None) -> int:
         "--participation",
         action="store_true",
         help="дополнительно посчитать признаки синтетического корпуса доли участия ИИ "
-        "(240样本) — без них обучение головы участия в режиме hf пропускается",
+        "(240 пар) — без них обучение головы участия в режиме hf пропускается",
     )
+    parser.add_argument(
+        "--grid",
+        action="store_true",
+        help="режим сетки: широкие признаки за один проход (spanverify.hf_grid), формат v3",
+    )
+    parser.add_argument(
+        "--split-files",
+        default="",
+        help="части разбиения списком «имя=путь» через запятую: выход — grid_<имя>_<шард>.jsonl",
+    )
+    parser.add_argument("--max-length", type=int, default=1024, help="обрезка последовательности для режима сетки")
+    parser.add_argument("--k-values", default="1,3,5", help="k для плотности представлений (режим сетки)")
+    parser.add_argument("--window", type=int, default=1, help="радиус сглаживания соседами (режим сетки)")
     args = parser.parse_args(argv)
 
     if args.shards < 1 or not (0 <= args.shard < args.shards):
@@ -116,6 +179,9 @@ def main(argv: list[str] | None = None) -> int:
     if not dataset.is_file():
         print(f"корпус не найден: {dataset}", file=sys.stderr)
         return 2
+
+    if args.grid:
+        return _run_grid(args, dataset)
 
     records = list(read_pairs(dataset))
     if args.limit:
@@ -208,6 +274,115 @@ def main(argv: list[str] | None = None) -> int:
     summary_path.write_text(json.dumps(summary, ensure_ascii=False, indent=2), encoding="utf-8")
     print(json.dumps(summary, ensure_ascii=False, indent=2), flush=True)
 
+    if skipped:
+        print(f"ВНИМАНИЕ: пропущено пар {skipped} — метрики были бы неполными", file=sys.stderr)
+        return 1
+    return 0
+
+
+def _run_grid(args, dataset: Path) -> int:
+    """Одна загрузка модели на весь прогон, строки v3 по частям разбиения.
+
+    Модель грузится ровно один раз: ``hf_features`` делает это на каждую пару,
+    и на тысяче пар праздное ожидание сравнимо по времени с самим счётом.
+    """
+    from spanverify.features import feature_cache_key
+    from spanverify.hf_grid import compute_grid, grid_model_info, load_grid_model
+
+    targets: list[tuple[str, list[dict]]] = []
+    for name, path in parse_split_files(args.split_files) or [("", dataset)]:
+        if not path.is_file():
+            print(f"файл не найден: {path}", file=sys.stderr)
+            return 2
+        records = [(record.to_dict() if hasattr(record, "to_dict") else dict(record)) for record in read_pairs(path)]
+        if args.limit:
+            records = records[: args.limit]
+        targets.append((name, records))
+    total = sum(len(records) for _name, records in targets)
+    selected: list[tuple[str, int, dict]] = []
+    for name, records in targets:
+        for index, record in enumerate(records):
+            if index % args.shards == args.shard:
+                selected.append((name, index, record))
+    out_dir = Path(args.out)
+    out_dir.mkdir(parents=True, exist_ok=True)
+    suffix = f"shard{args.shard}of{args.shards}" if args.shards > 1 else "all"
+    k_values = tuple(int(value) for value in str(args.k_values).split(",") if value.strip()) or (1, 3, 5)
+
+    print(
+        f"сетка v{GRID_CACHE_FORMAT}: пар в прогоне {len(selected)} из {total}, модель {args.model}, "
+        f"признаков {len(GRID_FEATURE_NAMES)}",
+        flush=True,
+    )
+    loaded = load_grid_model(args.model)
+    info = grid_model_info(loaded)
+    handles: dict = {}  # файловые объекты по частям разбиения
+    started = time.time()
+    done = skipped = 0
+    per_split: dict[str, int] = {}
+    unmatched_total = 0
+    truncated_total = 0
+    try:
+        for name, _index, record in selected:
+            answer = str(record.get("answer", ""))
+            context = record.get("context", "")
+            pair_id = str(record.get("id") or "")
+            label = name or "pairs"
+            features_path = out_dir / f"grid_{label}_{suffix}.jsonl"
+            if label not in handles:
+                handles[label] = features_path.open("a", encoding="utf-8")
+            handle = handles[label]
+            try:
+                result = compute_grid(
+                    answer,
+                    context,
+                    loaded,
+                    max_length=args.max_length,
+                    k_values=k_values,
+                    window=args.window,
+                )
+                key = feature_cache_key(answer, context, "hf", args.model)
+                row = dump_grid_row(key, pair_id, result, args.model)
+                handle.write(json.dumps(row, ensure_ascii=False) + "\n")
+                handle.flush()
+                done += 1
+                per_split[label] = per_split.get(label, 0) + 1
+                unmatched_total += int(result["meta"].get("unmatched_tokens", 0))
+                if int(result["meta"].get("seq_len", 0)) >= args.max_length:
+                    truncated_total += 1
+            except Exception as exc:  # noqa: BLE001 - причина пишется в файл пропусков
+                skipped += 1
+                print(f"  пропуск {pair_id}: {type(exc).__name__}: {exc}", flush=True)
+    finally:
+        for handle in handles.values():
+            handle.close()
+    elapsed = time.time() - started
+    summary = {
+        "mode": "grid",
+        "grid_format": GRID_CACHE_FORMAT,
+        "dataset": str(dataset),
+        "split_files": args.split_files,
+        "model": args.model,
+        "model_info": info,
+        "feature_names": list(GRID_FEATURE_NAMES),
+        "max_length": args.max_length,
+        "k_values": list(k_values),
+        "window": args.window,
+        "shard": args.shard,
+        "shards": args.shards,
+        "pairs_total": total,
+        "pairs_done": done,
+        "pairs_skipped": skipped,
+        "pairs_per_split": per_split,
+        "unmatched_tokens": unmatched_total,
+        "truncated_pairs": truncated_total,
+        "seconds": round(elapsed, 1),
+        "seconds_per_pair": round(elapsed / max(1, done + skipped), 3),
+    }
+    (out_dir / f"grid_summary_{suffix}.json").write_text(
+        json.dumps(summary, ensure_ascii=False, indent=2), encoding="utf-8"
+    )
+    print(json.dumps(summary, ensure_ascii=False, indent=2), flush=True)
     if skipped:
         print(f"ВНИМАНИЕ: пропущено пар {skipped} — метрики были бы неполными", file=sys.stderr)
         return 1

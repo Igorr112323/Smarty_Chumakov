@@ -389,7 +389,42 @@ def check_docs(docs: list[Path], metrics: dict, repo_root: Path | None = None) -
                     )
 
     problems.extend(check_required_sections(repo_root))
+    problems.extend(check_hf_criterion_block(repo_root))
     return problems
+
+
+def check_hf_criterion_block(repo_root: Path) -> list[str]:
+    """Блок критерия ТЗ в README обязан совпадать с ``reports/hf_final/manifest.json``.
+
+    Числа режима hf попадают в README только через ``scripts/render_hf_table.py``:
+    сверка запускает его режим ``--check``, который (а) требует, чтобы каждое
+    число блока было в манифесте, и (б) если манифеста ещё нет — чтобы в блоке
+    стояло «не измерено». Так преждевременные и «примерные» числа ломают CI.
+    """
+    import importlib.util
+
+    renderer = Path(__file__).resolve().parent / "render_hf_table.py"
+    if not renderer.is_file():  # pragma: no cover - вне стандартной раскладки
+        return ["нет scripts/render_hf_table.py: сверку блока критерия выполнить нечем"]
+    spec = importlib.util.spec_from_file_location("render_hf_table_check", renderer)
+    if spec is None or spec.loader is None:  # pragma: no cover
+        return ["не удалось загрузить scripts/render_hf_table.py"]
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    readme = repo_root / "README.md"
+    manifest = Path(__file__).resolve().parents[1] / "reports" / "hf_final" / "manifest.json"
+    import io
+    from contextlib import redirect_stderr, redirect_stdout
+
+    buffer = io.StringIO()
+    try:
+        with redirect_stdout(buffer), redirect_stderr(buffer):
+            code = module.check_or_write(readme, manifest, "a3", False)
+    except SystemExit as exc:  # noqa: PERF203 - конфигурация может быть неполной
+        return [f"сверка блока критерия не выполнена: {exc}"]
+    if code:
+        return [f"блок критерия ТЗ в README расходится с манифестом: {buffer.getvalue().strip()[:300]}"]
+    return []
 
 
 def main() -> int:

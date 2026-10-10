@@ -1,0 +1,33 @@
+========================================================================
+корпус: data/corpus_a3/pairs.jsonl (1200 пар), режим demo, модель ai-forever/rugpt3small_based_on_gpt2
+обучающая часть: 842 пар; официальный тест: 177 пар
+отбор признаков: жадный прямой поиск
+========================================================================
+отбор: подвыборка 300 пар, кандидаты 7
+  раунд 1: база AUC головы на валидации 0.9203
+    ctx_attention_mass_norm    AUC 0.9201 (Δ -0.0001) token F1 0.7059 → отклонили
+    ctx_attention_mass_lift    AUC 0.9220 (Δ +0.0018) token F1 0.7293 → взяли
+    ctx_max_similarity         AUC 0.9465 (Δ +0.0262) token F1 0.8625 → взяли
+    ctx_support_distance       AUC 0.9121 (Δ -0.0082) token F1 0.7041 → отклонили
+    ctx_similarity_decay       AUC 0.9060 (Δ -0.0143) token F1 0.7360 → отклонили
+    ctx_sim_contrast           AUC 0.9295 (Δ +0.0092) token F1 0.8258 → взяли
+    ctx_sim_margin             AUC 0.9338 (Δ +0.0136) token F1 0.8526 → взяли
+  раунд 1: взят ctx_max_similarity (AUC 0.9465)
+  раунд 2: база AUC головы на валидации 0.9465
+    ctx_attention_mass_norm    AUC 0.9465 (Δ -0.0000) token F1 0.8625 → отклонили
+    ctx_attention_mass_lift    AUC 0.9490 (Δ +0.0025) token F1 0.8794 → взяли
+    ctx_support_distance       AUC 0.9447 (Δ -0.0018) token F1 0.8625 → отклонили
+    ctx_similarity_decay       AUC 0.9302 (Δ -0.0163) token F1 0.8625 → отклонили
+    ctx_sim_contrast           AUC 0.9496 (Δ +0.0032) token F1 0.8794 → взяли
+    ctx_sim_margin             AUC 0.9481 (Δ +0.0016) token F1 0.8625 → взяли
+  раунд 2: взят ctx_sim_contrast (AUC 0.9496)
+------------------------------------------------------------------------
+финальное обучение: ctx_max_similarity, ctx_sim_contrast
+
+официальный тест (база)      база (6)             token F1 0.7484 FPR 0.0022 AUC 0.9321 вердикт F1 0.7642
+официальный тест             расширенная (8)      token F1 0.8681 FPR 0.0017 AUC 0.9649 вердикт F1 0.8165
+весь корпус                  расширенная (8)      token F1 0.8643 FPR 0.0016 AUC 0.9697 вердикт F1 0.8045
+
+критерий: token F1 0.8681 при пороге 0.90, токенный FPR 0.0017 при ограничении 0.10: критерий НЕ выполнен
+отчёт: reports/hf_a3_eval_demo.md, артефакты: weights=config/demo_a3/weights_hf.json, head=config/demo_a3/head_hf.json, participation=config/demo_a3/participation_hf.json, dataset=data/corpus_a3/pairs.jsonl, mode=demo, model=
+длительность: 3558.0 с

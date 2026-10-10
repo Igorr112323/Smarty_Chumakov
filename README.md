@@ -36,7 +36,7 @@ python -m spanverify train --dataset data/demo_pairs.jsonl --out config/weights.
 python -m spanverify evaluate --dataset data/demo_pairs.jsonl   # метрики и критерий качества
 python -m spanverify selftest                                   # само-проверка конвейера
 python -m spanverify server --port 8765                         # API + веб-интерфейс
-python -m pytest -q                                             # 550 тестов
+python -m pytest -q                                             # 596 тестов
 ```
 
 Коды возврата `verify`: `0` — ответ подтверждён, `1` — найдены спорные
@@ -178,6 +178,20 @@ A3 построен обрезкой реальных OCR-выписок: гра
 контраст и маржа похожести, удалённость опоры, спад внимания по расстоянию), которые
 попадают в голову только если повышают AUC на валидации — критерий и журнал отбора в
 `spanverify-module/reports/hf_a3_eval.md`.
+
+### Критерий ТЗ по режиму `hf` (замороженный протокол)
+
+<!-- HF-CRITERION:BEGIN -->
+
+Критерий ТЗ (Прил. №3 к договору 0117812, п. 4.1): **F1 ≥ 0,60 при FPR ≤ 0,40** на отложенной по документам части `test` в режиме `hf`. Числа ниже — из `spanverify-module/reports/hf_final/manifest.json` (корпус a3); блок собирает `scripts/render_hf_table.py`, руками вписывать числа в него запрещено, рассинхрон валит CI (`tests/test_reported_metrics.py`).
+
+| Метрика | Значение | Уровень | Выборка | Файл-источник | Подтверждающий тест |
+| --- | --- | --- | --- | --- | --- |
+| F1 | не измерено | токены | test (a3) | `reports/hf_final/manifest.json` | `tests/test_criterion_hf.py` |
+| FPR | не измерено | токены | test (a3) | `reports/hf_final/manifest.json` | `tests/test_criterion_hf.py` |
+
+Измерение ещё не выполнено: прогон — workflow «Протокол hf (критерий ТЗ)», шаг 3 — и детали протокола: `spanverify-module/docs/METRIC_SPEC.md`, `spanverify-module/docs/EXPERIMENTS.md`.
+<!-- HF-CRITERION:END -->
 
 Команды: `scripts/fetch_external_tests.py --all --verify --adapt` (скачивание с
 закреплёнными ревизиями и SHA256), `scripts/external_eval.py`, отчёт —

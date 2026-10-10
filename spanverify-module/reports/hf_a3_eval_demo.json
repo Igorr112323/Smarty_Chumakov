@@ -1,0 +1,314 @@
+{
+  "generated_at": "2026-10-10 09:04:23 UTC",
+  "mode": "demo",
+  "model": "",
+  "dataset": "data/corpus_a3/pairs.jsonl",
+  "pairs_total": 1200,
+  "splits": {
+    "train": 842,
+    "dev": 181,
+    "test": 177
+  },
+  "seed": 42,
+  "folds": 3,
+  "target_fpr": 0.1,
+  "selection": {
+    "candidates": [
+      "ctx_attention_mass_norm",
+      "ctx_attention_mass_lift",
+      "ctx_max_similarity",
+      "ctx_support_distance",
+      "ctx_similarity_decay",
+      "ctx_sim_contrast",
+      "ctx_sim_margin"
+    ],
+    "steps": [
+      {
+        "round": 1,
+        "candidate": "ctx_attention_mass_norm",
+        "auc": 0.9201,
+        "auc_gain": -0.0001,
+        "accepted": false,
+        "token_f1": 0.7059,
+        "token_fpr": 0.0066
+      },
+      {
+        "round": 1,
+        "candidate": "ctx_attention_mass_lift",
+        "auc": 0.922,
+        "auc_gain": 0.0018,
+        "accepted": true,
+        "token_f1": 0.7293,
+        "token_fpr": 0.0052
+      },
+      {
+        "round": 1,
+        "candidate": "ctx_max_similarity",
+        "auc": 0.9465,
+        "auc_gain": 0.0262,
+        "accepted": true,
+        "token_f1": 0.8625,
+        "token_fpr": 0.002
+      },
+      {
+        "round": 1,
+        "candidate": "ctx_support_distance",
+        "auc": 0.9121,
+        "auc_gain": -0.0082,
+        "accepted": false,
+        "token_f1": 0.7041,
+        "token_fpr": 0.006
+      },
+      {
+        "round": 1,
+        "candidate": "ctx_similarity_decay",
+        "auc": 0.906,
+        "auc_gain": -0.0143,
+        "accepted": false,
+        "token_f1": 0.736,
+        "token_fpr": 0.003
+      },
+      {
+        "round": 1,
+        "candidate": "ctx_sim_contrast",
+        "auc": 0.9295,
+        "auc_gain": 0.0092,
+        "accepted": true,
+        "token_f1": 0.8258,
+        "token_fpr": 0.0024
+      },
+      {
+        "round": 1,
+        "candidate": "ctx_sim_margin",
+        "auc": 0.9338,
+        "auc_gain": 0.0136,
+        "accepted": true,
+        "token_f1": 0.8526,
+        "token_fpr": 0.0002
+      },
+      {
+        "round": 2,
+        "candidate": "ctx_attention_mass_norm",
+        "auc": 0.9465,
+        "auc_gain": -0.0,
+        "accepted": false,
+        "token_f1": 0.8625,
+        "token_fpr": 0.002
+      },
+      {
+        "round": 2,
+        "candidate": "ctx_attention_mass_lift",
+        "auc": 0.949,
+        "auc_gain": 0.0025,
+        "accepted": true,
+        "token_f1": 0.8794,
+        "token_fpr": 0.0002
+      },
+      {
+        "round": 2,
+        "candidate": "ctx_support_distance",
+        "auc": 0.9447,
+        "auc_gain": -0.0018,
+        "accepted": false,
+        "token_f1": 0.8625,
+        "token_fpr": 0.002
+      },
+      {
+        "round": 2,
+        "candidate": "ctx_similarity_decay",
+        "auc": 0.9302,
+        "auc_gain": -0.0163,
+        "accepted": false,
+        "token_f1": 0.8625,
+        "token_fpr": 0.002
+      },
+      {
+        "round": 2,
+        "candidate": "ctx_sim_contrast",
+        "auc": 0.9496,
+        "auc_gain": 0.0032,
+        "accepted": true,
+        "token_f1": 0.8794,
+        "token_fpr": 0.0002
+      },
+      {
+        "round": 2,
+        "candidate": "ctx_sim_margin",
+        "auc": 0.9481,
+        "auc_gain": 0.0016,
+        "accepted": true,
+        "token_f1": 0.8625,
+        "token_fpr": 0.002
+      }
+    ],
+    "selected": [
+      "ctx_max_similarity",
+      "ctx_sim_contrast"
+    ],
+    "select_pairs": 300,
+    "final_features": [
+      "attention_entropy",
+      "ctx_attention_mass",
+      "embedding_density",
+      "risk",
+      "position",
+      "length",
+      "ctx_max_similarity",
+      "ctx_sim_contrast"
+    ],
+    "baseline_auc": 0.9283871074530641
+  },
+  "final": {
+    "head_auc_out_of_fold": 0.9574171357397253,
+    "head_auc_test": 0.9619951046722861,
+    "head_auc_rule": 0.8234714263327843,
+    "weights": {
+      "attention_entropy": 0.0,
+      "ctx_attention_mass": 1.0,
+      "embedding_density": 0.0
+    },
+    "threshold": 0.265455,
+    "span": {
+      "z": 0.0,
+      "floor": 0.1,
+      "cap": 0.5
+    }
+  },
+  "baseline": {
+    "head_auc_out_of_fold": 0.9283871074530641,
+    "metrics": {
+      "pairs": 177,
+      "token_precision": 0.9,
+      "token_recall": 0.6406,
+      "token_f1": 0.7484,
+      "token_fpr": 0.0022,
+      "token_auc": 0.9321,
+      "span_f1_iou_0_5": 0.2516,
+      "span_coverage": 0.7216,
+      "verdict_f1": 0.7642,
+      "verdict_fpr": 0.425,
+      "coverage": {
+        "enabled": true,
+        "pairs_with_context": 177,
+        "missing_pairs": 10,
+        "partial_pairs": 10,
+        "clean_pairs": 80,
+        "predicted_missing": 29,
+        "predicted_partial": 5,
+        "recall_missing": 0.0,
+        "precision_missing": 0.0,
+        "recall_partial": 0.5,
+        "precision_partial": 1.0,
+        "fpr_clean": 0.05
+      },
+      "split": "официальный тест (база)",
+      "features": "база (6)"
+    }
+  },
+  "metrics": [
+    {
+      "pairs": 177,
+      "token_precision": 0.9,
+      "token_recall": 0.6406,
+      "token_f1": 0.7484,
+      "token_fpr": 0.0022,
+      "token_auc": 0.9321,
+      "span_f1_iou_0_5": 0.2516,
+      "span_coverage": 0.7216,
+      "verdict_f1": 0.7642,
+      "verdict_fpr": 0.425,
+      "coverage": {
+        "enabled": true,
+        "pairs_with_context": 177,
+        "missing_pairs": 10,
+        "partial_pairs": 10,
+        "clean_pairs": 80,
+        "predicted_missing": 29,
+        "predicted_partial": 5,
+        "recall_missing": 0.0,
+        "precision_missing": 0.0,
+        "recall_partial": 0.5,
+        "precision_partial": 1.0,
+        "fpr_clean": 0.05
+      },
+      "split": "официальный тест (база)",
+      "features": "база (6)"
+    },
+    {
+      "pairs": 177,
+      "token_precision": 0.938,
+      "token_recall": 0.8078,
+      "token_f1": 0.8681,
+      "token_fpr": 0.0017,
+      "token_auc": 0.9649,
+      "span_f1_iou_0_5": 0.2748,
+      "span_coverage": 0.7732,
+      "verdict_f1": 0.8165,
+      "verdict_fpr": 0.4,
+      "coverage": {
+        "enabled": true,
+        "pairs_with_context": 177,
+        "missing_pairs": 10,
+        "partial_pairs": 10,
+        "clean_pairs": 80,
+        "predicted_missing": 29,
+        "predicted_partial": 5,
+        "recall_missing": 0.0,
+        "precision_missing": 0.0,
+        "recall_partial": 0.5,
+        "precision_partial": 1.0,
+        "fpr_clean": 0.05
+      },
+      "split": "официальный тест",
+      "features": "расширенная (8)"
+    },
+    {
+      "pairs": 1200,
+      "token_precision": 0.9409,
+      "token_recall": 0.7992,
+      "token_f1": 0.8643,
+      "token_fpr": 0.0016,
+      "token_auc": 0.9697,
+      "span_f1_iou_0_5": 0.2296,
+      "span_coverage": 0.7682,
+      "verdict_f1": 0.8045,
+      "verdict_fpr": 0.437,
+      "coverage": {
+        "enabled": true,
+        "pairs_with_context": 1200,
+        "missing_pairs": 72,
+        "partial_pairs": 108,
+        "clean_pairs": 540,
+        "predicted_missing": 173,
+        "predicted_partial": 46,
+        "recall_missing": 0.0278,
+        "precision_missing": 0.0116,
+        "recall_partial": 0.3241,
+        "precision_partial": 0.7609,
+        "fpr_clean": 0.0519
+      },
+      "split": "весь корпус",
+      "features": "расширенная (8)"
+    }
+  ],
+  "gate_token_f1": 0.9,
+  "gate_token_fpr": 0.1,
+  "gate_passed": false,
+  "gate_statement": "token F1 0.8681 при пороге 0.90, токенный FPR 0.0017 при ограничении 0.10: критерий НЕ выполнен",
+  "artifacts": {
+    "weights": "config/demo_a3/weights_hf.json",
+    "head": "config/demo_a3/head_hf.json",
+    "participation": "config/demo_a3/participation_hf.json",
+    "dataset": "data/corpus_a3/pairs.jsonl",
+    "mode": "demo",
+    "model": ""
+  },
+  "cache": {
+    "paths": [],
+    "keys": 0,
+    "hits": null,
+    "misses": null
+  },
+  "duration_s": 3558.0,
+  "disclaimer": "Режим demo: лексические суррогаты признаков без весов модели. Числа измеряют полезность самих признаков на реальных текстах и работоспособность конвейера; научным результатом не являются."
+}

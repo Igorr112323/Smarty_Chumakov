@@ -30,7 +30,11 @@ MAX_JOB_MINUTES = 40
 # с отбором признаков занимают часы, потому что прямой проход по модели стоит
 # секунды на пару. Исключение разрешено только этим файлам и только с
 # обоснованием в шапке workflow — иначе «висящий» job снова съедает очередь.
-HEAVY_JOB_MINUTES = {"hf-runs.yml": 180, "hf-a3-head.yml": 150}
+HEAVY_JOB_MINUTES = {
+    "hf-runs.yml": 180,
+    "hf-a3-head.yml": 150,
+    "hf-protocol.yml": 150,
+}
 
 
 def _workflow_paths() -> list[Path]:

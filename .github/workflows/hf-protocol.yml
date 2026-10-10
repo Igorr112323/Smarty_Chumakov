@@ -1,0 +1,404 @@
+# Протокол измерения критерия режима hf (docs/METRIC_SPEC.md).
+#
+# Зачем отдельный workflow: критерий «F1 ≥ 0,60 при FPR ≤ 0,40 на отложенном по
+# документам test» должен быть получен прогоном, а не заявлением. Дорогая часть —
+# прямой проход по языковой модели (секунды на пару), и она выполняется один раз:
+# job `grid` считает широкую сетку признаков (36 имён) для обучающей и
+#_validation_ частей, job `sweep` поверх кеша перебирает не более 10 конфигураций,
+# а шаг 3 (`final`) догружает признаки test и считает финал ровно один раз.
+#
+# Запуск: workflow_dispatch (шаг 2 — всегда; шаг 3 — только с run_final=true) или
+# пуш файла .github/hf-protocol.trigger (номер замера в содержимом).
+#
+# Почему test считается отдельным job'ом: признаки test физически не попадают в
+# кеш шага 2, поэтому перебрать конфигурации на test невозможно даже случайно.
+#
+# Результаты: артефакты прогона + коммит в ветку данных data/metrics (всегда с
+# [skip ci]); ci.yml в ветку не пишет ничего.
+name: Протокол hf (критерий ТЗ)
+
+on:
+  workflow_dispatch:
+    inputs:
+      run_final:
+        description: "Шаг 3: запустить финальную оценку на test (ровно один раз)"
+        type: boolean
+        default: false
+      corpora:
+        description: "Корпусы через запятую"
+        default: "a3,a1"
+      shards:
+        description: "Число шардов предпосчёта признаков"
+        default: "4"
+  push:
+    branches: ["arena/**"]
+    paths:
+      - .github/hf-protocol.trigger
+
+concurrency:
+  group: hf-protocol-${{ github.ref }}
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+env:
+  PYTHONUTF8: "1"
+  PYTHONIOENCODING: "utf-8"
+  HF_MODEL: ai-forever/rugpt3small_based_on_gpt2
+  SEED: "42"
+
+jobs:
+  grid:
+    name: "Сетка признаков train+dev, ${{ matrix.corpus }}, шард ${{ matrix.shard }}"
+    runs-on: ubuntu-latest
+    # 60 минут: 1023 пары A3 при ~2,5 с/пару = ~43 минуты на весь корпус, делить
+    # на число шардов; запас — на загрузку весов и установку torch.
+    timeout-minutes: 60
+    strategy:
+      fail-fast: false
+      matrix:
+        corpus: [a3, a1]
+        shard: [0, 1, 2, 3]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: "Кэш весов модели"
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/huggingface
+          key: hf-${{ runner.os }}-rugpt3small-v1
+      - name: "Зависимости и среда"
+        uses: ./.github/actions/hf-setup
+      - name: "Сетка признаков обучающей и validation-частей"
+        working-directory: spanverify-module
+        env:
+          OMP_NUM_THREADS: "4"
+        run: |
+          corpus="${{ matrix.corpus }}"
+          case "$corpus" in
+            a3) dir="data/corpus_a3/splits" ;;
+            a1) dir="data/corpus_a/splits" ;;
+            *) echo "неизвестный корпус $corpus" >&2; exit 2 ;;
+          esac
+          splits="${corpus}-train=$dir/train.jsonl,${corpus}-dev=$dir/dev.jsonl"
+          echo "python scripts/precompute_features.py --grid --model $HF_MODEL --dataset $dir/train.jsonl --split-files $splits --out reports/hf-grid --shard ${{ matrix.shard }} --shards ${{ matrix.shards || 4 }}"
+          python scripts/precompute_features.py \
+            --grid \
+            --model "$HF_MODEL" \
+            --dataset "$dir/train.jsonl" \
+            --split-files "$splits" \
+            --out reports/hf-grid \
+            --shard "${{ matrix.shard }}" \
+            --shards 4
+      - name: "Проверка полноты кеша"
+        working-directory: spanverify-module
+        run: |
+          python - << 'PY'
+          import glob
+          import json
+          paths = sorted(glob.glob("reports/hf-grid/grid_*.jsonl"))
+          assert paths, "шард не записал ни одного файла кеша"
+          total = 0
+          for path in paths:
+              with open(path, encoding="utf-8") as handle:
+                  rows = [json.loads(line) for line in handle if line.strip()]
+              assert rows, f"{path}: пустой файл"
+              for row in rows:
+                  assert int(row.get("grid_format", 0)) == 3, (path, row.get("pair_id"))
+                  assert len(row["arrays"]) == 36, (path, row.get("pair_id"), len(row["arrays"]))
+                  assert len(row["tokens"]) == len(row["arrays"]["entropy_last"]), path
+                  assert row["meta"]["unmatched_tokens"] == 0 or row["meta"]["seq_len"] >= row["meta"]["max_length"], (
+                      f"{path}: {row['pair_id']} — токены ответа не сопоставлены с моделью без обрезки"
+                  )
+              total += len(rows)
+              print(path, "строк", len(rows))
+          print("всего строк кеша в этом шарде:", total)
+          PY
+      - name: "Product-кеш для базовой линии (val, формат v2)"
+        working-directory: spanverify-module
+        env:
+          OMP_NUM_THREADS: "4"
+        run: |
+          corpus="${{ matrix.corpus }}"
+          case "$corpus" in
+            a3) dir="data/corpus_a3/splits" ;;
+            a1) dir="data/corpus_a/splits" ;;
+          esac
+          # Шаг 1 обязан прогнать ТЕКУЩИЙ код, а не новую сетку: признаки для
+          # него считаютсяproduct-путём (precompute без --grid) и только для
+          # validation-части — test в этом шаге не участвует.
+          python scripts/precompute_features.py \
+            --dataset "$dir/dev.jsonl" \
+            --mode hf --model "$HF_MODEL" \
+            --shard "${{ matrix.shard }}" --shards 4 \
+            --out "reports/hf-cache-val/$corpus"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: "grid-${{ matrix.corpus }}-${{ matrix.shard }}"
+          path: spanverify-module/reports/hf-grid/
+          retention-days: 30
+          if-no-files-found: error
+      - uses: actions/upload-artifact@v4
+        with:
+          name: "feat-${{ matrix.corpus }}-${{ matrix.shard }}"
+          path: spanverify-module/reports/hf-cache-val/
+          retention-days: 30
+          if-no-files-found: error
+
+  sweep:
+    name: "Шаг 1–2: базовая линия и перебор конфигураций на val"
+    needs: grid
+    runs-on: ubuntu-latest
+    # 150 минут: шаг 1 на кеше стоит минуты, а десять конфигураций на 46 607
+    # обучающих строках (logreg до 800 эпох и бустинг до 60 раундов, ×2 корпуса)
+    # — полтора часа. Больше нельзя: иначе job снимают по лимиту, и прогон
+    # приходится начинать заново.
+    timeout-minutes: 150
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: "Зависимости и среда"
+        uses: ./.github/actions/hf-setup
+      - name: "Собрать кеш сетки со всех шардов"
+        uses: actions/download-artifact@v4
+        with:
+          pattern: "grid-*"
+          path: spanverify-module/reports/hf-grid
+          merge-multiple: true
+      - name: "Собрать product-кеш базовой линии"
+        uses: actions/download-artifact@v4
+        with:
+          pattern: "feat-*"
+          path: spanverify-module/reports/hf-cache-val
+          merge-multiple: false
+      - name: "Шаг 0: аудит разбиения (заодно проверяет, что артефакты на месте)"
+        working-directory: spanverify-module
+        run: |
+          set -x
+          python scripts/hf_protocol.py freeze \
+            --corpus "a3=data/corpus_a3/splits;a1=data/corpus_a/splits" \
+            --config config/hf_experiments.json \
+            --out reports/hf_protocol
+      - name: "Шаг 1: базовая линия текущего кода на val"
+        working-directory: spanverify-module
+        env:
+          OMP_NUM_THREADS: "4"
+        run: |
+          set -x
+          python scripts/hf_protocol.py baseline \
+            --corpus "a3=data/corpus_a3/splits;a1=data/corpus_a/splits" \
+            --mode hf --model "$HF_MODEL" --seed "$SEED" \
+            --features-cache reports/hf-cache-val \
+            --out reports/hf_baseline
+      - name: "Шаг 2: перебор не более 10 конфигураций на val"
+        working-directory: spanverify-module
+        run: |
+          set -x
+          python scripts/hf_protocol.py sweep \
+            --grid config/hf_experiments.json \
+            --grid-cache reports/hf-grid \
+            --corpus "a3=data/corpus_a3/splits;a1=data/corpus_a/splits" \
+            --primary a3 \
+            --out reports/hf_protocol \
+            --write-predictions
+          # Выбранные на val числа проверяются тем же пересчётом, что и финал:
+          # расхождение «манифест vs предсказания» должно быть видно до шага 3.
+          python scripts/hf_protocol.py verify-manifest \
+            --manifest reports/hf_protocol/manifest_val.json \
+            --predictions reports/hf_protocol/predictions_val.jsonl.gz
+      - name: "Сводка для отчёта"
+        working-directory: spanverify-module
+        run: |
+          python - << 'PY'
+          import json
+          data = json.loads(open("reports/hf_protocol/sweep.json", encoding="utf-8").read())
+          print("лучшая конфигурация:", data.get("best"))
+          print("правило:", data["rule"])
+          for item in data["experiments"]:
+              for corpus, numbers in sorted(item["per_corpus"].items()):
+                  tokens = numbers.get("tokens") or {}
+                  print(
+                      f"{item['number']:>2} {item['name']:<24} {corpus}: "
+                      f"F1 {tokens.get('f1')} FPR {tokens.get('fpr')} AUC {tokens.get('auc')}"
+                  )
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: "hf-protocol-sweep"
+          path: |
+            spanverify-module/reports/hf_protocol/
+            spanverify-module/reports/hf_baseline/
+          retention-days: 90
+          if-no-files-found: error
+      - name: "Опубликовать в ветку данных"
+        run: |
+          mkdir -p /tmp/keep
+          cp -r spanverify-module/reports/hf_protocol /tmp/keep/hf_protocol
+          cp -r spanverify-module/reports/hf_baseline /tmp/keep/hf_baseline
+          git config user.name "spanverify-bot"
+          git config user.email "bot@spanverify.local"
+          git fetch origin data/metrics || true
+          git checkout -B data/metrics FETCH_HEAD 2>/dev/null || git checkout -B data/metrics
+          mkdir -p hf-protocol
+          cp -r /tmp/keep/hf_protocol/. hf-protocol/
+          mkdir -p hf-baseline
+          cp -r /tmp/keep/hf_baseline/. hf-baseline/
+          git add -A hf-protocol hf-baseline
+          if git diff --cached --quiet; then
+            echo "изменений нет, коммит не нужен"
+            exit 0
+          fi
+          git commit -m "hf протокол: шаг 0-2, прогон ${{ github.run_number }} [skip ci]"
+          for attempt in 1 2 3 4 5; do
+            if git push origin HEAD:data/metrics; then
+              echo "ветка данных обновлена с попытки $attempt"
+              break
+            fi
+            echo "пуш отклонён, попытка $attempt"
+            git fetch origin data/metrics
+            git rebase FETCH_HEAD || git rebase --abort
+            sleep $((attempt * 10))
+            if [ "$attempt" = 5 ]; then
+              echo "не удалось опубликовать ветку данных за 5 попыток" >&2
+              exit 1
+            fi
+          done
+
+  grid-test:
+    name: "Сетка признаков test, ${{ matrix.corpus }}, шард ${{ matrix.shard }}"
+    if: ${{ github.event_name == 'workflow_dispatch' && inputs.run_final }}
+    needs: sweep
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    strategy:
+      fail-fast: false
+      matrix:
+        corpus: [a3, a1]
+        shard: [0, 1, 2, 3]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: "Кэш весов модели"
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/huggingface
+          key: hf-${{ runner.os }}-rugpt3small-v1
+      - name: "Зависимости и среда"
+        uses: ./.github/actions/hf-setup
+      - name: "Сетка признаков отложенной части"
+        working-directory: spanverify-module
+        env:
+          OMP_NUM_THREADS: "4"
+        run: |
+          corpus="${{ matrix.corpus }}"
+          case "$corpus" in
+            a3) dir="data/corpus_a3/splits" ;;
+            a1) dir="data/corpus_a/splits" ;;
+            *) echo "неизвестный корпус $corpus" >&2; exit 2 ;;
+          esac
+          python scripts/precompute_features.py \
+            --grid \
+            --model "$HF_MODEL" \
+            --dataset "$dir/test.jsonl" \
+            --split-files "${corpus}-test=$dir/test.jsonl" \
+            --out reports/hf-grid-test \
+            --shard "${{ matrix.shard }}" \
+            --shards "4"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: "grid-test-${{ matrix.corpus }}-${{ matrix.shard }}"
+          path: spanverify-module/reports/hf-grid-test/
+          retention-days: 30
+          if-no-files-found: error
+
+  final:
+    name: "Шаг 3: финальная оценка на test (один раз)"
+    if: ${{ github.event_name == 'workflow_dispatch' && inputs.run_final }}
+    needs: [sweep, grid-test]
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: "Взять выбранную на val конфигурацию (для сверки источника порога)"
+        uses: actions/download-artifact@v4
+        with:
+          name: "hf-protocol-sweep"
+          path: spanverify-module/reports/hf-protocol-val
+        uses: actions/download-artifact@v4
+        with:
+          pattern: "grid*"
+          path: spanverify-module/reports/hf-grid
+          merge-multiple: true
+      - name: "Зависимости и среда"
+        uses: ./.github/actions/hf-setup
+      - name: "Проверка, что конфигурация зафиксирована"
+        working-directory: spanverify-module
+        run: |
+          if [ ! -f config/hf_final_config.json ]; then
+            echo "нет config/hf_final_config.json: шаг 3 выполняется только после того, как" >&2
+            echo "выбранная на val конфигурация зафиксирована коммитом (docs/EXPERIMENTS.md, шаг 3)" >&2
+            exit 1
+          fi
+          python - << 'PY'
+          import json
+          config = json.load(open("config/hf_final_config.json", encoding="utf-8"))
+          assert config.get("step") == "final-config", config.get("step")
+          print("зафиксировано:", config.get("name"), "| признаков:", len(config.get("features", [])))
+          PY
+      - name: "Финальный прогон"
+        working-directory: spanverify-module
+        run: |
+          set -x
+          python scripts/hf_protocol.py final \
+            --config config/hf_final_config.json \
+            --grid-cache reports/hf-grid \
+            --splits data/corpus_a3/splits \
+            --corpus-name a3 \
+            --seeds 42,43,44,45,46 \
+            --include-val \
+            --out reports/hf_final
+      - name: "Пересчёт чисел из предсказаний"
+        working-directory: spanverify-module
+        run: |
+          python scripts/hf_protocol.py verify-manifest \
+            --manifest reports/hf_final/manifest.json \
+            --predictions reports/hf_final/predictions_test.jsonl.gz \
+            --check-splits
+      - uses: actions/upload-artifact@v4
+        with:
+          name: "hf-protocol-final"
+          path: spanverify-module/reports/hf_final/
+          retention-days: 90
+          if-no-files-found: error
+      - name: "Опубликовать в ветку данных"
+        run: |
+          mkdir -p /tmp/keep-final
+          cp -r spanverify-module/reports/hf_final/. /tmp/keep-final/
+          git config user.name "spanverify-bot"
+          git config user.email "bot@spanverify.local"
+          git fetch origin data/metrics || true
+          git checkout -B data/metrics FETCH_HEAD 2>/dev/null || git checkout -B data/metrics
+          mkdir -p hf-final
+          cp -r /tmp/keep-final/. hf-final/
+          git add -A hf-final
+          if git diff --cached --quiet; then
+            echo "изменений нет, коммит не нужен"
+            exit 0
+          fi
+          git commit -m "hf протокол: шаг 3, критерий на test, прогон ${{ github.run_number }} [skip ci]"
+          git push origin HEAD:data/metrics
+      - name: "Подтверждающие тесты (падение = критерий не выполнен)"
+        working-directory: spanverify-module
+        run: |
+          python -m pip install -q pytest
+          python -m pytest -q tests/test_reported_metrics.py tests/test_no_test_leakage.py tests/test_metric_spec.py tests/test_criterion_hf.py
