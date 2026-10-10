@@ -225,7 +225,15 @@ jobs:
           mkdir -p hf-a3-head
           cp -r /tmp/keep/out/. hf-a3-head/ 2>/dev/null || true
           git add -A hf-a3-head
-          git diff --cached --quiet && echo "изменений нет" && exit 0
+          # Проверка «есть ли что коммитить» отдельным if: конструкция
+          # `git diff --cached --quiet && echo && exit 0` при наличии изменений
+          # возвращает 1, а шаг идёт под `set -e` — и шаг обрывался ровно тогда,
+          # когда коммитить было нужно (прогон 38031393798, step «Сохранить в
+          # ветку данных»: failure при полностью успешном обучении).
+          if git diff --cached --quiet; then
+            echo "изменений нет, коммит не нужен"
+            exit 0
+          fi
           git commit -m "hf A3: обучение с отбором признаков, прогон ${{ github.run_number }} [skip ci]"
           for attempt in 1 2 3 4 5; do
             if git push origin HEAD:data/metrics; then
@@ -236,4 +244,8 @@ jobs:
             git fetch origin data/metrics
             git rebase FETCH_HEAD || git rebase --abort
             sleep $((attempt * 10))
+            if [ "$attempt" = 5 ]; then
+              echo "не удалось опубликовать ветку данных за 5 попыток" >&2
+              exit 1
+            fi
           done
