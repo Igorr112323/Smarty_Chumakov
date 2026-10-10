@@ -109,6 +109,70 @@ def test_documents_match_metrics_file() -> None:
     assert checker.check_docs(docs, metrics) == []
 
 
+def _full_suite_requested(config: pytest.Config) -> bool:
+    """Запрошен ли полный прогон: нет путей, ``-k`` и ``-m``.
+
+    Проверки числа тестов имеют смысл только тогда, когда собрана вся сюита
+    (``testpaths = tests`` из ``pyproject.toml``). Прогон одного файла или
+    отбор по ключевому слову даёт заведомо другое число — такие прогоны
+    пропускаются, а не падают.
+    """
+    if config.args:
+        return False
+    option = config.option
+    return not (getattr(option, "keyword", "") or getattr(option, "markexpr", ""))
+
+
+def test_metrics_file_is_not_behind_the_suite(request: pytest.FixtureRequest) -> None:
+    """Файл чисел обязан совпадать с фактическим числом тестов этого прогона.
+
+    Причина проверки: два ночных прогона ``ci`` на ``main`` подряд
+    (37755784670, 37911250513) падали на шаге «Сверить числа в документах с
+    METRICS.json». Job «Единый файл чисел» пересчитывает ``tests.collected``
+    заново (``pytest --collect-only``), а закоммиченный файл и документы
+    остались с прежним числом после слияния ветки, добавившей тесты. Локально
+    расхождение не ловилось: сверка смотрела в устаревший файл.
+
+    Здесь число берётся из самой сессии pytest (коллекция завершена до запуска
+    тестов), поэтому проверка ничего не пересчитывает и не запускает второй
+    pytest. Прогон подмножества тестов — не полный состав, он пропускается.
+    """
+    if not _full_suite_requested(request.config):
+        pytest.skip("запрошено подмножество тестов: полный состав не собирался")
+    collected = request.session.testscollected
+    metrics = _metrics()
+    tests_block = metrics.get("tests") or {}
+    assert tests_block.get("collected") == collected, (
+        f"reports/METRICS.json отстал от состава тестов: в файле {tests_block.get('collected')}, "
+        f"собрано {collected}; пересоберите файл (scripts/collect_metrics.py) и обновите документы"
+    )
+    coverage = tests_block.get("coverage_percent")
+    assert isinstance(coverage, (int, float)) and not isinstance(coverage, bool), (
+        "в reports/METRICS.json нет измеренного покрытия (null): локальная сверка документов "
+        "пропускает заявления о покрытии, а ночной CI, где покрытие измеряется, — нет"
+    )
+
+
+def test_document_test_claims_match_this_session(request: pytest.FixtureRequest) -> None:
+    """Заявленное в документах число тестов совпадает с собранным в этом прогоне.
+
+    Документы (README, ИТОГ, отчёт о НИР, руководство) называют число тестов
+    текстом. Сверка с закоммиченным ``METRICS.json`` этого не ловит, если файл
+    устарел вместе с документами, — поэтому число подставляется из текущей
+    сессии pytest, а правила чтения строк берутся из ``scripts/check_numbers.py``
+    (оговорки «устарело», «аннотации CI», пороги и критерии остаются допустимыми).
+    """
+    if not _full_suite_requested(request.config):
+        pytest.skip("запрошено подмножество тестов: полный состав не собирался")
+    collected = request.session.testscollected
+    checker = _load_script("check_numbers")
+    metrics = json.loads(json.dumps(_metrics()))
+    metrics.setdefault("tests", {})["collected"] = collected
+    docs = [REPO_ROOT / name for name in checker.DEFAULT_DOCS if (REPO_ROOT / name).is_file()]
+    problems = [problem for problem in checker.check_docs(docs, metrics, repo_root=REPO_ROOT) if "tests=" in problem]
+    assert problems == [], "документы заявляют число тестов, которого нет в этом прогоне:\n" + "\n".join(problems)
+
+
 def test_pilot_publishes_control_thresholds_and_draws_png(tmp_path: Path) -> None:
     """Пилот обязан публиковать контроль корпуса (0.8/0.3) и рисовать PNG без зависимостей."""
     pilot = _load_script("pilot_rugpt3small")
