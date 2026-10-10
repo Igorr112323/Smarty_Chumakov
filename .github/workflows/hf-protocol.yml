@@ -362,7 +362,13 @@ jobs:
     if: ${{ (github.event_name == 'workflow_dispatch' && inputs.run_final) || (github.event_name == 'push' && contains(github.event.head_commit.message, '[hf-final]')) }}
     needs: [sweep, grid-test]
     runs-on: ubuntu-latest
-    timeout-minutes: 40
+    # 90 минут. Прогон `38053135407` был убит лимитом 40 минут ровно на шаге
+    # «Финальный прогон»: там на каждый seed уходило по шесть обучений — пять
+    # фолдов CV ради порога, который уже зафиксирован до запуска, и одно итоговое.
+    # Теперь при замороженном пороге CV не запускается вовсе (scripts/hf_protocol.py),
+    # а запас оставлен потому, что единственный запуск не должен зависеть от
+    # оценки времени.
+    timeout-minutes: 90
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -425,11 +431,79 @@ jobs:
             --manifest reports/hf_final/manifest.json \
             --predictions reports/hf_final/predictions_test.jsonl.gz \
             --check-splits
-      - name: "Вторичное измерение: тот же замороженный конфиг на A1"
-        # Объявлено ДО запуска (docs/EXPERIMENTS.md, отступления фиксации): это не
-        # переподбор параметров, а то же самое измерение на втором корпусе. Не
-        # влияет на статус критерия и не может его изменить, поэтому падение
-        # вторичного шага — предупреждение, а не красный прогон.
+      - uses: actions/upload-artifact@v4
+        # always() и warn: числа нужны, даже если следующий шаг упадёт или job
+        # догонит таймаут. Иначе единственный финальный прогон придётся повторять
+        # вслепую, не зная, успел ли он записать манифест.
+        if: ${{ always() }}
+        with:
+          name: "hf-protocol-final"
+          path: spanverify-module/reports/hf_final/
+          retention-days: 90
+          if-no-files-found: warn
+      - name: "Опубликовать в ветку данных"
+        if: ${{ always() }}
+        # Манифест, предсказания и gold — в ветку данных: только так их может
+        # перепроверить тот, у кого нет доступа к артефактам. Сюда же кладутся
+        # сгенерированный блок README и журнал: их числа обязаны совпасть с
+        # манифестом буквально, байт в байт.
+        working-directory: spanverify-module
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          if [ ! -f reports/hf_final/manifest.json ]; then
+            echo "::warning::[publish] reports/hf_final/manifest.json не создан — публиковать нечего"
+            exit 0
+          fi
+          python scripts/publish_reports.py --branch data/metrics --dest hf-final \
+            --report reports/hf_final --report ../README.md --report docs/EXPERIMENTS.md \
+            --message "hf протокол: шаг 3, критерий на test, прогон ${{ github.run_number }} [skip ci]"
+      - name: "Блок критерия в README — из манифеста, не от руки"
+        # До измерения в README стоит отметка «не измерено»: переписывать числа
+        # от руки запрещено, поэтому блок генерируется из только что полученного
+        # манифеста и тут же сверяется генератором и check_numbers. В ветку блок
+        # попадает следующим коммитом — вместе с артефактами прогона.
+        working-directory: spanverify-module
+        run: |
+          python scripts/render_hf_table.py --readme ../README.md --write
+          python scripts/render_hf_table.py --readme ../README.md
+          python scripts/check_numbers.py --metrics reports/METRICS.json
+      - name: "Подтверждающие тесты (падение = критерий не выполнен)"
+        working-directory: spanverify-module
+        run: |
+          python -m pip install -q pytest
+          python -m pytest -q tests/test_reported_metrics.py tests/test_no_test_leakage.py tests/test_metric_spec.py tests/test_criterion_hf.py
+
+  final-a1:
+    name: "Шаг 3 (вторично): тот же замороженный конфиг на A1"
+    # Отдельный job, а не шаг внутри `final`: вторичное измерение не может ни
+    # съесть лимит времени основного прогона, ни утопить его публикацию. Условие
+    # то же, что у `final` — запускается только коммитом с меткой [hf-final].
+    # Объявлено ДО запуска (отступления в docs/EXPERIMENTS.md): это то же
+    # измерение на втором корпусе, а не переподбор параметров; статусом критерия
+    # не является и изменить его не может.
+    if: ${{ (github.event_name == 'workflow_dispatch' && inputs.run_final) || (github.event_name == 'push' && contains(github.event.head_commit.message, '[hf-final]')) }}
+    needs: final
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: "Собрать кеш train+dev и test"
+        uses: actions/download-artifact@v4
+        with:
+          pattern: "grid*"
+          path: spanverify-module/reports/hf-grid
+          merge-multiple: true
+      - name: "Зависимости продукта"
+        # torch здесь не нужен: шаг читает признаки из кеша, а не грузит модель,
+        # поэтому ставим только requirements.txt — иначе вторичный прогон ждал бы
+        # установку весов ради предсказуемого отказа.
+        working-directory: spanverify-module
+        run: python -m pip install -q -r requirements.txt
+      - name: "Вторичное измерение: A1"
         working-directory: spanverify-module
         run: |
           set +e
@@ -450,41 +524,24 @@ jobs:
           python scripts/hf_protocol.py verify-manifest \
             --manifest reports/hf_final_a1/manifest.json \
             --predictions reports/hf_final_a1/predictions_test.jsonl.gz \
-            --check-splits || echo "::warning::[secondary a1] пересчёт манифеста не сошёлся (код $?)"
-      - name: "Блок критерия в README — из манифеста, не от руки"
-        # До измерения в README стоит отметка «не измерено»: переписывать числа
-        # от руки запрещено, поэтому блок генерируется из только что полученного
-        # манифеста и тут же сверяется генератором и check_numbers. В ветку блок
-        # попадает следующим коммитом — вместе с артефактами прогона.
-        working-directory: spanverify-module
-        run: |
-          python scripts/render_hf_table.py --readme ../README.md --write
-          python scripts/render_hf_table.py --readme ../README.md
-          python scripts/check_numbers.py --metrics reports/METRICS.json
+            --check-splits || echo "::warning::[secondary a1] пересчёт манифеста не сошёлся"
       - uses: actions/upload-artifact@v4
+        if: ${{ always() }}
         with:
-          name: "hf-protocol-final"
-          path: spanverify-module/reports/hf_final/
+          name: "hf-protocol-final-a1"
+          path: spanverify-module/reports/hf_final_a1/
           retention-days: 90
-          if-no-files-found: error
+          if-no-files-found: warn
       - name: "Опубликовать в ветку данных"
-        # Манифест, предсказания и gold — в ветку данных: только так их может
-        # перепроверить тот, у кого нет доступа к артефактам. Сюда же кладутся
-        # сгенерированный блок README и журнал: их числа обязаны совпасть с
-        # манифестом буквально, байт в байт.
+        if: ${{ always() }}
         working-directory: spanverify-module
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          python scripts/publish_reports.py --branch data/metrics --dest hf-final \
-            --report reports/hf_final --report ../README.md --report docs/EXPERIMENTS.md \
-            --message "hf протокол: шаг 3, критерий на test, прогон ${{ github.run_number }} [skip ci]"
+          if [ ! -f reports/hf_final_a1/manifest.json ]; then
+            echo "::warning::[publish] вторичный манифест не создан — публиковать нечего"
+            exit 0
+          fi
           python scripts/publish_reports.py --branch data/metrics --dest hf-final-a1 \
             --report reports/hf_final_a1 \
-            --message "hf протокол: шаг 3, вторичное измерение A1, прогон ${{ github.run_number }} [skip ci]" \
-            || echo "::warning::[publish] вторичные артефакты не опубликованы"
-      - name: "Подтверждающие тесты (падение = критерий не выполнен)"
-        working-directory: spanverify-module
-        run: |
-          python -m pip install -q pytest
-          python -m pytest -q tests/test_reported_metrics.py tests/test_no_test_leakage.py tests/test_metric_spec.py tests/test_criterion_hf.py
+            --message "hf протокол: шаг 3, вторичное измерение A1, прогон ${{ github.run_number }} [skip ci]"

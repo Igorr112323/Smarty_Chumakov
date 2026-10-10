@@ -988,19 +988,33 @@ def run_experiment(
         return {"error": "нет строк: кеш не покрывает выборку"}
     config = dict(entry["params"])
     config["classifier"] = entry["classifier"]
-    model, threshold, details = fit_with_cv(
-        feature_matrix(fit_rows, names),
-        [int(row["gold"]) for row in fit_rows],
-        [str(row["doc"]) for row in fit_rows],
-        [str(row["id"]) for row in fit_rows],
-        config,
-        seed,
-        int(entry["window"]),
-    )
+    matrix = feature_matrix(fit_rows, names)
+    labels = [int(row["gold"]) for row in fit_rows]
     frozen = fixed_threshold is not None
     if frozen:
+        # Порог заморожен ДО шага 3, а групповая CV в `fit_with_cv` нужна ровно
+        # для его выбора. Без CV шаг 3 обучает ту же модель тем же вызовом
+        # (`fit_model` на всём fit-множестве) и экономит пять шестых времени:
+        # иначе единственный финальный прогон упирался бы в лимит job'а.
+        model = fit_model(matrix, labels, config, seed)
         threshold = float(fixed_threshold)
-        details = {**(details or {}), "source": "frozen-before-step-3"}
+        details = {
+            "folds": 0,
+            "oof_rows": 0,
+            "threshold": threshold,
+            "smoothing_radius": int(entry["window"]),
+            "source": "frozen-before-step-3",
+        }
+    else:
+        model, threshold, details = fit_with_cv(
+            matrix,
+            labels,
+            [str(row["doc"]) for row in fit_rows],
+            [str(row["id"]) for row in fit_rows],
+            config,
+            seed,
+            int(entry["window"]),
+        )
     for row, value in zip(eval_rows, model.scores(feature_matrix(eval_rows, names)), strict=True):
         row["score"] = float(value)
     groups = group_by_pair(eval_rows)
