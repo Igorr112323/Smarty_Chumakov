@@ -2038,13 +2038,13 @@ METRICS.json» в job'е «Единый файл чисел»; остальны�
 
 ### Что сделано
 
-* Числа в документах приведены к измеренным: **530 тестов** (515 на `main`
+* Числа в документах приведены к измеренным: **531 тест** (515 на `main`
   + 5 параметризованных проверок воркфлоу на восстановленный
-  `hf-span-filter.yml` + 8 тестов шага 32 + 2 новых теста сверки) и
+  `hf-span-filter.yml` + 8 тестов шага 32 + 3 новых теста сверки) и
   **покрытие 88 %** (87,51 %; 537 непокрытых строк из 4298). Правки:
   `README.md`, `ИТОГ.md` (три места), `docs/ОТЧЁТ_о_НИР_шаблон.md` (два места),
   `spanverify-module/README.md` (два места).
-* В `reports/METRICS.json` блок `tests` записан измеренным (530 / 87.51), а не
+* В `reports/METRICS.json` блок `tests` записан измеренным (531 / 87.51), а не
   `null`; `meta.commit` и `meta.generated_at` указывают состояние кода, для
   которого сделано измерение. Остальные блоки не тронуты намеренно: локальный
   пересчёт `collect_metrics.py` обнуляет `pilot` (каталог `reports/pilot/` в
@@ -2078,7 +2078,7 @@ METRICS.json» в job'е «Единый файл чисел»; остальны�
 cd spanverify-module
 python -m ruff check .                    # All checks passed!
 python -m black --check .                 # 121 files would be left unchanged
-python -m pytest --collect-only -q        # 530 (scripts/collect_metrics.py::_test_count)
+python -m pytest --collect-only -q        # 531 (scripts/collect_metrics.py::_test_count)
 python -m pytest --cov=spanverify --cov-report=json:reports/coverage.json
 python scripts/check_numbers.py --metrics reports/METRICS.json
 python scripts/collect_metrics.py --out /tmp/METRICS.sim.json --coverage-json reports/coverage.json
