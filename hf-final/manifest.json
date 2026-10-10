@@ -1,5 +1,5 @@
 {
- "code_commit": "39dffafe98591af0ceab41aa987452b81a92bcf0",
+ "code_commit": "d5dc9a5386977e022336d47e9dd1ca90d011bb72",
  "config": {
   "classifier": "logreg",
   "deviations": [
@@ -164,19 +164,19 @@
   "test": 64,
   "train": 265
  },
- "duration_s": 1080.58,
+ "duration_s": 1096.23,
  "fit_on": "train+val",
  "freeze_file": "reports/hf_protocol/freeze.json",
  "freeze_sha256": "1052c294eaa64a84e0f590de0daa2df273b01b7e3b0251e6d47d7b424aaff92a",
  "gold_file": "gold_test.jsonl.gz",
  "gold_rows": 177,
- "gold_sha256": "6354406911c8d5fc36dc93e8639c9cfa9906a5b0ea1235f417f655de838343c0",
+ "gold_sha256": "a78cefed500e4fd15f4d475c9bb91170492403c64745fc50879b7b99a2129758",
  "hardware": {
-  "cpu_mhz": "3302.303",
+  "cpu_mhz": "3181.272",
   "cpu_model": "AMD EPYC 7763 64-Core Processor",
   "cpu_processors": 4,
-  "free_h": "total        used        free      shared  buff/cache   available\nMem:            15Gi       1.5Gi        10Gi        47Mi       4.2Gi        14Gi\nSwap:          3.0Gi          0B       3.0Gi",
-  "lscpu": "Architecture:                            x86_64\nCPU op-mode(s):                          32-bit, 64-bit\nAddress sizes:                           48 bits physical, 48 bits virtual\nByte Order:                              Little Endian\nCPU(s):                                  4\nOn-line CPU(s) list:                     0-3\nVendor ID:                               AuthenticAMD\nModel name:                              AMD EPYC 7763 64-Core Processor\nCPU family:                              25\nModel:                                   1\nThread(s) per core:                      2\nCore(s) per socket:                      2\nSocket(s):                               1\nStepping:                                1\nBogoMIPS:                                4890.86\nFlags:                                   fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush mmx fxsr sse sse2 ht syscall nx mmxext fxsr_opt pdpe1gb rdtscp lm constant_tsc rep_good nopl tsc_reliable nonstop_tsc cpuid extd_apicid aperfmperf tsc_known_freq pni pclmulqdq ssse3 fma cx16 pcid sse4_1 sse4_2 movbe popcnt aes xsave avx f16c rdrand hypervisor lahf_lm cmp_legacy svm cr8_legacy abm sse4a misalignsse 3dnowprefetch osvw topoext vmmcall fsgsbase bmi1 avx2 smep bmi2 erms invpcid rdseed adx smap clflushopt clwb sha_ni xsaveopt xsavec xgetbv1 xsaves user_shstk clzero xsaveerptr rdpru arat npt nrip_save tsc_scale vmcb_clean flushbyasid decodeassists pausefilter pfthreshold v_vmsave_vmload umip vaes vpclmulqdq rdpid fsrm\nVirtualization:                          AMD-V\nHypervisor vendor:                       Microsoft\nVirtualization type:                     full\nL1d cache:                               64 KiB (2 instances)\nL1i cache:                               64 KiB (2 instances)\nL2 cache:                                1 MiB (2 instances)\nL3 cache:                                32 MiB (1 instance)\nNUMA node(s):                            1\nNUMA node0 CPU(s):                       0-3\nVulnerab",
+  "free_h": "total        used        free      shared  buff/cache   available\nMem:            15Gi       1.5Gi        10Gi        50Mi       4.2Gi        14Gi\nSwap:          3.0Gi          0B       3.0Gi",
+  "lscpu": "Architecture:                            x86_64\nCPU op-mode(s):                          32-bit, 64-bit\nAddress sizes:                           48 bits physical, 48 bits virtual\nByte Order:                              Little Endian\nCPU(s):                                  4\nOn-line CPU(s) list:                     0-3\nVendor ID:                               AuthenticAMD\nModel name:                              AMD EPYC 7763 64-Core Processor\nCPU family:                              25\nModel:                                   1\nThread(s) per core:                      2\nCore(s) per socket:                      2\nSocket(s):                               1\nStepping:                                1\nBogoMIPS:                                4890.85\nFlags:                                   fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush mmx fxsr sse sse2 ht syscall nx mmxext fxsr_opt pdpe1gb rdtscp lm constant_tsc rep_good nopl tsc_reliable nonstop_tsc cpuid extd_apicid aperfmperf tsc_known_freq pni pclmulqdq ssse3 fma cx16 pcid sse4_1 sse4_2 movbe popcnt aes xsave avx f16c rdrand hypervisor lahf_lm cmp_legacy svm cr8_legacy abm sse4a misalignsse 3dnowprefetch osvw topoext vmmcall fsgsbase bmi1 avx2 smep bmi2 erms invpcid rdseed adx smap clflushopt clwb sha_ni xsaveopt xsavec xgetbv1 xsaves user_shstk clzero xsaveerptr rdpru arat npt nrip_save tsc_scale vmcb_clean flushbyasid decodeassists pausefilter pfthreshold v_vmsave_vmload umip vaes vpclmulqdq rdpid fsrm\nVirtualization:                          AMD-V\nHypervisor vendor:                       Microsoft\nVirtualization type:                     full\nL1d cache:                               64 KiB (2 instances)\nL1i cache:                               64 KiB (2 instances)\nL2 cache:                                1 MiB (2 instances)\nL3 cache:                                32 MiB (1 instance)\nNUMA node(s):                            1\nNUMA node0 CPU(s):                       0-3\nVulnerab",
   "machine": "x86_64",
   "numpy_version": "2.4.6",
   "python": "3.11.17",
@@ -245,11 +245,11 @@
   ],
   "fpr_std": 0.0,
   "model_sha256_per_seed": [
-   "94a3922a75cad7e9909505fef38d458451c312fa2772536ccdd5fc8fd9316aef",
-   "94a3922a75cad7e9909505fef38d458451c312fa2772536ccdd5fc8fd9316aef",
-   "94a3922a75cad7e9909505fef38d458451c312fa2772536ccdd5fc8fd9316aef",
-   "94a3922a75cad7e9909505fef38d458451c312fa2772536ccdd5fc8fd9316aef",
-   "94a3922a75cad7e9909505fef38d458451c312fa2772536ccdd5fc8fd9316aef"
+   "6e9a8e28f55bce440cb312726debd1b90a39880b4a4172b0cdbcc891de9c8b74",
+   "6e9a8e28f55bce440cb312726debd1b90a39880b4a4172b0cdbcc891de9c8b74",
+   "6e9a8e28f55bce440cb312726debd1b90a39880b4a4172b0cdbcc891de9c8b74",
+   "6e9a8e28f55bce440cb312726debd1b90a39880b4a4172b0cdbcc891de9c8b74",
+   "6e9a8e28f55bce440cb312726debd1b90a39880b4a4172b0cdbcc891de9c8b74"
   ],
   "positive_rows": 281,
   "precision": 0.70936,
@@ -334,7 +334,7 @@
     "tn": 56.0,
     "tp": 58.0
    },
-   "model_sha256": "94a3922a75cad7e9909505fef38d458451c312fa2772536ccdd5fc8fd9316aef",
+   "model_sha256": "6e9a8e28f55bce440cb312726debd1b90a39880b4a4172b0cdbcc891de9c8b74",
    "positive_rows": 281,
    "rows": 9268,
    "seed": 42,
@@ -373,7 +373,7 @@
     "tn": 56.0,
     "tp": 58.0
    },
-   "model_sha256": "94a3922a75cad7e9909505fef38d458451c312fa2772536ccdd5fc8fd9316aef",
+   "model_sha256": "6e9a8e28f55bce440cb312726debd1b90a39880b4a4172b0cdbcc891de9c8b74",
    "positive_rows": 281,
    "rows": 9268,
    "seed": 43,
@@ -412,7 +412,7 @@
     "tn": 56.0,
     "tp": 58.0
    },
-   "model_sha256": "94a3922a75cad7e9909505fef38d458451c312fa2772536ccdd5fc8fd9316aef",
+   "model_sha256": "6e9a8e28f55bce440cb312726debd1b90a39880b4a4172b0cdbcc891de9c8b74",
    "positive_rows": 281,
    "rows": 9268,
    "seed": 44,
@@ -451,7 +451,7 @@
     "tn": 56.0,
     "tp": 58.0
    },
-   "model_sha256": "94a3922a75cad7e9909505fef38d458451c312fa2772536ccdd5fc8fd9316aef",
+   "model_sha256": "6e9a8e28f55bce440cb312726debd1b90a39880b4a4172b0cdbcc891de9c8b74",
    "positive_rows": 281,
    "rows": 9268,
    "seed": 45,
@@ -490,7 +490,7 @@
     "tn": 56.0,
     "tp": 58.0
    },
-   "model_sha256": "94a3922a75cad7e9909505fef38d458451c312fa2772536ccdd5fc8fd9316aef",
+   "model_sha256": "6e9a8e28f55bce440cb312726debd1b90a39880b4a4172b0cdbcc891de9c8b74",
    "positive_rows": 281,
    "rows": 9268,
    "seed": 46,
@@ -545,7 +545,7 @@
   "train": "75c2504acefb6a3c325f8b3b94c1e4da9ec441d9440c1cfd07c16eb8e49040a2",
   "val": "cba705f836d9c25f28fc162b5cbf89b52bfabe7c47c56e2a4d6d652cded2c2dd"
  },
- "started_at": "2026-10-10T17:59:50Z",
+ "started_at": "2026-10-10T19:49:34Z",
  "step": "final",
  "threshold": 0.1106,
  "threshold_frozen": true,
