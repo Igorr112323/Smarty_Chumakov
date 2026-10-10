@@ -329,16 +329,17 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
-      - name: "Взять выбранную на val конфигурацию (для сверки источника порога)"
-        uses: actions/download-artifact@v4
-        with:
-          name: "hf-protocol-sweep"
-          path: spanverify-module/reports/hf-protocol-val
+      - name: "Собрать кеш train+dev и test"
         uses: actions/download-artifact@v4
         with:
           pattern: "grid*"
           path: spanverify-module/reports/hf-grid
           merge-multiple: true
+      - name: "Взять сводку шага 2 (для сверки источника выбора конфигурации)"
+        uses: actions/download-artifact@v4
+        with:
+          name: "hf-protocol-sweep"
+          path: spanverify-module/reports/hf-protocol-val
       - name: "Зависимости и среда"
         uses: ./.github/actions/hf-setup
       - name: "Проверка, что конфигурация зафиксирована"
