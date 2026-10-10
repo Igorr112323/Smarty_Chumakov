@@ -48,6 +48,7 @@ from .logreg import (
 from .logreg import (
     train_logreg as _train_logreg,
 )
+from .normalize import contains_number_date_or_amount
 from .participation import ParticipationModel, build_participation_corpus, corpus_rows_and_labels
 
 __all__ = [
@@ -80,6 +81,10 @@ class TokenSample:
     text: str
     features: dict[str, float]
     label: int
+    # Символьные смещения токена в ответе: нужны фильтру коротких фрагментов,
+    # чтобы мерить длину фрагмента так же, как движок.
+    start: int = 0
+    end: int = 0
 
 
 def collect_samples(
@@ -134,6 +139,8 @@ def collect_samples(
                         "risk": risk[index],
                     },
                     label=labels[index],
+                    start=token.start,
+                    end=token.end,
                 )
             )
             stats["positive"] += labels[index]
@@ -402,6 +409,41 @@ def _head_rows(samples: Sequence[TokenSample], risks: Sequence[float], with_labe
 # ---------------------------------------------------------------- основной вход
 
 
+def _filter_short_flagged_groups(
+    flagged: set[int],
+    samples_by_index: dict[int, TokenSample],
+    answer: str,
+    min_chars: int,
+) -> set[int]:
+    """Вариант маски при подборе: короткие группы без числовой записи снять.
+
+    Группы помеченных токенов строятся той же склейкой, что в движке
+    (соседние индексы), а длина фрагмента меряется по срезам ответа между
+    крайними токенами группы. Группа короче ``min_chars`` знаков без числа,
+    даты или денежной суммы перестаёт быть помеченной.
+    """
+    kept: set[int] = set()
+    group: list[int] = []
+
+    def flush() -> None:
+        if not group:
+            return
+        first = samples_by_index[group[0]]
+        last = samples_by_index[group[-1]]
+        text = answer[first.start : last.end]
+        if len(text.strip()) >= min_chars or contains_number_date_or_amount(text):
+            kept.update(group)
+
+    for index in sorted(flagged):
+        if group and index - group[-1] <= 1:
+            group.append(index)
+        else:
+            flush()
+            group = [index]
+    flush()
+    return kept
+
+
 def _score_pairs(
     verifier: Verifier,
     pairs: Sequence[dict],
@@ -415,6 +457,7 @@ def _score_pairs(
     передаётся снаружи, чтобы порог маски подбирался ровно на том сигнале,
     который будет отдавать API (правило или обученная голова).
     """
+    span_filter_min_chars = int(getattr(verifier, "span_filter_min_chars", 0))
     labels: list[int] = []
     flags: list[bool] = []
     risks: list[float] = []
@@ -437,15 +480,26 @@ def _score_pairs(
         smoothed = _smooth(sequence, SMOOTH_WINDOW)
         threshold = span_threshold_for(smoothed, *span_params)
 
+        flagged_sample_indices = {sample.index for sample in samples if smoothed[sample.index] >= threshold}
+        if span_filter_min_chars > 0 and flagged_sample_indices:
+            flagged_sample_indices = _filter_short_flagged_groups(
+                flagged_sample_indices,
+                {sample.index: sample for sample in samples},
+                pair.get("answer", ""),
+                span_filter_min_chars,
+            )
+
         for sample in samples:
             labels.append(sample.label)
-            flags.append(smoothed[sample.index] >= threshold)
+            flags.append(sample.index in flagged_sample_indices)
             risks.append(smoothed[sample.index])
 
         raw_scores.append(_answer_score([smoothed[sample.index] for sample in samples]))
         answer_labels.append(1 if any(sample.label == 1 for sample in samples) else 0)
 
         flagged_indices = [index for index, value in enumerate(smoothed) if value >= threshold]
+        if span_filter_min_chars > 0:
+            flagged_indices = sorted(flagged_sample_indices)
         if flagged_indices:
             span_predicted.append((min(flagged_indices), max(flagged_indices) + 1))
         truth_indices = [sample.index for sample in samples if sample.label == 1]
