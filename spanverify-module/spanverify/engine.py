@@ -58,6 +58,7 @@ from .features import (
     feature_cache_key,
     is_scored_token,
     number_attribution,
+    validate_feature_cache_model,
 )
 from .participation import PARTICIPATION_FILENAME, ParticipationModel
 
@@ -230,7 +231,13 @@ class Verifier:
         self.bundle = weights if weights is not None else WeightsBundle.load(weights_path)
         self.weights_loaded = weights is not None or self.bundle.loaded
         self.mode = (mode or self.bundle.mode or self.config.backend or "demo").lower()
-        self.model_name = model_name or getattr(self.config, "hf_model", "ai-forever/rugpt3small_based_on_gpt2")
+        self.model_name = (
+            model_name
+            or ((self.bundle.meta or {}).get("hf_model") if self.mode == "hf" else None)
+            or getattr(self.config, "hf_model", "ai-forever/rugpt3small_based_on_gpt2")
+        )
+        if self.mode == "hf":
+            validate_feature_cache_model(features_cache, self.model_name)
         self._detector = detector
         # Проверка покрытия фактов документа ответом (типы missing и partial).
         #
@@ -504,7 +511,9 @@ class Verifier:
                 hit = cache.get(key)
                 if hit is not None:
                     return hit
-            return extract_features(answer, context, mode="hf", model_name=self.model_name, answer_tokens=tokens)
+            return extract_features(
+                answer, context, mode="hf", model_name=self.model_name, answer_tokens=tokens, cache=cache
+            )
         return extract_features(answer, context, mode="demo", answer_tokens=tokens)
 
     def _span_threshold(self, risk: Sequence[float]) -> float:

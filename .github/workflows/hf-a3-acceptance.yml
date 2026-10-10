@@ -1,0 +1,151 @@
+name: HF A3 acceptance evidence
+
+on:
+  workflow_dispatch:
+  push:
+    branches: ["arena/**"]
+    paths:
+      - .github/hf-a3-acceptance.trigger
+
+permissions:
+  contents: read
+  actions: read
+
+concurrency:
+  group: hf-a3-acceptance-${{ github.ref }}
+  cancel-in-progress: false
+
+env:
+  HF_MODEL: ai-forever/rugpt3small_based_on_gpt2
+  OMP_NUM_THREADS: "4"
+  MKL_NUM_THREADS: "4"
+
+jobs:
+  features:
+    name: "HF A3 feature shard"
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [0, 1, 2, 3]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - uses: actions/cache@v4
+        with:
+          path: ~/.cache/huggingface
+          key: hf-${{ runner.os }}-rugpt3small-v1
+      - uses: ./.github/actions/hf-setup
+      - name: "Extract real HF features with diagnostics and provenance"
+        working-directory: spanverify-module
+        timeout-minutes: 30
+        run: |
+          python scripts/precompute_features.py --dataset data/corpus_a3/pairs.jsonl \
+            --model "$HF_MODEL" --mode hf --shard ${{ matrix.shard }} --shards 4 \
+            --out reports/hf-a3-cache
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: hf-a3-features-${{ matrix.shard }}
+          path: spanverify-module/reports/hf-a3-cache
+          retention-days: 30
+          if-no-files-found: error
+
+  training:
+    name: "HF A3 train and public evaluate"
+    needs: features
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: "Test dependencies only; complete cache avoids torch"
+        working-directory: spanverify-module
+        run: python -m pip install -r requirements.txt
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: hf-a3-features-*
+          path: spanverify-module/reports/hf-a3-cache
+          merge-multiple: true
+      - name: "Train without extra threshold scan"
+        working-directory: spanverify-module
+        timeout-minutes: 20
+        run: python scripts/train_hf_a3.py --features-cache reports/hf-a3-cache
+      - name: "Public CLI evaluate with the SAME model cache"
+        working-directory: spanverify-module
+        timeout-minutes: 5
+        run: |
+          python - <<'PY'
+          import sys
+          from spanverify.features import load_feature_cache, set_feature_cache
+          from spanverify.cli import main
+          set_feature_cache(load_feature_cache("reports/hf-a3-cache"))
+          sys.exit(main(["evaluate", "--dataset", "data/corpus_a3/pairs.jsonl", "--mode", "hf", "--weights", "config/weights_hf.json"]))
+          PY
+      - name: "Publish measured evidence in log"
+        if: always()
+        working-directory: spanverify-module
+        run: |
+          python - <<'PY'
+          import base64
+          from pathlib import Path
+          for path in [Path("reports/hf_a3_run.json"), *Path("config").glob("*_hf.json")]:
+              if path.is_file():
+                  print("HF_A3_ARTIFACT", path, base64.b64encode(path.read_bytes()).decode())
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: hf-a3-acceptance-evidence
+          path: |
+            spanverify-module/config/*_hf.json
+            spanverify-module/reports/hf_a3_*
+            spanverify-module/reports/experiments/hf_a3_experiment.md
+          retention-days: 30
+          if-no-files-found: error
+
+  ablation:
+    name: "Grouped AUC feature ablation (no test-label selection)"
+    needs: features
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: "Dependencies"
+        working-directory: spanverify-module
+        run: python -m pip install -r requirements.txt
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: hf-a3-features-*
+          path: spanverify-module/reports/hf-a3-cache
+          merge-multiple: true
+      - name: "Measure every feature against baseline"
+        working-directory: spanverify-module
+        timeout-minutes: 35
+        run: python scripts/hf_feature_ablation.py --features-cache reports/hf-a3-cache
+      - name: "Publish ablation evidence in log"
+        if: always()
+        working-directory: spanverify-module
+        run: |
+          python - <<'PY'
+          import base64
+          from pathlib import Path
+          path = Path("reports/hf_a3_feature_ablation.json")
+          if path.is_file():
+              print("HF_A3_ARTIFACT", path, base64.b64encode(path.read_bytes()).decode())
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: hf-a3-feature-ablation
+          path: spanverify-module/reports/hf_a3_feature_ablation.json
+          retention-days: 30
+          if-no-files-found: warn

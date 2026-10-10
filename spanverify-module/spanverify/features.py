@@ -1205,12 +1205,43 @@ def load_feature_cache(paths: Any, counting: bool = False) -> dict[str, FeatureM
                 key = row.get("key")
                 if not key:
                     continue
-                cache[key] = FeatureMatrix(
+                matrix = FeatureMatrix(
                     attention_entropy=[float(x) for x in row.get("attention_entropy", [])],
                     ctx_attention_mass=[float(x) for x in row.get("ctx_attention_mass", [])],
                     embedding_density=[float(x) for x in row.get("embedding_density", [])],
-                    meta={"from_cache": True, "pair_id": row.get("pair_id")},
+                    ctx_mass_expected=[float(x) for x in row.get("ctx_mass_expected", [])],
+                    ctx_mass_norm=[float(x) for x in row.get("ctx_mass_norm", [])],
+                    ctx_mass_lift=[float(x) for x in row.get("ctx_mass_lift", [])],
+                    ctx_max_similarity=[float(x) for x in row.get("ctx_max_similarity", [])],
+                    ctx_support_distance=[float(x) for x in row.get("ctx_support_distance", [])],
+                    ctx_similarity_decay=[float(x) for x in row.get("ctx_similarity_decay", [])],
+                    ctx_sim_contrast=[float(x) for x in row.get("ctx_sim_contrast", [])],
+                    ctx_sim_margin=[float(x) for x in row.get("ctx_sim_margin", [])],
+                    meta={**row.get("meta", {}), "from_cache": True, "pair_id": row.get("pair_id")},
                 )
+                if key in cache:
+                    previous = cache[key]
+                    # Identical answer/context pairs may occur in multiple shards.
+                    # pair_id differs, but features and model provenance must agree.
+                    fields = (
+                        "attention_entropy",
+                        "ctx_attention_mass",
+                        "embedding_density",
+                        "ctx_mass_expected",
+                        "ctx_mass_norm",
+                        "ctx_mass_lift",
+                        "ctx_max_similarity",
+                        "ctx_support_distance",
+                        "ctx_similarity_decay",
+                        "ctx_sim_contrast",
+                        "ctx_sim_margin",
+                    )
+                    same_meta = {k: v for k, v in previous.meta.items() if k != "pair_id"} == {
+                        k: v for k, v in matrix.meta.items() if k != "pair_id"
+                    }
+                    if not same_meta or any(getattr(previous, name) != getattr(matrix, name) for name in fields):
+                        raise ValueError(f"conflicting duplicate feature cache key: {key} ({file})")
+                cache[key] = matrix
     return cache
 
 
@@ -1247,6 +1278,23 @@ def feature_cache_key(
     return hashlib.sha256(payload.encode("utf-8")).hexdigest()
 
 
+def validate_feature_cache_model(cache: Mapping[str, FeatureMatrix] | None, model_name: str) -> None:
+    """Check explicit provenance, never search for a model name inside a SHA256.
+
+    Historical caches lack provenance; they remain readable, but cannot prove
+    model identity. New training pipelines must additionally require metadata.
+    """
+    from .backends.base import BackendUnavailable
+
+    for matrix in (cache or {}).values():
+        cached_model = matrix.meta.get("model")
+        if cached_model and cached_model != model_name:
+            raise BackendUnavailable(
+                f"HF cache model mismatch: requested '{model_name}', cache model '{cached_model}'. "
+                "Clear cache or use matching model_name."
+            )
+
+
 def extract_features(
     answer: str,
     context: str | Sequence[str] | None,
@@ -1267,7 +1315,11 @@ def extract_features(
         key = cache_key or feature_cache_key(answer, context, mode, str(kwargs.get("model_name", "")))
         cached = cache.get(key)
         if cached is not None:
+            if mode == "hf":
+                validate_feature_cache_model({key: cached}, str(kwargs.get("model_name", HF_MODEL_DEFAULT)))
             return cached
+        if mode == "hf":
+            validate_feature_cache_model(cache, str(kwargs.get("model_name", HF_MODEL_DEFAULT)))
     if mode == "hf":
         return hf_features(answer, context, **kwargs)
     return demo_features(answer, context, **kwargs)

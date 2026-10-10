@@ -63,6 +63,20 @@ def dump_matrix(key: str, matrix, pair_id: str) -> dict:
         "attention_entropy": [float(x) for x in matrix.attention_entropy],
         "ctx_attention_mass": [float(x) for x in matrix.ctx_attention_mass],
         "embedding_density": [float(x) for x in matrix.embedding_density],
+        **{
+            name: [float(x) for x in getattr(matrix, name)]
+            for name in (
+                "ctx_mass_expected",
+                "ctx_mass_norm",
+                "ctx_mass_lift",
+                "ctx_max_similarity",
+                "ctx_support_distance",
+                "ctx_similarity_decay",
+                "ctx_sim_contrast",
+                "ctx_sim_margin",
+            )
+        },
+        "meta": dict(matrix.meta),
     }
 
 
@@ -119,6 +133,7 @@ def main(argv: list[str] | None = None) -> int:
             call_kwargs = {"model_name": model_name} if args.mode == "hf" else {}
             try:
                 matrix = extract_features(answer, context, mode=args.mode, **call_kwargs)
+                matrix.meta.update({"model": model_name, "mode": args.mode, "cache_schema": 2})
                 key = feature_cache_key(answer, context, args.mode, model_name)
                 out.write(json.dumps(dump_matrix(key, matrix, pair_id), ensure_ascii=False) + "\n")
                 out.flush()

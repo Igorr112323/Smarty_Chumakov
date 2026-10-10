@@ -750,7 +750,15 @@ def train(
 
     # 6. Сквозная проверка: те же параметры, но через публичный verify() — то, что
     #    реально увидит пользователь API. Числа берутся из настоящего пути.
-    end_to_end = Verifier(mode=mode, weights=bundle).evaluate(test_pairs)
+    end_to_end = Verifier(
+        config=verifier.config,
+        mode=mode,
+        weights=bundle,
+        model_name=verifier.model_name,
+        features_cache=verifier.features_cache,
+        coverage=verifier.coverage,
+        verdict_rule=verifier.verdict_rule,
+    ).evaluate(test_pairs)
 
     report = TrainReport(
         bundle=bundle,

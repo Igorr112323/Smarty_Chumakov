@@ -308,6 +308,7 @@ def _mask_scan(
 def main(argv: list[str] | None = None) -> int:
     """Запустить эксперимент и сохран отчёт."""
     parser = argparse.ArgumentParser(description="Эксперименты SpanVerify")
+    parser.add_argument("--corpus", choices=["a", "a3"], default=None, help="isolated corpus experiment")
     parser.add_argument("--dataset", default="data/demo_pairs.jsonl")
     parser.add_argument("--out", default="reports/experiments")
     parser.add_argument("--mode", choices=["demo", "hf"], default="demo")
@@ -344,6 +345,26 @@ def main(argv: list[str] | None = None) -> int:
     )
     args = parser.parse_args(argv)
 
+    if args.corpus == "a3" and args.mode == "hf":
+        from train_hf_a3 import main as train_hf_a3_main
+
+        forwarded = [
+            "--dataset",
+            "data/corpus_a3/pairs.jsonl",
+            "--seed",
+            str(args.seed),
+            "--folds",
+            str(args.folds),
+            "--target-fpr",
+            str(args.target_fpr),
+            "--model",
+            args.model,
+        ]
+        for path in args.features_cache:
+            forwarded.extend(["--features-cache", path])
+        return train_hf_a3_main(forwarded)
+    if args.corpus:
+        args.dataset = f"data/corpus_{args.corpus}/pairs.jsonl"
     dataset = Path(args.dataset)
     records = load_records(dataset, args.pairs, 1312)
 

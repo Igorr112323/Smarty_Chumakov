@@ -6,3 +6,6 @@ spanverify-module/data/external/
 spanverify-module/.coverage
 .coverage
 .venv/
+
+# HF acceptance caches: large measured features stay in CI artifacts, not Git.
+spanverify-module/reports/hf-a3-cache/

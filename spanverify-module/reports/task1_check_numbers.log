@@ -1,0 +1,8 @@
+РАСХОЖДЕНИЯ (7):
+  - /home/user/Smarty_Chumakov/README.md:39: tests=510 нет в METRICS.json (допустимо: ['542']) → python -m pytest -q                                             # 510 тестов
+  - /home/user/Smarty_Chumakov/ИТОГ.md:56: tests=510 нет в METRICS.json (допустимо: ['542']) → | 1 | Тесты проходят | `python -m pytest -q` | **510 тестов, все проходят** |
+  - /home/user/Smarty_Chumakov/ИТОГ.md:155: tests=510 нет в METRICS.json (допустимо: ['542']) → 4. **Тесты и покрытие**: 510 тестов проходят, покрытие 88 % (шаги CI «Тесты с
+  - /home/user/Smarty_Chumakov/ИТОГ.md:195: tests=510 нет в METRICS.json (допустимо: ['542']) → | 510 теста, покрытие 88 % | подтверждается в CI | job «Тесты (Python 3.10–3.12)» и «Линте
+  - /home/user/Smarty_Chumakov/docs/ОТЧЁТ_о_НИР_шаблон.md:223: tests=510 нет в METRICS.json (допустимо: ['542']) → | Автоматические тесты | 510 тестов, все проходят |
+  - /home/user/Smarty_Chumakov/spanverify-module/README.md:26: tests=510 нет в METRICS.json (допустимо: ['542']) → | Конвейер (признаки → риск → фрагменты → калибровка → вердикт) | реализован, 510 тестов, 
+  - /home/user/Smarty_Chumakov/spanverify-module/README.md:248: tests=510 нет в METRICS.json (допустимо: ['542']) → ├── tests/               510 тестов (pytest), у каждого теста — docstring о смысле проверк

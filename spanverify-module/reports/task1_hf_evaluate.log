@@ -1,0 +1,1 @@
+ошибка выполнения: BackendUnavailable: режим 'hf' требует torch и transformers: pip install -r requirements-hf.txt (причина: ModuleNotFoundError: No module named 'torch')

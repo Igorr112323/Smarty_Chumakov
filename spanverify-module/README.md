@@ -23,7 +23,7 @@ python -m spanverify verify --answer "..." --context "..."
 
 | Что | Состояние |
 |---|---|
-| Конвейер (признаки → риск → фрагменты → калибровка → вердикт) | реализован, 510 тестов, покрытие 88 % |
+| Конвейер (признаки → риск → фрагменты → калибровка → вердикт) | реализован, 510 тестов (устарело: исторический CI до HF-A3 расширения), покрытие 88 % |
 | Режим `demo` (без зависимостей) | работает; признаки — лексические суррогаты, годится для проверки конвейера, интерфейса и обучения на своих данных |
 | Режим `hf` (реальная модель: внимание + скрытые состояния) | реализован; путь проверен на локально собранной модели, пилот на `rugpt3small` выполняется в CI |
 | Числа качества | получены на **синтетическом** корпусе: переносить их на реальные документы нельзя |
@@ -245,7 +245,7 @@ spanverify-module/
 │   └── detector.py, backends/, vectors.py, training.py, text.py   исторический детектор «текст написан ИИ»
 ├── scripts/             exe_launcher.py, make_demo_dataset.py, make_markup_template.py,
 │                        run_experiments.py, pilot_rugpt3small.py, make_zipapp.py, make_exe.ps1
-├── tests/               510 тестов (pytest), у каждого теста — docstring о смысле проверки
+├── tests/               510 тестов (устарело: исторический CI до HF-A3 расширения) (pytest), у каждого теста — docstring о смысле проверки
 ├── config/              weights.json (веса, порог, изотоника, голова), head.json, config.json
 ├── data/                demo_pairs.jsonl (демонстрационный корпус), demo_dataset.jsonl (исторический)
 ├── reports/             отчёты экспериментов и демо-прогонов
@@ -272,3 +272,13 @@ spanverify-module/
 `reports/experiments/experiment.md` (метрики), `config/weights.json` (параметры
 метода), артефакты CI (`pilot-report`, `spanverify-windows-x64`) и протокол
 `python -m spanverify selftest`.
+
+## Изолированное обучение HF A3
+
+`python scripts/train_hf_a3.py` сохраняет измеренный отчёт и новые HF-конфиги,
+не перезаписывая demo-конфиги. Запуск с ошибкой зависимостей/модели записывает
+`blocked` и `null` в `reports/hf_a3_run.json`, не создаёт фиктивные веса.
+Подробности и команды: `reports/TASK1_STATUS.md`. Диагностические признаки
+доступны отдельному `scripts/hf_feature_ablation.py`, но ещё не активированы
+в production. Текущее число тестов — `reports/METRICS.json → tests.collected`;
+собранные тесты не следует приравнивать к прошедшим.

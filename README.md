@@ -36,7 +36,7 @@ python -m spanverify train --dataset data/demo_pairs.jsonl --out config/weights.
 python -m spanverify evaluate --dataset data/demo_pairs.jsonl   # метрики и критерий качества
 python -m spanverify selftest                                   # само-проверка конвейера
 python -m spanverify server --port 8765                         # API + веб-интерфейс
-python -m pytest -q                                             # 510 тестов
+python -m pytest -q                                             # 510 тестов (устарело: исторический CI до HF-A3 расширения)
 ```
 
 Коды возврата `verify`: `0` — ответ подтверждён, `1` — найдены спорные
@@ -196,3 +196,25 @@ baseline из статей не извлечён (PDF недоступен).
 ([`docs/ЗАЯВКА_поля.md`](docs/ЗАЯВКА_поля.md)): их можно копировать в поля
 АС «Фонд-М». Поля про публикации, дипломную работу и письмо поддержки
 заполняет исполнитель — эти данные знает только он.
+
+### HF A3: воспроизводимый acceptance-запуск
+
+Новый запуск задачи 1 и блокеры: [TASK1_STATUS.md](spanverify-module/reports/TASK1_STATUS.md).
+Текущие измерения — `reports/METRICS.json → hf_a3_acceptance`, не историческая
+оценка в `reports/experiments/a3`. Локальное обучение заблокировано отсутствием
+HF-зависимостей/весов; `null` не означает нулевое качество модели.
+
+```bash
+cd spanverify-module
+python scripts/train_hf_a3.py  # реальные HF-веса обязательны
+# Или полный кеш текущего precompute_features.py с метаданными модели:
+python scripts/train_hf_a3.py --features-cache reports/hf-a3-cache
+python scripts/hf_feature_ablation.py --features-cache reports/hf-a3-cache
+python scripts/run_experiments.py --corpus a3 --mode hf --features-cache reports/hf-a3-cache
+```
+
+AUC-ablation использует только official train/dev и документные folds. Признаки
+не активируются без доказательства улучшения, тестовые пороги не подбираются.
+Цель качества и готовность к приёмке этим расширением **не подтверждены**.
+Актуальное число собранных тестов находится в METRICS.json; факт прохождения и
+покрытие определяются завершённым pytest/CI, а не одним collect-only.

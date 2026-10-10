@@ -678,6 +678,7 @@ def collect(dataset: str, seed: int, release_dir: Path, coverage_json: Path) -> 
         "corpus_b": _corpus_b_block(),
         "external_tests": _external_tests_block(),
         "hf_experiments": _hf_experiments_block(),
+        "hf_a3_acceptance": _hf_a3_acceptance_block(),
         "hf_external_slices": _hf_external_slices_block(),
         "cross_corpus": None,
         "pilot": None,
@@ -724,6 +725,14 @@ def collect(dataset: str, seed: int, release_dir: Path, coverage_json: Path) -> 
             },
         }
     return payload
+
+
+def _hf_a3_acceptance_block() -> dict | None:
+    """Current task-1 run, including blocked runs with null measurements."""
+    path = ROOT / "reports" / "hf_a3_run.json"
+    if not path.is_file():
+        return None
+    return json.loads(path.read_text(encoding="utf-8"))
 
 
 def main() -> int:

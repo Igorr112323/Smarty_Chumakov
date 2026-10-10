@@ -1,0 +1,30 @@
+{"started_at": "2026-10-10T05:13:27.093296+00:00", "model": "ai-forever/rugpt3small_based_on_gpt2", "seed": 42, "folds": 5, "target_fpr": 0.1, "command": ["scripts/train_hf_a3.py"], "run_id": null, "commit": null, "python": "3.11.2", "dataset_sha256": null, "evaluations": null}
+Traceback (most recent call last):
+  File "/home/user/Smarty_Chumakov/spanverify-module/scripts/train_hf_a3.py", line 303, in main
+    payload.update(run(args))
+                   ^^^^^^^^^
+  File "/home/user/Smarty_Chumakov/spanverify-module/scripts/train_hf_a3.py", line 210, in run
+    matrix = extract_features(pair["answer"], pair["context"], mode="hf", model_name=args.model)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/Smarty_Chumakov/spanverify-module/spanverify/features.py", line 1303, in extract_features
+    return hf_features(answer, context, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/Smarty_Chumakov/spanverify-module/spanverify/features.py", line 892, in hf_features
+    raise BackendUnavailable(reason)
+spanverify.backends.base.BackendUnavailable: режим 'hf' требует torch и transformers: pip install -r requirements-hf.txt (причина: ModuleNotFoundError: No module named 'torch')
+status=blocked; report=reports/hf_a3_run.json
+{"started_at": "2026-10-10T05:14:43.800930+00:00", "model": "ai-forever/rugpt3small_based_on_gpt2", "seed": 42, "folds": 5, "target_fpr": 0.1, "command": ["scripts/train_hf_a3.py"], "run_id": null, "commit": null, "python": "3.11.2", "source_sha256": {"scripts/train_hf_a3.py": "ec7ba0bd6b0c8a47e076a2e094c4cab04a8cd22f70f92bb08bed17f0f816086b", "spanverify/features.py": "48d225f4776cd395441a74f938d99f9451d250b56ec31ed146772a120b1fc993", "spanverify/train.py": "552c6b45ac62d4360d457dea4f2359a0df95226e32eb74c9a67f2567240592a6", "spanverify/engine.py": "51992086a336470b157ffef42961847fc4d8a9d6a76b96ad0b205c06e884d9e6", "scripts/precompute_features.py": "bf40e7e9288ce83fda05b2ae5ed91a149edb55a77a0a706b796385e3933b88e2"}, "dataset_sha256": null, "evaluations": null}
+Traceback (most recent call last):
+  File "/home/user/Smarty_Chumakov/spanverify-module/scripts/train_hf_a3.py", line 318, in main
+    payload.update(run(args))
+                   ^^^^^^^^^
+  File "/home/user/Smarty_Chumakov/spanverify-module/scripts/train_hf_a3.py", line 210, in run
+    matrix = extract_features(pair["answer"], pair["context"], mode="hf", model_name=args.model)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/Smarty_Chumakov/spanverify-module/spanverify/features.py", line 1303, in extract_features
+    return hf_features(answer, context, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/Smarty_Chumakov/spanverify-module/spanverify/features.py", line 892, in hf_features
+    raise BackendUnavailable(reason)
+spanverify.backends.base.BackendUnavailable: режим 'hf' требует torch и transformers: pip install -r requirements-hf.txt (причина: ModuleNotFoundError: No module named 'torch')
+status=blocked; report=reports/hf_a3_run.json
