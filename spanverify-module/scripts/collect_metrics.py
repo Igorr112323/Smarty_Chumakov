@@ -647,6 +647,55 @@ def _hf_external_slices_block() -> dict | None:
     }
 
 
+def _cycle_v2_section() -> dict:
+    """Числа цикла v2 (независимая выборка) — только из артефактов, без пересчётов.
+
+    Если шага 3 ещё не было, возвращается ``{"status": "не измерено", ...}`` с тем,
+    что уже есть (заморозка шага 0, сводка шага 2, seedcheck): так METRICS.json
+    отражает состояние цикла, а не отсутствующие числа.
+    """
+    root = ROOT / "reports" / "v2"
+
+    def load(name: str) -> dict:
+        path = root / name
+        if not path.is_file():
+            return {}
+        try:
+            return json.loads(path.read_text(encoding="utf-8"))
+        except (ValueError, OSError):
+            return {}
+
+    manifest = load("manifest.json")
+    freeze = load("freeze.json")
+    sweep = load("sweep.json")
+    seedcheck = load("seedcheck.json")
+    section: dict = {"step0": bool(freeze), "step2": bool(sweep), "step3": bool(manifest)}
+    if freeze:
+        independence = freeze.get("independence") or {}
+        section["independence_overlap"] = independence.get("overlap_total")
+        section["metric_spec_v2_sha256"] = freeze.get("metric_spec_v2_sha256", "")
+        section["splits_sha256"] = freeze.get("splits_sha256") or {}
+    if sweep:
+        section["experiments_run"] = sweep.get("experiments_run")
+        section["selected"] = sweep.get("selected")
+        section["stop_rule_triggered"] = bool((sweep.get("stop_rule") or {}).get("triggered"))
+    if seedcheck:
+        section["seed_f1_std"] = seedcheck.get("f1_std")
+    if manifest:
+        aggregate = manifest.get("metrics_mean_std") or {}
+        section["f1"] = aggregate.get("f1")
+        section["f1_std"] = aggregate.get("f1_std")
+        section["fpr"] = aggregate.get("fpr")
+        section["threshold"] = manifest.get("threshold")
+        section["status_internal"] = ((manifest.get("goal_internal") or {}).get("status")) or ""
+        section["status_contract"] = ((manifest.get("goal_contract_min") or {}).get("status")) or ""
+        section["pairs"] = (manifest.get("pairs") or {}).get("test")
+        section["code_commit"] = manifest.get("code_commit", "")
+    else:
+        section["status"] = "не измерено"
+    return section
+
+
 def collect(
     dataset: str, seed: int, release_dir: Path, coverage_json: Path, facts_coverage_json: Path | None = None
 ) -> dict:
@@ -794,6 +843,7 @@ def main() -> int:
         Path(args.coverage_json),
         Path(args.facts_coverage_json),
     )
+    payload["cycle_v2"] = _cycle_v2_section()
     out = Path(args.out)
     out.parent.mkdir(parents=True, exist_ok=True)
     out.write_text(json.dumps(payload, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")

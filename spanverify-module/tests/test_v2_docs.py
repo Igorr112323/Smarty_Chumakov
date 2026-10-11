@@ -173,3 +173,20 @@ def test_readme_explains_the_second_red_gate() -> None:
     assert "Почему CI бывает красным" in text
     assert "test_v2_criterion.py" in text, "в README нет объяснения второго красного гейта (цикл v2)"
     assert "не выполнено" in text or "не выполнялось" in text, "объяснение обязано называть состояние словами"
+
+
+def test_metrics_json_knows_the_cycle_state_but_not_invented_numbers() -> None:
+    """`reports/METRICS.json` обязан различать «не измерено» и числа из манифеста."""
+    metrics = json.loads((ROOT / "reports" / "METRICS.json").read_text(encoding="utf-8"))
+    section = metrics.get("cycle_v2")
+    assert isinstance(section, dict), "в METRICS.json нет секции cycle_v2"
+    if MANIFEST.is_file():
+        manifest = json.loads(MANIFEST.read_text(encoding="utf-8"))
+        aggregate = manifest.get("metrics_mean_std") or {}
+        assert abs(float(section["f1"]) - float(aggregate["f1"])) < 1e-9, "число в METRICS.json != из манифеста"
+        assert abs(float(section["fpr"]) - float(aggregate["fpr"])) < 1e-9
+    else:
+        assert section.get("status") == "не измерено", "до шага 3 в METRICS.json не может быть чисел v2"
+        assert section.get("step3") is False
+        for key in ("f1", "fpr", "threshold"):
+            assert key not in section, f"поле {key} появилось раньше измерения"

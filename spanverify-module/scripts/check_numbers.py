@@ -390,6 +390,7 @@ def check_docs(docs: list[Path], metrics: dict, repo_root: Path | None = None) -
 
     problems.extend(check_required_sections(repo_root))
     problems.extend(check_hf_criterion_block(repo_root))
+    problems.extend(check_hf_criterion_block_v2(repo_root))
     return problems
 
 
@@ -424,6 +425,40 @@ def check_hf_criterion_block(repo_root: Path) -> list[str]:
         return [f"сверка блока критерия не выполнена: {exc}"]
     if code:
         return [f"блок критерия ТЗ в README расходится с манифестом: {buffer.getvalue().strip()[:300]}"]
+    return []
+
+
+def check_hf_criterion_block_v2(repo_root: Path) -> list[str]:
+    """Блок цикла v2 в README обязан совпадать с ``reports/v2/manifest.json``.
+
+    Тот же принцип, что и для блока v1: числа в README появляются только из
+    генератора. Отличие — в v2 генератор умеет и «до измерения»: если манифеста
+    ещё нет, он требует, чтобы блока в README не было вовсе. Так «результат»
+    не может появиться раньше, чем собран корпус и выполнен единственный прогон.
+    """
+    import importlib.util
+
+    renderer = Path(__file__).resolve().parent / "render_readme_v2.py"
+    if not renderer.is_file():  # pragma: no cover - вне стандартной раскладки
+        return ["нет scripts/render_readme_v2.py: сверку блока цикла v2 выполнить нечем"]
+    spec = importlib.util.spec_from_file_location("render_readme_v2_check", renderer)
+    if spec is None or spec.loader is None:  # pragma: no cover
+        return ["не удалось загрузить scripts/render_readme_v2.py"]
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    readme = repo_root / "README.md"
+    manifest = Path(__file__).resolve().parents[1] / "reports" / "v2" / "manifest.json"
+    import io
+    from contextlib import redirect_stderr, redirect_stdout
+
+    buffer = io.StringIO()
+    try:
+        with redirect_stdout(buffer), redirect_stderr(buffer):
+            code = module.main(["--manifest", str(manifest), "--readme", str(readme), "--check"])
+    except SystemExit as exc:  # noqa: PERF203 - раскладка может быть неполной
+        return [f"сверка блока цикла v2 не выполнена: {exc}"]
+    if code:
+        return [f"блок цикла v2 в README расходится с манифестом: {buffer.getvalue().strip()[:300]}"]
     return []
 
 
