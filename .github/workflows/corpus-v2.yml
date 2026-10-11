@@ -177,6 +177,11 @@ jobs:
             corpus-v2-${{ matrix.slice }}-
 
       - name: Загрузка и распознавание среза
+        # `--force` обязателен для цепочки волн: кэш среза продолжает начатое, и без
+        # него «достаточно документов» считается по накопленному в кэше — вторая волна
+        # в том же срезе не скачала бы ни одного документа (проверено на прогоне
+        # 38114525626: +0 документов, цепочка корректно остановилась по нулевому
+        # прогрессу). Отбор при этом всё равно пропускает уже известные doc_id.
         working-directory: spanverify-module
         timeout-minutes: 38
         env:
@@ -196,7 +201,8 @@ jobs:
             --max-pages-per-type 30 --max-pages 20 --dpi 200 \
             --workers 4 --pause 1.2 \
             --exclude-dirs "data/corpus_a3;data/corpus_a3_local70" \
-            --exclude-file /tmp/archived.txt
+            --exclude-file /tmp/archived.txt \
+            --force
 
       - name: Сколько получилось в срезе
         id: count
