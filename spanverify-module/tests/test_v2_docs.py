@@ -329,12 +329,12 @@ def test_methodology_numbers_match_the_corpus_manifest() -> None:
 
 
 def test_decisions_needed_lists_are_facts_and_consequences_only() -> None:
-    """Листы «а», «б», «в»: факты, варианты, последствия — и никаких рекомендаций агенту."""
+    """Листы «а», «б», «в», «г»: факты, варианты, последствия — и никаких рекомендаций агенту."""
     text = DECISIONS_DOC.read_text(encoding="utf-8")
-    for marker in ("Лист «а»", "Лист «б»", "Лист «в»"):
+    for marker in ("Лист «а»", "Лист «б»", "Лист «в»", "Лист «г»"):
         assert marker in text, f"в {DECISIONS_DOC.name} нет листа {marker}"
     chunks = text.split("## Лист ")[1:]
-    assert len(chunks) == 3
+    assert len(chunks) == 4, "изменилось число листов: проверь, что каждый заполнен по шаблону"
     for chunk in chunks:
         title = chunk.splitlines()[0].strip()
         for section in (

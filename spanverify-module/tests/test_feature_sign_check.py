@@ -19,6 +19,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 SCRIPT = ROOT / "scripts" / "feature_sign_check.py"
+SIGNS_ARTIFACT = ROOT / "reports" / "hf_protocol" / "feature_signs_a3dev.json"
 
 sys.path.insert(0, str(ROOT))
 sys.path.insert(0, str(ROOT / "scripts"))
@@ -211,3 +212,31 @@ def test_grid_cache_with_test_shard_is_rejected(tmp_path: Path) -> None:
     combined = proc.stdout + proc.stderr
     assert "только на валидации" in combined, combined[-400:]
     assert not (tmp_path / "signs.json").exists(), "отчёт записан до отказа"
+
+
+def test_known_grid_aliases_and_degenerate_feature_are_recorded() -> None:
+    """Два совпадения в сетке объяснимы определением, третий признак на A3 dev вырожден.
+
+    Тест держит согласованность кода и документа (`docs/ПРИЗНАКИ.md`, раздел 3.3, абзац
+    «Совпадения…»): роль «m4» в `resolve_layer` не распознаётся и откатывается на последний
+    слой, поэтому `entropy_m4` — дубль `entropy_last`; `density_k1_last` — среднее по одному
+    лучшему совпадению, то есть в точности `sim_max_last`; `attrib_borrowed` на валидации
+    постоянен, и AUC для него не определена. Если кто-то починит `resolve_layer` или определение
+    `k`, тест обязан упасть: вместе с кодом тогда меняют документ и состав сетки, а состав сетки —
+    решение заказчика (лист «г»), а не агента.
+    """
+    from spanverify.features import resolve_layer
+
+    assert resolve_layer("m4", 6) == resolve_layer("last", 6) == 5, "роль m4 перестала быть дублем last"
+    assert resolve_layer(-4, 6) == 2, "числовая роль -4 обязана считать четвёртый с конца"
+
+    payload = json.loads(SIGNS_ARTIFACT.read_text(encoding="utf-8"))
+    by_name = {item["name"]: item for item in payload["features"]}
+    for left, right in (("entropy_last", "entropy_m4"), ("density_k1_last", "sim_max_last")):
+        for key in ("auc", "mean_positive", "mean_negative", "distinct_values", "sign_by_val"):
+            assert by_name[left][key] == by_name[right][key], (
+                f"{left} и {right}: значение «{key}» разошлось — определение изменилось, и абзац"
+                " «Совпадения…» в docs/ПРИЗНАКИ.md больше не соответствует коду"
+            )
+    assert by_name["attrib_borrowed"]["auc"] is None, "признак перестал быть постоянным — 3.3 надо пересобрать"
+    assert by_name["attrib_borrowed"]["distinct_values"] == 1

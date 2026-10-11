@@ -2445,12 +2445,13 @@ GPT-2 приходит батчем `(1, heads, seq, seq)`, редукция ш�
   закрытому словарю.
 * **Проверки**: `pytest tests/test_feature_sign_check.py tests/test_report_links_resolve.py` →
   8 PASSED; `pytest tests/test_calibration.py tests/test_config.py tests/test_split_and_version.py`
-  → 36 PASSED; `pytest tests/test_workflow_limits.py` → 85 PASSED; `black --check .` →
+  → 36 PASSED; `pytest tests/test_workflow_limits.py` → 83 PASSED; `black --check .` →
   153 файла; `ruff check .` → «All checks passed!»; `python3 scripts/render_features_doc.py --check`
-  → 177 строк; `python3 scripts/collect_metrics.py` → `tests.collected = 727`;
+  → 177 строк; `python3 scripts/collect_metrics.py` → `tests.collected = 734`;
   `python3 scripts/check_numbers.py` → «Числа сходятся с METRICS.json: проверено документов 14».
-  Число тестов в `README.md`, `ИТОГ.md`, `docs/ОТЧЁТ_о_НИР_шаблон.md` и README модуля — 727
-  (было 714; рост = 8 новых тестов и 5 параметризованных проверок workflow на новый файл).
+  Число тестов в `README.md`, `ИТОГ.md`, `docs/ОТЧЁТ_о_НИР_шаблон.md` и README модуля — 734
+  (было 714: 6 тестов измерителя знака, 4 теста ссылок отчёта и 10 параметризованных проверок
+  workflow — по 5 на каждый из двух добавленных файлов).
 * **Сборка `.exe` на HEAD (работа 9) — проверена**: прогон `exe-check` `38136282824` на job
   `114460695934` — `success`, шаги «Сборка onefile spanverify.exe», «Контрольная сумма…»,
   «Проверка собранного .exe (запуск, health, verify)» — `success`; в аннотациях
