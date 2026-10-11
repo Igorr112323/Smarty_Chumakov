@@ -1,0 +1,139 @@
+name: exe-check
+
+# Проверка сборки .exe на текущем HEAD — без тега и без публикации релиза.
+
+# Зачем отдельный workflow. Официальный смоук-тест приложения Б живёт в
+# `build-and-release-exe.yml`, и его job сборки идёт после job'а «Тесты»
+# (`needs: test`). Пока проверочный гейт `tests/test_criterion_hf.py` красный
+# (критерий ТЗ не достигнут — см. docs/ОТЧЁТ_по_договору.md, раздел 3), job сборок
+# в том workflow просто не стартует, и пересобрать .exe на HEAD через
+# `workflow_dispatch` нельзя. Этот workflow ничего не публикует и ничего не ждёт:
+# он отвечает на один вопрос — собирается ли текущий код в автономный .exe,
+# запускается ли он и выдаёт ли контракт (риск и границы фрагментов).
+#
+# Что этот прогон НЕ утверждает: он не заменяет смоук-тест приложения Б (тот
+# проверяет ещё andir-сборку, zipapp, контроль Python DLL и автономность config),
+# и не создаёт релиз: публикация — только по тегу в `build-and-release-exe.yml`.
+#
+# Запуск: Actions → exe-check → Run workflow, либо пуш файла
+# .github/exe-check.trigger в ветку arena/**.
+
+on:
+  workflow_dispatch:
+  push:
+    branches: ["arena/**"]
+    paths:
+      - .github/exe-check.trigger
+
+permissions:
+  contents: read
+
+env:
+  PYTHONUTF8: "1"
+  PYTHONIOENCODING: "utf-8"
+
+jobs:
+  check:
+    timeout-minutes: 35
+    name: "Сборка и проверка .exe на HEAD"
+    runs-on: windows-latest
+    defaults:
+      run:
+        working-directory: spanverify-module
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+          cache-dependency-path: spanverify-module/requirements.txt
+
+      - name: Зависимости сборки
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements.txt
+          python -m pip install "pyinstaller>=6.0"
+
+      - name: Версия пакета (тег не требуется)
+        run: python -c "import spanverify; print('version', spanverify.__version__)"
+
+      - name: Убедиться, что веса обучены (обучить, если нет)
+        run: |
+          if (-not (Test-Path "config/weights.json")) {
+            python -m spanverify train --dataset data/demo_pairs.jsonl --out config/weights.json --seed 42 --folds 5
+          }
+          python -m spanverify config
+
+      - name: Сборка onefile spanverify.exe
+        run: python -m PyInstaller spanverify.spec --noconfirm --clean
+
+      - name: Контрольная сумма собранного .exe
+        run: |
+          $hash = (Get-FileHash -Algorithm SHA256 dist/spanverify.exe).Hash.ToLower()
+          $size = (Get-Item dist/spanverify.exe).Length
+          Write-Host "::notice title=sha256 spanverify.exe::$hash размер=$size commit=${{ github.sha }}"
+          "sha256=$hash размер=$size commit=${{ github.sha }}" | Out-File -Encoding utf8 dist/spanverify.exe.sha256.txt
+
+      - name: Проверка собранного .exe (запуск, health, verify)
+        shell: pwsh
+        working-directory: spanverify-module/dist
+        run: |
+          $ErrorActionPreference = "Stop"
+          $proc = Start-Process -FilePath ".\spanverify.exe" -ArgumentList "--port","8766","--no-browser" -PassThru -RedirectStandardOutput out.log -RedirectStandardError err.log
+          try {
+            $ready = $false
+            for ($i = 0; $i -lt 45; $i++) {
+              Start-Sleep -Seconds 2
+              try {
+                $health = Invoke-RestMethod -Uri "http://127.0.0.1:8766/health" -TimeoutSec 3
+                if ($health.status -eq "ok") { $ready = $true; break }
+              } catch { }
+              if ($proc.HasExited) { throw "процесс .exe завершился с кодом $($proc.ExitCode)" }
+            }
+            if (-not $ready) { throw "сервис из .exe не поднялся за 90 секунд" }
+            Write-Host "::notice title=health собранного exe::$($health | ConvertTo-Json -Compress)"
+            $bad = @{
+              answer  = "Срок хранения первичных документов составляет 3 года."
+              context = "Регламент 343: срок хранения первичных документов составляет 10 лет."
+            } | ConvertTo-Json -Compress
+            $response = Invoke-RestMethod -Uri "http://127.0.0.1:8766/v1/verify" -Method Post -Body ([System.Text.Encoding]::UTF8.GetBytes($bad)) -ContentType "application/json; charset=utf-8" -TimeoutSec 60
+            foreach ($field in @("score","is_hallucination","ai_share","threshold","spans","latency_ms","mode","stats")) {
+              if ($null -eq $response.$field) { throw "в ответе нет поля контракта '$field'" }
+            }
+            if ($response.spans.Count -lt 1) { throw "подмена числа не найдена" }
+            $span = $response.spans[0]
+            foreach ($key in @("start","end","text","risk")) {
+              if ($null -eq $span.$key) { throw "во фрагменте нет поля '$key' (границы и риск обязательны)" }
+            }
+            Write-Host "::notice title=span из exe::start=$($span.start) end=$($span.end) risk=$($span.risk) текст=$($span.text)"
+            $good = @{
+              answer  = "Срок хранения первичных документов составляет 10 лет."
+              context = "Регламент 343: срок хранения первичных документов составляет 10 лет."
+            } | ConvertTo-Json -Compress
+            $ok = Invoke-RestMethod -Uri "http://127.0.0.1:8766/v1/verify" -Method Post -Body ([System.Text.Encoding]::UTF8.GetBytes($good)) -ContentType "application/json; charset=utf-8" -TimeoutSec 60
+            if ($ok.verdict -ne "grounded") { throw "подтверждённый ответ получил вердикт '$($ok.verdict)'" }
+            Write-Host "ПРОВЕРКА СБОРКИ ПРОЙДЕНА"
+          } catch {
+            foreach ($name in @("out.log","err.log")) {
+              if (Test-Path $name) {
+                Get-Content $name -Encoding utf8 | Select-Object -Last 20 | ForEach-Object { Write-Host "::error title=$name::$_" }
+              }
+            }
+            Write-Host "::error title=сбой проверки сборки::$($_.Exception.Message)"
+            throw
+          } finally {
+            if ($proc -and -not $proc.HasExited) { Stop-Process -Id $proc.Id -Force }
+          }
+
+      - name: Артефакт проверки
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: exe-check
+          path: |
+            spanverify-module/dist/spanverify.exe.sha256.txt
+            spanverify-module/dist/out.log
+            spanverify-module/dist/err.log
+          if-no-files-found: warn
+          retention-days: 30

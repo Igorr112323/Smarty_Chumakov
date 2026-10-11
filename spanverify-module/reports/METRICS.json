@@ -8,8 +8,8 @@
   },
   "meta": {
     "version": "1.3.0",
-    "commit": "c82d61b61b8ca1135ab071a87f0ba8197235eaac",
-    "generated_at": "2026-10-11T09:30:16Z",
+    "commit": "8da2b662212875579001293baa4b68c0fa46df4a",
+    "generated_at": "2026-10-11T11:15:29Z",
     "seed": 42,
     "dataset": "data/demo_pairs.jsonl"
   },
@@ -92,7 +92,7 @@
     ]
   },
   "tests": {
-    "collected": 714,
+    "collected": 727,
     "coverage_percent": null,
     "coverage_gate_percent": 85
   },
@@ -1850,7 +1850,7 @@
   },
   "pilot": null,
   "release": null,
-  "duration_s": 107.1,
+  "duration_s": 103.5,
   "cycle_v2": {
     "step0": false,
     "step2": false,

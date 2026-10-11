@@ -1,0 +1,134 @@
+# Знак и информативность признаков сетки на валидации (A3 dev).
+#
+# Зачем отдельный прогон. В `docs/ПРИЗНАКИ.md` зафиксировано: пилот на 96 парах
+# дал значимые отклонения AUC от 0,5, и все — ниже 0,5. Прежде чем писать
+# «признак информативен», надо измерить знак на официальной валидации. Модель для
+# этого не нужна: признаки уже лежат в кеше сетки (формат v3) тяжёлого прогона,
+# поэтому job читает артефакт и считает AUC со стандартной библиотекой.
+#
+# Что выходит. `spanverify-module/reports/hf_protocol/feature_signs_a3dev.json` и
+# `.md` коммитом в ту же ветку (паттерн hf-analysis.yml) + аннотации прогона,
+# чтобы числа читались без скачивания артефакта. Тестовая часть не открывается:
+# скрипт принимает только val и падает, если вместо него подставляют test.
+#
+# Запуск: workflow_dispatch (номер прогона с кешем — параметр) или пуш
+# .github/hf-feature-signs.trigger в ветку arena/**.
+name: Знак признаков на валидации (A3 dev)
+
+on:
+  workflow_dispatch:
+    inputs:
+      run_id:
+        description: "Прогон «Тяжёлые прогоны hf», из которого брать кеш сетки A3"
+        default: "37609202780"
+  push:
+    branches: ["arena/**"]
+    paths:
+      - .github/hf-feature-signs.trigger
+
+concurrency:
+  group: hf-feature-signs-${{ github.ref }}
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+env:
+  RUN_ID: ${{ github.event.inputs.run_id || '37609202780' }}
+
+jobs:
+  signs:
+    name: "AUC и знак по каждому признаку сетки (val)"
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: "Зависимости (без torch: работает кеш и стандартная библиотека)"
+        working-directory: spanverify-module
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -q -r requirements.txt
+
+      - name: "Кеш сетки из тяжёлого прогона"
+        uses: actions/download-artifact@v4
+        with:
+          name: hf-runs-a3
+          run-id: ${{ env.RUN_ID }}
+          path: /tmp/signs-dl
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: "Разложить кеш"
+        run: |
+          python3 - << 'PY'
+          import shutil
+          from pathlib import Path
+
+          src = next(
+              (p for p in Path("/tmp/signs-dl").rglob("*") if p.is_dir() and p.name == "hf-cache-a3"), None
+          )
+          if src is None:
+              raise SystemExit("в артефакте нет каталога hf-cache-a3")
+          dest = Path("spanverify-module/reports/hf-cache-a3")
+          dest.mkdir(parents=True, exist_ok=True)
+          count = 0
+          for path in src.rglob("*"):
+              if path.is_file():
+                  target = dest / path.relative_to(src)
+                  target.parent.mkdir(parents=True, exist_ok=True)
+                  shutil.copy2(path, target)
+                  count += 1
+          print("файлов кеша:", count)
+          PY
+
+      - name: "Измерить знак и AUC по каждому признаку (только val)"
+        working-directory: spanverify-module
+        timeout-minutes: 20
+        run: |
+          echo "команда: python3 scripts/feature_sign_check.py --grid-cache reports/hf-cache-a3 --splits data/corpus_a3/splits --bootstrap 5000 --seed 42 --annotate --out-json reports/hf_protocol/feature_signs_a3dev.json --out-md reports/hf_protocol/feature_signs_a3dev.md (кеш — прогон $RUN_ID)"
+          python3 scripts/feature_sign_check.py \
+            --grid-cache reports/hf-cache-a3 \
+            --splits data/corpus_a3/splits \
+            --bootstrap 5000 \
+            --seed 42 \
+            --annotate \
+            --out-json reports/hf_protocol/feature_signs_a3dev.json \
+            --out-md reports/hf_protocol/feature_signs_a3dev.md
+
+      - name: "Таблица в лог (чтобы её видно было в аннотациях и в отчёте прогона)"
+        if: always()
+        working-directory: spanverify-module
+        run: |
+          if [ -f reports/hf_protocol/feature_signs_a3dev.md ]; then
+            cat reports/hf_protocol/feature_signs_a3dev.md
+          else
+            echo "::error title=нет таблицы::файл feature_signs_a3dev.md не создан"
+            exit 1
+          fi
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: feature-signs-a3dev
+          path: |
+            spanverify-module/reports/hf_protocol/feature_signs_a3dev.json
+            spanverify-module/reports/hf_protocol/feature_signs_a3dev.md
+          if-no-files-found: warn
+          retention-days: 90
+
+      - name: "Коммит чисел в ветку"
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -- spanverify-module/reports/hf_protocol/feature_signs_a3dev.json spanverify-module/reports/hf_protocol/feature_signs_a3dev.md
+          if git diff --cached --quiet; then
+            echo "нечего коммитить"
+            exit 0
+          fi
+          git commit -m "числа: знак и AUC признаков на val (кеш прогона $RUN_ID) [skip ci]"
+          git push origin "HEAD:${GITHUB_REF_NAME}"
+          echo "запушено в ${GITHUB_REF_NAME}"

@@ -32,6 +32,7 @@ DOC = REPO_ROOT / "docs" / "ПРИЗНАКИ.md"
 PILOT = MODULE_ROOT / "reports" / "experiments" / "pilot" / "pilot.json"
 SWEEP = MODULE_ROOT / "reports" / "hf_protocol" / "sweep.json"
 A3 = MODULE_ROOT / "reports" / "experiments" / "a3" / "experiment.json"
+SIGNS = MODULE_ROOT / "reports" / "hf_protocol" / "feature_signs_a3dev.json"
 METRICS = MODULE_ROOT / "reports" / "METRICS.json"
 
 # Определение каждого признака сетки — по коду ``spanverify/hf_grid.py``.
@@ -289,14 +290,81 @@ def _zero_f1_note(experiments: list[dict]) -> str:
     )
 
 
+def sign_section() -> list[str]:
+    """Знак и информативность каждого признака на валидации — из артефакта прогона."""
+    header = ["### 3.3. Знак признака на валидации (AUC с исходным и инвертированным знаком)", ""]
+    if not SIGNS.is_file():
+        header += [
+            "**Не измерено.** Пилот (3.1) дал отклонения AUC ниже 0,5, и прежде, чем писать что-либо",
+            "об информативности отдельного признака, знак обязан быть измерен на официальной",
+            "валидации. Измеритель готов: `scripts/feature_sign_check.py`, прогон — workflow",
+            "`hf-feature-signs.yml` (читает кеш сетки тяжёлого прогона, тестовую часть не открывает).",
+            "",
+            "До появления артефакта `reports/hf_protocol/feature_signs_a3dev.json` любые формулировки",
+            "«признак X информативен» и «знак перевёрнут» считаются неподтверждёнными.",
+            "",
+        ]
+        return header
+    payload = json.loads(SIGNS.read_text(encoding="utf-8"))
+    split = payload["split"]
+    counts = payload["counts"]
+    lines = header + [
+        f"Источник — `spanverify-module/reports/hf_protocol/feature_signs_a3dev.json` (прогон CI, модель"
+        f" `{payload['model']['id']}`, кеш `{payload['inputs']['grid_cache']}`). Выборка: пар"
+        f" `{split['pairs']}`, токенов `{split['tokens']}` (положительных"
+        f" `{payload['labels']['positive_tokens']}`, отрицательных"
+        f" `{payload['labels']['negative_tokens']}`). Правило: «{payload['rule']}»."
+        "",
+        f"Определение: {payload['auc_definition']}. Доверительный интервал: {payload['ci_definition']}.",
+        "",
+        "| Признак | AUC (исходный знак) | AUC (инвертированный) | ДИ исходного | Значимость | Знак по val |",
+        "|---|---|---|---|---|---|",
+    ]
+    for item in payload["features"]:
+        if item["auc"] is None:
+            lines.append(f"| `{item['name']}` | — | — | — | нет | {item['sign_by_val']} |")
+            continue
+        interval = f"[{item['ci_low']:.3f}; {item['ci_high']:.3f}]" if item["ci_low"] is not None else "—"
+        if item["significant_original"]:
+            verdict = "значимо, исходный знак"
+        elif item["significant_inverted"]:
+            verdict = "значимо, обратный знак"
+        else:
+            verdict = "не значимо (ДИ накрывает 0,5)"
+        lines.append(
+            f"| `{item['name']}` | {item['auc']:.6f} | {item['auc_inverted']:.6f} | {interval} | {verdict}"
+            f" | {item['sign_by_val']} |"
+        )
+    lines += [
+        "",
+        f"Итог по артефакту: AUC ниже 0,5 у `{counts['auc_below_half']}` признаков из"
+        f" `{len(payload['features'])}`; значимых с исходным знаком — `{counts['significant_original']}`,"
+        f" значимых с обратным — `{counts['significant_inverted']}`, постоянных (AUC не определена) —"
+        f" `{counts['constant']}`.",
+        "",
+        "Как это читать. AUC ниже 0,5 — не «признак плохой», а признак с обратным направлением:"
+        " линейная модель сама присвоит ему отрицательный вес, отдельного вычитания в коде не требуется"
+        " (в `spanverify/hf_grid.py` и `spanverify/features.py` инверсии знака нет — признаки подаются"
+        " как есть). Если доверительный интервал накрывает 0,5, направление не установлено и вывод об"
+        " информативности признака не делается ни в какую сторону.",
+        "",
+        "Воспроизвести: `python3 scripts/feature_sign_check.py --grid-cache reports/hf-cache-a3"
+        " --splits data/corpus_a3/splits --bootstrap 5000 --seed 42 --out-json"
+        " reports/hf_protocol/feature_signs_a3dev.json --out-md reports/hf_protocol/feature_signs_a3dev.md`"
+        " (кеш сетки — артефакт тяжёлого прогона `hf-runs-a3`; локально требует кеш, в CI — job"
+        " «Знак признаков на валидации»).",
+        "",
+    ]
+    return lines
+
+
 def gap_section() -> list[str]:
     return [
-        "### 3.3. Чего нет (и это не «почти сделано»)",
+        "### 3.4. Чего нет (и это не «почти сделано»)",
         "",
-        "* **AUC каждого из 36 признаков по отдельности на официальной валидации — не измерено.**"
-        " Пилот (3.1) отвечал на вопрос «есть ли сигнал вообще» на 96 контрастных парах; отбор (3.2)"
-        " отвечал на вопрос «какой набор оставить». Разложение «признак → вклад в F1» на val никто не"
-        " считал; команды — `make hf-grid-v2` затем `make hf-curve-v2`.",
+        "* **Вклад каждого из 36 признаков в F1 на val — не измерено.** Знак и AUC по признаку"
+        " измерены (3.3), но «сколько добавляет признак» без прогона ablation не утверждается;"
+        " команды — `make hf-grid-v2` затем `make hf-curve-v2`.",
         "* **Отдельного замера «только признаки attention» на A3 — нет.** В v1 они входили в расширенный"
         " набор; вывод о их индивидуальном вкладе без этого замера не делается.",
         "* **Информативность на реальных (не синтетических) размеченных данных — не измерено**, потому что"
@@ -414,6 +482,7 @@ def render() -> str:
     ]
     lines += pilot_section(pilot)
     lines += sweep_section(sweep)
+    lines += sign_section()
     lines += gap_section()
     lines += [
         "## 4. Как признаки участвуют в решении",

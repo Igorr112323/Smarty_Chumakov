@@ -8,6 +8,7 @@
 from __future__ import annotations
 
 import json
+import re
 import subprocess
 import sys
 from pathlib import Path
@@ -363,23 +364,25 @@ def test_contract_report_states_criterion_from_the_manifest() -> None:
 
 
 def test_contract_report_rows_cite_evidence_or_say_not_done() -> None:
-    """Каждая строка таблицы работ: либо путь/команда, либо явное «не выполнено»."""
+    """Каждая строка таблицы работ: в «что закрыто» — путь/команда, иначе явное «не выполнено».
+
+    Таблица договора шестиколонная: № | статус | требуется | закрыто | не закрыто | блокер.
+    Порядок колонок закрепляет и тест словаря статусов (``test_report_links_resolve.py``).
+    """
     text = CONTRACT_REPORT.read_text(encoding="utf-8")
     table = text.split("## 1. Инвентаризация работ", 1)[1].split("## 2.", 1)[0]
-    rows = [
-        line
-        for line in table.splitlines()
-        if line.startswith("| ") and line.count("|") >= 5 and not line.startswith("|---")
-    ]
-    works = [row for row in rows if row.split("|")[1].strip().isdigit()]
+    rows = [line for line in table.splitlines() if line.startswith("| ") and line.count("|") >= 6]
+    works = [line for line in rows if re.match(r"\|\s*\d+\s*\|", line)]
     assert len(works) == 10, f"в таблице работ {len(works)} строк, ожидалось 10"
-    for row in works:
-        cells = [cell.strip() for cell in row.strip().strip("|").split("|")]
-        number, done, not_done, blocker = cells[0], cells[2], cells[3], cells[4]
-        assert done, f"работа {number}: пустая колонка «сделано»"
-        evidenced = "`" in done or "—" == done
+    for line in works:
+        cells = [cell.strip() for cell in line.strip().strip("|").split("|")]
+        number, status, closed, open_part, blocker = cells[0], cells[1], cells[3], cells[4], cells[5]
+        assert closed, f"работа {number}: пустая колонка «что закрыто»"
+        evidenced = "`" in closed or status.startswith("**не выполняется")
         admitted = any(
-            word in (done + not_done + blocker)
-            for word in ("не выполнено", "не выполнена", "ожидает", "Не выполняется")
+            word in (status + closed + open_part + blocker)
+            for word in ("не выполнено", "не выполнена", "ожидает", "не проверено", "не запускаются", "не выполняется")
         )
-        assert evidenced or admitted, f"работа {number}: «сделано» без пути, команды или явного «не выполнено»"
+        assert evidenced or admitted, f"работа {number}: «закрыто» без пути, команды или явного «не выполнено»"
+        if "частично" in status.lower():
+            assert open_part and open_part != "—", f"работа {number}: статус «частично», но незакрытая часть не названа"
