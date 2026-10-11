@@ -78,16 +78,16 @@
    ```bash
    # 10 % тестовой части v2 + все пары подтипа «атрибуция числа»
    python scripts/review_server.py --make-sample --source data/corpus_v2/splits/test.jsonl \
-     --queue data/review_queue/corpus_v2_10pct.jsonl --share 0.10 --seed 42
+     --queue data/review_queue/corpus_v2_10pct.jsonl --share 0.10 --seed 42 \
+     --include-modes number_attribution
    python scripts/review_server.py --queue data/review_queue/corpus_v2_10pct.jsonl \
      --out data/review_queue/corpus_v2_decisions.jsonl --port 8770
    ```
 
    Объём работы эксперта — ≈64 + ≈70 пар, 2–2,5 часа. Итог идёт в
    `reports/CORPUS_V2_REPORT.md` строками «проверено N, подтверждено M, расхождения …».
-   Если экспертной проверки не будет, в отчёте так и пишется: **«экспертная
-   верификация разметки не выполнена»**. Агентская вычитка не записывается как
-   человеческая подпись.
+   Если экспертной проверки не будет, в отчёте так и пишется: «экспертная верификация разметки не выполнена».
+   Агентская вычитка не записывается как человеческая подпись.
 
 ## 5. Команды сборки (после того как CI собрал тексты)
 

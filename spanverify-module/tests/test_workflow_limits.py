@@ -32,6 +32,9 @@ MAX_JOB_MINUTES = 40
 # обоснованием в шапке workflow — иначе «висящий» job снова съедает очередь.
 HEAVY_JOB_MINUTES = {
     "hf-runs.yml": 180,
+    # Цикл v2: предвычисление сетки на ≈3600 парах и перебор 10 гипотез — те же
+    # по природе job'ы, что и в hf-protocol.yml (v1), с той же вилкой.
+    "hf-protocol-v2.yml": 150,
     "hf-a3-head.yml": 150,
     "hf-protocol.yml": 150,
 }

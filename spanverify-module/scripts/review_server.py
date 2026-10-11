@@ -37,6 +37,7 @@ import html
 import json
 import random
 import sys
+from collections.abc import Sequence
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from urllib.parse import unquote
@@ -109,16 +110,41 @@ def load_jsonl(path: Path) -> list[dict]:
     return rows
 
 
-def make_sample(source: Path, queue: Path, share: float, seed: int) -> int:
-    """Взять случайную долю пар из источника — очередь ручной проверки."""
+def mode_of(pair: dict) -> str:
+    """Режим генерации пары (то, чем различаются «подтвёрждённый» и «атрибуция числа»)."""
+    meta = pair.get("meta") or {}
+    return str(meta.get("mode") or "")
+
+
+def make_sample(source: Path, queue: Path, share: float, seed: int, include_modes: Sequence[str] = ()) -> int:
+    """Случайная доля пар из источника плюс, если задано, все пары выбранных режимов.
+
+    Второй список нужен не для объёма, а для цены ошибки: режим «атрибуция числа»
+    (значение есть в документе, но относится к другому объекту) — самый трудный для
+    генератора разметки, и выбирать его случаем нельзя: при доле 10 % в выборку
+    попало бы пара-тройка таких пар, и вывод о корректности метки сделать было бы
+    нельзя. Порядок очереди — по id, чтобы очередь была воспроизводимой.
+    """
     pairs = load_jsonl(source)
     if not pairs:
         raise SystemExit(f"нет пар в {source}")
-    random.Random(seed).shuffle(pairs)
-    count = max(1, round(len(pairs) * share))
+    wanted = {str(mode).strip() for mode in include_modes if str(mode).strip()}
+    forced = [pair for pair in pairs if mode_of(pair) in wanted] if wanted else []
+    forced_ids = {str(pair.get("id")) for pair in forced}
+    rest = [pair for pair in pairs if str(pair.get("id")) not in forced_ids]
+    random.Random(seed).shuffle(rest)
+    count = max(1, round(len(rest) * share)) if rest else 0
+    selected = sorted(forced + rest[:count], key=lambda pair: str(pair.get("id")))
+    if not selected:
+        raise SystemExit(f"в {source} нет ни одной пары для очереди (доля {share}, режимы {sorted(wanted)})")
     queue.parent.mkdir(parents=True, exist_ok=True)
-    queue.write_text("".join(json.dumps(pair, ensure_ascii=False) + "\n" for pair in pairs[:count]), encoding="utf-8")
-    return count
+    queue.write_text("".join(json.dumps(pair, ensure_ascii=False) + "\n" for pair in selected), encoding="utf-8")
+    if wanted:
+        print(
+            f"принудительно включено режимов {sorted(wanted)}: {len(forced)} пар, "
+            f"случайная доля {count} из {len(rest)}"
+        )
+    return len(selected)
 
 
 def decisions_index(path: Path) -> dict[str, dict]:
@@ -279,12 +305,19 @@ def main() -> int:
     parser.add_argument("--make-sample", action="store_true", help="создать очередь из источника и выйти")
     parser.add_argument("--source", type=Path, default=ROOT / "data" / "corpus_a" / "splits" / "test.jsonl")
     parser.add_argument("--share", type=float, default=0.10)
+    parser.add_argument(
+        "--include-modes",
+        default="",
+        help="режимы генерации, все пары которых обязательно попадают в очередь "
+        "(через запятую), например number_attribution",
+    )
     parser.add_argument("--seed", type=int, default=42)
     args = parser.parse_args()
 
     if args.make_sample:
         try:
-            count = make_sample(args.source, args.queue, args.share, args.seed)
+            modes = [item.strip() for item in str(args.include_modes).split(",") if item.strip()]
+            count = make_sample(args.source, args.queue, args.share, args.seed, modes)
         except SystemExit as error:
             print(f"ошибка: {error}", file=sys.stderr)
             return 2

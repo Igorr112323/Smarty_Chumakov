@@ -1,0 +1,358 @@
+# Протокол цикла v2: измерение метода на независимой выборке (цель F1 ≥ 0,70).
+#
+# Отличие от hf-protocol.yml (v1) не в правилах счёта — определения импортированы
+# из замороженного харнесса v1, — а в выборке, в правиле порога (val вместо train-CV,
+# по требованию заказчика), в обязательном разбросе seed'ов и в стоп-правиле шага 2.
+#
+# Порядок job'ов и есть порядок шагов протокола:
+#   gate      — есть ли корпус v2; без него остальные job'ы не запускаются
+#   grid      — предвычисление сетки признаков train+val (rugpt3small) и train+val для
+#               гипотезы «модель больше» (rugpt3base); test на этом этапе не читается
+#   measure   — шаг 0 (freeze), шаг 1 (кривые и оба правила порога на val),
+#               шаг 2 (10 гипотез, отбор, стоп-правило), seedcheck
+#   grid-test — сетка признаков test'а: только ПОСЛЕ отбора и заморозки конфигурации
+#   final     — шаг 3, единственный прогон на test; включается меткой [hf-final-v2]
+#   final-again-never — guard: повторный прогон шага 3 запрещён механизмом
+#
+# Запуск: правкой .github/hf-protocol-v2.trigger; шаг 3 — пушем с [hf-final-v2]
+# в сообщении коммита (у токена песочницы нет права actions:write, проверено v1).
+name: "Протокол v2 (независимая выборка)"
+
+on:
+  workflow_dispatch: {}
+  push:
+    branches: ["arena/**"]
+    paths:
+      - .github/hf-protocol-v2.trigger
+
+concurrency:
+  group: hf-protocol-v2-${{ github.ref }}
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+env:
+  HF_MODEL: ai-forever/rugpt3small_based_on_gpt2
+  HF_MODEL_BIG: ai-forever/rugpt3base
+  SEED: "42"
+  SPLITS: data/corpus_v2/splits
+  EXPERIMENTS: config/hf_experiments_v2.json
+
+jobs:
+  gate:
+    name: "Есть ли корпус v2"
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    outputs:
+      ready: ${{ steps.check.outputs.ready }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: "Проверка файлов выборки и заморозки шага 0"
+        id: check
+        working-directory: spanverify-module
+        run: |
+          ready=yes
+          for file in data/corpus_v2/pairs.jsonl data/corpus_v2/splits/train.jsonl \
+                     data/corpus_v2/splits/dev.jsonl data/corpus_v2/splits/test.jsonl \
+                     config/hf_experiments_v2.json docs/METRIC_SPEC_v2.md; do
+            if [ ! -f "$file" ]; then
+              echo "::warning::[gate v2] нет $file — цикл v2 ещё не готов к измерениям"
+              ready=no
+            fi
+          done
+          pairs=$(wc -l < data/corpus_v2/splits/test.jsonl 2>/dev/null || echo 0)
+          echo "тестовая часть: $pairs пар (пол по спецификации — 600)" >> "$GITHUB_STEP_SUMMARY"
+          echo "ready=$ready" >> "$GITHUB_OUTPUT"
+          echo "ready=$ready" >> "$GITHUB_STEP_SUMMARY"
+
+  grid:
+    name: "Сетка train+val, ${{ matrix.model }}, шард ${{ matrix.shard }}"
+    runs-on: ubuntu-latest
+    needs: gate
+    if: needs.gate.outputs.ready == 'yes'
+    timeout-minutes: 60
+    strategy:
+      fail-fast: false
+      matrix:
+        model: [small, base]
+        shard: [0, 1, 2, 3, 4, 5]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: "Кэш весов модели"
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/huggingface
+          key: hf-${{ runner.os }}-${{ matrix.model }}-v1
+      - name: "Зависимости и среда"
+        uses: ./.github/actions/hf-setup
+      - name: "Сетка признаков обучающей и validation-частей"
+        working-directory: spanverify-module
+        env:
+          OMP_NUM_THREADS: "4"
+          MODEL: ${{ matrix.model == 'base' && env.HF_MODEL_BIG || env.HF_MODEL }}
+          OUT: ${{ matrix.model == 'base' && 'reports/v2-grid-base' || 'reports/v2-grid' }}
+        run: |
+          # Логи job'а из песочницы не читаются, поэтому вывод шага пишется в файл,
+          # а при падении его последние строки публикуются аннотацией (Checks API).
+          diag="$RUNNER_TEMP/hf-v2-diag.log"; : > "$diag"
+          trap 'sync; sleep 6; tail -c 4000 "$diag" | sed -e "s/[[:cntrl:]]/ /g" -e "s/%/%25/g" -e "s|^|::error::[grid v2 ${{ matrix.model }} шард ${{ matrix.shard }}] |"; tail -n 60 "$diag" >> "$GITHUB_STEP_SUMMARY" 2>/dev/null || true' ERR
+          exec > >(tee -a "$diag") 2>&1
+          set -x
+          python scripts/precompute_features.py \
+            --grid \
+            --model "$MODEL" \
+            --dataset "$SPLITS/train.jsonl" \
+            --split-files "v2-train=$SPLITS/train.jsonl,v2-val=$SPLITS/dev.jsonl" \
+            --out "$OUT" \
+            --shard "${{ matrix.shard }}" --shards 6
+      - uses: actions/upload-artifact@v4
+        with:
+          name: "grid-v2-${{ matrix.model }}-${{ matrix.shard }}"
+          path: spanverify-module/${{ matrix.model == 'base' && 'reports/v2-grid-base' || 'reports/v2-grid' }}
+          retention-days: 30
+
+  measure:
+    name: "Шаги 0–2: аудит, кривые, 10 гипотез, seedcheck"
+    runs-on: ubuntu-latest
+    needs: grid
+    timeout-minutes: 150
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: "Зависимости и среда"
+        uses: ./.github/actions/hf-setup
+      - name: "Собрать кеш сетки со всех шардов"
+        uses: actions/download-artifact@v4
+        with:
+          pattern: "grid-v2-*"
+          path: spanverify-module/reports/v2-grid-merged
+          merge-multiple: true
+      - name: "Разложить кеши по каталогам моделей"
+        working-directory: spanverify-module
+        run: |
+          mkdir -p reports/v2-grid reports/v2-grid-base
+          # Имена артефактов сохраняют вложенность каталогов, поэтому просто
+          # переносим файлы: у base-модели свои признаки, смешивать кеши нельзя
+          # (cache_model_provenance падает на двух моделях в одном кеше).
+          find reports/v2-grid-merged -name '*.jsonl*' -o -name '*.json' | while read -r file; do
+            case "$file" in
+              *v2-grid-base*) mv "$file" reports/v2-grid-base/ ;;
+              *) mv "$file" reports/v2-grid/ ;;
+            esac
+          done
+          rm -rf reports/v2-grid-merged
+          ls -1 reports/v2-grid | head -5
+          ls -1 reports/v2-grid-base | head -5
+      - name: "Шаг 0: аудит разбиения и независимости"
+        working-directory: spanverify-module
+        run: |
+          set -x
+          python scripts/hf_protocol_v2.py freeze \
+            --splits "$SPLITS" \
+            --config "$EXPERIMENTS" \
+            --out reports/v2
+      - name: "Шаг 1: кривые F1/FPR на val и оба правила порога"
+        working-directory: spanverify-module
+        run: |
+          set -x
+          python scripts/hf_protocol_v2.py curve \
+            --config "$EXPERIMENTS" \
+            --grid-cache reports/v2-grid \
+            --splits "$SPLITS" \
+            --out reports/v2
+      - name: "Шаг 2: десять гипотез, отбор по val"
+        working-directory: spanverify-module
+        run: |
+          set -x
+          python scripts/hf_protocol_v2.py sweep \
+            --config "$EXPERIMENTS" \
+            --grid-cache reports/v2-grid \
+            --splits "$SPLITS" \
+            --out reports/v2
+      - name: "Seedcheck: seed обязан влиять на обучение"
+        working-directory: spanverify-module
+        run: |
+          set -x
+          selected=$(python -c "import json;print(json.load(open('reports/v2/sweep.json',encoding='utf-8')).get('selected') or '')")
+          if [ -z "$selected" ]; then
+            echo "::error::[seedcheck v2] на val не отобрана ни одна конфигурация (FPR_val > 0,40 у всех)"
+            exit 1
+          fi
+          python scripts/hf_protocol_v2.py seedcheck \
+            --config "$EXPERIMENTS" \
+            --grid-cache reports/v2-grid \
+            --splits "$SPLITS" \
+            --experiment "$selected" \
+            --out reports/v2
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: "hf-v2-measure"
+          path: spanverify-module/reports/v2
+          if-no-files-found: warn
+          retention-days: 60
+      - name: "Опубликовать сводки шагов 0–2"
+        if: always()
+        working-directory: spanverify-module
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          if [ ! -f reports/v2/sweep.json ]; then
+            echo "::warning::[publish v2] сводки шага 2 нет — публиковать нечего"
+            exit 0
+          fi
+          python scripts/publish_reports.py --branch data/metrics --dest hf-v2-measure \
+            --report reports/v2 --message "цикл v2: шаги 0–2, прогон ${{ github.run_number }} [skip ci]"
+
+  grid-test:
+    name: "Сетка test (после отбора), шард ${{ matrix.shard }}"
+    runs-on: ubuntu-latest
+    needs: measure
+    timeout-minutes: 45
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [0, 1, 2]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: "Кэш весов модели"
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/huggingface
+          key: hf-${{ runner.os }}-rugpt3small-v1
+      - name: "Зависимости и среда"
+        uses: ./.github/actions/hf-setup
+      - name: "Сетка признаков отложенной части"
+        working-directory: spanverify-module
+        env:
+          OMP_NUM_THREADS: "4"
+        run: |
+          diag="$RUNNER_TEMP/hf-v2-test-diag.log"; : > "$diag"
+          trap 'sync; sleep 6; tail -c 4000 "$diag" | sed -e "s/[[:cntrl:]]/ /g" -e "s/%/%25/g" -e "s|^|::error::[grid-test v2 шард ${{ matrix.shard }}] |"; tail -n 60 "$diag" >> "$GITHUB_STEP_SUMMARY" 2>/dev/null || true' ERR
+          exec > >(tee -a "$diag") 2>&1
+          set -x
+          python scripts/precompute_features.py \
+            --grid \
+            --model "$HF_MODEL" \
+            --dataset "$SPLITS/train.jsonl" \
+            --split-files "v2-test=$SPLITS/test.jsonl" \
+            --out reports/v2-grid-test \
+            --shard "${{ matrix.shard }}" --shards 3
+      - uses: actions/upload-artifact@v4
+        with:
+          name: "grid-v2-test-${{ matrix.shard }}"
+          path: spanverify-module/reports/v2-grid-test
+          retention-days: 30
+
+  final:
+    name: "Шаг 3: единственный прогон на test"
+    runs-on: ubuntu-latest
+    needs: [grid-test]
+    if: contains(github.event.head_commit.message, '[hf-final-v2]')
+    timeout-minutes: 90
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: "Собрать кеш train+val и test"
+        uses: actions/download-artifact@v4
+        with:
+          pattern: "grid-v2*"
+          path: spanverify-module/reports/v2-grid
+          merge-multiple: true
+      - name: "Взять сводки шагов 0–2 (источник отобранной конфигурации)"
+        uses: actions/download-artifact@v4
+        with:
+          name: "hf-v2-measure"
+          path: spanverify-module
+      - name: "Зависимости и среда"
+        uses: ./.github/actions/hf-setup
+      - name: "Проверка заморозки конфигурации (без неё шаг 3 не выполняется)"
+        working-directory: spanverify-module
+        run: |
+          if [ ! -f config/hf_final_config_v2.json ]; then
+            echo "::error::[final v2] нет config/hf_final_config_v2.json — сначала `make hf-freeze-config-v2`"
+            exit 1
+          fi
+          python - << 'PY'
+          import json
+
+          config = json.load(open("config/hf_final_config_v2.json", encoding="utf-8"))
+          assert config.get("step") == "final-config-v2", config.get("step")
+          print("зафиксировано:", config.get("name"), "| признаков:", len(config.get("features", [])),
+                "| порог:", config.get("threshold"))
+          PY
+      - name: "Финальный прогон"
+        working-directory: spanverify-module
+        run: |
+          diag="$RUNNER_TEMP/hf-v2-final.log"; : > "$diag"
+          trap 'sync; sleep 6; tail -c 4000 "$diag" | sed -e "s/[[:cntrl:]]/ /g" -e "s/%/%25/g" -e "s|^|::error::[final v2] |"; tail -n 60 "$diag" >> "$GITHUB_STEP_SUMMARY" 2>/dev/null || true' ERR
+          exec > >(tee -a "$diag") 2>&1
+          make hf-final-v2
+      - name: "Пересчёт чисел из предсказаний"
+        working-directory: spanverify-module
+        run: |
+          python scripts/hf_protocol_v2.py verify-manifest \
+            --manifest reports/v2/manifest.json --check-splits
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: "hf-v2-final"
+          path: spanverify-module/reports/v2
+          if-no-files-found: warn
+          retention-days: 90
+      - name: "Опубликовать в ветку данных"
+        if: always()
+        working-directory: spanverify-module
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          if [ ! -f reports/v2/manifest.json ]; then
+            echo "::warning::[publish v2] манифеста нет — публиковать нечего"
+            exit 0
+          fi
+          python scripts/publish_reports.py --branch data/metrics --dest hf-v2-final \
+            --report reports/v2 --report ../README.md --report docs/EXPERIMENTS_v2.md \
+            --message "цикл v2: шаг 3 на независимом test, прогон ${{ github.run_number }} [skip ci]"
+      - name: "Блок цикла v2 в README — из манифеста, не от руки"
+        working-directory: spanverify-module
+        run: |
+          python scripts/render_readme_v2.py --manifest reports/v2/manifest.json --readme ../README.md --write
+          python scripts/render_readme_v2.py --manifest reports/v2/manifest.json --readme ../README.md --check
+          python scripts/collect_metrics.py --out reports/METRICS.json
+          python scripts/check_numbers.py --metrics reports/METRICS.json
+      - name: "Подтверждающие тесты (падение = критерий не выполнен)"
+        working-directory: spanverify-module
+        run: |
+          python -m pip install -q pytest
+          python -m pytest -q tests/test_v2_criterion.py tests/test_v2_docs.py tests/test_v2_gates.py tests/test_v2_harness.py tests/test_v2_no_leakage.py
+
+  repeat-guard:
+    name: "Запрет повторного шага 3"
+    runs-on: ubuntu-latest
+    needs: final
+    if: always() && needs.final.result == 'success'
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: "После прогона шаг 3 обязан быть закрыт меткой в конфиге"
+        working-directory: spanverify-module
+        run: |
+          if [ ! -f reports/v2/manifest.json ]; then
+            echo "::error::[guard v2] прогон прошёл, а манифеста нет — это невозможно, разбираемся"
+            exit 1
+          fi
+          echo "шаг 3 цикла v2 выполнен; повторный прогон требует нового замораживания конфигурации и нового коммита с [hf-final-v2]" \
+            >> "$GITHUB_STEP_SUMMARY"
