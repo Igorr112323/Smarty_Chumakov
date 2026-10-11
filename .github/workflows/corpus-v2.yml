@@ -39,12 +39,18 @@ on:
         type: string
         default: "1800"
   push:
-    branches: ["arena/**"]
+    branches: ["arena/**", "data/corpus-v2-wave"]
     paths:
       - .github/corpus-v2.trigger
+      # Каждый коммит в ветку-счётчик — это ровно одна запрошенная волна: механизм
+      # цепочки вместо `workflow_dispatch` (прогон 38113258526 показал, что у
+      # GITHUB_TOKEN этого репозитория нет права actions:write: dispatch → 403).
+      - "wave/**"
 
 concurrency:
-  group: corpus-v2-${{ github.ref }}
+  # Группа одна на все ветки: две волны не должны одновременно писать в один кэш
+  # среза и в одну ветку данных.
+  group: corpus-v2
   # Волны идут последовательно и не отменяют друг друга: кэш среза продолжает
   # начатое, а отмена прогона посреди волны означала бы потерю распознанного.
   cancel-in-progress: false
@@ -152,16 +158,22 @@ jobs:
           jq -r '.tree[]? | select(.path | startswith("acts/")) | .path' /tmp/tree.json \
             | sed 's|^acts/||; s|\.txt$||' | sort -u > /tmp/archived.txt
           n_total=$(wc -l < /tmp/archived.txt)
-          echo "в ветке данных уже лежит документов: $n_total"
+          waves=$(jq -r '.tree[]? | select(.path | startswith("reports-wave-"))' /tmp/tree.json | wc -l)
+          # Срез выдачи уезжает вперёд на номер волны: без этого вторая волна
+          # перебирала бы те же страницы выдачи и получала «0 новых документов».
+          page_from=$((3 + waves))
+          if [ -n "${{ inputs.page_from }}" ]; then page_from="${{ inputs.page_from }}"; fi
+          echo "в ветке данных документов: $n_total, волн: $waves, page_from: $page_from"
           echo "docs=$n_total" >> "$GITHUB_STEP_SUMMARY"
+          echo "waves=$waves" >> "$GITHUB_OUTPUT"
+          echo "page_from=$page_from" >> "$GITHUB_OUTPUT"
 
       - name: Кэш среза (что уже скачано и распознано в прошлых волнах)
         uses: actions/cache@v4
         with:
           path: spanverify-module/data/corpus_v2_slice_${{ matrix.slice }}
-          key: corpus-v2-${{ matrix.slice }}-p${{ inputs.page_from || '3' }}-${{ github.run_id }}
+          key: corpus-v2-${{ matrix.slice }}-wave${{ steps.archived.outputs.waves || '0' }}
           restore-keys: |
-            corpus-v2-${{ matrix.slice }}-p${{ inputs.page_from || '3' }}-
             corpus-v2-${{ matrix.slice }}-
 
       - name: Загрузка и распознавание среза
@@ -180,7 +192,7 @@ jobs:
             --buffer 12 \
             --types "${{ matrix.types }}" \
             --title-filter "${{ matrix.title_filter }}" \
-            --page-from ${{ inputs.page_from || '3' }} \
+            --page-from ${{ steps.archived.outputs.page_from || '3' }} \
             --max-pages-per-type 30 --max-pages 20 --dpi 200 \
             --workers 4 --pause 1.2 \
             --exclude-dirs "data/corpus_a3;data/corpus_a3_local70" \
@@ -352,25 +364,19 @@ jobs:
     needs: archive
     if: always() && needs.archive.result == 'success'
     permissions:
-      contents: read
-      actions: write
+      contents: write
     steps:
-      - name: Запустить следующую волну, пока цели нет и есть прогресс
-        timeout-minutes: 5
+      - name: Запросить следующую волну коммитом в ветку-счётчик
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           BEFORE: ${{ needs.archive.outputs.before }}
           AFTER: ${{ needs.archive.outputs.after }}
           TARGET: ${{ inputs.target_docs || '1800' }}
-          PAGE_FROM: ${{ inputs.page_from || '3' }}
-          REF: ${{ github.ref_name }}
-          WORKFLOW: ${{ github.workflow }}
-          REPO: ${{ github.repository }}
         run: |
           set -o pipefail
           before=${BEFORE:-0}; after=${AFTER:-0}; target=${TARGET:-1800}
           waves=$(curl -s -H "Authorization: Bearer $GITHUB_TOKEN" \
-            "https://api.github.com/repos/$REPO/git/trees/data/corpus-v2-raw?recursive=1" \
+            "https://api.github.com/repos/$GITHUB_REPOSITORY/git/trees/data/corpus-v2-raw?recursive=1" \
             | jq -r '.tree[]? | select(.path | startswith("reports-wave-"))' | wc -l)
           {
             echo "## Цепочка волн корпуса v2"
@@ -382,31 +388,55 @@ jobs:
             echo "| цель | $target |"
             echo "| волн в ветке данных | $waves |"
           } >> "$GITHUB_STEP_SUMMARY"
+          stop=""
           if [ "$after" -ge "$target" ]; then
-            echo "цель по числу документов достигнута ($after >= $target) — цепочка остановлена" \
-              | tee -a "$GITHUB_STEP_SUMMARY"
+            stop="цель по числу документов достигнута ($after из $target)"
+          elif [ "$after" -le "$before" ]; then
+            stop="волна не добавила документов: срез выдачи исчерпан или сломалось распознавание — цепочка остановлена, чтобы не жечь раннеры впустую"
+          elif [ "$waves" -ge 24 ]; then
+            stop="предохранитель цепочки (24 волны): документов $after — остановка, разбираемся с урожайностью срезов"
+          fi
+          if [ -n "$stop" ]; then
+            echo "СТОП: $stop" | tee -a "$GITHUB_STEP_SUMMARY"
             exit 0
           fi
-          if [ "$after" -le "$before" ]; then
-            echo "ВОЛНА НЕ ДОБАВИЛА ДОКУМЕНТОВ — цепочка остановлена, чтобы не жечь раннеры впустую." \
-              "Нужно проверить: исчерпан ли срез выдачи (поднять page_from), не сломалось ли распознавание," \
-              "не кончился ли лимит запросов к порталу." | tee -a "$GITHUB_STEP_SUMMARY"
-            exit 0
+          # Механизм цепочки: коммит файла в отдельную ветку-счётчик. Она попала в
+          # paths-фильтр этого workflow, и её push запускает следующую волну.
+          # «[skip ci]» здесь невозможен именно потому, что он убил бы сам запуск.
+          branch=data/corpus-v2-wave
+          mkdir -p /tmp/counter && cd /tmp/counter
+          git init -q .
+          git remote add origin "https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
+          git config user.name "spanverify-bot"
+          git config user.email "bot@spanverify.local"
+          # База коммита-запроса — содержимое рабочей ветки, а не пустой orphan:
+          # для push-события GitHub берёт файл workflow из отправленного коммита, и
+          # если в нём нет `.github/workflows/corpus-v2.yml` и `spanverify-module/`,
+          # следующая волна либо вообще не запустится, либо упадёт без скриптов.
+          git fetch -q origin "${{ github.ref_name }}"
+          git checkout -q FETCH_HEAD
+          previous=""
+          if git ls-remote --exit-code origin "$branch" >/dev/null 2>&1; then
+            git fetch -q origin "$branch"
+            previous=$(git show "FETCH_HEAD:wave/requests.md" 2>/dev/null || true)
           fi
-          if [ "$waves" -ge 24 ]; then
-            echo "достигнут предохранитель цепочки (24 волны) — остановка; объем в ветке данных: $after" \
-              | tee -a "$GITHUB_STEP_SUMMARY"
-            exit 0
-          fi
-          next=$((PAGE_FROM + 1))
-          echo "следующая волна: page_from=$next (документов в ветке данных $after из $target)" \
-            | tee -a "$GITHUB_STEP_SUMMARY"
-          curl -s -X POST -H "Authorization: Bearer $GITHUB_TOKEN" -H "Accept: application/vnd.github+json" \
-            "https://api.github.com/repos/$REPO/actions/workflows/$WORKFLOW/dispatches" \
-            --data "$(jq -n --arg ref "$REF" --arg page "$next" '{ref: $ref, inputs: {page_from: $page}}')" \
-            | tee /tmp/dispatch.json
-          test -s /tmp/dispatch.json || true
-          if grep -q '"message"' /tmp/dispatch.json && ! grep -q '"documentation_url".*dispatches' /tmp/dispatch.json; then
-            echo "::error::[corpus-v2] следующая волна не запущена: $(head -c 300 /tmp/dispatch.json)"
-            exit 1
-          fi
+          mkdir -p wave
+          {
+            if [ -n "$previous" ]; then
+              printf '%s\n' "$previous"
+            else
+              echo "# Запросы волн корпуса v2"
+              echo
+              echo "Каждая строка — запрос следующей волны загрузки (коммит в эту ветку"
+              echo "попадает в paths-фильтр workflow и запускает её). Правая колонка —"
+              echo "число документов в ветке данных на момент запроса."
+              echo
+              echo "| волна | запрошена | документов после предыдущей |"
+              echo "|---|---|---|"
+            fi
+            printf '| %s | %s | %s |\n' "$((waves + 1))" "$(date -u +%FT%TZ)" "$after"
+          } > wave/requests.md
+          git add wave/requests.md
+          git commit -qm "корпус v2: запрос волны $((waves + 1)) (документов $after из $target)"
+          git push -f -q origin "HEAD:$branch"
+          echo "запрошена волна $((waves + 1)): документов $after из $target" | tee -a "$GITHUB_STEP_SUMMARY"
