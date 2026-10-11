@@ -62,27 +62,73 @@ jobs:
           path: /tmp/signs-dl
           github-token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: "Разложить кеш"
+      - name: "Разложить кеш и сообщить, что в нём"
+        # Диагностика обязана быть в аннотациях: загрузка журналов сборки из этой среды
+        # недоступна (blob.core.windows.net), а без неё прогон непонятно почему упавший
+        # превращается в «не проверено». Шаг ничего не решает за скрипт измерения: он
+        # раскладывает файлы и печатает факты о их форме.
         run: |
           python3 - << 'PY'
+          import gzip
+          import json
           import shutil
           from pathlib import Path
 
-          src = next(
-              (p for p in Path("/tmp/signs-dl").rglob("*") if p.is_dir() and p.name == "hf-cache-a3"), None
-          )
-          if src is None:
-              raise SystemExit("в артефакте нет каталога hf-cache-a3")
+          def note(text):
+              print(f"::notice title=диагностика кеша::{text}")
+
+          downloaded = sorted(p for p in Path("/tmp/signs-dl").rglob("*") if p.is_file())
+          grids = [p for p in downloaded if p.name.startswith(("grid_", "features_grid_"))]
+          note(f"файлов в артефакте: {len(downloaded)}, из них кешей сетки: {len(grids)}")
+          for path in grids[:6]:
+              note(f"{path.relative_to('/tmp/signs-dl')} — {path.stat().st_size} Б")
+          if not grids:
+              for path in downloaded[:10]:
+                  note(f"первый уровень артефакта: {path.relative_to('/tmp/signs-dl')}")
+              raise SystemExit("в артефакте нет файлов grid_*.jsonl[.gz]: кеш не там, где ожидалось")
+
           dest = Path("spanverify-module/reports/hf-cache-a3")
           dest.mkdir(parents=True, exist_ok=True)
-          count = 0
-          for path in src.rglob("*"):
-              if path.is_file():
-                  target = dest / path.relative_to(src)
-                  target.parent.mkdir(parents=True, exist_ok=True)
-                  shutil.copy2(path, target)
-                  count += 1
-          print("файлов кеша:", count)
+          # Кладём плоско и только кеш: вложенность каталога артефакта — типичная причина
+          # «файл есть, а glob его не видит».
+          for path in grids:
+              shutil.copy2(path, dest / path.name)
+          note(f"складываем в {dest}: {sorted(p.name for p in dest.iterdir())}")
+
+          sample = grids[0]
+          opener = gzip.open if sample.suffix == ".gz" else open
+          with opener(sample, "rt", encoding="utf-8") as handle:
+              first = json.loads(handle.readline())
+          note(
+              "первая строка кеша: keys="
+              + ",".join(sorted(first.keys()))
+              + f" grid_format={first.get('grid_format')} model={first.get('model')}"
+          )
+          cache = {}
+          for path in grids:
+              op = gzip.open if path.suffix == ".gz" else open
+              with op(path, "rt", encoding="utf-8") as handle:
+                  for line in handle:
+                      row = json.loads(line)
+                      cache[str(row.get("pair_id") or row.get("key") or "")] = row
+          note(f"уникальных pair_id в кеше: {len(cache)}")
+
+          val = Path("spanverify-module/data/corpus_a3/splits/dev.jsonl")
+          if not val.is_file():
+              val = Path("spanverify-module/data/corpus_a3/splits/val.jsonl")
+          if val.is_file():
+              ids = []
+              with open(val, "r", encoding="utf-8") as handle:
+                  for line in handle:
+                      line = line.strip()
+                      if line:
+                          ids.append(str(json.loads(line).get("id")))
+              missing = [i for i in ids if i not in cache]
+              note(f"файл валидации: {val.name}, пар {len(ids)}, нет в кеше: {len(missing)}")
+              if missing:
+                  note(f"пример отсутствующих id: {missing[:5]}")
+          else:
+              note("файл валидации не найден — скрипт измерения сообщит об этом сам")
           PY
 
       - name: "Измерить знак и AUC по каждому признаку (только val)"
@@ -90,14 +136,23 @@ jobs:
         timeout-minutes: 20
         run: |
           echo "команда: python3 scripts/feature_sign_check.py --grid-cache reports/hf-cache-a3 --splits data/corpus_a3/splits --bootstrap 5000 --seed 42 --annotate --out-json reports/hf_protocol/feature_signs_a3dev.json --out-md reports/hf_protocol/feature_signs_a3dev.md (кеш — прогон $RUN_ID)"
-          python3 scripts/feature_sign_check.py \
+          set -o pipefail
+          if python3 scripts/feature_sign_check.py \
             --grid-cache reports/hf-cache-a3 \
             --splits data/corpus_a3/splits \
             --bootstrap 5000 \
             --seed 42 \
             --annotate \
             --out-json reports/hf_protocol/feature_signs_a3dev.json \
-            --out-md reports/hf_protocol/feature_signs_a3dev.md
+            --out-md reports/hf_protocol/feature_signs_a3dev.md 2>&1 | tee /tmp/signs.log; then
+            :
+          else
+            # Последние строки ошибки — в аннотации: журнал сборки отсюда не читается.
+            tail -n 25 /tmp/signs.log | sed 's/^[[:space:]]*//' | while IFS= read -r line; do
+              printf '::error title=сбой измерения::%s\n' "$line"
+            done
+            exit 1
+          fi
 
       - name: "Таблица в лог (чтобы её видно было в аннотациях и в отчёте прогона)"
         if: always()
