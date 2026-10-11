@@ -59,8 +59,46 @@ permissions:
   contents: read
 
 jobs:
+  gate:
+    name: "Режим загрузки (решение заказчика)"
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      mode: ${{ steps.mode.outputs.mode }}
+      run: ${{ steps.mode.outputs.run }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: "Прочитать .github/corpus-v2.mode"
+        id: mode
+        run: |
+          file=.github/corpus-v2.mode
+          if [ ! -f "$file" ]; then
+            mode=paused
+          else
+            mode=$(tr -d '\r' < "$file" | head -1 | tr -d '[:space:]')
+          fi
+          case "$mode" in
+            text-only|ocr) run=yes ;;
+            paused|"") run=no ;;
+            *) echo "::error::[corpus-v2] .github/corpus-v2.mode = «$mode»: допустимо text-only, ocr или paused" >&2; run=no; mode=paused ;;
+          esac
+          {
+            echo "## Режим загрузки корпуса v2"
+            echo
+            echo "* режим из \`.github/corpus-v2.mode\`: \`$mode\`"
+            echo "* волны запускаются: \`$run\`"
+            echo
+            echo "OCR-волны включаются только после явного подтверждения заказчика (правка"
+            echo "\`.github/corpus-v2.mode\` на \`ocr\` коммитом в рабочую ветку). \`paused\` —"
+            echo "ожидание решения; \`text-only\` — режим, выбранный заказчиком изначально."
+          } >> "$GITHUB_STEP_SUMMARY"
+          echo "mode=$mode" >> "$GITHUB_OUTPUT"
+          echo "run=$run" >> "$GITHUB_OUTPUT"
+
   slice:
     name: "Срез «${{ matrix.title }}»"
+    needs: gate
+    if: needs.gate.outputs.run == 'yes'
     runs-on: ubuntu-latest
     # 40 минут — общий потолок этого репозитория для job'ов (тест
     # test_no_job_is_longer_than_the_limit); длинная работа прерывается на границе
@@ -135,14 +173,18 @@ jobs:
         with:
           python-version: "3.11"
 
-      - name: "Зависимости: распознавание обязательно (годный текстовый слой — у ~3 % актов)"
+      - name: "Зависимости (tesseract нужен только в режиме ocr)"
         working-directory: spanverify-module
         timeout-minutes: 8
         run: |
-          sudo apt-get update -o Acquire::Retries=5 || true
-          sudo apt-get install -y --no-install-recommends tesseract-ocr tesseract-ocr-rus poppler-utils || \
-            echo "tesseract не установился — распознавание будет недоступно, волна соберёт только текстовые слои"
-          tesseract --version | head -2 || true
+          if [ "${{ needs.gate.outputs.mode }}" = "ocr" ]; then
+            sudo apt-get update -o Acquire::Retries=5 || true
+            sudo apt-get install -y --no-install-recommends tesseract-ocr tesseract-ocr-rus poppler-utils || \
+              echo "tesseract не установился — распознавание будет недоступно"
+            tesseract --version | head -2 || true
+          else
+            echo "режим ${{ needs.gate.outputs.mode }}: tesseract не устанавливаем"
+          fi
           python -m pip install --upgrade pip
           python -m pip install -q pypdf requests
 
@@ -202,6 +244,7 @@ jobs:
             --workers 4 --pause 1.2 \
             --exclude-dirs "data/corpus_a3;data/corpus_a3_local70" \
             --exclude-file /tmp/archived.txt \
+            ${{ needs.gate.outputs.mode == 'text-only' && '--text-only' || '' }} \
             --force
 
       - name: Сколько получилось в срезе
@@ -229,8 +272,8 @@ jobs:
     name: "Сборка волны и сверка с v1"
     runs-on: ubuntu-latest
     timeout-minutes: 20
-    needs: slice
-    if: always()
+    if: always() && needs.gate.outputs.run == 'yes'
+    needs: [slice, gate]
     permissions:
       contents: read
     steps:
@@ -292,8 +335,8 @@ jobs:
     name: "Архив волны в ветку данных"
     runs-on: ubuntu-latest
     timeout-minutes: 20
-    needs: assemble
-    if: always()
+    if: always() && needs.gate.outputs.run == 'yes'
+    needs: [assemble, gate]
     permissions:
       contents: write
     outputs:
@@ -367,8 +410,8 @@ jobs:
     name: "Цепочка волн"
     runs-on: ubuntu-latest
     timeout-minutes: 10
-    needs: archive
-    if: always() && needs.archive.result == 'success'
+    needs: [archive, gate]
+    if: always() && needs.gate.outputs.run == 'yes' && needs.archive.result == 'success'
     permissions:
       contents: write
     steps:
@@ -443,6 +486,26 @@ jobs:
             printf '| %s | %s | %s |\n' "$((waves + 1))" "$(date -u +%FT%TZ)" "$after"
           } > wave/requests.md
           git add wave/requests.md
+          # Гигиена коммита в публичную ветку: только текстовые файлы-счётчики, без
+          # бинарников и без токенов (URL с x-access-token живёт только в конфиге git,
+          # в дерево он не попадает — проверяем это перед push, а не на глаз).
+          staged=$(git diff --cached --name-only)
+          for file in $staged; do
+            case "$file" in
+              wave/*.md) ;;
+              *) echo "::error::[corpus-v2] в коммит цепочки попал лишний файл $file" >&2; exit 1 ;;
+            esac
+            size=$(wc -c < "$file")
+            if [ "$size" -gt 20000 ]; then
+              echo "::error::[corpus-v2] $file весит $size байт — счётчик волн обязан оставаться текстовым" >&2
+              exit 1
+            fi
+          done
+          if git diff --cached | grep -E 'gh[pousr]_[A-Za-z0-9]{20,}|x-access-token|-----BEGIN [A-Z ]*PRIVATE KEY-----'; then
+            echo "::error::[corpus-v2] в диффе цепочки похож на токен/ключ — коммит запрещён" >&2
+            exit 1
+          fi
+          echo "коммит цепочки: $(echo "$staged" | tr '\n' ' ') — только текстовые счётчики" >> "$GITHUB_STEP_SUMMARY"
           git commit -qm "корпус v2: запрос волны $((waves + 1)) (документов $after из $target)"
           git push -f -q origin "HEAD:$branch"
           echo "запрошена волна $((waves + 1)): документов $after из $target" | tee -a "$GITHUB_STEP_SUMMARY"
