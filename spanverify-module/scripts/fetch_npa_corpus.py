@@ -588,6 +588,13 @@ def main() -> int:
         help="каталоги корпусов через ';': документы (по именам файлов sources/*.txt) отсюда "
         "не скачиваются повторно — так новый корпус делается независимым от уже измеренных",
     )
+    parser.add_argument(
+        "--exclude-file",
+        type=Path,
+        default=None,
+        help="файл со списком doc_id по одному в строке (например, уже лежащих в ветке данных): "
+        "эти документы не скачиваются и не распознаются повторно",
+    )
     parser.add_argument("--psm", type=int, default=6, help="режим разбиения страницы tesseract (--psm)")
     parser.add_argument("--oem", type=int, default=1, help="движок tesseract (--oem)")
     args = parser.parse_args()
@@ -675,6 +682,11 @@ def main() -> int:
         ids = {item.stem for item in sources.glob("*.txt")}
         excluded_ids |= ids
         excluded_from.append({"dir": directory, "documents": len(ids)})
+    if args.exclude_file:
+        lines = Path(args.exclude_file).read_text(encoding="utf-8").splitlines()
+        extra = {line.strip().removesuffix(".txt") for line in lines if line.strip() and not line.startswith("#")}
+        excluded_ids |= extra
+        excluded_from.append({"file": str(args.exclude_file), "documents": len(extra)})
     before_filter = len(candidates)
     candidates = [item for item in candidates if str(item["doc_id"]) not in excluded_ids]
     excluded_collisions = before_filter - len(candidates)

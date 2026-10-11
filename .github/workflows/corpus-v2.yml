@@ -1,37 +1,43 @@
-# Корпус v2: независимая выборка для цикла v2 (только документы с текстовым слоем).
+# Корпус v2: независимая выборка для цикла v2.
 #
 # Зачем отдельный workflow. Цикл v1 использовал все документы, которые лежат в
 # репозитории: 409 актов в `data/corpus_a3/sources`, их подмножество в
-# `data/corpus_a3_local70`, 60 синтетических документов A1 и demo. Проверено
+# `data/corpus_a3_local70`, 60 синтетических документов A1 и демо. Проверено
 # побайтово: новых документов внутри репозитория нет (пересечение local70 с A3 —
 # 20 из 20). Поэтому v2 обязан быть скачан заново, и он обязан не содержать ни
-# одного doc_id из v1 — иначе «независимая тестовая выборка» будет подглядыванием
-# в уже измеренное.
+# одного doc_id из v1 — иначе «независимая тестовая выборка» была бы подглядыванием
+# в уже измеренное (проверка — в job «Сборка волны», `overlap` обязан быть 0).
 #
-# Режим `--text-only`: распознавание сканов стоит 580–2680 с на документ и
-# определяло всё время волны в v1. Здесь берутся только акты с годным текстовым
-# слоем PDF. Это осознанный срез со смещением (электронные акты крупнее и
-# «ровнее»), смещение записано в манифесте и в docs/CORPUS_v2.md, а не промолчано.
+# Почему не `--text-only`. Режим «только текстовый слой PDF» был измерен прогоном
+# 38112679499 (2026-10-11): 5 срезов по 20 кандидатов дали 0, 0, 0, 1 и 1 документ
+# с годным текстовым слоем. Годный слой есть примерно у 3 % актов, поэтому без
+# распознавания корпус в 1500 документов не собирается в принципе. Флаг остаётся в
+# загрузчике (он нужен для быстрых пробных срезов), но волны идут с распознаванием:
+# 580–2680 с на документ — это и есть цена независимой выборки на этом источнике.
 #
-# Запуск: правкой файла .github/corpus-v2.trigger («Run workflow» для ветки не из
-# ветки по умолчанию недоступен) либо вручную через workflow_dispatch.
-name: "Корпус v2 (независимая выборка, текстовые акты)"
+# Волны идут цепочкой: job `chain` запускает следующую, пока в ветке данных меньше
+# `target_docs` и пока предыдущая волна добавила хоть что-то. Так сборка не требует
+# человека между прогонами и не может зациклиться на пустом результате.
+#
+# Запуск вручную: правкой файла .github/corpus-v2.trigger («Run workflow» для
+# ветки не из ветки по умолчанию недоступен) либо workflow_dispatch.
+name: "Корпус v2 (независимая выборка)"
 
 on:
   workflow_dispatch:
     inputs:
       target_per_slice:
-        description: "Сколько документов с текстом собрать в одном срезе"
+        description: "Сколько документов с текстом собрать в одном срезе за волну"
         type: string
-        default: "60"
-      buffer:
-        description: "Сколько кандидатов взять сверх цели (на брак по текстовому слою)"
-        type: string
-        default: "70"
+        default: "12"
       page_from:
-        description: "С какой страницы выдачи начинать (увод от срезов v1)"
+        description: "С какой страницы выдачи начинать (увод от срезов v1 и от прошлых волн)"
         type: string
         default: "3"
+      target_docs:
+        description: "Сколько всего документов нужно в ветке данных, чтобы остановить цепочку"
+        type: string
+        default: "1800"
   push:
     branches: ["arena/**"]
     paths:
@@ -44,12 +50,15 @@ concurrency:
   cancel-in-progress: false
 
 permissions:
-  contents: write
+  contents: read
 
 jobs:
   slice:
     name: "Срез «${{ matrix.title }}»"
     runs-on: ubuntu-latest
+    # 40 минут — общий потолок этого репозитория для job'ов (тест
+    # test_no_job_is_longer_than_the_limit); длинная работа прерывается на границе
+    # волны и продолжается с кэша, а не висит часами.
     timeout-minutes: 40
     permissions:
       contents: read
@@ -120,13 +129,33 @@ jobs:
         with:
           python-version: "3.11"
 
-      - name: Зависимости
+      - name: "Зависимости: распознавание обязательно (годный текстовый слой — у ~3 % актов)"
         working-directory: spanverify-module
+        timeout-minutes: 8
         run: |
+          sudo apt-get update -o Acquire::Retries=5 || true
+          sudo apt-get install -y --no-install-recommends tesseract-ocr tesseract-ocr-rus poppler-utils || \
+            echo "tesseract не установился — распознавание будет недоступно, волна соберёт только текстовые слои"
+          tesseract --version | head -2 || true
           python -m pip install --upgrade pip
           python -m pip install -q pypdf requests
 
-      - name: Кэш среза (что уже скачано в прошлых волнах)
+      - name: Список уже собранных doc_id (ветка данных) — чтобы не распознавать повторно
+        id: archived
+        timeout-minutes: 3
+        run: |
+          n_total=0
+          curl -s -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
+            -H "Accept: application/vnd.github+json" \
+            "https://api.github.com/repos/${{ github.repository }}/git/trees/data/corpus-v2-raw?recursive=1" \
+            > /tmp/tree.json || echo '{}' > /tmp/tree.json
+          jq -r '.tree[]? | select(.path | startswith("acts/")) | .path' /tmp/tree.json \
+            | sed 's|^acts/||; s|\.txt$||' | sort -u > /tmp/archived.txt
+          n_total=$(wc -l < /tmp/archived.txt)
+          echo "в ветке данных уже лежит документов: $n_total"
+          echo "docs=$n_total" >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Кэш среза (что уже скачано и распознано в прошлых волнах)
         uses: actions/cache@v4
         with:
           path: spanverify-module/data/corpus_v2_slice_${{ matrix.slice }}
@@ -135,38 +164,39 @@ jobs:
             corpus-v2-${{ matrix.slice }}-p${{ inputs.page_from || '3' }}-
             corpus-v2-${{ matrix.slice }}-
 
-      - name: Загрузка среза (только документы с текстовым слоем)
+      - name: Загрузка и распознавание среза
         working-directory: spanverify-module
-        timeout-minutes: 33
+        timeout-minutes: 38
         env:
           OMP_THREAD_LIMIT: "1"
         run: |
           set -o pipefail
           diag="$RUNNER_TEMP/corpus-v2-diag.log"; : > "$diag"
-          trap 'sync; sleep 6; tail -c 4000 "$diag" | sed -e "s/[[:cntrl:]]/ /g" -e "s/%/%25/g" -e "s|^|::error::[corpus-v2 ${{ matrix.corpus }}${{ matrix.slice }}] |"; tail -n 40 "$diag" >> "$GITHUB_STEP_SUMMARY" 2>/dev/null || true' ERR
+          trap 'sync; sleep 6; tail -c 4000 "$diag" | sed -e "s/[[:cntrl:]]/ /g" -e "s/%/%25/g" -e "s|^|::error::[corpus-v2 ${{ matrix.slice }}] |"; tail -n 40 "$diag" >> "$GITHUB_STEP_SUMMARY" 2>/dev/null || true' ERR
           exec > >(tee -a "$diag") 2>&1
           python scripts/fetch_npa_corpus.py \
             --out data/corpus_v2_slice_${{ matrix.slice }} \
-            --target-docs ${{ inputs.target_per_slice || '60' }} \
-            --buffer ${{ inputs.buffer || '70' }} \
+            --target-docs ${{ inputs.target_per_slice || '12' }} \
+            --buffer 12 \
             --types "${{ matrix.types }}" \
             --title-filter "${{ matrix.title_filter }}" \
             --page-from ${{ inputs.page_from || '3' }} \
-            --max-pages-per-type 30 --max-pages 20 \
+            --max-pages-per-type 30 --max-pages 20 --dpi 200 \
             --workers 4 --pause 1.2 \
-            --text-only \
-            --exclude-dirs "data/corpus_a3;data/corpus_a3_local70"
+            --exclude-dirs "data/corpus_a3;data/corpus_a3_local70" \
+            --exclude-file /tmp/archived.txt
 
       - name: Сколько получилось в срезе
         id: count
         working-directory: spanverify-module
+        timeout-minutes: 3
         run: |
           d=data/corpus_v2_slice_${{ matrix.slice }}/sources
           n=$(ls -1 "$d"/*.txt 2>/dev/null | wc -l)
-          echo "срез ${{ matrix.slice }}: документов с текстовым слоем: $n"
-          echo "docs=$n" >> "$GITHUB_STEP_SUMMARY"
+          ocr=$(grep -l '"method": "ocr' "$d"/sources.json 2>/dev/null | wc -l)
+          echo "срез ${{ matrix.slice }}: документов с текстом: $n (источников с распознаванием в sources.json: $ocr)"
+          echo "документов: $n" >> "$GITHUB_STEP_SUMMARY"
           echo "docs=$n" >> "$GITHUB_OUTPUT"
-          ls -1 "$d" 2>/dev/null | head -20
 
       - uses: actions/upload-artifact@v4
         with:
@@ -195,13 +225,19 @@ jobs:
 
       - name: Свести срезы и проверить независимость от v1
         id: merge
+        timeout-minutes: 8
         run: |
           set -o pipefail
           mkdir -p /tmp/wave_all/sources
           find wave -path '*/sources/*.txt' -exec cp -n {} /tmp/wave_all/sources/ \;
+          find wave -name 'sources.json' -exec cp -n {} /tmp/wave_all/ \; || true
           total=$(ls -1 /tmp/wave_all/sources/*.txt 2>/dev/null | wc -l)
-          used=$(ls -1 spanverify-module/data/corpus_a3/sources/*.txt 2>/dev/null | xargs -r -n1 basename | sed 's/\.txt$//' | sort -u > /tmp/v1_ids.txt; wc -l < /tmp/v1_ids.txt)
-          new_ids=$(ls -1 /tmp/wave_all/sources/*.txt 2>/dev/null | xargs -r -n1 basename | sed 's/\.txt$//' | sort -u > /tmp/v2_ids.txt; wc -l < /tmp/v2_ids.txt)
+          ls -1 spanverify-module/data/corpus_a3/sources/*.txt 2>/dev/null | xargs -r -n1 basename | sed 's/\.txt$//' | sort -u > /tmp/v1_ids.txt
+          ls -1 spanverify-module/data/corpus_a3_local70/sources/*.txt 2>/dev/null | xargs -r -n1 basename | sed 's/\.txt$//' | sort -u >> /tmp/v1_ids.txt
+          sort -u /tmp/v1_ids.txt -o /tmp/v1_ids.txt
+          used=$(wc -l < /tmp/v1_ids.txt)
+          ls -1 /tmp/wave_all/sources/*.txt 2>/dev/null | xargs -r -n1 basename | sed 's/\.txt$//' | sort -u > /tmp/v2_ids.txt
+          new_ids=$(wc -l < /tmp/v2_ids.txt)
           overlap=$(comm -12 /tmp/v1_ids.txt /tmp/v2_ids.txt | wc -l)
           echo "документов в волне: $total (уникальных id: $new_ids), id в списках v1: $used, пересечение: $overlap"
           {
@@ -211,7 +247,7 @@ jobs:
             echo "|---|---|"
             echo "| документов в волне | $total |"
             echo "| уникальных doc_id | $new_ids |"
-            echo "| doc_id в списках v1 (A3) | $used |"
+            echo "| doc_id в списках v1 (A3 + local70) | $used |"
             echo "| **пересечение v2 ∩ v1** | **$overlap** |"
             echo
             echo "| срез | документов |"
@@ -222,16 +258,15 @@ jobs:
             done
           } >> "$GITHUB_STEP_SUMMARY"
           echo "docs=$total" >> "$GITHUB_OUTPUT"
-          echo "overlap=$overlap" >> "$GITHUB_OUTPUT"
           if [ "$overlap" != "0" ]; then
-            echo "::error::[corpus-v2] независимость нарушена: $overlap документов уже есть в корпусе A3"
+            echo "::error::[corpus-v2] независимость нарушена: $overlap документов уже есть в корпусах v1"
             exit 1
           fi
 
       - uses: actions/upload-artifact@v4
         with:
           name: corpus-v2-wave
-          path: /tmp/wave_all/sources/*.txt
+          path: /tmp/wave_all
           if-no-files-found: warn
           retention-days: 90
 
@@ -243,60 +278,135 @@ jobs:
     if: always()
     permissions:
       contents: write
+    outputs:
+      before: ${{ steps.push.outputs.before }}
+      after: ${{ steps.push.outputs.after }}
     steps:
       - uses: actions/download-artifact@v4
         with:
           name: corpus-v2-wave
-          path: texts
+          path: wave
 
-      - name: Сложить тексты в ветку данных (ветка создаётся первой волной)
+      - name: Сложить тексты в ветку данных (ветку создаёт первая волна)
+        id: push
+        timeout-minutes: 12
         run: |
           set -o pipefail
-          git config --global user.name "spanverify-bot"
-          git config --global user.email "bot@spanverify.local"
           branch=data/corpus-v2-raw
-          mkdir -p /tmp/dbr && cd /tmp/dbr
+          mkdir -p /tmp/dbr
+          cd /tmp/dbr
           git init -q .
           git remote add origin "https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
+          git config user.name "spanverify-bot"
+          git config user.email "bot@spanverify.local"
           if git ls-remote --exit-code origin "$branch" >/dev/null 2>&1; then
             git fetch -q origin "$branch"
             git checkout -q FETCH_HEAD
           else
             git checkout -q --orphan "$branch"
-            echo "# Ветка данных: тексты корпуса v2" > README.md
-            echo >> README.md
-            echo "Сырьё: официально опубликованные акты, только документы с текстовым слоем PDF." >> README.md
-            echo "Лицензионная основа: п. 6 ст. 1259 ГК РФ — официальные документы государственных" >> README.md
-            echo "органов не являются объектами авторских прав. В рабочую ветку тексты не коммитятся," >> README.md
-            echo "чтобы не раздувать клон: в репозитории лежат пары, сплиты и манифест с sha256." >> README.md
+            {
+              echo "# Ветка данных: тексты корпуса v2"
+              echo
+              echo "Сырьё цикла v2: официально опубликованные акты, тексты после извлечения."
+              echo "Лицензионная основа — п. 6 ст. 1259 ГК РФ: официальные документы государственных"
+              echo "органов не являются объектами авторских прав. В рабочую ветку тексты не коммитятся,"
+              echo "чтобы не раздувать клон: в репозитории лежат пары, сплиты и манифесты со sha256."
+            } > README.md
             git add README.md
             git commit -qm "корпус v2: ветка данных [skip ci]"
           fi
+          before=$(ls -1 acts/*.txt 2>/dev/null | wc -l)
           mkdir -p acts
-          # cp -n: накопление волн без перезаписи — уже лежащий в ветке текст не
-          # меняется, поэтому sha256 документа остаётся тем же, что при первой волне.
-          cp -n "$GITHUB_WORKSPACE"/texts/*.txt acts/ 2>/dev/null || true
-          n=$(ls -1 acts/*.txt 2>/dev/null | wc -l)
-          if [ "$n" = "0" ]; then
-            echo "документов нет — коммит не нужен"
-            exit 0
-          fi
+          # cp -n: накопление волн без перезаписи — sha256 уже архивированного документа
+          # не может измениться второй волной, иначе хеши в манифесте разошлись бы.
+          find "$GITHUB_WORKSPACE/wave" -path '*/sources/*.txt' -exec cp -n {} acts/ \; 2>/dev/null || true
+          after=$(ls -1 acts/*.txt 2>/dev/null | wc -l)
           stamp=$(date -u +%Y%m%dT%H%M%S)
           {
             echo "# Волна корпуса v2 от $stamp"
             echo
-            echo "документов в ветке данных: **$n**"
+            echo "* документов до волны: $before"
+            echo "* документов после волны: $after"
+            echo "* добавлено: $((after - before))"
             echo
-            echo "Проверка: все файлы добавляются по принципу «не перезаписывать» (cp -n),"
-            echo "поэтому ветка данных — накапливаемый архив волн, а не слепок одного прогона."
+            echo "Добавление идёт по «cp -n»: ветка данных — накапливаемый архив волн,"
+            echo "а не слепок одного прогона. Цепочку волн останавливает job «Цепочка волн»."
           } > "reports-wave-$stamp.md"
-          git add -A acts "reports-wave-$stamp.md"
-          if git diff --cached --quiet; then
-            echo "новых текстов нет — коммит не нужен"
+          echo "before=$before" >> "$GITHUB_OUTPUT"
+          echo "after=$after" >> "$GITHUB_OUTPUT"
+          if [ "$after" = "$before" ]; then
+            echo "новых документов нет — отчёт волны не коммитится"
             exit 0
           fi
-          git commit -qm "корпус v2: волна $stamp — $n документов [skip ci]"
+          git add -A acts "reports-wave-$stamp.md"
+          git commit -qm "корпус v2: волна $stamp — $after документов [skip ci]"
           git push -q origin "HEAD:$branch"
-          echo "документов в ветке данных после волны: $n" >> "$GITHUB_STEP_SUMMARY"
+          echo "документов в ветке данных: $before → $after" >> "$GITHUB_STEP_SUMMARY"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  chain:
+    name: "Цепочка волн"
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    needs: archive
+    if: always() && needs.archive.result == 'success'
+    permissions:
+      contents: read
+      actions: write
+    steps:
+      - name: Запустить следующую волну, пока цели нет и есть прогресс
+        timeout-minutes: 5
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          BEFORE: ${{ needs.archive.outputs.before }}
+          AFTER: ${{ needs.archive.outputs.after }}
+          TARGET: ${{ inputs.target_docs || '1800' }}
+          PAGE_FROM: ${{ inputs.page_from || '3' }}
+          REF: ${{ github.ref_name }}
+          WORKFLOW: ${{ github.workflow }}
+          REPO: ${{ github.repository }}
+        run: |
+          set -o pipefail
+          before=${BEFORE:-0}; after=${AFTER:-0}; target=${TARGET:-1800}
+          waves=$(curl -s -H "Authorization: Bearer $GITHUB_TOKEN" \
+            "https://api.github.com/repos/$REPO/git/trees/data/corpus-v2-raw?recursive=1" \
+            | jq -r '.tree[]? | select(.path | startswith("reports-wave-"))' | wc -l)
+          {
+            echo "## Цепочка волн корпуса v2"
+            echo
+            echo "| величина | значение |"
+            echo "|---|---|"
+            echo "| документов до волны | $before |"
+            echo "| после волны | $after |"
+            echo "| цель | $target |"
+            echo "| волн в ветке данных | $waves |"
+          } >> "$GITHUB_STEP_SUMMARY"
+          if [ "$after" -ge "$target" ]; then
+            echo "цель по числу документов достигнута ($after >= $target) — цепочка остановлена" \
+              | tee -a "$GITHUB_STEP_SUMMARY"
+            exit 0
+          fi
+          if [ "$after" -le "$before" ]; then
+            echo "ВОЛНА НЕ ДОБАВИЛА ДОКУМЕНТОВ — цепочка остановлена, чтобы не жечь раннеры впустую." \
+              "Нужно проверить: исчерпан ли срез выдачи (поднять page_from), не сломалось ли распознавание," \
+              "не кончился ли лимит запросов к порталу." | tee -a "$GITHUB_STEP_SUMMARY"
+            exit 0
+          fi
+          if [ "$waves" -ge 24 ]; then
+            echo "достигнут предохранитель цепочки (24 волны) — остановка; объем в ветке данных: $after" \
+              | tee -a "$GITHUB_STEP_SUMMARY"
+            exit 0
+          fi
+          next=$((PAGE_FROM + 1))
+          echo "следующая волна: page_from=$next (документов в ветке данных $after из $target)" \
+            | tee -a "$GITHUB_STEP_SUMMARY"
+          curl -s -X POST -H "Authorization: Bearer $GITHUB_TOKEN" -H "Accept: application/vnd.github+json" \
+            "https://api.github.com/repos/$REPO/actions/workflows/$WORKFLOW/dispatches" \
+            --data "$(jq -n --arg ref "$REF" --arg page "$next" '{ref: $ref, inputs: {page_from: $page}}')" \
+            | tee /tmp/dispatch.json
+          test -s /tmp/dispatch.json || true
+          if grep -q '"message"' /tmp/dispatch.json && ! grep -q '"documentation_url".*dispatches' /tmp/dispatch.json; then
+            echo "::error::[corpus-v2] следующая волна не запущена: $(head -c 300 /tmp/dispatch.json)"
+            exit 1
+          fi
