@@ -298,7 +298,8 @@ def sign_section() -> list[str]:
             "**Не измерено.** Пилот (3.1) дал отклонения AUC ниже 0,5, и прежде, чем писать что-либо",
             "об информативности отдельного признака, знак обязан быть измерен на официальной",
             "валидации. Измеритель готов: `scripts/feature_sign_check.py`, прогон — workflow",
-            "`hf-feature-signs.yml` (читает кеш сетки тяжёлого прогона, тестовую часть не открывает).",
+            "`hf-feature-signs.yml` (читает кеш сетки v3 из артефактов `grid-a3-*`, тестовую часть"
+            " не открывает: файл кеша с `test` в имени приводит к отказу).",
             "",
             "До появления артефакта `reports/hf_protocol/feature_signs_a3dev.json` любые формулировки",
             "«признак X информативен» и «знак перевёрнут» считаются неподтверждёнными.",
@@ -348,9 +349,11 @@ def sign_section() -> list[str]:
         " как есть). Если доверительный интервал накрывает 0,5, направление не установлено и вывод об"
         " информативности признака не делается ни в какую сторону.",
         "",
-        "Воспроизвести: `python3 scripts/feature_sign_check.py --grid-cache reports/hf-cache-a3"
-        " --splits data/corpus_a3/splits --bootstrap 5000 --seed 42 --out-json"
-        " reports/hf_protocol/feature_signs_a3dev.json --out-md reports/hf_protocol/feature_signs_a3dev.md`"
+        f"Воспроизвести: `python3 scripts/feature_sign_check.py --grid-cache"
+        f" {payload['inputs']['grid_cache']} --splits {payload['inputs']['splits']} --bootstrap"
+        f" {payload['bootstrap_iterations']} --seed {payload['seed']} --out-json"
+        f" reports/hf_protocol/feature_signs_a3dev.json --out-md"
+        f" reports/hf_protocol/feature_signs_a3dev.md`"
         " (сетка v3 берётся из артефактов `grid-a3-0`…`grid-a3-3` прогона «Протокол hf"
         " (критерий ТЗ)» `38076145605`; шарды тестовой выборки `grid-test-a3-*` не скачиваются,"
         " а скрипт отвергает любой файл кеша с `test` в имени; локально прогон требует кеш, в CI"

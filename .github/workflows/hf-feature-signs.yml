@@ -40,7 +40,7 @@ jobs:
   signs:
     name: "AUC и знак по каждому признаку сетки (val)"
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 40
     steps:
       - uses: actions/checkout@v4
 
@@ -73,6 +73,13 @@ jobs:
         # превращается в «не проверено». Шаг ничего не решает за скрипт измерения: он
         # раскладывает файлы и печатает факты о их форме.
         run: |
+          set -o pipefail
+          if ! python3 - << 'PY' 2>&1 | tee "$RUNNER_TEMP/diag.log"; then
+            tail -n 25 "$RUNNER_TEMP/diag.log" | sed 's/^[[:space:]]*//' | while IFS= read -r line; do
+              printf '::error title=сбой диагностики::%s\n' "$line"
+            done
+            exit 1
+          fi
           python3 - << 'PY'
           import gzip
           import json
@@ -83,7 +90,14 @@ jobs:
               print(f"::notice title=диагностика кеша::{text}")
 
           downloaded = sorted(p for p in Path("/tmp/signs-dl").rglob("*") if p.is_file())
-          grids = [p for p in downloaded if p.name.startswith(("grid_", "features_grid_"))]
+          # Только JSONL-строки кеша: рядом лежат grid_summary_*.json (сводки шардов), и чтение
+          # их как кеша — источник падения прогона 38136961509 (json.loads от «{»).
+          grids = [
+              p
+              for p in downloaded
+              if p.name.startswith(("grid_", "features_grid_"))
+              and (p.suffix == ".jsonl" or p.name.endswith(".jsonl.gz"))
+          ]
           note(f"файлов в артефакте: {len(downloaded)}, из них кешей сетки: {len(grids)}")
           for path in grids[:6]:
               note(f"{path.relative_to('/tmp/signs-dl')} — {path.stat().st_size} Б")
@@ -138,7 +152,7 @@ jobs:
 
       - name: "Измерить знак и AUC по каждому признаку (только val)"
         working-directory: spanverify-module
-        timeout-minutes: 20
+        timeout-minutes: 30
         run: |
           echo "команда: python3 scripts/feature_sign_check.py --grid-cache reports/hf-cache-a3 --splits data/corpus_a3/splits --bootstrap 5000 --seed 42 --annotate --out-json reports/hf_protocol/feature_signs_a3dev.json --out-md reports/hf_protocol/feature_signs_a3dev.md (кеш — прогон $RUN_ID)"
           set -o pipefail
