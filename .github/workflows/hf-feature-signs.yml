@@ -19,8 +19,8 @@ on:
   workflow_dispatch:
     inputs:
       run_id:
-        description: "Прогон «Тяжёлые прогоны hf», из которого брать кеш сетки A3"
-        default: "37609202780"
+        description: "Прогон «Протокол hf (критерий ТЗ)», из которого брать кеш сетки A3 (артефакты grid-a3-*)"
+        default: "38076145605"
   push:
     branches: ["arena/**"]
     paths:
@@ -34,7 +34,7 @@ permissions:
   contents: write
 
 env:
-  RUN_ID: ${{ github.event.inputs.run_id || '37609202780' }}
+  RUN_ID: ${{ github.event.inputs.run_id || '38076145605' }}
 
 jobs:
   signs:
@@ -54,10 +54,15 @@ jobs:
           python -m pip install --upgrade pip
           python -m pip install -q -r requirements.txt
 
-      - name: "Кеш сетки из тяжёлого прогона"
+      # Скачиваются ТОЛЬКО шарды валидационного кеша: pattern grid-a3-* не захватывает
+      # grid-test-a3-* (тестовая выборка закрыта, скрипт её тоже отвергает по имени файла).
+      # Проверено на прогоне 38136530693: в артефакте hf-runs-a3 лежал product-кеш
+      # (features_all.jsonl), а сетка v3 — в артефактах grid-a3-0…3 прогона 38076145605.
+      - name: "Кеш сетки из прогона протокола"
         uses: actions/download-artifact@v4
         with:
-          name: hf-runs-a3
+          pattern: grid-a3-*
+          merge-multiple: true
           run-id: ${{ env.RUN_ID }}
           path: /tmp/signs-dl
           github-token: ${{ secrets.GITHUB_TOKEN }}

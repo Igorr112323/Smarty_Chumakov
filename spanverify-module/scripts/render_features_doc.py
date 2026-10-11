@@ -351,8 +351,11 @@ def sign_section() -> list[str]:
         "Воспроизвести: `python3 scripts/feature_sign_check.py --grid-cache reports/hf-cache-a3"
         " --splits data/corpus_a3/splits --bootstrap 5000 --seed 42 --out-json"
         " reports/hf_protocol/feature_signs_a3dev.json --out-md reports/hf_protocol/feature_signs_a3dev.md`"
-        " (кеш сетки — артефакт тяжёлого прогона `hf-runs-a3`; локально требует кеш, в CI — job"
-        " «Знак признаков на валидации»).",
+        " (сетка v3 берётся из артефактов `grid-a3-0`…`grid-a3-3` прогона «Протокол hf"
+        " (критерий ТЗ)» `38076145605`; шарды тестовой выборки `grid-test-a3-*` не скачиваются,"
+        " а скрипт отвергает любой файл кеша с `test` в имени; локально прогон требует кеш, в CI"
+        " — job «AUC и знак по каждому признаку сетки (val)» из"
+        " `.github/workflows/hf-feature-signs.yml`).",
         "",
     ]
     return lines

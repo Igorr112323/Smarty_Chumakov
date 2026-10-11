@@ -192,3 +192,22 @@ def test_markdown_table_lists_every_grid_feature(tmp_path: Path) -> None:
     for name in GRID_FEATURE_NAMES:
         assert f"`{name}`" in text, f"в таблице нет строки признака {name}"
     assert "Знак по val" in text
+
+
+def test_grid_cache_with_test_shard_is_rejected(tmp_path: Path) -> None:
+    """Кеш, собранный по тестовой выборке, отвергается по имени файла.
+
+    Проверяет не математику, а запрет: артефакты вида `grid-test-a3-0` существуют в CI, и их
+    легко скачать «по соседству». Посчитать на них AUC — значит открыть тестовую выборку
+    второй раз, поэтому отказ происходит до любых вычислений и без записи файлов отчёта.
+    """
+    splits = _write_dataset(tmp_path)
+    cache = tmp_path / "cache"
+    (cache / "grid_test_a3_00.jsonl").write_text(
+        (cache / "grid_all_00.jsonl").read_text(encoding="utf-8"), encoding="utf-8"
+    )
+    proc = run(tmp_path, splits)
+    assert proc.returncode != 0, "кеш с тестовой выборкой принят"
+    combined = proc.stdout + proc.stderr
+    assert "только на валидации" in combined, combined[-400:]
+    assert not (tmp_path / "signs.json").exists(), "отчёт записан до отказа"

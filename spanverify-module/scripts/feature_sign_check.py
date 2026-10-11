@@ -121,7 +121,18 @@ def measure(args: argparse.Namespace) -> dict[str, Any]:
     splits_dir = Path(args.splits)
     records, val_path = load_val_records(splits_dir)
     cache_dir = Path(args.grid_cache)
-    cache = hf_protocol.load_grid_cache(hf_protocol._cache_paths(cache_dir))
+    paths = hf_protocol._cache_paths(cache_dir)
+    # Тестовая выборка v1 (A3 test) использована для финальной оценки и закрыта. Кеш сетки
+    # лежит отдельными артефактами (`grid-test-*`), и случайное скачивание одного из них —
+    # самый дешёвый способ испортить измерение: проверка по имени файла, а не по содержимому.
+    forbidden = [p.name for p in paths if "test" in p.name.lower()]
+    if forbidden:
+        raise SystemExit(
+            "в списке файлов кеша есть тестовая выборка: "
+            + ", ".join(sorted(forbidden))
+            + " — измерение знака делается только на валидации"
+        )
+    cache = hf_protocol.load_grid_cache(paths)
     rows = hf_protocol.prepare(records, cache, list(GRID_FEATURE_NAMES))
     labels = [int(row["gold"]) for row in rows]
     positives = sum(labels)
