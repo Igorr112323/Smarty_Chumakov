@@ -251,3 +251,135 @@ def test_reports_never_call_agent_review_expert() -> None:
                     marker in lowered
                     for marker in ("не выполнена", "не выполнялась", "подписывает", "экспертной проверки не будет", "|")
                 ), f"{doc.name}: утверждение об экспертной проверке без отрицания: {line}"
+
+
+# --- документы договорного задания: методика, признаки, листы решений, отчёт ---
+
+CONTRACT_DIR = ROOT.parent / "docs"
+FEATURES_DOC = CONTRACT_DIR / "ПРИЗНАКИ.md"
+METHODOLOGY_DOC = CONTRACT_DIR / "МЕТОДИКА_РАЗМЕТКИ.md"
+DECISIONS_DOC = CONTRACT_DIR / "DECISIONS_NEEDED.md"
+CONTRACT_REPORT = CONTRACT_DIR / "ОТЧЁТ_по_договору.md"
+A3_MANIFEST = ROOT / "data" / "corpus_a3" / "manifest.json"
+RENDERER = ROOT / "scripts" / "render_features_doc.py"
+
+
+def test_features_doc_is_generated_from_artifacts() -> None:
+    """``docs/ПРИЗНАКИ.md`` обязан совпадать с тем, что собрали из артефактов измерений.
+
+    Правка чисел этого документа вручную — тот же грех, что правка чисел в README:
+    они живут в ``reports/`` и пересобираются скриптом.
+    """
+    assert RENDERER.is_file(), "нет генератора docs/ПРИЗНАКИ.md"
+    proc = subprocess.run(
+        [sys.executable, str(RENDERER), "--check"],
+        capture_output=True,
+        text=True,
+        cwd=ROOT,
+        check=False,
+    )
+    assert proc.returncode == 0, (proc.stdout + proc.stderr).strip()
+
+
+def test_contract_documents_carry_the_accepted_version() -> None:
+    """Штамп версии в договорных документах = версия пакета = версия объекта приёмки."""
+    metrics = json.loads((ROOT / "reports" / "METRICS.json").read_text(encoding="utf-8"))
+    version = metrics["meta"]["version"]
+    sys.path.insert(0, str(ROOT / "spanverify"))
+    import spanverify
+
+    assert spanverify.__version__ == version
+    for doc in (FEATURES_DOC, METHODOLOGY_DOC, CONTRACT_REPORT):
+        assert doc.is_file(), f"нет документа {doc.name}"
+        assert version in doc.read_text(encoding="utf-8"), f"{doc.name}: нет штампа версии {version}"
+
+
+def test_methodology_numbers_match_the_corpus_manifest() -> None:
+    """Цифры проверок корпуса в методике — ровно те же, что в ``manifest.json``."""
+    text = METHODOLOGY_DOC.read_text(encoding="utf-8")
+    assert "```json markup-checks" in text, "в методике нет блокируемого блока чисел проверок"
+    claimed = json.loads(text.split("```json markup-checks", 1)[1].split("```", 1)[0])
+    manifest = json.loads(A3_MANIFEST.read_text(encoding="utf-8"))
+    expected = {
+        "dataset_version": manifest["dataset_version"],
+        "pairs": manifest["pairs"],
+        "real_documents": manifest["real_documents"],
+        "documents_count": manifest["documents"]["count"],
+        "documents_synthetic": manifest["documents"]["synthetic"],
+        "spans_checked": manifest["spans_checked"],
+        "spans_problems": len(manifest["spans_problems"]),
+        "contexts_checked": manifest["contexts_checked"],
+        "contexts_problems": len(manifest["contexts_problems"]),
+        "number_attribution_checked": manifest["number_attribution_checked"],
+        "number_attribution_problems": len(manifest["number_attribution_problems"]),
+        "plan_problems": len(manifest["plan_problems"]),
+        "clean_share": manifest["balance"]["clean_share"],
+        "min_per_mode": manifest["balance"]["min_per_mode"],
+        "shared_groups": manifest["shared_groups"],
+        "split_train": manifest["splits"]["train"],
+        "split_dev": manifest["splits"]["dev"],
+        "split_test": manifest["splits"]["test"],
+        "seed": manifest["seed"],
+    }
+    missing = sorted(set(expected) - set(claimed))
+    assert not missing, f"в методике не заявлены проверки: {missing}"
+    wrong = {key: (claimed[key], expected[key]) for key in expected if claimed[key] != expected[key]}
+    assert not wrong, f"методика расходится с манифестом корпуса: {wrong}"
+
+
+def test_decisions_needed_lists_are_facts_and_consequences_only() -> None:
+    """Листы «а», «б», «в»: факты, варианты, последствия — и никаких рекомендаций агенту."""
+    text = DECISIONS_DOC.read_text(encoding="utf-8")
+    for marker in ("Лист «а»", "Лист «б»", "Лист «в»"):
+        assert marker in text, f"в {DECISIONS_DOC.name} нет листа {marker}"
+    chunks = text.split("## Лист ")[1:]
+    assert len(chunks) == 3
+    for chunk in chunks:
+        title = chunk.splitlines()[0].strip()
+        for section in (
+            "**Факты.**",
+            "**Варианты и последствия.**",
+            "**Что нужно от заказчика",
+            "**Ответ заказчика:** (ожидает)",
+        ):
+            assert section in chunk, f"лист {title}: нет раздела «{section}»"
+        lowered = chunk.lower()
+        for hedging in ("рекомендуем", "советуем", "лучше выбрать", "выбирайте"):
+            assert hedging not in lowered, f"лист {title} содержит рекомендацию «{hedging}»"
+
+
+def test_contract_report_states_criterion_from_the_manifest() -> None:
+    """Строка критерия в отчёте берётся из манифеста прогона, а не переформулируется."""
+    text = CONTRACT_REPORT.read_text(encoding="utf-8")
+    manifest = json.loads((ROOT / "reports" / "hf_final" / "manifest.json").read_text(encoding="utf-8"))
+    criterion = manifest["criterion"]
+    assert criterion["status"] == "NOT MET"
+    for field in ("token_f1", "token_fpr", "f1_gap"):
+        rendered = f"{criterion[field]:.6f}".replace(".", ",")
+        assert rendered in text, f"в отчёте нет числа {rendered} ({field} из манифеста)"
+    assert "**не достигнуто**" in text
+    table = text.split("## 1. Инвентаризация работ", 1)[1].split("## 2.", 1)[0]
+    assert "почти" not in table.lower(), "в таблице работ есть «почти» вместо статуса"
+
+
+def test_contract_report_rows_cite_evidence_or_say_not_done() -> None:
+    """Каждая строка таблицы работ: либо путь/команда, либо явное «не выполнено»."""
+    text = CONTRACT_REPORT.read_text(encoding="utf-8")
+    table = text.split("## 1. Инвентаризация работ", 1)[1].split("## 2.", 1)[0]
+    rows = [
+        line
+        for line in table.splitlines()
+        if line.startswith("| ") and line.count("|") >= 5 and not line.startswith("|---")
+    ]
+    works = [row for row in rows if row.split("|")[1].strip().isdigit()]
+    assert len(works) == 10, f"в таблице работ {len(works)} строк, ожидалось 10"
+    for row in works:
+        cells = [cell.strip() for cell in row.strip().strip("|").split("|")]
+        number, done, not_done, blocker = cells[0], cells[2], cells[3], cells[4]
+        assert done, f"работа {number}: пустая колонка «сделано»"
+        evidenced = "`" in done or "—" == done
+        admitted = any(
+            word in (done + not_done + blocker)
+            for word in ("не выполнено", "не выполнена", "ожидает", "Не выполняется")
+        )
+        assert evidenced or admitted, f"работа {number}: «сделано» без пути, команды или явного «не выполнено»"

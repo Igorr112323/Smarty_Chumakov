@@ -1,5 +1,5 @@
 {
-  "measured_at": "2026-10-06T07:50:00Z",
+  "measured_at": "2026-10-11T09:15:17Z",
   "hardware": {
     "platform": "Linux-6.1.158+-x86_64-with-glibc2.36",
     "processor": "неизвестно",
@@ -19,44 +19,44 @@
   "by_size": [
     {
       "context_chars": 500,
-      "seconds_median": 0.011,
-      "seconds_min": 0.011,
-      "seconds_max": 0.011,
+      "seconds_median": 0.024,
+      "seconds_min": 0.024,
+      "seconds_max": 0.025,
       "peak_mb_median": 0.11,
-      "ms_per_1000_chars": 22.0,
+      "ms_per_1000_chars": 48.0,
       "verdict": "likely_hallucination",
       "synthetic_extension": false,
       "repeats": 3
     },
     {
       "context_chars": 2000,
-      "seconds_median": 0.036,
-      "seconds_min": 0.036,
-      "seconds_max": 0.037,
+      "seconds_median": 0.098,
+      "seconds_min": 0.096,
+      "seconds_max": 0.098,
       "peak_mb_median": 0.41,
-      "ms_per_1000_chars": 18.0,
+      "ms_per_1000_chars": 49.0,
       "verdict": "likely_hallucination",
       "synthetic_extension": false,
       "repeats": 3
     },
     {
       "context_chars": 10000,
-      "seconds_median": 0.165,
-      "seconds_min": 0.16,
-      "seconds_max": 0.176,
-      "peak_mb_median": 2.04,
-      "ms_per_1000_chars": 16.5,
+      "seconds_median": 0.914,
+      "seconds_min": 0.896,
+      "seconds_max": 0.954,
+      "peak_mb_median": 2.05,
+      "ms_per_1000_chars": 91.4,
       "verdict": "likely_hallucination",
       "synthetic_extension": false,
       "repeats": 3
     },
     {
       "context_chars": 50000,
-      "seconds_median": 0.966,
-      "seconds_min": 0.937,
-      "seconds_max": 0.995,
-      "peak_mb_median": 10.62,
-      "ms_per_1000_chars": 19.32,
+      "seconds_median": 3.091,
+      "seconds_min": 3.088,
+      "seconds_max": 3.436,
+      "peak_mb_median": 10.67,
+      "ms_per_1000_chars": 61.82,
       "verdict": "grounded",
       "synthetic_extension": false,
       "repeats": 3
@@ -72,36 +72,36 @@
       {
         "context_chars": 100000,
         "ok": true,
-        "seconds": 2.073,
-        "peak_mb": 21.62,
+        "seconds": 4.868,
+        "peak_mb": 21.72,
         "error": null
       },
       {
         "context_chars": 200000,
         "ok": true,
-        "seconds": 3.819,
-        "peak_mb": 42.94,
+        "seconds": 6.7,
+        "peak_mb": 43.18,
         "error": null
       },
       {
         "context_chars": 500000,
         "ok": true,
-        "seconds": 10.027,
-        "peak_mb": 107.52,
+        "seconds": 13.987,
+        "peak_mb": 108.12,
         "error": null
       },
       {
         "context_chars": 1000000,
         "ok": true,
-        "seconds": 19.288,
-        "peak_mb": 214.59,
+        "seconds": 24.758,
+        "peak_mb": 215.85,
         "error": null
       },
       {
         "context_chars": 2000000,
         "ok": true,
-        "seconds": 39.557,
-        "peak_mb": 429.32,
+        "seconds": 47.967,
+        "peak_mb": 431.86,
         "error": null
       }
     ],

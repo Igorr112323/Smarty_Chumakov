@@ -44,6 +44,12 @@ DEFAULT_DOCS = (
     "docs/РУКОВОДСТВО.md",
     "spanverify-module/README.md",
     "spanverify-module/reports/EXTERNAL_TESTS.md",
+    # договорное задание: методика, признаки, листы решений и сводный отчёт —
+    # те же правила чисел, что для README (число только из manifest/METRICS.json)
+    "docs/МЕТОДИКА_РАЗМЕТКИ.md",
+    "docs/ПРИЗНАКИ.md",
+    "docs/DECISIONS_NEEDED.md",
+    "docs/ОТЧЁТ_по_договору.md",
 )
 
 REQUIRED_IN_ITOG = (
