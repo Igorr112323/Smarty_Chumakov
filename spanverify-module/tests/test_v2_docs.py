@@ -190,3 +190,64 @@ def test_metrics_json_knows_the_cycle_state_but_not_invented_numbers() -> None:
         assert section.get("step3") is False
         for key in ("f1", "fpr", "threshold"):
             assert key not in section, f"поле {key} появилось раньше измерения"
+
+
+def test_corpus_doc_marks_the_mode_as_awaiting_customer_approval() -> None:
+    """Режим загрузки — решение заказчика: документ не вправе писать о нём «решено»."""
+    text = flat(CORPUS_DOC)
+    for item in (".github/corpus-v2.mode", "ожидает подтверждения заказчика", "на паузе", "ocr_pending_approval"):
+        assert item in text, f"в `docs/CORPUS_v2.md` нет обязательной строки «{item}»"
+    for banned in ("измерен и отвергнут", "решено заменить", "text_only: false"):
+        assert banned not in text, f"документ заявляет отменённое заказчиком решение как факт: «{banned}»"
+
+
+def test_corpus_doc_distinguishes_the_volume_target_from_the_download_stop_threshold() -> None:
+    """1500 — цель по объёму выборки, 1800 — порог остановки загрузки; путать их нельзя."""
+    text = flat(CORPUS_DOC)
+    assert "1500" in text and "1800" in text, "в документе обязаны стоять оба числа"
+    assert "порог остановки" in text, "1800 обязан быть подписан как порог остановки, а не как цель"
+
+
+def test_every_share_of_the_text_layer_is_backed_by_the_measuring_script() -> None:
+    """Доля годовых слоёв упоминается только вместе с командой, которая её считает."""
+    for doc in (CORPUS_DOC, DOC):
+        if not doc.is_file():
+            continue
+        for line in doc.read_text(encoding="utf-8").splitlines():
+            if "текстовым слоем" in line and "%" in line:
+                assert (
+                    "text_layer_yield" in line or "ДИ" in line
+                ), f"{doc.name}: доля текстового слоя без команды и интервала: {line}"
+
+
+def test_numbers_doc_binds_every_reported_number_to_a_command() -> None:
+    """`docs/ЧИСЛА_v2.md`: таблица «число → команда → файл → статус», и ничего без статуса."""
+    path = ROOT / "docs" / "ЧИСЛА_v2.md"
+    assert path.is_file(), "числа цикла обязаны быть сверены с командами воспроизведения"
+    rows = []
+    for line in path.read_text(encoding="utf-8").splitlines():
+        if not line.startswith("|") or line.startswith("|---"):
+            continue
+        cells = [cell.strip() for cell in line.strip().strip("|").split("|")]
+        if len(cells) == 4 and cells[0] not in ("число", "что ранее звучало", "величина"):
+            rows.append(cells)
+    assert rows, "в таблице чисел нет ни одной строки"
+    for number, command, source, status in rows:
+        assert "`" in command or "git " in command or "gh " in command, f"число «{number}» без команды воспроизведения"
+        assert source, f"число «{number}» без файла-источника"
+        assert (
+            ("проверено" in status) or ("не" in status) or ("заморожен" in status)
+        ), f"число «{number}» без статуса проверки"
+
+
+def test_reports_never_call_agent_review_expert() -> None:
+    """Пока эксперт заказчика не назначен, «экспертная верификация» возможна только с отрицанием."""
+    for doc in (CORPUS_DOC, DOC):
+        text = doc.read_text(encoding="utf-8")
+        for line in text.splitlines():
+            if "экспертн" in line.lower() and "верификац" in line.lower():
+                lowered = line.lower()
+                assert any(
+                    marker in lowered
+                    for marker in ("не выполнена", "не выполнялась", "подписывает", "экспертной проверки не будет", "|")
+                ), f"{doc.name}: утверждение об экспертной проверке без отрицания: {line}"

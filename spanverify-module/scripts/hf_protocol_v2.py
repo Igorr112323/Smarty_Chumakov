@@ -360,6 +360,20 @@ def command_freeze(args: argparse.Namespace) -> int:
             f"независимость нарушена: {independence['overlap_total']} doc_id уже есть в корпусах v1 "
             f"(примеры: {json.dumps(independence['v1_universes'], ensure_ascii=False)[:300]})"
         )
+    # Режим загрузки корпуса — часть заморозки: документы, полученные распознаванием без
+    # подтверждения заказчика, в шаг 0 не входят (решение заказчика не отменяется исполнителем).
+    status_path = Path(getattr(args, "corpus_status", "") or (ROOT / "reports" / "v2" / "corpus_status.json"))
+    corpus_status: dict[str, Any] = {}
+    if status_path.is_file():
+        corpus_status = json.loads(status_path.read_text(encoding="utf-8"))
+    if corpus_status.get("ocr_pending_approval"):
+        counts = corpus_status.get("counts") or {}
+        problems.append(
+            "режим загрузки не подтверждён заказчиком: в "
+            f"{status_path} стоит ocr_pending_approval=true (режим `{corpus_status.get('load_mode', '?')}`, "
+            f"документов в ветке данных {counts.get('documents_in_acts', 0)}); шаг 0 замораживается "
+            "только после ответа заказчика — docs/CORPUS_v2.md, раздел 3.4"
+        )
     config_path = Path(args.config) if args.config else None
     config = json.loads(config_path.read_text(encoding="utf-8")) if config_path and config_path.is_file() else {}
     payload = {
@@ -414,6 +428,13 @@ def command_freeze(args: argparse.Namespace) -> int:
         "splits_sha256": {part: block["sha256"] for part, block in info.items()},
         "parts": info,
         "independence": independence,
+        "corpus_status": {
+            "file": str(status_path),
+            "load_mode": corpus_status.get("load_mode"),
+            "mode_approved_by_customer": corpus_status.get("mode_approved_by_customer"),
+            "ocr_pending_approval": corpus_status.get("ocr_pending_approval"),
+            "documents_in_acts": (corpus_status.get("counts") or {}).get("documents_in_acts"),
+        },
         "experiments_limit": MAX_EXPERIMENTS,
         "config": config,
         "config_sha256": v1.sha256_file(config_path) if config_path and config_path.is_file() else "",
@@ -944,6 +965,11 @@ def build_parser() -> argparse.ArgumentParser:
     freeze.add_argument("--config", default="config/hf_experiments_v2.json")
     freeze.add_argument("--seeds", default="42,43,44,45,46")
     freeze.add_argument("--out", default="reports/v2")
+    freeze.add_argument(
+        "--corpus-status",
+        default="reports/v2/corpus_status.json",
+        help="отчёт scripts/v2_corpus_status.py; при ocr_pending_approval шаг 0 блокируется",
+    )
     freeze.set_defaults(func=command_freeze)
 
     for name, help_text in (

@@ -1,0 +1,24 @@
+{
+  "data_branch": "data/corpus-v2-raw",
+  "read_from": "git:FETCH_HEAD",
+  "load_mode": "paused",
+  "mode_approved_by_customer": false,
+  "ocr_pending_approval": true,
+  "note": "Документы получены в режиме распознавания сканов. Заказчик выбрал --text-only, смена режима не подтверждена: файлы сохранены, но в размечаемую выборку не включаются, пока заказчик не ответит. Уже скачанное не удаляется.",
+  "counts": {
+    "documents_in_acts": 84,
+    "documents_nonempty": 84,
+    "documents_at_least_min_chars": 84,
+    "min_chars_usable": 800,
+    "chars_median": 9192,
+    "chars_p10": 3212,
+    "chars_p90": 26547,
+    "wave_reports": 4,
+    "report_files": [
+      "reports-wave-20261011T050005.md",
+      "reports-wave-20261011T051200.md",
+      "reports-wave-20261011T052815.md",
+      "reports-wave-20261011T053537.md"
+    ]
+  }
+}
