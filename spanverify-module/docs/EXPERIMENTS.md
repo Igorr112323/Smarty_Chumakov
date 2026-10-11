@@ -308,3 +308,43 @@ Test оказался **лучше** val (0,595041 против 0,515702 на о
 0,60 не достигнут на 0.004959 (0,83 % относительно), и осознанно не
 «дожимается»: единственный способ его «достичь» теперь — подобрать порог или
 признаки по уже прочитанному тесту, что обнулило бы измерение.
+
+
+## Шаг 3 (вторично) — тот же замороженный конфиг на корпусе A1
+
+Объявлено ДО запуска (п. 3 отступлений), источником отбора не является и статусом
+критерия по договору не становится: первичный корпус зафиксирован как **a3** до
+того, как были прочитаны любые числа на test. Числа ниже — из
+`reports/hf_final_a1/manifest.json` (прогон `38076145605`, код `d5dc9a538…`,
+226.0 с; та же модель `ai-forever/rugpt3small_based_on_gpt2` @ `a9307e696cd3…`,
+тот же файл конфигурации (sha256 `a45d49b4328fee34…`), тот же замороженный
+порог 0.1106, те же seed'ы 42, 43, 44, 45, 46; железо —
+AMD EPYC 7763 64-Core Processor, 4 CPU, 15.61 ГБ RAM,
+torch не установлен).
+
+| Метрика | Значение | Уровень | Выборка | Файл-источник | Подтверждающий тест |
+| --- | --- | --- | --- | --- | --- |
+| F1 (mean ± std, 5 seed'ов) | 0.621118 ± 0.000000 | токены | test (a1) | `reports/hf_final_a1/manifest.json` | `verify-manifest`, `tests/test_reported_metrics.py` |
+| Precision / Recall | 0.462107 / 0.946970 | токены | test (a1) | `reports/hf_final_a1/manifest.json` | `tests/test_reported_metrics.py` |
+| FPR | 0.181421 | токены | test (a1) | `reports/hf_final_a1/manifest.json` | `tests/test_reported_metrics.py` |
+| AUC (справочно) | 0.968193 | токены | test (a1) | `reports/hf_final_a1/manifest.json` | `tests/test_reported_metrics.py` |
+| TP / FP / FN / TN | 250 / 291 / 14 / 1313 | токены | test (a1) | `reports/hf_final_a1/manifest.json` | `tests/test_reported_metrics.py` |
+| F1 / FPR | 0.720000 / 0.950617 | ответы (вердикт) | test (a1) | `reports/hf_final_a1/manifest.json` | `tests/test_reported_metrics.py` |
+| F1 | 0.430851 | фрагменты, IoU ≥ 0,5 | test (a1) | `reports/hf_final_a1/manifest.json` | `tests/test_reported_metrics.py` |
+| Ориентир на этой выборке | **PASS** (F1 0.621118, FPR 0.181421) | токены | test (a1) | `reports/hf_final_a1/manifest.json` | пересчёт `verify-manifest` |
+
+Выборка: 180 пар, 9 документов (train — 840 пар,
+42 документов), обучение на `train+val`, gold-записей 180.
+Числа пересчитаны из предсказаний независимо:
+`python scripts/hf_protocol.py verify-manifest --manifest reports/hf_final_a1/manifest.json
+--predictions reports/hf_final_a1/predictions_test.jsonl.gz --check-splits` →
+«числа воспроизведены … → PASS», sha256 test `6ccddcb2ae4a…`
+совпадает с заморозкой шага 0, пересечений документов нет.
+
+**Почему это не меняет вердикт по договору.** На A1 тот же конфиг даёт F1 0.621118 при
+FPR 0.181421 — формально выше ориентира, но: (а) выборка test здесь — 9 документов,
+это грубая оценка; (б) FPR на порядок выше, чем на a3, а на уровне ответов — 0.950617,
+то есть «придираться почти ко всему»; (в) переносить первичный корпус на A1 после того,
+как оба числа прочитаны, — ровно та подгонка, которую протокол запрещает. Поэтому
+критерий по договору остаётся **НЕ ДОСТИГНУТЫМ** (a3: F1 0.595041), а A1 приводится
+как измеренное и заранее объявленное вторичное наблюдение.
