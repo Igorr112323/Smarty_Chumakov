@@ -75,7 +75,7 @@
 
 | Что | Значение | Откуда |
 |---|---|---|
-| Доля документов с годным текстовым слоем | 4 из 272 записей манифеста (0,0147; 95 % ДИ Уилсона 0,0057…0,0372) — одинаковый результат по обоим определениям: «метод извлечения не OCR» и «≥ 500 знаков текстового слоя на страницу» | `python3 scripts/text_layer_yield.py` → `spanverify-module/reports/v2/text_layer_yield.json` |
+| Доля документов с годным текстовым слоем | 4 из 272 записей манифеста (0,0147; 95 % ДИ Уилсона 0,0057…0,0372) — одинаковый результат по обоим определениям: «метод извлечения не OCR» и «≥ 500 знаков текстового слоя на страницу» | `python3 scripts/text_layer_yield.py --sources data/corpus_a3/sources/sources.json --all` → `spanverify-module/reports/v2/text_layer_yield.json` (команда взята из `.github/workflows/corpus-v2.yml`) |
 | записей без годного слоя | 268 из 272 | тот же артефакт, поле `by_host["publication.pravo.gov.ru"]` |
 | CER распознавания | не измерено | — |
 | Скачано и оставлено (ветка `data/corpus-v2-raw`) | 84 документов, все непустые, медиана 9192 знака; помечены `ocr_pending_approval`, не удаляются | `spanverify-module/reports/v2/corpus_status.json` (поле `counts`) |
