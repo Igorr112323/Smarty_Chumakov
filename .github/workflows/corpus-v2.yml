@@ -1,0 +1,302 @@
+# Корпус v2: независимая выборка для цикла v2 (только документы с текстовым слоем).
+#
+# Зачем отдельный workflow. Цикл v1 использовал все документы, которые лежат в
+# репозитории: 409 актов в `data/corpus_a3/sources`, их подмножество в
+# `data/corpus_a3_local70`, 60 синтетических документов A1 и demo. Проверено
+# побайтово: новых документов внутри репозитория нет (пересечение local70 с A3 —
+# 20 из 20). Поэтому v2 обязан быть скачан заново, и он обязан не содержать ни
+# одного doc_id из v1 — иначе «независимая тестовая выборка» будет подглядыванием
+# в уже измеренное.
+#
+# Режим `--text-only`: распознавание сканов стоит 580–2680 с на документ и
+# определяло всё время волны в v1. Здесь берутся только акты с годным текстовым
+# слоем PDF. Это осознанный срез со смещением (электронные акты крупнее и
+# «ровнее»), смещение записано в манифесте и в docs/CORPUS_v2.md, а не промолчано.
+#
+# Запуск: правкой файла .github/corpus-v2.trigger («Run workflow» для ветки не из
+# ветки по умолчанию недоступен) либо вручную через workflow_dispatch.
+name: "Корпус v2 (независимая выборка, текстовые акты)"
+
+on:
+  workflow_dispatch:
+    inputs:
+      target_per_slice:
+        description: "Сколько документов с текстом собрать в одном срезе"
+        type: string
+        default: "60"
+      buffer:
+        description: "Сколько кандидатов взять сверх цели (на брак по текстовому слою)"
+        type: string
+        default: "70"
+      page_from:
+        description: "С какой страницы выдачи начинать (увод от срезов v1)"
+        type: string
+        default: "3"
+  push:
+    branches: ["arena/**"]
+    paths:
+      - .github/corpus-v2.trigger
+
+concurrency:
+  group: corpus-v2-${{ github.ref }}
+  # Волны идут последовательно и не отменяют друг друга: кэш среза продолжает
+  # начатое, а отмена прогона посреди волны означала бы потерю распознанного.
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  slice:
+    name: "Срез «${{ matrix.title }}»"
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    permissions:
+      contents: read
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          # --- вид акта: федеральный и ведомственный уровень ---
+          - slice: fz
+            title: Федеральный закон
+            types: "Федеральный закон"
+          - slice: ukaz
+            title: Указ
+            types: "Указ"
+          - slice: postanov
+            title: Постановление
+            types: "Постановление"
+          - slice: prikaz
+            title: Приказ
+            types: "Приказ"
+          - slice: polozhenie
+            title: Положение
+            types: "Положение"
+          - slice: rasporyazh
+            title: Распоряжение
+            types: "Распоряжение"
+          # --- региональный уровень: срез по названию акта ---
+          - slice: dfo
+            title: Акты субъектов (общий срез)
+            types: ""
+            title_filter: "правительств|министерств|ведомств"
+          - slice: krasnodar2
+            title: Краснодарский край (срез 2)
+            types: ""
+            title_filter: "краснодарск"
+          - slice: moskva2
+            title: Москва (срез 2)
+            types: ""
+            title_filter: "москв"
+          - slice: spb2
+            title: Санкт-Петербург (срез 2)
+            types: ""
+            title_filter: "санкт-петербург|петербург"
+          - slice: ekos
+            title: Экология и природопользование
+            types: ""
+            title_filter: "эколог|природопольз|отход"
+          - slice: sport
+            title: Спорт и молодёжная политика
+            types: ""
+            title_filter: "спорт|молодёж|молодеж"
+          - slice: kult
+            title: Культура и архивы
+            types: ""
+            title_filter: "культур|архив|библиотек"
+          - slice: it
+            title: ИТ, связь и документооборот
+            types: ""
+            title_filter: "информацион|связи|электрон"
+          - slice: finance
+            title: Финансы, закупки и имущество
+            types: ""
+            title_filter: "бюджет|закупк|имуществ"
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Зависимости
+        working-directory: spanverify-module
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -q pypdf requests
+
+      - name: Кэш среза (что уже скачано в прошлых волнах)
+        uses: actions/cache@v4
+        with:
+          path: spanverify-module/data/corpus_v2_slice_${{ matrix.slice }}
+          key: corpus-v2-${{ matrix.slice }}-p${{ inputs.page_from || '3' }}-${{ github.run_id }}
+          restore-keys: |
+            corpus-v2-${{ matrix.slice }}-p${{ inputs.page_from || '3' }}-
+            corpus-v2-${{ matrix.slice }}-
+
+      - name: Загрузка среза (только документы с текстовым слоем)
+        working-directory: spanverify-module
+        timeout-minutes: 33
+        env:
+          OMP_THREAD_LIMIT: "1"
+        run: |
+          set -o pipefail
+          diag="$RUNNER_TEMP/corpus-v2-diag.log"; : > "$diag"
+          trap 'sync; sleep 6; tail -c 4000 "$diag" | sed -e "s/[[:cntrl:]]/ /g" -e "s/%/%25/g" -e "s|^|::error::[corpus-v2 ${{ matrix.corpus }}${{ matrix.slice }}] |"; tail -n 40 "$diag" >> "$GITHUB_STEP_SUMMARY" 2>/dev/null || true' ERR
+          exec > >(tee -a "$diag") 2>&1
+          python scripts/fetch_npa_corpus.py \
+            --out data/corpus_v2_slice_${{ matrix.slice }} \
+            --target-docs ${{ inputs.target_per_slice || '60' }} \
+            --buffer ${{ inputs.buffer || '70' }} \
+            --types "${{ matrix.types }}" \
+            --title-filter "${{ matrix.title_filter }}" \
+            --page-from ${{ inputs.page_from || '3' }} \
+            --max-pages-per-type 30 --max-pages 20 \
+            --workers 4 --pause 1.2 \
+            --text-only \
+            --exclude-dirs "data/corpus_a3;data/corpus_a3_local70"
+
+      - name: Сколько получилось в срезе
+        id: count
+        working-directory: spanverify-module
+        run: |
+          d=data/corpus_v2_slice_${{ matrix.slice }}/sources
+          n=$(ls -1 "$d"/*.txt 2>/dev/null | wc -l)
+          echo "срез ${{ matrix.slice }}: документов с текстовым слоем: $n"
+          echo "docs=$n" >> "$GITHUB_STEP_SUMMARY"
+          echo "docs=$n" >> "$GITHUB_OUTPUT"
+          ls -1 "$d" 2>/dev/null | head -20
+
+      - uses: actions/upload-artifact@v4
+        with:
+          # Число документов — прямо в имени артефакта: содержимое артефакта и логи
+          # job'а снаружи не читаются, а имена видны через API.
+          name: corpus-v2-${{ matrix.slice }}-документов-${{ steps.count.outputs.docs }}
+          path: spanverify-module/data/corpus_v2_slice_${{ matrix.slice }}
+          if-no-files-found: warn
+          retention-days: 90
+
+  assemble:
+    name: "Сборка волны и сверка с v1"
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    needs: slice
+    if: always()
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/download-artifact@v4
+        with:
+          path: wave
+          pattern: corpus-v2-*
+
+      - name: Свести срезы и проверить независимость от v1
+        id: merge
+        run: |
+          set -o pipefail
+          mkdir -p /tmp/wave_all/sources
+          find wave -path '*/sources/*.txt' -exec cp -n {} /tmp/wave_all/sources/ \;
+          total=$(ls -1 /tmp/wave_all/sources/*.txt 2>/dev/null | wc -l)
+          used=$(ls -1 spanverify-module/data/corpus_a3/sources/*.txt 2>/dev/null | xargs -r -n1 basename | sed 's/\.txt$//' | sort -u > /tmp/v1_ids.txt; wc -l < /tmp/v1_ids.txt)
+          new_ids=$(ls -1 /tmp/wave_all/sources/*.txt 2>/dev/null | xargs -r -n1 basename | sed 's/\.txt$//' | sort -u > /tmp/v2_ids.txt; wc -l < /tmp/v2_ids.txt)
+          overlap=$(comm -12 /tmp/v1_ids.txt /tmp/v2_ids.txt | wc -l)
+          echo "документов в волне: $total (уникальных id: $new_ids), id в списках v1: $used, пересечение: $overlap"
+          {
+            echo "## Волна корпуса v2"
+            echo
+            echo "| метрика | значение |"
+            echo "|---|---|"
+            echo "| документов в волне | $total |"
+            echo "| уникальных doc_id | $new_ids |"
+            echo "| doc_id в списках v1 (A3) | $used |"
+            echo "| **пересечение v2 ∩ v1** | **$overlap** |"
+            echo
+            echo "| срез | документов |"
+            echo "|---|---|"
+            for d in wave/*/; do
+              [ -d "$d" ] || continue
+              echo "| $(basename "$d") | $(find "$d" -path '*/sources/*.txt' | wc -l) |"
+            done
+          } >> "$GITHUB_STEP_SUMMARY"
+          echo "docs=$total" >> "$GITHUB_OUTPUT"
+          echo "overlap=$overlap" >> "$GITHUB_OUTPUT"
+          if [ "$overlap" != "0" ]; then
+            echo "::error::[corpus-v2] независимость нарушена: $overlap документов уже есть в корпусе A3"
+            exit 1
+          fi
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: corpus-v2-wave
+          path: /tmp/wave_all/sources/*.txt
+          if-no-files-found: warn
+          retention-days: 90
+
+  archive:
+    name: "Архив волны в ветку данных"
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    needs: assemble
+    if: always()
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: corpus-v2-wave
+          path: texts
+
+      - name: Сложить тексты в ветку данных (ветка создаётся первой волной)
+        run: |
+          set -o pipefail
+          git config --global user.name "spanverify-bot"
+          git config --global user.email "bot@spanverify.local"
+          branch=data/corpus-v2-raw
+          mkdir -p /tmp/dbr && cd /tmp/dbr
+          git init -q .
+          git remote add origin "https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
+          if git ls-remote --exit-code origin "$branch" >/dev/null 2>&1; then
+            git fetch -q origin "$branch"
+            git checkout -q FETCH_HEAD
+          else
+            git checkout -q --orphan "$branch"
+            echo "# Ветка данных: тексты корпуса v2" > README.md
+            echo >> README.md
+            echo "Сырьё: официально опубликованные акты, только документы с текстовым слоем PDF." >> README.md
+            echo "Лицензионная основа: п. 6 ст. 1259 ГК РФ — официальные документы государственных" >> README.md
+            echo "органов не являются объектами авторских прав. В рабочую ветку тексты не коммитятся," >> README.md
+            echo "чтобы не раздувать клон: в репозитории лежат пары, сплиты и манифест с sha256." >> README.md
+            git add README.md
+            git commit -qm "корпус v2: ветка данных [skip ci]"
+          fi
+          mkdir -p acts
+          # cp -n: накопление волн без перезаписи — уже лежащий в ветке текст не
+          # меняется, поэтому sha256 документа остаётся тем же, что при первой волне.
+          cp -n "$GITHUB_WORKSPACE"/texts/*.txt acts/ 2>/dev/null || true
+          n=$(ls -1 acts/*.txt 2>/dev/null | wc -l)
+          if [ "$n" = "0" ]; then
+            echo "документов нет — коммит не нужен"
+            exit 0
+          fi
+          stamp=$(date -u +%Y%m%dT%H%M%S)
+          {
+            echo "# Волна корпуса v2 от $stamp"
+            echo
+            echo "документов в ветке данных: **$n**"
+            echo
+            echo "Проверка: все файлы добавляются по принципу «не перезаписывать» (cp -n),"
+            echo "поэтому ветка данных — накапливаемый архив волн, а не слепок одного прогона."
+          } > "reports-wave-$stamp.md"
+          git add -A acts "reports-wave-$stamp.md"
+          if git diff --cached --quiet; then
+            echo "новых текстов нет — коммит не нужен"
+            exit 0
+          fi
+          git commit -qm "корпус v2: волна $stamp — $n документов [skip ci]"
+          git push -q origin "HEAD:$branch"
+          echo "документов в ветке данных после волны: $n" >> "$GITHUB_STEP_SUMMARY"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

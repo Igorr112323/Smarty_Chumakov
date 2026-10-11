@@ -393,10 +393,22 @@ def pick_extraction(text_layer: dict, ocr: dict, min_chars_per_page: int = 120) 
     return "none"
 
 
-def extract_text(path: Path, dpi: int = 200, max_pages: int = 20, psm: int = 6, oem: int = 1) -> dict:
-    """Текст PDF: сначала текстовый слой, затем OCR. Возвращает факты, без догадок."""
+def extract_text(
+    path: Path, dpi: int = 200, max_pages: int = 20, psm: int = 6, oem: int = 1, *, allow_ocr: bool = True
+) -> dict:
+    """Текст PDF: сначала текстовый слой, затем OCR. Возвращает факты, без догадок.
+
+    ``allow_ocr=False`` (режим ``--text-only``) распознавание не запускает вовсе:
+    документ либо имеет годный текстовый слой, либо отбрасывается. Это не «дешёвая
+    замена» OCR, а осознанный срез корпуса — распознавание стоит 580–2680 с на
+    документ и определяет всё время волны, а «электронные» акты доступны сразу.
+    Смещение среза записывается в манифест, а не замалчивается.
+    """
     text_layer = pypdf_text(path)
-    ocr = ocr_pdf(path, dpi=dpi, max_pages=max_pages, psm=psm, oem=oem)
+    if allow_ocr:
+        ocr = ocr_pdf(path, dpi=dpi, max_pages=max_pages, psm=psm, oem=oem)
+    else:
+        ocr = {"text": "", "pages": 0, "error": "OCR выключен (--text-only)"}
     method = pick_extraction(text_layer, ocr)
     text = text_layer["text"] if method == "pypdf" else ocr["text"]
     return {
@@ -564,6 +576,18 @@ def main() -> int:
     )
     parser.add_argument("--page-from", type=int, default=1, help="с какой страницы выдачи начинать срез")
     parser.add_argument("--page-to", type=int, default=None, help="какой страницей выдачи закончить срез")
+    parser.add_argument(
+        "--text-only",
+        action="store_true",
+        help="не запускать распознавание: брать только документы с годным текстовым слоем "
+        "(срез смещён к «электронным» актам — признак записывается в манифест)",
+    )
+    parser.add_argument(
+        "--exclude-dirs",
+        default="",
+        help="каталоги корпусов через ';': документы (по именам файлов sources/*.txt) отсюда "
+        "не скачиваются повторно — так новый корпус делается независимым от уже измеренных",
+    )
     parser.add_argument("--psm", type=int, default=6, help="режим разбиения страницы tesseract (--psm)")
     parser.add_argument("--oem", type=int, default=1, help="движок tesseract (--oem)")
     args = parser.parse_args()
@@ -636,6 +660,25 @@ def main() -> int:
         f"{args.page_to or args.max_pages_per_type} фильтр={args.title_filter or 'нет'}"
     )
     existing_ids = {str(document["doc_id"]) for document in existing}
+    # Независимость нового корпуса — не обещание, а ограничение отбора: любой doc_id,
+    # который уже есть в перечисленных каталогах корпусов, не попадает в новую волну.
+    excluded_ids: set[str] = set()
+    excluded_from: list[dict] = []
+    for raw_dir in str(args.exclude_dirs or "").split(";"):
+        directory = raw_dir.strip()
+        if not directory:
+            continue
+        sources = Path(directory) / "sources"
+        if not sources.is_dir():
+            print(f"ВНИМАНИЕ: каталог источников {sources} не найден — исключение не применено", file=sys.stderr)
+            continue
+        ids = {item.stem for item in sources.glob("*.txt")}
+        excluded_ids |= ids
+        excluded_from.append({"dir": directory, "documents": len(ids)})
+    before_filter = len(candidates)
+    candidates = [item for item in candidates if str(item["doc_id"]) not in excluded_ids]
+    excluded_collisions = before_filter - len(candidates)
+    existing_ids |= excluded_ids
     needed = max(0, args.target_docs - len(existing))
     planned = plan_downloads(candidates, existing_ids, needed, buffer=args.buffer)
     print(
@@ -689,7 +732,15 @@ def main() -> int:
 
         with concurrent.futures.ThreadPoolExecutor(max_workers=max(1, args.workers)) as pool:
             futures = {
-                pool.submit(extract_text, Path(item["_pdf_path"]), args.dpi, args.max_pages, args.psm, args.oem): item
+                pool.submit(
+                    extract_text,
+                    Path(item["_pdf_path"]),
+                    args.dpi,
+                    args.max_pages,
+                    args.psm,
+                    args.oem,
+                    allow_ocr=not args.text_only,
+                ): item
                 for item in downloaded
             }
             for future in concurrent.futures.as_completed(futures):
@@ -809,6 +860,10 @@ def main() -> int:
         "robots": robots,
         "sources": sources,
         "scan_stats": scan_stats,
+        "text_only": bool(args.text_only),
+        "excluded_from": excluded_from,
+        "excluded_ids_total": len(excluded_ids),
+        "excluded_collisions_in_slice": excluded_collisions,
         "target_docs": args.target_docs,
         "documents_total": len(documents),
         "by_theme": by_theme,
