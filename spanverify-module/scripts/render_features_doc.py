@@ -33,6 +33,7 @@ PILOT = MODULE_ROOT / "reports" / "experiments" / "pilot" / "pilot.json"
 SWEEP = MODULE_ROOT / "reports" / "hf_protocol" / "sweep.json"
 A3 = MODULE_ROOT / "reports" / "experiments" / "a3" / "experiment.json"
 SIGNS = MODULE_ROOT / "reports" / "hf_protocol" / "feature_signs_a3dev.json"
+DIAGNOSTICS = MODULE_ROOT / "reports" / "hf_protocol" / "val_diagnostics.json"
 METRICS = MODULE_ROOT / "reports" / "METRICS.json"
 
 # Определение каждого признака сетки — по коду ``spanverify/hf_grid.py``.
@@ -374,13 +375,95 @@ def sign_section() -> list[str]:
     return lines
 
 
+def diagnostics_section() -> list[str]:
+    """Диагностика на val из `reports/hf_protocol/val_diagnostics.json` (прогон CI).
+
+    Раздел обязан молчать «не измерено», пока артефакта нет, и обязан переписываться числом
+    артефакта, когда он появился: документ не является местом для оценок «на глаз».
+    """
+    header = ["### 3.4. Диагностика val: операционная точка, сглаживание, семейства, seed'ы", ""]
+    command = (
+        "python3 scripts/val_diagnostics.py --grid-cache reports/hf-cache-a3 \\\n"
+        "  --splits data/corpus_a3/splits --config config/hf_experiments.json \\\n"
+        "  --baseline wide-linear --annotate \\\n"
+        "  --out-json reports/hf_protocol/val_diagnostics.json \\\n"
+        "  --out-md reports/hf_protocol/val_diagnostics.md"
+    )
+    if not DIAGNOSTICS.is_file():
+        return header + [
+            "**Не измерено.** Инструмент готов: `scripts/val_diagnostics.py`, прогон — workflow",
+            "`hf-val-diagnostics.yml` (тот же кеш `grid-a3-*`, что и в 3.3; тестовая часть не читается —",
+            "файлы с `test` в имени отвергаются до вычислений, а в выходном JSON стоит",
+            "`test_not_read: true`). Без артефакта ни один вывод об операционной точке, о сглаживании",
+            "и о вкладе семейств в документ не попадает. Команда прогона:",
+            "",
+            "```",
+            command,
+            "```",
+            "",
+        ]
+    payload = json.loads(DIAGNOSTICS.read_text(encoding="utf-8"))
+    results = payload["results"]
+    base = results["baseline"]
+    frontier_block = results.get("frontier") or {}
+    capped = frontier_block.get("capped") or {}
+    split = payload["split"]
+    lines = header + [
+        f"Выборка — `{split['name']}`: пар `{split['pairs']}`, токенов `{split['tokens']}`, положительных"
+        f" токенов `{payload['labels']['positive_tokens']}`. Порог — {payload['threshold_source']};"
+        f" потолок FPR — `{payload['fpr_cap']}`. Это диагностика, а не проверка критерия:"
+        f" `not_for_criterion: true`, `test_not_read: true`. Кеш: `{payload['inputs']['cache_files']}`,"
+        f" SHA-256 файла валидации `{str(payload['inputs']['splits_sha256'])[:8]}…`, код прогона"
+        f" `{payload['code_commit']}`.",
+        "",
+        f"* Базовая линия `{base['name']}`: F1 токенов `{_comma(base['token_f1'])}` при FPR"
+        f" `{_comma(base['token_fpr'])}` (порог `{base['threshold']}`), точность `{_comma(base['token_precision'], 5)}`,"
+        f" полнота `{_comma(base['token_recall'], 5)}`, AUC `{_comma(base['token_auc'], 5)}`."
+        f" Собственная лучшая точка той же конфигурации под потолком FPR — F1 `{_comma(capped.get('f1'))}`"
+        f" при FPR `{_comma(capped.get('fpr'))}` (oracle по val: выбран и измерен на одной выборке)."
+        f" До порога критерия на val не хватает `{_comma(results['frontier'].get('gap_to_criterion_on_val'))}`.",
+        "",
+        "| Сглаживание (окно) | F1 при общем пороге | Δ к базовой линии | F1 под потолком FPR | Δ под потолком |",
+        "|---|---|---|---|---|",
+    ]
+    for item in results.get("smoothing") or []:
+        lines.append(
+            f"| `{item['window']}` | {_comma(item['token_f1'])} | {_comma(item.get('delta_f1'))} |"
+            f" {_comma(item.get('capped_f1'))} | {_comma(item.get('delta_capped_f1'))} |"
+        )
+    lines += [
+        "",
+        "| Семейство, убранное из базовой линии | колонок убрано | колонок осталось | F1 при общем пороге | Δ F1 | Δ под потолком FPR |",
+        "|---|---|---|---|---|---|",
+    ]
+    for item in sorted(
+        results.get("ablations") or [], key=lambda value: abs(value.get("delta_f1") or 0.0), reverse=True
+    ):
+        lines.append(
+            f"| `{item['family']}` | {len(item['removed'])} | {item['kept']} | {_comma(item['token_f1'])} |"
+            f" {_comma(item.get('delta_f1'))} | {_comma(item.get('delta_capped_f1'))} |"
+        )
+    seeds_block = results.get("seeds") or {}
+    lines += [
+        "",
+        f"* Разброс по seed'ам (`{seeds_block.get('requested')}`): СКО F1 токенов —"
+        f" {_comma(seeds_block.get('std_token_f1'))}, СКО порога — {_comma(seeds_block.get('std_threshold'))},"
+        f" различных моделей — {len(seeds_block.get('model_sha256_unique') or [])}. Нулевое СКО здесь означает,"
+        " что харнесс детерминирован (`fit_model` для `logreg` игнорирует seed), а не что модель устойчива;"
+        " требование измеримого разброса и гейт `seedcheck` — в `docs/METRIC_SPEC_v2.md`, раздел 4.",
+        "",
+    ]
+    return lines
+
+
 def gap_section() -> list[str]:
     return [
-        "### 3.4. Чего нет (и это не «почти сделано»)",
+        "### 3.5. Чего нет (и это не «почти сделано»)",
         "",
         "* **Вклад каждого из 36 признаков в F1 на val — не измерено.** Знак и AUC по признаку"
         " измерены (3.3), но «сколько добавляет признак» без прогона ablation не утверждается;"
-        " команды — `make hf-grid-v2` затем `make hf-curve-v2`.",
+        " готовый измеритель — 3.4 (`scripts/val_diagnostics.py`, `--ablate all`), числа — за прогоном."
+        " Команды цикла: `make hf-grid-v2` затем `make hf-curve-v2`.",
         "* **Отдельного замера «только признаки attention» на A3 — нет.** В v1 они входили в расширенный"
         " набор; вывод о их индивидуальном вкладе без этого замера не делается.",
         "* **Информативность на реальных (не синтетических) размеченных данных — не измерено**, потому что"
@@ -499,6 +582,7 @@ def render() -> str:
     lines += pilot_section(pilot)
     lines += sweep_section(sweep)
     lines += sign_section()
+    lines += diagnostics_section()
     lines += gap_section()
     lines += [
         "## 4. Как признаки участвуют в решении",

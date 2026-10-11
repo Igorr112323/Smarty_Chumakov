@@ -1,0 +1,245 @@
+# Диагностика на валидации (A3 dev): знак признаков, операционная точка, сглаживание,
+# вклад семейств и разброс по seed'ам.
+#
+# Скрипты: `spanverify-module/scripts/feature_sign_check.py` (3.3 в docs/ПРИЗНАКИ.md) и
+# `spanverify-module/scripts/val_diagnostics.py`. Оба читают только val (A3 dev): файлы с
+# `test` в имени отвергаются до вычислений, а тестовый кеш (`grid-test-a3-*`) не скачивается.
+#
+# Зачем отдельный прогон. В `docs/ПРИЗНАКИ.md` зафиксировано: пилот на 96 парах
+# дал значимые отклонения AUC от 0,5, и все — ниже 0,5. Прежде чем писать
+# «признак информативен», надо измерить знак на официальной валидации. Модель для
+# этого не нужна: признаки уже лежат в кеше сетки (формат v3) тяжёлого прогона,
+# поэтому job читает артефакт и считает AUC со стандартной библиотекой.
+#
+# Что выходит. `spanverify-module/reports/hf_protocol/feature_signs_a3dev.json` и
+# `.md` коммитом в ту же ветку (паттерн hf-analysis.yml) + аннотации прогона,
+# чтобы числа читались без скачивания артефакта. Тестовая часть не открывается:
+# скрипт принимает только val и падает, если вместо него подставляют test.
+#
+# Запуск: workflow_dispatch (номер прогона с кешем — параметр) или пуш
+# .github/hf-val-diagnostics.trigger в ветку arena/**.
+name: Диагностика на валидации (A3 dev)
+
+on:
+  workflow_dispatch:
+    inputs:
+      run_id:
+        description: "Прогон «Протокол hf (критерий ТЗ)», из которого брать кеш сетки A3 (артефакты grid-a3-*)"
+        default: "38076145605"
+      baseline:
+        description: "Имя базовой линии в config/hf_experiments.json"
+        default: "wide-linear"
+  push:
+    branches: ["arena/**"]
+    paths:
+      - .github/hf-val-diagnostics.trigger
+
+concurrency:
+  group: hf-val-diagnostics-${{ github.ref }}
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+env:
+  RUN_ID: ${{ github.event.inputs.run_id || '38076145605' }}
+  BASELINE: ${{ github.event.inputs.baseline || 'wide-linear' }}
+
+jobs:
+  signs:
+    name: "Диагностика val: знак, операционная точка, семейства, seed'ы"
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: "Зависимости (без torch: работает кеш и стандартная библиотека)"
+        working-directory: spanverify-module
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -q -r requirements.txt
+
+      # Скачиваются ТОЛЬКО шарды валидационного кеша: pattern grid-a3-* не захватывает
+      # grid-test-a3-* (тестовая выборка закрыта, скрипт её тоже отвергает по имени файла).
+      # Проверено на прогоне 38136530693: в артефакте hf-runs-a3 лежал product-кеш
+      # (features_all.jsonl), а сетка v3 — в артефактах grid-a3-0…3 прогона 38076145605.
+      - name: "Кеш сетки из прогона протокола"
+        uses: actions/download-artifact@v4
+        with:
+          pattern: grid-a3-*
+          merge-multiple: true
+          run-id: ${{ env.RUN_ID }}
+          path: /tmp/signs-dl
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: "Разложить кеш и сообщить, что в нём"
+        # Диагностика обязана быть в аннотациях: загрузка журналов сборки из этой среды
+        # недоступна (result-хост вне списка разрешённых хостов), а прогон, который непонятно
+        # почему упал, превращается в «не проверено». Шаг ничего не решает за скрипт измерения:
+        # он раскладывает файлы и печатает факты об их форме. Скрипт пишется в файл и
+        # вызывается один раз: heredoc внутри «if ! … | tee» ломает разбор (прогон 38137103728
+        # упал с exit 2 и без единой строки вывода).
+        run: |
+          cat > "$RUNNER_TEMP/diag_cache.py" << 'PY'
+          import gzip
+          import json
+          import shutil
+          from pathlib import Path
+
+          def note(text):
+              print(f"::notice title=диагностика кеша::{text}")
+
+          root = Path("/tmp/signs-dl")
+          downloaded = sorted(p for p in root.rglob("*") if p.is_file())
+          # Только JSONL-строки кеша: рядом лежат сводки grid_summary_*.json, и попытка прочитать
+          # их как кеш — причина падения прогона 38136961509 (json.loads от «{»).
+          grids = [
+              p
+              for p in downloaded
+              if p.name.startswith(("grid_", "features_grid_"))
+              and (p.suffix == ".jsonl" or p.name.endswith(".jsonl.gz"))
+          ]
+          note(f"файлов в артефакте: {len(downloaded)}, JSONL-кешей сетки: {len(grids)}")
+          for path in grids:
+              note(f"{path.relative_to(root)} — {path.stat().st_size} Б")
+          if not grids:
+              for path in downloaded[:12]:
+                  note(f"содержимое артефакта: {path.relative_to(root)}")
+              raise SystemExit("в артефакте нет grid_*.jsonl[.gz]: кеш не там, где ожидалось")
+
+          dest = Path("spanverify-module/reports/hf-cache-a3")
+          dest.mkdir(parents=True, exist_ok=True)
+          # Плоско и только кеш: вложенность каталога артефакта — типичная причина
+          # «файл есть, а glob его не видит».
+          for path in grids:
+              shutil.copy2(path, dest / path.name)
+          note(f"складываем в {dest}: {sorted(p.name for p in dest.iterdir())}")
+
+          sample = grids[0]
+          opener = gzip.open if sample.name.endswith(".gz") else open
+          with opener(sample, "rt", encoding="utf-8") as handle:
+              first = json.loads(handle.readline())
+          note(
+              "первая строка кеша: keys="
+              + ",".join(sorted(first))
+              + f" grid_format={first.get('grid_format')} model={first.get('model')}"
+          )
+
+          cache = {}
+          for path in grids:
+              op = gzip.open if path.name.endswith(".gz") else open
+              with op(path, "rt", encoding="utf-8") as handle:
+                  for line in handle:
+                      if not line.strip():
+                          continue
+                      row = json.loads(line)
+                      cache[str(row.get("pair_id") or row.get("key") or "")] = row
+          note(f"уникальных pair_id в кеше: {len(cache)}")
+
+          val = Path("spanverify-module/data/corpus_a3/splits/dev.jsonl")
+          if not val.is_file():
+              val = Path("spanverify-module/data/corpus_a3/splits/val.jsonl")
+          if val.is_file():
+              ids = []
+              for line in val.read_text(encoding="utf-8").splitlines():
+                  if line.strip():
+                      ids.append(str(json.loads(line).get("id")))
+              missing = [item for item in ids if item not in cache]
+              note(f"файл валидации: {val.name}, пар {len(ids)}, нет в кеше: {len(missing)}")
+              if missing:
+                  note(f"пример отсутствующих id: {missing[:5]}")
+          else:
+              note("файл валидации не найден — скрипт измерения сообщит об этом сам")
+          PY
+          set -o pipefail
+          if python3 "$RUNNER_TEMP/diag_cache.py" 2>&1 | tee "$RUNNER_TEMP/diag_cache.log"; then
+            :
+          else
+            tail -n 25 "$RUNNER_TEMP/diag_cache.log" | sed 's/^[[:space:]]*//' | while IFS= read -r line; do
+              printf '::error title=сбой диагностики::%s\n' "$line"
+            done
+            exit 1
+          fi
+
+      - name: "Измерить знак, операционную точку и вклад семейств (только val)"
+        working-directory: spanverify-module
+        timeout-minutes: 30
+        run: |
+          echo "команда: python3 scripts/feature_sign_check.py --grid-cache reports/hf-cache-a3 --splits data/corpus_a3/splits --bootstrap 5000 --seed 42 --annotate --out-json reports/hf_protocol/feature_signs_a3dev.json --out-md reports/hf_protocol/feature_signs_a3dev.md (кеш — прогон $RUN_ID)"
+          echo "команда: python3 scripts/val_diagnostics.py --grid-cache reports/hf-cache-a3 --splits data/corpus_a3/splits --config config/hf_experiments.json --baseline $BASELINE --annotate --out-json reports/hf_protocol/val_diagnostics.json --out-md reports/hf_protocol/val_diagnostics.md"
+          set -o pipefail
+          if python3 scripts/feature_sign_check.py \
+            --grid-cache reports/hf-cache-a3 \
+            --splits data/corpus_a3/splits \
+            --bootstrap 5000 \
+            --seed 42 \
+            --annotate \
+            --out-json reports/hf_protocol/feature_signs_a3dev.json \
+            --out-md reports/hf_protocol/feature_signs_a3dev.md 2>&1 | tee /tmp/signs.log; then
+            :
+          else
+            # Последние строки ошибки — в аннотации: журнал сборки отсюда не читается.
+            tail -n 25 /tmp/signs.log | sed 's/^[[:space:]]*//' | while IFS= read -r line; do
+              printf '::error title=сбой измерения::%s\n' "$line"
+            done
+            exit 1
+          fi
+
+          # Диагностика — тот же кеш и та же val; отдельный `if`, чтобы сбой одного
+          # замера не прятал вывод другого (журнал сборки отсюда не читается).
+          if python3 scripts/val_diagnostics.py \
+            --grid-cache reports/hf-cache-a3 \
+            --splits data/corpus_a3/splits \
+            --config config/hf_experiments.json \
+            --baseline "$BASELINE" \
+            --annotate \
+            --out-json reports/hf_protocol/val_diagnostics.json \
+            --out-md reports/hf_protocol/val_diagnostics.md 2>&1 | tee /tmp/diag.log; then
+            :
+          else
+            tail -n 25 /tmp/diag.log | sed 's/^[[:space:]]*//' | while IFS= read -r line; do
+              printf '::error title=сбой диагностики::%s\n' "$line"
+            done
+            exit 1
+          fi
+
+      - name: "Таблица в лог (чтобы её видно было в аннотациях и в отчёте прогона)"
+        if: always()
+        working-directory: spanverify-module
+        run: |
+          if [ -f reports/hf_protocol/feature_signs_a3dev.md ]; then
+            cat reports/hf_protocol/feature_signs_a3dev.md
+            cat reports/hf_protocol/val_diagnostics.md || echo "::warning title=нет диагностики::val_diagnostics.md не создан"
+          else
+            echo "::error title=нет таблицы::файл feature_signs_a3dev.md не создан"
+            exit 1
+          fi
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: val-diagnostics-a3dev
+          path: |
+            spanverify-module/reports/hf_protocol/feature_signs_a3dev.json
+            spanverify-module/reports/hf_protocol/feature_signs_a3dev.md
+            spanverify-module/reports/hf_protocol/val_diagnostics.json
+            spanverify-module/reports/hf_protocol/val_diagnostics.md
+          if-no-files-found: warn
+          retention-days: 90
+
+      - name: "Коммит чисел в ветку"
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -- spanverify-module/reports/hf_protocol/feature_signs_a3dev.json spanverify-module/reports/hf_protocol/feature_signs_a3dev.md spanverify-module/reports/hf_protocol/val_diagnostics.json spanverify-module/reports/hf_protocol/val_diagnostics.md
+          if git diff --cached --quiet; then
+            echo "нечего коммитить"
+            exit 0
+          fi
+          git commit -m "числа: диагностика val — знак, операционная точка, семейства, seed'ы (кеш прогона $RUN_ID) [skip ci]"
+          git push origin "HEAD:${GITHUB_REF_NAME}"
+          echo "запушено в ${GITHUB_REF_NAME}"
