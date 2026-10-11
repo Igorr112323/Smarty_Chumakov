@@ -436,7 +436,14 @@ jobs:
           TARGET: ${{ inputs.target_docs || '1800' }}
         run: |
           set -o pipefail
-          before=${BEFORE:-0}; after=${AFTER:-0}; target=${TARGET:-1800}
+          # Пустой выход archive — это НЕ «нулевой прогресс», а сломанная передача
+          # outputs: молча останавливать цепочку в этом случае нельзя (именно так
+          # четыре волны и не запросили следующую: job завершался за 1–2 секунды).
+          if [ -z "${BEFORE:-}" ] || [ -z "${AFTER:-}" ]; then
+            echo "::error::[corpus-v2] цепочка не получила before/after из job «Архив волны» (before=«${BEFORE:-}», after=«${AFTER:-}») — отличить «документов нет» от «числа не доехали» нельзя, останавливаемся с ошибкой" >&2
+            exit 1
+          fi
+          before=$BEFORE; after=$AFTER; target=${TARGET:-1800}
           waves=$(curl -s -H "Authorization: Bearer $GITHUB_TOKEN" \
             "https://api.github.com/repos/$GITHUB_REPOSITORY/git/trees/data/corpus-v2-raw?recursive=1" \
             | jq -r '.tree[]? | select(.path | startswith("reports-wave-"))' | wc -l)
@@ -520,5 +527,21 @@ jobs:
           fi
           echo "коммит цепочки: $(echo "$staged" | tr '\n' ' ') — только текстовые счётчики" >> "$GITHUB_STEP_SUMMARY"
           git commit -qm "корпус v2: запрос волны $((waves + 1)) (документов $after из $target)"
-          git push -f -q origin "HEAD:$branch"
+          git push -f origin "HEAD:$branch" 2>&1 | tail -3
+          # Push push'ом расходится: коммит, сделанный GITHUB_TOKEN, по правилам GitHub
+          # не порождает новый прогон. Поэтому результат проверяется явно, а не «на веру».
+          pushed=$(git rev-parse HEAD)
+          remote=$(git ls-remote origin "refs/heads/$branch" | cut -f1)
+          {
+            echo
+            echo "* коммит запроса: \`$pushed\`"
+            echo "* вершина \`$branch\` на remote: \`${remote:-нет}\`"
+            echo "* волна считается запрошенной только если вершины совпадают; если run не"
+            echo "  появился — нужен коммит-бамп \`.github/corpus-v2.trigger\` от токена, который"
+            echo "  запускает workflow (обычно — руками или PAT заказчика)."
+          } >> "$GITHUB_STEP_SUMMARY"
+          if [ "$remote" != "$pushed" ]; then
+            echo "::error::[corpus-v2] ветка-счётчик не двинулась (ожидался $pushed, на remote «${remote:-нет}») — следующая волна НЕ запрошена" >&2
+            exit 1
+          fi
           echo "запрошена волна $((waves + 1)): документов $after из $target" | tee -a "$GITHUB_STEP_SUMMARY"

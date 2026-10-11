@@ -296,3 +296,29 @@ def test_freeze_accepts_an_approved_mode_and_records_it(tmp_path: Path, capsys) 
     payload = json.loads((tmp_path / "отчёт" / "freeze.json").read_text(encoding="utf-8"))
     assert payload["corpus_status"]["mode_approved_by_customer"] is True
     assert not any("не подтверждён заказчиком" in problem for problem in payload["problems"])
+
+
+def test_chain_fails_instead_of_guessing_about_missing_outputs() -> None:
+    """Пустые `before/after` — ошибка, а не «нулевой прогресс»: иначе цепочка молча умирает."""
+    text = WORKFLOW.read_text(encoding="utf-8")
+    assert 'if [ -z "${BEFORE:-}" ] || [ -z "${AFTER:-}" ]' in text
+    assert "числа не доехали" in text, "сообщение об ошибке обязано называть различие двух случаев"
+
+
+def test_chain_verifies_that_the_counter_branch_moved() -> None:
+    """Push без проверки — это «успешный» job, который ничего не запросил."""
+    text = WORKFLOW.read_text(encoding="utf-8")
+    assert 'git ls-remote origin "refs/heads/$branch"' in text
+    assert 'if [ "$remote" != "$pushed" ]' in text
+    assert "следующая волна НЕ запрошена" in text
+    assert "GITHUB_TOKEN" in text, "в summary обязано быть правило про токен, не порождающий прогоны"
+
+
+def test_numbers_doc_records_the_withdrawn_chain_claim() -> None:
+    """Снятое заявление обязано оставаться снятым в документе с числами."""
+    text = (ROOT / "docs" / "ЧИСЛА_v2.md").read_text(encoding="utf-8")
+    assert "автоцепочка не работала" in text.lower()
+    corpus = (ROOT / "docs" / "CORPUS_v2.md").read_text(encoding="utf-8")
+    assert "Автоцепочка волн: измеренное состояние — не работала" in corpus, "раздел с состоянием цепочки обязАН быть"
+    assert "ни одного от счётчика" in corpus, "документ обязан содержать проверяемую формулировку факта"
+    assert "точная причина не установлена" in corpus, "нельзя фиксировать причину, которую не видели"

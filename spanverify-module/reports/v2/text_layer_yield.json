@@ -1,5 +1,5 @@
 {
-  "sources": "spanverify-module/data/corpus_a3/sources/sources.json",
+  "sources": "data/corpus_a3/sources/sources.json",
   "hosts_filter": [],
   "min_chars_per_page": 500,
   "definition_by_method": "поле extraction (метод извлечения) не содержит подстроки ocr",
@@ -218,6 +218,109 @@
         "share_by_method": 1.0,
         "ci95_by_method": [
           0.972725,
+          1.0
+        ],
+        "docs_with_usable_layer_chars": 0
+      }
+    }
+  },
+  "sample": {
+    "size": 100,
+    "seed": 20261011
+  },
+  "sampled": {
+    "n_records_in_manifest": 100,
+    "n_scored": 100,
+    "n_without_method": 0,
+    "docs_with_text_layer": 36,
+    "share_by_method": 0.36,
+    "ci95_by_method": [
+      0.272712,
+      0.457646
+    ],
+    "docs_with_usable_layer_chars": 2,
+    "share_by_layer_chars": 0.02,
+    "ci95_by_layer_chars": [
+      0.005502,
+      0.070012
+    ],
+    "by_act_type": {
+      "Закон": {
+        "n": 1,
+        "docs_with_text_layer": 0,
+        "share_by_method": 0.0,
+        "ci95_by_method": [
+          0.0,
+          0.793451
+        ],
+        "docs_with_usable_layer_chars": 0
+      },
+      "Положение": {
+        "n": 3,
+        "docs_with_text_layer": 0,
+        "share_by_method": 0.0,
+        "ci95_by_method": [
+          0.0,
+          0.561497
+        ],
+        "docs_with_usable_layer_chars": 0
+      },
+      "Постановление": {
+        "n": 29,
+        "docs_with_text_layer": 1,
+        "share_by_method": 0.034483,
+        "ci95_by_method": [
+          0.006113,
+          0.171755
+        ],
+        "docs_with_usable_layer_chars": 1
+      },
+      "Приказ": {
+        "n": 20,
+        "docs_with_text_layer": 1,
+        "share_by_method": 0.05,
+        "ci95_by_method": [
+          0.008881,
+          0.236131
+        ],
+        "docs_with_usable_layer_chars": 1
+      },
+      "Распоряжение": {
+        "n": 2,
+        "docs_with_text_layer": 0,
+        "share_by_method": 0.0,
+        "ci95_by_method": [
+          0.0,
+          0.65762
+        ],
+        "docs_with_usable_layer_chars": 0
+      },
+      "Указ": {
+        "n": 6,
+        "docs_with_text_layer": 0,
+        "share_by_method": 0.0,
+        "ci95_by_method": [
+          0.0,
+          0.390334
+        ],
+        "docs_with_usable_layer_chars": 0
+      },
+      "Федеральный закон": {
+        "n": 5,
+        "docs_with_text_layer": 0,
+        "share_by_method": 0.0,
+        "ci95_by_method": [
+          0.0,
+          0.434482
+        ],
+        "docs_with_usable_layer_chars": 0
+      },
+      "метаданные не перенесены": {
+        "n": 34,
+        "docs_with_text_layer": 34,
+        "share_by_method": 1.0,
+        "ci95_by_method": [
+          0.898485,
           1.0
         ],
         "docs_with_usable_layer_chars": 0
