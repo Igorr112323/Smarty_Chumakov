@@ -69,18 +69,13 @@ jobs:
 
       - name: "Разложить кеш и сообщить, что в нём"
         # Диагностика обязана быть в аннотациях: загрузка журналов сборки из этой среды
-        # недоступна (blob.core.windows.net), а без неё прогон непонятно почему упавший
-        # превращается в «не проверено». Шаг ничего не решает за скрипт измерения: он
-        # раскладывает файлы и печатает факты о их форме.
+        # недоступна (result-хост вне списка разрешённых хостов), а прогон, который непонятно
+        # почему упал, превращается в «не проверено». Шаг ничего не решает за скрипт измерения:
+        # он раскладывает файлы и печатает факты об их форме. Скрипт пишется в файл и
+        # вызывается один раз: heredoc внутри «if ! … | tee» ломает разбор (прогон 38137103728
+        # упал с exit 2 и без единой строки вывода).
         run: |
-          set -o pipefail
-          if ! python3 - << 'PY' 2>&1 | tee "$RUNNER_TEMP/diag.log"; then
-            tail -n 25 "$RUNNER_TEMP/diag.log" | sed 's/^[[:space:]]*//' | while IFS= read -r line; do
-              printf '::error title=сбой диагностики::%s\n' "$line"
-            done
-            exit 1
-          fi
-          python3 - << 'PY'
+          cat > "$RUNNER_TEMP/diag_cache.py" << 'PY'
           import gzip
           import json
           import shutil
@@ -89,45 +84,49 @@ jobs:
           def note(text):
               print(f"::notice title=диагностика кеша::{text}")
 
-          downloaded = sorted(p for p in Path("/tmp/signs-dl").rglob("*") if p.is_file())
-          # Только JSONL-строки кеша: рядом лежат grid_summary_*.json (сводки шардов), и чтение
-          # их как кеша — источник падения прогона 38136961509 (json.loads от «{»).
+          root = Path("/tmp/signs-dl")
+          downloaded = sorted(p for p in root.rglob("*") if p.is_file())
+          # Только JSONL-строки кеша: рядом лежат сводки grid_summary_*.json, и попытка прочитать
+          # их как кеш — причина падения прогона 38136961509 (json.loads от «{»).
           grids = [
               p
               for p in downloaded
               if p.name.startswith(("grid_", "features_grid_"))
               and (p.suffix == ".jsonl" or p.name.endswith(".jsonl.gz"))
           ]
-          note(f"файлов в артефакте: {len(downloaded)}, из них кешей сетки: {len(grids)}")
-          for path in grids[:6]:
-              note(f"{path.relative_to('/tmp/signs-dl')} — {path.stat().st_size} Б")
+          note(f"файлов в артефакте: {len(downloaded)}, JSONL-кешей сетки: {len(grids)}")
+          for path in grids:
+              note(f"{path.relative_to(root)} — {path.stat().st_size} Б")
           if not grids:
-              for path in downloaded[:10]:
-                  note(f"первый уровень артефакта: {path.relative_to('/tmp/signs-dl')}")
-              raise SystemExit("в артефакте нет файлов grid_*.jsonl[.gz]: кеш не там, где ожидалось")
+              for path in downloaded[:12]:
+                  note(f"содержимое артефакта: {path.relative_to(root)}")
+              raise SystemExit("в артефакте нет grid_*.jsonl[.gz]: кеш не там, где ожидалось")
 
           dest = Path("spanverify-module/reports/hf-cache-a3")
           dest.mkdir(parents=True, exist_ok=True)
-          # Кладём плоско и только кеш: вложенность каталога артефакта — типичная причина
+          # Плоско и только кеш: вложенность каталога артефакта — типичная причина
           # «файл есть, а glob его не видит».
           for path in grids:
               shutil.copy2(path, dest / path.name)
           note(f"складываем в {dest}: {sorted(p.name for p in dest.iterdir())}")
 
           sample = grids[0]
-          opener = gzip.open if sample.suffix == ".gz" else open
+          opener = gzip.open if sample.name.endswith(".gz") else open
           with opener(sample, "rt", encoding="utf-8") as handle:
               first = json.loads(handle.readline())
           note(
               "первая строка кеша: keys="
-              + ",".join(sorted(first.keys()))
+              + ",".join(sorted(first))
               + f" grid_format={first.get('grid_format')} model={first.get('model')}"
           )
+
           cache = {}
           for path in grids:
-              op = gzip.open if path.suffix == ".gz" else open
+              op = gzip.open if path.name.endswith(".gz") else open
               with op(path, "rt", encoding="utf-8") as handle:
                   for line in handle:
+                      if not line.strip():
+                          continue
                       row = json.loads(line)
                       cache[str(row.get("pair_id") or row.get("key") or "")] = row
           note(f"уникальных pair_id в кеше: {len(cache)}")
@@ -137,18 +136,25 @@ jobs:
               val = Path("spanverify-module/data/corpus_a3/splits/val.jsonl")
           if val.is_file():
               ids = []
-              with open(val, "r", encoding="utf-8") as handle:
-                  for line in handle:
-                      line = line.strip()
-                      if line:
-                          ids.append(str(json.loads(line).get("id")))
-              missing = [i for i in ids if i not in cache]
+              for line in val.read_text(encoding="utf-8").splitlines():
+                  if line.strip():
+                      ids.append(str(json.loads(line).get("id")))
+              missing = [item for item in ids if item not in cache]
               note(f"файл валидации: {val.name}, пар {len(ids)}, нет в кеше: {len(missing)}")
               if missing:
                   note(f"пример отсутствующих id: {missing[:5]}")
           else:
               note("файл валидации не найден — скрипт измерения сообщит об этом сам")
           PY
+          set -o pipefail
+          if python3 "$RUNNER_TEMP/diag_cache.py" 2>&1 | tee "$RUNNER_TEMP/diag_cache.log"; then
+            :
+          else
+            tail -n 25 "$RUNNER_TEMP/diag_cache.log" | sed 's/^[[:space:]]*//' | while IFS= read -r line; do
+              printf '::error title=сбой диагностики::%s\n' "$line"
+            done
+            exit 1
+          fi
 
       - name: "Измерить знак и AUC по каждому признаку (только val)"
         working-directory: spanverify-module
