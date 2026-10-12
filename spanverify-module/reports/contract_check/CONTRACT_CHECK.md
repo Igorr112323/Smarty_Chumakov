@@ -231,7 +231,9 @@ MemAvailable 3 930,3 МБ (свободно на 07:02 UTC, до фоновых 
 |---|---|---|
 | `d39c95c` | `main` | Проверяемое состояние (`Merge pull request #2 from Igorr112323/arena/316d8fab-smarty-chumakov`, 2026-10-07 18:33 +0300). Изменений нет |
 | `3d5dc87` | `arena/cd51890b-smarty-chumakov` | **Код**: `spanverify-module/scripts/measure_latency.py` и `spanverify-module/tests/test_measure_latency.py` — измеритель времени ответа и пика памяти (3 теста). Признаки, веса, пороги, разметку не касается |
-| (следующий за ним) | `arena/cd51890b-smarty-chumakov` | **Отчёты**: каталог `spanverify-module/reports/contract_check/` (этот файл, `quality_A.json`, `quality_A3.json`, `latency.json`, `tests.md`, `quality_summary.md`, `resources.md`), перегенерированные `spanverify-module/reports/METRICS.json` и `reports/COUNTERS.json`, блоки счётчиков в `README.md`, `spanverify-module/README.md`, `ИТОГ.md`, `docs/ОТЧЁТ_по_договору.md`, `docs/ОТЧЁТ_по_НИР_шаблон.md`, `docs/ПРИЗНАКИ.md` |
+| `d446533` | `arena/cd51890b-smarty-chumakov` | **Отчёты**: каталог `spanverify-module/reports/contract_check/` (этот файл, `README.md` каталога, `quality_A.json`, `quality_A3.json`, `latency.json`, `tests.md`, `quality_summary.md`, `resources.md`), перегенерированные `spanverify-module/reports/METRICS.json` и `reports/COUNTERS.json`, блоки счётчиков в `README.md`, `spanverify-module/README.md`, `ИТОГ.md`, `docs/ОТЧЁТ_по_договору.md`, `docs/ОТЧЁТ_о_НИР_шаблон.md`, `docs/ПРИЗНАКИ.md` |
+| `873d4ba` | `arena/cd51890b-smarty-chumakov` | **Отчёт**: правка шапки этого файла — опечатка, восстановлено начало фразы про снапшот, `MemAvailable` 3 669 МБ (снято после фонового прогона тестов) заменено на 3 930,3 МБ (снято до прогонов); отметки и числа метрик не тронуты |
+| (этот коммит) | `arena/cd51890b-smarty-chumakov` | **Отчёт**: исправлена ссылка на `docs/ГОСТ/19.602_Формуляр.md` (такого файла в `d39c95c` нет) — заменена на `docs/ОТЧЁТ_о_НИР_шаблон.md:223`, и обновлена таблица коммитов ниже |
 
 `origin/main` не тронут. Код и отчёты — два разных коммита, как требует задание.
 
