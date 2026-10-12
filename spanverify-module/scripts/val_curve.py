@@ -190,6 +190,11 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--out", default="reports/hf_protocol/val_curve.json")
     parser.add_argument("--fpr-cap", type=float, default=hf_protocol.CRITERION_FPR)
     parser.add_argument("--criterion-f1", type=float, default=hf_protocol.CRITERION_F1)
+    parser.add_argument(
+        "--full-json",
+        action="store_true",
+        help="положить в JSON ВСЮ кривую (7 953 точки): для локального разбора, в репозитории не хранить",
+    )
     args = parser.parse_args(argv)
 
     predictions = (MODULE_ROOT / args.predictions).resolve()
@@ -301,9 +306,10 @@ def main(argv: list[str] | None = None) -> int:
             "кривая построена по val; «oracle» — максимум F1 без ограничения по FPR, измеренный на той же "
             "выборке, поэтому он не результат, а верхняя граница того, что вообще даёт этот скор"
         ),
-        "curve_full": scan["curve"],
         "checks": scan["checks"],
     }
+    if args.full_json:
+        payload["curve_full"] = scan["curve"]
     out_path.parent.mkdir(parents=True, exist_ok=True)
     out_path.write_text(json.dumps(payload, ensure_ascii=False, indent=1), encoding="utf-8")
 
