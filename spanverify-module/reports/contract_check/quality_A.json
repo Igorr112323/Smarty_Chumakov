@@ -1,0 +1,346 @@
+{
+ "corpus": "corpus_a1_synthetic",
+ "metrics_key_in_METRICS_json": "corpus_a",
+ "dataset": "data/corpus_a/pairs.jsonl",
+ "mode": "hf",
+ "model": "ai-forever/rugpt3small_based_on_gpt2",
+ "seed": 42,
+ "git_commit_of_run": "39a0ad4858f7278335b9f0ef94bc405485a78b4a",
+ "ci_run_id": "37609202780",
+ "duration_s": 84.68,
+ "pairs_total": 1200,
+ "splits": {
+  "source": "data/corpus_a/splits",
+  "sizes": {
+   "train": 840,
+   "dev": 180,
+   "test": 180
+  },
+  "rule": "порог и маска выбраны только на официальной обучающей части; тест в выборе не участвовал"
+ },
+ "shared_groups": 0,
+ "dataset_sha256_pairs": "734c89159f4a828d63e2d99a27fcac830bf435f8a5bf822ff5f6819cf09e6c6e",
+ "balance_counts": {
+  "faithful": 566,
+  "contradiction": 148,
+  "partial": 129,
+  "number_attribution": 93,
+  "unconfirmed": 83,
+  "missing": 57,
+  "oversight": 59,
+  "excess": 65
+ },
+ "documents": {
+  "count": 60,
+  "synthetic": true
+ },
+ "checked_on": {
+  "code_commit_under_check": "d39c95c",
+  "measured_at": "2026-10-12",
+  "note": "числа скопированы из закоммиченных артефактов прогона CI 37609202780 (коммит 39a0ad4); повторить hf на d39c95c в песочнице нельзя: нет torch/transformers, кеша признаков в дереве нет, huggingface.co вне белого списка сети"
+ },
+ "held_out_official_test": {
+  "pairs": 180,
+  "tokens": {
+   "precision": 0.7765,
+   "recall": 0.5,
+   "f1": 0.6083,
+   "fpr": 0.0237,
+   "auc": 0.9095,
+   "tp": 132,
+   "fp": 38,
+   "fn": 132,
+   "tn": 1566
+  },
+  "spans": {
+   "strict_f1_iou_0_5": 0.5896,
+   "coverage": 0.5152,
+   "soft_f1_expanded": 0.1156,
+   "mean_width_ratio": 1.08
+  },
+  "answers": {
+   "threshold": 1.0,
+   "precision": 1.0,
+   "recall": 0.1212,
+   "f1": 0.2162,
+   "fpr": 0.0,
+   "auc": 0.6699
+  },
+  "verdicts": {
+   "tp": 49,
+   "fp": 6,
+   "fn": 50,
+   "tn": 75,
+   "precision": 0.8909,
+   "recall": 0.4949,
+   "f1": 0.6364,
+   "fpr": 0.0741,
+   "flagged_share": 0.3056
+  }
+ },
+ "whole_corpus": {
+  "tokens": {
+   "precision": 0.7444061962134251,
+   "recall": 0.516726403823178,
+   "f1": 0.6100141043723555,
+   "fpr": 0.0267639902676399,
+   "tp": 865,
+   "fp": 297,
+   "fn": 809,
+   "tn": 10800,
+   "auc": 0.9073316122227918
+  },
+  "spans": {
+   "precision": 0.6963906581740976,
+   "recall": 0.5173501577287066,
+   "f1": 0.5936651583710406,
+   "tp": 328,
+   "fp": 143,
+   "fn": 306,
+   "iou_threshold": 0.5,
+   "recall_containment": 0.5220820189274448,
+   "f1_expanded_labels": 0.1592760180995475,
+   "mean_width_ratio": 1.1375126297378602
+  },
+  "answers": {
+   "threshold": 1.0,
+   "precision": 1.0,
+   "recall": 0.14826498422712933,
+   "f1": 0.2582417582417582,
+   "fpr": 0.0,
+   "auc": 0.675767185740879,
+   "tp": 94,
+   "fp": 0,
+   "fn": 540,
+   "tn": 566
+  }
+ },
+ "contract_criterion": {
+  "required": {
+   "f1_min": 0.5,
+   "fpr_max": 0.4,
+   "iou": 0.5
+  },
+  "source_of_requirement": "Приложение 3, п. 4.1 (6)",
+  "f1_held_out": 0.6083,
+  "fpr_held_out": 0.0237,
+  "f1_met": true,
+  "fpr_met": true,
+  "verdict": "достигнуто",
+  "answer_level_fpr_held_out": 0.0741
+ },
+ "internal_gate": {
+  "required": {
+   "f1_min": 0.9,
+   "fpr_max": 0.1,
+   "source": "spanverify-module/scripts/run_experiments.py:220"
+  },
+  "value_whole_corpus": "НЕ достигнут",
+  "value_held_out": "НЕ достигнут"
+ },
+ "by_type_held_out": {
+  "contradiction": {
+   "pairs": 26,
+   "token_precision": 0.1429,
+   "token_recall": 0.0217,
+   "token_f1": 0.0377,
+   "span_coverage": 0.3077,
+   "verdict_recall": 0.2692,
+   "verdict_fpr": 0.0
+  },
+  "excess": {
+   "pairs": 14,
+   "token_precision": 1.0,
+   "token_recall": 0.7671,
+   "token_f1": 0.8682,
+   "span_coverage": 1.0,
+   "verdict_recall": 1.0,
+   "verdict_fpr": 0.0
+  },
+  "faithful": {
+   "pairs": 81,
+   "token_precision": 0.0,
+   "token_recall": 0.0,
+   "token_f1": 0.0,
+   "span_coverage": 0.0,
+   "verdict_recall": 0.0,
+   "verdict_fpr": 0.0741
+  },
+  "missing": {
+   "pairs": 10,
+   "token_precision": 0.0,
+   "token_recall": 0.0,
+   "token_f1": 0.0,
+   "span_coverage": 0.0,
+   "verdict_recall": 0.0,
+   "verdict_fpr": 0.0
+  },
+  "number_attribution": {
+   "pairs": 13,
+   "token_precision": 0.0,
+   "token_recall": 0.0,
+   "token_f1": 0.0,
+   "span_coverage": 0.5385,
+   "verdict_recall": 0.5385,
+   "verdict_fpr": 0.0
+  },
+  "oversight": {
+   "pairs": 11,
+   "token_precision": 1.0,
+   "token_recall": 0.9091,
+   "token_f1": 0.9524,
+   "span_coverage": 1.0,
+   "verdict_recall": 1.0,
+   "verdict_fpr": 0.0
+  },
+  "partial": {
+   "pairs": 15,
+   "token_precision": 1.0,
+   "token_recall": 0.0345,
+   "token_f1": 0.0667,
+   "span_coverage": 0.0667,
+   "verdict_recall": 0.0,
+   "verdict_fpr": 0.0
+  },
+  "unconfirmed": {
+   "pairs": 10,
+   "token_precision": 1.0,
+   "token_recall": 0.9565,
+   "token_f1": 0.9778,
+   "span_coverage": 1.0,
+   "verdict_recall": 1.0,
+   "verdict_fpr": 0.0
+  }
+ },
+ "bundle": {
+  "weights": {
+   "attention_entropy": 0.0,
+   "ctx_attention_mass": 1.0,
+   "embedding_density": 0.0
+  },
+  "threshold": 1.0,
+  "target_fpr": 0.1,
+  "span_z": 0.0,
+  "span_floor": 0.35,
+  "span_cap": 0.5,
+  "isotonic": {
+   "x": [
+    0.165706,
+    0.167936,
+    0.183746,
+    0.266856,
+    0.297779,
+    0.432972,
+    0.442715,
+    0.545278
+   ],
+   "y": [
+    0.33871,
+    0.363636,
+    0.454545,
+    0.529412,
+    0.607143,
+    0.697674,
+    1.0,
+    1.0
+   ]
+  },
+  "head": {
+   "type": "logreg",
+   "file": "config/head.json",
+   "model": {
+    "weights": [
+     0.6707395823084761,
+     -0.025947669571916646,
+     -1.1014479417512626,
+     0.025947669571922464,
+     1.8757997971080909,
+     -0.7500195553917404
+    ],
+    "bias": -3.2050517976303294
+   },
+   "scaler": {
+    "means": [
+     0.6830069214023482,
+     0.8582376139016588,
+     0.7856825688205419,
+     0.14176238609834138,
+     0.43240533465993075,
+     0.38544589178357125
+    ],
+    "scales": [
+     0.06671512834690922,
+     0.06639149207542311,
+     0.09280288750581217,
+     0.06639149207542315,
+     0.28820104145443126,
+     0.1474958585907626
+    ]
+   }
+  },
+  "folds": [
+   {
+    "fold": 0,
+    "n_train": 4791,
+    "n_test": 1197,
+    "auc": 0.8927170624198428
+   },
+   {
+    "fold": 1,
+    "n_train": 4791,
+    "n_test": 1197,
+    "auc": 0.9048811414519187
+   },
+   {
+    "fold": 2,
+    "n_train": 4791,
+    "n_test": 1197,
+    "auc": 0.899943644653927
+   },
+   {
+    "fold": 3,
+    "n_train": 4791,
+    "n_test": 1197,
+    "auc": 0.9199053714917229
+   },
+   {
+    "fold": 4,
+    "n_train": 4788,
+    "n_test": 1200,
+    "auc": 0.9102187664256067
+   }
+  ],
+  "seed": 42,
+  "version": "1.3.0",
+  "mode": "hf",
+  "meta": {
+   "dataset": "data/corpus_a/pairs.jsonl (официальная обучающая часть)",
+   "synthetic": false,
+   "signal": "logreg",
+   "threshold_report": {
+    "threshold": 1.0,
+    "precision": 1.0,
+    "recall": 0.17,
+    "f1": 0.2905982905982906,
+    "fpr": 0.0,
+    "hdr": 1.0,
+    "accuracy": 0.5592920353982301,
+    "tp": 51.0,
+    "fp": 0.0,
+    "tn": 265.0,
+    "fn": 249.0,
+    "constraint_met": 1.0
+   },
+   "note": "Демонстрационный корпус: параметры проверяют конвейер, а не качество на реальных документах. Для боевой калибровки используйте размеченные реальные пары в режиме hf.",
+   "participation": {
+    "type": "participation-logreg",
+    "auc_out_of_fold": 0.0,
+    "calibrated_on": "пропущено: кеш признаков не содержит корпус участия"
+   }
+  }
+ },
+ "provenance_files": [
+  "spanverify-module/reports/experiments/a/experiment.json",
+  "spanverify-module/reports/METRICS.json"
+ ]
+}
