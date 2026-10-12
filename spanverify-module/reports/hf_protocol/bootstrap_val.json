@@ -1,0 +1,43 @@
+{
+ "documents": 181,
+ "tokens": 7969,
+ "reps": 1000,
+ "seed": 42,
+ "point_f1": 0.515702,
+ "ci95_f1": [
+  0.39641,
+  0.635043
+ ],
+ "mean_f1": 0.514074,
+ "std_f1": 0.061905,
+ "ci95_precision": [
+  0.329359,
+  0.697371
+ ],
+ "ci95_recall": [
+  0.440457,
+  0.634289
+ ],
+ "point_precision": 0.490566,
+ "point_recall": 0.543554,
+ "confusion": {
+  "tp": 156,
+  "fp": 162,
+  "fn": 131
+ },
+ "protocol": "bootstrap-ci-v1",
+ "sample": "val (A3 dev)",
+ "threshold": 0.1106,
+ "threshold_source": "манифест manifest_val.json",
+ "seeds_included": [
+  42
+ ],
+ "seeds_collapse_note": "все seed'ы дали одинаковую метрику (std = 0), поэтому взят один: 5 копий той же оценки не являются пятью измерениями и сузили бы интервал искусственно",
+ "estimator": "бутстрап по документам (выбор документов с возвращением), метрика — по токенам пула",
+ "threshold_fixed": true,
+ "manifest_cross_check": {
+  "recorded_f1": 0.515702,
+  "recomputed_f1": 0.515702,
+  "abs_расхождение": 0.0
+ }
+}

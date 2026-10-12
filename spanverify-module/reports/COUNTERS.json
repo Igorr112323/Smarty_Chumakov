@@ -1,0 +1,18 @@
+{
+ "tests": {
+  "collected": 768,
+  "files": 66,
+  "command": "/usr/bin/python3 -m pytest --collect-only -q (сумма по строкам «файл: число»)",
+  "metrics_json": 768
+ },
+ "formatting": {
+  "black_files": 161,
+  "command": "black --check ."
+ },
+ "documents": {
+  "checked": 14,
+  "consistent": true,
+  "command": "/usr/bin/python3 scripts/check_numbers.py"
+ },
+ "note": "число тестов в `tests.collected` того же файла `reports/METRICS.json` обязано совпасть с `collected` здесь: METRICS.json обновляется `scripts/collect_metrics.py`"
+}

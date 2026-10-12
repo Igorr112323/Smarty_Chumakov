@@ -218,7 +218,16 @@ def test_audit_records_hash_not_answer_text(server: dict[str, object]) -> None:
 
 
 def test_metrics_endpoint_exposes_contract_names(server: dict[str, object]) -> None:
-    """/metrics содержит все имена из контракта и корректный текст Prometheus."""
+    """`/metrics` содержит все имена из контракта и корректный текст Prometheus.
+
+    Проверка не зависит от порядка запуска: перед `/metrics` выполняется один запрос к
+    `/v1/verify`, чтобы у гистограммы задержки было наблюдение.
+    """
+    # Первый запрос к /v1/verify обязателен, а не косметика: гистограмма задержки не публикует
+    # строк _bucket, пока не появилось ни одного наблюдения. Без него тест проходит только тогда,
+    # когда перед ним в этом же файле уже был вызов сервиса, — при запуске `pytest -k metrics` он
+    # падал. Проверка не должна зависеть от порядка запуска и от алфавита имён тестов.
+    _call(server, "/v1/verify", key=OPERATOR_KEY, body={"answer": ANSWER, "context": CONTEXT})
     status, text = _call(server, "/metrics", key=VIEWER_KEY)
     assert status == 200
     for name in metric_names():
