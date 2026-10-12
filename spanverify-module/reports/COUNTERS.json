@@ -1,13 +1,14 @@
 {
  "tests": {
-  "collected": 768,
+  "collected": 769,
   "files": 66,
   "command": "/usr/bin/python3 -m pytest --collect-only -q (сумма по строкам «файл: число»)",
-  "metrics_json": 768
+  "metrics_json": 769
  },
  "formatting": {
-  "black_files": 161,
-  "command": "black --check ."
+  "black_files": 162,
+  "available": true,
+  "command": "/usr/bin/python3 -m black --check ."
  },
  "documents": {
   "checked": 14,

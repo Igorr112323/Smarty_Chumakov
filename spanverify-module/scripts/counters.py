@@ -34,7 +34,7 @@ REPO_ROOT = MODULE_ROOT.parent
 
 COMMANDS = {
     "tests": [sys.executable, "-m", "pytest", "--collect-only", "-q", "-p", "no:cacheprovider"],
-    "black": ["black", "--check", "."],
+    "black": [sys.executable, "-m", "black", "--check", "."],
     "check_numbers": [sys.executable, "scripts/check_numbers.py"],
     "metrics": [
         sys.executable,
@@ -74,8 +74,17 @@ MARK_END = "<!-- counters:end -->"
 REPORT = "docs/ОТЧЁТ_по_договору.md"
 
 
-def _run(argv: list[str]) -> str:
-    completed = subprocess.run(argv, capture_output=True, text=True, cwd=MODULE_ROOT, check=False)
+def _run(argv: list[str]) -> str | None:
+    """Вывод команды целиком; `None` — если исполняемого файла нет в этой среде.
+
+    Второй случай не ошибка: job «Тесты» ставит только `pytest` и `pyyaml` (см. `ci.yml`), пакета
+    `black` в нём нет, а счётчик форматирования должен работать там, где black есть (job «Линтер»).
+    Падать из-за этого в CI — значит сделать сверку документов зависимой от окружения.
+    """
+    try:
+        completed = subprocess.run(argv, capture_output=True, text=True, cwd=MODULE_ROOT, check=False)
+    except (FileNotFoundError, OSError):
+        return None
     return (completed.stdout or "") + (completed.stderr or "")
 
 
@@ -90,15 +99,13 @@ def collect() -> dict[str, Any]:
             tests += int(match.group(1))
             files += 1
     black_out = _run(COMMANDS["black"])
-    black_match = re.search(r"(\d+) files? would be left unchanged", black_out)
-    if not black_match:
-        raise SystemExit(f"не удалось прочитать вывод black: {black_out[-300:]}")
+    black_match = re.search(r"(\d+) files? would be left unchanged", black_out or "")
     # «Сколько документов сверяется» — свойство самого чекера (список DEFAULT_DOCS), а не результат
     # прогона: иначе правка документов не могла бы начаться, пока check_numbers красный, —
     # и получался бы замкнутый круг «сначала почини числа, чтобы узнать, сколько чисел чинить».
     import check_numbers
 
-    docs_out = _run(COMMANDS["check_numbers"])
+    docs_out = _run(COMMANDS["check_numbers"]) or ""
     documents_checked = sum(1 for name in check_numbers.DEFAULT_DOCS if (REPO_ROOT / name).is_file())
     numbers_consistent = "проверено документов" in docs_out
     metrics_out = _run(COMMANDS["metrics"]).strip()
@@ -109,7 +116,11 @@ def collect() -> dict[str, Any]:
             "command": " ".join(COMMANDS["tests"][:-2]) + " (сумма по строкам «файл: число»)",
             "metrics_json": int(metrics_out) if metrics_out.isdigit() else None,
         },
-        "formatting": {"black_files": int(black_match.group(1)), "command": " ".join(COMMANDS["black"])},
+        "formatting": {
+            "black_files": int(black_match.group(1)) if black_match else None,
+            "available": black_match is not None,
+            "command": " ".join(COMMANDS["black"]),
+        },
         "documents": {
             "checked": documents_checked,
             "consistent": numbers_consistent,
@@ -130,7 +141,14 @@ def block(counters: dict[str, Any]) -> list[str]:
         f"| Тестов собрано | {counters['tests']['collected']} | `{counters['tests']['command']}` |",
         f"| Файлов тестов | {counters['tests']['files']} | там же (число строк «файл: N») |",
         f"| `tests.collected` в `reports/METRICS.json` | {counters['tests']['metrics_json']} | `python3 scripts/collect_metrics.py` |",
-        f"| Файлов по `black --check .` | {counters['formatting']['black_files']} | `{counters['formatting']['command']}` |",
+        "| Файлов по `black --check .` | {} | `{}` |".format(
+            (
+                counters["formatting"]["black_files"]
+                if counters["formatting"]["available"]
+                else "пакета `black` в этой среде нет (job «Тесты») — счётчик недоступен, снимается в job «Линтер»"
+            ),
+            counters["formatting"]["command"],
+        ),
         f"| Документов сверил `check_numbers` | {counters['documents']['checked']} | `{counters['documents']['command']}` |",
     ]
 
@@ -246,7 +264,13 @@ def main(argv: list[str] | None = None) -> int:
             return 1
         print(
             f"счётчики согласованы: тестов {counters['tests']['collected']} в {counters['tests']['files']} файлах, "
-            f"black — {counters['formatting']['black_files']} файлов, check_numbers — {counters['documents']['checked']} документов"
+            f"black — "
+            + (
+                f"{counters['formatting']['black_files']} файлов"
+                if counters["formatting"]["available"]
+                else "недоступен в этой среде"
+            )
+            + f", check_numbers — {counters['documents']['checked']} документов"
         )
         return 0
     if args.write_report:

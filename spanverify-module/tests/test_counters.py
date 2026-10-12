@@ -9,6 +9,7 @@
 
 from __future__ import annotations
 
+import importlib
 import json
 import subprocess
 import sys
@@ -31,7 +32,9 @@ REPORT = REPO_ROOT / "docs" / "ОТЧЁТ_по_договору.md"
 
 
 def test_counters_artifact_exists_and_agrees_with_metrics_file() -> None:
-    assert COUNTERS.is_file(), "нет `reports/COUNTERS.json`: выполните scripts/counters.py --json-out reports/COUNTERS.json"
+    assert (
+        COUNTERS.is_file()
+    ), "нет `reports/COUNTERS.json`: выполните scripts/counters.py --json-out reports/COUNTERS.json"
     payload = json.loads(COUNTERS.read_text(encoding="utf-8"))
     metrics = json.loads(METRICS.read_text(encoding="utf-8"))
     assert payload["tests"]["collected"] == metrics["tests"]["collected"], (
@@ -83,7 +86,9 @@ def test_substitution_touches_only_the_matched_line(tmp_path: Path, monkeypatch:
     module_docs.mkdir()
     (module_docs / "README.md").write_text("├── tests/ 752 тестов (pytest)\n", encoding="utf-8")
     monkeypatch.setattr(counters, "REPO_ROOT", tmp_path)
-    monkeypatch.setattr(counters, "DOC_PATTERNS", [("docs/ОТЧЁТ_по_договору.md", r"\| «(\d+) собрано» \|", {"tests": "{tests}"})])
+    monkeypatch.setattr(
+        counters, "DOC_PATTERNS", [("docs/ОТЧЁТ_по_договору.md", r"\| «(\d+) собрано» \|", {"tests": "{tests}"})]
+    )
     fake = {"tests": {"collected": 777, "files": 64}, "formatting": {"black_files": 161}, "documents": {"checked": 14}}
     touched = counters._apply(fake, write=True)
     assert touched == ["docs/ОТЧЁТ_по_договору.md:2"], touched
@@ -93,13 +98,27 @@ def test_substitution_touches_only_the_matched_line(tmp_path: Path, monkeypatch:
     assert "tests.collected = 758" in text, "вне шаблона числа менять нельзя"
 
 
+def test_missing_black_does_not_break_the_check(monkeypatch: pytest.MonkeyPatch) -> None:
+    """Без пакета `black` (job «Тесты») сверка счётчиков всё равно проходит и не врёт нулём."""
+    # Патчим ПОСЛЕ reload: reload пересоздаёт модуль и его COMMANDS, — патч до reload терялся,
+    # и тест «про отсутствие black» незаметно проверял присутствие.
+    counters_module = importlib.reload(counters)
+    monkeypatch.setitem(counters_module.COMMANDS, "black", [sys.executable, "-c", "raise SystemExit(3)"])
+    payload = counters_module.collect()
+    assert payload["formatting"]["available"] is False
+    assert payload["formatting"]["black_files"] is None
+    assert "недоступен" in "\n".join(payload and counters_module.block(payload))
+
+
 def test_ambiguous_pattern_is_fatal(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
     """Если шаблон встречается дважды — скрипт обязан остановиться, а не выбрать первый."""
     docs = tmp_path / "docs"
     docs.mkdir()
     (docs / "ОТЧЁТ_по_договору.md").write_text("| «1 собрано» |\n| «2 собрано» |\n", encoding="utf-8")
     monkeypatch.setattr(counters, "REPO_ROOT", tmp_path)
-    monkeypatch.setattr(counters, "DOC_PATTERNS", [("docs/ОТЧЁТ_по_договору.md", r"\| «(\d+) собрано» \|", {"tests": "{tests}"})])
+    monkeypatch.setattr(
+        counters, "DOC_PATTERNS", [("docs/ОТЧЁТ_по_договору.md", r"\| «(\d+) собрано» \|", {"tests": "{tests}"})]
+    )
     fake = {"tests": {"collected": 777, "files": 1}, "formatting": {"black_files": 1}, "documents": {"checked": 1}}
     with pytest.raises(SystemExit):
         counters._apply(fake, write=True)
