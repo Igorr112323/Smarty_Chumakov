@@ -2595,7 +2595,18 @@ GPT-2 приходит батчем `(1, heads, seq, seq)`, редукция ш�
   test_metrics_endpoint_exposes_contract_names` проходил только внутри полного файла: гистограмма
   задержки не публикует `_bucket` до первого наблюдения, поэтому одиночный запуск (`-k metrics`)
   падал. Добавлен разогревающий запрос к `/v1/verify` — `1 passed` в одиночку, `22 passed` в файле.
-* **Счётчики цикла:** 768 тестов в 66 файлах (`tests.collected = 768`), `black --check .` — 161
-  файл без изменений, `ruff check .` — чисто, `check_numbers.py` — 14 документов,
-  `render_features_doc.py --check` — 235 строк согласован. Полный прогон: FAILED ровно один —
-  `test_criterion_hf`.
+* **Счётчики на конец цикла:** 770 тестов в 66 файлах (`tests.collected = 770`), `black --check .`
+  — 162 файла без изменений, `ruff check .` — чисто, `check_numbers.py` — 14 документов,
+  `render_features_doc.py --check` — 235 строк согласован. Полный прогон: `FAILED` ровно один —
+  `test_criterion_hf`. (Числа росли вместе с тестами этого цикла: 768 → 770 — это два теста на
+  самих счётчиков; каждое изменение числа делал `scripts/counters.py`, не руки.)
+* **Догон CI по этому пушу.** Прогон `38209900547` показал две причины красноты кроме штатной:
+  job «Линтер» падал на `black --check .`, потому что `tests/test_counters.py` не был отформатирован,
+  и job «Тесты» падал на тесте, который звал `counters.py --check`, — а в этом job нет пакета `black`
+  (ставятся только `pytest` и `pyyaml`), то есть падение было по окружению, а не по числам.
+  `counters.py` теперь зовёт `python -m black` и при отсутствии пакета помечает счётчик недоступным
+  (`None`, не ноль) и исключает ровно эту строку из сравнения блока; добавлены тесты
+  `test_missing_black_does_not_break_the_check` и `test_block_comparison_ignores_only_the_unavailable_row`.
+  Найденное попутно: job «Единый файл чисел…» идёт с `needs: [quality, pilot, external]` без
+  `if: always()`, поэтому на красном `test_criterion_hf` он `skipped` — сверку чисел в CI держат
+  тесты в том же прогоне, и это записано в §5 отчёта.

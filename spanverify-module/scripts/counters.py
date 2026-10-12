@@ -207,6 +207,26 @@ def _apply(counters: dict[str, Any], *, write: bool) -> list[str]:
     return touched
 
 
+def _differs(current: str, wanted: str, *, ignore_black: bool) -> bool:
+    """Нужно ли обновлять блок.
+
+    Строка `black` — единственная, которая зависит от окружения прогона: в job «Тесты» пакета
+    `black` нет, и там счётчик физически нечем снять. Сравнивать блок целиком в такой среде —
+    значит получить «блок устарел» там, где устареть нечему: значения тестов и документов совпадают,
+    а отличается лишь строка, помеченная как недоступная. Поэтому при отсутствии black эта строка
+    из сравнения исключается — но только она.
+    """
+    if current == wanted:
+        return False
+    if not ignore_black:
+        return True
+
+    def strip(text: str) -> str:
+        return "\n".join(line for line in text.splitlines() if "Файлов по" not in line)
+
+    return strip(current) != strip(wanted)
+
+
 def _replace_report_block(counters: dict[str, Any], *, write: bool) -> bool:
     path = REPO_ROOT / REPORT
     text = path.read_text(encoding="utf-8")
@@ -216,7 +236,7 @@ def _replace_report_block(counters: dict[str, Any], *, write: bool) -> bool:
     end = text.index(MARK_END, start) + len(MARK_END)
     current = text[start:end]
     wanted = render(counters)
-    if current == wanted:
+    if not _differs(current, wanted, ignore_black=not counters["formatting"]["available"]):
         return False
     if write:
         path.write_text(text[:start] + wanted + text[end:], encoding="utf-8")

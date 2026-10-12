@@ -1,9 +1,9 @@
 {
  "tests": {
-  "collected": 769,
+  "collected": 770,
   "files": 66,
   "command": "/usr/bin/python3 -m pytest --collect-only -q (сумма по строкам «файл: число»)",
-  "metrics_json": 769
+  "metrics_json": 770
  },
  "formatting": {
   "black_files": 162,

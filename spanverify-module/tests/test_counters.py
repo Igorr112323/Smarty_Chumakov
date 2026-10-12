@@ -110,6 +110,28 @@ def test_missing_black_does_not_break_the_check(monkeypatch: pytest.MonkeyPatch)
     assert "недоступен" in "\n".join(payload and counters_module.block(payload))
 
 
+def test_block_comparison_ignores_only_the_unavailable_row() -> None:
+    """Сравнение блока: без `black` отличается только строка black, и это не «устарел»."""
+    payload = {
+        "tests": {"collected": 769, "files": 66, "metrics_json": 769, "command": "pytest --collect-only"},
+        "formatting": {"black_files": None, "available": False, "command": "python -m black --check ."},
+        "documents": {"checked": 14, "consistent": True, "command": "python scripts/check_numbers.py"},
+    }
+    wanted = "\n".join(counters.block(payload))
+    assert counters._differs(wanted, wanted, ignore_black=False) is False
+    # блок, снятый там, где black есть (строка с числом), — для среды без black не «устаревший»
+    with_black = payload["formatting"].copy()
+    payload["formatting"] = {"black_files": 162, "available": True, "command": "python -m black --check ."}
+    stale_env = "\n".join(counters.block(payload))
+    assert counters._differs(stale_env, wanted, ignore_black=True) is False
+    assert counters._differs(stale_env, wanted, ignore_black=False) is True
+    payload["formatting"] = with_black
+    # но если разошлись числа тестов — расхождение обязано остаться видимым
+    other = json.loads(json.dumps(payload))
+    other["tests"] = {"collected": 111, "files": 66, "metrics_json": 111, "command": "pytest --collect-only"}
+    assert counters._differs("\n".join(counters.block(other)), wanted, ignore_black=True) is True
+
+
 def test_ambiguous_pattern_is_fatal(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
     """Если шаблон встречается дважды — скрипт обязан остановиться, а не выбрать первый."""
     docs = tmp_path / "docs"
