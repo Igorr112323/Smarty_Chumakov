@@ -165,32 +165,10 @@ jobs:
             exit 1
           fi
 
-      - name: "Измерить знак, операционную точку и вклад семейств (только val)"
-        working-directory: spanverify-module
-        timeout-minutes: 30
+      - name: "Диагностика val: порог, сглаживание, семейства, seed'ы"
+        timeout-minutes: 35
         run: |
-          echo "команда: python3 scripts/feature_sign_check.py --grid-cache reports/hf-cache-a3 --splits data/corpus_a3/splits --bootstrap 5000 --seed 42 --annotate --out-json reports/hf_protocol/feature_signs_a3dev.json --out-md reports/hf_protocol/feature_signs_a3dev.md (кеш — прогон $RUN_ID)"
-          echo "команда: python3 scripts/val_diagnostics.py --grid-cache reports/hf-cache-a3 --splits data/corpus_a3/splits --config config/hf_experiments.json --baseline $BASELINE --annotate --out-json reports/hf_protocol/val_diagnostics.json --out-md reports/hf_protocol/val_diagnostics.md"
-          set -o pipefail
-          if python3 scripts/feature_sign_check.py \
-            --grid-cache reports/hf-cache-a3 \
-            --splits data/corpus_a3/splits \
-            --bootstrap 5000 \
-            --seed 42 \
-            --annotate \
-            --out-json reports/hf_protocol/feature_signs_a3dev.json \
-            --out-md reports/hf_protocol/feature_signs_a3dev.md 2>&1 | tee /tmp/signs.log; then
-            :
-          else
-            # Последние строки ошибки — в аннотации: журнал сборки отсюда не читается.
-            tail -n 25 /tmp/signs.log | sed 's/^[[:space:]]*//' | while IFS= read -r line; do
-              printf '::error title=сбой измерения::%s\n' "$line"
-            done
-            exit 1
-          fi
-
-          # Диагностика — тот же кеш и та же val; отдельный `if`, чтобы сбой одного
-          # замера не прятал вывод другого (журнал сборки отсюда не читается).
+          cd spanverify-module
           if python3 scripts/val_diagnostics.py \
             --grid-cache reports/hf-cache-a3 \
             --splits data/corpus_a3/splits \
@@ -206,16 +184,14 @@ jobs:
             done
             exit 1
           fi
-
       - name: "Таблица в лог (чтобы её видно было в аннотациях и в отчёте прогона)"
         if: always()
         working-directory: spanverify-module
         run: |
-          if [ -f reports/hf_protocol/feature_signs_a3dev.md ]; then
-            cat reports/hf_protocol/feature_signs_a3dev.md
-            cat reports/hf_protocol/val_diagnostics.md || echo "::warning title=нет диагностики::val_diagnostics.md не создан"
+          if [ -f reports/hf_protocol/val_diagnostics.md ]; then
+            cat reports/hf_protocol/val_diagnostics.md
           else
-            echo "::error title=нет таблицы::файл feature_signs_a3dev.md не создан"
+            echo "::error title=нет таблицы::файл reports/hf_protocol/val_diagnostics.md не создан"
             exit 1
           fi
 
