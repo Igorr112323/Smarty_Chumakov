@@ -137,7 +137,8 @@ def _write_dataset(tmp_path: Path, *, cache_name: str = "grid_all_00.jsonl") -> 
     return splits, config_path
 
 
-def run(tmp_path: Path, *extra: str) -> subprocess.CompletedProcess[str]:
+def run(tmp_path: Path, *extra: str, frozen: bool = True) -> subprocess.CompletedProcess[str]:
+    """Прогон скрипта на фикстуре. `frozen=False` — режим «порог подбирается CV» (без манифеста)."""
     splits, config = _write_dataset(tmp_path)
     argv = [
         sys.executable,
@@ -150,8 +151,10 @@ def run(tmp_path: Path, *extra: str) -> subprocess.CompletedProcess[str]:
         str(config),
         "--baseline",
         "fixture",
-        "--threshold-manifest",
-        str(tmp_path / "freeze_manifest.json"),
+    ]
+    if frozen:
+        argv += ["--threshold-manifest", str(tmp_path / "freeze_manifest.json")]
+    argv += [
         "--seeds",
         "42,43",
         "--out-json",
@@ -316,6 +319,27 @@ def _payload() -> dict:
             },
         },
     }
+
+
+def test_threshold_cv_mode_is_common_for_all_configs(tmp_path: Path) -> None:
+    """Режим без `--threshold-manifest`: порог считается ОДИН раз и общий для всех конфигураций.
+
+    Это не косметика: в CI прогон 38187404918 упал по таймауту шага именно потому, что без
+    манифеста `run_experiment` подбирал порог внутри каждой конфигурации (5 фолдов × 23
+    конфигурации). Плюс второй смысл — сравнение конфигураций при разных порогах некорректно,
+    а «общий замороженный порог» обещан в выводе скрипта.
+    """
+    proc = run(tmp_path, frozen=False)
+    assert proc.returncode == 0, (proc.stdout + proc.stderr)[-1500:]
+    payload = json.loads((tmp_path / "diag.json").read_text(encoding="utf-8"))
+    assert "общий порог" in payload["threshold_source"], payload["threshold_source"]
+    assert (
+        "не задан" in payload["inputs"]["threshold_manifest"] or payload["inputs"]["threshold_manifest"] == "не задан"
+    )
+    thresholds = {item["threshold"] for item in payload["results"]["seeds"]["per_seed"]}
+    assert len(thresholds) == 1, "в режиме CV порог обязан быть общим: иначе ΔF1 смешан с переселекцией"
+    anchor = payload["results"]["baseline"].get("anchor_cv") or {}
+    assert "не считается" in str(anchor.get("note", "")), "лишний якорь в режиме CV удваивает цену прогона"
 
 
 def test_render_section_34_uses_artifact_numbers(tmp_path, monkeypatch) -> None:

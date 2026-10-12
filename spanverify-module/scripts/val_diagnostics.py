@@ -199,6 +199,14 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
     if unknown:
         raise SystemExit(f"базовая линия ссылается на вне сетки: {unknown}")
 
+    window_base = int(base.get("window", 0))
+    baseline_entry = experiment_entry(
+        "baseline", base_features, window_base, base, "базовая линия = лучшая конфигурация шага 1–2"
+    )
+    seeds = [int(item) for item in str(args.seeds).split(",") if item.strip()]
+    if not seeds:
+        raise SystemExit("пуст --seeds: разброс по seed'ам обязан быть заявлен явно")
+
     frozen: float | None = None
     threshold_source = "подбор по групповой CV по документам на train (тот же seed, что и обучение)"
     if args.threshold_manifest:
@@ -209,23 +217,36 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
             "конфигураций, чтобы ΔF1 не смешивался с переселекцией порога"
         )
 
-    seeds = [int(item) for item in str(args.seeds).split(",") if item.strip()]
-    if not seeds:
-        raise SystemExit("пуст --seeds: разброс по seed'ам обязан быть заявлен явно")
+    else:
+        # Порог считается ОДИН раз — по групповой CV на базовой линии — и затем общий для всех
+        # конфигураций. Две причины так делать: (1) подбор порога внутри каждой конфигурации сравнивал бы
+        # не веса признаков, а переселекции порога; (2) это 5 лишних прогонов на конфигурацию —
+        # прогон 38187404918 именно так и упёрся в лимит шага (23 конфигурации × CV > 35 минут).
+        anchor = hf_protocol.run_experiment(cache, train, val, baseline_entry, seeds[0], keep_rows=False)
+        if "error" in anchor:
+            raise SystemExit(f"порог по CV не подобран: {anchor['error']}")
+        frozen = float(anchor["threshold"])
+        threshold_source = (
+            f"подобран по групповой CV по документам на train на базовой линии «{args.baseline}» "
+            f"(seed {seeds[0]}) — общий порог {frozen} для всех конфигураций"
+        )
 
     def evaluate(experiment: dict[str, Any], seed: int) -> dict[str, Any]:
+        # Строка на конфигурацию: без неё таймаут шага неотличим от тихого падения (журнал сборки
+        # из этой среды не читается — см. warning про results-receiver в docs/ОТЧЁТ_по_договору.md).
+        print(
+            f"[val-диагностика] {experiment['name']}: признаков {len(experiment['features'])}, "
+            f"окно {experiment['window']}, seed {seed}",
+            flush=True,
+        )
         block = hf_protocol.run_experiment(cache, train, val, experiment, seed, fixed_threshold=frozen, keep_rows=True)
         if "error" in block:
             raise SystemExit(f"{experiment['name']}: {block['error']}")
         return block
 
     results: dict[str, Any] = {}
-    window_base = int(base.get("window", 0))
 
-    baseline_block = evaluate(
-        experiment_entry("baseline", base_features, window_base, base, "базовая линия = лучшая конфигурация шага 1–2"),
-        seeds[0],
-    )
+    baseline_block = evaluate(baseline_entry, seeds[0])
     results["baseline"] = summarize(baseline_block, args.fpr_cap) | {
         "name": args.baseline,
         "features": base_features,
@@ -236,7 +257,14 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
     base_capped = results["baseline"].get("capped_f1")
     results["baseline"]["delta_f1"] = 0.0
 
-    if args.anchor_cv and frozen is not None:
+    if args.anchor_cv and not args.threshold_manifest:
+        results["baseline"]["anchor_cv"] = {
+            "note": (
+                "отдельный якорь не считается: порог базовой линии уже подобран по групповой CV, "
+                "то есть базовая линия и есть точка, сопоставимая с best_selection из sweep.json"
+            )
+        }
+    elif args.anchor_cv and frozen is not None:
         # Единственная лишняя CV-процедура в диагностике: без неё базовая линия — «модель,
         # обученная на train, с порогом шага 3», и сравнивать её с числами sweep.json
         # нельзя (та модель обучалась на train+val, и порог у неё свой).
