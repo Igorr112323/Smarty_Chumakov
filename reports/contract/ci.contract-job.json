@@ -1,10 +1,10 @@
 {
   "id": "ci.contract-job",
-  "commit": "0f696675bbd4cfa5a1d7112fde3827ea7df58ce3",
+  "commit": "9656515725f68879f6a593ae4870fb579a32f9fa",
   "seed": 42,
   "mode": "demo",
   "dataset": "ci",
-  "date": "2026-10-13T13:25:09Z",
+  "date": "2026-10-13T13:25:51Z",
   "command": "",
   "metrics": {
     "workflow": ".github/workflows/ci.yml",
