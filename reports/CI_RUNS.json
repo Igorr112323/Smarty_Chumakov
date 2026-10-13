@@ -1,42 +1,50 @@
 {
   "kind": "ci_runs",
   "repo": "Igorr112323/Smarty_Chumakov",
-  "generated_at": "2026-10-13T20:34:53Z",
+  "generated_at": "2026-10-13T22:56:59Z",
   "command": "python scripts/collect_ci_runs.py --limit 40",
   "note": "список прогонов получен из GitHub API (gh api); заключения заданий — как их отдаёт API на момент сбора",
   "runs": [
     {
-      "id": 38463829783,
-      "name": "ci",
-      "event": "pull_request",
-      "head_branch": "arena/266e93dc-smarty-chumakov",
-      "head_sha": "fb025159188f450780590dc794f51d578445a6da",
+      "id": 38481064209,
+      "name": "build-and-release-exe",
+      "event": "push",
+      "head_branch": "main",
+      "head_sha": "a8454d0476cac2feddccc91d0e91e1fb52f5e87c",
       "conclusion": null,
-      "created_at": "2026-10-13T20:33:59Z",
-      "url": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/38463829783",
+      "created_at": "2026-10-13T22:56:19Z",
+      "url": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/38481064209",
       "jobs": [
         {
-          "name": "Линтер, форматирование, покрытие",
+          "name": "Тесты (Python 3.12)",
           "conclusion": null
         },
         {
-          "name": "Тесты (Python 3.11, windows-latest)",
+          "name": "Тесты (Python 3.10)",
           "conclusion": null
         },
         {
-          "name": "Тесты (Python 3.10, windows-latest)",
+          "name": "Тесты (Python 3.11)",
           "conclusion": null
-        },
-        {
-          "name": "Тесты (Python 3.12, ubuntu-latest)",
-          "conclusion": null
-        },
-        {
-          "name": "Тесты (Python 3.10, ubuntu-latest)",
-          "conclusion": null
-        },
+        }
+      ]
+    },
+    {
+      "id": 38481064089,
+      "name": "ci",
+      "event": "push",
+      "head_branch": "main",
+      "head_sha": "a8454d0476cac2feddccc91d0e91e1fb52f5e87c",
+      "conclusion": null,
+      "created_at": "2026-10-13T22:56:19Z",
+      "url": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/38481064089",
+      "jobs": [
         {
           "name": "Тесты (Python 3.12, windows-latest)",
+          "conclusion": null
+        },
+        {
+          "name": "Линтер, форматирование, покрытие",
           "conclusion": null
         },
         {
@@ -45,6 +53,566 @@
         },
         {
           "name": "Разведка официальных источников (не блокирует CI)",
+          "conclusion": "skipped"
+        }
+      ]
+    },
+    {
+      "id": 38476886874,
+      "name": "ci",
+      "event": "pull_request",
+      "head_branch": "arena/266e93dc-smarty-chumakov",
+      "head_sha": "557e2cbd9bc4fd8406405d0937c1c65939f99414",
+      "conclusion": "success",
+      "created_at": "2026-10-13T22:18:24Z",
+      "url": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/38476886874",
+      "jobs": [
+        {
+          "name": "Линтер, форматирование, покрытие",
+          "conclusion": "success"
+        },
+        {
+          "name": "Тесты (Python 3.10, ubuntu-latest)",
+          "conclusion": "success"
+        },
+        {
+          "name": "Тесты (Python 3.10, windows-latest)",
+          "conclusion": "success"
+        },
+        {
+          "name": "Тесты (Python 3.12, ubuntu-latest)",
+          "conclusion": "success"
+        },
+        {
+          "name": "Тесты (Python 3.12, windows-latest)",
+          "conclusion": "success"
+        },
+        {
+          "name": "Тесты (Python 3.11, ubuntu-latest)",
+          "conclusion": "success"
+        },
+        {
+          "name": "Тесты (Python 3.11, windows-latest)",
+          "conclusion": "success"
+        },
+        {
+          "name": "Разведка официальных источников (не блокирует CI)",
+          "conclusion": "skipped"
+        },
+        {
+          "name": "Соответствие договору (проект 117812)",
+          "conclusion": "success"
+        },
+        {
+          "name": "Единый файл чисел (METRICS.json) и сверка документов",
+          "conclusion": "success"
+        },
+        {
+          "name": "Внешние размеченные наборы (скачивание, контрольные ...",
+          "conclusion": "skipped"
+        },
+        {
+          "name": "Пилот на реальной модели (rugpt3small, CPU)",
+          "conclusion": "skipped"
+        }
+      ]
+    },
+    {
+      "id": 38476879676,
+      "name": "ci",
+      "event": "push",
+      "head_branch": "arena/266e93dc-smarty-chumakov",
+      "head_sha": "557e2cbd9bc4fd8406405d0937c1c65939f99414",
+      "conclusion": "success",
+      "created_at": "2026-10-13T22:18:21Z",
+      "url": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/38476879676",
+      "jobs": [
+        {
+          "name": "Линтер, форматирование, покрытие",
+          "conclusion": "success"
+        },
+        {
+          "name": "Тесты (Python 3.12, windows-latest)",
+          "conclusion": "success"
+        },
+        {
+          "name": "Тесты (Python 3.11, ubuntu-latest)",
+          "conclusion": "success"
+        },
+        {
+          "name": "Разведка официальных источников (не блокирует CI)",
+          "conclusion": "skipped"
+        },
+        {
+          "name": "Соответствие договору (проект 117812)",
+          "conclusion": "success"
+        },
+        {
+          "name": "Единый файл чисел (METRICS.json) и сверка документов",
+          "conclusion": "success"
+        },
+        {
+          "name": "Внешние размеченные наборы (скачивание, контрольные ...",
+          "conclusion": "skipped"
+        },
+        {
+          "name": "Пилот на реальной модели (rugpt3small, CPU)",
+          "conclusion": "skipped"
+        }
+      ]
+    },
+    {
+      "id": 38473784576,
+      "name": "ci",
+      "event": "pull_request",
+      "head_branch": "arena/266e93dc-smarty-chumakov",
+      "head_sha": "c7d09454d67c92932d1fca140e9bfc97f1e81631",
+      "conclusion": "cancelled",
+      "created_at": "2026-10-13T21:52:18Z",
+      "url": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/38473784576",
+      "jobs": [
+        {
+          "name": "Линтер, форматирование, покрытие",
+          "conclusion": "cancelled"
+        },
+        {
+          "name": "Тесты (Python 3.11, ubuntu-latest)",
+          "conclusion": "success"
+        },
+        {
+          "name": "Тесты (Python 3.11, windows-latest)",
+          "conclusion": "success"
+        },
+        {
+          "name": "Тесты (Python 3.12, windows-latest)",
+          "conclusion": "success"
+        },
+        {
+          "name": "Тесты (Python 3.10, ubuntu-latest)",
+          "conclusion": "success"
+        },
+        {
+          "name": "Тесты (Python 3.10, windows-latest)",
+          "conclusion": "success"
+        },
+        {
+          "name": "Тесты (Python 3.12, ubuntu-latest)",
+          "conclusion": "success"
+        },
+        {
+          "name": "Разведка официальных источников (не блокирует CI)",
+          "conclusion": "skipped"
+        },
+        {
+          "name": "Соответствие договору (проект 117812)",
+          "conclusion": "success"
+        },
+        {
+          "name": "Внешние размеченные наборы (скачивание, контрольные ...",
+          "conclusion": "cancelled"
+        },
+        {
+          "name": "Пилот на реальной модели (rugpt3small, CPU)",
+          "conclusion": "cancelled"
+        },
+        {
+          "name": "Единый файл чисел (METRICS.json) и сверка документов",
+          "conclusion": "cancelled"
+        }
+      ]
+    },
+    {
+      "id": 38473778295,
+      "name": "ci",
+      "event": "push",
+      "head_branch": "arena/266e93dc-smarty-chumakov",
+      "head_sha": "c7d09454d67c92932d1fca140e9bfc97f1e81631",
+      "conclusion": "cancelled",
+      "created_at": "2026-10-13T21:52:14Z",
+      "url": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/38473778295",
+      "jobs": [
+        {
+          "name": "Тесты (Python 3.12, windows-latest)",
+          "conclusion": "success"
+        },
+        {
+          "name": "Тесты (Python 3.11, ubuntu-latest)",
+          "conclusion": "success"
+        },
+        {
+          "name": "Линтер, форматирование, покрытие",
+          "conclusion": "cancelled"
+        },
+        {
+          "name": "Разведка официальных источников (не блокирует CI)",
+          "conclusion": "skipped"
+        },
+        {
+          "name": "Соответствие договору (проект 117812)",
+          "conclusion": "success"
+        },
+        {
+          "name": "Пилот на реальной модели (rugpt3small, CPU)",
+          "conclusion": "cancelled"
+        },
+        {
+          "name": "Внешние размеченные наборы (скачивание, контрольные ...",
+          "conclusion": "cancelled"
+        },
+        {
+          "name": "Единый файл чисел (METRICS.json) и сверка документов",
+          "conclusion": "cancelled"
+        }
+      ]
+    },
+    {
+      "id": 38473778173,
+      "name": "build-and-release-exe",
+      "event": "push",
+      "head_branch": "arena/266e93dc-smarty-chumakov",
+      "head_sha": "c7d09454d67c92932d1fca140e9bfc97f1e81631",
+      "conclusion": "success",
+      "created_at": "2026-10-13T21:52:14Z",
+      "url": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/38473778173",
+      "jobs": [
+        {
+          "name": "Тесты (Python 3.11)",
+          "conclusion": "success"
+        },
+        {
+          "name": "Тесты (Python 3.12)",
+          "conclusion": "success"
+        },
+        {
+          "name": "Тесты (Python 3.10)",
+          "conclusion": "success"
+        },
+        {
+          "name": "Сборка и проверка .exe",
+          "conclusion": "success"
+        }
+      ]
+    },
+    {
+      "id": 38470670967,
+      "name": "ci",
+      "event": "pull_request",
+      "head_branch": "arena/266e93dc-smarty-chumakov",
+      "head_sha": "b74a25e7ffbe1369b8c34c0ab2120f2bfe2f4bd5",
+      "conclusion": "cancelled",
+      "created_at": "2026-10-13T21:26:53Z",
+      "url": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/38470670967",
+      "jobs": [
+        {
+          "name": "Линтер, форматирование, покрытие",
+          "conclusion": "success"
+        },
+        {
+          "name": "Тесты (Python 3.12, ubuntu-latest)",
+          "conclusion": "success"
+        },
+        {
+          "name": "Тесты (Python 3.11, windows-latest)",
+          "conclusion": "success"
+        },
+        {
+          "name": "Тесты (Python 3.10, windows-latest)",
+          "conclusion": "success"
+        },
+        {
+          "name": "Тесты (Python 3.12, windows-latest)",
+          "conclusion": "success"
+        },
+        {
+          "name": "Тесты (Python 3.10, ubuntu-latest)",
+          "conclusion": "success"
+        },
+        {
+          "name": "Тесты (Python 3.11, ubuntu-latest)",
+          "conclusion": "success"
+        },
+        {
+          "name": "Разведка официальных источников (не блокирует CI)",
+          "conclusion": "skipped"
+        },
+        {
+          "name": "Соответствие договору (проект 117812)",
+          "conclusion": "success"
+        },
+        {
+          "name": "Единый файл чисел (METRICS.json) и сверка документов",
+          "conclusion": "cancelled"
+        },
+        {
+          "name": "Пилот на реальной модели (rugpt3small, CPU)",
+          "conclusion": "skipped"
+        },
+        {
+          "name": "Внешние размеченные наборы (скачивание, контрольные ...",
+          "conclusion": "skipped"
+        }
+      ]
+    },
+    {
+      "id": 38470664317,
+      "name": "build-and-release-exe",
+      "event": "push",
+      "head_branch": "arena/266e93dc-smarty-chumakov",
+      "head_sha": "b74a25e7ffbe1369b8c34c0ab2120f2bfe2f4bd5",
+      "conclusion": "success",
+      "created_at": "2026-10-13T21:26:50Z",
+      "url": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/38470664317",
+      "jobs": [
+        {
+          "name": "Тесты (Python 3.10)",
+          "conclusion": "success"
+        },
+        {
+          "name": "Тесты (Python 3.12)",
+          "conclusion": "success"
+        },
+        {
+          "name": "Тесты (Python 3.11)",
+          "conclusion": "success"
+        },
+        {
+          "name": "Сборка и проверка .exe",
+          "conclusion": "success"
+        }
+      ]
+    },
+    {
+      "id": 38470664254,
+      "name": "ci",
+      "event": "push",
+      "head_branch": "arena/266e93dc-smarty-chumakov",
+      "head_sha": "b74a25e7ffbe1369b8c34c0ab2120f2bfe2f4bd5",
+      "conclusion": "cancelled",
+      "created_at": "2026-10-13T21:26:50Z",
+      "url": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/38470664254",
+      "jobs": [
+        {
+          "name": "Тесты (Python 3.12, windows-latest)",
+          "conclusion": "success"
+        },
+        {
+          "name": "Тесты (Python 3.11, ubuntu-latest)",
+          "conclusion": "success"
+        },
+        {
+          "name": "Линтер, форматирование, покрытие",
+          "conclusion": "cancelled"
+        },
+        {
+          "name": "Разведка официальных источников (не блокирует CI)",
+          "conclusion": "skipped"
+        },
+        {
+          "name": "Соответствие договору (проект 117812)",
+          "conclusion": "success"
+        },
+        {
+          "name": "Пилот на реальной модели (rugpt3small, CPU)",
+          "conclusion": "cancelled"
+        },
+        {
+          "name": "Внешние размеченные наборы (скачивание, контрольные ...",
+          "conclusion": "cancelled"
+        },
+        {
+          "name": "Единый файл чисел (METRICS.json) и сверка документов",
+          "conclusion": "cancelled"
+        }
+      ]
+    },
+    {
+      "id": 38467383126,
+      "name": "ci",
+      "event": "pull_request",
+      "head_branch": "arena/266e93dc-smarty-chumakov",
+      "head_sha": "3dbbab81d6bb1fe1ab770ff6d82fc11e54482869",
+      "conclusion": "success",
+      "created_at": "2026-10-13T21:01:10Z",
+      "url": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/38467383126",
+      "jobs": [
+        {
+          "name": "Линтер, форматирование, покрытие",
+          "conclusion": "success"
+        },
+        {
+          "name": "Тесты (Python 3.11, windows-latest)",
+          "conclusion": "success"
+        },
+        {
+          "name": "Тесты (Python 3.10, ubuntu-latest)",
+          "conclusion": "success"
+        },
+        {
+          "name": "Тесты (Python 3.12, windows-latest)",
+          "conclusion": "success"
+        },
+        {
+          "name": "Тесты (Python 3.11, ubuntu-latest)",
+          "conclusion": "success"
+        },
+        {
+          "name": "Тесты (Python 3.10, windows-latest)",
+          "conclusion": "success"
+        },
+        {
+          "name": "Тесты (Python 3.12, ubuntu-latest)",
+          "conclusion": "success"
+        },
+        {
+          "name": "Разведка официальных источников (не блокирует CI)",
+          "conclusion": "skipped"
+        },
+        {
+          "name": "Соответствие договору (проект 117812)",
+          "conclusion": "success"
+        },
+        {
+          "name": "Единый файл чисел (METRICS.json) и сверка документов",
+          "conclusion": "success"
+        },
+        {
+          "name": "Внешние размеченные наборы (скачивание, контрольные ...",
+          "conclusion": "skipped"
+        },
+        {
+          "name": "Пилот на реальной модели (rugpt3small, CPU)",
+          "conclusion": "skipped"
+        }
+      ]
+    },
+    {
+      "id": 38467373828,
+      "name": "build-and-release-exe",
+      "event": "push",
+      "head_branch": "arena/266e93dc-smarty-chumakov",
+      "head_sha": "3dbbab81d6bb1fe1ab770ff6d82fc11e54482869",
+      "conclusion": "success",
+      "created_at": "2026-10-13T21:01:06Z",
+      "url": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/38467373828",
+      "jobs": [
+        {
+          "name": "Тесты (Python 3.12)",
+          "conclusion": "success"
+        },
+        {
+          "name": "Тесты (Python 3.11)",
+          "conclusion": "success"
+        },
+        {
+          "name": "Тесты (Python 3.10)",
+          "conclusion": "success"
+        },
+        {
+          "name": "Сборка и проверка .exe",
+          "conclusion": "success"
+        }
+      ]
+    },
+    {
+      "id": 38467373802,
+      "name": "ci",
+      "event": "push",
+      "head_branch": "arena/266e93dc-smarty-chumakov",
+      "head_sha": "3dbbab81d6bb1fe1ab770ff6d82fc11e54482869",
+      "conclusion": "cancelled",
+      "created_at": "2026-10-13T21:01:06Z",
+      "url": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/38467373802",
+      "jobs": [
+        {
+          "name": "Линтер, форматирование, покрытие",
+          "conclusion": "cancelled"
+        },
+        {
+          "name": "Тесты (Python 3.11, ubuntu-latest)",
+          "conclusion": "success"
+        },
+        {
+          "name": "Тесты (Python 3.12, windows-latest)",
+          "conclusion": "success"
+        },
+        {
+          "name": "Разведка официальных источников (не блокирует CI)",
+          "conclusion": "skipped"
+        },
+        {
+          "name": "Соответствие договору (проект 117812)",
+          "conclusion": "success"
+        },
+        {
+          "name": "Пилот на реальной модели (rugpt3small, CPU)",
+          "conclusion": "cancelled"
+        },
+        {
+          "name": "Внешние размеченные наборы (скачивание, контрольные ...",
+          "conclusion": "cancelled"
+        },
+        {
+          "name": "Единый файл чисел (METRICS.json) и сверка документов",
+          "conclusion": "cancelled"
+        }
+      ]
+    },
+    {
+      "id": 38463829783,
+      "name": "ci",
+      "event": "pull_request",
+      "head_branch": "arena/266e93dc-smarty-chumakov",
+      "head_sha": "fb025159188f450780590dc794f51d578445a6da",
+      "conclusion": "success",
+      "created_at": "2026-10-13T20:33:59Z",
+      "url": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/38463829783",
+      "jobs": [
+        {
+          "name": "Линтер, форматирование, покрытие",
+          "conclusion": "success"
+        },
+        {
+          "name": "Тесты (Python 3.11, windows-latest)",
+          "conclusion": "success"
+        },
+        {
+          "name": "Тесты (Python 3.10, windows-latest)",
+          "conclusion": "success"
+        },
+        {
+          "name": "Тесты (Python 3.12, ubuntu-latest)",
+          "conclusion": "success"
+        },
+        {
+          "name": "Тесты (Python 3.10, ubuntu-latest)",
+          "conclusion": "success"
+        },
+        {
+          "name": "Тесты (Python 3.12, windows-latest)",
+          "conclusion": "success"
+        },
+        {
+          "name": "Тесты (Python 3.11, ubuntu-latest)",
+          "conclusion": "success"
+        },
+        {
+          "name": "Разведка официальных источников (не блокирует CI)",
+          "conclusion": "skipped"
+        },
+        {
+          "name": "Соответствие договору (проект 117812)",
+          "conclusion": "success"
+        },
+        {
+          "name": "Единый файл чисел (METRICS.json) и сверка документов",
+          "conclusion": "success"
+        },
+        {
+          "name": "Пилот на реальной модели (rugpt3small, CPU)",
+          "conclusion": "skipped"
+        },
+        {
+          "name": "Внешние размеченные наборы (скачивание, контрольные ...",
           "conclusion": "skipped"
         }
       ]
@@ -55,21 +623,25 @@
       "event": "push",
       "head_branch": "arena/266e93dc-smarty-chumakov",
       "head_sha": "fb025159188f450780590dc794f51d578445a6da",
-      "conclusion": null,
+      "conclusion": "success",
       "created_at": "2026-10-13T20:33:56Z",
       "url": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/38463822076",
       "jobs": [
         {
           "name": "Тесты (Python 3.10)",
-          "conclusion": null
+          "conclusion": "success"
         },
         {
           "name": "Тесты (Python 3.11)",
-          "conclusion": null
+          "conclusion": "success"
         },
         {
           "name": "Тесты (Python 3.12)",
-          "conclusion": null
+          "conclusion": "success"
+        },
+        {
+          "name": "Сборка и проверка .exe",
+          "conclusion": "success"
         }
       ]
     },
@@ -79,25 +651,41 @@
       "event": "push",
       "head_branch": "arena/266e93dc-smarty-chumakov",
       "head_sha": "fb025159188f450780590dc794f51d578445a6da",
-      "conclusion": null,
+      "conclusion": "cancelled",
       "created_at": "2026-10-13T20:33:56Z",
       "url": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/38463821914",
       "jobs": [
         {
           "name": "Тесты (Python 3.11, ubuntu-latest)",
-          "conclusion": null
+          "conclusion": "success"
         },
         {
           "name": "Линтер, форматирование, покрытие",
-          "conclusion": null
+          "conclusion": "cancelled"
         },
         {
           "name": "Тесты (Python 3.12, windows-latest)",
-          "conclusion": null
+          "conclusion": "success"
         },
         {
           "name": "Разведка официальных источников (не блокирует CI)",
           "conclusion": "skipped"
+        },
+        {
+          "name": "Соответствие договору (проект 117812)",
+          "conclusion": "success"
+        },
+        {
+          "name": "Внешние размеченные наборы (скачивание, контрольные ...",
+          "conclusion": "cancelled"
+        },
+        {
+          "name": "Пилот на реальной модели (rugpt3small, CPU)",
+          "conclusion": "cancelled"
+        },
+        {
+          "name": "Единый файл чисел (METRICS.json) и сверка документов",
+          "conclusion": "cancelled"
         }
       ]
     },
@@ -1048,502 +1636,6 @@
         {
           "name": "Соответствие договору (проект 117812)",
           "conclusion": "success"
-        },
-        {
-          "name": "Пилот на реальной модели (rugpt3small, CPU)",
-          "conclusion": "skipped"
-        },
-        {
-          "name": "Внешние размеченные наборы (скачивание, контрольные ...",
-          "conclusion": "skipped"
-        },
-        {
-          "name": "Единый файл чисел (METRICS.json) и сверка документов",
-          "conclusion": "skipped"
-        }
-      ]
-    },
-    {
-      "id": 38416302813,
-      "name": "ci",
-      "event": "push",
-      "head_branch": "main",
-      "head_sha": "83e243e3e9a4be03466f3496f4f58dbcab9f4b72",
-      "conclusion": "success",
-      "created_at": "2026-10-13T14:46:46Z",
-      "url": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/38416302813",
-      "jobs": [
-        {
-          "name": "Линтер, форматирование, покрытие",
-          "conclusion": "success"
-        },
-        {
-          "name": "Тесты (Python 3.11, ubuntu-latest)",
-          "conclusion": "success"
-        },
-        {
-          "name": "Тесты (Python 3.12, windows-latest)",
-          "conclusion": "success"
-        },
-        {
-          "name": "Разведка официальных источников (не блокирует CI)",
-          "conclusion": "skipped"
-        },
-        {
-          "name": "Единый файл чисел (METRICS.json) и сверка документов",
-          "conclusion": "success"
-        },
-        {
-          "name": "Пилот на реальной модели (rugpt3small, CPU)",
-          "conclusion": "skipped"
-        },
-        {
-          "name": "Внешние размеченные наборы (скачивание, контрольные ...",
-          "conclusion": "skipped"
-        }
-      ]
-    },
-    {
-      "id": 38414696104,
-      "name": "ci",
-      "event": "push",
-      "head_branch": "main",
-      "head_sha": "64c893081036fe2395c089eb41d7972e284b2548",
-      "conclusion": "cancelled",
-      "created_at": "2026-10-13T14:35:40Z",
-      "url": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/38414696104",
-      "jobs": [
-        {
-          "name": "Тесты (Python 3.12, windows-latest)",
-          "conclusion": "success"
-        },
-        {
-          "name": "Линтер, форматирование, покрытие",
-          "conclusion": "cancelled"
-        },
-        {
-          "name": "Тесты (Python 3.11, ubuntu-latest)",
-          "conclusion": "success"
-        },
-        {
-          "name": "Разведка официальных источников (не блокирует CI)",
-          "conclusion": "skipped"
-        },
-        {
-          "name": "Пилот на реальной модели (rugpt3small, CPU)",
-          "conclusion": "cancelled"
-        },
-        {
-          "name": "Внешние размеченные наборы (скачивание, контрольные ...",
-          "conclusion": "cancelled"
-        },
-        {
-          "name": "Единый файл чисел (METRICS.json) и сверка документов",
-          "conclusion": "cancelled"
-        }
-      ]
-    },
-    {
-      "id": 38404990323,
-      "name": "ci",
-      "event": "pull_request",
-      "head_branch": "arena/266e93dc-smarty-chumakov",
-      "head_sha": "d1594ef2fc47d3f9800be8e800ee4794ceb842ae",
-      "conclusion": "success",
-      "created_at": "2026-10-13T13:26:40Z",
-      "url": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/38404990323",
-      "jobs": [
-        {
-          "name": "Тесты (Python 3.12, ubuntu-latest)",
-          "conclusion": "success"
-        },
-        {
-          "name": "Тесты (Python 3.11, ubuntu-latest)",
-          "conclusion": "success"
-        },
-        {
-          "name": "Тесты (Python 3.12, windows-latest)",
-          "conclusion": "success"
-        },
-        {
-          "name": "Тесты (Python 3.10, ubuntu-latest)",
-          "conclusion": "success"
-        },
-        {
-          "name": "Тесты (Python 3.10, windows-latest)",
-          "conclusion": "success"
-        },
-        {
-          "name": "Линтер, форматирование, покрытие",
-          "conclusion": "success"
-        },
-        {
-          "name": "Тесты (Python 3.11, windows-latest)",
-          "conclusion": "success"
-        },
-        {
-          "name": "Разведка официальных источников (не блокирует CI)",
-          "conclusion": "skipped"
-        },
-        {
-          "name": "Соответствие договору (проект 117812)",
-          "conclusion": "success"
-        },
-        {
-          "name": "Пилот на реальной модели (rugpt3small, CPU)",
-          "conclusion": "skipped"
-        },
-        {
-          "name": "Внешние размеченные наборы (скачивание, контрольные ...",
-          "conclusion": "skipped"
-        },
-        {
-          "name": "Единый файл чисел (METRICS.json) и сверка документов",
-          "conclusion": "skipped"
-        }
-      ]
-    },
-    {
-      "id": 38404982394,
-      "name": "ci",
-      "event": "push",
-      "head_branch": "arena/266e93dc-smarty-chumakov",
-      "head_sha": "d1594ef2fc47d3f9800be8e800ee4794ceb842ae",
-      "conclusion": "success",
-      "created_at": "2026-10-13T13:26:36Z",
-      "url": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/38404982394",
-      "jobs": [
-        {
-          "name": "Тесты (Python 3.12, windows-latest)",
-          "conclusion": "success"
-        },
-        {
-          "name": "Линтер, форматирование, покрытие",
-          "conclusion": "success"
-        },
-        {
-          "name": "Тесты (Python 3.11, ubuntu-latest)",
-          "conclusion": "success"
-        },
-        {
-          "name": "Разведка официальных источников (не блокирует CI)",
-          "conclusion": "skipped"
-        },
-        {
-          "name": "Соответствие договору (проект 117812)",
-          "conclusion": "success"
-        },
-        {
-          "name": "Пилот на реальной модели (rugpt3small, CPU)",
-          "conclusion": "skipped"
-        },
-        {
-          "name": "Внешние размеченные наборы (скачивание, контрольные ...",
-          "conclusion": "skipped"
-        },
-        {
-          "name": "Единый файл чисел (METRICS.json) и сверка документов",
-          "conclusion": "skipped"
-        }
-      ]
-    },
-    {
-      "id": 38404908152,
-      "name": "ci",
-      "event": "push",
-      "head_branch": "arena/266e93dc-smarty-chumakov",
-      "head_sha": "37ac80d7e21940aa0b173c19fac84e1a8dc57d50",
-      "conclusion": "cancelled",
-      "created_at": "2026-10-13T13:26:03Z",
-      "url": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/38404908152",
-      "jobs": []
-    },
-    {
-      "id": 38404896034,
-      "name": "ci",
-      "event": "pull_request",
-      "head_branch": "arena/266e93dc-smarty-chumakov",
-      "head_sha": "37ac80d7e21940aa0b173c19fac84e1a8dc57d50",
-      "conclusion": "cancelled",
-      "created_at": "2026-10-13T13:25:57Z",
-      "url": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/38404896034",
-      "jobs": []
-    },
-    {
-      "id": 38404811972,
-      "name": "ci",
-      "event": "pull_request",
-      "head_branch": "arena/266e93dc-smarty-chumakov",
-      "head_sha": "9656515725f68879f6a593ae4870fb579a32f9fa",
-      "conclusion": "cancelled",
-      "created_at": "2026-10-13T13:25:20Z",
-      "url": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/38404811972",
-      "jobs": []
-    },
-    {
-      "id": 38404803917,
-      "name": "ci",
-      "event": "push",
-      "head_branch": "arena/266e93dc-smarty-chumakov",
-      "head_sha": "9656515725f68879f6a593ae4870fb579a32f9fa",
-      "conclusion": "cancelled",
-      "created_at": "2026-10-13T13:25:17Z",
-      "url": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/38404803917",
-      "jobs": []
-    },
-    {
-      "id": 38404711400,
-      "name": "ci",
-      "event": "pull_request",
-      "head_branch": "arena/266e93dc-smarty-chumakov",
-      "head_sha": "0f696675bbd4cfa5a1d7112fde3827ea7df58ce3",
-      "conclusion": "cancelled",
-      "created_at": "2026-10-13T13:24:35Z",
-      "url": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/38404711400",
-      "jobs": [
-        {
-          "name": "Линтер, форматирование, покрытие",
-          "conclusion": "cancelled"
-        },
-        {
-          "name": "Тесты (Python 3.12, ubuntu-latest)",
-          "conclusion": "cancelled"
-        },
-        {
-          "name": "Тесты (Python 3.10, windows-latest)",
-          "conclusion": "cancelled"
-        },
-        {
-          "name": "Тесты (Python 3.12, windows-latest)",
-          "conclusion": "cancelled"
-        },
-        {
-          "name": "Тесты (Python 3.11, windows-latest)",
-          "conclusion": "cancelled"
-        },
-        {
-          "name": "Тесты (Python 3.11, ubuntu-latest)",
-          "conclusion": "cancelled"
-        },
-        {
-          "name": "Тесты (Python 3.10, ubuntu-latest)",
-          "conclusion": "cancelled"
-        },
-        {
-          "name": "Разведка официальных источников (не блокирует CI)",
-          "conclusion": "skipped"
-        },
-        {
-          "name": "Соответствие договору (проект 117812)",
-          "conclusion": "success"
-        },
-        {
-          "name": "Пилот на реальной модели (rugpt3small, CPU)",
-          "conclusion": "cancelled"
-        },
-        {
-          "name": "Внешние размеченные наборы (скачивание, контрольные ...",
-          "conclusion": "cancelled"
-        },
-        {
-          "name": "Единый файл чисел (METRICS.json) и сверка документов",
-          "conclusion": "cancelled"
-        }
-      ]
-    },
-    {
-      "id": 38404704534,
-      "name": "ci",
-      "event": "push",
-      "head_branch": "arena/266e93dc-smarty-chumakov",
-      "head_sha": "0f696675bbd4cfa5a1d7112fde3827ea7df58ce3",
-      "conclusion": "cancelled",
-      "created_at": "2026-10-13T13:24:32Z",
-      "url": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/38404704534",
-      "jobs": [
-        {
-          "name": "Линтер, форматирование, покрытие",
-          "conclusion": "cancelled"
-        },
-        {
-          "name": "Тесты (Python 3.11, ubuntu-latest)",
-          "conclusion": "cancelled"
-        },
-        {
-          "name": "Тесты (Python 3.12, windows-latest)",
-          "conclusion": "cancelled"
-        },
-        {
-          "name": "Разведка официальных источников (не блокирует CI)",
-          "conclusion": "skipped"
-        },
-        {
-          "name": "Соответствие договору (проект 117812)",
-          "conclusion": "success"
-        },
-        {
-          "name": "Пилот на реальной модели (rugpt3small, CPU)",
-          "conclusion": "cancelled"
-        },
-        {
-          "name": "Внешние размеченные наборы (скачивание, контрольные ...",
-          "conclusion": "cancelled"
-        },
-        {
-          "name": "Единый файл чисел (METRICS.json) и сверка документов",
-          "conclusion": "cancelled"
-        }
-      ]
-    },
-    {
-      "id": 38400287447,
-      "name": "ci",
-      "event": "pull_request",
-      "head_branch": "arena/266e93dc-smarty-chumakov",
-      "head_sha": "b2d4fa900514fef1b086bd2d9fe571aaa5684720",
-      "conclusion": "success",
-      "created_at": "2026-10-13T12:50:28Z",
-      "url": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/38400287447",
-      "jobs": [
-        {
-          "name": "Линтер, форматирование, покрытие",
-          "conclusion": "success"
-        },
-        {
-          "name": "Тесты (Python 3.11, windows-latest)",
-          "conclusion": "success"
-        },
-        {
-          "name": "Тесты (Python 3.10, ubuntu-latest)",
-          "conclusion": "success"
-        },
-        {
-          "name": "Тесты (Python 3.10, windows-latest)",
-          "conclusion": "success"
-        },
-        {
-          "name": "Тесты (Python 3.11, ubuntu-latest)",
-          "conclusion": "success"
-        },
-        {
-          "name": "Тесты (Python 3.12, ubuntu-latest)",
-          "conclusion": "success"
-        },
-        {
-          "name": "Тесты (Python 3.12, windows-latest)",
-          "conclusion": "success"
-        },
-        {
-          "name": "Разведка официальных источников (не блокирует CI)",
-          "conclusion": "skipped"
-        },
-        {
-          "name": "Соответствие договору (проект 117812)",
-          "conclusion": "success"
-        },
-        {
-          "name": "Внешние размеченные наборы (скачивание, контрольные ...",
-          "conclusion": "skipped"
-        },
-        {
-          "name": "Пилот на реальной модели (rugpt3small, CPU)",
-          "conclusion": "skipped"
-        },
-        {
-          "name": "Единый файл чисел (METRICS.json) и сверка документов",
-          "conclusion": "skipped"
-        }
-      ]
-    },
-    {
-      "id": 38400281234,
-      "name": "ci",
-      "event": "push",
-      "head_branch": "arena/266e93dc-smarty-chumakov",
-      "head_sha": "b2d4fa900514fef1b086bd2d9fe571aaa5684720",
-      "conclusion": "success",
-      "created_at": "2026-10-13T12:50:24Z",
-      "url": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/38400281234",
-      "jobs": [
-        {
-          "name": "Линтер, форматирование, покрытие",
-          "conclusion": "success"
-        },
-        {
-          "name": "Тесты (Python 3.12, windows-latest)",
-          "conclusion": "success"
-        },
-        {
-          "name": "Тесты (Python 3.11, ubuntu-latest)",
-          "conclusion": "success"
-        },
-        {
-          "name": "Разведка официальных источников (не блокирует CI)",
-          "conclusion": "skipped"
-        },
-        {
-          "name": "Соответствие договору (проект 117812)",
-          "conclusion": "success"
-        },
-        {
-          "name": "Внешние размеченные наборы (скачивание, контрольные ...",
-          "conclusion": "skipped"
-        },
-        {
-          "name": "Пилот на реальной модели (rugpt3small, CPU)",
-          "conclusion": "skipped"
-        },
-        {
-          "name": "Единый файл чисел (METRICS.json) и сверка документов",
-          "conclusion": "skipped"
-        }
-      ]
-    },
-    {
-      "id": 38393462993,
-      "name": "ci",
-      "event": "pull_request",
-      "head_branch": "arena/266e93dc-smarty-chumakov",
-      "head_sha": "17846f4ff73b52ab7069728c3bc5fcb13d752208",
-      "conclusion": "failure",
-      "created_at": "2026-10-13T11:54:25Z",
-      "url": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/38393462993",
-      "jobs": [
-        {
-          "name": "Линтер, форматирование, покрытие",
-          "conclusion": "success"
-        },
-        {
-          "name": "Тесты (Python 3.11, windows-latest)",
-          "conclusion": "success"
-        },
-        {
-          "name": "Тесты (Python 3.11, ubuntu-latest)",
-          "conclusion": "success"
-        },
-        {
-          "name": "Соответствие договору (проект 117812)",
-          "conclusion": "failure"
-        },
-        {
-          "name": "Тесты (Python 3.12, ubuntu-latest)",
-          "conclusion": "success"
-        },
-        {
-          "name": "Тесты (Python 3.10, windows-latest)",
-          "conclusion": "success"
-        },
-        {
-          "name": "Тесты (Python 3.10, ubuntu-latest)",
-          "conclusion": "success"
-        },
-        {
-          "name": "Тесты (Python 3.12, windows-latest)",
-          "conclusion": "success"
-        },
-        {
-          "name": "Разведка официальных источников (не блокирует CI)",
-          "conclusion": "skipped"
         },
         {
           "name": "Пилот на реальной модели (rugpt3small, CPU)",

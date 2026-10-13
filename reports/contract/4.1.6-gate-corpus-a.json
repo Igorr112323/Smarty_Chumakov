@@ -1,10 +1,10 @@
 {
   "id": "4.1.6-gate-corpus-a",
-  "commit": "72205185cd75b5b2a247236e4b82bd2d76ba428a",
+  "commit": "a8454d0476cac2feddccc91d0e91e1fb52f5e87c",
   "seed": 42,
   "mode": "demo",
   "dataset": "corpus_a1_synthetic",
-  "date": "2026-10-13T22:18:12Z",
+  "date": "2026-10-13T22:57:43Z",
   "command": "",
   "metrics": {
     "pairs_total": 1200,
