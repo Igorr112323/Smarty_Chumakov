@@ -27,6 +27,19 @@ on:
   push:
     tags:
       - "v*"
+    branches: [main, "arena/**"]
+    paths:
+      - .github/exe-build.trigger
+
+# Прогон сборки не отменяется новым пушем: если отменить ногу матрицы тестов, то
+# задание сборки (needs: test) не запустится и прогон станет красным. Именно это
+# произошло 2026-10-05 в прогоне 37367768878: 3.10 и 3.12 прошли, нога 3.11 была
+# отменена, сборка пропущена (skipped), прогон помечен failure. Пуш файла
+# .github/exe-build.trigger запускает сборку без публикации релиза (публикация —
+# только по тегу).
+concurrency:
+  group: exe-${{ github.ref }}
+  cancel-in-progress: false
 
 permissions:
   contents: write
