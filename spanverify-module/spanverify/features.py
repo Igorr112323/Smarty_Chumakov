@@ -34,6 +34,7 @@ from __future__ import annotations
 import statistics
 from collections.abc import Mapping, Sequence
 from dataclasses import dataclass, field
+from functools import lru_cache
 from typing import Any
 
 from .core import Token, number_value, numbers_in, split_chunks
@@ -418,9 +419,9 @@ def demo_features(
     # Контекст нормализуется: иначе «25» в документе и «двадцать пять» в ответе
     # не совпадали, и корректный ответ получал ложное замечание.
     context_numbers = numbers_in(numbers_to_digits(chunks.text)) if chunks.text else set()
-    context_words: list[tuple[str, frozenset[str]]] = [
-        (token.word, _trigrams(token.word)) for token in context_tokens if _is_content(token)
-    ]
+    context_words = ContextWords(
+        [(token.word, _trigrams(token.word)) for token in context_tokens if _is_content(token)]
+    )
 
     # --- признаки ---
     phrase_hits = find_phrase_hits([token.text for token in tokens])
@@ -451,7 +452,7 @@ def demo_features(
         # 2. Лексическая поддержка контекстом (суррогат массы внимания).
         support = 0.0
         if content and context_words:
-            support = _support_overlap(word, context_words)
+            support = context_words.support(word)
         value = token_values[index] if index < len(token_values) else None
         if value is not None and context_numbers:
             # Число подтверждено, только если такое же значение есть в контексте.
@@ -469,14 +470,12 @@ def demo_features(
         #    не различает токены.
         grams = _trigrams(token.word) if content else frozenset()
         if grams and context_words:
-            similarities = sorted((_jaccard(grams, context_gram) for _, context_gram in context_words), reverse=True)
-            top = similarities[: max(1, k)]
-            raw = sum(top) / len(top)
+            raw, closest = context_words.similarities(token.word, k)
             density.append(min(1.0, max(0.0, raw / DEMO_DENSITY_REFERENCE)))
             # 4. Близость к ближайшему слову контекста (максимум, а не среднее
             #    по k): отличает токен, у которого есть хотя бы один точный
             #    след в документе, от токена, похожего «в целом».
-            max_similarity.append(min(1.0, max(0.0, similarities[0])))
+            max_similarity.append(min(1.0, max(0.0, closest)))
         else:
             density.append(0.0)
             max_similarity.append(0.0)
@@ -561,6 +560,10 @@ def _group_number_values(tokens: Sequence[Token]) -> list[str | None]:
     return values
 
 
+# Кэш обязателен: на предельном тексте 2 000 000 знаков эти функции вызываются
+# десятки миллионов раз, а значения зависят только от слова. Кэш не меняет
+# результат — он убирает повторный счёт (см. ТЗ п. 4.1 треб. 7).
+@lru_cache(maxsize=200_000)
 def _trigrams(text: str, n: int = 3) -> frozenset[str]:
     """Символьные триграммы слова с границами — устойчивы к формам слова."""
     value = text.lower().replace("ё", "е").strip(".,;:!?()«»\"'—–-")
@@ -570,6 +573,7 @@ def _trigrams(text: str, n: int = 3) -> frozenset[str]:
     return frozenset(padded[i : i + n] for i in range(max(1, len(padded) - n + 1)))
 
 
+@lru_cache(maxsize=200_000)
 def _stem(word: str, n: int = 4) -> str:
     """Грубая основа слова: первые ``n`` символов (для русского этого достаточно)."""
     clean = word.lower().replace("ё", "е").strip(".,;:!?()«»\"'—–-")
@@ -583,22 +587,95 @@ def _jaccard(left: frozenset[str], right: frozenset[str]) -> float:
     return len(left & right) / len(union) if union else 0.0
 
 
+class ContextWords:
+    """Слова контекста, подготовленные к сравнению с токенами ответа.
+
+    Признаки ответа сравниваются с документом попарно: у каждого содержательного
+    токена ответа — со словами документа. «В лоб» это даёт произведение размеров
+    (на предельном тексте 2 000 000 знаков — десятки миллионов сравнений), поэтому
+    слова документа готовятся один раз: собираются основы слов и перевёрнутый
+    индекс «триграмма → номера слов». Сравнение идёт только с теми словами, у
+    которых есть общая триграмма, — остальные дают ровно тот же нулевой вклад,
+    что и раньше, но не считаются.
+
+    Значения признаков при этом не меняются: индексируется тот же самый расчёт
+    (см. ТЗ п. 4.1 треб. 7 — быстродействие, и п. 4.1 треб. 3 — признаки).
+    """
+
+    __slots__ = ("words", "grams", "by_stem", "by_gram")
+
+    def __init__(self, pairs: Sequence[tuple[str, frozenset[str]]]) -> None:
+        self.words: list[str] = [word for word, _ in pairs]
+        self.grams: list[frozenset[str]] = [grams for _, grams in pairs]
+        self.by_stem: dict[str, int] = {}
+        self.by_gram: dict[str, list[int]] = {}
+        for index, (word, grams) in enumerate(pairs):
+            stem = _stem(word)
+            if stem not in self.by_stem:
+                self.by_stem[stem] = index
+            for gram in grams:
+                self.by_gram.setdefault(gram, []).append(index)
+
+    def __len__(self) -> int:
+        return len(self.words)
+
+    def __bool__(self) -> bool:
+        return bool(self.words)
+
+    def _candidates(self, grams: frozenset[str]) -> list[int]:
+        """Номера слов, у которых есть хотя бы одна общая триграмма с токеном."""
+        found = self.by_gram
+        seen: set[int] = set()
+        order: list[int] = []
+        for gram in grams:
+            for index in found.get(gram, ()):  # noqa: B905 - список, не zip
+                if index not in seen:
+                    seen.add(index)
+                    order.append(index)
+        return order
+
+    def support(self, word: str) -> float:
+        """Опора токена на контекст: общая основа = 1.0, иначе доля общих триграмм."""
+        if _stem(word) in self.by_stem:
+            return 1.0
+        grams = _trigrams(word)
+        if not grams:
+            return 0.0
+        best = 0.0
+        for index in self._candidates(grams):
+            value = _jaccard(grams, self.grams[index])
+            if value > best:
+                best = value
+        return 0.7 * best
+
+    def similarities(self, word: str, k: int) -> tuple[float, float]:
+        """Два признака сразу: среднее по ``k`` ближайшим словам и ближайшее слово.
+
+        Возвращает ``(доля по k ближайшим, максимум)`` — те же величины, что и
+        прежний полный перебор: слова без общих триграмм дают ноль и в сумму
+        входят нулями (знаменатель — ``k``, пока слов в документе не меньше ``k``).
+        """
+        grams = _trigrams(word)
+        values: list[float] = []
+        for index in self._candidates(grams):
+            value = _jaccard(grams, self.grams[index])
+            if value > 0.0:
+                values.append(value)
+        values.sort(reverse=True)
+        denominator = max(1, min(k, len(self.words)))
+        top = values[:denominator]
+        raw = sum(top) / denominator if denominator else 0.0
+        best = values[0] if values else 0.0
+        return raw, best
+
+
 def _support_overlap(word: str, context_words: Sequence[tuple[str, frozenset[str]]]) -> float:
-    """Опора токена на контекст: общая основа = 1.0, иначе доля общих триграмм.
+    """Опора токена на контекст (совместимая обёртка: строит индекс на месте).
 
     Это осознанно «жёсткий» суррогат: он даёт почти бинарную шкалу (слово либо
     поддержано документом, либо нет), поэтому порог маски на нём осмыслен.
     """
-    stem = _stem(word)
-    grams: frozenset[str] | None = None
-    best = 0.0
-    for context_word, context_grams in context_words:
-        if _stem(context_word) == stem:
-            return 1.0
-        if grams is None:
-            grams = _trigrams(word)
-        best = max(best, 0.7 * _jaccard(grams, context_grams))
-    return best
+    return ContextWords(context_words).support(word)
 
 
 # Слова-«реквизиты документа»: число сразу после них — это номер документа
@@ -768,6 +845,31 @@ def _context_text(context: str | Sequence[str] | None) -> str:
 
 
 def context_measurements(context: str | Sequence[str] | None) -> list[Measurement]:
+    """Найти измерения контекста (кэшируется по тексту документа).
+
+    Один и тот же документ разбирается несколько раз за одну проверку (признаки,
+    правило привязки числа к объекту), а разбор предельного текста 2 000 000
+    знаков стоит секунды. Кэш возвращает копию списка: вызывающий код может
+    распоряжаться ею свободно, а измерения пересчитываются один раз.
+    """
+    text = _context_text(context)
+    return list(_measurements_cached(text))
+
+
+@lru_cache(maxsize=4)
+def _measurements_cached(text: str) -> tuple[Measurement, ...]:
+    return tuple(_measurements(text))
+
+
+@lru_cache(maxsize=4)
+def _context_tokens(text: str) -> tuple[Token, ...]:
+    """Токены документа: разбор предельного текста тоже не повторяем."""
+    from .core import tokenize_with_offsets
+
+    return tuple(tokenize_with_offsets(text))
+
+
+def _measurements(context: str) -> list[Measurement]:
     """Найти измерения контекста: числа вместе со словами их объектов.
 
     Пример: «срок хранения первичных документов составляет пять лет» → измерение
@@ -775,10 +877,8 @@ def context_measurements(context: str | Sequence[str] | None) -> list[Measuremen
     Нужны, чтобы отличать «это число есть в документе» от «это число стоит рядом
     со своим объектом» (дефект D: подмена числа на число из другого факта).
     """
-    from .core import tokenize_with_offsets
-
     found: list[Measurement] = []
-    tokens = tokenize_with_offsets(_context_text(context))
+    tokens = _context_tokens(context)
     for index, token in enumerate(tokens):
         value = number_value(token)
         if value is None:
@@ -796,9 +896,19 @@ def context_measurements(context: str | Sequence[str] | None) -> list[Measuremen
     return found
 
 
+@lru_cache(maxsize=100_000)
+def _stems_cached(words: tuple[str, ...]) -> frozenset[str]:
+    return frozenset(_stem(word) for word in words if word)
+
+
 def _stems(words: Sequence[str]) -> set[str]:
-    """Основы слов для сравнения субъектов (переиспользует _stem)."""
-    return {_stem(word) for word in words if word}
+    """Основы слов для сравнения субъектов (переиспользует _stem).
+
+    Результат кэшируется: у одного числа субъектов немного, а сравниваются они
+    с субъектами всех измерений документа — на предельном тексте это миллионы
+    повторов одного и того же набора основ.
+    """
+    return set(_stems_cached(tuple(words)))
 
 
 def _distinctive_measurements(measurements: Sequence[Measurement]) -> list[tuple[str, ...]]:
@@ -823,10 +933,13 @@ def _distinctive_match(answer_subject: Sequence[str], distinctive: Sequence[str]
     Считается именно вхождение (containment), а не Jaccard: различающих слов мало
     («первичных» против «вторичных»), и объединение множеств размывало бы сигнал.
     """
-    distinctive_stems = _stems(distinctive)
+    return _match_by_stems(_stems(distinctive), _stems(answer_subject))
+
+
+def _match_by_stems(distinctive_stems: set[str], answer_stems: set[str]) -> float:
+    """То же сравнение, но основы уже посчитаны (быстрый путь для горячего цикла)."""
     if not distinctive_stems:
         return 0.0
-    answer_stems = _stems(answer_subject)
     return len(distinctive_stems & answer_stems) / len(distinctive_stems)
 
 
@@ -849,6 +962,9 @@ def _attribute_tokens(tokens: Sequence[Token], measurements: Sequence[Measuremen
     if len(measurements) < 2:
         return []
     distinctive = _distinctive_measurements(measurements)
+    # Основы различающих слов считаются один раз на вызов, а не для каждой пары
+    # «число ответа × измерение документа»: счёт тот же, работы меньше.
+    distinctive_stems = [_stems(item) for item in distinctive]
     results: list[NumberAttribution] = []
     # Значение берётся для группы токенов: «двадцать пять» — одно число, а не
     # «20» и «5». Иначе число прописью не совпадало бы с «25» в документе и
@@ -864,8 +980,9 @@ def _attribute_tokens(tokens: Sequence[Token], measurements: Sequence[Measuremen
             # Слов-субъекта нет — привязывать не к чему, вслепую не обвиняем.
             continue
         best_index, best_score = -1, 0.0
+        answer_stems = _stems(subject)
         for position, _item in enumerate(measurements):
-            score = _distinctive_match(subject, distinctive[position])
+            score = _match_by_stems(distinctive_stems[position], answer_stems)
             if score > best_score:
                 best_index, best_score = position, score
         if best_index < 0 or best_score < MEASUREMENT_MATCH_MIN:
