@@ -62,7 +62,11 @@ STATUS_UNKNOWN = "не измерено"
 def git_commit() -> str:
     try:
         return subprocess.run(
-            ["git", "rev-parse", "HEAD"], cwd=ROOT, capture_output=True, text=True, check=True
+            ["git", "rev-parse", "HEAD"],
+            cwd=ROOT,
+            capture_output=True,
+            text=True,
+            check=True,
         ).stdout.strip()
     except (subprocess.CalledProcessError, FileNotFoundError):  # pragma: no cover
         return "unknown"
@@ -96,7 +100,9 @@ def run_module(args: list[str], timeout: int = 900) -> subprocess.CompletedProce
     )
 
 
-def run_python(script: str, timeout: int = 900, cwd: Path | None = None) -> subprocess.CompletedProcess:
+def run_python(
+    script: str, timeout: int = 900, cwd: Path | None = None
+) -> subprocess.CompletedProcess:
     return subprocess.run(
         [sys.executable, "-c", script],
         cwd=cwd or MODULE,
@@ -110,11 +116,15 @@ def run_python(script: str, timeout: int = 900, cwd: Path | None = None) -> subp
 def write_artifact(check_id: str, payload: dict[str, Any]) -> str:
     ARTIFACTS.mkdir(parents=True, exist_ok=True)
     path = ARTIFACTS / f"{check_id}.json"
-    path.write_text(json.dumps(payload, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    path.write_text(
+        json.dumps(payload, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
+    )
     return str(path.relative_to(ROOT))
 
 
-def artifact_payload(check_id: str, fact: dict[str, Any], note: str = "", gate: str | None = None) -> dict[str, Any]:
+def artifact_payload(
+    check_id: str, fact: dict[str, Any], note: str = "", gate: str | None = None
+) -> dict[str, Any]:
     """Стандартная схема артефакта: commit, seed, mode, dataset, metrics, note, gate."""
     return {
         "id": check_id,
@@ -206,7 +216,11 @@ print(json.dumps({{
 """
         proc = run_python(script, timeout=1800)
         if proc.returncode != 0:
-            self.shared["limit"] = {"skipped": False, "success": False, "stderr": proc.stderr[-500:]}
+            self.shared["limit"] = {
+                "skipped": False,
+                "success": False,
+                "stderr": proc.stderr[-500:],
+            }
             return self.shared["limit"]
         payload = json.loads(proc.stdout.strip().splitlines()[-1])
         payload["skipped"] = False
@@ -256,8 +270,12 @@ print(json.dumps({{"by_size": out, "peak_memory_mb": round(resource.getrusage(re
     def corpus_a(self) -> dict[str, Any]:
         if "corpus_a" in self.shared:
             return self.shared["corpus_a"]
-        proc = run_module(["evaluate", "--dataset", "data/corpus_a/splits/test.jsonl", "--json"])
-        manifest = json.loads((MODULE / "data" / "corpus_a" / "manifest.json").read_text(encoding="utf-8"))
+        proc = run_module(
+            ["evaluate", "--dataset", "data/corpus_a/splits/test.jsonl", "--json"]
+        )
+        manifest = json.loads(
+            (MODULE / "data" / "corpus_a" / "manifest.json").read_text(encoding="utf-8")
+        )
         metrics = json.loads(proc.stdout) if proc.returncode == 0 else {}
         self.shared["corpus_a"] = {
             "returncode": proc.returncode,
@@ -399,7 +417,10 @@ print(json.dumps({{
 """
         proc = run_python(script, timeout=900)
         if proc.returncode != 0:
-            self.shared["participation"] = {"failed": True, "stderr": proc.stderr[-600:]}
+            self.shared["participation"] = {
+                "failed": True,
+                "stderr": proc.stderr[-600:],
+            }
             return self.shared["participation"]
         self.shared["participation"] = json.loads(proc.stdout.strip().splitlines()[-1])
         return self.shared["participation"]
@@ -458,19 +479,31 @@ print(json.dumps({{
         workdir = Path(tempfile.mkdtemp(prefix="spanverify-contract-"))
         out_dir = workdir / "release"
         proc = subprocess.run(
-            [sys.executable, "scripts/make_zipapp.py", "--out", str(out_dir), "--name", "spanverify.pyz"],
+            [
+                sys.executable,
+                "scripts/make_zipapp.py",
+                "--out",
+                str(out_dir),
+                "--name",
+                "spanverify.pyz",
+            ],
             cwd=MODULE,
             capture_output=True,
             text=True,
             timeout=900,
             env={**os.environ, "PYTHONPATH": str(MODULE), "PYTHONUTF8": "1"},
         )
-        payload: dict[str, Any] = {"build_returncode": proc.returncode, "build_stderr": proc.stderr[-400:]}
+        payload: dict[str, Any] = {
+            "build_returncode": proc.returncode,
+            "build_stderr": proc.stderr[-400:],
+        }
         out_pyz = out_dir / "spanverify.pyz"
         if out_pyz.is_file():
             payload["pyz_size_bytes"] = out_pyz.stat().st_size
             payload["pyz_size_mb"] = round(out_pyz.stat().st_size / (1024 * 1024), 4)
-            payload["pyz_size_mb_decimal"] = round(out_pyz.stat().st_size / 1_000_000, 4)
+            payload["pyz_size_mb_decimal"] = round(
+                out_pyz.stat().st_size / 1_000_000, 4
+            )
             payload["pyz_sha256"] = sha256_of(out_pyz)
             smoke = subprocess.run(
                 [sys.executable, str(out_pyz), "selftest"],
@@ -504,21 +537,42 @@ print(json.dumps({{
         repo = "Igorr112323/Smarty_Chumakov"
         info = subprocess.run(
             ["gh", "api", f"repos/{repo}/releases/latest"],
-            capture_output=True, text=True, timeout=120,
+            capture_output=True,
+            text=True,
+            timeout=120,
         )
         if info.returncode != 0:
-            self.shared["release"] = {"available": False, "reason": (info.stderr or "").strip()[-300:]}
+            self.shared["release"] = {
+                "available": False,
+                "reason": (info.stderr or "").strip()[-300:],
+            }
             return self.shared["release"]
         payload = json.loads(info.stdout)
         assets = {
-            item["name"]: {"size_bytes": item["size"], "size_mb": round(item["size"] / (1024 * 1024), 4),
-                           "size_mb_decimal": round(item["size"] / 1_000_000, 4), "url": item["browser_download_url"]}
+            item["name"]: {
+                "size_bytes": item["size"],
+                "size_mb": round(item["size"] / (1024 * 1024), 4),
+                "size_mb_decimal": round(item["size"] / 1_000_000, 4),
+                "url": item["browser_download_url"],
+            }
             for item in payload.get("assets", [])
         }
         runs = subprocess.run(
-            ["gh", "run", "list", "--workflow", "build-and-release-exe.yml", "--limit", "10",
-             "--json", "databaseId,headSha,conclusion,createdAt"],
-            cwd=ROOT, capture_output=True, text=True, timeout=120,
+            [
+                "gh",
+                "run",
+                "list",
+                "--workflow",
+                "build-and-release-exe.yml",
+                "--limit",
+                "10",
+                "--json",
+                "databaseId,headSha,conclusion,createdAt",
+            ],
+            cwd=ROOT,
+            capture_output=True,
+            text=True,
+            timeout=120,
         )
         workflow_runs = json.loads(runs.stdout) if runs.returncode == 0 else []
         result: dict[str, Any] = {
@@ -528,7 +582,10 @@ print(json.dumps({{
             "assets": assets,
             "workflow": {
                 "name": "build-and-release-exe.yml",
-                "latest_success": next((run for run in workflow_runs if run["conclusion"] == "success"), None),
+                "latest_success": next(
+                    (run for run in workflow_runs if run["conclusion"] == "success"),
+                    None,
+                ),
                 "latest": workflow_runs[0] if workflow_runs else None,
             },
         }
@@ -536,10 +593,24 @@ print(json.dumps({{
         workdir = Path(tempfile.mkdtemp(prefix="spanverify-release-"))
         try:
             download = subprocess.run(
-                ["gh", "release", "download", "--repo", repo, "--pattern", "spanverify.pyz",
-                 "--pattern", "SHA256SUMS.txt", "--dir", str(workdir), "--clobber",
-                 payload.get("tag_name") or ""],
-                capture_output=True, text=True, timeout=600,
+                [
+                    "gh",
+                    "release",
+                    "download",
+                    "--repo",
+                    repo,
+                    "--pattern",
+                    "spanverify.pyz",
+                    "--pattern",
+                    "SHA256SUMS.txt",
+                    "--dir",
+                    str(workdir),
+                    "--clobber",
+                    payload.get("tag_name") or "",
+                ],
+                capture_output=True,
+                text=True,
+                timeout=600,
             )
             result["download_returncode"] = download.returncode
             pyz = workdir / "spanverify.pyz"
@@ -559,11 +630,22 @@ print(json.dumps({{
                 result["downloaded_pyz_size_bytes"] = pyz.stat().st_size
                 result["downloaded_pyz_sha256"] = sha256_of(pyz)
                 verify = subprocess.run(
-                    [sys.executable, str(ROOT / "scripts" / "verify_checksum.py"), str(pyz), "--sums", str(sums)],
-                    cwd=ROOT, capture_output=True, text=True, timeout=300,
+                    [
+                        sys.executable,
+                        str(ROOT / "scripts" / "verify_checksum.py"),
+                        str(pyz),
+                        "--sums",
+                        str(sums),
+                    ],
+                    cwd=ROOT,
+                    capture_output=True,
+                    text=True,
+                    timeout=300,
                 )
                 result["checksum_verified"] = verify.returncode == 0
-                result["checksum_tail"] = (verify.stdout or verify.stderr).strip().splitlines()[-1:]
+                result["checksum_tail"] = (
+                    (verify.stdout or verify.stderr).strip().splitlines()[-1:]
+                )
             else:
                 result["checksum_verified"] = False
                 result["checksum_note"] = (download.stderr or "")[-300:]
@@ -579,8 +661,19 @@ print(json.dumps({{
             return self.shared["tests"]
         coverage_path = MODULE / "reports" / "coverage.json"
         collected = subprocess.run(
-            [sys.executable, "-m", "pytest", "--collect-only", "-q", "-p", "no:cacheprovider"],
-            cwd=MODULE, capture_output=True, text=True, timeout=900,
+            [
+                sys.executable,
+                "-m",
+                "pytest",
+                "--collect-only",
+                "-q",
+                "-p",
+                "no:cacheprovider",
+            ],
+            cwd=MODULE,
+            capture_output=True,
+            text=True,
+            timeout=900,
         )
         count = 0
         for line in collected.stdout.splitlines():
@@ -592,13 +685,19 @@ print(json.dumps({{
         payload: dict[str, Any] = {
             "collect_returncode": collected.returncode,
             "collected": count,
-            "coverage_file": str(coverage_path.relative_to(ROOT)) if coverage_path.is_file() else None,
+            "coverage_file": (
+                str(coverage_path.relative_to(ROOT))
+                if coverage_path.is_file()
+                else None
+            ),
             "coverage_percent": None,
             "coverage_gate_percent": 85,
         }
         if coverage_path.is_file():
             data = json.loads(coverage_path.read_text(encoding="utf-8"))
-            payload["coverage_percent"] = round(float(data["totals"]["percent_covered"]), 2)
+            payload["coverage_percent"] = round(
+                float(data["totals"]["percent_covered"]), 2
+            )
         self.shared["tests"] = payload
         return payload
 
@@ -609,7 +708,9 @@ CHECKS: list[Check] = []
 
 
 def check(**kwargs: Any) -> Callable:
-    def decorator(func: Callable[[Runner], tuple[str, dict[str, Any], str]]) -> Callable:
+    def decorator(
+        func: Callable[[Runner], tuple[str, dict[str, Any], str]],
+    ) -> Callable:
         CHECKS.append(Check(runner=func, **kwargs))
         return func
 
@@ -630,7 +731,11 @@ def check(**kwargs: Any) -> Callable:
 def check_text_limit(runner: Runner) -> tuple[str, dict[str, Any], str]:
     run = runner.limit_run()
     if run.get("skipped"):
-        return STATUS_UNKNOWN, {"skipped": True, "reason": run.get("reason")}, "режим --fast: предельный прогон не выполнялся"
+        return (
+            STATUS_UNKNOWN,
+            {"skipped": True, "reason": run.get("reason")},
+            "режим --fast: предельный прогон не выполнялся",
+        )
     if not run.get("success"):
         return STATUS_FAIL, run, "прогон на предельном тексте не завершился"
     ok = run["chars"] == 2_000_000
@@ -644,7 +749,11 @@ def check_text_limit(runner: Runner) -> tuple[str, dict[str, Any], str]:
     return (
         STATUS_OK if ok else STATUS_FAIL,
         fact,
-        "текст 2 000 000 знаков обработан" if ok else "длина текста в прогоне не равна 2 000 000 знаков",
+        (
+            "текст 2 000 000 знаков обработан"
+            if ok
+            else "длина текста в прогоне не равна 2 000 000 знаков"
+        ),
     )
 
 
@@ -683,7 +792,11 @@ def check_api_schema(runner: Runner) -> tuple[str, dict[str, Any], str]:
         "max_body": interfaces.get("max_body"),
         "dataset": "api-smoke",
     }
-    return (STATUS_OK if not problems else STATUS_FAIL), fact, "; ".join(problems) or "схема ответа соответствует требованию"
+    return (
+        (STATUS_OK if not problems else STATUS_FAIL),
+        fact,
+        "; ".join(problems) or "схема ответа соответствует требованию",
+    )
 
 
 @check(
@@ -705,7 +818,11 @@ def check_five_features(runner: Runner) -> tuple[str, dict[str, Any], str]:
         ]
     )
     if proc.returncode != 0:
-        return STATUS_FAIL, {"stderr": proc.stderr[-400:]}, "команда дампа признаков завершилась ошибкой"
+        return (
+            STATUS_FAIL,
+            {"stderr": proc.stderr[-400:]},
+            "команда дампа признаков завершилась ошибкой",
+        )
     payload = json.loads(proc.stdout)
     names = payload["features"]
     problems: list[str] = []
@@ -723,7 +840,11 @@ def check_five_features(runner: Runner) -> tuple[str, dict[str, Any], str]:
         "weights": payload.get("weights"),
         "dataset": "api-smoke",
     }
-    return (STATUS_OK if not problems else STATUS_FAIL), fact, "; ".join(problems) or "дамп содержит ровно пять конечных признаков"
+    return (
+        (STATUS_OK if not problems else STATUS_FAIL),
+        fact,
+        "; ".join(problems) or "дамп содержит ровно пять конечных признаков",
+    )
 
 
 @check(
@@ -752,7 +873,11 @@ def check_participation(runner: Runner) -> tuple[str, dict[str, Any], str]:
         "calibration_file_exists": calibration_file.is_file(),
         "dataset": "synthetic-participation-corpus",
     }
-    return (STATUS_OK if not problems else STATUS_FAIL), fact, "; ".join(problems) or "калибровка воспроизводима, шаг смеси 0,25"
+    return (
+        (STATUS_OK if not problems else STATUS_FAIL),
+        fact,
+        "; ".join(problems) or "калибровка воспроизводима, шаг смеси 0,25",
+    )
 
 
 @check(
@@ -774,7 +899,15 @@ def check_metric_groups(runner: Runner) -> tuple[str, dict[str, Any], str]:
     if (metrics.get("spans") or {}).get("iou_threshold") != 0.5:
         problems.append("порог IoU в отчёте не равен 0.5")
     proc = subprocess.run(
-        [sys.executable, "-m", "pytest", "-q", "-p", "no:cacheprovider", "tests/test_contract_surface.py::test_span_has_offsets_label_and_confidence"],
+        [
+            sys.executable,
+            "-m",
+            "pytest",
+            "-q",
+            "-p",
+            "no:cacheprovider",
+            "tests/test_contract_surface.py::test_span_has_offsets_label_and_confidence",
+        ],
         cwd=MODULE,
         capture_output=True,
         text=True,
@@ -792,7 +925,11 @@ def check_metric_groups(runner: Runner) -> tuple[str, dict[str, Any], str]:
         "iou_test_passed": proc.returncode == 0,
         "dataset": "corpus_a1_synthetic/test",
     }
-    return (STATUS_OK if not problems else STATUS_FAIL), fact, "; ".join(problems) or "три группы метрик и порог IoU 0.5 присутствуют"
+    return (
+        (STATUS_OK if not problems else STATUS_FAIL),
+        fact,
+        "; ".join(problems) or "три группы метрик и порог IoU 0.5 присутствуют",
+    )
 
 
 @check(
@@ -810,7 +947,9 @@ def check_gate_corpus_a(runner: Runner) -> tuple[str, dict[str, Any], str]:
     if manifest.get("target") != 1200:
         problems.append(f"объём набора {manifest.get('target')} вместо 1200 пар")
     if manifest.get("seed") != SEED:
-        problems.append(f"корпус собран с seed {manifest.get('seed')}, а проверка идёт с seed {SEED}")
+        problems.append(
+            f"корпус собран с seed {manifest.get('seed')}, а проверка идёт с seed {SEED}"
+        )
     gates = metrics.get("gates") or {}
     contract = (gates.get("tokens") or {}).get("contract") or {}
     status = contract.get("status")
@@ -853,7 +992,9 @@ def check_performance(runner: Runner) -> tuple[str, dict[str, Any], str]:
     problems: list[str] = []
     for size, block in perf["by_size"].items():
         if block["median_ms_per_1000_chars"] > 30.0:
-            problems.append(f"{size} знаков: {block['median_ms_per_1000_chars']} мс/1000 знаков > 30")
+            problems.append(
+                f"{size} знаков: {block['median_ms_per_1000_chars']} мс/1000 знаков > 30"
+            )
     if limit.get("skipped"):
         problems.append("предельный прогон 2 000 000 знаков не выполнен (--fast)")
     elif not limit.get("success"):
@@ -867,8 +1008,20 @@ def check_performance(runner: Runner) -> tuple[str, dict[str, Any], str]:
         "target_seconds_2m": 60.0,
         "dataset": "synthetic",
     }
-    status = STATUS_OK if not problems else (STATUS_UNKNOWN if "не выполнен (--fast)" in "; ".join(problems) else STATUS_FAIL)
-    return status, fact, "; ".join(problems) or "быстродействие в пределах договорных значений"
+    status = (
+        STATUS_OK
+        if not problems
+        else (
+            STATUS_UNKNOWN
+            if "не выполнен (--fast)" in "; ".join(problems)
+            else STATUS_FAIL
+        )
+    )
+    return (
+        status,
+        fact,
+        "; ".join(problems) or "быстродействие в пределах договорных значений",
+    )
 
 
 @check(
@@ -880,7 +1033,14 @@ def check_performance(runner: Runner) -> tuple[str, dict[str, Any], str]:
 )
 def check_interfaces(runner: Runner) -> tuple[str, dict[str, Any], str]:
     proc = run_module(
-        ["verify", "--answer", "Срок хранения составляет 3 года.", "--context", "Регламент: срок хранения 10 лет.", "--json"]
+        [
+            "verify",
+            "--answer",
+            "Срок хранения составляет 3 года.",
+            "--context",
+            "Регламент: срок хранения 10 лет.",
+            "--json",
+        ]
     )
     cli_ok = proc.returncode in (0, 1) and bool(proc.stdout.strip())
     interfaces = runner.interfaces()
@@ -897,7 +1057,9 @@ def check_interfaces(runner: Runner) -> tuple[str, dict[str, Any], str]:
         if interfaces.get("verify_status") != 200:
             problems.append("POST /v1/verify не ответил 200")
         if interfaces.get("port") != interfaces.get("default_port"):
-            problems.append(f"порт {interfaces.get('port')} вместо договорного {interfaces.get('default_port')}")
+            problems.append(
+                f"порт {interfaces.get('port')} вместо договорного {interfaces.get('default_port')}"
+            )
     fact = {
         "cli_returncode": proc.returncode,
         "health_status": interfaces.get("health_status"),
@@ -909,7 +1071,11 @@ def check_interfaces(runner: Runner) -> tuple[str, dict[str, Any], str]:
         "verify_keys": interfaces.get("verify_keys"),
         "dataset": "api-smoke",
     }
-    return (STATUS_OK if not problems else STATUS_FAIL), fact, "; ".join(problems) or "все три интерфейса отвечают"
+    return (
+        (STATUS_OK if not problems else STATUS_FAIL),
+        fact,
+        "; ".join(problems) or "все три интерфейса отвечают",
+    )
 
 
 @check(
@@ -936,7 +1102,8 @@ def check_delivery(runner: Runner) -> tuple[str, dict[str, Any], str]:
         "release_tag": release.get("tag"),
         "release_assets": release.get("assets"),
         "release_checksum_verified": release.get("checksum_verified"),
-        "release_workflow_run": (release.get("workflow") or {}).get("latest_success") or {},
+        "release_workflow_run": (release.get("workflow") or {}).get("latest_success")
+        or {},
         "dataset": "spanverify.pyz / release v1.3.0",
     }
     if problems:
@@ -976,7 +1143,11 @@ def check_no_network(runner: Runner) -> tuple[str, dict[str, Any], str]:
     if data.get("failed"):
         return STATUS_FAIL, data, "операции проверки обратились к сети или упали"
     fact = {**data, "dataset": "demo_pairs(20)"}
-    return STATUS_OK, fact, "verify и evaluate работают при полностью заблокированных сокетах"
+    return (
+        STATUS_OK,
+        fact,
+        "verify и evaluate работают при полностью заблокированных сокетах",
+    )
 
 
 # ------------------------------------------------------------------ ТЗ п. 4.2
@@ -1001,8 +1172,12 @@ def check_delivery_size(runner: Runner) -> tuple[str, dict[str, Any], str]:
         "pyz_size_mb_decimal": data.get("pyz_size_mb_decimal"),
         "pyz_size_bytes": data.get("pyz_size_bytes"),
         "limit_mb": 0.6,
-        "release_pyz_size_bytes": (assets.get("spanverify.pyz") or {}).get("size_bytes"),
-        "release_exe_size_bytes": (assets.get("spanverify.exe") or {}).get("size_bytes"),
+        "release_pyz_size_bytes": (assets.get("spanverify.pyz") or {}).get(
+            "size_bytes"
+        ),
+        "release_exe_size_bytes": (assets.get("spanverify.exe") or {}).get(
+            "size_bytes"
+        ),
         "release_exe_size_mb": (assets.get("spanverify.exe") or {}).get("size_mb"),
         "release_tag": release.get("tag"),
         "exe_limit_mb": 9.0,
@@ -1011,7 +1186,9 @@ def check_delivery_size(runner: Runner) -> tuple[str, dict[str, Any], str]:
     # Требование даёт выбор: один исполняемый файл ≤ 9 МБ ИЛИ пакет ≤ 0,6 МБ.
     # Обе величины считаем в двух трактовках мегабайта (1 000 000 и 1 048 576 байт)
     # и печатаем фактические байты, чтобы решение было проверяемым.
-    pyz_bytes = data.get("pyz_size_bytes") or (assets.get("spanverify.pyz") or {}).get("size_bytes")
+    pyz_bytes = data.get("pyz_size_bytes") or (assets.get("spanverify.pyz") or {}).get(
+        "size_bytes"
+    )
     pyz_ok = bool(pyz_bytes) and pyz_bytes <= 0.6 * 1_000_000
     exe_bytes = (assets.get("spanverify.exe") or {}).get("size_bytes")
     exe_ok = bool(exe_bytes) and exe_bytes <= 9.0 * 1024 * 1024
@@ -1029,7 +1206,11 @@ def check_delivery_size(runner: Runner) -> tuple[str, dict[str, Any], str]:
             f"укладывается в 0,6 МБ при любой трактовке; опубликованный файл .exe — {exe_bytes} байт",
         )
     if exe_ok and exe_ok_decimal:
-        return STATUS_OK, fact, f"первый вариант поставки выполнен: файл {exe_bytes} байт укладывается в 9 МБ"
+        return (
+            STATUS_OK,
+            fact,
+            f"первый вариант поставки выполнен: файл {exe_bytes} байт укладывается в 9 МБ",
+        )
     return (
         STATUS_FAIL,
         fact,
@@ -1049,7 +1230,11 @@ def check_delivery_size(runner: Runner) -> tuple[str, dict[str, Any], str]:
 def check_port(runner: Runner) -> tuple[str, dict[str, Any], str]:
     interfaces = runner.interfaces()
     port = interfaces.get("port")
-    fact = {"port": port, "default_port": interfaces.get("default_port"), "dataset": "api-smoke"}
+    fact = {
+        "port": port,
+        "default_port": interfaces.get("default_port"),
+        "dataset": "api-smoke",
+    }
     if port == 8765:
         return STATUS_OK, fact, "сервис поднялся на порту 8765 и ответил"
     return STATUS_FAIL, fact, f"сервис поднялся на порту {port}, а требуется 8765"
@@ -1097,15 +1282,26 @@ shutil.rmtree(workdir, ignore_errors=True)
     script = "import sysconfig\n" + script
     proc = run_python(script, timeout=900)
     if proc.returncode != 0:
-        return STATUS_FAIL, {"stderr": proc.stderr[-400:]}, "проверка запуска из копии не удалась"
+        return (
+            STATUS_FAIL,
+            {"stderr": proc.stderr[-400:]},
+            "проверка запуска из копии не удалась",
+        )
     data = json.loads(proc.stdout.strip().splitlines()[-1])
     problems = []
     if data["returncode"] not in (0, 1):
         problems.append("запуск из копии каталога завершился ошибкой")
     if data["changed_files_outside_copy"]:
-        problems.append(f"запись вне каталога программы: {data['changed_files_outside_copy']}")
+        problems.append(
+            f"запись вне каталога программы: {data['changed_files_outside_copy']}"
+        )
     fact = {**data, "dataset": "copied-module"}
-    return (STATUS_OK if not problems else STATUS_FAIL), fact, "; ".join(problems) or "запуск из копии работает, запись остаётся внутри каталога"
+    return (
+        (STATUS_OK if not problems else STATUS_FAIL),
+        fact,
+        "; ".join(problems)
+        or "запуск из копии работает, запись остаётся внутри каталога",
+    )
 
 
 @check(
@@ -1124,9 +1320,16 @@ def check_build_checksum(runner: Runner) -> tuple[str, dict[str, Any], str]:
         problems.append("workflow сборки не формирует SHA256SUMS.txt")
     if not helper.is_file():
         problems.append("нет скрипта проверки суммы scripts/verify_checksum.py")
-    elif subprocess.run(
-        [sys.executable, str(helper), "--self-test"], cwd=ROOT, capture_output=True, text=True, timeout=300
-    ).returncode != 0:
+    elif (
+        subprocess.run(
+            [sys.executable, str(helper), "--self-test"],
+            cwd=ROOT,
+            capture_output=True,
+            text=True,
+            timeout=300,
+        ).returncode
+        != 0
+    ):
         problems.append("самопроверка скрипта проверки суммы не прошла")
     release = runner.release()
     if release.get("checksum_verified") is False:
@@ -1225,7 +1428,9 @@ def check_portable_copy(runner: Runner) -> tuple[str, dict[str, Any], str]:
     if not delivery.get("copy_sha256_equal"):
         problems.append("сумма копии не совпала с исходной")
     if release.get("checksum_verified") is False:
-        problems.append("сумма опубликованного пакета не совпала с SHA256SUMS.txt релиза")
+        problems.append(
+            "сумма опубликованного пакета не совпала с SHA256SUMS.txt релиза"
+        )
     helper = ROOT / "scripts" / "verify_checksum.py"
     if not helper.is_file():
         problems.append("нет скрипта scripts/verify_checksum.py")
@@ -1306,11 +1511,16 @@ def check_runtime_config(runner: Runner) -> tuple[str, dict[str, Any], str]:
         else "предельный прогон не выполнен в этом запуске, пик памяти не измерен"
     )
     if peak_mb is None:
-        return STATUS_UNKNOWN, fact, note + "; нужен прогон с полным набором проверок (без --fast)"
+        return (
+            STATUS_UNKNOWN,
+            fact,
+            note + "; нужен прогон с полным набором проверок (без --fast)",
+        )
     return (
         STATUS_OK,
         fact,
-        note + "; машина эталонной конфигурации заказчика (≥4 ГБ ОЗУ, ≥8 ГБ с весами) не проверялась: "
+        note
+        + "; машина эталонной конфигурации заказчика (≥4 ГБ ОЗУ, ≥8 ГБ с весами) не проверялась: "
         f"в окружении прогона {memory_gb} ГБ ОЗУ, и это указано честно",
     )
 
@@ -1333,7 +1543,11 @@ def check_update_procedure(runner: Runner) -> tuple[str, dict[str, Any], str]:
         "dataset": "docs",
     }
     if missing:
-        return STATUS_FAIL, fact, f"в руководстве нет разделов о процедуре обновления: {missing}"
+        return (
+            STATUS_FAIL,
+            fact,
+            f"в руководстве нет разделов о процедуре обновления: {missing}",
+        )
     return STATUS_OK, fact, "процедура обновления заменой целиком описана в руководстве"
 
 
@@ -1354,7 +1568,11 @@ def check_qualification(runner: Runner) -> tuple[str, dict[str, Any], str]:
         "обновление": ("Обновление",),
         "удаление": ("удал",),
     }
-    missing = [name for name, markers in sections.items() if not any(marker in text for marker in markers)]
+    missing = [
+        name
+        for name, markers in sections.items()
+        if not any(marker in text for marker in markers)
+    ]
     fact = {
         "guide": str(guide.relative_to(ROOT)) if guide.is_file() else None,
         "sections_found": [name for name in sections if name not in missing],
@@ -1362,7 +1580,11 @@ def check_qualification(runner: Runner) -> tuple[str, dict[str, Any], str]:
     }
     if missing:
         return STATUS_FAIL, fact, f"в руководстве нет разделов: {missing}"
-    return STATUS_OK, fact, "чек-лист руководства покрывает эксплуатацию без спецподготовки"
+    return (
+        STATUS_OK,
+        fact,
+        "чек-лист руководства покрывает эксплуатацию без спецподготовки",
+    )
 
 
 @check(
@@ -1384,7 +1606,9 @@ def check_tests_coverage(runner: Runner) -> tuple[str, dict[str, Any], str]:
     if data.get("collect_returncode") != 0 or not data.get("collected"):
         problems.append("тесты не собираются")
     if data.get("coverage_percent") is None:
-        problems.append("нет отчёта покрытия: прогон с --cov не выполнялся в этом окружении")
+        problems.append(
+            "нет отчёта покрытия: прогон с --cov не выполнялся в этом окружении"
+        )
     elif data["coverage_percent"] < 85:
         problems.append(f"покрытие {data['coverage_percent']} % ниже порога 85 %")
     if problems:
@@ -1420,7 +1644,11 @@ def check_plan(runner: Runner) -> tuple[str, dict[str, Any], str]:
     }
     if missing:
         return STATUS_FAIL, fact, f"в календарном плане нет: {missing}"
-    return STATUS_OK, fact, "календарный план: 2 этапа по 6 месяцев с суммами 200 000 и 300 000 руб."
+    return (
+        STATUS_OK,
+        fact,
+        "календарный план: 2 этапа по 6 месяцев с суммами 200 000 и 300 000 руб.",
+    )
 
 
 @check(
@@ -1433,11 +1661,22 @@ def check_plan(runner: Runner) -> tuple[str, dict[str, Any], str]:
 def check_reporting(runner: Runner) -> tuple[str, dict[str, Any], str]:
     doc = ROOT / "docs" / "ТЗ_и_календарный_план.md"
     text = doc.read_text(encoding="utf-8") if doc.is_file() else ""
-    required = ["промежуточный отчёт", "акт", "финансов", "заключительный отчёт", "20 календарных дней", "РИД"]
+    required = [
+        "промежуточный отчёт",
+        "акт",
+        "финансов",
+        "заключительный отчёт",
+        "20 календарных дней",
+        "РИД",
+    ]
     missing = [marker for marker in required if marker.lower() not in text.lower()]
     fact = {
         "document": str(doc.relative_to(ROOT)),
-        "markers_found": [marker for marker in required if marker.lower() not in [item.lower() for item in missing]],
+        "markers_found": [
+            marker
+            for marker in required
+            if marker.lower() not in [item.lower() for item in missing]
+        ],
         "dataset": "docs",
     }
     if missing:
@@ -1498,7 +1737,11 @@ def check_report_abstract(runner: Runner) -> tuple[str, dict[str, Any], str]:
     if marker in text:
         tail = text.split(marker, 1)[1]
         line = tail.splitlines()[1] if len(tail.splitlines()) > 1 else ""
-        keywords = [item.strip(" .;*") for item in line.replace(":", ",").split(",") if item.strip(" .;*")]
+        keywords = [
+            item.strip(" .;*")
+            for item in line.replace(":", ",").split(",")
+            if item.strip(" .;*")
+        ]
     problems = list(missing)
     if keywords and not (5 <= len(keywords) <= 15):
         problems.append(f"ключевых слов {len(keywords)}, требуется 5–15")
@@ -1511,7 +1754,11 @@ def check_report_abstract(runner: Runner) -> tuple[str, dict[str, Any], str]:
     }
     if problems:
         return STATUS_FAIL, fact, f"реферат неполон: {problems}"
-    return STATUS_OK, fact, f"реферат содержит сведения об объёме и {len(keywords)} ключевых слов"
+    return (
+        STATUS_OK,
+        fact,
+        f"реферат содержит сведения об объёме и {len(keywords)} ключевых слов",
+    )
 
 
 @check(
@@ -1562,7 +1809,9 @@ def check_numbers_registry(runner: Runner) -> tuple[str, dict[str, Any], str]:
     )
     if proc.returncode != 0:
         return STATUS_FAIL, {"stderr": proc.stderr[-400:]}, "реестр чисел не собрался"
-    payload = json.loads((ROOT / "reports" / "NUMBERS.json").read_text(encoding="utf-8"))
+    payload = json.loads(
+        (ROOT / "reports" / "NUMBERS.json").read_text(encoding="utf-8")
+    )
     check_proc = subprocess.run(
         [sys.executable, str(ROOT / "scripts" / "build_numbers.py"), "--check"],
         cwd=ROOT,
@@ -1580,7 +1829,11 @@ def check_numbers_registry(runner: Runner) -> tuple[str, dict[str, Any], str]:
     }
     if check_proc.returncode != 0:
         return STATUS_FAIL, fact, "реестр не совпадает с артефактами прогонов"
-    return STATUS_OK, fact, f"реестр собран: {len(payload['entries'])} записей, не измерено {len(payload['measured_missing'])}"
+    return (
+        STATUS_OK,
+        fact,
+        f"реестр собран: {len(payload['entries'])} записей, не измерено {len(payload['measured_missing'])}",
+    )
 
 
 @check(
@@ -1667,7 +1920,12 @@ def check_acceptance_doc(runner: Runner) -> tuple[str, dict[str, Any], str]:
 def check_ci_job(runner: Runner) -> tuple[str, dict[str, Any], str]:
     workflow = ROOT / ".github" / "workflows" / "ci.yml"
     text = workflow.read_text(encoding="utf-8") if workflow.is_file() else ""
-    markers = ["contract:", "scripts/contract_check.py", "scripts/check_numbers.py", "CONTRACT.json"]
+    markers = [
+        "contract:",
+        "scripts/contract_check.py",
+        "scripts/check_numbers.py",
+        "CONTRACT.json",
+    ]
     missing = [marker for marker in markers if marker not in text]
     fact = {
         "workflow": str(workflow.relative_to(ROOT)),
@@ -1676,7 +1934,11 @@ def check_ci_job(runner: Runner) -> tuple[str, dict[str, Any], str]:
     }
     if missing:
         return STATUS_FAIL, fact, f"в CI нет job contract или её шагов: {missing}"
-    return STATUS_OK, fact, "job contract запускает тесты, контрактную проверку и сверку чисел"
+    return (
+        STATUS_OK,
+        fact,
+        "job contract запускает тесты, контрактную проверку и сверку чисел",
+    )
 
 
 # ------------------------------------------------------------------ прогон
@@ -1710,7 +1972,11 @@ def run_checks(only: str | None, fast: bool) -> tuple[list[dict[str, Any]], int]
         try:
             status, fact, note = check_item.runner(runner)
         except Exception as error:  # noqa: BLE001 - проверка не должна ронять прогон
-            status, fact, note = STATUS_FAIL, {"error": f"{type(error).__name__}: {error}"}, "проверка упала"
+            status, fact, note = (
+                STATUS_FAIL,
+                {"error": f"{type(error).__name__}: {error}"},
+                "проверка упала",
+            )
         payload = artifact_payload(check_item.id, dict(fact), note=note)
         artifact = write_artifact(check_item.id, payload)
         results.append(
@@ -1802,10 +2068,20 @@ def render_compliance_doc(payload: dict[str, Any]) -> str:
 
 def main() -> int:
     parser = argparse.ArgumentParser(description="Контрактная проверка репозитория")
-    parser.add_argument("--only", default=None, help="выполнить только одну проверку по id")
-    parser.add_argument("--fast", action="store_true", help="пропустить тяжёлые проверки (2 000 000 знаков)")
+    parser.add_argument(
+        "--only", default=None, help="выполнить только одну проверку по id"
+    )
+    parser.add_argument(
+        "--fast",
+        action="store_true",
+        help="пропустить тяжёлые проверки (2 000 000 знаков)",
+    )
     parser.add_argument("--out", default=str(CONTRACT_JSON.relative_to(ROOT)))
-    parser.add_argument("--no-doc", action="store_true", help="не перегенерировать документ соответствия")
+    parser.add_argument(
+        "--no-doc",
+        action="store_true",
+        help="не перегенерировать документ соответствия",
+    )
     args = parser.parse_args()
 
     started = time.time()
@@ -1830,16 +2106,42 @@ def main() -> int:
     }
     out = ROOT / args.out
     out.parent.mkdir(parents=True, exist_ok=True)
-    out.write_text(json.dumps(payload, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    out.write_text(
+        json.dumps(payload, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
+    )
     if not args.no_doc and not args.only:
         COMPLIANCE_DOC.parent.mkdir(parents=True, exist_ok=True)
         COMPLIANCE_DOC.write_text(render_compliance_doc(payload), encoding="utf-8")
 
     print(f"проверок: {len(results)}")
     for item in results:
-        mark = {STATUS_OK: "OK ", STATUS_FAIL: "FAIL", STATUS_UNKNOWN: "н/и"}[item["status"]]
+        mark = {STATUS_OK: "OK ", STATUS_FAIL: "FAIL", STATUS_UNKNOWN: "н/и"}[
+            item["status"]
+        ]
         print(f"  [{mark}] {item['id']:<28} {item['status']:<16} {item['note'][:90]}")
+
+    # В CI провал шага виден в аннотациях — их читают через API, не выгружая логи.
+    # Печатаем причину по каждой не прошедшей и каждой неизмеренной проверке.
+    if os.environ.get("GITHUB_ACTIONS"):
+        for item in results:
+            if item["status"] == STATUS_FAIL:
+                print(
+                    f"::error title={item['id']}::{item['point']}: {item['note'][:500]}"
+                )
+            elif item["status"] == STATUS_UNKNOWN:
+                print(
+                    f"::warning title={item['id']}::{item['point']}: {item['note'][:500]}"
+                )
+        print(
+            f"::notice title=Контрактные проверки::соответствует {summary[STATUS_OK]}, "
+            f"не соответствует {summary[STATUS_FAIL]}, не измерено {summary[STATUS_UNKNOWN]}"
+        )
     print(f"CONTRACT.json: {out}")
+    if failures:
+        print(
+            "НЕ ПРОШЛИ: "
+            + ", ".join(item["id"] for item in results if item["status"] == STATUS_FAIL)
+        )
     return 1 if failures else 0
 
 
