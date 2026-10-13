@@ -48,7 +48,16 @@ def build(out_dir: Path, name: str = "spanverify.pyz") -> Path:
         # Точка входа — ``cli:run``: она поднимает SystemExit с кодом команды.
         # С ``cli:main`` zipapp печатал результат, но всегда возвращал код 0,
         # то есть контракт «0 / 1 / 2» на релизном .pyz не соблюдался.
-        zipapp.create_archive(stage, target, interpreter="/usr/bin/env python3", main="spanverify.cli:run")
+        # Архив собирается СЖАТЫМ: требование ТЗ п. 4.2 — переносимый пакет не
+        # больше 0,6 МБ. Без сжатия исходники и демонстрационный корпус дают
+        # ~0,66 МБ и требование не выполняется; со сжатием — ~0,17 МБ.
+        zipapp.create_archive(
+            stage,
+            target,
+            interpreter="/usr/bin/env python3",
+            main="spanverify.cli:run",
+            compressed=True,
+        )
 
     target.chmod(0o755)
     return target
