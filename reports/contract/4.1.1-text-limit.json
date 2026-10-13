@@ -1,14 +1,14 @@
 {
   "id": "4.1.1-text-limit",
-  "commit": "9656515725f68879f6a593ae4870fb579a32f9fa",
+  "commit": "37ac80d7e21940aa0b173c19fac84e1a8dc57d50",
   "seed": 42,
   "mode": "demo",
   "dataset": "synthetic-2000000",
-  "date": "2026-10-13T13:25:50Z",
+  "date": "2026-10-13T13:26:28Z",
   "command": "",
   "metrics": {
     "chars": 2000000,
-    "seconds": 4.922,
+    "seconds": 5.343,
     "peak_memory_mb": 259.3,
     "spans": 1
   },
