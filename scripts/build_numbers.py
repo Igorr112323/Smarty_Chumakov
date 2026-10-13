@@ -124,10 +124,220 @@ CONTRACT_VALUES: list[dict] = [
         "requirement": "ТЗ п. 4.1 треб. 4 — калибровка на наборе с известной долей смеси, шаг 0.25",
         "source": "договор, п. 4.1 треб. 4",
     },
+    {
+        "id": "contract.seconds_50k",
+        "value": 1.0,
+        "unit": "с",
+        "requirement": "ТЗ п. 4.2 (стр. 13) — документ 50 000 знаков обрабатывается не более чем за 1 с",
+        "source": "договор, п. 4.2",
+    },
+    {
+        "id": "contract.features_per_token",
+        "value": 5,
+        "unit": "признаков",
+        "requirement": "ТЗ п. 4.1 треб. 3 — пять числовых признаков на токен",
+        "source": "spanverify-module/spanverify/features.py",
+    },
+    {
+        "id": "contract.corpus_pairs",
+        "value": 1200,
+        "unit": "пар",
+        "requirement": "ТЗ п. 4.1 треб. 6 — отложенная по документам часть набора из 1200 пар",
+        "source": "spanverify-module/data/corpus_a/pairs.jsonl",
+    },
+    {
+        "id": "contract.hf_libraries_mb",
+        "value": 500.0,
+        "unit": "МБ",
+        "requirement": "ТЗ п. 4.2 (стр. 12) — библиотеки Python режима признаков около 500 МБ",
+        "source": "договор, п. 4.2",
+    },
+    {
+        "id": "contract.hf_weights_mb",
+        "value": 530.0,
+        "unit": "МБ",
+        "requirement": "ТЗ п. 4.2 (стр. 12) — файл весов модели около 530 МБ",
+        "source": "договор, п. 4.2",
+    },
+    {
+        "id": "contract.cores_min",
+        "value": 2,
+        "unit": "ядер",
+        "requirement": "ТЗ п. 4.2 (стр. 12) — процессор x86-64, число ядер не менее двух",
+        "source": "договор, п. 4.2",
+    },
+    {
+        "id": "contract.ram_gb",
+        "value": 4,
+        "unit": "ГБ",
+        "requirement": "ТЗ п. 4.2 (стр. 12) — оперативная память не менее 4 ГБ",
+        "source": "договор, п. 4.2",
+    },
+    {
+        "id": "contract.ram_gb_with_weights",
+        "value": 8,
+        "unit": "ГБ",
+        "requirement": "ТЗ п. 4.2 (стр. 12) — для режима с весами модели не менее 8 ГБ",
+        "source": "договор, п. 4.2",
+    },
+    {
+        "id": "contract.disk_gb",
+        "value": 1.5,
+        "unit": "ГБ",
+        "requirement": "ТЗ п. 4.2 (стр. 12) — свободное место на диске не менее 1,5 ГБ",
+        "source": "договор, п. 4.2",
+    },
+    {
+        "id": "contract.stages",
+        "value": 2,
+        "unit": "этапа",
+        "requirement": "календарный план (Приложение № 4) — два этапа",
+        "source": "договор, Приложение № 4",
+    },
+    {
+        "id": "contract.months_per_stage",
+        "value": 6,
+        "unit": "месяцев",
+        "requirement": "календарный план (Приложение № 4) — срок каждого этапа 6 месяцев",
+        "source": "договор, Приложение № 4",
+    },
+    {
+        "id": "contract.months_total",
+        "value": 12,
+        "unit": "месяцев",
+        "requirement": "ТЗ п. 8 и календарный план — срок выполнения работ 12 месяцев",
+        "source": "договор, Приложение № 4",
+    },
+    {
+        "id": "contract.stage1_rub",
+        "value": 200000,
+        "unit": "руб.",
+        "requirement": "календарный план (Приложение № 4) — сумма расходов первого этапа",
+        "source": "договор, Приложение № 4",
+    },
+    {
+        "id": "contract.stage2_rub",
+        "value": 300000,
+        "unit": "руб.",
+        "requirement": "календарный план (Приложение № 4) — сумма расходов второго этапа",
+        "source": "договор, Приложение № 4",
+    },
+    {
+        "id": "contract.total_rub",
+        "value": 500000,
+        "unit": "руб.",
+        "requirement": "п. 3.1 договора и календарный план — общая сумма гранта",
+        "source": "договор, п. 3.1",
+    },
+    {
+        "id": "contract.reporting_days_before_stage_end",
+        "value": 20,
+        "unit": "календарных дней",
+        "requirement": "п. 6.1 договора — отчётность не позднее чем за 20 календарных дней до окончания этапа",
+        "source": "договор, п. 6.1",
+    },
+    {
+        "id": "contract.originality_percent_min",
+        "value": 80,
+        "unit": "%",
+        "requirement": "Приложение № 10, п. 4 — оригинальность текста отчёта не менее 80 %",
+        "source": "договор, Приложение № 10",
+    },
+    {
+        "id": "contract.keywords_min",
+        "value": 5,
+        "unit": "слов",
+        "requirement": "Приложение № 10, п. 2.2 — перечень ключевых слов от 5 до 15",
+        "source": "договор, Приложение № 10",
+    },
+    {
+        "id": "contract.keywords_max",
+        "value": 15,
+        "unit": "слов",
+        "requirement": "Приложение № 10, п. 2.2 — перечень ключевых слов от 5 до 15",
+        "source": "договор, Приложение № 10",
+    },
+    {
+        "id": "contract.report_elements",
+        "value": 10,
+        "unit": "элементов",
+        "requirement": "Приложение № 10, п. 1 — структурные элементы отчёта",
+        "source": "docs/ОТЧЁТ_о_НИР_шаблон.md",
+    },
+    {
+        "id": "contract.business_plan_pages_min",
+        "value": 20,
+        "unit": "страниц",
+        "requirement": "Приложение № 11 — объём бизнес-плана не менее 20 страниц (зона получателя гранта)",
+        "source": "договор, Приложение № 11",
+    },
+]
+
+#: Факты об источнике требований: не измерение и не требование, а привязка версии.
+#: Подписанный PDF в публичном репозитории не хранится (персональные данные),
+#: поэтому фиксируется его SHA-256 и размер, а сами данные не переносятся.
+SOURCE_VALUES: list[dict] = [
+    {
+        "id": "contract.source.pdf_sha256",
+        "value": "e5eb6ad8522fa70135f75bf22b0b5f3464fcc17d9c6f04d81b48976a42e69cd5",
+        "unit": "SHA-256",
+        "source": "docs/ДОГОВОР_ИЗВЛЕЧЕНИЕ.md",
+        "requirement": "подписанный договор № 20478ГУ/2026 (проект 117812), файл Договор_0117812 (25).pdf",
+    },
+    {
+        "id": "contract.source.pdf_bytes",
+        "value": 5019351,
+        "unit": "байт",
+        "source": "docs/ДОГОВОР_ИЗВЛЕЧЕНИЕ.md",
+        "requirement": "размер подписанного договора (32 страницы)",
+    },
 ]
 
 #: Что переносим из артефактов: (id, файл, путь внутри файла, единица, описание).
 MEASURED_SOURCES: list[dict] = [
+    # --- объёмы режима hf (измеряет CI-задание hf-footprint) ---
+    {
+        "id": "hf_footprint.libs_mb",
+        "source": "reports/contract/4.2.5-hf-footprint.json",
+        "path": ["metrics", "libs_mb"],
+        "unit": "МБ",
+        "dataset": "hf/rugpt3small",
+        "mode": "hf",
+    },
+    {
+        "id": "hf_footprint.weights_mb",
+        "source": "reports/contract/4.2.5-hf-footprint.json",
+        "path": ["metrics", "weights_mb"],
+        "unit": "МБ",
+        "dataset": "hf/rugpt3small",
+        "mode": "hf",
+    },
+    {
+        "id": "hf_footprint.storage_with_weights_mb",
+        "source": "reports/contract/4.2.6-storage.json",
+        "path": ["metrics", "storage_with_weights_mb"],
+        "unit": "МБ",
+        "dataset": "hf/rugpt3small",
+        "mode": "hf",
+    },
+    # --- размеры собранной поставки (записывает задание build-and-release-exe) ---
+    {
+        "id": "release.exe_bytes",
+        "source": "reports/release_sizes.json",
+        "path": ["exe_bytes"],
+        "unit": "байт",
+        "dataset": "spanverify.exe",
+        "mode": "release",
+    },
+    {
+        "id": "release.pyz_bytes",
+        "source": "reports/release_sizes.json",
+        "path": ["pyz_bytes"],
+        "unit": "байт",
+        "dataset": "spanverify.pyz",
+        "mode": "release",
+    },
+
     # --- прогон на отложенной части корпуса A (договорный ориентир) ---
     {
         "id": "corpus_a.test.tokens.f1",
@@ -403,6 +613,26 @@ def build() -> dict:
                 "source_path": spec["requirement"],
                 "gate": None,
                 "note": "требование договора, не измерение",
+            }
+        )
+
+    for spec in SOURCE_VALUES:
+        entries.append(
+            {
+                "id": spec["id"],
+                "value": spec["value"],
+                "unit": spec["unit"],
+                "kind": "source",
+                "dataset": None,
+                "mode": None,
+                "seed": None,
+                "commit": None,
+                "command": None,
+                "date": date,
+                "source": spec["source"],
+                "source_path": spec["requirement"],
+                "gate": None,
+                "note": "версия источника требований: зафиксирован хеш файла, персональные данные не переносятся",
             }
         )
 

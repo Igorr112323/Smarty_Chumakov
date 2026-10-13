@@ -171,10 +171,20 @@ def test_numbers_registry_exists_with_provenance() -> None:
     assert payload["kind"] == "numbers_registry"
     assert payload["entries"], "реестр пуст"
     for entry in payload["entries"]:
-        assert entry["kind"] in {"contract", "measured"}, entry["id"]
+        # "contract" — требование договора, "measured" — измерение прогона,
+        # "source" — версия источника требований (SHA-256 и размер подписанного
+        # договора): ни требование, ни измерение, но и то, и другое к нему
+        # ссылается, поэтому реестр хранит его рядом.
+        assert entry["kind"] in {"contract", "measured", "source"}, entry["id"]
         assert entry["unit"], f"{entry['id']}: не указана единица измерения"
         if entry["kind"] == "contract":
             assert entry["note"], f"{entry['id']}: требование без пояснения"
+            continue
+        if entry["kind"] == "source":
+            # Факт об источнике требований (хеш и размер файла договора): набора
+            # данных у него нет — он сам описывает, откуда взяты требования.
+            assert entry["source"], f"{entry['id']}: нет файла-источника"
+            assert entry["note"], f"{entry['id']}: источник без пояснения"
             continue
         assert entry["source"], f"{entry['id']}: нет файла-источника"
         assert entry["dataset"], f"{entry['id']}: нет метки набора данных"

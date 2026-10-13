@@ -53,6 +53,10 @@ DEFAULT_DOCS = (
     "docs/ПРОГРАММА_И_МЕТОДИКА_ПРИЁМКИ.md",
     "spanverify-module/README.md",
     "spanverify-module/reports/EXTERNAL_TESTS.md",
+    "docs/ДОГОВОР_ИЗВЛЕЧЕНИЕ.md",
+    "docs/ЗАКРЫТИЕ_ДОГОВОРА_ПО_КОДУ.md",
+    "docs/ОТЧЁТ_ПРИЛОЖЕНИЕ_СООТВЕТСТВИЕ.md",
+    "docs/ПРОВЕРКА_ОРИГИНАЛЬНОСТИ.md",
 )
 
 REQUIRED_IN_ITOG = (
@@ -359,6 +363,37 @@ def _merge_numbers_registry(allowed: dict[str, set[str]], path: Path) -> int:
     return merged
 
 
+def _contract_whitelist(path: Path) -> set[str]:
+    """Числа договора — белый список для документов.
+
+    Требования договора называются в документах прямо: «2 000 000 знаков»,
+    «не более 9 МБ», «200 000 руб.», «20 календарных дней», «не менее 80 %».
+    Это не измерения, и сверять их с METRICS.json нельзя, но и запрещать нельзя:
+    без них не рассказать о требованиях. Поэтому значения записей реестра с
+    ``kind = "contract"`` (требования) и ``kind = "source"`` (хеш и размер файла
+    договора) попадают в белый список, и число из него не считается нарушением.
+    Измерения (``kind = "measured"``) сюда не попадают: они проходят обычную
+    сверку с артефактами.
+    """
+    out: set[str] = set()
+    if not path.is_file():
+        return out
+    try:
+        payload = json.loads(path.read_text(encoding="utf-8"))
+    except json.JSONDecodeError:
+        return out
+    for entry in payload.get("entries") or []:
+        if entry.get("kind") not in {"contract", "source"}:
+            continue
+        value = entry.get("value")
+        if isinstance(value, (int, float)) and not isinstance(value, bool):
+            out.add(f"{float(value):g}")
+            out.add(f"{value}")
+        elif isinstance(value, str):
+            out.add(value)
+    return out
+
+
 def check_required_sections(repo_root: Path) -> list[str]:
     """Обязательные разделы: «заявлено/факт», «не проверено», «3 шага» в ИТОГ."""
     problems: list[str] = []
@@ -390,6 +425,7 @@ def check_docs(
     allowed = _allowed(metrics)
     if numbers_path is not None:
         _merge_numbers_registry(allowed, numbers_path)
+    contract_ok = _contract_whitelist(numbers_path) if numbers_path is not None else set()
     version = str(metrics["meta"]["version"])
     problems: list[str] = []
 
@@ -410,7 +446,7 @@ def check_docs(
                     context = line[max(0, match.start(1) - 30) : match.start(1) + 5]
                     if OLD_MARKER in line or CI_MARKER in line or GUARD.search(context):
                         continue
-                    if value not in allowed[kind]:
+                    if value not in allowed[kind] and value not in contract_ok:
                         problems.append(
                             f"{path}:{number}: {kind}={value} нет в METRICS.json "
                             f"(допустимо: {sorted(allowed[kind])[:6]}…) → {line.strip()[:90]}"
@@ -419,7 +455,11 @@ def check_docs(
                 for match in pattern.finditer(line):
                     value = match.group(1)
                     context = line[max(0, match.start(1) - 30) : match.start(1) + 5]
-                    if allowed[kind] and value not in allowed[kind]:
+                    if (
+                        allowed[kind]
+                        and value not in allowed[kind]
+                        and value not in contract_ok
+                    ):
                         if OLD_MARKER in line or CI_MARKER in line or GUARD.search(context):
                             continue
                         problems.append(
