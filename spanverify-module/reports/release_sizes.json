@@ -1,0 +1,19 @@
+{
+  "tag": "arena/266e93dc-smarty-chumakov",
+  "run_id": "38470664317",
+  "run_number": "18",
+  "commit": "b74a25e7ffbe1369b8c34c0ab2120f2bfe2f4bd5",
+  "date": "2026-10-13T21:38:47Z",
+  "exe_bytes": 8966500,
+  "pyz_bytes": 172242,
+  "zip_bytes": 9119317,
+  "exe_mb_decimal": 8.97,
+  "exe_mib": 8.55,
+  "pyz_mb_decimal": 0.1722,
+  "limit_exe_bytes": 9000000,
+  "limit_pyz_bytes": 600000,
+  "exe_ok": true,
+  "pyz_ok": true,
+  "gate": "ТЗ п. 4.2: исполняемый файл не более 9 МБ либо переносимый пакет не более 0,6 МБ",
+  "command": "python -m PyInstaller spanverify.spec; python scripts/make_zipapp.py --out release"
+}
