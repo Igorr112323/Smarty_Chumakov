@@ -43,12 +43,14 @@
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import os
 import platform
 import subprocess
 import sys
 import sysconfig
+import tempfile
 import time
 from pathlib import Path
 
@@ -115,7 +117,18 @@ for name, module in list(sys.modules.items()):
     if top.endswith((".dist-info", ".egg-info")) or top == "__pycache__":
         continue
     modules.append(top)
-print(json.dumps({"modules": sorted(set(modules)), "verdict": result.get("verdict")}, ensure_ascii=False))
+payload = result.to_dict()
+with open(os.environ["SPANVERIFY_PROBE_OUT"], "w", encoding="utf-8") as handle:
+    json.dump(
+        {
+            "modules": sorted(set(modules)),
+            "mode": payload.get("mode"),
+            "verdict": payload.get("verdict"),
+            "score": payload.get("score"),
+        },
+        handle,
+        ensure_ascii=False,
+    )
 """
 
 
@@ -138,17 +151,34 @@ def _walk(path: Path) -> list[tuple[Path, int]]:
     return files
 
 
+#: Файлы крупнее этого порога проверяются на совпадение по содержимому: кеш
+#: весов держит один и тот же файл и в буфере загрузки, и в самом кеше, и считать
+#: его дважды нельзя (в задании hf-footprint так и было: 554,3 МБ против 1105,7).
+CONTENT_DEDUPE_MIN_BYTES = 1_000_000
+
+
+def _digest(path: Path) -> str:
+    """SHA-256 файла кусками: файл весов нельзя читать в память целиком."""
+    digest = hashlib.sha256()
+    with path.open("rb") as handle:
+        while chunk := handle.read(8 * 1024 * 1024):
+            digest.update(chunk)
+    return digest.hexdigest()
+
+
 def dir_bytes_unique(path: Path) -> dict[str, int]:
     """Размер каталога с подсчётом каждого файла один раз.
 
-    Возвращает три величины: ``unique`` — сумма размеров файлов, у которых
-    индексный дескриптор встречается первый раз (жёсткие ссылки одного файла не
-    удваиваются), ``naive`` — сумма всех встреченных ``st_size`` и ``files`` —
-    число файлов. Нужны обе: если уникальная и наивная суммы совпадают, значит
-    дублей в кеше нет, и это видно в артефакте, а не выводится на слово.
+    Возвращает величины: ``unique`` — сумма размеров файлов, которые встретились
+    впервые, ``unique_content`` — то же, но одинаковые по содержимому крупные
+    файлы считаются один раз (буфер загрузки и кеш весов), ``naive`` — сумма
+    всех ``st_size`` и ``files`` — число файлов. Нужны все три: видно, сколько
+    объёма добавили жёсткие ссылки и дубли содержимого, а не выводится на слово.
     """
     seen: set[tuple[int, int]] = set()
+    seen_content: set[str] = set()
     unique = 0
+    unique_content = 0
     naive = 0
     count = 0
     for item, size in _walk(path):
@@ -163,7 +193,17 @@ def dir_bytes_unique(path: Path) -> dict[str, int]:
             continue
         seen.add(key)
         unique += size
-    return {"unique": unique, "naive": naive, "files": count}
+        if size >= CONTENT_DEDUPE_MIN_BYTES:
+            try:
+                digest = _digest(item)
+            except OSError:  # pragma: no cover — файл исчез во время обхода
+                unique_content += size
+                continue
+            if digest in seen_content:
+                continue
+            seen_content.add(digest)
+        unique_content += size
+    return {"unique": unique, "unique_content": unique_content, "naive": naive, "files": count}
 
 
 def package_bytes(site: Path, top: str, prune: bool) -> tuple[int, list[tuple[str, int]]]:
@@ -195,27 +235,45 @@ def package_bytes(site: Path, top: str, prune: bool) -> tuple[int, list[tuple[st
 
 
 def runtime_modules(model: str) -> tuple[list[str], str]:
-    """Какие пакеты загружает режим hf: список модулей и вердикт пробы."""
+    """Какие пакеты загружает режим hf: список модулей и пояснение пробы.
+
+    Проба поднимает режим hf на настоящих весах и отдаёт результат через файл
+    (в stdout библиотеки пишут свои сообщения, поэтому читать его нельзя). Если
+    режим оказался не ``hf``, значит сработал тихий откат на демонстрационный
+    режим: мерить по такому набору пакетов нельзя, и это честно попадает в
+    пояснение, а объём библиотек берётся сырым приростом.
+    """
     env = dict(os.environ)
     if model:
         env["SPANVERIFY_MODEL"] = model
-    proc = subprocess.run(
-        [sys.executable, "-c", RUNTIME_PROBE],
-        cwd=ROOT,
-        capture_output=True,
-        text=True,
-        env=env,
-        check=False,
-    )
-    if proc.returncode != 0:
-        return [], f"проба не выполнилась: {proc.stderr.strip().splitlines()[-1:] or [proc.returncode]}"
-    line = proc.stdout.strip().splitlines()[-1] if proc.stdout.strip() else "{}"
+    with tempfile.NamedTemporaryFile(suffix=".json", delete=False) as tmp:
+        out_path = Path(tmp.name)
+    env["SPANVERIFY_PROBE_OUT"] = str(out_path)
     try:
-        payload = json.loads(line)
-    except json.JSONDecodeError:  # pragma: no cover — защита от лишнего вывода
-        return [], "проба вернула не JSON"
-    modules = [str(item) for item in payload.get("modules") or []]
-    return modules, str(payload.get("verdict") or "")
+        proc = subprocess.run(
+            [sys.executable, "-c", RUNTIME_PROBE],
+            cwd=ROOT,
+            capture_output=True,
+            text=True,
+            env=env,
+            check=False,
+        )
+        if proc.returncode != 0:
+            tail = (proc.stderr.strip().splitlines() or [str(proc.returncode)])[-1]
+            return [], f"проба не выполнилась: {tail}"
+        if not out_path.is_file():
+            return [], "проба не записала результат"
+        payload = json.loads(out_path.read_text(encoding="utf-8"))
+    except (json.JSONDecodeError, OSError) as error:  # pragma: no cover
+        return [], f"проба вернула нечитаемый результат: {error}"
+    finally:
+        out_path.unlink(missing_ok=True)
+    mode = str(payload.get("mode") or "")
+    verdict = str(payload.get("verdict") or "")
+    note = f"режим {mode}, вердикт {verdict}"
+    if mode != "hf":
+        return [], f"проба поднялась не в режиме hf ({note}) — объём библиотек не измерен"
+    return [str(item) for item in payload.get("modules") or []], note
 
 
 def site_packages() -> Path:
@@ -345,9 +403,9 @@ def main() -> int:
 
     site = site_packages()
     modules: list[str] = []
-    verdict = ""
+    mode_note = ""
     if not args.skip_runtime:
-        modules, verdict = runtime_modules(args.model)
+        modules, mode_note = runtime_modules(args.model)
     libs_runtime_full = 0
     libs_runtime = 0
     dropped: dict[str, int] = {}
@@ -368,7 +426,7 @@ def main() -> int:
     libs_bytes = libs_runtime if runtime_measured else libs_delta_bytes
 
     weights = dir_bytes_unique(cache)
-    weights_bytes = weights["unique"]
+    weights_bytes = weights["unique_content"]
     delivery_bytes = dir_bytes(args.delivery)
     storage_with_weights = delivery_bytes + libs_bytes + weights_bytes
     storage_without_weights = delivery_bytes
@@ -395,7 +453,7 @@ def main() -> int:
         "libs_full_mib": mib(libs_delta_bytes),
         "libs_runtime_measured": runtime_measured,
         "libs_runtime_modules": modules,
-        "libs_runtime_probe_verdict": verdict,
+        "libs_runtime_probe_note": mode_note,
         "libs_runtime_per_package_mb": {
             key: mb(value) for key, value in sorted(per_package.items(), key=lambda item: -item[1])
         },
@@ -413,6 +471,13 @@ def main() -> int:
         "weights_mib": mib(weights_bytes),
         "weights_naive_bytes": weights["naive"],
         "weights_naive_mb": mb(weights["naive"]),
+        "weights_unique_bytes": weights["unique"],
+        "weights_unique_mb": mb(weights["unique"]),
+        "weights_dedupe_rule": (
+            "каждый файл считается один раз: жёсткие ссылки — по индексному "
+            "дескриптору, одинаковые по содержимому файлы крупнее 1 МБ — по SHA-256 "
+            "(кеш Hugging Face держит копию в буфере загрузки и в самом кеше)"
+        ),
         "weights_files_total": weights["files"],
         "delivery_bytes": delivery_bytes,
         "delivery_mb": mb(delivery_bytes),
