@@ -362,9 +362,11 @@ def combine(
     выглядел бы полностью подтверждённым.
 
     ``mass_norm`` и ``max_similarity`` — необязательные: если вызывающий код их
-    не передал (например, старый артефакт признаков), берутся ``mass`` и
-    ``density`` соответственно, и формула сводится к трёхпризнаковой с теми же
-    суммарными весами.
+    не передал (например, старый артефакт признаков) или передал список другой
+    длины (матрица собрана вручную в тесте), берутся ``mass`` и ``density``
+    соответственно, и формула сводится к трёхпризнаковой с теми же суммарными
+    весами. Проверка длины здесь обязательна: короткий список иначе даёт
+    ``IndexError`` вместо риска.
 
     ``entropy_quantile`` < 1 включает нормировку по квантили вместо максимума —
     это нужно режиму ``hf`` (см. :func:`scale_robust`); значение 1.0 сохраняет
@@ -372,11 +374,24 @@ def combine(
     """
     weights = {**DEFAULT_WEIGHTS, **(weights or {})}
     total = sum(abs(weights.get(name, 0.0)) for name in FEATURE_NAMES) or 1.0
+    n_tokens = len(entropy)
+
+    def _aligned(values: Sequence[float] | None, fallback: Sequence[float]) -> Sequence[float]:
+        """Список признака, длина которого совпадает с длиной энтропии.
+
+        Несовпадение (признак не считался или матрица собрана вручную) — это не
+        ошибка вызова, а «признак недоступен»: подставляется резервный список,
+        как описано в docstring. Молчаливого ``IndexError`` здесь быть не должно.
+        """
+        if values is None or len(values) != n_tokens:
+            return fallback
+        return values
+
     e_hat = scale_robust(entropy, entropy_quantile)
-    m_hat = [_clamp01(value) for value in mass]
-    n_hat = [_clamp01(value) for value in (mass_norm if mass_norm is not None else mass)]
-    s_hat = [_clamp01(value) for value in (max_similarity if max_similarity is not None else density)]
-    d_hat = [_clamp01(value) for value in density]
+    m_hat = [_clamp01(value) for value in _aligned(mass, [0.0] * n_tokens)]
+    n_hat = [_clamp01(value) for value in _aligned(mass_norm, mass)]
+    s_hat = [_clamp01(value) for value in _aligned(max_similarity, density)]
+    d_hat = [_clamp01(value) for value in _aligned(density, [0.0] * n_tokens)]
     out: list[float] = []
     for i in range(len(e_hat)):
         risk = (
