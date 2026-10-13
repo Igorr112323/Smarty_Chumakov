@@ -38,7 +38,7 @@ from .engine import (
     _smooth,
     span_threshold_for,
 )
-from .features import DEFAULT_WEIGHTS, combine, is_scored_token
+from .features import DEFAULT_WEIGHTS, FEATURE_NAMES, combine, is_scored_token
 from .logreg import (
     probabilities as _head_probabilities,
 )
@@ -108,6 +108,8 @@ def collect_samples(
             features.embedding_density,
             verifier.bundle.weights,
             entropy_quantile=verifier.entropy_quantile,
+            mass_norm=features.ctx_attention_mass_norm,
+            max_similarity=features.ctx_max_similarity,
         )
 
         labels = [0] * len(tokens)
@@ -128,9 +130,7 @@ def collect_samples(
                     total=len(tokens),
                     text=token.text.strip(),
                     features={
-                        "attention_entropy": features.attention_entropy[index],
-                        "ctx_attention_mass": features.ctx_attention_mass[index],
-                        "embedding_density": features.embedding_density[index],
+                        **{name: getattr(features, name)[index] for name in FEATURE_NAMES},
                         "risk": risk[index],
                     },
                     label=labels[index],
@@ -215,19 +215,31 @@ class TrainReport:
 
 
 def _weight_grid(step: float = WEIGHT_GRID_STEP) -> list[dict[str, float]]:
+    """Сетка весов по пяти рабочим признакам: сумма = 1, шаг ``step``.
+
+    Шаг 0.1 при пяти признаках даёт 1001 комбинацию — перебор остаётся дешёвым,
+    а веса не «подбираются по тесту»: AUC считается только на обучающей части
+    (см. :func:`train`).
+    """
     grid: list[dict[str, float]] = []
     total_units = int(round(1 / step))
-    for units_w1 in range(total_units + 1):
-        for units_w2 in range(total_units + 1 - units_w1):
-            units_w3 = total_units - units_w1 - units_w2
-            weights = {
-                "attention_entropy": units_w1 * step,
-                "ctx_attention_mass": units_w2 * step,
-                "embedding_density": units_w3 * step,
-            }
-            if abs(sum(weights.values()) - 1.0) < 1e-9:
-                grid.append(weights)
+    names = tuple(FEATURE_NAMES)
+    for units in _compositions(total_units, len(names)):
+        weights = {name: units[index] * step for index, name in enumerate(names)}
+        if abs(sum(weights.values()) - 1.0) < 1e-9:
+            grid.append(weights)
     return grid
+
+
+def _compositions(total: int, parts: int) -> list[tuple[int, ...]]:
+    """Все разбиения ``total`` на ``parts`` неотрицательных целых частей."""
+    if parts == 1:
+        return [(total,)]
+    out: list[tuple[int, ...]] = []
+    for first in range(total + 1):
+        for rest in _compositions(total - first, parts - 1):
+            out.append((first, *rest))
+    return out
 
 
 def _group_key(pair: dict) -> tuple[str, str]:
@@ -285,8 +297,20 @@ def _risk_for(
     """
     entropy = [sample.features["attention_entropy"] for sample in samples]
     mass = [sample.features["ctx_attention_mass"] for sample in samples]
+    mass_norm = [sample.features.get("ctx_attention_mass_norm", sample.features["ctx_attention_mass"]) for sample in samples]
+    max_similarity = [
+        sample.features.get("ctx_max_similarity", sample.features["embedding_density"]) for sample in samples
+    ]
     density = [sample.features["embedding_density"] for sample in samples]
-    return combine(entropy, mass, density, weights, entropy_quantile=entropy_quantile)
+    return combine(
+        entropy,
+        mass,
+        density,
+        weights,
+        entropy_quantile=entropy_quantile,
+        mass_norm=mass_norm,
+        max_similarity=max_similarity,
+    )
 
 
 def _score_pairs(

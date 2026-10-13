@@ -1,6 +1,7 @@
 """Командная строка SpanVerify.
 
     spanverify verify    --answer "... --context "..."   # проверить ответ
+    spanverify features  --answer "... --context "..."   # 5 признаков на токен
     spanverify train     --dataset data/demo_pairs.jsonl --out config/weights.json
     spanverify calibrate --dataset data/demo_pairs.jsonl
     spanverify evaluate  --dataset data/demo_pairs.jsonl
@@ -38,6 +39,8 @@ from .dataset import (
     write_pairs,
 )
 from .engine import WEIGHTS_FILENAME, Verifier
+from .features import FEATURE_NAMES
+from .gates import CONTRACT_GATE, INTERNAL_TARGET
 from .server import DEFAULT_PORT, serve
 
 EXIT_OK = 0
@@ -219,6 +222,42 @@ def cmd_calibrate(args: argparse.Namespace) -> int:
     return EXIT_OK
 
 
+def cmd_features(args: argparse.Namespace) -> int:
+    """Дамп признаков по токенам: ровно пять именованных признаков на токен.
+
+    Требование ТЗ п. 4.1, требование 3. Дамп печатается из того же конвейера,
+    что и проверка (``verify``), поэтому «признаки в отчёте» и «признаки в
+    ответе» — одни и те же числа.
+    """
+    answer = args.answer
+    if args.answer_file:
+        answer = Path(args.answer_file).read_text(encoding="utf-8")
+    if not answer:
+        print("ошибка: нужен --answer или --answer-file", file=sys.stderr)
+        return EXIT_ERROR
+    context = args.context
+    if args.context_file:
+        context = Path(args.context_file).read_text(encoding="utf-8")
+
+    verifier = Verifier(mode=_mode(args), weights_path=args.weights)
+    result = verifier.verify(answer, context, with_tokens=True)
+    payload = {
+        "features": list(FEATURE_NAMES),
+        "count": len(FEATURE_NAMES),
+        "mode": verifier.mode,
+        "tokens": result.tokens,
+        "weights": {name: verifier.bundle.weights.get(name, 0.0) for name in FEATURE_NAMES},
+    }
+    if args.json:
+        _print_json(payload)
+        return EXIT_OK
+    print(f"Признаков на токен: {len(FEATURE_NAMES)} ({', '.join(FEATURE_NAMES)})")
+    for row in result.tokens:
+        values = " ".join(f"{name}={row.get(name, float('nan')):.3f}" for name in FEATURE_NAMES)
+        print(f"  {row['index']:3d} {row['text']:18s} {values} риск={row['risk']:.3f}")
+    return EXIT_OK
+
+
 def cmd_evaluate(args: argparse.Namespace) -> int:
     """Показать метрики конвейера на размеченном корпусе."""
     records = _load_dataset(args.dataset, pairs=args.make_dataset, seed=args.seed)
@@ -245,8 +284,22 @@ def cmd_evaluate(args: argparse.Namespace) -> int:
         f"F1={answers['f1']:.3f} FPR={answers['fpr']:.3f} AUC={answers['auc']:.3f} "
         f"(порог {answers['threshold']:.3f})"
     )
-    gate = tokens["f1"] >= 0.90 and tokens["fpr"] <= 0.10
-    print(f"Критерий качества (token F1 ≥ 0.90 при FPR ≤ 0.10): {'ДОСТИГНУТ' if gate else 'НЕ достигнут'}")
+    gates = metrics.get("gates") or {}
+    contract = (gates.get("tokens") or {}).get("contract") or {}
+    internal = (gates.get("tokens") or {}).get("internal") or {}
+    print(
+        "Критерий договора (токены: F1 ≥ "
+        f"{CONTRACT_GATE['f1_min']:.2f} при FPR ≤ {CONTRACT_GATE['fpr_max']:.2f}): {contract.get('status', '—')}"
+    )
+    print(
+        "Внутренний ориентир проекта (токены: F1 ≥ "
+        f"{INTERNAL_TARGET['f1_min']:.2f} при FPR ≤ {INTERNAL_TARGET['fpr_max']:.2f}): {internal.get('status', '—')}"
+    )
+    for family, block in gates.items():
+        if family == "tokens":
+            continue
+        status = (block.get("contract") or {}).get("status", "—")
+        print(f"  договорный критерий по группе «{family}»: {status}")
     if metrics["warning"]:
         print(f"ВНИМАНИЕ: {metrics['warning']}")
     return EXIT_OK
@@ -455,6 +508,15 @@ def build_parser() -> argparse.ArgumentParser:
     calibrate.add_argument("--target-fpr", type=float, default=0.1)
     add_common(calibrate)
     calibrate.set_defaults(func=cmd_calibrate)
+
+    features = subparsers.add_parser("features", help="дамп пяти признаков по токенам (ТЗ п. 4.1 треб. 3)")
+    features.add_argument("--answer", default=None, help="текст ответа")
+    features.add_argument("--answer-file", default=None, help="файл с ответом")
+    features.add_argument("--context", default=None, help="текст контекста (документ-источник)")
+    features.add_argument("--context-file", default=None, help="файл с контекстом")
+    features.add_argument("--json", action="store_true", help="вывести дамп в JSON")
+    add_common(features)
+    features.set_defaults(func=cmd_features)
 
     evaluate = subparsers.add_parser("evaluate", help="метрики на размеченном корпусе")
     evaluate.add_argument("--dataset", default=DEFAULT_DATASET)

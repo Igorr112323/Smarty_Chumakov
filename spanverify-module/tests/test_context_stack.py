@@ -47,6 +47,7 @@ from spanverify.engine import (
 from spanverify.features import (
     DEFAULT_WEIGHTS,
     DEMO_WARNING,
+    FEATURE_NAMES,
     FeatureMatrix,
     _clamp01,
     _jaccard,
@@ -272,7 +273,8 @@ def test_demo_features_matrix_has_one_row_per_token():
     row = FeatureMatrix(
         attention_entropy=[0.1], ctx_attention_mass=[0.2], embedding_density=[0.3], token_risk=[0.4]
     ).as_rows()[0]
-    assert set(row) == {"attention_entropy", "ctx_attention_mass", "embedding_density", "risk"}
+    # Состав строки — ровно пять рабочих признаков (ТЗ п. 4.1 треб. 3) и риск.
+    assert set(row) == set(FEATURE_NAMES) | {"risk"}
     assert row["risk"] == pytest.approx(0.4)
 
 
@@ -468,11 +470,17 @@ def test_weights_bundle_defaults_without_file(tmp_path):
 
 
 def test_head_changes_decisions():
-    """Обученная голова реально участвует в решении, а не лежит мёртвым грузом."""
+    """Обученная голова реально участвует в решении, а не лежит мёртвым грузом.
+
+    Коэффициенты головы взяты с запасом: после исправления знака признаков опоры
+    средний риск правила на этом примере равен 0.058, и голова должна явно
+    поднять его выше порога маски — иначе тест проверял бы арифметику, а не
+    участие головы в решении.
+    """
     bundle = WeightsBundle(weights=dict(DEFAULT_WEIGHTS), threshold=0.5)
     bundle.head = {
         "type": "logreg",
-        "model": {"weights": [0.0, 0.0, 0.0, 3.0, 0.0, 0.0], "bias": -0.5},
+        "model": {"weights": [0.0, 0.0, 0.0, 10.0, 0.0, 0.0], "bias": 0.0},
         "scaler": {"means": [0, 0, 0, 0, 0, 0], "scales": [1, 1, 1, 1, 1, 1]},
     }
     plain = Verifier(mode="demo", weights=WeightsBundle(weights=dict(DEFAULT_WEIGHTS), threshold=0.5)).verify(
@@ -643,11 +651,19 @@ def test_pair_dict_shape():
 def test_weight_grid_is_a_simplex():
     """Сетка весов: сумма ровно 1, шаг 0.1, число комбинаций как у симплекса."""
     grid = _weight_grid()
-    assert len(grid) == 66
+    # Разбиения 10 единиц по 5 признакам: C(14, 4) = 1001.
+    assert len(grid) == 1001
+    assert all(set(weights) == set(FEATURE_NAMES) for weights in grid)
     for weights in grid:
         assert sum(weights.values()) == pytest.approx(1.0)
         assert all(0.0 <= value <= 1.0 for value in weights.values())
-    assert {"attention_entropy": 0.9, "ctx_attention_mass": 0.1, "embedding_density": 0.0} in grid
+    assert {
+        "attention_entropy": 0.9,
+        "ctx_attention_mass": 0.1,
+        "ctx_attention_mass_norm": 0.0,
+        "ctx_max_similarity": 0.0,
+        "embedding_density": 0.0,
+    } in grid
 
 
 def test_auc_perfect_and_inverted():

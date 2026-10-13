@@ -1,0 +1,22 @@
+{
+  "kind": "density_reference",
+  "commit": "d39c95ccc58aa0c09cbd4308188c89743ce59c7a",
+  "seed": 42,
+  "mode": "demo",
+  "dataset": "data/corpus_a/splits/train.jsonl",
+  "command": "python scripts/density_reference.py --dataset data/corpus_a/splits/train.jsonl --out reports/DENSITY_REFERENCE.json --seed 42",
+  "date": "2026-10-13T06:57:01Z",
+  "duration_s": 2.25,
+  "note": "замер на обучающей части; тестовая часть в измерении константы не участвует; сырая плотность восстановлена как значение признака × DEMO_DENSITY_REFERENCE",
+  "metrics": {
+    "pairs": 840,
+    "tokens_scored": 9003,
+    "supported_tokens": 8363,
+    "unsupported_tokens": 640,
+    "supported_median": 0.52,
+    "supported_mean": 0.4599,
+    "unsupported_median": 0.061,
+    "unsupported_mean": 0.0996,
+    "constant_in_code": 0.52
+  }
+}

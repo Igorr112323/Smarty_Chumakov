@@ -220,12 +220,26 @@ class SpanResult:
     # одном токене, а на одиночный токен маски — нет (см. ``_verdict``).
     source: str = "mask"
 
+    @property
+    def confidence(self) -> float:
+        """Уровень уверенности в том, что фрагмент НЕ подтверждён документом.
+
+        Требование ТЗ п. 4.1, требование 2: у каждого фрагмента — номер первого и
+        последнего символа, метка и уровень уверенности в диапазоне 0…1.
+        Уверенность — дополнение к риску (``1 − риск``): риск 0.9 означает
+        уверенность 0.1 в том, что фрагмент подтверждён, и 0.9 — в том, что он
+        не подтверждён. Величина производная от ``risk``, а не второй,
+        независимый скор, — так её и надо читать.
+        """
+        return round(min(1.0, max(0.0, 1.0 - self.risk)), 4)
+
     def to_dict(self) -> dict[str, Any]:
         return {
             "start": self.start,
             "end": self.end,
             "text": self.text,
             "risk": round(self.risk, 4),
+            "confidence": self.confidence,
             "label": self.label,
             "n_tokens": self.n_tokens,
             "source": self.source,

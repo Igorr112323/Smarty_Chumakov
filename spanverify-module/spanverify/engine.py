@@ -59,6 +59,8 @@ from .features import (
     is_scored_token,
     number_attribution,
 )
+from .gates import gate_report
+from .limits import check_text_length
 from .participation import PARTICIPATION_FILENAME, ParticipationModel
 
 WEIGHTS_FILENAME = "config/weights.json"
@@ -130,8 +132,21 @@ class WeightsBundle:
             if isotonic_data.get("x")
             else None
         )
+        # Артефакт мог быть обучен на предыдущем составе признаков (3 признака до
+        # договорной редакции). Недостающие веса берём из DEFAULT_WEIGHTS, но
+        # честно фиксируем это в meta: иначе молчаливый переход на другие веса
+        # выглядел бы как «тот же самый прогон».
+        stored_weights = data.get("weights", {}) or {}
+        missing = [name for name in FEATURE_NAMES if name not in stored_weights]
+        meta = dict(data.get("meta", {}))
+        if missing:
+            meta["missing_feature_weights"] = missing
+            meta["weights_source_note"] = (
+                "в артефакте нет весов части признаков — для них взяты DEFAULT_WEIGHTS; "
+                "переобучите конфигурацию: python -m spanverify train"
+            )
         return cls(
-            weights={name: float(data.get("weights", {}).get(name, DEFAULT_WEIGHTS[name])) for name in FEATURE_NAMES},
+            weights={name: float(stored_weights.get(name, DEFAULT_WEIGHTS[name])) for name in FEATURE_NAMES},
             threshold=float(data.get("threshold", 0.5)),
             target_fpr=float(data.get("target_fpr", 0.1)),
             span_z=float(data.get("span_z", 1.0)),
@@ -143,7 +158,7 @@ class WeightsBundle:
             seed=int(data.get("seed", 42)),
             version=str(data.get("version", "1.1.0")),
             mode=str(data.get("mode", "demo")),
-            meta=dict(data.get("meta", {})),
+            meta=meta,
         )
 
     def save(self, path: str | Path) -> Path:
@@ -303,6 +318,10 @@ class Verifier:
         started = time.perf_counter()
         answer = answer or ""
         context_text = prompt if prompt else context
+        # Требование 1 договора: длина каждого текста ограничена 2 000 000 знаков.
+        # Отказ с объяснением лучше, чем молчаливая обрезка: обрезанный текст
+        # менял бы результат проверки.
+        check_text_length([answer, _context_as_text(context_text)])
 
         if not answer.strip():
             return VerificationResult(
@@ -336,6 +355,8 @@ class Verifier:
             features.embedding_density,
             self.bundle.weights,
             entropy_quantile=self.entropy_quantile,
+            mass_norm=features.ctx_attention_mass_norm,
+            max_similarity=features.ctx_max_similarity,
         )
         if self.bundle.head and self.bundle.head.get("type") == "logreg":
             head_risk = _head_risk(self.bundle.head, features, risk, tokens)
@@ -476,11 +497,22 @@ class Verifier:
             answer_labels, answer_scores, threshold if threshold is not None else self.bundle.threshold
         )
         verdict_metrics = _binary_metrics(verdict_labels, verdict_flags)
+        # Критерии считаются здесь же, чтобы CLI, HTTP API и отчёты брали один и
+        # тот же вердикт «достигнут / не достигнут» (см. ``spanverify.gates``).
+        gates = {
+            "tokens": gate_report(token_metrics, "tokens"),
+            "answers": gate_report(answer_metrics, "answers"),
+            # У фрагментов FPR не определён: ложное срабатывание — это помеченный
+            # токен, поэтому для контроля FPR берётся токенный (и это указано в
+            # отчёте отдельным полем ``fpr_tokens``).
+            "spans": gate_report({**span_metrics, "fpr_tokens": token_metrics.get("fpr")}, "spans"),
+        }
         return {
             "tokens": token_metrics,
             "spans": span_metrics,
             "answers": answer_metrics,
             "verdicts": verdict_metrics,
+            "gates": gates,
             "pairs": len(truth),
             "mode": self.mode,
             "warning": self.warning if self.mode != "hf" else "",
@@ -704,6 +736,15 @@ class Verifier:
                 )
             )
         return _merge_spans(spans)
+
+
+def _context_as_text(context: str | Sequence[str] | None) -> str:
+    """Контекст как одна строка — для проверки длины и текстовых правил."""
+    if context is None:
+        return ""
+    if isinstance(context, str):
+        return context
+    return "\n".join(str(item) for item in context)
 
 
 def _token_metrics(labels: Sequence[int], flags: Sequence[bool], risks: Sequence[float]) -> dict[str, float]:
@@ -1095,9 +1136,11 @@ def _token_payload(
                 "text": token.text.strip(),
                 "start": token.start,
                 "end": token.end,
-                "attention_entropy": round(features.attention_entropy[index], 4),
-                "ctx_attention_mass": round(features.ctx_attention_mass[index], 4),
-                "embedding_density": round(features.embedding_density[index], 4),
+                **{
+                    name: round(getattr(features, name)[index], 4)
+                    for name in FEATURE_NAMES
+                    if index < len(getattr(features, name))
+                },
                 "risk": round(risk[index], 4),
                 "flagged": risk[index] >= threshold,
                 "label": (
