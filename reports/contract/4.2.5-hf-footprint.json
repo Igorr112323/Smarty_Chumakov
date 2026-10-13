@@ -1,17 +1,140 @@
 {
   "id": "4.2.5-hf-footprint",
-  "commit": "7a8a19e30591379f45f3e14a9f93ceeb91e87a73",
+  "commit": "21ed12fccd838dc5bfc3e1b9f9bcb9cc849166a8",
   "seed": 42,
-  "mode": "demo",
-  "dataset": "hf-mode",
-  "date": "2026-10-13T15:42:21Z",
-  "command": "",
+  "mode": "hf",
+  "dataset": "ai-forever/rugpt3small_based_on_gpt2",
+  "date": "2026-10-13T15:47:03Z",
+  "command": "python scripts/measure_hf_footprint.py --out ../reports/contract --model ai-forever/rugpt3small_based_on_gpt2 --cache /home/runner/hf-cache",
   "metrics": {
-    "libraries_dir": "site-packages (прирост после установки режима hf)",
-    "weights_dir": "кеш весов модели",
-    "libraries_mb": null,
-    "weights_mb": null
+    "model": "ai-forever/rugpt3small_based_on_gpt2",
+    "cache": "/home/runner/hf-cache",
+    "libs_bytes": 1137614128,
+    "libs_mb": 1137.6,
+    "libs_mib": 1084.9,
+    "weights_bytes": 554332190,
+    "weights_mb": 554.3,
+    "weights_mib": 528.7,
+    "delivery_bytes": 0,
+    "delivery_mb": 0.0,
+    "storage_without_weights_mb": 0.0,
+    "storage_with_weights_mb": 1691.9,
+    "weight_files": [
+      {
+        "path": "hub/blobs/90/9071e474490f65ddfb2251b0af8dd6d6cff8adc2ad97511516158088bafc118c",
+        "bytes": 551290714
+      },
+      {
+        "path": "hub/models--ai-forever--rugpt3small_based_on_gpt2/blobs/0d2a4a387b0430654bb1f6813436bd31f8e10a06e18ea0e5c41b33120b78458e",
+        "bytes": 551290714
+      },
+      {
+        "path": "hub/models--ai-forever--rugpt3small_based_on_gpt2/snapshots/a9307e696cd3c5b7f953ff4cb19d76a4d81821d5/pytorch_model.bin",
+        "bytes": 551290714
+      },
+      {
+        "path": "hub/models--ai-forever--rugpt3small_based_on_gpt2/blobs/29154a654dcb0b71c25a9ea6df60a9a34f302a4f",
+        "bytes": 1713123
+      },
+      {
+        "path": "hub/models--ai-forever--rugpt3small_based_on_gpt2/snapshots/a9307e696cd3c5b7f953ff4cb19d76a4d81821d5/vocab.json",
+        "bytes": 1713123
+      },
+      {
+        "path": "hub/models--ai-forever--rugpt3small_based_on_gpt2/blobs/8d6ce0fc5b6c262020ff8f8b07c8511a19b13778",
+        "bytes": 1270925
+      },
+      {
+        "path": "hub/models--ai-forever--rugpt3small_based_on_gpt2/snapshots/a9307e696cd3c5b7f953ff4cb19d76a4d81821d5/merges.txt",
+        "bytes": 1270925
+      },
+      {
+        "path": "xet/logs/xet_20261013T154657699+0000_2233.log",
+        "bytes": 47398
+      },
+      {
+        "path": ".agent_harnesses.json",
+        "bytes": 5778
+      },
+      {
+        "path": "hub/models--ai-forever--rugpt3small_based_on_gpt2/trees/a9307e696cd3c5b7f953ff4cb19d76a4d81821d5.json",
+        "bytes": 1356
+      },
+      {
+        "path": "hub/models--ai-forever--rugpt3small_based_on_gpt2/blobs/7bdc623bf90e44c5f7cad5c44606d6af754fd0c2",
+        "bytes": 1252
+      },
+      {
+        "path": "hub/models--ai-forever--rugpt3small_based_on_gpt2/snapshots/a9307e696cd3c5b7f953ff4cb19d76a4d81821d5/tokenizer_config.json",
+        "bytes": 1252
+      },
+      {
+        "path": "hub/models--ai-forever--rugpt3small_based_on_gpt2/blobs/7a05ebb1619c0327080d4924d523688a21bb2515",
+        "bytes": 720
+      },
+      {
+        "path": "hub/models--ai-forever--rugpt3small_based_on_gpt2/snapshots/a9307e696cd3c5b7f953ff4cb19d76a4d81821d5/config.json",
+        "bytes": 720
+      },
+      {
+        "path": "hub/models--ai-forever--rugpt3small_based_on_gpt2/blobs/1ca6de7fc0e91fd7c9f0be529596a307906d5dca",
+        "bytes": 574
+      },
+      {
+        "path": "hub/models--ai-forever--rugpt3small_based_on_gpt2/snapshots/a9307e696cd3c5b7f953ff4cb19d76a4d81821d5/special_tokens_map.json",
+        "bytes": 574
+      },
+      {
+        "path": "hub/CACHEDIR.TAG",
+        "bytes": 191
+      },
+      {
+        "path": "hub/blobs/90/9071e474490f65ddfb2251b0af8dd6d6cff8adc2ad97511516158088bafc118c.refs",
+        "bytes": 117
+      },
+      {
+        "path": "hub/models--ai-forever--rugpt3small_based_on_gpt2/refs/main",
+        "bytes": 40
+      },
+      {
+        "path": "hub/blobs/.huggingface-shared-blobs",
+        "bytes": 2
+      }
+    ],
+    "weight_files_total": 27,
+    "site_packages_top": {
+      "total": 1158294494,
+      "torch": 770342432,
+      "transformers": 108853681,
+      "sympy": 75181560,
+      "numpy": 42689416,
+      "numpy.libs": 28493675,
+      "networkx": 16479078,
+      "tokenizers": 11617566,
+      "hf_xet": 11274480,
+      "pip": 11009981
+    },
+    "pip_freeze_hf": [
+      "huggingface_hub==2.2.0",
+      "numpy==2.4.6",
+      "regex==2026.9.29",
+      "safetensors==0.8.0",
+      "sentencepiece==0.2.2",
+      "tokenizers==0.23.3",
+      "torch==2.14.1+cpu",
+      "transformers==5.19.0"
+    ],
+    "contract_libs_mb": 500,
+    "contract_weights_mb": 530,
+    "libs_vs_contract_percent": 127.5,
+    "weights_vs_contract_percent": 4.6
   },
-  "note": "прогон не выполнен: в этом окружении нет torch/transformers и кэша весов модели; нужна машина с доступом к хранилищу весов — артефакт создаёт CI-задание hf-footprint (.github/workflows/hf-footprint.yml)",
-  "gate": null
+  "note": "Объёмы измерены командой на раннере: прирост каталога библиотек и каталог кеша весов. Договор называет ориентиры «около 500 МБ» и «около 530 МБ»; отклонения приведены отдельными полями.",
+  "gate": "ТЗ п. 4.2: библиотеки режима признаков около 500 МБ, веса около 530 МБ",
+  "environment": {
+    "python": "3.11.17",
+    "platform": "Linux-6.17.0-1022-azure-x86_64-with-glibc2.39",
+    "machine": "x86_64",
+    "cpu_count": 4
+  }
 }
