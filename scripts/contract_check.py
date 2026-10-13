@@ -171,6 +171,10 @@ class Check:
     command: str
     runner: Callable[["Runner"], tuple[str, dict[str, Any], str]]
     heavy: bool = False
+    #: Проверка выполняется после перегенерации документа соответствия: она читает
+    #: сам документ, а тот собирается из CONTRACT.json — иначе получается
+    #: самоссылка (проверка видит документ от прошлого прогона).
+    after_docs: bool = False
     data: dict[str, Any] = field(default_factory=dict)
 
 
@@ -1842,6 +1846,7 @@ def check_numbers_registry(runner: Runner) -> tuple[str, dict[str, Any], str]:
     requirement="Автоматическая сверка чисел документов с реестром — scripts/check_numbers.py",
     how="прогон сверки документов с реестром чисел",
     command="python scripts/check_numbers.py",
+    after_docs=True,
 )
 def check_numbers_script(runner: Runner) -> tuple[str, dict[str, Any], str]:
     proc = subprocess.run(
@@ -1859,8 +1864,20 @@ def check_numbers_script(runner: Runner) -> tuple[str, dict[str, Any], str]:
         timeout=600,
         env={**os.environ, "PYTHONUTF8": "1"},
     )
-    tail = (proc.stdout or proc.stderr).strip().splitlines()[-6:]
-    fact = {"returncode": proc.returncode, "tail": tail, "dataset": "docs"}
+    # В факт идёт счёт расхождений и первая строка, а не весь список: этот
+    # артефакт потом попадает в документ соответствия, который та же проверка
+    # читает — длинные сообщения создавали самоссылку.
+    lines = (proc.stdout or proc.stderr).strip().splitlines()
+    problems = 0
+    for line in lines:
+        if line.startswith("РАСХОЖДЕНИЯ ("):
+            problems = int(line.split("(")[1].split(")")[0])
+    fact = {
+        "returncode": proc.returncode,
+        "problems": problems,
+        "first": (lines[1].strip()[:120] if len(lines) > 1 else ""),
+        "dataset": "docs",
+    }
     if proc.returncode == 0:
         return STATUS_OK, fact, "числа документов сверены с реестром: расхождений нет"
     return STATUS_FAIL, fact, "найдены числа без источника в реестре"
@@ -1944,12 +1961,19 @@ def check_ci_job(runner: Runner) -> tuple[str, dict[str, Any], str]:
 # ------------------------------------------------------------------ прогон
 
 
-def run_checks(only: str | None, fast: bool) -> tuple[list[dict[str, Any]], int]:
-    runner = Runner(fast=fast)
+def run_checks(
+    only: str | None,
+    fast: bool,
+    runner: Runner | None = None,
+    skip_after_docs: bool = False,
+) -> tuple[list[dict[str, Any]], int]:
+    runner = runner or Runner(fast=fast)
     results: list[dict[str, Any]] = []
     env = env_info()
     for check_item in CHECKS:
         if only and check_item.id != only:
+            continue
+        if skip_after_docs and check_item.after_docs:
             continue
         if fast and check_item.heavy:
             results.append(
@@ -2085,7 +2109,45 @@ def main() -> int:
     args = parser.parse_args()
 
     started = time.time()
-    results, failures = run_checks(args.only, args.fast)
+    # Две фазы. Сначала все проверки, кроме читающих сам документ соответствия;
+    # затем документ перегенерируется из CONTRACT.json, и вторая фаза проверяет
+    # уже итоговый текст. Так «числа документов сверены с реестром» относится к
+    # тому документу, который получит проверяющий, а не к прошлому прогону.
+    runner = Runner(fast=args.fast)
+    results, failures = run_checks(
+        args.only, args.fast, runner=runner, skip_after_docs=True
+    )
+    if not args.only and not args.no_doc:
+        COMPLIANCE_DOC.parent.mkdir(parents=True, exist_ok=True)
+        COMPLIANCE_DOC.write_text(
+            render_compliance_doc(
+                {
+                    "checks": results,
+                    "commit": git_commit(),
+                    "environment": env_info(),
+                    "summary": {
+                        STATUS_OK: sum(
+                            1 for item in results if item["status"] == STATUS_OK
+                        ),
+                        STATUS_FAIL: sum(
+                            1 for item in results if item["status"] == STATUS_FAIL
+                        ),
+                        STATUS_UNKNOWN: sum(
+                            1 for item in results if item["status"] == STATUS_UNKNOWN
+                        ),
+                    },
+                }
+            ),
+            encoding="utf-8",
+        )
+    deferred, deferred_failures = run_checks(args.only, args.fast, runner=runner)
+    deferred = [
+        item
+        for item in deferred
+        if item["id"] in {check.id for check in CHECKS if check.after_docs}
+    ]
+    results.extend(deferred)
+    failures += deferred_failures
     summary = {
         STATUS_OK: sum(1 for item in results if item["status"] == STATUS_OK),
         STATUS_FAIL: failures,

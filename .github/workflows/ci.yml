@@ -96,6 +96,7 @@ jobs:
         with:
           name: coverage-json
           path: spanverify-module/reports/coverage.json
+          if-no-files-found: warn
           retention-days: 30
 
       - name: Сохранить отчёт обучения
@@ -121,8 +122,21 @@ jobs:
     # API GitHub. Без токена эта проверка честно пишет «не измерено», а не падает.
     env:
       GH_TOKEN: ${{ github.token }}
+    # Артефакт с покрытием берётся у job «Качество»: сам контрактный прогон
+    # тесты с покрытием не запускает (иначе они шли бы дважды). Если job качества
+    # упал и артефакта нет, контрактная проверка продолжает работу и пишет по
+    # правилу готовности «не измерено» с причиной.
+    needs: quality
+    if: always()
     steps:
       - uses: actions/checkout@v4
+
+      - name: Отчёт покрытия из job «Качество» (если он есть)
+        continue-on-error: true
+        uses: actions/download-artifact@v4
+        with:
+          name: coverage-json
+          path: spanverify-module/reports
 
       - uses: actions/setup-python@v5
         with:

@@ -8,24 +8,20 @@
   },
   "meta": {
     "version": "1.3.0",
-    "commit": "d39c95ccc58aa0c09cbd4308188c89743ce59c7a",
-    "generated_at": "2026-10-13T07:41:10Z",
+    "commit": "17846f4ff73b52ab7069728c3bc5fcb13d752208",
+    "generated_at": "2026-10-13T12:48:32Z",
     "seed": 42,
     "dataset": "data/demo_pairs.jsonl",
     "refresh": {
-      "at": "2026-10-13T07:41:20Z",
-      "head_commit": "d39c95ccc58aa0c09cbd4308188c89743ce59c7a",
+      "at": "2026-10-13T12:48:36Z",
+      "head_commit": "17846f4ff73b52ab7069728c3bc5fcb13d752208",
       "worktree": "dirty",
-      "preserved_from_commit": "39a0ad4858f7278335b9f0ef94bc405485a78b4a",
+      "preserved_from_commit": "17846f4ff73b52ab7069728c3bc5fcb13d752208",
       "preserved_blocks": [
         "pilot"
       ],
       "refreshed_blocks": [
-        "corpus_a",
-        "corpus_a3_real",
-        "demo",
         "duration_s",
-        "hf_external_slices",
         "tests"
       ],
       "rule": "блоки пересобраны из артефактов прогонов; блоки, артефактов которых нет на этой машине, сохранены из прежнего файла и перечислены в preserved_blocks"
@@ -33,8 +29,8 @@
   },
   "disclaimer": "Демонстрационные метрики получены на синтетическом корпусе и научным результатом не являются. Для подтверждения требуются 1200 пар «вопрос–ответ» с экспертной разметкой на реальных регламентах организации.",
   "tests": {
-    "collected": 550,
-    "coverage_percent": 87.48,
+    "collected": 555,
+    "coverage_percent": 87.6,
     "coverage_gate_percent": 85
   },
   "demo": {
@@ -2539,5 +2535,5 @@
     }
   },
   "release": null,
-  "duration_s": 36.8
+  "duration_s": 31.0
 }

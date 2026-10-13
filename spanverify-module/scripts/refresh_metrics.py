@@ -70,7 +70,7 @@ def collect(target: Path) -> dict:
             "--out",
             str(target),
             "--coverage-json",
-            "reports/coverage.json",
+            str(ROOT / "reports" / "coverage.json"),
         ],
         cwd=ROOT,
         capture_output=True,
