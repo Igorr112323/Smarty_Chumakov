@@ -1,10 +1,10 @@
 {
   "id": "4.2.4-build-sha256",
-  "commit": "a8454d0476cac2feddccc91d0e91e1fb52f5e87c",
+  "commit": "636656411f194543a3e2b8521c971b2220d3a597",
   "seed": 42,
   "mode": "demo",
   "dataset": "build-artifacts",
-  "date": "2026-10-13T22:57:44Z",
+  "date": "2026-10-13T23:40:35Z",
   "command": "",
   "metrics": {
     "workflow": ".github/workflows/build-and-release-exe.yml",

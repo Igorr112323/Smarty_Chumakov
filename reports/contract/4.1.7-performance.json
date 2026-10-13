@@ -1,55 +1,55 @@
 {
   "id": "4.1.7-performance",
-  "commit": "a8454d0476cac2feddccc91d0e91e1fb52f5e87c",
+  "commit": "636656411f194543a3e2b8521c971b2220d3a597",
   "seed": 42,
   "mode": "demo",
   "dataset": "synthetic",
-  "date": "2026-10-13T22:57:43Z",
+  "date": "2026-10-13T23:40:35Z",
   "command": "",
   "metrics": {
     "by_size": {
       "500": {
         "runs_seconds": [
-          0.002378,
-          0.001642,
-          0.001696
+          0.001731,
+          0.000986,
+          0.000956
         ],
-        "median_seconds": 0.001696,
-        "median_ms_per_1000_chars": 3.3916
+        "median_seconds": 0.000986,
+        "median_ms_per_1000_chars": 1.9723
       },
       "2000": {
         "runs_seconds": [
-          0.003852,
-          0.002875,
-          0.002645
+          0.003284,
+          0.002386,
+          0.002295
         ],
-        "median_seconds": 0.002875,
-        "median_ms_per_1000_chars": 1.4377
+        "median_seconds": 0.002386,
+        "median_ms_per_1000_chars": 1.1931
       },
       "10000": {
         "runs_seconds": [
-          0.016908,
-          0.010173,
-          0.010339
+          0.014188,
+          0.010023,
+          0.009484
         ],
-        "median_seconds": 0.010339,
-        "median_ms_per_1000_chars": 1.0339
+        "median_seconds": 0.010023,
+        "median_ms_per_1000_chars": 1.0023
       },
       "50000": {
         "runs_seconds": [
-          0.070252,
-          0.053171,
-          0.046986
+          0.06739,
+          0.051499,
+          0.048148
         ],
-        "median_seconds": 0.053171,
-        "median_ms_per_1000_chars": 1.0634
+        "median_seconds": 0.051499,
+        "median_ms_per_1000_chars": 1.03
       }
     },
     "limit_run": {
       "chars": 2000000,
-      "seconds": 8.183,
-      "ms_per_1000_chars": 4.0915,
-      "peak_memory_mb": 259.4,
+      "seconds": 8.047,
+      "ms_per_1000_chars": 4.0237,
+      "peak_memory_mb": 259.3,
       "success": true,
       "spans": 1
     },
