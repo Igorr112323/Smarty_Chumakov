@@ -1,10 +1,10 @@
 {
   "id": "4.1.9-delivery-artifacts",
-  "commit": "d39c95ccc58aa0c09cbd4308188c89743ce59c7a",
+  "commit": "d01659977f089d9decbbe38bdd5fb3d26c00eb9b",
   "seed": 42,
   "mode": "demo",
   "dataset": "spanverify.pyz / release v1.3.0",
-  "date": "2026-10-13T08:05:13Z",
+  "date": "2026-10-13T08:17:31Z",
   "command": "",
   "metrics": {
     "build_returncode": 0,
@@ -12,7 +12,7 @@
     "pyz_size_bytes": 167250,
     "pyz_size_mb": 0.1595,
     "pyz_size_mb_decimal": 0.1673,
-    "pyz_sha256": "4bcbc30c50bd2f160983bc477108f378cba978c8c7661bdae44ba7501fe8de7b",
+    "pyz_sha256": "5c043002ce9e32ca1756a608a26ff1dc72081221b128b7c60d3492adf024d45c",
     "smoke_returncode": 0,
     "smoke_tail": "вейера и интерфейса, а не достоверность ответа. Подмена числа ловится, если число есть у другого объекта документа (например, «первичные — пять лет» против «вторичные — десять лет»); перефразирования и таблицы требуют режима 'hf'. Научные выводы возможны только в режиме 'hf'.\nВсе проверки пройдены.\n",
     "copy_sha256_equal": true,
