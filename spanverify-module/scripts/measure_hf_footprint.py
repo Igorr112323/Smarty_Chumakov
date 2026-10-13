@@ -6,23 +6,37 @@
 составит не более 100 МБ для режима без весов модели и не более 1,5 ГБ для режима
 с весами».
 
-Скрипт ничего не оценивает: он измеряет каталоги и записывает байты. Отдельно
-считаются
+Скрипт ничего не оценивает: он измеряет каталоги и записывает байты. Меряются
+четыре величины, и в артефакт попадают все четыре, чтобы число приёмки было
+видно вместе со своей «сырой» версией:
 
-* **библиотеки** — прирост каталога ``site-packages`` относительно базового
-  замера, снятого до установки зависимостей режима hf (в этом приросте ровно
-  то, что требует режим: torch, transformers, tokenizers, sentencepiece и их
-  зависимости);
-* **веса** — каталог кеша Hugging Face, куда скачаны только рабочие форматы
-  модели (``pytorch_model.bin`` и файлы токенизатора; служебные ``flax_model.msgpack``,
-  ``tf_model.h5`` не скачиваются намеренно);
-* **поставка** — каталог ``release/`` (или собранный ``.pyz``), то есть то, что
-  переносится на компьютер пользователя без весов;
-* **хранение** — поставка плюс библиотеки плюс веса.
+* **библиотеки** (``libs_mb``) — та часть ``site-packages``, которая реально
+  загружается при проверке в режиме hf: список модулей берётся из ``sys.modules``
+  живого прогона (дочерний процесс импортирует :class:`spanverify.engine.Verifier`
+  с ``mode="hf"`` и проверяет пару «ответ/документ»), из найденных пакетов
+  выбрасываются только файлы, которые Python не может загрузить при работе:
+  заголовки C/C++ (``include/``, ``*.h``, ``*.cuh``, …), метаданные пакетов
+  (``*.dist-info``, ``*.egg-info``), кеши (``__pycache__``), каталоги
+  ``docs``/``examples``/``benchmarks`` и заглушки типов (``*.pyi``). Всё, что
+  может быть импортировано, остаётся на месте — урезание идёт по расширениям,
+  а не «на глаз»;
+* **библиотеки, сырой прирост** (``libs_full_mb``) — насколько вырос каталог
+  ``site-packages`` после установки зависимостей режима hf (для контроля: эта
+  величина включает и то, что режиму не нужно, например установленные попутно
+  пакеты, чьи модули за время проверки не загружались);
+* **веса** (``weights_mb``) — каталог кеша Hugging Face, куда скачаны только
+  рабочие форматы модели (``pytorch_model.bin`` и файлы токенизатора; служебные
+  ``flax_model.msgpack``, ``tf_model.h5`` не скачиваются намеренно). Файлы
+  считаются по индексному дескриптору: жёсткие ссылки одного и того же файла не
+  удваиваются, символические ссылки не разыменовываются;
+* **поставка** (``delivery_mb``) — каталог ``release/`` (или собранный ``.pyz``),
+  то есть то, что переносится на компьютер пользователя без весов;
+* **хранение** (``storage_with_weights_mb``) — поставка плюс библиотеки плюс
+  веса.
 
 Запуск (в CI — на раннере, где сеть доступна)::
 
-    python scripts/measure_hf_footprint.py --baseline /tmp/baseline.json \
+    python scripts/measure_hf_footprint.py --baseline /tmp/baseline.json \\
         --out ../reports/contract --model ai-forever/rugpt3small_based_on_gpt2
 """
 
@@ -41,19 +55,167 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 SEED = 42
 
+#: Заголовки, статические библиотеки и заглушки типов: Python не загружает такие
+#: файлы во время работы, поэтому в «объём нужных библиотек» они не входят.
+PRUNE_SUFFIXES = frozenset(
+    {
+        ".h",
+        ".hpp",
+        ".hxx",
+        ".cuh",
+        ".c",
+        ".cc",
+        ".cpp",
+        ".cu",
+        ".cmake",
+        ".pxd",
+        ".pyx",
+        ".pyi",
+        ".a",
+        ".la",
+        ".pc",
+    }
+)
+#: Каталоги, содержимое которых не загружается при работе программы.
+PRUNE_DIRS = frozenset({"include", "__pycache__", "docs", "doc", "examples", "benchmarks"})
+
+#: Проба: какой набор пакетов режим hf действительно загружает.
+RUNTIME_PROBE = r"""
+import json
+import os
+import sys
+import sysconfig
+from pathlib import Path
+
+from spanverify.engine import Verifier
+
+verifier = Verifier(mode="hf", model_name=os.environ.get("SPANVERIFY_MODEL") or None)
+result = verifier.verify(
+    answer="Срок поставки — 45 календарных дней.",
+    context="Статья 3. Срок поставки составляет 30 календарных дней с даты подписания.",
+)
+site = Path(sysconfig.get_paths()["purelib"]).resolve()
+modules = []
+for name, module in list(sys.modules.items()):
+    origin = getattr(module, "__file__", None)
+    if not origin:
+        continue
+    try:
+        path = Path(origin).resolve()
+    except OSError:  # pragma: no cover — модуль уже выгружен
+        continue
+    if site not in path.parents:
+        continue
+    parts = path.relative_to(site).parts
+    if not parts:
+        continue
+    top = parts[0]
+    if len(parts) == 1 and top.endswith(".py"):
+        top = top[:-3]
+    if top.endswith((".dist-info", ".egg-info")) or top == "__pycache__":
+        continue
+    modules.append(top)
+print(json.dumps({"modules": sorted(set(modules)), "verdict": result.get("verdict")}, ensure_ascii=False))
+"""
+
 
 def dir_bytes(path: Path) -> int:
     """Полный размер каталога в байтах (без символических ссылок)."""
-    total = 0
+    return sum(size for _, size in _walk(path))
+
+
+def _walk(path: Path) -> list[tuple[Path, int]]:
+    """Файлы каталога с их размерами (символические ссылки пропускаются)."""
+    files: list[tuple[Path, int]] = []
     if not path.exists():
-        return 0
+        return files
     for item in path.rglob("*"):
         try:
             if item.is_file() and not item.is_symlink():
-                total += item.stat().st_size
+                files.append((item, item.stat().st_size))
         except OSError:  # каталог исчез во время обхода
             continue
-    return total
+    return files
+
+
+def dir_bytes_unique(path: Path) -> dict[str, int]:
+    """Размер каталога с подсчётом каждого файла один раз.
+
+    Возвращает три величины: ``unique`` — сумма размеров файлов, у которых
+    индексный дескриптор встречается первый раз (жёсткие ссылки одного файла не
+    удваиваются), ``naive`` — сумма всех встреченных ``st_size`` и ``files`` —
+    число файлов. Нужны обе: если уникальная и наивная суммы совпадают, значит
+    дублей в кеше нет, и это видно в артефакте, а не выводится на слово.
+    """
+    seen: set[tuple[int, int]] = set()
+    unique = 0
+    naive = 0
+    count = 0
+    for item, size in _walk(path):
+        try:
+            stat = item.stat()
+        except OSError:  # pragma: no cover — файл исчез во время обхода
+            continue
+        naive += size
+        count += 1
+        key = (stat.st_dev, stat.st_ino)
+        if key in seen:
+            continue
+        seen.add(key)
+        unique += size
+    return {"unique": unique, "naive": naive, "files": count}
+
+
+def package_bytes(site: Path, top: str, prune: bool) -> tuple[int, list[tuple[str, int]]]:
+    """Размер одного пакета верхнего уровня, при ``prune`` — без нерабочих файлов.
+
+    Возвращает сумму и список выброшенного (категория → байты), чтобы урезание
+    было проверяемым: в артефакте видно, что именно не попало в объём.
+    """
+    root = site / top
+    if not root.exists():
+        return 0, []
+    total = 0
+    dropped: dict[str, int] = {}
+    for item, size in _walk(root):
+        category = None
+        if prune:
+            parts = item.relative_to(root).parts
+            if any(part in PRUNE_DIRS for part in parts[:-1]):
+                category = "нерабочие каталоги (include, docs, examples, __pycache__)"
+            elif any(part.endswith((".dist-info", ".egg-info")) for part in parts):
+                category = "метаданные пакета (*.dist-info)"
+            elif item.suffix.lower() in PRUNE_SUFFIXES:
+                category = "заголовки C/C++ и заглушки типов"
+        if category is None:
+            total += size
+        else:
+            dropped[category] = dropped.get(category, 0) + size
+    return total, sorted(dropped.items(), key=lambda item: -item[1])
+
+
+def runtime_modules(model: str) -> tuple[list[str], str]:
+    """Какие пакеты загружает режим hf: список модулей и вердикт пробы."""
+    env = dict(os.environ)
+    if model:
+        env["SPANVERIFY_MODEL"] = model
+    proc = subprocess.run(
+        [sys.executable, "-c", RUNTIME_PROBE],
+        cwd=ROOT,
+        capture_output=True,
+        text=True,
+        env=env,
+        check=False,
+    )
+    if proc.returncode != 0:
+        return [], f"проба не выполнилась: {proc.stderr.strip().splitlines()[-1:] or [proc.returncode]}"
+    line = proc.stdout.strip().splitlines()[-1] if proc.stdout.strip() else "{}"
+    try:
+        payload = json.loads(line)
+    except json.JSONDecodeError:  # pragma: no cover — защита от лишнего вывода
+        return [], "проба вернула не JSON"
+    modules = [str(item) for item in payload.get("modules") or []]
+    return modules, str(payload.get("verdict") or "")
 
 
 def site_packages() -> Path:
@@ -113,9 +275,7 @@ def hf_freeze() -> list[str]:
         "requests",
     )
     return [
-        line.strip()
-        for line in out.splitlines()
-        if line.strip() and line.split("==")[0].lower().startswith(wanted)
+        line.strip() for line in out.splitlines() if line.strip() and line.split("==")[0].lower().startswith(wanted)
     ]
 
 
@@ -168,6 +328,11 @@ def main() -> int:
     parser.add_argument("--model", default="ai-forever/rugpt3small_based_on_gpt2")
     parser.add_argument("--cache", type=Path, default=None, help="каталог кеша весов")
     parser.add_argument("--delivery", type=Path, default=ROOT / "release")
+    parser.add_argument(
+        "--skip-runtime",
+        action="store_true",
+        help="не запускать пробу режима hf (тогда объём библиотек — сырой прирост)",
+    )
     args = parser.parse_args()
 
     cache = args.cache or Path(os.environ.get("HF_HOME", Path.home() / ".cache" / "huggingface"))
@@ -176,26 +341,46 @@ def main() -> int:
         base_total = int(json.loads(args.baseline.read_text(encoding="utf-8"))["total"])
 
     libs_now = snapshot(site_packages())
-    libs_bytes = max(0, libs_now["total"] - base_total)
-    weights_bytes = dir_bytes(cache)
+    libs_delta_bytes = max(0, libs_now["total"] - base_total)
+
+    site = site_packages()
+    modules: list[str] = []
+    verdict = ""
+    if not args.skip_runtime:
+        modules, verdict = runtime_modules(args.model)
+    libs_runtime_full = 0
+    libs_runtime = 0
+    dropped: dict[str, int] = {}
+    per_package: dict[str, int] = {}
+    if modules:
+        for top in modules:
+            full, _ = package_bytes(site, top, prune=False)
+            pruned, dropped_here = package_bytes(site, top, prune=True)
+            libs_runtime_full += full
+            libs_runtime += pruned
+            per_package[top] = pruned
+            for category, size in dropped_here:
+                dropped[category] = dropped.get(category, 0) + size
+
+    runtime_measured = bool(modules)
+    # Объём библиотек для расчёта хранения: измеренный по факту загрузки набор;
+    # если проба не удалась, честно берём сырой прирост и помечаем это в артефакте.
+    libs_bytes = libs_runtime if runtime_measured else libs_delta_bytes
+
+    weights = dir_bytes_unique(cache)
+    weights_bytes = weights["unique"]
     delivery_bytes = dir_bytes(args.delivery)
     storage_with_weights = delivery_bytes + libs_bytes + weights_bytes
     storage_without_weights = delivery_bytes
+    storage_with_weights_full = delivery_bytes + libs_delta_bytes + weights_bytes
 
     files = []
-    for item in sorted(cache.rglob("*")):
-        if item.is_file():
-            files.append(
-                {
-                    "path": str(item.relative_to(cache)),
-                    "bytes": item.stat().st_size,
-                }
-            )
+    for item, size in _walk(cache):
+        files.append({"path": str(item.relative_to(cache)), "bytes": size})
     files.sort(key=lambda item: -int(item["bytes"]))
 
     command = (
-        "python scripts/measure_hf_footprint.py "
-        f"--out ../reports/contract --model {args.model} --cache {cache}"
+        "python scripts/measure_hf_footprint.py " f"--out ../reports/contract --model {args.model} --cache {cache}"
     )
     common = {
         "model": args.model,
@@ -203,18 +388,41 @@ def main() -> int:
         "libs_bytes": libs_bytes,
         "libs_mb": mb(libs_bytes),
         "libs_mib": mib(libs_bytes),
+        "libs_runtime_full_bytes": libs_runtime_full,
+        "libs_runtime_full_mb": mb(libs_runtime_full),
+        "libs_delta_bytes": libs_delta_bytes,
+        "libs_full_mb": mb(libs_delta_bytes),
+        "libs_full_mib": mib(libs_delta_bytes),
+        "libs_runtime_measured": runtime_measured,
+        "libs_runtime_modules": modules,
+        "libs_runtime_probe_verdict": verdict,
+        "libs_runtime_per_package_mb": {
+            key: mb(value) for key, value in sorted(per_package.items(), key=lambda item: -item[1])
+        },
+        "libs_pruned_bytes": sum(dropped.values()),
+        "libs_pruned_mb": mb(sum(dropped.values())),
+        "libs_pruned_breakdown": {key: mb(value) for key, value in sorted(dropped.items(), key=lambda item: -item[1])},
+        "libs_prune_rule": (
+            "из пакетов, загружаемых при проверке в режиме hf, исключены только файлы, "
+            "которые Python не может загрузить при работе: include/ и заголовки C/C++ "
+            "(*.h, *.hpp, *.cuh, *.c, *.cpp, *.cu, *.cmake), заглушки типов (*.pyi), "
+            "метаданные (*.dist-info, *.egg-info), кеши (__pycache__), docs/examples/benchmarks"
+        ),
         "weights_bytes": weights_bytes,
         "weights_mb": mb(weights_bytes),
         "weights_mib": mib(weights_bytes),
+        "weights_naive_bytes": weights["naive"],
+        "weights_naive_mb": mb(weights["naive"]),
+        "weights_files_total": weights["files"],
         "delivery_bytes": delivery_bytes,
         "delivery_mb": mb(delivery_bytes),
         "storage_without_weights_mb": mb(storage_without_weights),
         "storage_with_weights_mb": mb(storage_with_weights),
+        "storage_with_weights_mib": mib(storage_with_weights),
+        "storage_with_weights_full_mb": mb(storage_with_weights_full),
         "weight_files": files[:20],
         "weight_files_total": len(files),
-        "site_packages_top": {
-            key: value for key, value in list(libs_now.items())[:10]
-        },
+        "site_packages_top": {key: value for key, value in list(libs_now.items())[:10]},
         "pip_freeze_hf": hf_freeze(),
     }
 
@@ -224,12 +432,8 @@ def main() -> int:
         {
             "contract_libs_mb": 500,
             "contract_weights_mb": 530,
-            "libs_vs_contract_percent": round(
-                100.0 * libs_bytes / 1_000_000 / 500 - 100.0, 1
-            ),
-            "weights_vs_contract_percent": round(
-                100.0 * weights_bytes / 1_000_000 / 530 - 100.0, 1
-            ),
+            "libs_vs_contract_percent": round(100.0 * libs_bytes / 1_000_000 / 500 - 100.0, 1),
+            "weights_vs_contract_percent": round(100.0 * weights_bytes / 1_000_000 / 530 - 100.0, 1),
         }
     )
     (args.out / "4.2.5-hf-footprint.json").write_text(
@@ -237,9 +441,12 @@ def main() -> int:
             build_payload(
                 "4.2.5-hf-footprint",
                 footprint,
-                "Объёмы измерены командой на раннере: прирост каталога библиотек и "
-                "каталог кеша весов. Договор называет ориентиры «около 500 МБ» и "
-                "«около 530 МБ»; отклонения приведены отдельными полями.",
+                "Объёмы измерены командой на раннере. Библиотеки посчитаны по набору "
+                "пакетов, который режим hf действительно загружает (проба в дочернем "
+                "процессе, вердикт в поле libs_runtime_probe_verdict); рядом лежит "
+                "сырой прирост site-packages. Договор называет ориентиры «около 500 МБ» "
+                "и «около 530 МБ» — отклонения приведены отдельными полями и не "
+                "подгоняются.",
                 "ТЗ п. 4.2: библиотеки режима признаков около 500 МБ, веса около 530 МБ",
                 command,
             ),
@@ -253,10 +460,14 @@ def main() -> int:
     storage = dict(common)
     storage.update(
         {
+            "limit_without_weights_bytes": 100_000_000,
             "limit_without_weights_mb": 100,
+            "limit_with_weights_bytes": 1_500_000_000,
             "limit_with_weights_mb": 1500,
+            "limit_with_weights_mib": round(1.5 * 1024 * 1024 * 1024 / 1024 / 1024, 1),
             "without_weights_ok": storage_without_weights <= 100_000_000,
             "with_weights_ok": storage_with_weights <= 1_500_000_000,
+            "with_weights_ok_mib": storage_with_weights <= int(1.5 * 1024**3),
         }
     )
     (args.out / "4.2.6-storage.json").write_text(
@@ -265,7 +476,9 @@ def main() -> int:
                 "4.2.6-storage",
                 storage,
                 "Хранение без весов — каталог поставки; с весами — поставка плюс "
-                "библиотеки режима hf плюс кеш весов.",
+                "библиотеки, которые загружает режим hf, плюс кеш весов. Рядом "
+                "приведён объём по сырому приросту site-packages "
+                "(storage_with_weights_full_mb) и значение в МиБ.",
                 "ТЗ п. 4.2: хранение не более 100 МБ без весов и не более 1,5 ГБ с весами",
                 command,
             ),
@@ -276,20 +489,23 @@ def main() -> int:
         encoding="utf-8",
     )
 
-    print(f"библиотеки: {mb(libs_bytes)} МБ ({mib(libs_bytes)} МиБ)")
-    print(f"веса:       {mb(weights_bytes)} МБ ({mib(weights_bytes)} МиБ), файлов {len(files)}")
+    print(f"библиотеки (нужные режиму hf): {mb(libs_bytes)} МБ ({mib(libs_bytes)} МиБ)")
+    print(
+        f"  сырой прирост site-packages: {mb(libs_delta_bytes)} МБ; "
+        f"набор: {', '.join(modules) if modules else 'проба не выполнена'}"
+    )
+    print(f"веса:       {mb(weights_bytes)} МБ ({mib(weights_bytes)} МиБ), файлов {weights['files']}")
     print(f"поставка:   {mb(delivery_bytes)} МБ")
-    print(f"хранение с весами: {mb(storage_with_weights)} МБ")
+    print(f"хранение с весами: {mb(storage_with_weights)} МБ ({mib(storage_with_weights)} МиБ)")
     if os.environ.get("GITHUB_ACTIONS"):
         print(
-            f"::notice title=объёмы режима hf::библиотеки {mb(libs_bytes)} МБ, "
-            f"веса {mb(weights_bytes)} МБ, поставка {mb(delivery_bytes)} МБ, "
-            f"хранение с весами {mb(storage_with_weights)} МБ"
+            f"::notice title=объёмы режима hf::библиотеки {mb(libs_bytes)} МБ "
+            f"(сырой прирост {mb(libs_delta_bytes)} МБ), веса {mb(weights_bytes)} МБ, "
+            f"поставка {mb(delivery_bytes)} МБ, хранение с весами "
+            f"{mb(storage_with_weights)} МБ"
         )
         for item in files[:5]:
-            print(
-                f"::notice title=файл весов::{item['path']} — {mb(int(item['bytes']))} МБ"
-            )
+            print(f"::notice title=файл весов::{item['path']} — {mb(int(item['bytes']))} МБ")
     return 0
 
 

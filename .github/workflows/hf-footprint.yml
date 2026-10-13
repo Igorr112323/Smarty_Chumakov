@@ -83,13 +83,21 @@ jobs:
           print("веса скачаны в", path)
           PY
 
+      - name: Собрать переносимый пакет (поставка входит в замер хранения)
+        run: python scripts/make_zipapp.py --out release
+
       - name: Измерить объёмы и записать артефакты
+        # Замер состоит из двух частей: сначала дочерняя проба поднимает режим hf
+        # на реальных весах и запоминает, какие пакеты Python загрузил (объём
+        # библиотек считается по этому набору), затем считаются каталоги весов и
+        # поставки. Ничего не оценивается: в артефакт идут байты.
         run: |
           python scripts/measure_hf_footprint.py \
             --baseline /tmp/baseline.json \
             --out ../reports/contract \
             --model "$MODEL_ID" \
-            --cache "$HF_HOME"
+            --cache "$HF_HOME" \
+            --delivery release
 
       - name: Показать артефакты
         if: always()
