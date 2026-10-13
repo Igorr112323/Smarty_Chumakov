@@ -1,18 +1,19 @@
 {
   "id": "dod.tests",
-  "commit": "ef0015ff36944985e0d97d332f179e9b37680252",
+  "commit": "09911257202f409df53b96426182d2915b70d15e",
   "seed": 42,
   "mode": "demo",
   "dataset": "spanverify-module/tests",
-  "date": "2026-10-13T17:29:08Z",
+  "date": "2026-10-13T19:15:16Z",
   "command": "",
   "metrics": {
     "collect_returncode": 0,
     "collected": 587,
-    "coverage_file": null,
-    "coverage_percent": null,
-    "coverage_gate_percent": 85
+    "coverage_file": "spanverify-module/reports/coverage.json",
+    "coverage_percent": 87.78,
+    "coverage_gate_percent": 85,
+    "coverage_written": "2026-10-13T19:09:51Z"
   },
-  "note": "нет отчёта покрытия: прогон с --cov не выполнялся в этом окружении",
+  "note": "собрано тестов 587, покрытие 87.78 % при пороге 85 %",
   "gate": null
 }
