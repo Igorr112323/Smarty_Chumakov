@@ -117,6 +117,10 @@ jobs:
     name: Соответствие договору (проект 117812)
     runs-on: ubuntu-latest
     timeout-minutes: 40
+    # GH_TOKEN нужен проверке поставки: состав и размеры релиза читаются через
+    # API GitHub. Без токена эта проверка честно пишет «не измерено», а не падает.
+    env:
+      GH_TOKEN: ${{ github.token }}
     steps:
       - uses: actions/checkout@v4
 
@@ -144,7 +148,8 @@ jobs:
         run: python scripts/contract_check.py
 
       - name: Сверка чисел в документах с реестром
-        run: python spanverify-module/scripts/check_numbers.py --metrics spanverify-module/reports/METRICS.json --numbers reports/NUMBERS.json
+        working-directory: spanverify-module
+        run: python scripts/check_numbers.py --metrics reports/METRICS.json --numbers ../reports/NUMBERS.json
 
       - name: Артефакты контрактной проверки
         if: always()
