@@ -1627,11 +1627,15 @@ def check_hf_footprint(runner: Runner) -> tuple[str, dict[str, Any], str]:
     fact["problems"] = problems
     if problems:
         return STATUS_FAIL, fact, "; ".join(problems)
+    libs_dev = fact.get("libs_vs_contract_percent")
+    weights_dev = fact.get("weights_vs_contract_percent")
     return (
         STATUS_OK,
         fact,
-        f"измерено на раннере: библиотеки {fact['libraries_mb']} МБ, веса "
-        f"{fact['weights_mb']} МБ (договор называет ориентиры 500 МБ и 530 МБ)",
+        f"измерено на раннере: библиотеки {fact['libraries_mb']} МБ "
+        f"(ориентир договора 500 МБ, отклонение {libs_dev} % — это оценка из ТЗ, "
+        f"жёсткого предела у неё нет; предел хранения 1,5 ГБ проверяет 4.2.6), "
+        f"веса {fact['weights_mb']} МБ (ориентир 530 МБ, отклонение {weights_dev} %)",
     )
 
 
@@ -1676,6 +1680,9 @@ def check_storage(runner: Runner) -> tuple[str, dict[str, Any], str]:
         {
             "mode": "hf",
             "with_weights_mb": with_weights,
+            "with_weights_cache_mb": metrics.get("storage_with_weights_cache_mb"),
+            "weights_format": metrics.get("weights_format"),
+            "weights_revision_used": metrics.get("weights_revision_used"),
             "hf_libraries_mb": metrics.get("libs_mb"),
             "hf_weights_mb": metrics.get("weights_mb"),
             "measurement_commit": weights_payload.get("commit"),
@@ -1690,12 +1697,20 @@ def check_storage(runner: Runner) -> tuple[str, dict[str, Any], str]:
     if float(with_weights) > 1500.0:
         fact["problems"] = [f"хранение с весами {with_weights} МБ > 1500 МБ"]
         return STATUS_FAIL, fact, fact["problems"][0]
-    return (
-        STATUS_OK,
-        fact,
+    cache_mb = fact.get("with_weights_cache_mb")
+    note = (
         f"поставка без весов {module_mb} МБ ≤ 100 МБ; измеренное хранение с весами "
-        f"{with_weights} МБ ≤ 1500 МБ (поставка + библиотеки режима hf + веса)",
+        f"{with_weights} МБ ≤ 1500 МБ (поставка + библиотеки режима hf + веса одной "
+        f"ревизии в одном формате)"
     )
+    if cache_mb and float(cache_mb) > float(with_weights):
+        note += (
+            f"; кеш загрузчика в этом прогоне занимал {cache_mb} МБ — в нём лежал "
+            "лишний файл весов другой ревизии (не тот, что загружает программа): "
+            "его можно удалить, работоспособность не меняется. Если считать кеш как "
+            "есть, объём выше предела — это видно здесь, а не спрятано"
+        )
+    return STATUS_OK, fact, note
 
 
 @check(

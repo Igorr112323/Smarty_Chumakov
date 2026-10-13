@@ -1,10 +1,10 @@
 {
   "id": "4.1.10-no-network",
-  "commit": "7eb1d11faa0a410c08e4192731e6b40cea1376fd",
+  "commit": "ef0015ff36944985e0d97d332f179e9b37680252",
   "seed": 42,
   "mode": "demo",
   "dataset": "demo_pairs(20)",
-  "date": "2026-10-13T17:25:57Z",
+  "date": "2026-10-13T17:29:08Z",
   "command": "",
   "metrics": {
     "verify_ok": true,

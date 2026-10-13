@@ -1,10 +1,10 @@
 {
   "id": "plan.reporting",
-  "commit": "7eb1d11faa0a410c08e4192731e6b40cea1376fd",
+  "commit": "ef0015ff36944985e0d97d332f179e9b37680252",
   "seed": 42,
   "mode": "demo",
   "dataset": "docs",
-  "date": "2026-10-13T17:25:58Z",
+  "date": "2026-10-13T17:29:08Z",
   "command": "",
   "metrics": {
     "document": "docs/ТЗ_и_календарный_план.md",

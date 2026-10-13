@@ -1,10 +1,10 @@
 {
   "id": "contract.doc-hash",
-  "commit": "7eb1d11faa0a410c08e4192731e6b40cea1376fd",
+  "commit": "ef0015ff36944985e0d97d332f179e9b37680252",
   "seed": 42,
   "mode": "demo",
   "dataset": "договор № 20478ГУ/2026, проект 117812",
-  "date": "2026-10-13T17:25:59Z",
+  "date": "2026-10-13T17:29:09Z",
   "command": "",
   "metrics": {
     "recorded_sha256": "e5eb6ad8522fa70135f75bf22b0b5f3464fcc17d9c6f04d81b48976a42e69cd5",
