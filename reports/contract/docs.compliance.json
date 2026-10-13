@@ -1,0 +1,17 @@
+{
+  "id": "docs.compliance",
+  "commit": "d39c95ccc58aa0c09cbd4308188c89743ce59c7a",
+  "seed": 42,
+  "mode": "demo",
+  "dataset": "docs",
+  "date": "2026-10-13T08:05:14Z",
+  "command": "",
+  "metrics": {
+    "document": "docs/СООТВЕТСТВИЕ_ДОГОВОРУ.md",
+    "exists": true,
+    "has_table": true,
+    "has_statuses": true
+  },
+  "note": "документ соответствия сгенерирован из CONTRACT.json",
+  "gate": null
+}

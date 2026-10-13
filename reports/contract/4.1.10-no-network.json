@@ -1,0 +1,27 @@
+{
+  "id": "4.1.10-no-network",
+  "commit": "d39c95ccc58aa0c09cbd4308188c89743ce59c7a",
+  "seed": 42,
+  "mode": "demo",
+  "dataset": "demo_pairs(20)",
+  "date": "2026-10-13T08:05:13Z",
+  "command": "",
+  "metrics": {
+    "verify_ok": true,
+    "spans": 1,
+    "tokens": 8,
+    "evaluate_pairs": 20,
+    "token_f1": 0.9388,
+    "operations": [
+      "verify",
+      "evaluate",
+      "features(в составе verify)",
+      "числовые правила"
+    ],
+    "excluded": [
+      "HTTP-сервер: по определению открывает порт, проверяется отдельно"
+    ]
+  },
+  "note": "verify и evaluate работают при полностью заблокированных сокетах",
+  "gate": null
+}

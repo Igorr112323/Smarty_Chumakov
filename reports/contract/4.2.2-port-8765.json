@@ -1,0 +1,15 @@
+{
+  "id": "4.2.2-port-8765",
+  "commit": "d39c95ccc58aa0c09cbd4308188c89743ce59c7a",
+  "seed": 42,
+  "mode": "demo",
+  "dataset": "api-smoke",
+  "date": "2026-10-13T08:05:13Z",
+  "command": "",
+  "metrics": {
+    "port": 8765,
+    "default_port": 8765
+  },
+  "note": "сервис поднялся на порту 8765 и ответил",
+  "gate": null
+}

@@ -1,0 +1,19 @@
+{
+  "id": "4.2.6-storage",
+  "commit": "d39c95ccc58aa0c09cbd4308188c89743ce59c7a",
+  "seed": 42,
+  "mode": "demo",
+  "dataset": "spanverify-module",
+  "date": "2026-10-13T08:05:14Z",
+  "command": "",
+  "metrics": {
+    "module_size_mb": 43.422,
+    "module_size_without_data_mb": 1.062,
+    "pyz_size_mb": 0.1595,
+    "with_weights_mb": null,
+    "limit_without_weights_mb": 100.0,
+    "limit_with_weights_mb": 1500.0
+  },
+  "note": "объём без весов 43.422 МБ укладывается в 100 МБ; объём с весами (≤ 1,5 ГБ) в этом окружении не измеряется — нет кэша весов модели, нужна машина с загруженными весами",
+  "gate": null
+}

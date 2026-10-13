@@ -1,0 +1,17 @@
+{
+  "id": "numbers.registry",
+  "commit": "d39c95ccc58aa0c09cbd4308188c89743ce59c7a",
+  "seed": 42,
+  "mode": "demo",
+  "dataset": "reports/NUMBERS.json",
+  "date": "2026-10-13T08:05:14Z",
+  "command": "",
+  "metrics": {
+    "entries": 38,
+    "measured": 26,
+    "missing": [],
+    "check_ok": true
+  },
+  "note": "реестр собран: 38 записей, не измерено 0",
+  "gate": null
+}

@@ -1,0 +1,40 @@
+{
+  "id": "4.1.2-api-schema",
+  "commit": "d39c95ccc58aa0c09cbd4308188c89743ce59c7a",
+  "seed": 42,
+  "mode": "demo",
+  "dataset": "api-smoke",
+  "date": "2026-10-13T08:04:50Z",
+  "command": "",
+  "metrics": {
+    "spans": [
+      {
+        "start": 0,
+        "end": 53,
+        "text": "Срок хранения первичных документов составляет 3 года.",
+        "risk": 0.7734,
+        "confidence": 0.2266,
+        "label": "likely_hallucination",
+        "n_tokens": 2,
+        "source": "mask"
+      }
+    ],
+    "verify_keys": [
+      "ai_participation",
+      "ai_share",
+      "ai_share_hard",
+      "ai_share_soft",
+      "is_hallucination",
+      "latency_ms",
+      "mode",
+      "score",
+      "spans",
+      "stats",
+      "threshold",
+      "verdict"
+    ],
+    "max_body": 16777216
+  },
+  "note": "схема ответа соответствует требованию",
+  "gate": null
+}

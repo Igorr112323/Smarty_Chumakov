@@ -1,0 +1,19 @@
+{
+  "id": "docs.acceptance",
+  "commit": "d39c95ccc58aa0c09cbd4308188c89743ce59c7a",
+  "seed": 42,
+  "mode": "demo",
+  "dataset": "docs",
+  "date": "2026-10-13T08:05:14Z",
+  "command": "",
+  "metrics": {
+    "document": "docs/ПРОГРАММА_И_МЕТОДИКА_ПРИЁМКИ.md",
+    "markers_found": [
+      "contract_check.py",
+      "CONTRACT.json",
+      "check_numbers.py"
+    ]
+  },
+  "note": "программа приёмки построена на тех же проверках, что и CI",
+  "gate": null
+}

@@ -1,0 +1,59 @@
+{
+  "id": "4.1.9-delivery-artifacts",
+  "commit": "d39c95ccc58aa0c09cbd4308188c89743ce59c7a",
+  "seed": 42,
+  "mode": "demo",
+  "dataset": "spanverify.pyz / release v1.3.0",
+  "date": "2026-10-13T08:05:13Z",
+  "command": "",
+  "metrics": {
+    "build_returncode": 0,
+    "build_stderr": "",
+    "pyz_size_bytes": 167250,
+    "pyz_size_mb": 0.1595,
+    "pyz_size_mb_decimal": 0.1673,
+    "pyz_sha256": "4bcbc30c50bd2f160983bc477108f378cba978c8c7661bdae44ba7501fe8de7b",
+    "smoke_returncode": 0,
+    "smoke_tail": "вейера и интерфейса, а не достоверность ответа. Подмена числа ловится, если число есть у другого объекта документа (например, «первичные — пять лет» против «вторичные — десять лет»); перефразирования и таблицы требуют режима 'hf'. Научные выводы возможны только в режиме 'hf'.\nВсе проверки пройдены.\n",
+    "copy_sha256_equal": true,
+    "module_size_mb": 43.422,
+    "module_size_without_data_mb": 1.062,
+    "data_dir_mb": 38.045,
+    "release_tag": "v1.3.0",
+    "release_assets": {
+      "SHA256SUMS.txt": {
+        "size_bytes": 250,
+        "size_mb": 0.0002,
+        "size_mb_decimal": 0.0003,
+        "url": "https://github.com/Igorr112323/Smarty_Chumakov/releases/download/v1.3.0/SHA256SUMS.txt"
+      },
+      "spanverify-win.zip": {
+        "size_bytes": 9311779,
+        "size_mb": 8.8804,
+        "size_mb_decimal": 9.3118,
+        "url": "https://github.com/Igorr112323/Smarty_Chumakov/releases/download/v1.3.0/spanverify-win.zip"
+      },
+      "spanverify.exe": {
+        "size_bytes": 9134317,
+        "size_mb": 8.7112,
+        "size_mb_decimal": 9.1343,
+        "url": "https://github.com/Igorr112323/Smarty_Chumakov/releases/download/v1.3.0/spanverify.exe"
+      },
+      "spanverify.pyz": {
+        "size_bytes": 539191,
+        "size_mb": 0.5142,
+        "size_mb_decimal": 0.5392,
+        "url": "https://github.com/Igorr112323/Smarty_Chumakov/releases/download/v1.3.0/spanverify.pyz"
+      }
+    },
+    "release_checksum_verified": null,
+    "release_workflow_run": {
+      "conclusion": "success",
+      "createdAt": "2026-10-03T17:43:06Z",
+      "databaseId": 37141538627,
+      "headSha": "8e27b66688dfaa4d831c20a709878ede095d59c8"
+    }
+  },
+  "note": "переносимый пакет собран, смоук-тест прошёл, сумма копии совпала; в релизе опубликованы spanverify.exe, spanverify-win.zip, spanverify.pyz и SHA256SUMS.txt (состав и размеры прочитаны через API); сверка суммы опубликованного файла в этом окружении не выполнена — файлы релиза отдаются хранилищем, недоступным из сети прогона, поэтому это «не измерено», а не «соответствует»",
+  "gate": null
+}

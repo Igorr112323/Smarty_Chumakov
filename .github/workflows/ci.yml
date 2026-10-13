@@ -109,6 +109,55 @@ jobs:
             /tmp/run1/config/participation.json
           retention-days: 30
 
+  # Контрактные проверки договора (проект 117812): ТЗ пп. 4.1 и 4.2, правила
+  # отчётности и правило «числа только из прогонов». Job намеренно НЕ ночной:
+  # падение здесь означает, что заявленное соответствие договору разошлось с
+  # кодом или с документами, и это должно быть видно на каждом push.
+  contract:
+    name: Соответствие договору (проект 117812)
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+          cache-dependency-path: spanverify-module/requirements.txt
+
+      - name: Зависимости
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r spanverify-module/requirements.txt
+
+      - name: Контрактные тесты
+        working-directory: spanverify-module
+        run: python -m pytest -q tests/test_contract.py
+
+      - name: Реестр чисел и его сверка с артефактами
+        run: |
+          python scripts/build_numbers.py
+          python scripts/build_numbers.py --check
+
+      - name: Контрактные проверки (requirement → fact → status)
+        run: python scripts/contract_check.py
+
+      - name: Сверка чисел в документах с реестром
+        run: python spanverify-module/scripts/check_numbers.py --metrics spanverify-module/reports/METRICS.json --numbers reports/NUMBERS.json
+
+      - name: Артефакты контрактной проверки
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: contract
+          path: |
+            reports/CONTRACT.json
+            reports/NUMBERS.json
+            reports/contract/
+            docs/СООТВЕТСТВИЕ_ДОГОВОРУ.md
+          retention-days: 90
+
   tests:
     name: Тесты (Python ${{ matrix.python }}, ${{ matrix.os }})
     runs-on: ${{ matrix.os }}

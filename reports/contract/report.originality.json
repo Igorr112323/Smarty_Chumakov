@@ -1,0 +1,17 @@
+{
+  "id": "report.originality",
+  "commit": "d39c95ccc58aa0c09cbd4308188c89743ce59c7a",
+  "seed": 42,
+  "mode": "demo",
+  "dataset": "docs",
+  "date": "2026-10-13T08:05:14Z",
+  "command": "",
+  "metrics": {
+    "document": "docs/ОТЧЁТ_о_НИР_шаблон.md",
+    "field_present": true,
+    "measured_percent": null,
+    "required_percent": 80
+  },
+  "note": "фактический процент оригинальности не измерен: нужна внешняя система проверки текста; в шаблоне поле и процедура описаны",
+  "gate": null
+}

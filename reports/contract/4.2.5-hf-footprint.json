@@ -1,0 +1,17 @@
+{
+  "id": "4.2.5-hf-footprint",
+  "commit": "d39c95ccc58aa0c09cbd4308188c89743ce59c7a",
+  "seed": 42,
+  "mode": "demo",
+  "dataset": "hf-mode",
+  "date": "2026-10-13T08:05:14Z",
+  "command": "",
+  "metrics": {
+    "libraries_dir": null,
+    "weights_dir": null,
+    "libraries_mb": null,
+    "weights_mb": null
+  },
+  "note": "прогон не выполнен: в этом окружении нет torch/transformers и кэша весов модели; нужна машина с доступом к хранилищу весов (проверяется в CI-прогоне режима hf)",
+  "gate": null
+}

@@ -1,0 +1,24 @@
+{
+  "id": "4.2.4-build-sha256",
+  "commit": "d39c95ccc58aa0c09cbd4308188c89743ce59c7a",
+  "seed": 42,
+  "mode": "demo",
+  "dataset": "build-artifacts",
+  "date": "2026-10-13T08:05:14Z",
+  "command": "",
+  "metrics": {
+    "workflow": ".github/workflows/build-and-release-exe.yml",
+    "workflow_has_sha256sums": true,
+    "checksum_helper": "scripts/verify_checksum.py",
+    "release_tag": "v1.3.0",
+    "release_assets": [
+      "SHA256SUMS.txt",
+      "spanverify-win.zip",
+      "spanverify.exe",
+      "spanverify.pyz"
+    ],
+    "release_checksum_verified": null
+  },
+  "note": "сборка автоматическая, SHA256SUMS.txt формируется и публикуется в релизе; инструмент сверки проверен самопроверкой; сверка суммы опубликованного файла в этом окружении не выполнялась (файлы релиза недоступны из сети прогона) — это указано как ограничение",
+  "gate": null
+}

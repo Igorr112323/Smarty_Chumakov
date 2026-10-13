@@ -1,0 +1,17 @@
+{
+  "id": "numbers.check",
+  "commit": "d39c95ccc58aa0c09cbd4308188c89743ce59c7a",
+  "seed": 42,
+  "mode": "demo",
+  "dataset": "docs",
+  "date": "2026-10-13T08:05:14Z",
+  "command": "",
+  "metrics": {
+    "returncode": 0,
+    "tail": [
+      "Числа сходятся с METRICS.json (+16 измерений из NUMBERS.json): проверено документов 12"
+    ]
+  },
+  "note": "числа документов сверены с реестром: расхождений нет",
+  "gate": null
+}

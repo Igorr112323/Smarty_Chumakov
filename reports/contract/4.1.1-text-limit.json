@@ -1,0 +1,17 @@
+{
+  "id": "4.1.1-text-limit",
+  "commit": "d39c95ccc58aa0c09cbd4308188c89743ce59c7a",
+  "seed": 42,
+  "mode": "demo",
+  "dataset": "synthetic-2000000",
+  "date": "2026-10-13T08:04:49Z",
+  "command": "",
+  "metrics": {
+    "chars": 2000000,
+    "seconds": 52.051,
+    "peak_memory_mb": 524.0,
+    "spans": 1
+  },
+  "note": "текст 2 000 000 знаков обработан",
+  "gate": null
+}
