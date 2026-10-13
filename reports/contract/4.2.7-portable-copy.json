@@ -1,14 +1,14 @@
 {
   "id": "4.2.7-portable-copy",
-  "commit": "09911257202f409df53b96426182d2915b70d15e",
+  "commit": "4c2d9ed4dc9da519bcdc1f952e128bbb3b20e4f5",
   "seed": 42,
   "mode": "demo",
   "dataset": "spanverify.pyz",
-  "date": "2026-10-13T19:15:16Z",
+  "date": "2026-10-13T19:56:19Z",
   "command": "",
   "metrics": {
     "copy_sha256_equal": true,
-    "pyz_sha256": "d9c3db4cd22252f77e89dbc18b79e86ac9ddc3571040987685e163a93285f7b1",
+    "pyz_sha256": "0c16e9492eb2a2ff6411d304a588c333b85da46a13571d504b746dfb83827836",
     "checksum_helper": true,
     "release_tag": "v1.3.0",
     "release_checksum_verified": null

@@ -8,21 +8,21 @@
   },
   "meta": {
     "version": "1.3.1",
-    "commit": "09911257202f409df53b96426182d2915b70d15e",
-    "generated_at": "2026-10-13T19:13:49Z",
+    "commit": "4c2d9ed4dc9da519bcdc1f952e128bbb3b20e4f5",
+    "generated_at": "2026-10-13T19:55:06Z",
     "seed": 42,
     "dataset": "data/demo_pairs.jsonl",
     "refresh": {
-      "at": "2026-10-13T19:13:54Z",
-      "head_commit": "09911257202f409df53b96426182d2915b70d15e",
+      "at": "2026-10-13T19:55:11Z",
+      "head_commit": "4c2d9ed4dc9da519bcdc1f952e128bbb3b20e4f5",
       "worktree": "dirty",
       "preserved_from_commit": "09911257202f409df53b96426182d2915b70d15e",
       "preserved_blocks": [
         "pilot"
       ],
       "refreshed_blocks": [
-        "duration_s",
-        "tests"
+        "cross_corpus",
+        "duration_s"
       ],
       "rule": "блоки пересобраны из артефактов прогонов; блоки, артефактов которых нет на этой машине, сохранены из прежнего файла и перечислены в preserved_blocks"
     }
@@ -1777,10 +1777,10 @@
     "rule": "срез не равен всему набору: лимит и оговорка обязательны"
   },
   "cross_corpus": {
-    "in_corpus_f1": 0.9532,
-    "cross_corpus_f1": 0.7374,
-    "drop": 0.2158,
-    "cross_fpr": 0.1451,
+    "in_corpus_f1": 0.9576,
+    "cross_corpus_f1": 0.6752,
+    "drop": 0.2824,
+    "cross_fpr": 0.1478,
     "corpus_b": {
       "name": "alt-generator 1.0 (числа словами, другие шаблоны)",
       "pairs": 240,
@@ -2535,5 +2535,5 @@
     }
   },
   "release": null,
-  "duration_s": 49.6
+  "duration_s": 48.8
 }
