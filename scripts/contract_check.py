@@ -2722,13 +2722,27 @@ def main() -> int:
         action="store_true",
         help="пропустить тяжёлые проверки (2 000 000 знаков)",
     )
-    parser.add_argument("--out", default=str(CONTRACT_JSON.relative_to(ROOT)))
+    parser.add_argument(
+        "--out",
+        default=None,
+        help=(
+            "куда записать реестр (по умолчанию reports/CONTRACT.json; при "
+            "--only реестр не перезаписывается, чтобы частичный прогон не "
+            "затёр полный)"
+        ),
+    )
     parser.add_argument(
         "--no-doc",
         action="store_true",
         help="не перегенерировать документ соответствия",
     )
     args = parser.parse_args()
+
+    known_ids = {check.id for check in CHECKS}
+    if args.only and args.only not in known_ids:
+        print(f"неизвестный id проверки: {args.only}")
+        print("доступные id: " + ", ".join(sorted(known_ids)))
+        return 2
 
     started = time.time()
     # Две фазы. Сначала все проверки, кроме читающих сам документ соответствия;
@@ -2784,11 +2798,17 @@ def main() -> int:
             "«не измерено» допустимо лишь с обоснованием"
         ),
     }
-    out = ROOT / args.out
-    out.parent.mkdir(parents=True, exist_ok=True)
-    out.write_text(
-        json.dumps(payload, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
-    )
+    # Частичный прогон (--only) реестр не трогает: иначе одна проверка затирает
+    # 33 записей, и следующая сверка считает полный прогон неполным.
+    out: Path | None = None
+    if args.out or not args.only:
+        out = ROOT / (args.out or str(CONTRACT_JSON.relative_to(ROOT)))
+        out.parent.mkdir(parents=True, exist_ok=True)
+        out.write_text(
+            json.dumps(payload, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
+        )
+    else:
+        print("запуск с --only: reports/CONTRACT.json не перезаписан")
     if not args.no_doc and not args.only:
         COMPLIANCE_DOC.parent.mkdir(parents=True, exist_ok=True)
         COMPLIANCE_DOC.write_text(render_compliance_doc(payload), encoding="utf-8")
@@ -2818,7 +2838,8 @@ def main() -> int:
             f"::notice title=Контрактные проверки::соответствует {summary[STATUS_OK]}, "
             f"не соответствует {summary[STATUS_FAIL]}, не измерено {summary[STATUS_UNKNOWN]}"
         )
-    print(f"CONTRACT.json: {out}")
+    if out is not None:
+        print(f"CONTRACT.json: {out}")
     if failures:
         print(
             "НЕ ПРОШЛИ: "
