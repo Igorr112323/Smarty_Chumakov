@@ -1,10 +1,10 @@
 {
   "id": "contract.source",
-  "commit": "72205185cd75b5b2a247236e4b82bd2d76ba428a",
+  "commit": "a8454d0476cac2feddccc91d0e91e1fb52f5e87c",
   "seed": 42,
   "mode": "pdf",
   "dataset": "договор № 20478ГУ/2026, проект 117812",
-  "date": "2026-10-13T22:18:14Z",
+  "date": "2026-10-13T22:57:45Z",
   "command": "",
   "metrics": {
     "compared": {
