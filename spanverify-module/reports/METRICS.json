@@ -8,15 +8,15 @@
   },
   "meta": {
     "version": "1.3.0",
-    "commit": "39a0ad4858f7278335b9f0ef94bc405485a78b4a",
-    "generated_at": "2026-10-07T12:45:15Z",
+    "commit": "797d69b99e9929015773ea21768073499a7b040b",
+    "generated_at": "2026-10-10T05:38:41Z",
     "seed": 42,
     "dataset": "data/demo_pairs.jsonl"
   },
   "disclaimer": "Демонстрационные метрики получены на синтетическом корпусе и научным результатом не являются. Для подтверждения требуются 1200 пар «вопрос–ответ» с экспертной разметкой на реальных регламентах организации.",
   "tests": {
-    "collected": 510,
-    "coverage_percent": null,
+    "collected": 532,
+    "coverage_percent": 87.51,
     "coverage_gate_percent": 85
   },
   "demo": {

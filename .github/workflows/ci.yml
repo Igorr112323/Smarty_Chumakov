@@ -262,6 +262,17 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 30
     needs: [quality, pilot, external]
+    # На пуш job'ы pilot и external пропускаются (они работают по расписанию и
+    # вручную), а пропущенный needs по умолчанию пропускает и зависимый job.
+    # Из-за этого сверка чисел выполнялась раз в сутки и её падение не
+    # блокировало слияние: ночные прогоны 37755784670 и 37911250513 на main
+    # красные именно здесь — документы отстали от пересчитанного METRICS.json
+    # (515 тестов и 87,35 % против 510 и null в файле). Теперь job работает на
+    # каждый пуш: число тестов и покрытие берутся из свежего прогона, а блоки
+    # пилота и внешних наборов — из закоммиченных файлов (при отсутствии
+    # артефактов collect_metrics.py оставляет pilot пустым, на сверку документов
+    # это не влияет: проверено прогоном скрипта с pilot = null — нарушений 0).
+    if: ${{ !cancelled() && needs.quality.result == 'success' }}
     defaults:
       run:
         working-directory: spanverify-module
@@ -286,12 +297,18 @@ jobs:
           path: spanverify-module/reports
 
       - name: Скачать отчёт пилота (JSON + PNG)
+        # На пуш пилот не запускается и артефакта нет: шаг не роняет job,
+        # блок пилота в METRICS.json остаётся из закоммиченных файлов.
+        continue-on-error: true
         uses: actions/download-artifact@v4
         with:
           name: pilot-report
           path: spanverify-module/reports/pilot
 
       - name: Скачать результаты внешних наборов
+        # То же: на пуш внешние наборы не скачиваются, числа берутся из
+        # закоммиченных reports/ext_*.json и reports/external_tests.json.
+        continue-on-error: true
         uses: actions/download-artifact@v4
         with:
           name: external-tests

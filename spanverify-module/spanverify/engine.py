@@ -59,6 +59,7 @@ from .features import (
     is_scored_token,
     number_attribution,
 )
+from .normalize import contains_number_date_or_amount
 from .participation import PARTICIPATION_FILENAME, ParticipationModel
 
 WEIGHTS_FILENAME = "config/weights.json"
@@ -220,11 +221,17 @@ class Verifier:
         coverage: bool = False,
         features_cache: Mapping[str, FeatureMatrix] | None = None,
         verdict_rule: str = DEFAULT_VERDICT_RULE,
+        span_filter_min_chars: int = 0,
     ) -> None:
         self.config = config or Config.load()
         if verdict_rule not in VERDICT_RULES:
             raise ValueError(f"неизвестное правило вердикта: {verdict_rule!r}, допустимо {VERDICT_RULES}")
         self.verdict_rule = verdict_rule
+        # Фильтр коротких фрагментов маски (вариант сравнения маски): фрагмент
+        # маски короче стольких знаков без числа, даты или денежной суммы не
+        # помечается. 0 — фильтр выключен (текущее поведение). Порог задаётся
+        # снаружи и по тесту не подбирается.
+        self.span_filter_min_chars = int(span_filter_min_chars)
         # Явно переданные веса имеют приоритет: иначе обучение, которое считает
         # сквозные метрики «в памяти», случайно перечитало бы файл с диска.
         self.bundle = weights if weights is not None else WeightsBundle.load(weights_path)
@@ -348,11 +355,16 @@ class Verifier:
         smoothed = _smooth(masked, SMOOTH_WINDOW)
         scored = [smoothed[i] for i in scored_indices] or [0.0]
         span_threshold = span_threshold_for(scored, self.bundle.span_z, self.bundle.span_floor, self.bundle.span_cap)
-        spans = self._build_spans(answer, tokens, smoothed, span_threshold)
+        mask_spans = self._build_spans(answer, tokens, smoothed, span_threshold)
+        # Вариант маски «короткий фрагмент без числа не помечается»: токены
+        # отброшенных фрагментов перестают считаться помеченными и в метриках.
+        kept_flagged: set[int] | None = None
+        if self.span_filter_min_chars > 0:
+            mask_spans, kept_flagged = self._filter_short_mask_spans(mask_spans)
         # Правило привязки числа к объекту (дефект D): текстовое, поверх маски.
         spans = _merge_spans(
             [
-                *spans,
+                *mask_spans,
                 *self._attribution_spans(answer, context_text, tokens, smoothed, span_threshold),
                 *self._coverage_spans(answer, coverage_context, tokens, span_threshold),
             ]
@@ -364,7 +376,7 @@ class Verifier:
         ai_share_soft, ai_share_hard = self._shares(tokens, smoothed, scored_indices, spans)
         ai_participation = self.participation.estimate(answer, features) if self.participation is not None else 0.0
 
-        tokens_payload = _token_payload(tokens, features, smoothed, span_threshold)
+        tokens_payload = _token_payload(tokens, features, smoothed, span_threshold, flagged_override=kept_flagged)
         stats = {
             "token_count": len(tokens),
             "scored_tokens": len(scored_indices),
@@ -701,9 +713,27 @@ class Verifier:
                     label=label,
                     n_tokens=len(group),
                     source="mask",
+                    token_indices=tuple(group),
                 )
             )
         return _merge_spans(spans)
+
+    def _filter_short_mask_spans(self, spans: Sequence[SpanResult]) -> tuple[list[SpanResult], set[int]]:
+        """Вариант маски: короткие фрагменты без числовой записи не помечаются.
+
+        Возвращает уцелевшие фрагменты маски и множество индексов токенов,
+        которые остались помеченными. Фрагменты текстовых правил сюда не
+        передаются: вариант меняет только статистическую маску.
+        """
+        kept: list[SpanResult] = []
+        kept_indices: set[int] = set()
+        for span in spans:
+            short = len(span.text.strip()) < self.span_filter_min_chars
+            if short and not contains_number_date_or_amount(span.text):
+                continue
+            kept.append(span)
+            kept_indices.update(span.token_indices)
+        return kept, kept_indices
 
 
 def _token_metrics(labels: Sequence[int], flags: Sequence[bool], risks: Sequence[float]) -> dict[str, float]:
@@ -1084,11 +1114,13 @@ def _token_payload(
     features: FeatureMatrix,
     risk: Sequence[float],
     threshold: float,
+    flagged_override: set[int] | None = None,
 ) -> list[dict[str, Any]]:
     rows: list[dict[str, Any]] = []
     for index, token in enumerate(tokens):
         if index >= len(risk):
             break
+        flagged = (index in flagged_override) if flagged_override is not None else risk[index] >= threshold
         rows.append(
             {
                 "index": index,
@@ -1099,11 +1131,11 @@ def _token_payload(
                 "ctx_attention_mass": round(features.ctx_attention_mass[index], 4),
                 "embedding_density": round(features.embedding_density[index], 4),
                 "risk": round(risk[index], 4),
-                "flagged": risk[index] >= threshold,
+                "flagged": flagged,
                 "label": (
                     "likely_hallucination"
-                    if risk[index] >= HALLUCINATION_LABEL_RISK
-                    else ("doubtful" if risk[index] >= threshold else "ok")
+                    if risk[index] >= HALLUCINATION_LABEL_RISK and flagged
+                    else ("doubtful" if flagged else "ok")
                 ),
             }
         )
