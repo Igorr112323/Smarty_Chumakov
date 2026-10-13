@@ -1,10 +1,10 @@
 {
   "id": "4.2.6-storage",
-  "commit": "1a2a8e47b06105c5e6eb5187057a38fa6eafe024",
+  "commit": "92e5160e9248e24de63b1a93f63a85649f4ba874",
   "seed": 42,
   "mode": "hf",
   "dataset": "ai-forever/rugpt3small_based_on_gpt2",
-  "date": "2026-10-13T15:53:25Z",
+  "date": "2026-10-13T15:55:46Z",
   "command": "python scripts/measure_hf_footprint.py --out ../reports/contract --model ai-forever/rugpt3small_based_on_gpt2 --cache /home/runner/hf-cache",
   "metrics": {
     "model": "ai-forever/rugpt3small_based_on_gpt2",
@@ -82,21 +82,63 @@
       "заголовки C/C++ и заглушки типов": 5.9
     },
     "libs_prune_rule": "из пакетов, загружаемых при проверке в режиме hf, исключены только файлы, которые Python не может загрузить при работе: include/ и заголовки C/C++ (*.h, *.hpp, *.cuh, *.c, *.cpp, *.cu, *.cmake), заглушки типов (*.pyi), метаданные (*.dist-info, *.egg-info), кеши (__pycache__), docs/examples/benchmarks",
-    "weights_bytes": 1105655536,
-    "weights_mb": 1105.7,
-    "weights_mib": 1054.4,
-    "weights_naive_bytes": 1105655536,
+    "weights_bytes": 1105552916,
+    "weights_mb": 1105.6,
+    "weights_mib": 1054.3,
+    "weights_cache_bytes": 1105655134,
+    "weights_cache_mb": 1105.7,
+    "weights_cache_overhead_mb": 0.1,
+    "weights_cache_files_total": 32,
+    "weights_naive_bytes": 1105655134,
     "weights_naive_mb": 1105.7,
-    "weights_unique_bytes": 1105655536,
+    "weights_model_files": [
+      {
+        "path": "hub/models--ai-forever--rugpt3small_based_on_gpt2/snapshots/a9307e696cd3c5b7f953ff4cb19d76a4d81821d5/pytorch_model.bin",
+        "bytes": 551290714,
+        "resolved": "hub/blobs/90/9071e474490f65ddfb2251b0af8dd6d6cff8adc2ad97511516158088bafc118c"
+      },
+      {
+        "path": "hub/models--ai-forever--rugpt3small_based_on_gpt2/snapshots/0dc3542988c6f6475797ce6d019dce7cb0081e86/model.safetensors",
+        "bytes": 551275608,
+        "resolved": "hub/blobs/88/8874f08f3afb6bb5fa161cef43feb6e0694ff25fc0e4ea8bb1b9fe40d1ab4040"
+      },
+      {
+        "path": "hub/models--ai-forever--rugpt3small_based_on_gpt2/snapshots/a9307e696cd3c5b7f953ff4cb19d76a4d81821d5/vocab.json",
+        "bytes": 1713123,
+        "resolved": "hub/models--ai-forever--rugpt3small_based_on_gpt2/blobs/29154a654dcb0b71c25a9ea6df60a9a34f302a4f"
+      },
+      {
+        "path": "hub/models--ai-forever--rugpt3small_based_on_gpt2/snapshots/a9307e696cd3c5b7f953ff4cb19d76a4d81821d5/merges.txt",
+        "bytes": 1270925,
+        "resolved": "hub/models--ai-forever--rugpt3small_based_on_gpt2/blobs/8d6ce0fc5b6c262020ff8f8b07c8511a19b13778"
+      },
+      {
+        "path": "hub/models--ai-forever--rugpt3small_based_on_gpt2/snapshots/a9307e696cd3c5b7f953ff4cb19d76a4d81821d5/tokenizer_config.json",
+        "bytes": 1252,
+        "resolved": "hub/models--ai-forever--rugpt3small_based_on_gpt2/blobs/7bdc623bf90e44c5f7cad5c44606d6af754fd0c2"
+      },
+      {
+        "path": "hub/models--ai-forever--rugpt3small_based_on_gpt2/snapshots/a9307e696cd3c5b7f953ff4cb19d76a4d81821d5/config.json",
+        "bytes": 720,
+        "resolved": "hub/models--ai-forever--rugpt3small_based_on_gpt2/blobs/7a05ebb1619c0327080d4924d523688a21bb2515"
+      },
+      {
+        "path": "hub/models--ai-forever--rugpt3small_based_on_gpt2/snapshots/a9307e696cd3c5b7f953ff4cb19d76a4d81821d5/special_tokens_map.json",
+        "bytes": 574,
+        "resolved": "hub/models--ai-forever--rugpt3small_based_on_gpt2/blobs/1ca6de7fc0e91fd7c9f0be529596a307906d5dca"
+      }
+    ],
+    "weights_unique_bytes": 1105655134,
     "weights_unique_mb": 1105.7,
-    "weights_dedupe_rule": "каждый файл считается один раз: жёсткие ссылки — по индексному дескриптору, одинаковые по содержимому файлы крупнее 1 МБ — по SHA-256 (кеш Hugging Face держит копию в буфере загрузки и в самом кеше)",
+    "weights_dedupe_rule": "веса — файлы, на которые ссылается снимок модели (каждый один раз); объём кеша целиком приведён отдельно, вместе с буфером загрузки, логами и служебными деревьями",
     "weights_files_total": 32,
     "delivery_bytes": 171238,
     "delivery_mb": 0.2,
     "storage_without_weights_mb": 0.2,
-    "storage_with_weights_mb": 1919.6,
-    "storage_with_weights_mib": 1830.7,
-    "storage_with_weights_full_mb": 2243.4,
+    "storage_with_weights_mb": 1919.5,
+    "storage_with_weights_mib": 1830.6,
+    "storage_with_weights_full_mb": 2243.3,
+    "storage_with_weights_cache_mb": 1919.6,
     "weight_files": [
       {
         "path": "hub/blobs/90/9071e474490f65ddfb2251b0af8dd6d6cff8adc2ad97511516158088bafc118c",
@@ -115,12 +157,12 @@
         "bytes": 1270925
       },
       {
-        "path": "xet/logs/xet_20261013T155320212+0000_2525.log",
-        "bytes": 47581
+        "path": "xet/logs/xet_20261013T155532933+0000_2437.log",
+        "bytes": 47398
       },
       {
-        "path": "xet/logs/xet_20261013T155310912+0000_2495.log",
-        "bytes": 47398
+        "path": "xet/logs/xet_20261013T155541140+0000_2466.log",
+        "bytes": 47179
       },
       {
         "path": ".agent_harnesses.json",
