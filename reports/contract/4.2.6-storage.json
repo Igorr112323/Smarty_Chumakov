@@ -1,10 +1,10 @@
 {
   "id": "4.2.6-storage",
-  "commit": "21ed12fccd838dc5bfc3e1b9f9bcb9cc849166a8",
+  "commit": "53b82ba023d05d78488a464dbd3d19404dff9dc0",
   "seed": 42,
   "mode": "hf",
   "dataset": "ai-forever/rugpt3small_based_on_gpt2",
-  "date": "2026-10-13T15:47:03Z",
+  "date": "2026-10-13T15:50:40Z",
   "command": "python scripts/measure_hf_footprint.py --out ../reports/contract --model ai-forever/rugpt3small_based_on_gpt2 --cache /home/runner/hf-cache",
   "metrics": {
     "model": "ai-forever/rugpt3small_based_on_gpt2",
@@ -12,32 +12,42 @@
     "libs_bytes": 1137614128,
     "libs_mb": 1137.6,
     "libs_mib": 1084.9,
-    "weights_bytes": 554332190,
-    "weights_mb": 554.3,
-    "weights_mib": 528.7,
-    "delivery_bytes": 0,
-    "delivery_mb": 0.0,
-    "storage_without_weights_mb": 0.0,
-    "storage_with_weights_mb": 1691.9,
+    "libs_runtime_full_bytes": 0,
+    "libs_runtime_full_mb": 0.0,
+    "libs_delta_bytes": 1137614128,
+    "libs_full_mb": 1137.6,
+    "libs_full_mib": 1084.9,
+    "libs_runtime_measured": false,
+    "libs_runtime_modules": [],
+    "libs_runtime_probe_verdict": "проба не выполнилась: [\"AttributeError: 'VerificationResult' object has no attribute 'get'\"]",
+    "libs_runtime_per_package_mb": {},
+    "libs_pruned_bytes": 0,
+    "libs_pruned_mb": 0.0,
+    "libs_pruned_breakdown": {},
+    "libs_prune_rule": "из пакетов, загружаемых при проверке в режиме hf, исключены только файлы, которые Python не может загрузить при работе: include/ и заголовки C/C++ (*.h, *.hpp, *.cuh, *.c, *.cpp, *.cu, *.cmake), заглушки типов (*.pyi), метаданные (*.dist-info, *.egg-info), кеши (__pycache__), docs/examples/benchmarks",
+    "weights_bytes": 1105656742,
+    "weights_mb": 1105.7,
+    "weights_mib": 1054.4,
+    "weights_naive_bytes": 1105656742,
+    "weights_naive_mb": 1105.7,
+    "weights_files_total": 32,
+    "delivery_bytes": 171238,
+    "delivery_mb": 0.2,
+    "storage_without_weights_mb": 0.2,
+    "storage_with_weights_mb": 2243.4,
+    "storage_with_weights_mib": 2139.5,
+    "storage_with_weights_full_mb": 2243.4,
     "weight_files": [
       {
         "path": "hub/blobs/90/9071e474490f65ddfb2251b0af8dd6d6cff8adc2ad97511516158088bafc118c",
         "bytes": 551290714
       },
       {
-        "path": "hub/models--ai-forever--rugpt3small_based_on_gpt2/blobs/0d2a4a387b0430654bb1f6813436bd31f8e10a06e18ea0e5c41b33120b78458e",
-        "bytes": 551290714
-      },
-      {
-        "path": "hub/models--ai-forever--rugpt3small_based_on_gpt2/snapshots/a9307e696cd3c5b7f953ff4cb19d76a4d81821d5/pytorch_model.bin",
-        "bytes": 551290714
+        "path": "hub/blobs/88/8874f08f3afb6bb5fa161cef43feb6e0694ff25fc0e4ea8bb1b9fe40d1ab4040",
+        "bytes": 551275608
       },
       {
         "path": "hub/models--ai-forever--rugpt3small_based_on_gpt2/blobs/29154a654dcb0b71c25a9ea6df60a9a34f302a4f",
-        "bytes": 1713123
-      },
-      {
-        "path": "hub/models--ai-forever--rugpt3small_based_on_gpt2/snapshots/a9307e696cd3c5b7f953ff4cb19d76a4d81821d5/vocab.json",
         "bytes": 1713123
       },
       {
@@ -45,12 +55,12 @@
         "bytes": 1270925
       },
       {
-        "path": "hub/models--ai-forever--rugpt3small_based_on_gpt2/snapshots/a9307e696cd3c5b7f953ff4cb19d76a4d81821d5/merges.txt",
-        "bytes": 1270925
+        "path": "xet/logs/xet_20261013T155023124+0000_2487.log",
+        "bytes": 48202
       },
       {
-        "path": "xet/logs/xet_20261013T154657699+0000_2233.log",
-        "bytes": 47398
+        "path": "xet/logs/xet_20261013T155035302+0000_2520.log",
+        "bytes": 47983
       },
       {
         "path": ".agent_harnesses.json",
@@ -65,23 +75,11 @@
         "bytes": 1252
       },
       {
-        "path": "hub/models--ai-forever--rugpt3small_based_on_gpt2/snapshots/a9307e696cd3c5b7f953ff4cb19d76a4d81821d5/tokenizer_config.json",
-        "bytes": 1252
-      },
-      {
         "path": "hub/models--ai-forever--rugpt3small_based_on_gpt2/blobs/7a05ebb1619c0327080d4924d523688a21bb2515",
         "bytes": 720
       },
       {
-        "path": "hub/models--ai-forever--rugpt3small_based_on_gpt2/snapshots/a9307e696cd3c5b7f953ff4cb19d76a4d81821d5/config.json",
-        "bytes": 720
-      },
-      {
         "path": "hub/models--ai-forever--rugpt3small_based_on_gpt2/blobs/1ca6de7fc0e91fd7c9f0be529596a307906d5dca",
-        "bytes": 574
-      },
-      {
-        "path": "hub/models--ai-forever--rugpt3small_based_on_gpt2/snapshots/a9307e696cd3c5b7f953ff4cb19d76a4d81821d5/special_tokens_map.json",
         "bytes": 574
       },
       {
@@ -93,15 +91,35 @@
         "bytes": 117
       },
       {
+        "path": "hub/blobs/88/8874f08f3afb6bb5fa161cef43feb6e0694ff25fc0e4ea8bb1b9fe40d1ab4040.refs",
+        "bytes": 117
+      },
+      {
         "path": "hub/models--ai-forever--rugpt3small_based_on_gpt2/refs/main",
+        "bytes": 40
+      },
+      {
+        "path": "hub/models--ai-forever--rugpt3small_based_on_gpt2/refs/refs/pr/6",
         "bytes": 40
       },
       {
         "path": "hub/blobs/.huggingface-shared-blobs",
         "bytes": 2
+      },
+      {
+        "path": "hub/models--ai-forever--rugpt3small_based_on_gpt2/.no_exist/a9307e696cd3c5b7f953ff4cb19d76a4d81821d5/model.safetensors.index.json",
+        "bytes": 0
+      },
+      {
+        "path": "hub/models--ai-forever--rugpt3small_based_on_gpt2/.no_exist/a9307e696cd3c5b7f953ff4cb19d76a4d81821d5/model.safetensors",
+        "bytes": 0
+      },
+      {
+        "path": "hub/models--ai-forever--rugpt3small_based_on_gpt2/.no_exist/a9307e696cd3c5b7f953ff4cb19d76a4d81821d5/tokenizer.json",
+        "bytes": 0
       }
     ],
-    "weight_files_total": 27,
+    "weight_files_total": 32,
     "site_packages_top": {
       "total": 1158294494,
       "torch": 770342432,
@@ -124,12 +142,16 @@
       "torch==2.14.1+cpu",
       "transformers==5.19.0"
     ],
+    "limit_without_weights_bytes": 100000000,
     "limit_without_weights_mb": 100,
+    "limit_with_weights_bytes": 1500000000,
     "limit_with_weights_mb": 1500,
+    "limit_with_weights_mib": 1536.0,
     "without_weights_ok": true,
-    "with_weights_ok": false
+    "with_weights_ok": false,
+    "with_weights_ok_mib": false
   },
-  "note": "Хранение без весов — каталог поставки; с весами — поставка плюс библиотеки режима hf плюс кеш весов.",
+  "note": "Хранение без весов — каталог поставки; с весами — поставка плюс библиотеки, которые загружает режим hf, плюс кеш весов. Рядом приведён объём по сырому приросту site-packages (storage_with_weights_full_mb) и значение в МиБ.",
   "gate": "ТЗ п. 4.2: хранение не более 100 МБ без весов и не более 1,5 ГБ с весами",
   "environment": {
     "python": "3.11.17",
