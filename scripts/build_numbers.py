@@ -354,7 +354,11 @@ MEASURED_SOURCES: list[dict] = [
 def git_commit(where: Path) -> str:
     try:
         return subprocess.run(
-            ["git", "rev-parse", "HEAD"], cwd=where, capture_output=True, text=True, check=True
+            ["git", "rev-parse", "HEAD"],
+            cwd=where,
+            capture_output=True,
+            text=True,
+            check=True,
         ).stdout.strip()
     except (subprocess.CalledProcessError, FileNotFoundError):  # pragma: no cover
         return "unknown"
@@ -431,8 +435,16 @@ def build() -> dict:
                 "mode": spec.get("mode"),
                 "seed": seed,
                 "commit": commit,
-                "command": (payload or {}).get("command") if isinstance(payload, dict) else None,
-                "date": (payload or {}).get("date", date) if isinstance(payload, dict) else date,
+                "command": (
+                    (payload or {}).get("command")
+                    if isinstance(payload, dict)
+                    else None
+                ),
+                "date": (
+                    (payload or {}).get("date", date)
+                    if isinstance(payload, dict)
+                    else date
+                ),
                 "source": spec["source"],
                 "source_path": "/".join(spec["path"]),
                 "gate": None,
@@ -443,7 +455,14 @@ def build() -> dict:
     # Вердикты по целевым показателям — из измеренного значения и требования.
     by_id = {entry["id"]: entry for entry in entries}
     for entry in entries:
-        gate_of = next((spec.get("gate_of") for spec in MEASURED_SOURCES if spec["id"] == entry["id"]), None)
+        gate_of = next(
+            (
+                spec.get("gate_of")
+                for spec in MEASURED_SOURCES
+                if spec["id"] == entry["id"]
+            ),
+            None,
+        )
         if not gate_of:
             continue
         target = by_id.get(gate_of, {}).get("value")
@@ -451,10 +470,18 @@ def build() -> dict:
         if value is None or target is None:
             entry["gate"] = "не измерено"
             continue
-        if gate_of.endswith("fpr_max") or gate_of.endswith("ms_per_1000_chars") or gate_of.endswith("seconds_2m"):
-            entry["gate"] = "достигнут" if float(value) <= float(target) else "НЕ достигнут"
+        if (
+            gate_of.endswith("fpr_max")
+            or gate_of.endswith("ms_per_1000_chars")
+            or gate_of.endswith("seconds_2m")
+        ):
+            entry["gate"] = (
+                "достигнут" if float(value) <= float(target) else "НЕ достигнут"
+            )
         else:
-            entry["gate"] = "достигнут" if float(value) >= float(target) else "НЕ достигнут"
+            entry["gate"] = (
+                "достигнут" if float(value) >= float(target) else "НЕ достигнут"
+            )
         entry["gate_source"] = gate_of
 
     measured = [entry for entry in entries if entry["kind"] == "measured"]
@@ -477,7 +504,11 @@ def build() -> dict:
 def main() -> int:
     parser = argparse.ArgumentParser(description="Собрать reports/NUMBERS.json")
     parser.add_argument("--out", default=str(NUMBERS_PATH.relative_to(ROOT)))
-    parser.add_argument("--check", action="store_true", help="проверить, что реестр совпадает с артефактами")
+    parser.add_argument(
+        "--check",
+        action="store_true",
+        help="проверить, что реестр совпадает с артефактами",
+    )
     args = parser.parse_args()
 
     payload = build()
@@ -488,12 +519,20 @@ def main() -> int:
             print(f"нет реестра {out}: запустите python scripts/build_numbers.py")
             return 1
         current = json.loads(out.read_text(encoding="utf-8"))
-        same = {e["id"]: e["value"] for e in current["entries"]} == {e["id"]: e["value"] for e in payload["entries"]}
-        print("реестр совпадает с артефактами" if same else "реестр устарел: пересоберите NUMBERS.json")
+        same = {e["id"]: e["value"] for e in current["entries"]} == {
+            e["id"]: e["value"] for e in payload["entries"]
+        }
+        print(
+            "реестр совпадает с артефактами"
+            if same
+            else "реестр устарел: пересоберите NUMBERS.json"
+        )
         return 0 if same else 1
     out.parent.mkdir(parents=True, exist_ok=True)
     out.write_text(rendered, encoding="utf-8")
-    print(f"{out}: записей {len(payload['entries'])}, измеренных {payload['measured_total']}")
+    print(
+        f"{out}: записей {len(payload['entries'])}, измеренных {payload['measured_total']}"
+    )
     if payload["measured_missing"]:
         print("не измерено:", ", ".join(payload["measured_missing"]))
     return 0

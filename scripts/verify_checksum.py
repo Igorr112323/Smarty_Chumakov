@@ -61,7 +61,9 @@ def verify(target: Path, sums_file: Path) -> int:
         return 1
     actual = sha256_of(target)
     if actual == expected:
-        print(f"сумма совпала: {target.name}\n  ожидалось {expected}\n  получено  {actual}")
+        print(
+            f"сумма совпала: {target.name}\n  ожидалось {expected}\n  получено  {actual}"
+        )
         return 0
     print(
         f"СУММА НЕ СОВПАЛА: {target.name}\n  ожидалось {expected}\n  получено  {actual}\n"
@@ -77,7 +79,9 @@ def self_test() -> int:
         good = root / "spanverify.pyz"
         good.write_bytes(b"spanverify" * 100)
         digest = sha256_of(good)
-        (root / DEFAULT_SUMS).write_text(f"{digest}  spanverify.pyz\n", encoding="utf-8")
+        (root / DEFAULT_SUMS).write_text(
+            f"{digest}  spanverify.pyz\n", encoding="utf-8"
+        )
         if verify(good, root / DEFAULT_SUMS) != 0:
             print("самопроверка не пройдена: исправный файл отвергнут")
             return 1
@@ -92,9 +96,15 @@ def self_test() -> int:
 
 def main() -> int:
     parser = argparse.ArgumentParser(description="Сверка контрольной суммы поставки")
-    parser.add_argument("target", nargs="?", help="файл поставки (spanverify.exe, spanverify.pyz, …)")
-    parser.add_argument("--sums", default=DEFAULT_SUMS, help="файл сумм (по умолчанию SHA256SUMS.txt)")
-    parser.add_argument("--self-test", action="store_true", help="проверить сам инструмент и выйти")
+    parser.add_argument(
+        "target", nargs="?", help="файл поставки (spanverify.exe, spanverify.pyz, …)"
+    )
+    parser.add_argument(
+        "--sums", default=DEFAULT_SUMS, help="файл сумм (по умолчанию SHA256SUMS.txt)"
+    )
+    parser.add_argument(
+        "--self-test", action="store_true", help="проверить сам инструмент и выйти"
+    )
     args = parser.parse_args()
     if args.self_test:
         return self_test()
