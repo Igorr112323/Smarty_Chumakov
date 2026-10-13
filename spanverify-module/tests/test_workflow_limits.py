@@ -106,3 +106,38 @@ def test_ci_has_concurrency() -> None:
     """Без concurrency каждый пуш плодит полный прогон, и они толпятся."""
     data = yaml.safe_load((WORKFLOWS_DIR / "ci.yml").read_text(encoding="utf-8"))
     assert data.get("concurrency"), "в ci.yml нет блока concurrency"
+
+
+def test_metrics_job_runs_on_every_push_not_only_at_night() -> None:
+    """Сверка чисел обязана выполняться на каждый пуш, а не раз в сутки.
+
+    Job «Единый файл чисел» зависит от ``pilot`` и ``external``, а они работают
+    только по расписанию и вручную. Пропущенный ``needs`` по умолчанию пропускает
+    и зависимый job, поэтому на пуш сверка документов с METRICS.json не
+    выполнялась вовсе: ночные прогоны ``ci`` на ``main`` 37755784670 и
+    37911250513 красные именно на этом шаге (job пересчитал 515 тестов и 87,35 %
+    покрытия, а документы и закоммиченный файл остались на 510 и ``null``), и
+    слияние расхождение не заблокировало.
+
+    Условие ``!cancelled()`` запускает job при пропущенных ``pilot`` и
+    ``external``, а ``needs.quality.result`` не даёт собирать числа после
+    проваленного прогона с покрытием. Шаги скачивания артефактов пилота и
+    внешних наборов обязаны быть необязательными: на пуш этих артефактов нет.
+    """
+    data = yaml.safe_load((WORKFLOWS_DIR / "ci.yml").read_text(encoding="utf-8"))
+    metrics = (data.get("jobs") or {}).get("metrics") or {}
+    condition = str(metrics.get("if") or "")
+    assert "!cancelled()" in condition, "без !cancelled() job пропускается вместе с pilot и external"
+    assert "needs.quality.result" in condition, "числа нельзя собирать без зелёного job'а покрытия"
+
+    downloads = {
+        str((step.get("with") or {}).get("name")): step
+        for step in metrics.get("steps") or []
+        if str(step.get("uses") or "").startswith("actions/download-artifact")
+    }
+    for name in ("coverage-json", "pilot-report", "external-tests"):
+        assert name in downloads, f"в job'е чисел нет скачивания артефакта {name}"
+    for name in ("pilot-report", "external-tests"):
+        assert (
+            downloads[name].get("continue-on-error") is True
+        ), f"артефакт {name} на пуш отсутствует: шаг обязан быть необязательным, иначе job падает"
