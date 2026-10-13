@@ -1,19 +1,19 @@
 {
   "id": "4.2.6-storage",
-  "commit": "37ac80d7e21940aa0b173c19fac84e1a8dc57d50",
+  "commit": "7a8a19e30591379f45f3e14a9f93ceeb91e87a73",
   "seed": 42,
   "mode": "demo",
   "dataset": "spanverify-module",
-  "date": "2026-10-13T13:26:29Z",
+  "date": "2026-10-13T15:42:21Z",
   "command": "",
   "metrics": {
-    "module_size_mb": 43.418,
-    "module_size_without_data_mb": 1.076,
-    "pyz_size_mb": 0.1612,
+    "module_size_mb": 43.532,
+    "module_size_without_data_mb": 1.09,
+    "pyz_size_mb": 0.1633,
     "with_weights_mb": null,
     "limit_without_weights_mb": 100.0,
     "limit_with_weights_mb": 1500.0
   },
-  "note": "объём без весов 43.418 МБ укладывается в 100 МБ; объём с весами (≤ 1,5 ГБ) в этом окружении не измеряется — нет кэша весов модели, нужна машина с загруженными весами",
+  "note": "объём без весов 43.532 МБ укладывается в 100 МБ; объём с весами (≤ 1,5 ГБ) в этом окружении не измеряется — нет кэша весов модели, его измеряет CI-задание hf-footprint",
   "gate": null
 }

@@ -1,17 +1,17 @@
 {
   "id": "4.2.5-hf-footprint",
-  "commit": "37ac80d7e21940aa0b173c19fac84e1a8dc57d50",
+  "commit": "7a8a19e30591379f45f3e14a9f93ceeb91e87a73",
   "seed": 42,
   "mode": "demo",
   "dataset": "hf-mode",
-  "date": "2026-10-13T13:26:29Z",
+  "date": "2026-10-13T15:42:21Z",
   "command": "",
   "metrics": {
-    "libraries_dir": null,
-    "weights_dir": null,
+    "libraries_dir": "site-packages (прирост после установки режима hf)",
+    "weights_dir": "кеш весов модели",
     "libraries_mb": null,
     "weights_mb": null
   },
-  "note": "прогон не выполнен: в этом окружении нет torch/transformers и кэша весов модели; нужна машина с доступом к хранилищу весов (проверяется в CI-прогоне режима hf)",
+  "note": "прогон не выполнен: в этом окружении нет torch/transformers и кэша весов модели; нужна машина с доступом к хранилищу весов — артефакт создаёт CI-задание hf-footprint (.github/workflows/hf-footprint.yml)",
   "gate": null
 }

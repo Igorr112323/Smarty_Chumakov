@@ -1,6 +1,6 @@
 """Контрактная проверка репозитория: требование → факт → статус.
 
-Скрипт перебирает требования договора № ____ГУ/2026 (проект 117812):
+Скрипт перебирает требования договора № 20478ГУ/2026 (проект 117812):
 Техническое задание (Приложение № 3, пп. 4.1 и 4.2), календарный план
 (Приложение № 4) и правила оформления отчёта (Приложение № 10), выполняет
 измеримые проверки и пишет:
@@ -28,10 +28,12 @@ from __future__ import annotations
 
 import argparse
 import hashlib
+import importlib
 import json
 import math
 import os
 import platform
+import re
 import shutil
 import statistics
 import subprocess
@@ -50,6 +52,75 @@ ARTIFACTS = ROOT / "reports" / "contract"
 CONTRACT_JSON = ROOT / "reports" / "CONTRACT.json"
 COMPLIANCE_DOC = ROOT / "docs" / "СООТВЕТСТВИЕ_ДОГОВОРУ.md"
 SEED = 42
+
+#: Извлечение требований из подписанного договора (персональные данные не
+#: переносятся). Подписанный PDF в публичном репозитории не хранится; если файл
+#: есть локально (``SPANVERIFY_CONTRACT_PDF`` или корень репозитория), проверка
+#: читает сам PDF и сверяет с извлечением.
+EXTRACTION_DOC = ROOT / "docs" / "ДОГОВОР_ИЗВЛЕЧЕНИЕ.md"
+CLOSING_DOC = ROOT / "docs" / "ЗАКРЫТИЕ_ДОГОВОРА_ПО_КОДУ.md"
+REPORT_APPENDIX_DOC = ROOT / "docs" / "ОТЧЁТ_ПРИЛОЖЕНИЕ_СООТВЕТСТВИЕ.md"
+CONTRACT_PDF_NAME = "Договор_0117812 (25).pdf"
+CONTRACT_PDF_SHA256 = (
+    "e5eb6ad8522fa70135f75bf22b0b5f3464fcc17d9c6f04d81b48976a42e69cd5"
+)
+CONTRACT_PDF_BYTES = 5_019_351
+CONTRACT_PDF_PAGES = 32
+CONTRACT_EXE_MAX_MB = 9.0
+CONTRACT_PACKAGE_MAX_MB = 0.6
+CONTRACT_STORAGE_WITHOUT_MB = 100.0
+CONTRACT_STORAGE_WITH_MB = 1500.0
+
+#: Маркеры требований в тексте договора: ключ извлечения → регулярное выражение.
+#: Проверкой «маркер найден в PDF» подтверждается, что число взято из договора, а
+#: не переписано из кода.
+CONTRACT_TEXT_MARKERS: dict[str, str] = {
+    "макс_знаков": r"2\s?000\s?000 знаков",
+    "мс_на_1000_знаков": r"0,03 с на 1 000\s+знаков",
+    "сек_на_2000000": r"не более чем за 60 с",
+    "сек_на_50000": r"не более чем за 1 с",
+    "признаков_на_токен": r"пять числовых\s+признаков",
+    "пересечение_границ": r"не ниже 0,5",
+    "f1_мин": r"F1 не ниже 0,50",
+    "fpr_макс": r"не выше 0,40",
+    "пар_в_наборе": r"набора из 1200 па?р",
+    "шаг_смеси": r"\(шаг 0,25\)",
+    "exe_макс_МБ": r"не более 9 МБ",
+    "пакет_макс_МБ": r"0,6 МБ",
+    "порт": r"localhost:8765",
+    "библиотеки_МБ": r"около 500 МБ",
+    "веса_МБ": r"около 530 МБ",
+    "хранение_без_весов_МБ": r"не более 100 МБ",
+    "хранение_с_весами_МБ": r"не более 1,5 ГБ",
+    "ядер_мин": r"не менее двух",
+    "озу_ГБ": r"не менее 4 ГБ",
+    "озу_с_весами_ГБ": r"не менее 8 ГБ",
+    "диск_ГБ": r"не менее 1,5 ГБ",
+    "python_мин": r"Python 3\.10",
+    "месяцев_этап": r"6 месяцев",
+    "сумма_1_руб": r"200 000",
+    "сумма_2_руб": r"300 000",
+    "сумма_всего_руб": r"500 000",
+    "дней_до_окончания_этапа": r"20 \(Двадцать\) календарных дней",
+    "оригинальность_проц": r"не менее 80%",
+    "ключевых_слов_мин": r"от 5 до 15 слов",
+    "элементов_отчёта": r"Структурные элементы промежуточного и заключительного",
+}
+
+#: Зона получателя гранта: пункты, которые выполняет человек. В коде они только
+#: перечисляются — договор требует их представления в АС «Фонд-М» вместе с
+#: отчётностью, и подписания УКЭП программно выполнить нельзя.
+GRANTEE_ZONE: list[tuple[str, str]] = [
+    ("Преакселерация", "свидетельство о прохождении преакселерационной программы или акселератора вуза (Приложение № 4, этап 2)"),
+    ("Бизнес-план", "бизнес-план инновационного проекта по Приложению № 11 (не менее 20 страниц) либо заявка на «Студенческий стартап»/«Старт»"),
+    ("Дорожная карта", "дорожная карта развития проекта по Приложению № 12"),
+    ("РИД", "заявка на регистрацию прав на результат интеллектуальной деятельности и переписка с Роспатентом (ТЗ п. 6)"),
+    ("Оригинальность отчёта", "проверка текста отчёта во внешней системе; требуется не менее 80 % (Приложение № 10, п. 4)"),
+    ("Финансовый отчёт", "отчёт о расходовании средств гранта по каждому этапу (Приложение № 4)"),
+    ("Акт", "акт о выполнении Работ по каждому этапу (Приложения № 8 и № 9)"),
+    ("Отчёт о достижении значений результата", "по Приложению № 2 к договору: «Завершённый проект», план 0 (2026) / 1 (2027)"),
+    ("Подача в АС «Фонд-М»", "отчётность представляется не позднее чем за 20 календарных дней до окончания этапа и подписывается УКЭП (п. 6.1)"),
+]
 
 STATUS_OK = "соответствует"
 STATUS_FAIL = "не соответствует"
@@ -111,6 +182,145 @@ def run_python(
         timeout=timeout,
         env={**os.environ, "PYTHONPATH": str(MODULE), "PYTHONUTF8": "1"},
     )
+
+
+def _module_attr(module_name: str, attribute: str) -> Any:
+    """Значение константы из пакета spanverify (импорт без побочных эффектов)."""
+    if str(MODULE) not in sys.path:
+        sys.path.insert(0, str(MODULE))
+    module = importlib.import_module(module_name)
+    return getattr(module, attribute)
+
+
+def code_limits() -> dict[str, dict[str, Any]]:
+    """Числа договора, как они зафиксированы в коде: значение и место.
+
+    Каждая запись — «где это живёт в коде». Проверка ``contract.source`` сверяет
+    эти значения с текстом договора, поэтому расхождение кода с договором видно
+    как «не соответствует», а не как догадка.
+    """
+    limits = [
+        ("макс_знаков", "spanverify.limits", "MAX_TEXT_CHARS", "знаков"),
+        (
+            "мс_на_1000_знаков",
+            "spanverify.limits",
+            "TARGET_MS_PER_1000_CHARS",
+            "мс",
+        ),
+        ("сек_на_2000000", "spanverify.limits", "TARGET_SECONDS_2M", "с"),
+        ("пересечение_границ", "spanverify.gates", "IOU_MATCH_THRESHOLD", "IoU"),
+        ("порт", "spanverify.server", "DEFAULT_PORT", "порт"),
+    ]
+    out: dict[str, dict[str, Any]] = {}
+    for key, module_name, attribute, unit in limits:
+        out[key] = {
+            "value": _module_attr(module_name, attribute),
+            "unit": unit,
+            "source": f"spanverify-module/{module_name.replace('.', '/')}.py: {attribute}",
+        }
+    names = _module_attr("spanverify.features", "FEATURE_NAMES")
+    out["признаков_на_токен"] = {
+        "value": len(names),
+        "unit": "признаков",
+        "source": "spanverify-module/spanverify/features.py: FEATURE_NAMES",
+    }
+    gate = _module_attr("spanverify.gates", "CONTRACT_GATE")
+    out["f1_мин"] = {
+        "value": gate["f1_min"],
+        "unit": "F1",
+        "source": "spanverify-module/spanverify/gates.py: CONTRACT_GATE",
+    }
+    out["fpr_макс"] = {
+        "value": gate["fpr_max"],
+        "unit": "FPR",
+        "source": "spanverify-module/spanverify/gates.py: CONTRACT_GATE",
+    }
+    out["exe_макс_МБ"] = {
+        "value": CONTRACT_EXE_MAX_MB,
+        "unit": "МБ",
+        "source": "scripts/contract_check.py: CONTRACT_EXE_MAX_MB",
+    }
+    out["пакет_макс_МБ"] = {
+        "value": CONTRACT_PACKAGE_MAX_MB,
+        "unit": "МБ",
+        "source": "scripts/contract_check.py: CONTRACT_PACKAGE_MAX_MB",
+    }
+    out["хранение_без_весов_МБ"] = {
+        "value": CONTRACT_STORAGE_WITHOUT_MB,
+        "unit": "МБ",
+        "source": "scripts/contract_check.py: CONTRACT_STORAGE_WITHOUT_MB",
+    }
+    out["хранение_с_весами_МБ"] = {
+        "value": CONTRACT_STORAGE_WITH_MB,
+        "unit": "МБ",
+        "source": "scripts/contract_check.py: CONTRACT_STORAGE_WITH_MB",
+    }
+    corpus = MODULE / "data" / "corpus_a" / "pairs.jsonl"
+    pairs = None
+    if corpus.is_file():
+        pairs = sum(1 for line in corpus.read_text(encoding="utf-8").splitlines() if line.strip())
+    out["пар_в_наборе"] = {
+        "value": pairs,
+        "unit": "пар",
+        "source": "spanverify-module/data/corpus_a/pairs.jsonl",
+    }
+    return out
+
+
+def read_extraction() -> dict[str, Any] | None:
+    """Машиночитаемый блок из docs/ДОГОВОР_ИЗВЛЕЧЕНИЕ.md."""
+    if not EXTRACTION_DOC.is_file():
+        return None
+    text = EXTRACTION_DOC.read_text(encoding="utf-8")
+    match = re.search(r"```json\n(.*?)\n```", text, re.S)
+    if not match:
+        return None
+    try:
+        return json.loads(match.group(1))
+    except json.JSONDecodeError:
+        return None
+
+
+def contract_pdf_path() -> Path:
+    """Путь к подписанному PDF: переменная окружения или корень репозитория."""
+    env = os.environ.get("SPANVERIFY_CONTRACT_PDF")
+    if env:
+        return Path(env).expanduser()
+    return ROOT / CONTRACT_PDF_NAME
+
+
+def sha256_file(path: Path) -> str:
+    digest = hashlib.sha256()
+    with path.open("rb") as handle:
+        for chunk in iter(lambda: handle.read(1024 * 1024), b""):
+            digest.update(chunk)
+    return digest.hexdigest()
+
+
+def contract_pdf_text(path: Path) -> str | None:
+    """Текст подписанного PDF, если есть pypdf. Без библиотеки — None."""
+    try:
+        from pypdf import PdfReader  # noqa: PLC0415
+    except ImportError:
+        return None
+    reader = PdfReader(str(path))
+    return "\n".join((page.extract_text() or "") for page in reader.pages)
+
+
+def hf_artifact(check_id: str) -> dict[str, Any] | None:
+    """Артефакт измерения режима hf, записанный CI-заданием hf-footprint."""
+    path = ARTIFACTS / f"{check_id}.json"
+    if not path.is_file():
+        return None
+    try:
+        payload = json.loads(path.read_text(encoding="utf-8"))
+    except json.JSONDecodeError:
+        return None
+    if (payload.get("mode") or "") != "hf":
+        return None
+    if not isinstance(payload.get("metrics"), dict):
+        return None
+    return payload
 
 
 def write_artifact(check_id: str, payload: dict[str, Any]) -> str:
@@ -1368,18 +1578,60 @@ def check_build_checksum(runner: Runner) -> tuple[str, dict[str, Any], str]:
     command="python scripts/contract_check.py --only 4.2.5-hf-footprint",
 )
 def check_hf_footprint(runner: Runner) -> tuple[str, dict[str, Any], str]:
-    fact = {
-        "libraries_dir": None,
-        "weights_dir": None,
+    """Фактические объёмы библиотек и весов режима hf.
+
+    Числа даёт CI-задание ``hf-footprint`` (установка torch/transformers/sentencepiece
+    и загрузка весов ai-forever/rugpt3small_based_on_gpt2): оно измеряет каталоги и
+    коммитит артефакт. Здесь артефакт только читается — измерение в песочнице без
+    доступа к хранилищу весов невозможно, и подменять его оценкой нельзя.
+    """
+    payload = hf_artifact("4.2.5-hf-footprint")
+    fact: dict[str, Any] = {
+        "libraries_dir": "site-packages (прирост после установки режима hf)",
+        "weights_dir": "кеш весов модели",
         "libraries_mb": None,
         "weights_mb": None,
         "dataset": "hf-mode",
     }
+    if payload is None:
+        return (
+            STATUS_UNKNOWN,
+            fact,
+            "прогон не выполнен: в этом окружении нет torch/transformers и кэша "
+            "весов модели; нужна машина с доступом к хранилищу весов — артефакт "
+            "создаёт CI-задание hf-footprint (.github/workflows/hf-footprint.yml)",
+        )
+    metrics = payload["metrics"]
+    fact.update(
+        {
+            "mode": "hf",
+            "libraries_mb": metrics.get("libs_mb"),
+            "weights_mb": metrics.get("weights_mb"),
+            "libraries_mib": metrics.get("libs_mib"),
+            "weights_mib": metrics.get("weights_mib"),
+            "model": metrics.get("model"),
+            "measurement_commit": payload.get("commit"),
+            "measurement_date": payload.get("date"),
+            "contract_libs_mb": metrics.get("contract_libs_mb", 500),
+            "contract_weights_mb": metrics.get("contract_weights_mb", 530),
+            "libs_vs_contract_percent": metrics.get("libs_vs_contract_percent"),
+            "weights_vs_contract_percent": metrics.get("weights_vs_contract_percent"),
+            "dataset": str(metrics.get("model") or "hf-mode"),
+            "source_artifact": "reports/contract/4.2.5-hf-footprint.json",
+            "_keep_artifact": True,
+        }
+    )
+    problems: list[str] = []
+    if not fact["libraries_mb"] or not fact["weights_mb"]:
+        problems.append("в артефакте режима hf нет объёмов библиотек или весов")
+    fact["problems"] = problems
+    if problems:
+        return STATUS_FAIL, fact, "; ".join(problems)
     return (
-        STATUS_UNKNOWN,
+        STATUS_OK,
         fact,
-        "прогон не выполнен: в этом окружении нет torch/transformers и кэша весов модели; "
-        "нужна машина с доступом к хранилищу весов (проверяется в CI-прогоне режима hf)",
+        f"измерено на раннере: библиотеки {fact['libraries_mb']} МБ, веса "
+        f"{fact['weights_mb']} МБ (договор называет ориентиры 500 МБ и 530 МБ)",
     )
 
 
@@ -1409,12 +1661,40 @@ def check_storage(runner: Runner) -> tuple[str, dict[str, Any], str]:
     }
     if problems:
         return STATUS_FAIL, fact, "; ".join(problems)
+    weights_payload = hf_artifact("4.2.6-storage")
+    if weights_payload is None:
+        return (
+            STATUS_UNKNOWN,
+            fact,
+            f"объём без весов {module_mb} МБ укладывается в 100 МБ; объём с весами "
+            "(≤ 1,5 ГБ) в этом окружении не измеряется — нет кэша весов модели, "
+            "его измеряет CI-задание hf-footprint",
+        )
+    metrics = weights_payload["metrics"]
+    with_weights = metrics.get("storage_with_weights_mb")
+    fact.update(
+        {
+            "mode": "hf",
+            "with_weights_mb": with_weights,
+            "hf_libraries_mb": metrics.get("libs_mb"),
+            "hf_weights_mb": metrics.get("weights_mb"),
+            "measurement_commit": weights_payload.get("commit"),
+            "measurement_date": weights_payload.get("date"),
+            "dataset": str(metrics.get("model") or "hf-mode"),
+            "source_artifact": "reports/contract/4.2.6-storage.json",
+            "_keep_artifact": True,
+        }
+    )
+    if with_weights is None:
+        return STATUS_FAIL, fact, "в артефакте режима hf нет объёма хранения с весами"
+    if float(with_weights) > 1500.0:
+        fact["problems"] = [f"хранение с весами {with_weights} МБ > 1500 МБ"]
+        return STATUS_FAIL, fact, fact["problems"][0]
     return (
-        STATUS_UNKNOWN,
+        STATUS_OK,
         fact,
-        f"объём без весов {module_mb} МБ укладывается в 100 МБ; "
-        "объём с весами (≤ 1,5 ГБ) в этом окружении не измеряется — нет кэша весов модели, "
-        "нужна машина с загруженными весами",
+        f"поставка без весов {module_mb} МБ ≤ 100 МБ; измеренное хранение с весами "
+        f"{with_weights} МБ ≤ 1500 МБ (поставка + библиотеки режима hf + веса)",
     )
 
 
@@ -1958,6 +2238,193 @@ def check_ci_job(runner: Runner) -> tuple[str, dict[str, Any], str]:
     )
 
 
+# ------------------------------------------------- источник истины (договор)
+
+
+@check(
+    id="contract.source",
+    point="договор, Приложения № 3, № 4, № 10",
+    requirement=(
+        "Подписанный договор — источник истины: числовые требования ТЗ 4.1/4.2, "
+        "календарного плана и правил отчёта совпадают с константами кода"
+    ),
+    how=(
+        "разбор извлечения требований и сверка каждого числа с константой кода "
+        "(limits.py, gates.py, server.py, features.py, corpus_a); при наличии "
+        "подписанного PDF — сверка самих значений с текстом PDF по маркерам"
+    ),
+    command="python scripts/contract_check.py --only contract.source",
+)
+def check_contract_source(runner: Runner) -> tuple[str, dict[str, Any], str]:
+    extraction = read_extraction()
+    code = code_limits()
+    problems: list[str] = []
+    compared: dict[str, dict[str, Any]] = {}
+    fact: dict[str, Any] = {"dataset": "договор № 20478ГУ/2026, проект 117812"}
+    if extraction is None:
+        return (
+            STATUS_FAIL,
+            {**fact, "extraction_doc": str(EXTRACTION_DOC.relative_to(ROOT))},
+            "нет машиночитаемого блока требований в docs/ДОГОВОР_ИЗВЛЕЧЕНИЕ.md",
+        )
+
+    contract_limits = extraction.get("лимиты") or {}
+    for key, spec in code.items():
+        want = contract_limits.get(key)
+        if want is None:
+            problems.append(f"в извлечении нет требования «{key}»")
+            continue
+        if spec["value"] is None:
+            problems.append(f"в коде нет значения «{key}» ({spec['source']})")
+            continue
+        if isinstance(spec["value"], (int, float)) and isinstance(want, (int, float)):
+            equal = math.isclose(
+                float(spec["value"]), float(want), rel_tol=1e-9, abs_tol=1e-9
+            )
+        else:
+            equal = str(spec["value"]) == str(want)
+        compared[key] = {
+            "договор": want,
+            "код": spec["value"],
+            "источник": spec["source"],
+            "совпадает": equal,
+        }
+        if not equal:
+            problems.append(
+                f"«{key}»: договор {want}, код {spec['value']} ({spec['source']})"
+            )
+    fact["compared"] = compared
+    fact["compared_total"] = len(compared)
+    fact["mismatches"] = problems
+
+    pdf_path = contract_pdf_path()
+    fact["pdf_present"] = pdf_path.is_file()
+    fact["pdf_path_kind"] = (
+        "переменная окружения"
+        if os.environ.get("SPANVERIFY_CONTRACT_PDF")
+        else "корень репозитория"
+    )
+    if pdf_path.is_file():
+        digest = sha256_file(pdf_path)
+        fact["pdf_sha256"] = digest
+        fact["pdf_bytes"] = pdf_path.stat().st_size
+        if digest != (extraction.get("pdf") or {}).get("sha256"):
+            problems.append(
+                "SHA-256 подписанного PDF не совпадает с зафиксированным в извлечении"
+            )
+        if fact["pdf_bytes"] != (extraction.get("pdf") or {}).get("байт"):
+            problems.append("размер подписанного PDF не совпадает с извлечением")
+        text = contract_pdf_text(pdf_path)
+        if text is None:
+            fact["pdf_text"] = "нет pypdf: сверка с текстом PDF не выполнена"
+        else:
+            missing: list[str] = []
+            for key, pattern in CONTRACT_TEXT_MARKERS.items():
+                if not re.search(pattern, text):
+                    missing.append(key)
+            fact["pdf_markers_checked"] = len(CONTRACT_TEXT_MARKERS)
+            fact["pdf_markers_missing"] = missing
+            if missing:
+                problems.append(
+                    "в тексте договора не найдены маркеры: " + ", ".join(missing)
+                )
+            fact["mode"] = "pdf"
+    else:
+        fact["pdf_sha256"] = (extraction.get("pdf") or {}).get("sha256")
+        fact["pdf_bytes"] = (extraction.get("pdf") or {}).get("байт")
+        fact["pdf_pages"] = (extraction.get("pdf") or {}).get("страниц")
+        fact["mode"] = "extraction"
+        fact["note_pdf"] = (
+            "подписанный PDF не хранится в публичном репозитории (персональные "
+            "данные); требования сверены по извлечению и хешу файла"
+        )
+    fact["problems"] = problems
+    if problems:
+        return STATUS_FAIL, fact, "; ".join(problems)
+    where = "текст подписанного PDF" if fact.get("mode") == "pdf" else "извлечение требований"
+    return (
+        STATUS_OK,
+        fact,
+        f"{fact['compared_total']} требований договора совпали с константами кода; "
+        f"проверено по: {where}",
+    )
+
+
+@check(
+    id="contract.doc-hash",
+    point="договор, Приложения № 3, № 4, № 10",
+    requirement=(
+        "Версия источника требований зафиксирована: SHA-256 подписанного договора "
+        "записан в реестр чисел, персональные данные не раскрываются"
+    ),
+    how=(
+        "пересчёт SHA-256 подписанного файла (если он есть) и сверка с извлечением "
+        "и с записью contract.source.pdf_sha256 в reports/NUMBERS.json"
+    ),
+    command="python scripts/contract_check.py --only contract.doc-hash",
+)
+def check_contract_doc_hash(runner: Runner) -> tuple[str, dict[str, Any], str]:
+    extraction = read_extraction() or {}
+    recorded = (extraction.get("pdf") or {}).get("sha256")
+    problems: list[str] = []
+    fact: dict[str, Any] = {
+        "dataset": "договор № 20478ГУ/2026, проект 117812",
+        "recorded_sha256": recorded,
+        "recorded_bytes": (extraction.get("pdf") or {}).get("байт"),
+        "recorded_pages": (extraction.get("pdf") or {}).get("страниц"),
+        "pdf_present": False,
+        "personal_data_in_repo": False,
+    }
+    pdf_path = contract_pdf_path()
+    if pdf_path.is_file():
+        digest = sha256_file(pdf_path)
+        fact["pdf_present"] = True
+        fact["measured_sha256"] = digest
+        fact["measured_bytes"] = pdf_path.stat().st_size
+        if digest != recorded:
+            problems.append("пересчитанный SHA-256 не совпал с зафиксированным")
+        if fact["measured_bytes"] != fact["recorded_bytes"]:
+            problems.append("размер файла не совпал с зафиксированным")
+    if not recorded:
+        problems.append("SHA-256 договора не зафиксирован в извлечении")
+
+    numbers_path = ROOT / "reports" / "NUMBERS.json"
+    registry_value = None
+    if numbers_path.is_file():
+        registry = json.loads(numbers_path.read_text(encoding="utf-8"))
+        for entry in registry.get("entries", []):
+            if entry.get("id") == "contract.source.pdf_sha256":
+                registry_value = entry.get("value")
+    fact["registry_value"] = registry_value
+    if registry_value != recorded:
+        problems.append(
+            "в реестре чисел нет записи contract.source.pdf_sha256 с этим хешем"
+        )
+
+    tracked = subprocess.run(
+        ["git", "ls-files", "--error-unmatch", CONTRACT_PDF_NAME],
+        cwd=ROOT,
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    fact["pdf_tracked_in_git"] = tracked.returncode == 0
+    if fact["pdf_tracked_in_git"]:
+        problems.append(
+            "подписанный PDF отслеживается git — персональные данные попадут в "
+            "публичный репозиторий"
+        )
+    fact["problems"] = problems
+    if problems:
+        return STATUS_FAIL, fact, "; ".join(problems)
+    where = "пересчитан по файлу" if fact["pdf_present"] else "из извлечения (файл не в репозитории)"
+    return (
+        STATUS_OK,
+        fact,
+        f"SHA-256 договора зафиксирован и совпадает с реестром чисел; хеш {where}",
+    )
+
+
 # ------------------------------------------------------------------ прогон
 
 
@@ -2001,8 +2468,17 @@ def run_checks(
                 {"error": f"{type(error).__name__}: {error}"},
                 "проверка упала",
             )
+        # Проверки 4.2.5 и 4.2.6 читают артефакт, записанный CI-заданием на машине
+        # с весами модели. Перезаписывать его локальным «не измерено» нельзя:
+        # иначе измерение, полученное прогоном, будет затёрто отчётом о том, что
+        # измерения не было.
+        keep_artifact = bool(fact.pop("_keep_artifact", False))
         payload = artifact_payload(check_item.id, dict(fact), note=note)
-        artifact = write_artifact(check_item.id, payload)
+        existing = ARTIFACTS / f"{check_item.id}.json"
+        if keep_artifact and existing.is_file():
+            artifact = str(existing.relative_to(ROOT))
+        else:
+            artifact = write_artifact(check_item.id, payload)
         results.append(
             {
                 "id": check_item.id,
@@ -2034,9 +2510,177 @@ def _short(value: Any, digits: int = 4) -> Any:
     return value
 
 
+def _table_lines(payload: dict[str, Any]) -> list[str]:
+    """Таблица «пункт → требование → как проверяется → команда → факт → статус → источник»."""
+    lines = [
+        "| Пункт | Требование | Как проверяется | Команда | Факт | Статус | Источник числа |",
+        "| --- | --- | --- | --- | --- | --- | --- |",
+    ]
+    for item in payload["checks"]:
+        fact = _short(item["fact"])
+        summary = ", ".join(f"{key}={value}" for key, value in list(fact.items())[:6])
+        if len(fact) > 6:
+            summary += ", …"
+        summary = summary.replace("|", "/")
+        lines.append(
+            f"| {item['point']} | {item['requirement']} | {item['how']} | "
+            f"`{item['command']}` | {summary} | {item['status']} | {item['artifact'] or '—'} |"
+        )
+    return lines
+
+
+def _reproduction_block() -> list[str]:
+    return [
+        "## Воспроизведение",
+        "",
+        "```bash",
+        "cd " + (str(ROOT.name) if ROOT.name else "."),
+        "",
+        "# 1. Контрактные проверки: требование → факт → статус (этот документ собирается здесь же)",
+        "python scripts/contract_check.py",
+        "",
+        "# 2. Реестр чисел: каждое значение с источником, коммитом и набором данных",
+        "python scripts/build_numbers.py",
+        "python scripts/build_numbers.py --check",
+        "",
+        "# 3. Сверка чисел документов с реестром (падает, если число в тексте без источника)",
+        "python scripts/check_numbers.py",
+        "",
+        "# 3а. То же напрямую из модуля (если запускать из spanverify-module)",
+        "python spanverify-module/scripts/check_numbers.py \\",
+        "    --metrics spanverify-module/reports/METRICS.json --reports-root .",
+        "",
+        "# 4. Тесты модуля, включая контрактные",
+        "cd spanverify-module && python -m pytest -q",
+        "```",
+        "",
+    ]
+
+
+def render_report_appendix(payload: dict[str, Any]) -> str:
+    """Приложение к отчёту о НИР: таблица соответствия договору (по Приложению № 10)."""
+    appendix = [
+        "# Приложение к отчёту о НИР: соответствие требованиям договора",
+        "",
+        "Документ входит в отчёт о НИР как приложение (Приложение № 10 к договору,",
+        "п. 2.10: в приложения включаются материалы, дополняющие текст отчёта).",
+        "Собран автоматически скриптом `scripts/contract_check.py` из `reports/CONTRACT.json`:",
+        "числа в него не вписываются руками.",
+        "",
+        f"- Договор № 20478ГУ/2026 (проект 117812), ТЗ (Приложение № 3), календарный план (Приложение № 4)",
+        f"- Коммит прогона: `{payload['commit']}`",
+        f"- Дата: {payload['environment']['date']}",
+        f"- Проверок: {len(payload['checks'])}; соответствует — {payload['summary'][STATUS_OK]}, "
+        f"не соответствует — {payload['summary'][STATUS_FAIL]}, не измерено — {payload['summary'][STATUS_UNKNOWN]}",
+        "",
+        "## Таблица соответствия",
+        "",
+    ]
+    appendix += _table_lines(payload)
+    appendix += ["", "## Замечания по непройденным и неизмеренным пунктам", ""]
+    for item in payload["checks"]:
+        if item["status"] == STATUS_OK:
+            continue
+        appendix.append(f"- **{item['id']}** ({item['status']}): {item['note']}")
+    if all(item["status"] == STATUS_OK for item in payload["checks"]):
+        appendix.append("- Все проверки пройдены.")
+    appendix += [""] + _reproduction_block()
+    return "\n".join(appendix)
+
+
+def _ci_runs_block() -> list[str]:
+    """Номера прогонов CI, зафиксированные скриптом scripts/collect_ci_runs.py."""
+    path = ROOT / "reports" / "CI_RUNS.json"
+    lines = ["## Прогоны CI", ""]
+    if not path.is_file():
+        lines.append(
+            "- Номера прогонов не зафиксированы: запустите `python scripts/collect_ci_runs.py`."
+        )
+        return lines
+    payload = json.loads(path.read_text(encoding="utf-8"))
+    lines.append(
+        f"Источник: `reports/CI_RUNS.json` (собран {payload.get('generated_at', '—')})."
+    )
+    lines.append("")
+    lines.append("| Прогон | Задание | Ветка/коммит | Итог | Ссылка |")
+    lines.append("| --- | --- | --- | --- | --- |")
+    for run in payload.get("runs", [])[:20]:
+        lines.append(
+            f"| {run.get('id')} | {run.get('name')} | {run.get('head_branch')} / "
+            f"{(run.get('head_sha') or '')[:8]} | {run.get('conclusion')} | {run.get('url')} |"
+        )
+    for note in payload.get("notes", []):
+        lines.append(f"- {note}")
+    lines.append("")
+    return lines
+
+
+def render_closing_doc(payload: dict[str, Any]) -> str:
+    """docs/ЗАКРЫТИЕ_ДОГОВОРА_ПО_КОДУ.md — итог по кодовой части договора."""
+    lines = [
+        "# Закрытие договора по коду (проект № 117812)",
+        "",
+        "Договор № 20478ГУ/2026, г. Москва, 13.10.2026. В документе — только та часть",
+        "договора, которая выполняется кодом и подтверждается прогонами: техническое",
+        "задание (Приложение № 3), календарный план (Приложение № 4) и правила",
+        "оформления отчёта (Приложение № 10). Документы зоны получателя гранта",
+        "(преакселерация, бизнес-план, дорожная карта, заявка на РИД, финансовые",
+        "отчёты, акты, подача в АС «Фонд-М», проверка оригинальности) в коде не",
+        "выполняются — они перечислены в отдельном разделе.",
+        "",
+        "Документ собран скриптом `scripts/contract_check.py` из `reports/CONTRACT.json`.",
+        "**Числа не вписаны руками**: каждое взято из артефакта прогона в",
+        "`reports/contract/`, команда воспроизведения указана рядом.",
+        "",
+        f"- Коммит прогона: `{payload['commit']}`",
+        f"- Дата прогона: {payload['environment']['date']}",
+        f"- Окружение: Python {payload['environment']['python']}, "
+        f"{payload['environment']['platform']}, ядер {payload['environment']['cpu_count']}",
+        f"- Проверок: {len(payload['checks'])}; соответствует — {payload['summary'][STATUS_OK]}, "
+        f"не соответствует — {payload['summary'][STATUS_FAIL]}, "
+        f"не измерено — {payload['summary'][STATUS_UNKNOWN]}",
+        "",
+        "## Пункт договора → статус → команда → факт → файл-источник",
+        "",
+    ]
+    lines += _table_lines(payload)
+    lines += ["", "## Не достигнуто и не измерено (с причиной)", ""]
+    for item in payload["checks"]:
+        if item["status"] == STATUS_OK:
+            continue
+        lines.append(f"- **{item['id']}** — {item['status']}: {item['note']}")
+    if all(item["status"] == STATUS_OK for item in payload["checks"]):
+        lines.append("- Все проверки пройдены: не достигнутых и неизмеренных пунктов нет.")
+    lines += ["", "## Зона получателя гранта (к коду не относится)", ""]
+    lines.append(
+        "Эти пункты договор требует представить в АС «Фонд-М» вместе с отчётностью;"
+    )
+    lines.append("программно они не выполняются и в кодовой части не закрываются.")
+    lines.append("")
+    lines.append("| Пункт | Что делает получатель гранта |")
+    lines.append("| --- | --- |")
+    for name, what in GRANTEE_ZONE:
+        lines.append(f"| {name} | {what} |")
+    lines += ["", "## Осталось до закрытия договора людьми", ""]
+    for name, _ in GRANTEE_ZONE:
+        lines.append(f"- {name}")
+    lines += [
+        "",
+        "Числа и материалы для этих пунктов готовит кодовая часть: метрики —",
+        "`spanverify-module/reports/METRICS.json`, таблица соответствия — этот документ",
+        "и `docs/СООТВЕТСТВИЕ_ДОГОВОРУ.md`, приложение к отчёту —",
+        "`docs/ОТЧЁТ_ПРИЛОЖЕНИЕ_СООТВЕТСТВИЕ.md`, инструкция по оригинальности —",
+        "`docs/ПРОВЕРКА_ОРИГИНАЛЬНОСТИ.md`.",
+        "",
+    ]
+    lines += _ci_runs_block()
+    lines += _reproduction_block()
+    return "\n".join(lines)
+
+
 def render_compliance_doc(payload: dict[str, Any]) -> str:
     lines = [
-        "# Соответствие договору № ____ГУ/2026 (проект 117812)",
+        "# Соответствие договору № 20478ГУ/2026 (проект 117812)",
         "",
         "Документ сгенерирован скриптом `scripts/contract_check.py` из `reports/CONTRACT.json`.",
         "**Числа в документ не вписываются руками**: источник каждого — артефакт прогона в `reports/contract/`,",
@@ -2051,19 +2695,8 @@ def render_compliance_doc(payload: dict[str, Any]) -> str:
         "",
         "Статус «не измерено» означает, что прогон в этом окружении невозможен; причина указана в столбце «факт».",
         "",
-        "| Пункт | Требование | Как проверяется | Команда | Факт | Статус | Источник числа |",
-        "| --- | --- | --- | --- | --- | --- | --- |",
     ]
-    for item in payload["checks"]:
-        fact = _short(item["fact"])
-        summary = ", ".join(f"{key}={value}" for key, value in list(fact.items())[:6])
-        if len(fact) > 6:
-            summary += ", …"
-        summary = summary.replace("|", "/")
-        lines.append(
-            f"| {item['point']} | {item['requirement']} | {item['how']} | "
-            f"`{item['command']}` | {summary} | {item['status']} | {item['artifact'] or '—'} |"
-        )
+    lines += _table_lines(payload)
     lines += [
         "",
         "## Что не достигнуто или не измерено",
@@ -2075,29 +2708,7 @@ def render_compliance_doc(payload: dict[str, Any]) -> str:
         lines.append(f"- **{item['id']}** ({item['status']}): {item['note']}")
     if all(item["status"] == STATUS_OK for item in payload["checks"]):
         lines.append("- Все проверки пройдены.")
-    lines += [
-        "",
-        "## Воспроизведение",
-        "",
-        "```bash",
-        "cd " + str(ROOT.name) if ROOT.name else "cd .",
-        "",
-        "# 1. Контрактные проверки: требование → факт → статус (этот документ собирается здесь же)",
-        "python scripts/contract_check.py",
-        "",
-        "# 2. Реестр чисел: каждое значение с источником, коммитом и набором данных",
-        "python scripts/build_numbers.py",
-        "python scripts/build_numbers.py --check",
-        "",
-        "# 3. Сверка чисел документов с реестром (падает, если число в тексте без источника)",
-        "python spanverify-module/scripts/check_numbers.py \\",
-        "    --metrics spanverify-module/reports/METRICS.json --numbers reports/NUMBERS.json",
-        "",
-        "# 4. Тесты модуля, включая контрактные",
-        "cd spanverify-module && python -m pytest -q",
-        "```",
-        "",
-    ]
+    lines += _reproduction_block()
     return "\n".join(lines)
 
 
@@ -2130,26 +2741,22 @@ def main() -> int:
     )
     if not args.only and not args.no_doc:
         COMPLIANCE_DOC.parent.mkdir(parents=True, exist_ok=True)
-        COMPLIANCE_DOC.write_text(
-            render_compliance_doc(
-                {
-                    "checks": results,
-                    "commit": git_commit(),
-                    "environment": env_info(),
-                    "summary": {
-                        STATUS_OK: sum(
-                            1 for item in results if item["status"] == STATUS_OK
-                        ),
-                        STATUS_FAIL: sum(
-                            1 for item in results if item["status"] == STATUS_FAIL
-                        ),
-                        STATUS_UNKNOWN: sum(
-                            1 for item in results if item["status"] == STATUS_UNKNOWN
-                        ),
-                    },
-                }
-            ),
-            encoding="utf-8",
+        preliminary = {
+            "checks": results,
+            "commit": git_commit(),
+            "environment": env_info(),
+            "summary": {
+                STATUS_OK: sum(1 for item in results if item["status"] == STATUS_OK),
+                STATUS_FAIL: sum(1 for item in results if item["status"] == STATUS_FAIL),
+                STATUS_UNKNOWN: sum(
+                    1 for item in results if item["status"] == STATUS_UNKNOWN
+                ),
+            },
+        }
+        COMPLIANCE_DOC.write_text(render_compliance_doc(preliminary), encoding="utf-8")
+        CLOSING_DOC.write_text(render_closing_doc(preliminary), encoding="utf-8")
+        REPORT_APPENDIX_DOC.write_text(
+            render_report_appendix(preliminary), encoding="utf-8"
         )
     deferred, deferred_failures = run_checks(args.only, args.fast, runner=runner)
     deferred = [
@@ -2185,6 +2792,8 @@ def main() -> int:
     if not args.no_doc and not args.only:
         COMPLIANCE_DOC.parent.mkdir(parents=True, exist_ok=True)
         COMPLIANCE_DOC.write_text(render_compliance_doc(payload), encoding="utf-8")
+        CLOSING_DOC.write_text(render_closing_doc(payload), encoding="utf-8")
+        REPORT_APPENDIX_DOC.write_text(render_report_appendix(payload), encoding="utf-8")
 
     print(f"проверок: {len(results)}")
     for item in results:

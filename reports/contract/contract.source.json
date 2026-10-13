@@ -1,0 +1,102 @@
+{
+  "id": "contract.source",
+  "commit": "7a8a19e30591379f45f3e14a9f93ceeb91e87a73",
+  "seed": 42,
+  "mode": "pdf",
+  "dataset": "договор № 20478ГУ/2026, проект 117812",
+  "date": "2026-10-13T15:42:22Z",
+  "command": "",
+  "metrics": {
+    "compared": {
+      "макс_знаков": {
+        "договор": 2000000,
+        "код": 2000000,
+        "источник": "spanverify-module/spanverify/limits.py: MAX_TEXT_CHARS",
+        "совпадает": true
+      },
+      "мс_на_1000_знаков": {
+        "договор": 30,
+        "код": 30.0,
+        "источник": "spanverify-module/spanverify/limits.py: TARGET_MS_PER_1000_CHARS",
+        "совпадает": true
+      },
+      "сек_на_2000000": {
+        "договор": 60,
+        "код": 60.0,
+        "источник": "spanverify-module/spanverify/limits.py: TARGET_SECONDS_2M",
+        "совпадает": true
+      },
+      "пересечение_границ": {
+        "договор": 0.5,
+        "код": 0.5,
+        "источник": "spanverify-module/spanverify/gates.py: IOU_MATCH_THRESHOLD",
+        "совпадает": true
+      },
+      "порт": {
+        "договор": 8765,
+        "код": 8765,
+        "источник": "spanverify-module/spanverify/server.py: DEFAULT_PORT",
+        "совпадает": true
+      },
+      "признаков_на_токен": {
+        "договор": 5,
+        "код": 5,
+        "источник": "spanverify-module/spanverify/features.py: FEATURE_NAMES",
+        "совпадает": true
+      },
+      "f1_мин": {
+        "договор": 0.5,
+        "код": 0.5,
+        "источник": "spanverify-module/spanverify/gates.py: CONTRACT_GATE",
+        "совпадает": true
+      },
+      "fpr_макс": {
+        "договор": 0.4,
+        "код": 0.4,
+        "источник": "spanverify-module/spanverify/gates.py: CONTRACT_GATE",
+        "совпадает": true
+      },
+      "exe_макс_МБ": {
+        "договор": 9,
+        "код": 9.0,
+        "источник": "scripts/contract_check.py: CONTRACT_EXE_MAX_MB",
+        "совпадает": true
+      },
+      "пакет_макс_МБ": {
+        "договор": 0.6,
+        "код": 0.6,
+        "источник": "scripts/contract_check.py: CONTRACT_PACKAGE_MAX_MB",
+        "совпадает": true
+      },
+      "хранение_без_весов_МБ": {
+        "договор": 100,
+        "код": 100.0,
+        "источник": "scripts/contract_check.py: CONTRACT_STORAGE_WITHOUT_MB",
+        "совпадает": true
+      },
+      "хранение_с_весами_МБ": {
+        "договор": 1500,
+        "код": 1500.0,
+        "источник": "scripts/contract_check.py: CONTRACT_STORAGE_WITH_MB",
+        "совпадает": true
+      },
+      "пар_в_наборе": {
+        "договор": 1200,
+        "код": 1200,
+        "источник": "spanverify-module/data/corpus_a/pairs.jsonl",
+        "совпадает": true
+      }
+    },
+    "compared_total": 13,
+    "mismatches": [],
+    "pdf_present": true,
+    "pdf_path_kind": "корень репозитория",
+    "pdf_sha256": "e5eb6ad8522fa70135f75bf22b0b5f3464fcc17d9c6f04d81b48976a42e69cd5",
+    "pdf_bytes": 5019351,
+    "pdf_markers_checked": 30,
+    "pdf_markers_missing": [],
+    "problems": []
+  },
+  "note": "13 требований договора совпали с константами кода; проверено по: текст подписанного PDF",
+  "gate": null
+}

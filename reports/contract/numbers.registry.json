@@ -1,17 +1,23 @@
 {
   "id": "numbers.registry",
-  "commit": "37ac80d7e21940aa0b173c19fac84e1a8dc57d50",
+  "commit": "7a8a19e30591379f45f3e14a9f93ceeb91e87a73",
   "seed": 42,
   "mode": "demo",
   "dataset": "reports/NUMBERS.json",
-  "date": "2026-10-13T13:26:29Z",
+  "date": "2026-10-13T15:42:21Z",
   "command": "",
   "metrics": {
-    "entries": 38,
-    "measured": 26,
-    "missing": [],
+    "entries": 66,
+    "measured": 31,
+    "missing": [
+      "hf_footprint.libs_mb",
+      "hf_footprint.weights_mb",
+      "hf_footprint.storage_with_weights_mb",
+      "release.exe_bytes",
+      "release.pyz_bytes"
+    ],
     "check_ok": true
   },
-  "note": "реестр собран: 38 записей, не измерено 0",
+  "note": "реестр собран: 66 записей, не измерено 5",
   "gate": null
 }
