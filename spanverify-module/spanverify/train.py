@@ -297,7 +297,9 @@ def _risk_for(
     """
     entropy = [sample.features["attention_entropy"] for sample in samples]
     mass = [sample.features["ctx_attention_mass"] for sample in samples]
-    mass_norm = [sample.features.get("ctx_attention_mass_norm", sample.features["ctx_attention_mass"]) for sample in samples]
+    mass_norm = [
+        sample.features.get("ctx_attention_mass_norm", sample.features["ctx_attention_mass"]) for sample in samples
+    ]
     max_similarity = [
         sample.features.get("ctx_max_similarity", sample.features["embedding_density"]) for sample in samples
     ]

@@ -6,3 +6,7 @@ spanverify-module/data/external/
 spanverify-module/.coverage
 .coverage
 .venv/
+
+# Кэш байт-кода Python: не хранится в репозитории
+__pycache__/
+*.pyc
