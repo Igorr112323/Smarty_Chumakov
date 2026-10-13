@@ -59,7 +59,7 @@ from .features import (
     is_scored_token,
     number_attribution,
 )
-from .gates import gate_report
+from .gates import IOU_MATCH_THRESHOLD, gate_report
 from .limits import check_text_length
 from .normalize import contains_number_date_or_amount
 from .participation import PARTICIPATION_FILENAME, ParticipationModel
@@ -496,14 +496,14 @@ class Verifier:
             truth_expanded.append(pair_truth_expanded)
 
         token_metrics = _token_metrics(labels, flags, risks)
-        span_metrics = _span_f1(predicted, truth, iou_threshold=0.5)
+        span_metrics = _span_f1(predicted, truth, iou_threshold=IOU_MATCH_THRESHOLD)
         # Конвейер намеренно расширяет найденные токены до границ предложения,
         # поэтому строгий IoU с узкой разметкой («5» против целого предложения)
         # мало информативен. Поэтому дополнительно считаем: (а) полноту по
         # покрытию — размеченный фрагмент целиком попал в найденный; (б) F1 при
         # том же расширении разметки, то есть качество склейки и расширения.
         span_metrics["recall_containment"] = _containment_recall(predicted, truth)
-        span_metrics["f1_expanded_labels"] = _span_f1(predicted, truth_expanded, iou_threshold=0.5)["f1"]
+        span_metrics["f1_expanded_labels"] = _span_f1(predicted, truth_expanded, iou_threshold=IOU_MATCH_THRESHOLD)["f1"]
         span_metrics["mean_width_ratio"] = _mean_width_ratio(predicted, truth)
         answer_metrics = _answer_metrics(
             answer_labels, answer_scores, threshold if threshold is not None else self.bundle.threshold
@@ -876,7 +876,7 @@ def _iou(left: tuple[int, int], right: tuple[int, int]) -> float:
 def _span_f1(
     predicted: Sequence[Sequence[tuple[int, int]]],
     truth: Sequence[Sequence[tuple[int, int]]],
-    iou_threshold: float = 0.5,
+    iou_threshold: float = IOU_MATCH_THRESHOLD,
 ) -> dict[str, float]:
     """F1 по фрагментам: жадное сопоставление с порогом IoU (как в разметке)."""
     tp = fp = fn = 0
