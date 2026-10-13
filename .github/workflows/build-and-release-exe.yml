@@ -155,7 +155,7 @@ jobs:
       - name: Сборка onedir (вариант для строгих антивирусов)
         run: >
           python -m PyInstaller --noconfirm --clean --onedir --name spanverify_onedir
-          --add-data "config;config" --add-data "data;data"
+          --add-data "config;config" --add-data "data/demo_pairs.jsonl;data" --add-data "data/demo_dataset.jsonl;data"
           --hidden-import spanverify.server --hidden-import spanverify.cli
           --exclude-module torch --exclude-module transformers --exclude-module streamlit
           --exclude-module numpy --exclude-module pandas --exclude-module matplotlib
@@ -371,6 +371,80 @@ jobs:
           Write-Host ("размер spanverify.exe: {0} байт" -f $size)
           "Размер spanverify.exe: $size байт" | Out-File -Encoding utf8 size.txt
 
+      - name: "Проверка размеров поставки (ТЗ п. 4.2: ≤ 9 МБ .exe, ≤ 0,6 МБ пакет)"
+        shell: pwsh
+        working-directory: spanverify-module/release
+        run: |
+          # Считаем и десятичные мегабайты (1 МБ = 1 000 000 байт), и МиБ, и
+          # сравниваем с более строгой границей: договор называет «9 МБ» и
+          # «0,6 МБ» без уточнения кратности, поэтому поставка обязана уложиться
+          # в любую из трактовок.
+          $exe = (Get-Item spanverify.exe).Length
+          $pyz = (Get-Item spanverify.pyz).Length
+          $zip = (Get-Item spanverify-win.zip).Length
+          $exeMb = [math]::Round($exe / 1e6, 2)
+          $exeMib = [math]::Round($exe / 1MB, 2)
+          $pyzMb = [math]::Round($pyz / 1e6, 4)
+          Write-Host "spanverify.exe: $exe байт = $exeMb МБ (десятичных) = $exeMib МиБ"
+          Write-Host "spanverify.pyz: $pyz байт = $pyzMb МБ; spanverify-win.zip: $zip байт"
+          $sizes = [ordered]@{
+            "tag" = "${{ github.ref_name }}"
+            "run_id" = "${{ github.run_id }}"
+            "run_number" = "${{ github.run_number }}"
+            "commit" = "${{ github.sha }}"
+            "date" = (Get-Date -Format "yyyy-MM-ddTHH:mm:ssZ").ToString()
+            "exe_bytes" = $exe
+            "pyz_bytes" = $pyz
+            "zip_bytes" = $zip
+            "exe_mb_decimal" = $exeMb
+            "exe_mib" = $exeMib
+            "pyz_mb_decimal" = $pyzMb
+            "limit_exe_bytes" = 9000000
+            "limit_pyz_bytes" = 600000
+            "exe_ok" = ($exe -le 9000000)
+            "pyz_ok" = ($pyz -le 600000)
+            "gate" = "ТЗ п. 4.2: исполняемый файл не более 9 МБ либо переносимый пакет не более 0,6 МБ"
+            "command" = "python -m PyInstaller spanverify.spec; python scripts/make_zipapp.py --out release"
+          }
+          $json = $sizes | ConvertTo-Json -Depth 4
+          $json | Out-File -Encoding utf8 sizes.json
+          New-Item -ItemType Directory -Force -Path ../reports | Out-Null
+          $json | Out-File -Encoding utf8 ../reports/release_sizes.json
+          if (-not $sizes["exe_ok"]) {
+            Write-Host "::error title=размер .exe::spanverify.exe $exe байт ($exeMb МБ) больше 9 МБ"
+          }
+          if (-not $sizes["pyz_ok"]) {
+            Write-Host "::error title=размер пакета::spanverify.pyz $pyz байт больше 0,6 МБ"
+          }
+          if ((-not $sizes["exe_ok"]) -and (-not $sizes["pyz_ok"])) {
+            throw "поставка не уложилась ни в 9 МБ (.exe), ни в 0,6 МБ (пакет)"
+          }
+          Write-Host "::notice title=размеры поставки::exe $exe байт ($exeMb МБ), pyz $pyz байт ($pyzMb МБ)"
+
+      - name: Записать измеренные размеры в репозиторий
+        # Файл reports/release_sizes.json попадает в ветку по умолчанию: оттуда его
+        # читает реестр чисел (python scripts/build_numbers.py) и документ закрытия
+        # договора. Побочный коммит помечен [skip ci], чтобы не запускать CI заново.
+        continue-on-error: true
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          $repo = "${{ github.repository }}"
+          $branch = "${{ github.event.repository.default_branch }}"
+          $path = "reports/release_sizes.json"
+          $content = [Convert]::ToBase64String([IO.File]::ReadAllBytes("spanverify-module/reports/release_sizes.json"))
+          $sha = ""
+          try {
+            $sha = (gh api "repos/$repo/contents/$path`?ref=$branch" --jq ".sha") 2>$null
+          } catch { $sha = "" }
+          $args = @("api", "-X", "PUT", "repos/$repo/contents/$path",
+                    "-f", "message=сборка ${{ github.ref_name }}: измеренные размеры поставки [skip ci]",
+                    "-f", "content=$content", "-f", "branch=$branch")
+          if ($sha) { $args += @("-f", "sha=$sha") }
+          gh @args | Out-Null
+          Write-Host "размеры записаны в $branch:$path"
+
       - name: Артефакты сборки
         uses: actions/upload-artifact@v4
         with:
@@ -382,6 +456,8 @@ jobs:
             spanverify-module/release/SHA256SUMS.txt
             spanverify-module/release/pyz-verify.json
             spanverify-module/release/size.txt
+            spanverify-module/release/sizes.json
+            spanverify-module/reports/release_sizes.json
             spanverify-module/release/README.md
           retention-days: 90
 

@@ -30,9 +30,17 @@ from pathlib import Path
 block_cipher = None
 ROOT = Path(SPECPATH)
 
+# В поставку едут только те данные, которые нужны работающему приложению:
+# конфигурация (веса, голова, калибратор) и демонстрационные корпуса для
+# примеров. Исследовательские корпуса (``data/corpus_a*``, ``data/metrics``,
+# ``data/review_queue``) — рабочие материалы НИР, а не часть поставки: договор
+# (ТЗ п. 4.2) ограничивает объём исполняемого файла 9 МБ, и 40 МБ корпусов в
+# бандле этому не помогают. Проверка ``contract_check.py`` (4.2.1) следит за
+# объёмом собранного пакета, а объём .exe проверяет задание сборки.
 datas = [
     (str(ROOT / "config"), "config"),
-    (str(ROOT / "data"), "data"),
+    (str(ROOT / "data" / "demo_pairs.jsonl"), "data"),
+    (str(ROOT / "data" / "demo_dataset.jsonl"), "data"),
 ]
 
 hiddenimports = [
