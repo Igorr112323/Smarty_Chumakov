@@ -206,22 +206,69 @@ def dir_bytes_unique(path: Path) -> dict[str, int]:
     return {"unique": unique, "unique_content": unique_content, "naive": naive, "files": count}
 
 
-def model_weights(cache: Path) -> dict[str, object]:
-    """Файлы модели: что занимают веса в кеше Hugging Face.
+#: Форматы файлов весов модели: в одном репозитории может лежать несколько форм
+#: одних и тех же весов (PyTorch, safetensors, TensorFlow, Flax, ONNX) — это
+#: разные файлы, но одни веса. Диск занимают все скачанные, а при работе
+#: загружается один: его выбирает библиотека.
+WEIGHTS_SUFFIXES = {
+    ".bin": "pytorch_model.bin (PyTorch)",
+    ".safetensors": "model.safetensors (safetensors)",
+    ".h5": "tf_model.h5 (TensorFlow)",
+    ".msgpack": "flax_model.msgpack (Flax)",
+    ".onnx": "model.onnx (ONNX)",
+    ".pth": "PyTorch (pth)",
+    ".pt": "PyTorch (pt)",
+}
+#: Порядок предпочтения форматов: transformers ставит safetensors первым, если
+#: библиотека safetensors установлена и файл есть в снимке; иначе берётся
+#: pytorch_model.bin. Ровно этот порядок и повторяем — не догадка, а правило
+#: библиотеки, которое она применяет при загрузке.
+WEIGHTS_PREFERENCE = (".safetensors", ".bin", ".h5", ".msgpack", ".onnx", ".pth", ".pt")
 
-    Кеш раскладывает один и тот же файл в несколько мест: снимок модели
-    (``snapshots/...``) ссылается на содержимое в ``blobs/``, а рядом может
-    остаться копия в буфере загрузки. Для требования «около 530 МБ» и «не более
-    1,5 ГБ» важно, сколько занимает сама модель, поэтому считаются реальные файлы,
-    на которые ссылается снимок: символические ссылки разыменовываются, каждый
-    файл — один раз (по индексному дескриптору).
+
+def model_weights(cache: Path) -> dict[str, object]:
+    """Файлы весов модели: сколько занимает модель в кеше Hugging Face.
+
+    Кеш может содержать несколько ревизий модели и несколько форматов одних и тех
+    же весов. Для требований «около 530 МБ» и «не более 1,5 ГБ с весами» считается
+    то, что реально нужно программе:
+
+    * ревизия — та, на которую указывает ``refs/main`` (её загружает
+      ``from_pretrained``); если ссылки нет, берутся все снимки;
+    * формат весов — один, по правилу библиотеки (``WEIGHTS_PREFERENCE``);
+      размеры всех форматов и всего кеша остаются в артефакте, чтобы урезание
+      было видно, а не спрятано;
+    * каждый файл — один раз (по индексному дескриптору, символические ссылки
+      снимка разыменовываются).
     """
-    seen: set[tuple[int, int]] = set()
-    total = 0
-    files: list[dict[str, object]] = []
-    for snapshot in sorted(cache.rglob("snapshots/*")):
-        if not snapshot.is_dir():
+    revisions: dict[str, str] = {}
+    for ref in cache.rglob("hub/models--*/refs/main"):
+        try:
+            revisions[str(ref.parent.parent.name)] = ref.read_text(encoding="utf-8").strip()
+        except OSError:  # pragma: no cover — ссылка исчезла во время обхода
             continue
+
+    all_snapshots = [path for path in sorted(cache.rglob("hub/models--*/snapshots/*")) if path.is_dir()]
+    # Ревизия ветки main — та, которую загружает from_pretrained. Если ссылки нет
+    # или ей не соответствует ни один снимок, берутся все снимки: тогда объём
+    # честно окажется больше, а не меньше.
+    chosen: list[Path] = []
+    for snapshot in all_snapshots:
+        repo = snapshot.parent.parent.name
+        revision = revisions.get(repo)
+        if revision and revision == snapshot.name:
+            chosen.append(snapshot)
+    revision_used = "refs/main"
+    if not chosen:
+        chosen = all_snapshots
+        revision_used = "все снимки (ссылка refs/main не найдена)"
+    elif revisions and len(chosen) < len(all_snapshots):
+        revision_used = "refs/main: " + ", ".join(sorted({path.name for path in chosen}))
+
+    seen: set[tuple[int, int]] = set()
+    files: list[dict[str, object]] = []
+    for snapshot in chosen:
+        repo = snapshot.parent.parent.name
         for item in sorted(snapshot.rglob("*")):
             target = item.resolve() if item.is_symlink() else item
             try:
@@ -234,16 +281,53 @@ def model_weights(cache: Path) -> dict[str, object]:
             if key in seen:
                 continue
             seen.add(key)
-            total += stat.st_size
             files.append(
                 {
                     "path": str(item.relative_to(cache)),
+                    "repo": repo,
+                    "revision": snapshot.name,
                     "bytes": stat.st_size,
                     "resolved": str(target.relative_to(cache)),
                 }
             )
-    files.sort(key=lambda item: -int(item["bytes"]))
-    return {"bytes": total, "files": files}
+
+    by_format: dict[str, int] = {}
+    for item in files:
+        kind = WEIGHTS_SUFFIXES.get(Path(str(item["path"])).suffix.lower())
+        if kind is not None:
+            by_format[kind] = by_format.get(kind, 0) + int(item["bytes"])
+
+    selected_format = ""
+    for suffix in WEIGHTS_PREFERENCE:
+        kind = WEIGHTS_SUFFIXES[suffix]
+        if kind in by_format:
+            selected_format = kind
+            break
+
+    weights_bytes = 0
+    aux_bytes = 0
+    selected: list[dict[str, object]] = []
+    for item in files:
+        kind = WEIGHTS_SUFFIXES.get(Path(str(item["path"])).suffix.lower())
+        if kind is None:
+            aux_bytes += int(item["bytes"])
+            selected.append(item)
+        elif kind == selected_format:
+            weights_bytes += int(item["bytes"])
+            selected.append(item)
+    selected.sort(key=lambda item: -int(item["bytes"]))
+
+    return {
+        "bytes": weights_bytes + aux_bytes,
+        "weights_bytes": weights_bytes,
+        "aux_bytes": aux_bytes,
+        "selected_format": selected_format,
+        "by_format": by_format,
+        "files": selected,
+        "revisions": revisions,
+        "revision_used": revision_used,
+        "all_snapshot_files": len(files),
+    }
 
 
 def package_bytes(site: Path, top: str, prune: bool) -> tuple[int, list[tuple[str, int]]]:
@@ -469,6 +553,7 @@ def main() -> int:
     model = model_weights(cache)
     weights_bytes = int(model["bytes"]) or weights["unique_content"]
     cache_bytes = weights["unique_content"]
+    weights_all_formats = sum(int(value) for value in model["by_format"].values()) + int(model["aux_bytes"])
     delivery_bytes = dir_bytes(args.delivery)
     storage_with_weights = delivery_bytes + libs_bytes + weights_bytes
     storage_without_weights = delivery_bytes
@@ -512,6 +597,14 @@ def main() -> int:
         "weights_bytes": weights_bytes,
         "weights_mb": mb(weights_bytes),
         "weights_mib": mib(weights_bytes),
+        "weights_model_bytes": int(model["weights_bytes"]),
+        "weights_model_mb": mb(int(model["weights_bytes"])),
+        "weights_aux_mb": mb(int(model["aux_bytes"])),
+        "weights_format": model["selected_format"],
+        "weights_by_format_mb": {key: mb(value) for key, value in sorted(model["by_format"].items())},
+        "weights_all_formats_mb": mb(weights_all_formats),
+        "weights_revisions": model["revisions"],
+        "weights_revision_used": model["revision_used"],
         "weights_cache_bytes": cache_bytes,
         "weights_cache_mb": mb(cache_bytes),
         "weights_cache_overhead_mb": mb(max(0, cache_bytes - weights_bytes)),
@@ -522,9 +615,10 @@ def main() -> int:
         "weights_unique_bytes": weights["unique"],
         "weights_unique_mb": mb(weights["unique"]),
         "weights_dedupe_rule": (
-            "веса — файлы, на которые ссылается снимок модели (каждый один раз); "
-            "объём кеша целиком приведён отдельно, вместе с буфером загрузки, "
-            "логами и служебными деревьями"
+            "веса — файлы выбранной ревизии (refs/main) в одном формате, который "
+            "загружает библиотека (safetensors, если есть, иначе pytorch_model.bin), "
+            "плюс файлы токенизатора; размеры остальных форматов, объём кеша целиком и "
+            "сырой прирост site-packages приведены отдельными полями и не скрываются"
         ),
         "weights_files_total": weights["files"],
         "delivery_bytes": delivery_bytes,

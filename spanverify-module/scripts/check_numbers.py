@@ -455,11 +455,7 @@ def check_docs(
                 for match in pattern.finditer(line):
                     value = match.group(1)
                     context = line[max(0, match.start(1) - 30) : match.start(1) + 5]
-                    if (
-                        allowed[kind]
-                        and value not in allowed[kind]
-                        and value not in contract_ok
-                    ):
+                    if allowed[kind] and value not in allowed[kind] and value not in contract_ok:
                         if OLD_MARKER in line or CI_MARKER in line or GUARD.search(context):
                             continue
                         problems.append(

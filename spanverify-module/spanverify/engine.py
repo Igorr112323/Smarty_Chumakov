@@ -503,7 +503,9 @@ class Verifier:
         # покрытию — размеченный фрагмент целиком попал в найденный; (б) F1 при
         # том же расширении разметки, то есть качество склейки и расширения.
         span_metrics["recall_containment"] = _containment_recall(predicted, truth)
-        span_metrics["f1_expanded_labels"] = _span_f1(predicted, truth_expanded, iou_threshold=IOU_MATCH_THRESHOLD)["f1"]
+        span_metrics["f1_expanded_labels"] = _span_f1(predicted, truth_expanded, iou_threshold=IOU_MATCH_THRESHOLD)[
+            "f1"
+        ]
         span_metrics["mean_width_ratio"] = _mean_width_ratio(predicted, truth)
         answer_metrics = _answer_metrics(
             answer_labels, answer_scores, threshold if threshold is not None else self.bundle.threshold

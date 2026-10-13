@@ -68,29 +68,16 @@ jobs:
           python -m pip install -q -r requirements-hf.txt
           python -c "import torch, transformers, sentencepiece; print('torch', torch.__version__, '| transformers', transformers.__version__, '| sentencepiece', sentencepiece.__version__, '| cuda', torch.cuda.is_available())"
 
-      - name: Скачать веса модели (только рабочие форматы)
-        timeout-minutes: 15
-        run: |
-          python - <<'PY'
-          import os
-          from huggingface_hub import snapshot_download
-          model = os.environ["MODEL_ID"]
-          path = snapshot_download(
-              repo_id=model,
-              allow_patterns=["*.json", "*.txt", "pytorch_model.bin"],
-              ignore_patterns=["*.h5", "*.msgpack", "*.onnx", "*.tflite", "*.safetensors"],
-          )
-          print("веса скачаны в", path)
-          PY
-
       - name: Собрать переносимый пакет (поставка входит в замер хранения)
         run: python scripts/make_zipapp.py --out release
 
       - name: Измерить объёмы и записать артефакты
-        # Замер состоит из двух частей: сначала дочерняя проба поднимает режим hf
-        # на реальных весах и запоминает, какие пакеты Python загрузил (объём
-        # библиотек считается по этому набору), затем считаются каталоги весов и
-        # поставки. Ничего не оценивается: в артефакт идут байты.
+        # Веса скачивает само измерение: дочерняя проба поднимает режим hf тем же
+        # путём, что и программа (AutoModelForCausalLM.from_pretrained), — это и есть
+        # «сохраняемые локально заранее» из ТЗ п. 4.2. Отдельной предзагрузки нет
+        # намеренно: она тянула вторую ревизию модели (файл .bin из старой ревизии
+        # плюс model.safetensors из ветки main) и удваивала объём кеша — в замере
+        # это было бы видно как 1,1 ГБ весов вместо 0,55 ГБ.
         run: |
           python scripts/measure_hf_footprint.py \
             --baseline /tmp/baseline.json \
@@ -98,7 +85,6 @@ jobs:
             --model "$MODEL_ID" \
             --cache "$HF_HOME" \
             --delivery release
-
       - name: Показать артефакты
         if: always()
         run: |
@@ -107,13 +93,19 @@ jobs:
             python -c "import json,sys; d=json.load(open(sys.argv[1],encoding='utf-8')); m=d['metrics']; print({k: m[k] for k in ('libs_mb','weights_mb','delivery_mb','storage_with_weights_mb') if k in m})" "$file" || true
           done
 
+      - name: Обновить реестр чисел (reports/NUMBERS.json)
+        # Число без источника в реестре — дефект, поэтому реестр обновляется там же,
+        # где получено измерение, а не вручную. Документы и CONTRACT.json сверяет
+        # контрактное задание CI на следующем пуше.
+        run: python ../scripts/build_numbers.py
+
       - name: Сохранить артефакты в ветке прогона
         if: always() && github.ref_type == 'branch'
         working-directory: .
         run: |
           git config user.name "spanverify-bot"
           git config user.email "bot@spanverify.local"
-          git add reports/contract/4.2.5-hf-footprint.json reports/contract/4.2.6-storage.json
+          git add reports/contract/4.2.5-hf-footprint.json reports/contract/4.2.6-storage.json reports/NUMBERS.json
           git diff --cached --quiet && echo "изменений нет" && exit 0
           git commit -m "hf: объёмы режима hf измерены на раннере, прогон ${{ github.run_number }} [skip ci]"
           for attempt in 1 2 3; do

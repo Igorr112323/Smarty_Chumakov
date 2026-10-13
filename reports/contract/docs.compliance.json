@@ -1,10 +1,10 @@
 {
   "id": "docs.compliance",
-  "commit": "7a8a19e30591379f45f3e14a9f93ceeb91e87a73",
+  "commit": "7eb1d11faa0a410c08e4192731e6b40cea1376fd",
   "seed": 42,
   "mode": "demo",
   "dataset": "docs",
-  "date": "2026-10-13T15:42:21Z",
+  "date": "2026-10-13T17:25:58Z",
   "command": "",
   "metrics": {
     "document": "docs/СООТВЕТСТВИЕ_ДОГОВОРУ.md",
