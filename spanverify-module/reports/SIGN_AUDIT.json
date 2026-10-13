@@ -1,0 +1,72 @@
+{
+  "kind": "sign_audit",
+  "commit": "d39c95ccc58aa0c09cbd4308188c89743ce59c7a",
+  "seed": 42,
+  "mode": "demo",
+  "dataset": "data/corpus_a/splits/train.jsonl",
+  "command": "python scripts/sign_audit.py --dataset data/corpus_a/splits/train.jsonl --out reports/SIGN_AUDIT.json --seed 42",
+  "date": "2026-10-13T06:56:59Z",
+  "duration_s": 2.27,
+  "note": "замер на обучающей части; порог 0.5 фиксирован для сравнения формул, приёмка считается на отложенной части отдельной командой",
+  "metrics": {
+    "pairs": 840,
+    "tokens": 9003,
+    "positive_tokens": 1152,
+    "per_feature": {
+      "attention_entropy": {
+        "auc_as_risk": 0.4961,
+        "auc_as_support": 0.5039
+      },
+      "ctx_attention_mass": {
+        "auc_as_risk": 0.2227,
+        "auc_as_support": 0.7773
+      },
+      "ctx_attention_mass_norm": {
+        "auc_as_risk": 0.2227,
+        "auc_as_support": 0.7773
+      },
+      "ctx_max_similarity": {
+        "auc_as_risk": 0.1989,
+        "auc_as_support": 0.8011
+      },
+      "embedding_density": {
+        "auc_as_risk": 0.1363,
+        "auc_as_support": 0.8637
+      }
+    },
+    "legacy_formula": {
+      "weights": {
+        "attention_entropy": 0.1,
+        "ctx_attention_mass": 0.9,
+        "embedding_density": 0.0
+      },
+      "note": "плотность входит со знаком «плюс» — как в редакции до исправления",
+      "metrics": {
+        "threshold": 0.5,
+        "precision": 0.9984,
+        "recall": 0.5547,
+        "f1": 0.7132,
+        "fpr": 0.0001,
+        "auc": 0.7755
+      }
+    },
+    "corrected_formula": {
+      "weights": {
+        "attention_entropy": 0.1,
+        "ctx_attention_mass": 0.4,
+        "ctx_attention_mass_norm": 0.2,
+        "ctx_max_similarity": 0.2,
+        "embedding_density": 0.1
+      },
+      "note": "все признаки опоры входят как 1 − x",
+      "metrics": {
+        "threshold": 0.5,
+        "precision": 0.9983,
+        "recall": 0.5122,
+        "f1": 0.677,
+        "fpr": 0.0001,
+        "auc": 0.8852
+      }
+    }
+  }
+}

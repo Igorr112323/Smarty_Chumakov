@@ -1,0 +1,129 @@
+name: hf-footprint
+
+# Измерение фактических объёмов режима признаков языковой модели (ТЗ п. 4.2).
+#
+# Что измеряется: прирост каталога библиотек Python после установки torch,
+# transformers и sentencepiece; каталог кеша весов модели
+# ai-forever/rugpt3small_based_on_gpt2 (только рабочие форматы: pytorch_model.bin
+# и файлы токенизатора); суммарный объём поставки с весами.
+#
+# Зачем отдельное задание. Ночного расписания у него нет намеренно: объёмы
+# библиотек и весов — это свойство версий пакетов, а не ежедневная проверка.
+# Задание запускается вручную (Actions → hf-footprint → Run workflow) или пушем
+# в ветку `arena/**`, меняющим `.github/hf-footprint.trigger`.
+#
+# Результат: `reports/contract/4.2.5-hf-footprint.json` и
+# `reports/contract/4.2.6-storage.json` — артефакты с числами, которые читает
+# контрактная проверка (`scripts/contract_check.py`, проверки 4.2.5 и 4.2.6).
+# Файлы коммитятся в ветку прогона с пометкой `[skip ci]`.
+
+on:
+  workflow_dispatch:
+  push:
+    branches: ["arena/**"]
+    paths:
+      - .github/hf-footprint.trigger
+
+permissions:
+  contents: write
+
+env:
+  PYTHONUTF8: "1"
+  PYTHONIOENCODING: "utf-8"
+  HF_HOME: /home/runner/hf-cache
+  MODEL_ID: ai-forever/rugpt3small_based_on_gpt2
+
+jobs:
+  footprint:
+    name: Объёмы библиотек, весов и поставки
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    defaults:
+      run:
+        working-directory: spanverify-module
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Замер каталога библиотек до установки
+        run: |
+          python - <<'PY'
+          import json, sysconfig
+          from pathlib import Path
+          lib = Path(sysconfig.get_paths()["purelib"])
+          total = sum(p.stat().st_size for p in lib.rglob("*") if p.is_file())
+          Path("/tmp/baseline.json").write_text(json.dumps({"total": total}), encoding="utf-8")
+          print(f"базовый размер site-packages: {total} байт")
+          PY
+
+      - name: Зависимости режима hf (CPU-колёса torch, transformers, sentencepiece)
+        timeout-minutes: 20
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -q -r requirements.txt
+          python -m pip install -q "torch~=2.14" --index-url https://download.pytorch.org/whl/cpu
+          python -m pip install -q -r requirements-hf.txt
+          python -c "import torch, transformers, sentencepiece; print('torch', torch.__version__, '| transformers', transformers.__version__, '| sentencepiece', sentencepiece.__version__, '| cuda', torch.cuda.is_available())"
+
+      - name: Собрать переносимый пакет (поставка входит в замер хранения)
+        run: python scripts/make_zipapp.py --out release
+
+      - name: Измерить объёмы и записать артефакты
+        # Веса скачивает само измерение: дочерняя проба поднимает режим hf тем же
+        # путём, что и программа (AutoModelForCausalLM.from_pretrained), — это и есть
+        # «сохраняемые локально заранее» из ТЗ п. 4.2. Отдельной предзагрузки нет
+        # намеренно: она тянула вторую ревизию модели (файл .bin из старой ревизии
+        # плюс model.safetensors из ветки main) и удваивала объём кеша — в замере
+        # это было бы видно как 1,1 ГБ весов вместо 0,55 ГБ.
+        run: |
+          python scripts/measure_hf_footprint.py \
+            --baseline /tmp/baseline.json \
+            --out ../reports/contract \
+            --model "$MODEL_ID" \
+            --cache "$HF_HOME" \
+            --delivery release
+      - name: Показать артефакты
+        if: always()
+        run: |
+          for file in ../reports/contract/4.2.5-hf-footprint.json ../reports/contract/4.2.6-storage.json; do
+            echo "=== $file"
+            python -c "import json,sys; d=json.load(open(sys.argv[1],encoding='utf-8')); m=d['metrics']; print({k: m[k] for k in ('libs_mb','weights_mb','delivery_mb','storage_with_weights_mb') if k in m})" "$file" || true
+          done
+
+      - name: Обновить реестр чисел (reports/NUMBERS.json)
+        # Число без источника в реестре — дефект, поэтому реестр обновляется там же,
+        # где получено измерение, а не вручную. Документы и CONTRACT.json сверяет
+        # контрактное задание CI на следующем пуше.
+        run: python ../scripts/build_numbers.py
+
+      - name: Сохранить артефакты в ветке прогона
+        if: always() && github.ref_type == 'branch'
+        working-directory: .
+        run: |
+          git config user.name "spanverify-bot"
+          git config user.email "bot@spanverify.local"
+          git add reports/contract/4.2.5-hf-footprint.json reports/contract/4.2.6-storage.json reports/NUMBERS.json
+          git diff --cached --quiet && echo "изменений нет" && exit 0
+          git commit -m "hf: объёмы режима hf измерены на раннере, прогон ${{ github.run_number }} [skip ci]"
+          for attempt in 1 2 3; do
+            if git push origin "HEAD:${{ github.ref_name }}"; then
+              echo "артефакты закоммичены в ${{ github.ref_name }}"
+              break
+            fi
+            git pull --rebase origin "${{ github.ref_name }}" || git rebase --abort
+            sleep $((attempt * 5))
+          done
+
+      - name: Артефакты прогона
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: hf-footprint
+          path: |
+            reports/contract/4.2.5-hf-footprint.json
+            reports/contract/4.2.6-storage.json
+          if-no-files-found: warn
+          retention-days: 90

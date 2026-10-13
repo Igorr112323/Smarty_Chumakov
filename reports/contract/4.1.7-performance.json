@@ -1,0 +1,61 @@
+{
+  "id": "4.1.7-performance",
+  "commit": "72205185cd75b5b2a247236e4b82bd2d76ba428a",
+  "seed": 42,
+  "mode": "demo",
+  "dataset": "synthetic",
+  "date": "2026-10-13T22:18:12Z",
+  "command": "",
+  "metrics": {
+    "by_size": {
+      "500": {
+        "runs_seconds": [
+          0.001797,
+          0.001213,
+          0.000963
+        ],
+        "median_seconds": 0.001213,
+        "median_ms_per_1000_chars": 2.4259
+      },
+      "2000": {
+        "runs_seconds": [
+          0.00348,
+          0.002407,
+          0.002224
+        ],
+        "median_seconds": 0.002407,
+        "median_ms_per_1000_chars": 1.2034
+      },
+      "10000": {
+        "runs_seconds": [
+          0.017159,
+          0.010337,
+          0.012494
+        ],
+        "median_seconds": 0.012494,
+        "median_ms_per_1000_chars": 1.2494
+      },
+      "50000": {
+        "runs_seconds": [
+          0.077173,
+          0.061462,
+          0.052626
+        ],
+        "median_seconds": 0.061462,
+        "median_ms_per_1000_chars": 1.2292
+      }
+    },
+    "limit_run": {
+      "chars": 2000000,
+      "seconds": 8.903,
+      "ms_per_1000_chars": 4.4515,
+      "peak_memory_mb": 259.6,
+      "success": true,
+      "spans": 1
+    },
+    "target_ms_per_1000_chars": 30.0,
+    "target_seconds_2m": 60.0
+  },
+  "note": "быстродействие в пределах договорных значений",
+  "gate": null
+}

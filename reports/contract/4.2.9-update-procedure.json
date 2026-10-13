@@ -1,0 +1,19 @@
+{
+  "id": "4.2.9-update-procedure",
+  "commit": "72205185cd75b5b2a247236e4b82bd2d76ba428a",
+  "seed": 42,
+  "mode": "demo",
+  "dataset": "docs",
+  "date": "2026-10-13T22:18:13Z",
+  "command": "",
+  "metrics": {
+    "guide": "docs/РУКОВОДСТВО.md",
+    "markers_found": [
+      "Обновление",
+      "замен",
+      "предыдущ"
+    ]
+  },
+  "note": "процедура обновления заменой целиком описана в руководстве",
+  "gate": null
+}

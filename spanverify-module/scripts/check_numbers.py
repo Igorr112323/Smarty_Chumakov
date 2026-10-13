@@ -29,6 +29,13 @@ from pathlib import Path
 
 HISTORY_DOCS = {"PROGRESS.md", "AUDIT.md"}
 
+# Корневой реестр чисел (reports/NUMBERS.json) — расширение единого файла чисел.
+# Его измерения тоже законны: документы ссылаются на них и на артефакты прогонов.
+NUMBERS_PATH = "reports/NUMBERS.json"
+
+# Единица измерения → вид числа, который проверяют шаблоны документов.
+NUMBERS_UNIT_KIND = {"F1": "token_f1", "FPR": "fpr", "AUC": "auc", "тестов": "tests", "%": "coverage"}
+
 # Корень репозитория считаем от файла скрипта: запускать проверку можно из любого
 # каталога, и пути к документам всё равно указывают на репозиторий.
 DEFAULT_REPO_ROOT = Path(__file__).resolve().parents[2]
@@ -42,8 +49,14 @@ DEFAULT_DOCS = (
     "docs/ТЗ_и_календарный_план.md",
     "docs/ОТЧЁТ_о_НИР_шаблон.md",
     "docs/РУКОВОДСТВО.md",
+    "docs/СООТВЕТСТВИЕ_ДОГОВОРУ.md",
+    "docs/ПРОГРАММА_И_МЕТОДИКА_ПРИЁМКИ.md",
     "spanverify-module/README.md",
     "spanverify-module/reports/EXTERNAL_TESTS.md",
+    "docs/ДОГОВОР_ИЗВЛЕЧЕНИЕ.md",
+    "docs/ЗАКРЫТИЕ_ДОГОВОРА_ПО_КОДУ.md",
+    "docs/ОТЧЁТ_ПРИЛОЖЕНИЕ_СООТВЕТСТВИЕ.md",
+    "docs/ПРОВЕРКА_ОРИГИНАЛЬНОСТИ.md",
 )
 
 REQUIRED_IN_ITOG = (
@@ -76,7 +89,9 @@ CI_MARKER = "аннотаци"
 
 # Числа рядом с этими словами — критерии и пороги, а не измерения: их сверять
 # с METRICS.json нельзя (например «token F1 ≥ 0.90 при FPR ≤ 0.10»).
-GUARD = re.compile(r"[≥≤<>]|критери|порог|цель|минимум|максимум|не менее|не более", re.IGNORECASE)
+GUARD = re.compile(
+    r"[≥≤<>]|критери|порог|цель|минимум|максимум|не менее|не более|не меньше|не ниже|не выше", re.IGNORECASE
+)
 
 
 def _roundings(value: float) -> set[str]:
@@ -317,6 +332,68 @@ def _allowed(metrics: dict) -> dict[str, set[str]]:
     return allowed
 
 
+def _merge_numbers_registry(allowed: dict[str, set[str]], path: Path) -> int:
+    """Добавить в допустимые значения измерения из reports/NUMBERS.json.
+
+    Числа контракта (``kind == "contract"``) не добавляются: это требования, а не
+    измерения, и сверять с ними измерения документов нельзя. Возвращает число
+    перенесённых измерений.
+    """
+    if not path.is_file():
+        return 0
+    try:
+        payload = json.loads(path.read_text(encoding="utf-8"))
+    except json.JSONDecodeError:
+        return 0
+    merged = 0
+    for entry in payload.get("entries") or []:
+        if entry.get("kind") != "measured":
+            continue
+        value = entry.get("value")
+        kind = NUMBERS_UNIT_KIND.get(str(entry.get("unit")))
+        if kind is None or not isinstance(value, (int, float)):
+            continue
+        if kind == "tests":
+            allowed[kind].add(str(int(value)))
+        elif kind == "coverage":
+            allowed[kind] |= {f"{int(round(value))}", f"{round(value, 1):g}", f"{round(value, 2):g}"}
+        else:
+            allowed[kind] |= _roundings(float(value))
+        merged += 1
+    return merged
+
+
+def _contract_whitelist(path: Path) -> set[str]:
+    """Числа договора — белый список для документов.
+
+    Требования договора называются в документах прямо: «2 000 000 знаков»,
+    «не более 9 МБ», «200 000 руб.», «20 календарных дней», «не менее 80 %».
+    Это не измерения, и сверять их с METRICS.json нельзя, но и запрещать нельзя:
+    без них не рассказать о требованиях. Поэтому значения записей реестра с
+    ``kind = "contract"`` (требования) и ``kind = "source"`` (хеш и размер файла
+    договора) попадают в белый список, и число из него не считается нарушением.
+    Измерения (``kind = "measured"``) сюда не попадают: они проходят обычную
+    сверку с артефактами.
+    """
+    out: set[str] = set()
+    if not path.is_file():
+        return out
+    try:
+        payload = json.loads(path.read_text(encoding="utf-8"))
+    except json.JSONDecodeError:
+        return out
+    for entry in payload.get("entries") or []:
+        if entry.get("kind") not in {"contract", "source"}:
+            continue
+        value = entry.get("value")
+        if isinstance(value, (int, float)) and not isinstance(value, bool):
+            out.add(f"{float(value):g}")
+            out.add(f"{value}")
+        elif isinstance(value, str):
+            out.add(value)
+    return out
+
+
 def check_required_sections(repo_root: Path) -> list[str]:
     """Обязательные разделы: «заявлено/факт», «не проверено», «3 шага» в ИТОГ."""
     problems: list[str] = []
@@ -337,10 +414,18 @@ def check_required_sections(repo_root: Path) -> list[str]:
     return problems
 
 
-def check_docs(docs: list[Path], metrics: dict, repo_root: Path | None = None) -> list[str]:
+def check_docs(
+    docs: list[Path],
+    metrics: dict,
+    repo_root: Path | None = None,
+    numbers_path: Path | None = None,
+) -> list[str]:
     """Вернуть список нарушений (пустой список = числа сходятся)."""
     repo_root = repo_root or DEFAULT_REPO_ROOT
     allowed = _allowed(metrics)
+    if numbers_path is not None:
+        _merge_numbers_registry(allowed, numbers_path)
+    contract_ok = _contract_whitelist(numbers_path) if numbers_path is not None else set()
     version = str(metrics["meta"]["version"])
     problems: list[str] = []
 
@@ -361,7 +446,7 @@ def check_docs(docs: list[Path], metrics: dict, repo_root: Path | None = None) -
                     context = line[max(0, match.start(1) - 30) : match.start(1) + 5]
                     if OLD_MARKER in line or CI_MARKER in line or GUARD.search(context):
                         continue
-                    if value not in allowed[kind]:
+                    if value not in allowed[kind] and value not in contract_ok:
                         problems.append(
                             f"{path}:{number}: {kind}={value} нет в METRICS.json "
                             f"(допустимо: {sorted(allowed[kind])[:6]}…) → {line.strip()[:90]}"
@@ -370,7 +455,7 @@ def check_docs(docs: list[Path], metrics: dict, repo_root: Path | None = None) -
                 for match in pattern.finditer(line):
                     value = match.group(1)
                     context = line[max(0, match.start(1) - 30) : match.start(1) + 5]
-                    if allowed[kind] and value not in allowed[kind]:
+                    if allowed[kind] and value not in allowed[kind] and value not in contract_ok:
                         if OLD_MARKER in line or CI_MARKER in line or GUARD.search(context):
                             continue
                         problems.append(
@@ -395,6 +480,7 @@ def check_docs(docs: list[Path], metrics: dict, repo_root: Path | None = None) -
 def main() -> int:
     parser = argparse.ArgumentParser(description="Сверить числа в документах с METRICS.json")
     parser.add_argument("--metrics", default="reports/METRICS.json")
+    parser.add_argument("--numbers", default=NUMBERS_PATH, help="реестр чисел reports/NUMBERS.json")
     parser.add_argument("--docs", nargs="*", default=None, help="переопределить список документов")
     args = parser.parse_args()
 
@@ -408,7 +494,14 @@ def main() -> int:
     metrics = json.loads(metrics_path.read_text(encoding="utf-8"))
 
     docs = [repo_root / name for name in (args.docs or DEFAULT_DOCS)]
-    problems = check_docs(docs, metrics, repo_root=repo_root)
+    numbers_path = Path(args.numbers)
+    if not numbers_path.is_absolute() and not numbers_path.is_file():
+        # Путь задаётся либо от текущего каталога, либо от корня репозитория:
+        # скрипт запускают и из модуля, и из корня.
+        numbers_path = repo_root / numbers_path
+    probe = {"token_f1": set(), "fpr": set(), "auc": set(), "coverage": set(), "tests": set(), "tokens": set()}
+    merged = _merge_numbers_registry(probe, numbers_path)
+    problems = check_docs(docs, metrics, repo_root=repo_root, numbers_path=numbers_path)
     if problems:
         print(f"РАСХОЖДЕНИЯ ({len(problems)}):")
         for problem in problems[:60]:
@@ -416,7 +509,10 @@ def main() -> int:
         if len(problems) > 60:
             print(f"  … ещё {len(problems) - 60}")
         return 1
-    print(f"Числа сходятся с {metrics_path.name}: проверено документов {sum(1 for d in docs if d.is_file())}")
+    print(
+        f"Числа сходятся с {metrics_path.name} (+{merged} измерений из {numbers_path.name}): "
+        f"проверено документов {sum(1 for d in docs if d.is_file())}"
+    )
     return 0
 
 

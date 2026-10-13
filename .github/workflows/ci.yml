@@ -96,6 +96,7 @@ jobs:
         with:
           name: coverage-json
           path: spanverify-module/reports/coverage.json
+          if-no-files-found: warn
           retention-days: 30
 
       - name: Сохранить отчёт обучения
@@ -108,6 +109,73 @@ jobs:
             /tmp/run1/config/head.json
             /tmp/run1/config/participation.json
           retention-days: 30
+
+  # Контрактные проверки договора (проект 117812): ТЗ пп. 4.1 и 4.2, правила
+  # отчётности и правило «числа только из прогонов». Job намеренно НЕ ночной:
+  # падение здесь означает, что заявленное соответствие договору разошлось с
+  # кодом или с документами, и это должно быть видно на каждом push.
+  contract:
+    name: Соответствие договору (проект 117812)
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    # GH_TOKEN нужен проверке поставки: состав и размеры релиза читаются через
+    # API GitHub. Без токена эта проверка честно пишет «не измерено», а не падает.
+    env:
+      GH_TOKEN: ${{ github.token }}
+    # Артефакт с покрытием берётся у job «Качество»: сам контрактный прогон
+    # тесты с покрытием не запускает (иначе они шли бы дважды). Если job качества
+    # упал и артефакта нет, контрактная проверка продолжает работу и пишет по
+    # правилу готовности «не измерено» с причиной.
+    needs: quality
+    if: always()
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Отчёт покрытия из job «Качество» (если он есть)
+        continue-on-error: true
+        uses: actions/download-artifact@v4
+        with:
+          name: coverage-json
+          path: spanverify-module/reports
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+          cache-dependency-path: spanverify-module/requirements.txt
+
+      - name: Зависимости
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r spanverify-module/requirements.txt
+
+      - name: Контрактные тесты
+        working-directory: spanverify-module
+        run: python -m pytest -q tests/test_contract.py
+
+      - name: Реестр чисел и его сверка с артефактами
+        run: |
+          python scripts/build_numbers.py
+          python scripts/build_numbers.py --check
+
+      - name: Контрактные проверки (requirement → fact → status)
+        run: python scripts/contract_check.py
+
+      - name: Сверка чисел в документах с реестром
+        working-directory: spanverify-module
+        run: python scripts/check_numbers.py --metrics reports/METRICS.json --numbers ../reports/NUMBERS.json
+
+      - name: Артефакты контрактной проверки
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: contract
+          path: |
+            reports/CONTRACT.json
+            reports/NUMBERS.json
+            reports/contract/
+            docs/СООТВЕТСТВИЕ_ДОГОВОРУ.md
+          retention-days: 90
 
   tests:
     name: Тесты (Python ${{ matrix.python }}, ${{ matrix.os }})

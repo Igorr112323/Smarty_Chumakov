@@ -1,0 +1,30 @@
+{
+  "id": "4.2.3-no-install",
+  "commit": "72205185cd75b5b2a247236e4b82bd2d76ba428a",
+  "seed": 42,
+  "mode": "demo",
+  "dataset": "copied-module",
+  "date": "2026-10-13T22:18:13Z",
+  "command": "",
+  "metrics": {
+    "returncode": 1,
+    "changed_files_inside_copy": [
+      "spanverify-module/spanverify/__pycache__/__init__.cpython-311.pyc",
+      "spanverify-module/spanverify/__pycache__/__main__.cpython-311.pyc",
+      "spanverify-module/spanverify/__pycache__/_version.cpython-311.pyc",
+      "spanverify-module/spanverify/__pycache__/calibration.cpython-311.pyc",
+      "spanverify-module/spanverify/__pycache__/cli.cpython-311.pyc",
+      "spanverify-module/spanverify/__pycache__/config.cpython-311.pyc",
+      "spanverify-module/spanverify/__pycache__/core.cpython-311.pyc",
+      "spanverify-module/spanverify/__pycache__/coverage.cpython-311.pyc",
+      "spanverify-module/spanverify/__pycache__/dataset.cpython-311.pyc",
+      "spanverify-module/spanverify/__pycache__/detector.cpython-311.pyc"
+    ],
+    "changed_files_outside_copy": [],
+    "python": "3.11.2",
+    "site_packages": "/usr/local/lib/python3.11/dist-packages",
+    "extra_packages": []
+  },
+  "note": "запуск из копии работает, запись остаётся внутри каталога",
+  "gate": null
+}

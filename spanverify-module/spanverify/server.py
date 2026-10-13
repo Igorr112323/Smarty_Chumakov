@@ -28,9 +28,13 @@ from urllib.parse import urlparse
 
 from . import __version__
 from .engine import WEIGHTS_FILENAME, Verifier
+from .features import FEATURE_NAMES
+from .limits import MAX_REQUEST_BYTES
 from .webui import INDEX_HTML
 
-MAX_BODY = 4 * 1024 * 1024  # 4 МБ на запрос
+# Предел тела запроса: два текста по 2 000 000 знаков (ТЗ п. 4.1 треб. 1) в
+# UTF-8 — это до 8 МБ, плюс JSON-обвязка; см. spanverify.limits.
+MAX_BODY = MAX_REQUEST_BYTES
 DEFAULT_PORT = 8765
 DEFAULT_MODE = "demo"
 
@@ -151,12 +155,9 @@ class Service:
         elif context is not None:
             context = str(context)
 
-        result = self.verifier.verify(
-            answer=answer,
-            context=context,
-            with_tokens=bool(payload.get("with_tokens", False)),
-        )
-        body = result.to_dict(with_tokens=bool(payload.get("with_tokens", False)))
+        with_tokens = bool(payload.get("with_tokens") or payload.get("tokens"))
+        result = self.verifier.verify(answer=answer, context=context, with_tokens=with_tokens)
+        body = result.to_dict(with_tokens=with_tokens)
         body["mode"] = self.mode
         return body
 
@@ -235,7 +236,7 @@ def make_handler(service: Service):
 
         def do_POST(self) -> None:  # noqa: N802
             path = urlparse(self.path).path.rstrip("/")
-            if path not in ("/v1/verify", "/verify"):
+            if path not in ("/v1/verify", "/verify", "/v1/features"):
                 self._error(404, f"маршрут {path} не найден")
                 return
             try:
@@ -244,6 +245,21 @@ def make_handler(service: Service):
                 self._error(400, str(error))
                 return
             try:
+                # /v1/features — дамп пяти признаков по токенам (ТЗ п. 4.1 треб. 3):
+                # тот же конвейер, что и /v1/verify, но ответ обязательно с токенами.
+                if path == "/v1/features":
+                    payload = {**payload, "with_tokens": True}
+                    body = service.verify(payload)
+                    self._json(
+                        200,
+                        {
+                            "features": list(FEATURE_NAMES),
+                            "count": len(FEATURE_NAMES),
+                            "mode": body.get("mode"),
+                            "tokens": body.get("tokens", []),
+                        },
+                    )
+                    return
                 self._json(200, service.verify(payload))
             except ValueError as error:
                 self._error(400, str(error))

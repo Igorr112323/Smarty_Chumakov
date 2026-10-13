@@ -1,0 +1,279 @@
+{
+  "id": "4.2.5-hf-footprint",
+  "commit": "90bad01c636bf567983bbb154b9fb320d5383220",
+  "seed": 42,
+  "mode": "hf",
+  "dataset": "ai-forever/rugpt3small_based_on_gpt2",
+  "date": "2026-10-13T17:27:32Z",
+  "command": "python scripts/measure_hf_footprint.py --out ../reports/contract --model ai-forever/rugpt3small_based_on_gpt2 --cache /home/runner/hf-cache",
+  "metrics": {
+    "model": "ai-forever/rugpt3small_based_on_gpt2",
+    "cache": "/home/runner/hf-cache",
+    "libs_bytes": 813773084,
+    "libs_mb": 813.8,
+    "libs_mib": 776.1,
+    "libs_runtime_full_bytes": 1053454603,
+    "libs_runtime_full_mb": 1053.5,
+    "libs_delta_bytes": 1137614128,
+    "libs_full_mb": 1137.6,
+    "libs_full_mib": 1084.9,
+    "libs_runtime_measured": true,
+    "libs_runtime_modules": [
+      "_distutils_hack",
+      "anyio",
+      "filelock",
+      "h11",
+      "hf_xet",
+      "httpcore2",
+      "httpx2",
+      "huggingface_hub",
+      "idna",
+      "jinja2",
+      "markupsafe",
+      "mpmath",
+      "numpy",
+      "packaging",
+      "regex",
+      "safetensors",
+      "sentencepiece",
+      "sympy",
+      "tokenizers",
+      "torch",
+      "torchgen",
+      "tqdm",
+      "transformers",
+      "truststore",
+      "typing_extensions",
+      "yaml"
+    ],
+    "libs_runtime_probe_note": "режим hf, вердикт grounded",
+    "libs_runtime_per_package_mb": {
+      "torch": 668.3,
+      "transformers": 50.1,
+      "numpy": 26.3,
+      "sympy": 26.1,
+      "tokenizers": 11.4,
+      "hf_xet": 11.3,
+      "huggingface_hub": 3.2,
+      "regex": 3.0,
+      "yaml": 2.9,
+      "sentencepiece": 2.8,
+      "torchgen": 2.0,
+      "mpmath": 1.9,
+      "safetensors": 1.3,
+      "anyio": 0.5,
+      "jinja2": 0.5,
+      "packaging": 0.5,
+      "httpx2": 0.4,
+      "filelock": 0.3,
+      "idna": 0.3,
+      "httpcore2": 0.3,
+      "tqdm": 0.2,
+      "h11": 0.1,
+      "markupsafe": 0.1,
+      "truststore": 0.1,
+      "_distutils_hack": 0.0,
+      "typing_extensions": 0.0
+    },
+    "libs_pruned_bytes": 239681519,
+    "libs_pruned_mb": 239.7,
+    "libs_pruned_breakdown": {
+      "нерабочие каталоги (include, docs, examples, __pycache__)": 233.8,
+      "заголовки C/C++ и заглушки типов": 5.9
+    },
+    "libs_prune_rule": "из пакетов, загружаемых при проверке в режиме hf, исключены только файлы, которые Python не может загрузить при работе: include/ и заголовки C/C++ (*.h, *.hpp, *.cuh, *.c, *.cpp, *.cu, *.cmake), заглушки типов (*.pyi), метаданные (*.dist-info, *.egg-info), кеши (__pycache__), docs/examples/benchmarks",
+    "weights_bytes": 554277308,
+    "weights_mb": 554.3,
+    "weights_mib": 528.6,
+    "weights_model_bytes": 551290714,
+    "weights_model_mb": 551.3,
+    "weights_aux_mb": 3.0,
+    "weights_format": "pytorch_model.bin (PyTorch)",
+    "weights_by_format_mb": {
+      "pytorch_model.bin (PyTorch)": 551.3
+    },
+    "weights_all_formats_mb": 554.3,
+    "weights_revisions": {
+      "models--ai-forever--rugpt3small_based_on_gpt2": "a9307e696cd3c5b7f953ff4cb19d76a4d81821d5"
+    },
+    "weights_revision_used": "refs/main: a9307e696cd3c5b7f953ff4cb19d76a4d81821d5",
+    "weights_cache_bytes": 1105637840,
+    "weights_cache_mb": 1105.6,
+    "weights_cache_overhead_mb": 551.4,
+    "weights_cache_files_total": 30,
+    "weights_naive_bytes": 1105637840,
+    "weights_naive_mb": 1105.6,
+    "weights_model_files": [
+      {
+        "path": "hub/models--ai-forever--rugpt3small_based_on_gpt2/snapshots/a9307e696cd3c5b7f953ff4cb19d76a4d81821d5/pytorch_model.bin",
+        "repo": "models--ai-forever--rugpt3small_based_on_gpt2",
+        "revision": "a9307e696cd3c5b7f953ff4cb19d76a4d81821d5",
+        "bytes": 551290714,
+        "resolved": "hub/blobs/90/9071e474490f65ddfb2251b0af8dd6d6cff8adc2ad97511516158088bafc118c"
+      },
+      {
+        "path": "hub/models--ai-forever--rugpt3small_based_on_gpt2/snapshots/a9307e696cd3c5b7f953ff4cb19d76a4d81821d5/vocab.json",
+        "repo": "models--ai-forever--rugpt3small_based_on_gpt2",
+        "revision": "a9307e696cd3c5b7f953ff4cb19d76a4d81821d5",
+        "bytes": 1713123,
+        "resolved": "hub/models--ai-forever--rugpt3small_based_on_gpt2/blobs/29154a654dcb0b71c25a9ea6df60a9a34f302a4f"
+      },
+      {
+        "path": "hub/models--ai-forever--rugpt3small_based_on_gpt2/snapshots/a9307e696cd3c5b7f953ff4cb19d76a4d81821d5/merges.txt",
+        "repo": "models--ai-forever--rugpt3small_based_on_gpt2",
+        "revision": "a9307e696cd3c5b7f953ff4cb19d76a4d81821d5",
+        "bytes": 1270925,
+        "resolved": "hub/models--ai-forever--rugpt3small_based_on_gpt2/blobs/8d6ce0fc5b6c262020ff8f8b07c8511a19b13778"
+      },
+      {
+        "path": "hub/models--ai-forever--rugpt3small_based_on_gpt2/snapshots/a9307e696cd3c5b7f953ff4cb19d76a4d81821d5/tokenizer_config.json",
+        "repo": "models--ai-forever--rugpt3small_based_on_gpt2",
+        "revision": "a9307e696cd3c5b7f953ff4cb19d76a4d81821d5",
+        "bytes": 1252,
+        "resolved": "hub/models--ai-forever--rugpt3small_based_on_gpt2/blobs/7bdc623bf90e44c5f7cad5c44606d6af754fd0c2"
+      },
+      {
+        "path": "hub/models--ai-forever--rugpt3small_based_on_gpt2/snapshots/a9307e696cd3c5b7f953ff4cb19d76a4d81821d5/config.json",
+        "repo": "models--ai-forever--rugpt3small_based_on_gpt2",
+        "revision": "a9307e696cd3c5b7f953ff4cb19d76a4d81821d5",
+        "bytes": 720,
+        "resolved": "hub/models--ai-forever--rugpt3small_based_on_gpt2/blobs/7a05ebb1619c0327080d4924d523688a21bb2515"
+      },
+      {
+        "path": "hub/models--ai-forever--rugpt3small_based_on_gpt2/snapshots/a9307e696cd3c5b7f953ff4cb19d76a4d81821d5/special_tokens_map.json",
+        "repo": "models--ai-forever--rugpt3small_based_on_gpt2",
+        "revision": "a9307e696cd3c5b7f953ff4cb19d76a4d81821d5",
+        "bytes": 574,
+        "resolved": "hub/models--ai-forever--rugpt3small_based_on_gpt2/blobs/1ca6de7fc0e91fd7c9f0be529596a307906d5dca"
+      }
+    ],
+    "weights_unique_bytes": 1105637840,
+    "weights_unique_mb": 1105.6,
+    "weights_dedupe_rule": "веса — файлы выбранной ревизии (refs/main) в одном формате, который загружает библиотека (safetensors, если есть, иначе pytorch_model.bin), плюс файлы токенизатора; размеры остальных форматов, объём кеша целиком и сырой прирост site-packages приведены отдельными полями и не скрываются",
+    "weights_files_total": 30,
+    "delivery_bytes": 171242,
+    "delivery_mb": 0.2,
+    "storage_without_weights_mb": 0.2,
+    "storage_with_weights_mb": 1368.2,
+    "storage_with_weights_mib": 1304.8,
+    "storage_with_weights_full_mb": 1692.1,
+    "storage_with_weights_cache_mb": 1919.6,
+    "weight_files": [
+      {
+        "path": "hub/blobs/90/9071e474490f65ddfb2251b0af8dd6d6cff8adc2ad97511516158088bafc118c",
+        "bytes": 551290714
+      },
+      {
+        "path": "hub/blobs/88/8874f08f3afb6bb5fa161cef43feb6e0694ff25fc0e4ea8bb1b9fe40d1ab4040",
+        "bytes": 551275608
+      },
+      {
+        "path": "hub/models--ai-forever--rugpt3small_based_on_gpt2/blobs/29154a654dcb0b71c25a9ea6df60a9a34f302a4f",
+        "bytes": 1713123
+      },
+      {
+        "path": "hub/models--ai-forever--rugpt3small_based_on_gpt2/blobs/8d6ce0fc5b6c262020ff8f8b07c8511a19b13778",
+        "bytes": 1270925
+      },
+      {
+        "path": "xet/logs/xet_20261013T172715119+0000_2453.log",
+        "bytes": 78639
+      },
+      {
+        "path": ".agent_harnesses.json",
+        "bytes": 5778
+      },
+      {
+        "path": "hub/models--ai-forever--rugpt3small_based_on_gpt2/blobs/7bdc623bf90e44c5f7cad5c44606d6af754fd0c2",
+        "bytes": 1252
+      },
+      {
+        "path": "hub/models--ai-forever--rugpt3small_based_on_gpt2/blobs/7a05ebb1619c0327080d4924d523688a21bb2515",
+        "bytes": 720
+      },
+      {
+        "path": "hub/models--ai-forever--rugpt3small_based_on_gpt2/blobs/1ca6de7fc0e91fd7c9f0be529596a307906d5dca",
+        "bytes": 574
+      },
+      {
+        "path": "hub/CACHEDIR.TAG",
+        "bytes": 191
+      },
+      {
+        "path": "hub/blobs/90/9071e474490f65ddfb2251b0af8dd6d6cff8adc2ad97511516158088bafc118c.refs",
+        "bytes": 117
+      },
+      {
+        "path": "hub/blobs/88/8874f08f3afb6bb5fa161cef43feb6e0694ff25fc0e4ea8bb1b9fe40d1ab4040.refs",
+        "bytes": 117
+      },
+      {
+        "path": "hub/models--ai-forever--rugpt3small_based_on_gpt2/refs/main",
+        "bytes": 40
+      },
+      {
+        "path": "hub/models--ai-forever--rugpt3small_based_on_gpt2/refs/refs/pr/6",
+        "bytes": 40
+      },
+      {
+        "path": "hub/blobs/.huggingface-shared-blobs",
+        "bytes": 2
+      },
+      {
+        "path": "hub/models--ai-forever--rugpt3small_based_on_gpt2/.no_exist/a9307e696cd3c5b7f953ff4cb19d76a4d81821d5/model.safetensors.index.json",
+        "bytes": 0
+      },
+      {
+        "path": "hub/models--ai-forever--rugpt3small_based_on_gpt2/.no_exist/a9307e696cd3c5b7f953ff4cb19d76a4d81821d5/model.safetensors",
+        "bytes": 0
+      },
+      {
+        "path": "hub/models--ai-forever--rugpt3small_based_on_gpt2/.no_exist/a9307e696cd3c5b7f953ff4cb19d76a4d81821d5/tokenizer.json",
+        "bytes": 0
+      },
+      {
+        "path": "hub/models--ai-forever--rugpt3small_based_on_gpt2/.no_exist/a9307e696cd3c5b7f953ff4cb19d76a4d81821d5/chat_template.jinja",
+        "bytes": 0
+      },
+      {
+        "path": "hub/models--ai-forever--rugpt3small_based_on_gpt2/.no_exist/a9307e696cd3c5b7f953ff4cb19d76a4d81821d5/added_tokens.json",
+        "bytes": 0
+      }
+    ],
+    "weight_files_total": 30,
+    "site_packages_top": {
+      "total": 1158294494,
+      "torch": 770342432,
+      "transformers": 108853681,
+      "sympy": 75181560,
+      "numpy": 42689416,
+      "numpy.libs": 28493675,
+      "networkx": 16479078,
+      "tokenizers": 11617566,
+      "hf_xet": 11274480,
+      "pip": 11009981
+    },
+    "pip_freeze_hf": [
+      "huggingface_hub==2.2.0",
+      "numpy==2.4.6",
+      "regex==2026.9.29",
+      "safetensors==0.8.0",
+      "sentencepiece==0.2.2",
+      "tokenizers==0.23.3",
+      "torch==2.14.1+cpu",
+      "transformers==5.19.0"
+    ],
+    "contract_libs_mb": 500,
+    "contract_weights_mb": 530,
+    "libs_vs_contract_percent": 62.8,
+    "weights_vs_contract_percent": 4.6
+  },
+  "note": "Объёмы измерены командой на раннере. Библиотеки посчитаны по набору пакетов, который режим hf действительно загружает (проба в дочернем процессе, вердикт в поле libs_runtime_probe_verdict); рядом лежит сырой прирост site-packages. Договор называет ориентиры «около 500 МБ» и «около 530 МБ» — отклонения приведены отдельными полями и не подгоняются.",
+  "gate": "ТЗ п. 4.2: библиотеки режима признаков около 500 МБ, веса около 530 МБ",
+  "environment": {
+    "python": "3.11.17",
+    "platform": "Linux-6.17.0-1022-azure-x86_64-with-glibc2.39",
+    "machine": "x86_64",
+    "cpu_count": 4
+  }
+}

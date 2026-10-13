@@ -1,0 +1,16 @@
+{
+  "id": "numbers.check",
+  "commit": "72205185cd75b5b2a247236e4b82bd2d76ba428a",
+  "seed": 42,
+  "mode": "demo",
+  "dataset": "docs",
+  "date": "2026-10-13T22:18:13Z",
+  "command": "",
+  "metrics": {
+    "returncode": 0,
+    "problems": 0,
+    "first": ""
+  },
+  "note": "числа документов сверены с реестром: расхождений нет",
+  "gate": null
+}

@@ -1,0 +1,62 @@
+{
+  "id": "4.1.5-metric-groups",
+  "commit": "72205185cd75b5b2a247236e4b82bd2d76ba428a",
+  "seed": 42,
+  "mode": "demo",
+  "dataset": "corpus_a1_synthetic/test",
+  "date": "2026-10-13T22:18:12Z",
+  "command": "",
+  "metrics": {
+    "tokens": {
+      "precision": 1.0,
+      "recall": 0.5795454545454546,
+      "f1": 0.7338129496402878,
+      "fpr": 0.0,
+      "tp": 153,
+      "fp": 0,
+      "fn": 111,
+      "tn": 1604,
+      "auc": 0.9350416572205849
+    },
+    "spans": {
+      "precision": 1.0,
+      "recall": 0.6363636363636364,
+      "f1": 0.7777777777777778,
+      "tp": 63,
+      "fp": 0,
+      "fn": 36,
+      "iou_threshold": 0.5,
+      "recall_containment": 0.6363636363636364,
+      "f1_expanded_labels": 0.12345679012345681,
+      "mean_width_ratio": 1.0877701278552447
+    },
+    "answers": {
+      "threshold": 1.0,
+      "precision": 1.0,
+      "recall": 0.43434343434343436,
+      "f1": 0.6056338028169015,
+      "fpr": 0.0,
+      "auc": 0.7171717171717171,
+      "tp": 43,
+      "fp": 0,
+      "fn": 56,
+      "tn": 81
+    },
+    "verdicts": {
+      "tp": 58,
+      "fp": 0,
+      "fn": 41,
+      "tn": 81,
+      "precision": 1.0,
+      "recall": 0.5859,
+      "f1": 0.7389,
+      "fpr": 0.0,
+      "flagged_share": 0.3222
+    },
+    "pairs": 180,
+    "iou_threshold": 0.5,
+    "iou_test_passed": true
+  },
+  "note": "три группы метрик и порог IoU 0.5 присутствуют",
+  "gate": null
+}

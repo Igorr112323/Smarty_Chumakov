@@ -1,0 +1,20 @@
+{
+  "id": "ci.contract-job",
+  "commit": "72205185cd75b5b2a247236e4b82bd2d76ba428a",
+  "seed": 42,
+  "mode": "demo",
+  "dataset": "ci",
+  "date": "2026-10-13T22:18:13Z",
+  "command": "",
+  "metrics": {
+    "workflow": ".github/workflows/ci.yml",
+    "markers_found": [
+      "contract:",
+      "scripts/contract_check.py",
+      "scripts/check_numbers.py",
+      "CONTRACT.json"
+    ]
+  },
+  "note": "job contract запускает тесты, контрактную проверку и сверку чисел",
+  "gate": null
+}

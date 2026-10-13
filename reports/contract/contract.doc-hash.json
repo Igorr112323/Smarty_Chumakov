@@ -1,0 +1,23 @@
+{
+  "id": "contract.doc-hash",
+  "commit": "72205185cd75b5b2a247236e4b82bd2d76ba428a",
+  "seed": 42,
+  "mode": "demo",
+  "dataset": "договор № 20478ГУ/2026, проект 117812",
+  "date": "2026-10-13T22:18:14Z",
+  "command": "",
+  "metrics": {
+    "recorded_sha256": "e5eb6ad8522fa70135f75bf22b0b5f3464fcc17d9c6f04d81b48976a42e69cd5",
+    "recorded_bytes": 5019351,
+    "recorded_pages": 32,
+    "pdf_present": true,
+    "personal_data_in_repo": false,
+    "measured_sha256": "e5eb6ad8522fa70135f75bf22b0b5f3464fcc17d9c6f04d81b48976a42e69cd5",
+    "measured_bytes": 5019351,
+    "registry_value": "e5eb6ad8522fa70135f75bf22b0b5f3464fcc17d9c6f04d81b48976a42e69cd5",
+    "pdf_tracked_in_git": false,
+    "problems": []
+  },
+  "note": "SHA-256 договора зафиксирован и совпадает с реестром чисел; хеш пересчитан по файлу",
+  "gate": null
+}

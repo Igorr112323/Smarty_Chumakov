@@ -1,20 +1,28 @@
-"""Три признака недостоверности ответа относительно контекста.
+"""Пять признаков недостоверности ответа относительно контекста.
 
-Признаки (по одному значению на токен ответа, все в [0, 1]):
+Признаки (по одному значению на токен ответа; состав зафиксирован договором
+№ 20478ГУ/2026, проект 117812, ТЗ п. 4.1 треб. 3 — «5 признаков на токен»):
 
 1. ``attention_entropy`` — нормированная энтропия внимания последнего слоя
    (режим ``hf``) либо стилометрическая предсказуемость (режим ``demo``).
-   Чем выше — тем менее уверенно токен «поддерживается» моделью.
+   Единственный признак «чем выше — тем подозрительнее».
 2. ``ctx_attention_mass`` — доля массы внимания, пришедшая на токены контекста
    (режим ``hf``) либо масса лексической поддержки токена контекстом
-   (режим ``demo``). В итоговом риске входит со знаком минус: больше опоры на
-   контекст — ниже риск.
-3. ``embedding_density`` — 1 − среднее косинусное расстояние до ``k = 5``
-   ближайших чанков контекста (режим ``hf``: скрытые состояния; режим
-   ``demo``: лексические векторы с символьными n-граммами).
+   (режим ``demo``).
+3. ``ctx_attention_mass_norm`` — та же опора, нормированная на ожидаемый фон:
+   в ``hf`` — observed/expected для равномерного внимания, в ``demo`` — опора
+   относительно средней опоры содержательных токенов ответа.
+4. ``ctx_max_similarity`` — близость к ближайшему фрагменту документа
+   (в ``hf`` — максимальная косинусная близость к скрытому состоянию контекста,
+   в ``demo`` — максимальная схожесть триграмм с словом контекста).
+5. ``embedding_density`` — плотность векторного представления: средняя близость
+   к ``k = 5`` ближайшим фрагментам документа.
 
-Итоговый риск: ``r = w1·Ĥ + w2·(1 − m̂) + w3·d̂`` после нормировки признаков
-в [0, 1]. Веса подбираются на валидации (см. ``train.py``).
+Все признаки опоры (2–5) измеряются как «больше — достовернее», поэтому в риск
+входят с обратным знаком. Итоговый риск:
+``r = (w1·Ĥ + w2·(1 − m̂) + w3·(1 − m̂n) + w4·(1 − ŝ) + w5·(1 − d̂)) / Σw`` после
+нормировки признаков в [0, 1]. Веса подбираются только на обучающей части
+(см. ``train.py``); знаки зафиксированы по измерению (``reports/SIGN_AUDIT.json``).
 
 Режим ``demo`` не использует torch: это лексические суррогаты признаков. Он
 нужен, чтобы конвейер, интерфейс и сборка проверялись без весов модели; его
@@ -26,6 +34,7 @@ from __future__ import annotations
 import statistics
 from collections.abc import Mapping, Sequence
 from dataclasses import dataclass, field
+from functools import lru_cache
 from typing import Any
 
 from .core import Token, number_value, numbers_in, split_chunks
@@ -33,13 +42,40 @@ from .lexicon import BOILERPLATE_WORDS, PARAPHRASE_WORDS, STOPWORDS, find_phrase
 from .normalize import numbers_to_digits, words_to_number
 from .vectors import hash_index, normalize
 
-FEATURE_NAMES = ("attention_entropy", "ctx_attention_mass", "embedding_density")
+# Рабочие признаки — ровно пять (договор № 20478ГУ/2026, проект 117812,
+# Техническое задание п. 4.1, требование 3: «5 признаков на токен: энтропия
+# внимания, доля внимания на документ, косинусная близость и др.»).
+#
+#   1. attention_entropy      — энтропия внимания (в demo — стилометрическая
+#                               предсказуемость токена);
+#   2. ctx_attention_mass     — доля внимания (в demo — лексической опоры),
+#                               пришедшая на документ;
+#   3. ctx_attention_mass_norm — та же доля, нормированная на ожидаемый фон
+#                               (в hf — на равномерную массу causal-префикса,
+#                               в demo — на среднюю опору содержательных
+#                               токенов ответа): «сколько опоры сверх фона»;
+#   4. ctx_max_similarity     — косинусная близость к ближайшему фрагменту
+#                               документа (в demo — максимальная схожесть
+#                               триграмм с ближайшим словом контекста);
+#   5. embedding_density      — плотность векторного представления: средняя
+#                               близость к k ближайшим фрагментам документа.
+#
+# Все пять считаются в обоих режимах (demo и hf) и имеют конечные значения в
+# [0, 1] — это проверяется контрактным тестом. Веса всех пяти обучаются
+# (см. ``train.py``); нулевой вес признака — допустимый результат обучения, а не
+# отсутствие признака.
+FEATURE_NAMES = (
+    "attention_entropy",
+    "ctx_attention_mass",
+    "ctx_attention_mass_norm",
+    "ctx_max_similarity",
+    "embedding_density",
+)
 # Признаки-кандидаты: считаются рядом с рабочими, но НЕ входят в итоговый риск
 # (в DEFAULT_WEIGHTS их нет). Они нужны, чтобы измерить на реальной модели,
-# даёт ли нормировка массы на длину контекста прибавку к AUC, и только после
-# измерения решать, переводить ли их в рабочие.
+# даёт ли признак прибавку к AUC, и только после измерения решать, переводить ли
+# его в рабочие.
 DIAGNOSTIC_FEATURES = (
-    "ctx_attention_mass_norm",
     "ctx_attention_mass_lift",
     # Итерация 2: расстояние до подтверждающего фрагмента.
     "ctx_max_similarity",
@@ -55,7 +91,13 @@ SCORED_MIN_LEN = 3
 # Значения по умолчанию — не «на глаз»: это режим, к которому сходится перебор
 # весов на демонстрационном корпусе (масса опоры на контекст несёт основную
 # нагрузку). Обучение на своих данных заменяет их (``spanverify train``).
-DEFAULT_WEIGHTS = {"attention_entropy": 0.1, "ctx_attention_mass": 0.8, "embedding_density": 0.1}
+DEFAULT_WEIGHTS = {
+    "attention_entropy": 0.1,
+    "ctx_attention_mass": 0.4,
+    "ctx_attention_mass_norm": 0.2,
+    "ctx_max_similarity": 0.2,
+    "embedding_density": 0.1,
+}
 DEMO_WARNING = (
     "ДЕМО-РЕЖИМ: признаки считаются лексическими суррогатами без весов языковой модели. "
     "Он проверяет работоспособность конвейера и интерфейса, а не достоверность ответа. "
@@ -65,6 +107,17 @@ DEMO_WARNING = (
 )
 
 _CONTENT_MIN_LEN = 3
+
+# Нормировка шкалы плотности в demo-режиме. Средняя схожесть с k ближайшими
+# словами документа на подтверждённом токене равна не 1, а её реальному уровню:
+# измерено на ОБУЧАЮЩЕЙ части корпуса A (``data/corpus_a/splits/train.jsonl``,
+# 842 пары, seed 42) — медиана плотности токенов с лексической опорой 0.524,
+# у токенов без опоры 0.061. Отчёт и команда замера:
+# ``python scripts/density_reference.py`` → ``reports/DENSITY_REFERENCE.json``.
+# Это нормировка ШКАЛЫ признака (чтобы «подтверждён» читалось как 1.0, как у
+# остальных признаков опоры), а не подбор порога: порог и веса по-прежнему
+# выбираются только обучением на обучающей части.
+DEMO_DENSITY_REFERENCE = 0.52
 
 
 def is_scored_token(text: str, min_len: int = SCORED_MIN_LEN) -> bool:
@@ -92,7 +145,7 @@ class FeatureMatrix:
     embedding_density: list[float] = field(default_factory=list)
     # Диагностические (не участвуют в риске): нормированная масса опоры.
     ctx_mass_expected: list[float] = field(default_factory=list)
-    ctx_mass_norm: list[float] = field(default_factory=list)
+    ctx_attention_mass_norm: list[float] = field(default_factory=list)
     ctx_mass_lift: list[float] = field(default_factory=list)
     # Диагностические (итерация 2): максимум похожести и где он найден.
     ctx_max_similarity: list[float] = field(default_factory=list)
@@ -106,16 +159,26 @@ class FeatureMatrix:
     def __len__(self) -> int:
         return len(self.attention_entropy)
 
+    @property
+    def ctx_mass_norm(self) -> list[float]:
+        """Историческое имя поля ``ctx_attention_mass_norm`` (совместимость)."""
+        return self.ctx_attention_mass_norm
+
     def as_rows(self) -> list[dict[str, float]]:
-        return [
-            {
-                "attention_entropy": self.attention_entropy[i],
-                "ctx_attention_mass": self.ctx_attention_mass[i],
-                "embedding_density": self.embedding_density[i],
-                "risk": self.token_risk[i],
-            }
-            for i in range(len(self))
-        ]
+        """Строки по токенам: пять рабочих признаков (``FEATURE_NAMES``) и риск.
+
+        Незаполненные признаки (матрица собрана вручную в тесте или старым
+        кодом) читаются как 0.0 — это явный «опоры нет», а не пропуск поля.
+        """
+        rows: list[dict[str, float]] = []
+        for index in range(len(self)):
+            row: dict[str, float] = {}
+            for name in FEATURE_NAMES:
+                values = getattr(self, name)
+                row[name] = values[index] if index < len(values) else 0.0
+            row["risk"] = self.token_risk[index] if index < len(self.token_risk) else 0.0
+            rows.append(row)
+        return rows
 
 
 # ---------------------------------------------------------------- нормировка
@@ -256,20 +319,54 @@ def _clamp01(value: float) -> float:
 minmax = scale
 
 
+def feature_vectors(matrix: FeatureMatrix) -> dict[str, list[float]]:
+    """Рабочие признаки по токенам: ``{имя: значения}`` в порядке ``FEATURE_NAMES``.
+
+    Единственная точка, из которой берутся пять рабочих признаков, — иначе
+    дамп признаков, обучение и расчёт риска разошлись бы по составу.
+    """
+    return {name: list(getattr(matrix, name) or []) for name in FEATURE_NAMES}
+
+
 def combine(
     entropy: Sequence[float],
     mass: Sequence[float],
     density: Sequence[float],
     weights: dict[str, float] | None = None,
     entropy_quantile: float = 1.0,
+    mass_norm: Sequence[float] | None = None,
+    max_similarity: Sequence[float] | None = None,
 ) -> list[float]:
-    """Взвешенная комбинация признаков: r = w1·Ĥ + w2·(1 − m̂) + w3·d̂.
+    """Взвешенная комбинация пяти признаков.
+
+    Риск токена: ``r = (w1·Ĥ + w2·(1 − m̂) + w3·(1 − m̂n) + w4·(1 − ŝ) + w5·(1 − d̂)) / Σw``,
+    где ``Ĥ`` — нормированная энтропия, ``m̂`` — доля опоры на документ,
+    ``m̂n`` — она же нормированная на ожидаемый фон, ``ŝ`` — близость к
+    ближайшему фрагменту документа, ``d̂`` — плотность векторного
+    представления.
+
+    Знаки зафиксированы по измерению, а не по вкусу: у признаков опоры риск
+    растёт при падении значения, поэтому они входят как ``1 − x``. Измерение
+    на корпусе A (``data/corpus_a/pairs.jsonl``, 1200 пар, 12 771 оценённый
+    токен, 1 674 положительных; команда —
+    ``python scripts/sign_audit.py``, отчёт ``reports/SIGN_AUDIT.json``):
+    ``ctx_attention_mass`` AUC = 0.215 как риск против 0.785 как опора (1 − x),
+    ``embedding_density`` — 0.127 против 0.873. Обратный знак плотности в
+    предыдущей редакции формулы (``+ w3·d̂``) снижал качество правила; это
+    исправлено, числа до и после исправления — в ``reports/SIGN_AUDIT.json``.
 
     Нормируется только ``attention_entropy``: у неё нет абсолютного нуля, важен
-    лишь порядок токенов внутри ответа. ``ctx_attention_mass`` и
-    ``embedding_density`` имеют абсолютный смысл (0 = опоры нет, 1 = токен
-    подтверждён), поэтому они НЕ делятся на собственный максимум: иначе ответ,
-    где слабо поддержаны все токены, выглядел бы полностью подтверждённым.
+    лишь порядок токенов внутри ответа. Признаки опоры имеют абсолютный смысл
+    (0 = опоры нет, 1 = токен подтверждён), поэтому они НЕ делятся на
+    собственный максимум: иначе ответ, где слабо поддержаны все токены,
+    выглядел бы полностью подтверждённым.
+
+    ``mass_norm`` и ``max_similarity`` — необязательные: если вызывающий код их
+    не передал (например, старый артефакт признаков) или передал список другой
+    длины (матрица собрана вручную в тесте), берутся ``mass`` и ``density``
+    соответственно, и формула сводится к трёхпризнаковой с теми же суммарными
+    весами. Проверка длины здесь обязательна: короткий список иначе даёт
+    ``IndexError`` вместо риска.
 
     ``entropy_quantile`` < 1 включает нормировку по квантили вместо максимума —
     это нужно режиму ``hf`` (см. :func:`scale_robust`); значение 1.0 сохраняет
@@ -277,15 +374,32 @@ def combine(
     """
     weights = {**DEFAULT_WEIGHTS, **(weights or {})}
     total = sum(abs(weights.get(name, 0.0)) for name in FEATURE_NAMES) or 1.0
+    n_tokens = len(entropy)
+
+    def _aligned(values: Sequence[float] | None, fallback: Sequence[float]) -> Sequence[float]:
+        """Список признака, длина которого совпадает с длиной энтропии.
+
+        Несовпадение (признак не считался или матрица собрана вручную) — это не
+        ошибка вызова, а «признак недоступен»: подставляется резервный список,
+        как описано в docstring. Молчаливого ``IndexError`` здесь быть не должно.
+        """
+        if values is None or len(values) != n_tokens:
+            return fallback
+        return values
+
     e_hat = scale_robust(entropy, entropy_quantile)
-    m_hat = [_clamp01(value) for value in mass]
-    d_hat = [_clamp01(value) for value in density]
+    m_hat = [_clamp01(value) for value in _aligned(mass, [0.0] * n_tokens)]
+    n_hat = [_clamp01(value) for value in _aligned(mass_norm, mass)]
+    s_hat = [_clamp01(value) for value in _aligned(max_similarity, density)]
+    d_hat = [_clamp01(value) for value in _aligned(density, [0.0] * n_tokens)]
     out: list[float] = []
     for i in range(len(e_hat)):
         risk = (
             weights["attention_entropy"] * e_hat[i]
             + weights["ctx_attention_mass"] * (1.0 - m_hat[i])
-            + weights["embedding_density"] * d_hat[i]
+            + weights["ctx_attention_mass_norm"] * (1.0 - n_hat[i])
+            + weights["ctx_max_similarity"] * (1.0 - s_hat[i])
+            + weights["embedding_density"] * (1.0 - d_hat[i])
         )
         out.append(min(1.0, max(0.0, risk / total)))
     return out
@@ -306,7 +420,7 @@ def demo_features(
     k: int = 5,
     dim: int = 2048,
 ) -> FeatureMatrix:
-    """Лексические суррогаты трёх признаков (без весов модели)."""
+    """Лексические суррогаты пяти рабочих признаков (без весов модели)."""
     from .core import tokenize_with_offsets
 
     tokens = list(answer_tokens) if answer_tokens is not None else tokenize_with_offsets(answer)
@@ -320,9 +434,9 @@ def demo_features(
     # Контекст нормализуется: иначе «25» в документе и «двадцать пять» в ответе
     # не совпадали, и корректный ответ получал ложное замечание.
     context_numbers = numbers_in(numbers_to_digits(chunks.text)) if chunks.text else set()
-    context_words: list[tuple[str, frozenset[str]]] = [
-        (token.word, _trigrams(token.word)) for token in context_tokens if _is_content(token)
-    ]
+    context_words = ContextWords(
+        [(token.word, _trigrams(token.word)) for token in context_tokens if _is_content(token)]
+    )
 
     # --- признаки ---
     phrase_hits = find_phrase_hits([token.text for token in tokens])
@@ -330,6 +444,7 @@ def demo_features(
     entropy: list[float] = []
     mass: list[float] = []
     density: list[float] = []
+    max_similarity: list[float] = []
 
     # Числа прописью занимают несколько токенов («двадцать» + «пять»), поэтому
     # значение считается для группы целиком, а не по отдельному токену.
@@ -352,7 +467,7 @@ def demo_features(
         # 2. Лексическая поддержка контекстом (суррогат массы внимания).
         support = 0.0
         if content and context_words:
-            support = _support_overlap(word, context_words)
+            support = context_words.support(word)
         value = token_values[index] if index < len(token_values) else None
         if value is not None and context_numbers:
             # Число подтверждено, только если такое же значение есть в контексте.
@@ -370,19 +485,30 @@ def demo_features(
         #    не различает токены.
         grams = _trigrams(token.word) if content else frozenset()
         if grams and context_words:
-            similarities = sorted((_jaccard(grams, context_gram) for _, context_gram in context_words), reverse=True)
-            top = similarities[: max(1, k)]
-            density.append(min(1.0, max(0.0, sum(top) / len(top))))
+            raw, closest = context_words.similarities(token.word, k)
+            density.append(min(1.0, max(0.0, raw / DEMO_DENSITY_REFERENCE)))
+            # 4. Близость к ближайшему слову контекста (максимум, а не среднее
+            #    по k): отличает токен, у которого есть хотя бы один точный
+            #    след в документе, от токена, похожего «в целом».
+            max_similarity.append(min(1.0, max(0.0, closest)))
         else:
             density.append(0.0)
+            max_similarity.append(0.0)
 
     _apply_number_consistency(tokens, context_numbers, mass)
     # Дефект D: число проверяется внутри своего объекта, а не «где-то в контексте».
     _apply_number_attribution(tokens, answer, chunks.text, mass)
 
+    # 5. Нормированная опора: во сколько раз опора токена выше фоновой опоры
+    #    ответа (в hf — во сколько раз масса выше равномерной для этой позиции).
+    #    Считается ПОСЛЕ правил про числа, чтобы унаследовать их результат.
+    mass_norm = _normalised_support(mass, tokens)
+
     return FeatureMatrix(
         attention_entropy=entropy,
         ctx_attention_mass=mass,
+        ctx_attention_mass_norm=mass_norm,
+        ctx_max_similarity=max_similarity,
         embedding_density=density,
         meta={
             "backend": "demo",
@@ -392,6 +518,29 @@ def demo_features(
             "k": k,
         },
     )
+
+
+def _normalised_support(mass: Sequence[float], tokens: Sequence[Token], eps: float = 1e-9) -> list[float]:
+    """Опора токена относительно фоновой опоры ответа (суррогат нормировки массы).
+
+    В режиме ``hf`` ожидаемая масса считается по causal-префиксу
+    (:func:`expected_context_mass`): у внимания есть позиция в
+    последовательности. В лексическом суррогате такой позиции нет, поэтому
+    фон — средняя опора содержательных токенов ответа. Смысл тот же: 0 —
+    опоры нет вовсе, 1 — опора не ниже фоновой. Обрезка сверху до 1
+    обязательна: этого требует шкала признака (все признаки в [0, 1]).
+    """
+    content = [index for index, token in enumerate(tokens) if _is_content(token)]
+    if not content:
+        return [0.0] * len(mass)
+    background = sum(mass[index] for index in content) / len(content)
+    out = [0.0] * len(mass)
+    for index in range(len(mass)):
+        if index not in content:
+            out[index] = min(1.0, max(0.0, mass[index]))
+            continue
+        out[index] = min(1.0, max(0.0, mass[index] / (background if background > eps else eps)))
+    return out
 
 
 def _group_number_values(tokens: Sequence[Token]) -> list[str | None]:
@@ -426,6 +575,10 @@ def _group_number_values(tokens: Sequence[Token]) -> list[str | None]:
     return values
 
 
+# Кэш обязателен: на предельном тексте 2 000 000 знаков эти функции вызываются
+# десятки миллионов раз, а значения зависят только от слова. Кэш не меняет
+# результат — он убирает повторный счёт (см. ТЗ п. 4.1 треб. 7).
+@lru_cache(maxsize=200_000)
 def _trigrams(text: str, n: int = 3) -> frozenset[str]:
     """Символьные триграммы слова с границами — устойчивы к формам слова."""
     value = text.lower().replace("ё", "е").strip(".,;:!?()«»\"'—–-")
@@ -435,6 +588,7 @@ def _trigrams(text: str, n: int = 3) -> frozenset[str]:
     return frozenset(padded[i : i + n] for i in range(max(1, len(padded) - n + 1)))
 
 
+@lru_cache(maxsize=200_000)
 def _stem(word: str, n: int = 4) -> str:
     """Грубая основа слова: первые ``n`` символов (для русского этого достаточно)."""
     clean = word.lower().replace("ё", "е").strip(".,;:!?()«»\"'—–-")
@@ -448,22 +602,95 @@ def _jaccard(left: frozenset[str], right: frozenset[str]) -> float:
     return len(left & right) / len(union) if union else 0.0
 
 
+class ContextWords:
+    """Слова контекста, подготовленные к сравнению с токенами ответа.
+
+    Признаки ответа сравниваются с документом попарно: у каждого содержательного
+    токена ответа — со словами документа. «В лоб» это даёт произведение размеров
+    (на предельном тексте 2 000 000 знаков — десятки миллионов сравнений), поэтому
+    слова документа готовятся один раз: собираются основы слов и перевёрнутый
+    индекс «триграмма → номера слов». Сравнение идёт только с теми словами, у
+    которых есть общая триграмма, — остальные дают ровно тот же нулевой вклад,
+    что и раньше, но не считаются.
+
+    Значения признаков при этом не меняются: индексируется тот же самый расчёт
+    (см. ТЗ п. 4.1 треб. 7 — быстродействие, и п. 4.1 треб. 3 — признаки).
+    """
+
+    __slots__ = ("words", "grams", "by_stem", "by_gram")
+
+    def __init__(self, pairs: Sequence[tuple[str, frozenset[str]]]) -> None:
+        self.words: list[str] = [word for word, _ in pairs]
+        self.grams: list[frozenset[str]] = [grams for _, grams in pairs]
+        self.by_stem: dict[str, int] = {}
+        self.by_gram: dict[str, list[int]] = {}
+        for index, (word, grams) in enumerate(pairs):
+            stem = _stem(word)
+            if stem not in self.by_stem:
+                self.by_stem[stem] = index
+            for gram in grams:
+                self.by_gram.setdefault(gram, []).append(index)
+
+    def __len__(self) -> int:
+        return len(self.words)
+
+    def __bool__(self) -> bool:
+        return bool(self.words)
+
+    def _candidates(self, grams: frozenset[str]) -> list[int]:
+        """Номера слов, у которых есть хотя бы одна общая триграмма с токеном."""
+        found = self.by_gram
+        seen: set[int] = set()
+        order: list[int] = []
+        for gram in grams:
+            for index in found.get(gram, ()):  # noqa: B905 - список, не zip
+                if index not in seen:
+                    seen.add(index)
+                    order.append(index)
+        return order
+
+    def support(self, word: str) -> float:
+        """Опора токена на контекст: общая основа = 1.0, иначе доля общих триграмм."""
+        if _stem(word) in self.by_stem:
+            return 1.0
+        grams = _trigrams(word)
+        if not grams:
+            return 0.0
+        best = 0.0
+        for index in self._candidates(grams):
+            value = _jaccard(grams, self.grams[index])
+            if value > best:
+                best = value
+        return 0.7 * best
+
+    def similarities(self, word: str, k: int) -> tuple[float, float]:
+        """Два признака сразу: среднее по ``k`` ближайшим словам и ближайшее слово.
+
+        Возвращает ``(доля по k ближайшим, максимум)`` — те же величины, что и
+        прежний полный перебор: слова без общих триграмм дают ноль и в сумму
+        входят нулями (знаменатель — ``k``, пока слов в документе не меньше ``k``).
+        """
+        grams = _trigrams(word)
+        values: list[float] = []
+        for index in self._candidates(grams):
+            value = _jaccard(grams, self.grams[index])
+            if value > 0.0:
+                values.append(value)
+        values.sort(reverse=True)
+        denominator = max(1, min(k, len(self.words)))
+        top = values[:denominator]
+        raw = sum(top) / denominator if denominator else 0.0
+        best = values[0] if values else 0.0
+        return raw, best
+
+
 def _support_overlap(word: str, context_words: Sequence[tuple[str, frozenset[str]]]) -> float:
-    """Опора токена на контекст: общая основа = 1.0, иначе доля общих триграмм.
+    """Опора токена на контекст (совместимая обёртка: строит индекс на месте).
 
     Это осознанно «жёсткий» суррогат: он даёт почти бинарную шкалу (слово либо
     поддержано документом, либо нет), поэтому порог маски на нём осмыслен.
     """
-    stem = _stem(word)
-    grams: frozenset[str] | None = None
-    best = 0.0
-    for context_word, context_grams in context_words:
-        if _stem(context_word) == stem:
-            return 1.0
-        if grams is None:
-            grams = _trigrams(word)
-        best = max(best, 0.7 * _jaccard(grams, context_grams))
-    return best
+    return ContextWords(context_words).support(word)
 
 
 # Слова-«реквизиты документа»: число сразу после них — это номер документа
@@ -633,6 +860,31 @@ def _context_text(context: str | Sequence[str] | None) -> str:
 
 
 def context_measurements(context: str | Sequence[str] | None) -> list[Measurement]:
+    """Найти измерения контекста (кэшируется по тексту документа).
+
+    Один и тот же документ разбирается несколько раз за одну проверку (признаки,
+    правило привязки числа к объекту), а разбор предельного текста 2 000 000
+    знаков стоит секунды. Кэш возвращает копию списка: вызывающий код может
+    распоряжаться ею свободно, а измерения пересчитываются один раз.
+    """
+    text = _context_text(context)
+    return list(_measurements_cached(text))
+
+
+@lru_cache(maxsize=4)
+def _measurements_cached(text: str) -> tuple[Measurement, ...]:
+    return tuple(_measurements(text))
+
+
+@lru_cache(maxsize=4)
+def _context_tokens(text: str) -> tuple[Token, ...]:
+    """Токены документа: разбор предельного текста тоже не повторяем."""
+    from .core import tokenize_with_offsets
+
+    return tuple(tokenize_with_offsets(text))
+
+
+def _measurements(context: str) -> list[Measurement]:
     """Найти измерения контекста: числа вместе со словами их объектов.
 
     Пример: «срок хранения первичных документов составляет пять лет» → измерение
@@ -640,10 +892,8 @@ def context_measurements(context: str | Sequence[str] | None) -> list[Measuremen
     Нужны, чтобы отличать «это число есть в документе» от «это число стоит рядом
     со своим объектом» (дефект D: подмена числа на число из другого факта).
     """
-    from .core import tokenize_with_offsets
-
     found: list[Measurement] = []
-    tokens = tokenize_with_offsets(_context_text(context))
+    tokens = _context_tokens(context)
     for index, token in enumerate(tokens):
         value = number_value(token)
         if value is None:
@@ -661,9 +911,19 @@ def context_measurements(context: str | Sequence[str] | None) -> list[Measuremen
     return found
 
 
+@lru_cache(maxsize=100_000)
+def _stems_cached(words: tuple[str, ...]) -> frozenset[str]:
+    return frozenset(_stem(word) for word in words if word)
+
+
 def _stems(words: Sequence[str]) -> set[str]:
-    """Основы слов для сравнения субъектов (переиспользует _stem)."""
-    return {_stem(word) for word in words if word}
+    """Основы слов для сравнения субъектов (переиспользует _stem).
+
+    Результат кэшируется: у одного числа субъектов немного, а сравниваются они
+    с субъектами всех измерений документа — на предельном тексте это миллионы
+    повторов одного и того же набора основ.
+    """
+    return set(_stems_cached(tuple(words)))
 
 
 def _distinctive_measurements(measurements: Sequence[Measurement]) -> list[tuple[str, ...]]:
@@ -688,10 +948,13 @@ def _distinctive_match(answer_subject: Sequence[str], distinctive: Sequence[str]
     Считается именно вхождение (containment), а не Jaccard: различающих слов мало
     («первичных» против «вторичных»), и объединение множеств размывало бы сигнал.
     """
-    distinctive_stems = _stems(distinctive)
+    return _match_by_stems(_stems(distinctive), _stems(answer_subject))
+
+
+def _match_by_stems(distinctive_stems: set[str], answer_stems: set[str]) -> float:
+    """То же сравнение, но основы уже посчитаны (быстрый путь для горячего цикла)."""
     if not distinctive_stems:
         return 0.0
-    answer_stems = _stems(answer_subject)
     return len(distinctive_stems & answer_stems) / len(distinctive_stems)
 
 
@@ -714,6 +977,9 @@ def _attribute_tokens(tokens: Sequence[Token], measurements: Sequence[Measuremen
     if len(measurements) < 2:
         return []
     distinctive = _distinctive_measurements(measurements)
+    # Основы различающих слов считаются один раз на вызов, а не для каждой пары
+    # «число ответа × измерение документа»: счёт тот же, работы меньше.
+    distinctive_stems = [_stems(item) for item in distinctive]
     results: list[NumberAttribution] = []
     # Значение берётся для группы токенов: «двадцать пять» — одно число, а не
     # «20» и «5». Иначе число прописью не совпадало бы с «25» в документе и
@@ -729,8 +995,9 @@ def _attribute_tokens(tokens: Sequence[Token], measurements: Sequence[Measuremen
             # Слов-субъекта нет — привязывать не к чему, вслепую не обвиняем.
             continue
         best_index, best_score = -1, 0.0
+        answer_stems = _stems(subject)
         for position, _item in enumerate(measurements):
-            score = _distinctive_match(subject, distinctive[position])
+            score = _match_by_stems(distinctive_stems[position], answer_stems)
             if score > best_score:
                 best_index, best_score = position, score
         if best_index < 0 or best_score < MEASUREMENT_MATCH_MIN:
@@ -1076,7 +1343,7 @@ def hf_features(
         ctx_attention_mass=mass_values,
         embedding_density=density_values,
         ctx_mass_expected=mass_expected_values,
-        ctx_mass_norm=mass_norm_values,
+        ctx_attention_mass_norm=mass_norm_values,
         ctx_mass_lift=mass_lift_values,
         ctx_max_similarity=max_sim_values,
         ctx_support_distance=support_distance_values,

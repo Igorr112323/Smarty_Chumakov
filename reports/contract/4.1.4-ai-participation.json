@@ -1,0 +1,42 @@
+{
+  "id": "4.1.4-ai-participation",
+  "commit": "72205185cd75b5b2a247236e4b82bd2d76ba428a",
+  "seed": 42,
+  "mode": "demo",
+  "dataset": "synthetic-participation-corpus",
+  "date": "2026-10-13T22:18:12Z",
+  "command": "",
+  "metrics": {
+    "pairs": 240,
+    "fractions": [
+      0.0,
+      0.25,
+      0.5,
+      0.75,
+      1.0
+    ],
+    "mean_by_fraction": {
+      "0.0": 0.0174,
+      "0.25": 0.2786,
+      "0.5": 0.4913,
+      "0.75": 0.741,
+      "1.0": 0.981
+    },
+    "monotone": true,
+    "mae": 0.0352,
+    "auc_binary_at_0_5": 0.9992,
+    "precision_at_0_5": 1.0,
+    "recall_at_0_5": 0.8472,
+    "f1_at_0_5": 0.9173,
+    "pearson_vs_known_fraction": 0.9907,
+    "estimate_gap_1_0_minus_0_0": 0.9636,
+    "rows": 8179,
+    "auc_out_of_fold": 1.0,
+    "calibrated_on": "synthetic-participation-corpus 1.0 (два стиля, доля смеси известна)",
+    "calibration_file": "spanverify-module/config/participation.json",
+    "seed": 42,
+    "calibration_file_exists": true
+  },
+  "note": "калибровка воспроизводима, шаг смеси 0,25",
+  "gate": null
+}
