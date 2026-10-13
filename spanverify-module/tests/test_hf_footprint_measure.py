@@ -103,3 +103,28 @@ def test_runtime_probe_mentions_hf_mode() -> None:
 
 if __name__ == "__main__":  # pragma: no cover
     raise SystemExit(pytest.main([__file__, "-q"]))
+
+
+def test_model_weights_counted_once_through_snapshot(tmp_path: Path) -> None:
+    """Веса считаются по снимку модели: буфер загрузки объём не удваивает."""
+    measure = _load_measure()
+    cache = tmp_path / "hf"
+    snapshot = cache / "hub" / "models--org--model" / "snapshots" / "rev1"
+    staging = cache / "hub" / "blobs" / "ab"
+    snapshot.mkdir(parents=True)
+    staging.mkdir(parents=True)
+    model_file = staging / "pytorch_model.bin"
+    model_file.write_bytes(b"m" * 2048)
+    # Снимок ссылается на файл символической ссылкой (так устроен кеш HF).
+    (snapshot / "pytorch_model.bin").symlink_to(model_file)
+    (snapshot / "config.json").write_text("{}", encoding="utf-8")
+    # Копия того же файла в буфере загрузки — отдельный файл, не ссылка.
+    (cache / "hub" / "blobs" / "cd").mkdir()
+    (cache / "hub" / "blobs" / "cd" / "pytorch_model.bin").write_bytes(b"m" * 2048)
+
+    weights = measure.model_weights(cache)
+
+    assert weights["bytes"] == 2048 + 2, "модель занимает один файл весов плюс config"
+    assert len(weights["files"]) == 2
+    # Объём кеша целиком эту копию видит: в артефакте остаются обе величины.
+    assert measure.dir_bytes_unique(cache)["unique"] > int(weights["bytes"])

@@ -206,6 +206,46 @@ def dir_bytes_unique(path: Path) -> dict[str, int]:
     return {"unique": unique, "unique_content": unique_content, "naive": naive, "files": count}
 
 
+def model_weights(cache: Path) -> dict[str, object]:
+    """Файлы модели: что занимают веса в кеше Hugging Face.
+
+    Кеш раскладывает один и тот же файл в несколько мест: снимок модели
+    (``snapshots/...``) ссылается на содержимое в ``blobs/``, а рядом может
+    остаться копия в буфере загрузки. Для требования «около 530 МБ» и «не более
+    1,5 ГБ» важно, сколько занимает сама модель, поэтому считаются реальные файлы,
+    на которые ссылается снимок: символические ссылки разыменовываются, каждый
+    файл — один раз (по индексному дескриптору).
+    """
+    seen: set[tuple[int, int]] = set()
+    total = 0
+    files: list[dict[str, object]] = []
+    for snapshot in sorted(cache.rglob("snapshots/*")):
+        if not snapshot.is_dir():
+            continue
+        for item in sorted(snapshot.rglob("*")):
+            target = item.resolve() if item.is_symlink() else item
+            try:
+                if not target.is_file():
+                    continue
+                stat = target.stat()
+            except OSError:  # pragma: no cover — файл исчез во время обхода
+                continue
+            key = (stat.st_dev, stat.st_ino)
+            if key in seen:
+                continue
+            seen.add(key)
+            total += stat.st_size
+            files.append(
+                {
+                    "path": str(item.relative_to(cache)),
+                    "bytes": stat.st_size,
+                    "resolved": str(target.relative_to(cache)),
+                }
+            )
+    files.sort(key=lambda item: -int(item["bytes"]))
+    return {"bytes": total, "files": files}
+
+
 def package_bytes(site: Path, top: str, prune: bool) -> tuple[int, list[tuple[str, int]]]:
     """Размер одного пакета верхнего уровня, при ``prune`` — без нерабочих файлов.
 
@@ -426,11 +466,14 @@ def main() -> int:
     libs_bytes = libs_runtime if runtime_measured else libs_delta_bytes
 
     weights = dir_bytes_unique(cache)
-    weights_bytes = weights["unique_content"]
+    model = model_weights(cache)
+    weights_bytes = int(model["bytes"]) or weights["unique_content"]
+    cache_bytes = weights["unique_content"]
     delivery_bytes = dir_bytes(args.delivery)
     storage_with_weights = delivery_bytes + libs_bytes + weights_bytes
     storage_without_weights = delivery_bytes
     storage_with_weights_full = delivery_bytes + libs_delta_bytes + weights_bytes
+    storage_with_weights_cache = delivery_bytes + libs_bytes + cache_bytes
 
     files = []
     for item, size in _walk(cache):
@@ -469,14 +512,19 @@ def main() -> int:
         "weights_bytes": weights_bytes,
         "weights_mb": mb(weights_bytes),
         "weights_mib": mib(weights_bytes),
+        "weights_cache_bytes": cache_bytes,
+        "weights_cache_mb": mb(cache_bytes),
+        "weights_cache_overhead_mb": mb(max(0, cache_bytes - weights_bytes)),
+        "weights_cache_files_total": weights["files"],
         "weights_naive_bytes": weights["naive"],
         "weights_naive_mb": mb(weights["naive"]),
+        "weights_model_files": model["files"][:20],
         "weights_unique_bytes": weights["unique"],
         "weights_unique_mb": mb(weights["unique"]),
         "weights_dedupe_rule": (
-            "каждый файл считается один раз: жёсткие ссылки — по индексному "
-            "дескриптору, одинаковые по содержимому файлы крупнее 1 МБ — по SHA-256 "
-            "(кеш Hugging Face держит копию в буфере загрузки и в самом кеше)"
+            "веса — файлы, на которые ссылается снимок модели (каждый один раз); "
+            "объём кеша целиком приведён отдельно, вместе с буфером загрузки, "
+            "логами и служебными деревьями"
         ),
         "weights_files_total": weights["files"],
         "delivery_bytes": delivery_bytes,
@@ -485,6 +533,7 @@ def main() -> int:
         "storage_with_weights_mb": mb(storage_with_weights),
         "storage_with_weights_mib": mib(storage_with_weights),
         "storage_with_weights_full_mb": mb(storage_with_weights_full),
+        "storage_with_weights_cache_mb": mb(storage_with_weights_cache),
         "weight_files": files[:20],
         "weight_files_total": len(files),
         "site_packages_top": {key: value for key, value in list(libs_now.items())[:10]},
@@ -559,7 +608,10 @@ def main() -> int:
         f"  сырой прирост site-packages: {mb(libs_delta_bytes)} МБ; "
         f"набор: {', '.join(modules) if modules else 'проба не выполнена'}"
     )
-    print(f"веса:       {mb(weights_bytes)} МБ ({mib(weights_bytes)} МиБ), файлов {weights['files']}")
+    print(
+        f"веса:       {mb(weights_bytes)} МБ ({mib(weights_bytes)} МиБ), файлов "
+        f"{len(model['files'])}; кеш целиком {mb(cache_bytes)} МБ"
+    )
     print(f"поставка:   {mb(delivery_bytes)} МБ")
     print(f"хранение с весами: {mb(storage_with_weights)} МБ ({mib(storage_with_weights)} МиБ)")
     if os.environ.get("GITHUB_ACTIONS"):
