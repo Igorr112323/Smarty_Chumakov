@@ -438,6 +438,12 @@ jobs:
           }
           Write-Host "::notice title=размеры поставки::exe $exe байт ($exeMb МБ), pyz $pyz байт ($pyzMb МБ)"
 
+      - name: Обновить реестр чисел (reports/NUMBERS.json)
+        # Число без источника в реестре — дефект, поэтому реестр обновляется там же,
+        # где получено измерение (тот же порядок, что в задании hf-footprint):
+        # иначе файл размеров и реестр разъезжаются, и CI краснеет на сверке.
+        run: python ../scripts/build_numbers.py
+
       - name: Записать измеренные размеры в репозиторий
         # Файл reports/release_sizes.json читают реестр чисел (scripts/build_numbers.py)
         # и документ закрытия договора. Числа пишет сам прогон: сначала пробуем
@@ -462,7 +468,7 @@ jobs:
           if ("${{ github.ref }}".StartsWith("refs/heads/")) {
             git config user.name "spanverify-bot"
             git config user.email "bot@spanverify.local"
-            git add reports/release_sizes.json ../reports/release_sizes.json
+            git add reports/release_sizes.json ../reports/release_sizes.json ../reports/NUMBERS.json
             git diff --cached --quiet && Write-Host "изменений нет" && exit 0
             git commit -m "сборка ${{ github.ref_name }}: измеренные размеры поставки [skip ci]"
             for ($attempt = 1; $attempt -le 3; $attempt++) {
