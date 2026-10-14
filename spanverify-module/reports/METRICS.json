@@ -8,20 +8,19 @@
   },
   "meta": {
     "version": "1.3.1",
-    "commit": "4c2d9ed4dc9da519bcdc1f952e128bbb3b20e4f5",
-    "generated_at": "2026-10-13T19:55:06Z",
+    "commit": "50c6d586611fb7257b810d5f33627c02ac004632",
+    "generated_at": "2026-10-14T14:02:18Z",
     "seed": 42,
     "dataset": "data/demo_pairs.jsonl",
     "refresh": {
-      "at": "2026-10-13T19:55:11Z",
-      "head_commit": "4c2d9ed4dc9da519bcdc1f952e128bbb3b20e4f5",
-      "worktree": "dirty",
-      "preserved_from_commit": "09911257202f409df53b96426182d2915b70d15e",
+      "at": "2026-10-14T14:02:21Z",
+      "head_commit": "50c6d586611fb7257b810d5f33627c02ac004632",
+      "worktree": "clean",
+      "preserved_from_commit": "76bc22f3c5ae9cb1653d5c67b7b6d4c1597d3ccc",
       "preserved_blocks": [
         "pilot"
       ],
       "refreshed_blocks": [
-        "cross_corpus",
         "duration_s"
       ],
       "rule": "блоки пересобраны из артефактов прогонов; блоки, артефактов которых нет на этой машине, сохранены из прежнего файла и перечислены в preserved_blocks"
@@ -29,8 +28,8 @@
   },
   "disclaimer": "Демонстрационные метрики получены на синтетическом корпусе и научным результатом не являются. Для подтверждения требуются 1200 пар «вопрос–ответ» с экспертной разметкой на реальных регламентах организации.",
   "tests": {
-    "collected": 587,
-    "coverage_percent": 87.78,
+    "collected": 606,
+    "coverage_percent": 87.82,
     "coverage_gate_percent": 85
   },
   "demo": {
@@ -282,13 +281,13 @@
           "threshold": 1.0
         },
         "verdicts": {
-          "tp": 58,
+          "tp": 57,
           "fp": 0,
-          "fn": 41,
+          "fn": 42,
           "tn": 81,
           "precision": 1.0,
-          "recall": 0.5859,
-          "f1": 0.7389,
+          "recall": 0.5758,
+          "f1": 0.7308,
           "fpr": 0.0
         }
       }
@@ -296,7 +295,7 @@
     "by_mode": {
       "contradiction": {
         "pairs": 26,
-        "verdict_recall": 0.6154,
+        "verdict_recall": 0.5769,
         "verdict_fpr": 0.0,
         "token_f1": 0.6269,
         "span_coverage": 0.8077
@@ -433,52 +432,52 @@
     "by_split": {
       "dev": {
         "tokens": {
-          "precision": 0.7374,
-          "recall": 0.7143,
-          "f1": 0.7257,
-          "fpr": 0.0095,
-          "auc": 0.9052,
+          "precision": 0.8644,
+          "recall": 0.7108,
+          "f1": 0.7801,
+          "fpr": 0.0042,
+          "auc": 0.8933,
           "n": 7969
         },
         "spans": {
-          "strict_f1": 0.2667,
-          "coverage": 0.75,
-          "soft_f1": 0.1449,
-          "width_ratio": 10.32
+          "strict_f1": 0.5213,
+          "coverage": 0.6979,
+          "soft_f1": 0.266,
+          "width_ratio": 9.18
         },
         "answers": {
-          "precision": 0.9524,
+          "precision": 0.9756,
           "recall": 0.4167,
-          "f1": 0.5797,
-          "fpr": 0.0235,
-          "auc": 0.6966,
+          "f1": 0.5839,
+          "fpr": 0.0118,
+          "auc": 0.7025,
           "threshold": 1.0
         },
         "verdicts": {
-          "tp": 73,
-          "fp": 31,
-          "fn": 23,
-          "tn": 54,
-          "precision": 0.7019,
-          "recall": 0.7604,
-          "f1": 0.73,
-          "fpr": 0.3647
+          "tp": 62,
+          "fp": 6,
+          "fn": 34,
+          "tn": 79,
+          "precision": 0.9118,
+          "recall": 0.6458,
+          "f1": 0.7561,
+          "fpr": 0.0706
         }
       },
       "test": {
         "tokens": {
-          "precision": 0.7482,
-          "recall": 0.7402,
-          "f1": 0.7442,
-          "fpr": 0.0078,
-          "auc": 0.9129,
+          "precision": 0.8619,
+          "recall": 0.7331,
+          "f1": 0.7923,
+          "fpr": 0.0037,
+          "auc": 0.9049,
           "n": 9268
         },
         "spans": {
-          "strict_f1": 0.2687,
-          "coverage": 0.732,
-          "soft_f1": 0.125,
-          "width_ratio": 14.19
+          "strict_f1": 0.4422,
+          "coverage": 0.701,
+          "soft_f1": 0.201,
+          "width_ratio": 14.56
         },
         "answers": {
           "precision": 0.973,
@@ -489,23 +488,23 @@
           "threshold": 1.0
         },
         "verdicts": {
-          "tp": 69,
-          "fp": 31,
-          "fn": 28,
-          "tn": 49,
-          "precision": 0.69,
-          "recall": 0.7113,
-          "f1": 0.7005,
-          "fpr": 0.3875
+          "tp": 58,
+          "fp": 6,
+          "fn": 39,
+          "tn": 74,
+          "precision": 0.9062,
+          "recall": 0.5979,
+          "f1": 0.7205,
+          "fpr": 0.075
         }
       }
     },
     "by_mode": {
       "contradiction": {
         "pairs": 18,
-        "verdict_recall": 0.8333,
+        "verdict_recall": 0.7222,
         "verdict_fpr": 0.0,
-        "token_f1": 0.8308,
+        "token_f1": 0.9,
         "span_coverage": 0.9444
       },
       "excess": {
@@ -518,7 +517,7 @@
       "faithful": {
         "pairs": 80,
         "verdict_recall": 0.0,
-        "verdict_fpr": 0.3875,
+        "verdict_fpr": 0.075,
         "token_f1": 0.0,
         "span_coverage": 0.0
       },
@@ -531,9 +530,9 @@
       },
       "number_attribution": {
         "pairs": 27,
-        "verdict_recall": 0.4815,
+        "verdict_recall": 0.3333,
         "verdict_fpr": 0.0,
-        "token_f1": 0.6761,
+        "token_f1": 0.6667,
         "span_coverage": 0.6667
       },
       "oversight": {
@@ -545,16 +544,16 @@
       },
       "partial": {
         "pairs": 10,
-        "verdict_recall": 0.5,
+        "verdict_recall": 0.0,
         "verdict_fpr": 0.0,
-        "token_f1": 0.0645,
-        "span_coverage": 0.3
+        "token_f1": 0.0,
+        "span_coverage": 0.0
       },
       "unconfirmed": {
         "pairs": 10,
         "verdict_recall": 1.0,
         "verdict_fpr": 0.0,
-        "token_f1": 0.9913,
+        "token_f1": 1.0,
         "span_coverage": 1.0
       }
     }
@@ -1781,7 +1780,7 @@
     "cross_corpus_f1": 0.6752,
     "drop": 0.2824,
     "cross_fpr": 0.1478,
-    "corpus_b": {
+    "alt_generator": {
       "name": "alt-generator 1.0 (числа словами, другие шаблоны)",
       "pairs": 240,
       "seed": 4242
@@ -2535,5 +2534,5 @@
     }
   },
   "release": null,
-  "duration_s": 48.8
+  "duration_s": 27.5
 }

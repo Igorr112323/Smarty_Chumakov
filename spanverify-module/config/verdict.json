@@ -1,0 +1,11 @@
+{
+  "rule": "corroborated",
+  "params": {
+    "min_mask_tokens": 2,
+    "min_fragment_chars": 20,
+    "min_flagged_share": 0.0,
+    "text_rule_decisive": true
+  },
+  "chosen_on": "dev",
+  "target_fpr": 0.1
+}

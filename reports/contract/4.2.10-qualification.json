@@ -1,10 +1,10 @@
 {
   "id": "4.2.10-qualification",
-  "commit": "e3b2e4bb18a6136c8ba8fe33b46fefbaf75b37ce",
+  "commit": "50c6d586611fb7257b810d5f33627c02ac004632",
   "seed": 42,
   "mode": "demo",
   "dataset": "docs",
-  "date": "2026-10-14T00:46:29Z",
+  "date": "2026-10-14T14:06:52Z",
   "command": "",
   "metrics": {
     "guide": "docs/РУКОВОДСТВО.md",

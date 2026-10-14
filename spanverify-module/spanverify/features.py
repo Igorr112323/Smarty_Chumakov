@@ -996,11 +996,29 @@ def _attribute_tokens(tokens: Sequence[Token], measurements: Sequence[Measuremen
             continue
         best_index, best_score = -1, 0.0
         answer_stems = _stems(subject)
+        scores: list[float] = []
         for position, _item in enumerate(measurements):
             score = _match_by_stems(distinctive_stems[position], answer_stems)
+            scores.append(score)
             if score > best_score:
                 best_index, best_score = position, score
         if best_index < 0 or best_score < MEASUREMENT_MATCH_MIN:
+            continue
+        # Однозначность привязки. Если субъект ответа одинаково хорошо совпадает
+        # сразу с несколькими измерениями документа, к какому объекту относится
+        # число — неизвестно. Так выглядит типичный случай реального акта:
+        # «пункт 7» или «подпункты 4.1» — в акте десятки пунктов и подпунктов с
+        # теми же словами-субъектами. Обвинять честный ответ по неоднозначному
+        # совпадению нельзя (замер на корпусе A3: 28 из 80 чистых пар помечались
+        # правилом именно так). Привязка принимается, только если лучшее
+        # совпадение единственное; равные совпадения с разными значениями —
+        # признак неоднозначности, такой номер не обвиняется.
+        rivals = [
+            position
+            for position, score in enumerate(scores)
+            if position != best_index and score >= max(MEASUREMENT_MATCH_MIN, best_score - 1e-9)
+        ]
+        if any(measurements[position].value != measurements[best_index].value for position in rivals):
             continue
         matched = measurements[best_index]
         if matched.value == value:

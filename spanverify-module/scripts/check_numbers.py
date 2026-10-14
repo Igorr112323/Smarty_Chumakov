@@ -27,7 +27,17 @@ import re
 import sys
 from pathlib import Path
 
-HISTORY_DOCS = {"PROGRESS.md", "AUDIT.md"}
+# Журналы: хранят исторические числа своих прогонов (333 теста, версии 1.2.0/1.2.1,
+# AUC прошлых замеров) — сверять их с текущим METRICS.json нельзя. Требование к
+# ним одно: явная ссылка на reports/METRICS.json как источник актуальных чисел.
+HISTORY_DOCS = {
+    "PROGRESS.md",
+    "AUDIT.md",
+    "TODO_AUDIT.md",
+    "DEFECTS_D_E_evidence.md",
+    "РЕЗУЛЬТАТЫ_ПРОГОНА.md",
+    "CORPUS_REPORT.md",
+}
 
 # Корневой реестр чисел (reports/NUMBERS.json) — расширение единого файла чисел.
 # Его измерения тоже законны: документы ссылаются на них и на артефакты прогонов.
@@ -57,6 +67,14 @@ DEFAULT_DOCS = (
     "docs/ЗАКРЫТИЕ_ДОГОВОРА_ПО_КОДУ.md",
     "docs/ОТЧЁТ_ПРИЛОЖЕНИЕ_СООТВЕТСТВИЕ.md",
     "docs/ПРОВЕРКА_ОРИГИНАЛЬНОСТИ.md",
+    # Отчёты прогонов: текущие числа проверяются (CORPUS_A3), журналы прошлых
+    # прогонов обязаны ссылаться на reports/METRICS.json (см. HISTORY_DOCS).
+    "spanverify-module/reports/CORPUS_A3.md",
+    "spanverify-module/reports/README.md",
+    "spanverify-module/reports/TODO_AUDIT.md",
+    "spanverify-module/reports/РЕЗУЛЬТАТЫ_ПРОГОНА.md",
+    "spanverify-module/reports/CORPUS_REPORT.md",
+    "spanverify-module/reports/DEFECTS_D_E_evidence.md",
 )
 
 REQUIRED_IN_ITOG = (

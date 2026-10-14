@@ -1,15 +1,15 @@
 {
   "id": "4.1.1-text-limit",
-  "commit": "e3b2e4bb18a6136c8ba8fe33b46fefbaf75b37ce",
+  "commit": "50c6d586611fb7257b810d5f33627c02ac004632",
   "seed": 42,
   "mode": "demo",
   "dataset": "synthetic-2000000",
-  "date": "2026-10-14T00:46:28Z",
+  "date": "2026-10-14T14:06:51Z",
   "command": "",
   "metrics": {
     "chars": 2000000,
-    "seconds": 9.437,
-    "peak_memory_mb": 259.9,
+    "seconds": 5.269,
+    "peak_memory_mb": 261.1,
     "spans": 1
   },
   "note": "текст 2 000 000 знаков обработан",

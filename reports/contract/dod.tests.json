@@ -1,19 +1,19 @@
 {
   "id": "dod.tests",
-  "commit": "e3b2e4bb18a6136c8ba8fe33b46fefbaf75b37ce",
+  "commit": "50c6d586611fb7257b810d5f33627c02ac004632",
   "seed": 42,
   "mode": "demo",
   "dataset": "spanverify-module/tests",
-  "date": "2026-10-14T00:46:29Z",
+  "date": "2026-10-14T14:06:52Z",
   "command": "",
   "metrics": {
     "collect_returncode": 0,
-    "collected": 591,
+    "collected": 606,
     "coverage_file": "spanverify-module/reports/coverage.json",
-    "coverage_percent": 87.78,
+    "coverage_percent": 87.82,
     "coverage_gate_percent": 85,
-    "coverage_written": "2026-10-13T19:09:51Z"
+    "coverage_written": "2026-10-14T13:46:46Z"
   },
-  "note": "собрано тестов 591, покрытие 87.78 % при пороге 85 %",
+  "note": "собрано тестов 606, покрытие 87.82 % при пороге 85 %",
   "gate": null
 }
