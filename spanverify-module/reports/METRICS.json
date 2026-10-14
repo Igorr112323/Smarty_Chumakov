@@ -8,24 +8,20 @@
   },
   "meta": {
     "version": "1.3.1",
-    "commit": "76bc22f3c5ae9cb1653d5c67b7b6d4c1597d3ccc",
-    "generated_at": "2026-10-14T13:47:41Z",
+    "commit": "50c6d586611fb7257b810d5f33627c02ac004632",
+    "generated_at": "2026-10-14T14:02:18Z",
     "seed": 42,
     "dataset": "data/demo_pairs.jsonl",
     "refresh": {
-      "at": "2026-10-14T13:47:45Z",
-      "head_commit": "76bc22f3c5ae9cb1653d5c67b7b6d4c1597d3ccc",
-      "worktree": "dirty",
-      "preserved_from_commit": "4c2d9ed4dc9da519bcdc1f952e128bbb3b20e4f5",
+      "at": "2026-10-14T14:02:21Z",
+      "head_commit": "50c6d586611fb7257b810d5f33627c02ac004632",
+      "worktree": "clean",
+      "preserved_from_commit": "76bc22f3c5ae9cb1653d5c67b7b6d4c1597d3ccc",
       "preserved_blocks": [
         "pilot"
       ],
       "refreshed_blocks": [
-        "corpus_a",
-        "corpus_a3_real",
-        "cross_corpus",
-        "duration_s",
-        "tests"
+        "duration_s"
       ],
       "rule": "блоки пересобраны из артефактов прогонов; блоки, артефактов которых нет на этой машине, сохранены из прежнего файла и перечислены в preserved_blocks"
     }
@@ -2538,5 +2534,5 @@
     }
   },
   "release": null,
-  "duration_s": 27.7
+  "duration_s": 27.5
 }

@@ -12,9 +12,9 @@
   "seed": 42,
   "target_fpr": 0.1,
   "bundle": "обучение на train (842 пар), seed 42, фолдов 5",
-  "commit": "637a56215f2a622e857a2fbbadd633f96b47e25b",
-  "generated_at": "2026-10-14T13:53:00Z",
-  "duration_s": 244.2,
+  "commit": "50c6d586611fb7257b810d5f33627c02ac004632",
+  "generated_at": "2026-10-14T14:06:26Z",
+  "duration_s": 244.5,
   "command": "python scripts/calibrate_verdict.py --dataset data/corpus_a3/pairs.jsonl --splits data/corpus_a3/splits --mode demo --seed 42 --target-fpr 0.1 --freeze config/verdict.json --out reports/verdict_calibration.json --also data/corpus_a/pairs.jsonl --evidence-dir reports/verdict --save-bundle reports/verdict/bundle_a3_demo.json",
   "rule": "corroborated",
   "params": {
