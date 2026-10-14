@@ -1,0 +1,484 @@
+{
+  "kind": "ci_workflows",
+  "runs_considered": 100,
+  "generated_at": "2026-10-14T00:45:19Z",
+  "command": "python scripts/collect_ci_workflows.py",
+  "source": ".github/workflows/*.yml + reports/CI_RUNS.json",
+  "registry": {
+    "ci": "reports/METRICS.json, reports/contract/*.json",
+    "build-and-release-exe": "reports/release_sizes.json (spanverify.exe, spanverify.pyz)",
+    "hf-footprint": "reports/contract/4.2.5-hf-footprint.json, reports/contract/4.2.6-storage.json",
+    "hf-pilot": "spanverify-module/reports/pilot/pilot.json",
+    "corpus-a3": "reports/ext_*.json, spanverify-module/data/corpus_a3/manifest.json"
+  },
+  "workflows": [
+    {
+      "file": ".github/workflows/build-and-release-exe.yml",
+      "name": "build-and-release-exe",
+      "triggers": [
+        "workflow_dispatch",
+        "push"
+      ],
+      "schedule": [],
+      "push_paths": [
+        ".github/exe-build.trigger"
+      ],
+      "push_branches": [
+        "main",
+        "arena/**"
+      ],
+      "push_tags": [
+        "v*"
+      ],
+      "jobs": [
+        {
+          "name": "Тесты (Python ${{ matrix.python }})",
+          "timeout_minutes": 40,
+          "steps": 5,
+          "uploads_artifacts": false,
+          "runs_python": "ubuntu-latest"
+        },
+        {
+          "name": "Сборка и проверка .exe",
+          "timeout_minutes": 40,
+          "steps": 19,
+          "uploads_artifacts": true,
+          "runs_python": "windows-latest"
+        }
+      ],
+      "manual_only": true,
+      "never_runs_by_itself": false
+    },
+    {
+      "file": ".github/workflows/ci.yml",
+      "name": "ci",
+      "triggers": [
+        "push",
+        "pull_request",
+        "workflow_dispatch",
+        "schedule"
+      ],
+      "schedule": [
+        "30 2 * * *"
+      ],
+      "push_paths": [],
+      "push_branches": [
+        "main",
+        "arena/**"
+      ],
+      "push_tags": [],
+      "jobs": [
+        {
+          "name": "Линтер, форматирование, покрытие",
+          "timeout_minutes": 40,
+          "steps": 11,
+          "uploads_artifacts": true,
+          "runs_python": "ubuntu-latest"
+        },
+        {
+          "name": "Соответствие договору (проект 117812)",
+          "timeout_minutes": 40,
+          "steps": 9,
+          "uploads_artifacts": true,
+          "runs_python": "ubuntu-latest"
+        },
+        {
+          "name": "Тесты (Python ${{ matrix.python }}, ${{ matrix.os }})",
+          "timeout_minutes": 30,
+          "steps": 6,
+          "uploads_artifacts": false,
+          "runs_python": "${{ matrix.os }}"
+        },
+        {
+          "name": "Пилот на реальной модели (rugpt3small, CPU)",
+          "timeout_minutes": 40,
+          "steps": 8,
+          "uploads_artifacts": true,
+          "runs_python": "ubuntu-latest"
+        },
+        {
+          "name": "Единый файл чисел (METRICS.json) и сверка документов",
+          "timeout_minutes": 30,
+          "steps": 11,
+          "uploads_artifacts": true,
+          "runs_python": "ubuntu-latest"
+        },
+        {
+          "name": "Внешние размеченные наборы (скачивание, контрольные числа, оценка)",
+          "timeout_minutes": 40,
+          "steps": 11,
+          "uploads_artifacts": true,
+          "runs_python": "ubuntu-latest"
+        },
+        {
+          "name": "Разведка официальных источников (не блокирует CI)",
+          "timeout_minutes": 40,
+          "steps": 17,
+          "uploads_artifacts": true,
+          "runs_python": "ubuntu-latest"
+        }
+      ],
+      "manual_only": false,
+      "never_runs_by_itself": false
+    },
+    {
+      "file": ".github/workflows/corpus-a3.yml",
+      "name": "Корпус A3 (реальные акты, срезы)",
+      "triggers": [
+        "workflow_dispatch",
+        "push"
+      ],
+      "schedule": [],
+      "push_paths": [
+        ".github/corpus-a3.trigger"
+      ],
+      "push_branches": [
+        "arena/**"
+      ],
+      "push_tags": [],
+      "jobs": [
+        {
+          "name": "Срез «${{ matrix.title }}»",
+          "timeout_minutes": 40,
+          "steps": 8,
+          "uploads_artifacts": true,
+          "runs_python": "ubuntu-latest"
+        },
+        {
+          "name": "Сборка волны",
+          "timeout_minutes": 15,
+          "steps": 3,
+          "uploads_artifacts": true,
+          "runs_python": "ubuntu-latest"
+        },
+        {
+          "name": "Замер скорости распознавания",
+          "timeout_minutes": 40,
+          "steps": 6,
+          "uploads_artifacts": true,
+          "runs_python": "ubuntu-latest"
+        },
+        {
+          "name": "Архив волны в ветку данных",
+          "timeout_minutes": 15,
+          "steps": 4,
+          "uploads_artifacts": false,
+          "runs_python": "ubuntu-latest"
+        }
+      ],
+      "manual_only": true,
+      "never_runs_by_itself": false
+    },
+    {
+      "file": ".github/workflows/hf-analysis.yml",
+      "name": "Разбор ложных пометок по кешу",
+      "triggers": [
+        "workflow_dispatch",
+        "push"
+      ],
+      "schedule": [],
+      "push_paths": [
+        ".github/hf-analysis.trigger"
+      ],
+      "push_branches": [
+        "arena/**"
+      ],
+      "push_tags": [],
+      "jobs": [
+        {
+          "name": "Чистые пары теста: разбор по кешу",
+          "timeout_minutes": 30,
+          "steps": 8,
+          "uploads_artifacts": true,
+          "runs_python": "ubuntu-latest"
+        }
+      ],
+      "manual_only": true,
+      "never_runs_by_itself": false
+    },
+    {
+      "file": ".github/workflows/hf-collect.yml",
+      "name": "Свести числа экспериментов hf",
+      "triggers": [
+        "push"
+      ],
+      "schedule": [],
+      "push_paths": [
+        ".github/hf-collect.trigger"
+      ],
+      "push_branches": [
+        "arena/**"
+      ],
+      "push_tags": [],
+      "jobs": [
+        {
+          "name": "Свести числа из прогона",
+          "timeout_minutes": 25,
+          "steps": 8,
+          "uploads_artifacts": true,
+          "runs_python": "ubuntu-latest"
+        }
+      ],
+      "manual_only": false,
+      "never_runs_by_itself": false
+    },
+    {
+      "file": ".github/workflows/hf-experiments.yml",
+      "name": "Эксперименты hf (корпуса A3 и A)",
+      "triggers": [
+        "workflow_dispatch",
+        "push"
+      ],
+      "schedule": [],
+      "push_paths": [
+        ".github/hf-experiments.trigger"
+      ],
+      "push_branches": [
+        "arena/**"
+      ],
+      "push_tags": [],
+      "jobs": [
+        {
+          "name": "Признаки A3 (шард ${{ matrix.shard }}/4)",
+          "timeout_minutes": 35,
+          "steps": 5,
+          "uploads_artifacts": true,
+          "runs_python": "ubuntu-latest"
+        },
+        {
+          "name": "Признаки A (шард ${{ matrix.shard }}/5)",
+          "timeout_minutes": 35,
+          "steps": 5,
+          "uploads_artifacts": true,
+          "runs_python": "ubuntu-latest"
+        },
+        {
+          "name": "Эксперимент A3 (реальные акты)",
+          "timeout_minutes": 40,
+          "steps": 7,
+          "uploads_artifacts": true,
+          "runs_python": "ubuntu-latest"
+        },
+        {
+          "name": "Эксперимент A (синтетика)",
+          "timeout_minutes": 40,
+          "steps": 7,
+          "uploads_artifacts": true,
+          "runs_python": "ubuntu-latest"
+        },
+        {
+          "name": "Свести числа и сохранить",
+          "timeout_minutes": 20,
+          "steps": 8,
+          "uploads_artifacts": true,
+          "runs_python": "ubuntu-latest"
+        }
+      ],
+      "manual_only": true,
+      "never_runs_by_itself": false
+    },
+    {
+      "file": ".github/workflows/hf-footprint.yml",
+      "name": "hf-footprint",
+      "triggers": [
+        "workflow_dispatch",
+        "push"
+      ],
+      "schedule": [],
+      "push_paths": [
+        ".github/hf-footprint.trigger"
+      ],
+      "push_branches": [
+        "arena/**"
+      ],
+      "push_tags": [],
+      "jobs": [
+        {
+          "name": "Объёмы библиотек, весов и поставки",
+          "timeout_minutes": 40,
+          "steps": 10,
+          "uploads_artifacts": true,
+          "runs_python": "ubuntu-latest"
+        }
+      ],
+      "manual_only": true,
+      "never_runs_by_itself": false
+    },
+    {
+      "file": ".github/workflows/hf-pilot.yml",
+      "name": "Пилот hf (признаки, реальная модель)",
+      "triggers": [
+        "workflow_dispatch",
+        "push"
+      ],
+      "schedule": [],
+      "push_paths": [
+        ".github/hf-pilot.trigger"
+      ],
+      "push_branches": [
+        "arena/**"
+      ],
+      "push_tags": [],
+      "jobs": [
+        {
+          "name": "Пилот: AUC признаков по слоям",
+          "timeout_minutes": 40,
+          "steps": 7,
+          "uploads_artifacts": true,
+          "runs_python": "ubuntu-latest"
+        }
+      ],
+      "manual_only": true,
+      "never_runs_by_itself": false
+    },
+    {
+      "file": ".github/workflows/hf-remeasure.yml",
+      "name": "Пересчёт hf на кеше признаков",
+      "triggers": [
+        "push"
+      ],
+      "schedule": [],
+      "push_paths": [
+        ".github/hf-remeasure.trigger"
+      ],
+      "push_branches": [
+        "arena/**"
+      ],
+      "push_tags": [],
+      "jobs": [
+        {
+          "name": "Эксперимент ${{ matrix.corpus }} на кеше",
+          "timeout_minutes": 40,
+          "steps": 7,
+          "uploads_artifacts": true,
+          "runs_python": "ubuntu-latest"
+        },
+        {
+          "name": "Сохранить пересчёт",
+          "timeout_minutes": 15,
+          "steps": 4,
+          "uploads_artifacts": false,
+          "runs_python": "ubuntu-latest"
+        }
+      ],
+      "manual_only": false,
+      "never_runs_by_itself": false
+    },
+    {
+      "file": ".github/workflows/hf-runs.yml",
+      "name": "Тяжёлые прогоны hf",
+      "triggers": [
+        "workflow_dispatch",
+        "push"
+      ],
+      "schedule": [],
+      "push_paths": [
+        ".github/hf-runs.trigger"
+      ],
+      "push_branches": [
+        "arena/**"
+      ],
+      "push_tags": [],
+      "jobs": [
+        {
+          "name": "Пилот hf",
+          "timeout_minutes": 90,
+          "steps": 6,
+          "uploads_artifacts": true,
+          "runs_python": "ubuntu-latest"
+        },
+        {
+          "name": "Эксперимент hf, корпус A3",
+          "timeout_minutes": 180,
+          "steps": 6,
+          "uploads_artifacts": true,
+          "runs_python": "ubuntu-latest"
+        },
+        {
+          "name": "Эксперимент hf, корпус A",
+          "timeout_minutes": 180,
+          "steps": 6,
+          "uploads_artifacts": true,
+          "runs_python": "ubuntu-latest"
+        },
+        {
+          "name": "Внешний срез hf",
+          "timeout_minutes": 90,
+          "steps": 6,
+          "uploads_artifacts": true,
+          "runs_python": "ubuntu-latest"
+        },
+        {
+          "name": "Сбор чисел",
+          "timeout_minutes": 45,
+          "steps": 12,
+          "uploads_artifacts": true,
+          "runs_python": "ubuntu-latest"
+        },
+        {
+          "name": "Сохранить результаты",
+          "timeout_minutes": 15,
+          "steps": 10,
+          "uploads_artifacts": true,
+          "runs_python": "ubuntu-latest"
+        }
+      ],
+      "manual_only": true,
+      "never_runs_by_itself": false
+    },
+    {
+      "file": ".github/workflows/hf-salvage.yml",
+      "name": "Забрать числа hf",
+      "triggers": [
+        "workflow_dispatch",
+        "push"
+      ],
+      "schedule": [],
+      "push_paths": [
+        ".github/hf-salvage.trigger"
+      ],
+      "push_branches": [
+        "arena/**"
+      ],
+      "push_tags": [],
+      "jobs": [
+        {
+          "name": "Забрать артефакты прогона",
+          "timeout_minutes": 15,
+          "steps": 5,
+          "uploads_artifacts": false,
+          "runs_python": "ubuntu-latest"
+        }
+      ],
+      "manual_only": true,
+      "never_runs_by_itself": false
+    },
+    {
+      "file": ".github/workflows/hf-span-filter.yml",
+      "name": "Маска: сравнение варианта с фильтром коротких фрагментов",
+      "triggers": [
+        "workflow_dispatch",
+        "push"
+      ],
+      "schedule": [],
+      "push_paths": [
+        ".github/hf-span-filter.trigger"
+      ],
+      "push_branches": [
+        "arena/**"
+      ],
+      "push_tags": [],
+      "jobs": [
+        {
+          "name": "Сравнение двух вариантов маски на кеше (выбор по train)",
+          "timeout_minutes": 40,
+          "steps": 9,
+          "uploads_artifacts": true,
+          "runs_python": "ubuntu-latest"
+        }
+      ],
+      "manual_only": true,
+      "never_runs_by_itself": false
+    }
+  ]
+}
