@@ -1,26 +1,26 @@
 {
   "id": "4.2.1-delivery-size",
-  "commit": "e3b2e4bb18a6136c8ba8fe33b46fefbaf75b37ce",
+  "commit": "637a56215f2a622e857a2fbbadd633f96b47e25b",
   "seed": 42,
   "mode": "demo",
   "dataset": "spanverify.pyz",
-  "date": "2026-10-14T00:46:28Z",
+  "date": "2026-10-14T13:56:56Z",
   "command": "",
   "metrics": {
-    "pyz_size_mb": 0.1633,
-    "pyz_size_mb_decimal": 0.1712,
-    "pyz_size_bytes": 171242,
+    "pyz_size_mb": 0.1656,
+    "pyz_size_mb_decimal": 0.1737,
+    "pyz_size_bytes": 173653,
     "limit_mb": 0.6,
     "release_pyz_size_bytes": 539191,
     "release_exe_size_bytes": 9134317,
     "release_exe_size_mb": 8.7112,
     "release_tag": "v1.3.0",
     "exe_limit_mb": 9.0,
-    "pyz_bytes": 171242,
+    "pyz_bytes": 173653,
     "pyz_ok_in_both_readings": true,
     "exe_ok_mib": true,
     "exe_ok_decimal_mb": false
   },
-  "note": "второй вариант поставки выполнен: пакет 171242 байт (0.1633 МиБ / 0.1712 МБ) укладывается в 0,6 МБ при любой трактовке; опубликованный файл .exe — 9134317 байт",
+  "note": "второй вариант поставки выполнен: пакет 173653 байт (0.1656 МиБ / 0.1737 МБ) укладывается в 0,6 МБ при любой трактовке; опубликованный файл .exe — 9134317 байт",
   "gate": null
 }

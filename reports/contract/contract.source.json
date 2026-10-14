@@ -1,10 +1,10 @@
 {
   "id": "contract.source",
-  "commit": "e3b2e4bb18a6136c8ba8fe33b46fefbaf75b37ce",
+  "commit": "637a56215f2a622e857a2fbbadd633f96b47e25b",
   "seed": 42,
-  "mode": "pdf",
+  "mode": "extraction",
   "dataset": "договор № 20478ГУ/2026, проект 117812",
-  "date": "2026-10-14T00:46:30Z",
+  "date": "2026-10-14T13:56:57Z",
   "command": "",
   "metrics": {
     "compared": {
@@ -89,14 +89,14 @@
     },
     "compared_total": 13,
     "mismatches": [],
-    "pdf_present": true,
-    "pdf_path_kind": "переменная окружения",
+    "pdf_present": false,
+    "pdf_path_kind": "корень репозитория",
     "pdf_sha256": "e5eb6ad8522fa70135f75bf22b0b5f3464fcc17d9c6f04d81b48976a42e69cd5",
     "pdf_bytes": 5019351,
-    "pdf_markers_checked": 30,
-    "pdf_markers_missing": [],
+    "pdf_pages": 32,
+    "note_pdf": "подписанный PDF не хранится в публичном репозитории (персональные данные); требования сверены по извлечению и хешу файла",
     "problems": []
   },
-  "note": "13 требований договора совпали с константами кода; проверено по: текст подписанного PDF",
+  "note": "13 требований договора совпали с константами кода; проверено по: извлечение требований",
   "gate": null
 }

@@ -1,10 +1,10 @@
 {
   "id": "4.1.8-interfaces",
-  "commit": "e3b2e4bb18a6136c8ba8fe33b46fefbaf75b37ce",
+  "commit": "637a56215f2a622e857a2fbbadd633f96b47e25b",
   "seed": 42,
   "mode": "demo",
   "dataset": "api-smoke",
-  "date": "2026-10-14T00:46:28Z",
+  "date": "2026-10-14T13:56:56Z",
   "command": "",
   "metrics": {
     "cli_returncode": 1,

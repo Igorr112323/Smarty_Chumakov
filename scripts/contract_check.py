@@ -361,6 +361,42 @@ def dir_size_mb(path: Path) -> float:
     return round(total / (1024 * 1024), 3)
 
 
+#: Каталоги, которых не бывает в поставке: окружение разработчика, кэши
+#: инструментов, артефакты сборки. В чистый клон они не попадают (перечислены в
+#: .gitignore), но на рабочей машине занимают десятки мегабайт: считать их
+#: «поставкой без весов» — значит мерить машину, а не продукт.
+DELIVERY_SKIP_DIRS = frozenset(
+    {".git", ".venv", "venv", "__pycache__", ".ruff_cache", ".pytest_cache", ".mypy_cache", "build", "dist"}
+)
+#: Пути относительно каталога модуля, которые в поставку не входят: сырые внешние
+#: данные (лицензия не подтверждена, каталог в .gitignore, в клон не попадает).
+DELIVERY_SKIP_PATHS = ("data/external",)
+
+
+def delivery_size_mb(root: Path) -> float:
+    """Размер поставки: файлы клона без каталогов разработки и сырых внешних данных.
+
+    Правило одно и то же локально и в CI: в CI каталогов разработки просто нет,
+    поэтому число совпадает с чистым клоном, а не с машиной разработчика.
+    """
+    root = root.resolve()
+    total = 0
+    for item in root.rglob("*"):
+        if not item.is_file():
+            continue
+        rel = item.relative_to(root)
+        if any(part in DELIVERY_SKIP_DIRS for part in rel.parts):
+            continue
+        text = rel.as_posix()
+        if any(text == skip or text.startswith(skip + "/") for skip in DELIVERY_SKIP_PATHS):
+            continue
+        try:
+            total += item.stat().st_size
+        except OSError:  # pragma: no cover - файл исчез во время обхода
+            continue
+    return round(total / (1024 * 1024), 3)
+
+
 def sha256_of(path: Path) -> str:
     digest = hashlib.sha256()
     with path.open("rb") as handle:
@@ -733,12 +769,16 @@ print(json.dumps({{
             copied = workdir / "copy.pyz"
             shutil.copy2(out_pyz, copied)
             payload["copy_sha256_equal"] = sha256_of(copied) == payload["pyz_sha256"]
-        payload["module_size_mb"] = dir_size_mb(MODULE)
+        payload["module_size_mb"] = delivery_size_mb(MODULE)
         payload["module_size_without_data_mb"] = round(
-            dir_size_mb(MODULE / "spanverify") + dir_size_mb(MODULE / "config"), 3
+            delivery_size_mb(MODULE / "spanverify") + delivery_size_mb(MODULE / "config"), 3
         )
         data_dir = MODULE / "data"
-        payload["data_dir_mb"] = dir_size_mb(data_dir) if data_dir.is_dir() else None
+        payload["data_dir_mb"] = delivery_size_mb(data_dir) if data_dir.is_dir() else None
+        payload["size_rule"] = (
+            "размер поставки — файлы клона без каталогов разработки (.venv, кэши, build/dist) "
+            "и без сырых внешних данных (data/external)"
+        )
         shutil.rmtree(workdir, ignore_errors=True)
         self.shared["delivery"] = payload
         return payload
@@ -1592,6 +1632,9 @@ def check_hf_footprint(runner: Runner) -> tuple[str, dict[str, Any], str]:
         "libraries_mb": None,
         "weights_mb": None,
         "dataset": "hf-mode",
+        # Артефакт принадлежит CI-заданию hf-footprint: локальный прогон не имеет
+        # права затирать измерение отчётом о том, что измерения не было.
+        "_keep_artifact": True,
     }
     if payload is None:
         return (
@@ -1643,7 +1686,10 @@ def check_hf_footprint(runner: Runner) -> tuple[str, dict[str, Any], str]:
     id="4.2.6-storage",
     point="ТЗ п. 4.2",
     requirement="Хранение: ≤ 100 МБ (без весов) и ≤ 1,5 ГБ (с весами)",
-    how="замер объёма поставки без весов; объём с весами измеряется на машине с кэшем",
+    how=(
+        "замер объёма поставки без весов (файлы клона без .venv, кэшей, build/dist и сырых "
+        "внешних данных data/external); объём с весами измеряется на машине с кэшем"
+    ),
     command="python scripts/contract_check.py --only 4.2.6-storage",
 )
 def check_storage(runner: Runner) -> tuple[str, dict[str, Any], str]:
@@ -1662,6 +1708,9 @@ def check_storage(runner: Runner) -> tuple[str, dict[str, Any], str]:
         "limit_without_weights_mb": 100.0,
         "limit_with_weights_mb": 1500.0,
         "dataset": "spanverify-module",
+        # Артефакт с объёмом «с весами» пишет CI-задание hf-footprint: локальный
+        # прогон не должен затирать его своим «не измерено».
+        "_keep_artifact": True,
     }
     if problems:
         return STATUS_FAIL, fact, "; ".join(problems)

@@ -1,0 +1,695 @@
+{
+  "dataset": "data/corpus_a3/pairs.jsonl",
+  "splits": "data/corpus_a3/splits",
+  "split_sizes": {
+    "train": 842,
+    "dev": 181,
+    "test": 177
+  },
+  "dataset_sha256": "b9a4cf05a9078644dd539470481a1b8079aed2d9201e195c3ecd901276ff7c8e",
+  "mode": "demo",
+  "model": "ai-forever/rugpt3small_based_on_gpt2",
+  "seed": 42,
+  "target_fpr": 0.1,
+  "bundle": "обучение на train (842 пар), seed 42, фолдов 5",
+  "commit": "637a56215f2a622e857a2fbbadd633f96b47e25b",
+  "generated_at": "2026-10-14T13:53:00Z",
+  "duration_s": 244.2,
+  "command": "python scripts/calibrate_verdict.py --dataset data/corpus_a3/pairs.jsonl --splits data/corpus_a3/splits --mode demo --seed 42 --target-fpr 0.1 --freeze config/verdict.json --out reports/verdict_calibration.json --also data/corpus_a/pairs.jsonl --evidence-dir reports/verdict --save-bundle reports/verdict/bundle_a3_demo.json",
+  "rule": "corroborated",
+  "params": {
+    "min_mask_tokens": 2,
+    "min_fragment_chars": 20,
+    "min_flagged_share": 0.0,
+    "text_rule_decisive": true
+  },
+  "chosen_on": "dev",
+  "selection": {
+    "stage": "выбор внутри цели FPR ≤ 0.1",
+    "target_fpr": 0.1,
+    "grid_size": 810,
+    "points_within_target": 810,
+    "points_within_double_target": 810,
+    "rule": "параметры выбираются на dev по объявленному правилу: максимум F1 при FPR ≤ цели, иначе ближайшая достижимая зона; тест в выборе не участвует"
+  },
+  "dev": {
+    "rule_any_span": {
+      "tp": 75,
+      "fp": 7,
+      "fn": 21,
+      "tn": 78,
+      "precision": 0.9146,
+      "recall": 0.7812,
+      "f1": 0.8427,
+      "fpr": 0.0824,
+      "flagged_share": 0.453,
+      "pairs": 181
+    },
+    "rule_min_two_tokens": {
+      "tp": 73,
+      "fp": 7,
+      "fn": 23,
+      "tn": 78,
+      "precision": 0.9125,
+      "recall": 0.7604,
+      "f1": 0.8295,
+      "fpr": 0.0824,
+      "flagged_share": 0.442,
+      "pairs": 181
+    },
+    "rule_corroborated": {
+      "tp": 73,
+      "fp": 7,
+      "fn": 23,
+      "tn": 78,
+      "precision": 0.9125,
+      "recall": 0.7604,
+      "f1": 0.8295,
+      "fpr": 0.0824,
+      "flagged_share": 0.442,
+      "pairs": 181
+    }
+  },
+  "test": {
+    "rule_any_span": {
+      "tp": 78,
+      "fp": 7,
+      "fn": 19,
+      "tn": 73,
+      "precision": 0.9176,
+      "recall": 0.8041,
+      "f1": 0.8571,
+      "fpr": 0.0875,
+      "flagged_share": 0.4802,
+      "pairs": 177
+    },
+    "rule_min_two_tokens": {
+      "tp": 74,
+      "fp": 7,
+      "fn": 23,
+      "tn": 73,
+      "precision": 0.9136,
+      "recall": 0.7629,
+      "f1": 0.8315,
+      "fpr": 0.0875,
+      "flagged_share": 0.4576,
+      "pairs": 177
+    },
+    "rule_corroborated": {
+      "tp": 74,
+      "fp": 7,
+      "fn": 23,
+      "tn": 73,
+      "precision": 0.9136,
+      "recall": 0.7629,
+      "f1": 0.8315,
+      "fpr": 0.0875,
+      "flagged_share": 0.4576,
+      "pairs": 177
+    }
+  },
+  "control_other_corpus": {
+    "dataset": "data/corpus_a/pairs.jsonl",
+    "rules_by_split": {
+      "dev": {
+        "rule_any_span": {
+          "tp": 52,
+          "fp": 0,
+          "fn": 40,
+          "tn": 88,
+          "precision": 1.0,
+          "recall": 0.5652,
+          "f1": 0.7222,
+          "fpr": 0.0,
+          "flagged_share": 0.2889,
+          "pairs": 180
+        },
+        "rule_min_two_tokens": {
+          "tp": 52,
+          "fp": 0,
+          "fn": 40,
+          "tn": 88,
+          "precision": 1.0,
+          "recall": 0.5652,
+          "f1": 0.7222,
+          "fpr": 0.0,
+          "flagged_share": 0.2889,
+          "pairs": 180
+        },
+        "rule_corroborated": {
+          "tp": 52,
+          "fp": 0,
+          "fn": 40,
+          "tn": 88,
+          "precision": 1.0,
+          "recall": 0.5652,
+          "f1": 0.7222,
+          "fpr": 0.0,
+          "flagged_share": 0.2889,
+          "pairs": 180
+        }
+      },
+      "test": {
+        "rule_any_span": {
+          "tp": 64,
+          "fp": 0,
+          "fn": 35,
+          "tn": 81,
+          "precision": 1.0,
+          "recall": 0.6465,
+          "f1": 0.7853,
+          "fpr": 0.0,
+          "flagged_share": 0.3556,
+          "pairs": 180
+        },
+        "rule_min_two_tokens": {
+          "tp": 64,
+          "fp": 0,
+          "fn": 35,
+          "tn": 81,
+          "precision": 1.0,
+          "recall": 0.6465,
+          "f1": 0.7853,
+          "fpr": 0.0,
+          "flagged_share": 0.3556,
+          "pairs": 180
+        },
+        "rule_corroborated": {
+          "tp": 64,
+          "fp": 0,
+          "fn": 35,
+          "tn": 81,
+          "precision": 1.0,
+          "recall": 0.6465,
+          "f1": 0.7853,
+          "fpr": 0.0,
+          "flagged_share": 0.3556,
+          "pairs": 180
+        }
+      }
+    }
+  },
+  "frontier_dev": [
+    {
+      "params": {
+        "min_mask_tokens": 2,
+        "min_fragment_chars": 20,
+        "min_flagged_share": 0.0,
+        "text_rule_decisive": true
+      },
+      "dev": {
+        "tp": 73,
+        "fp": 7,
+        "fn": 23,
+        "tn": 78,
+        "precision": 0.9125,
+        "recall": 0.7604,
+        "f1": 0.8295,
+        "fpr": 0.0824,
+        "flagged_share": 0.442,
+        "pairs": 181
+      }
+    },
+    {
+      "params": {
+        "min_mask_tokens": 2,
+        "min_fragment_chars": 0,
+        "min_flagged_share": 0.0,
+        "text_rule_decisive": true
+      },
+      "dev": {
+        "tp": 73,
+        "fp": 7,
+        "fn": 23,
+        "tn": 78,
+        "precision": 0.9125,
+        "recall": 0.7604,
+        "f1": 0.8295,
+        "fpr": 0.0824,
+        "flagged_share": 0.442,
+        "pairs": 181
+      }
+    },
+    {
+      "params": {
+        "min_mask_tokens": 3,
+        "min_fragment_chars": 20,
+        "min_flagged_share": 0.0,
+        "text_rule_decisive": true
+      },
+      "dev": {
+        "tp": 72,
+        "fp": 7,
+        "fn": 24,
+        "tn": 78,
+        "precision": 0.9114,
+        "recall": 0.75,
+        "f1": 0.8229,
+        "fpr": 0.0824,
+        "flagged_share": 0.4365,
+        "pairs": 181
+      }
+    },
+    {
+      "params": {
+        "min_mask_tokens": 3,
+        "min_fragment_chars": 0,
+        "min_flagged_share": 0.0,
+        "text_rule_decisive": true
+      },
+      "dev": {
+        "tp": 72,
+        "fp": 7,
+        "fn": 24,
+        "tn": 78,
+        "precision": 0.9114,
+        "recall": 0.75,
+        "f1": 0.8229,
+        "fpr": 0.0824,
+        "flagged_share": 0.4365,
+        "pairs": 181
+      }
+    },
+    {
+      "params": {
+        "min_mask_tokens": 2,
+        "min_fragment_chars": 60,
+        "min_flagged_share": 0.0,
+        "text_rule_decisive": true
+      },
+      "dev": {
+        "tp": 72,
+        "fp": 7,
+        "fn": 24,
+        "tn": 78,
+        "precision": 0.9114,
+        "recall": 0.75,
+        "f1": 0.8229,
+        "fpr": 0.0824,
+        "flagged_share": 0.4365,
+        "pairs": 181
+      }
+    },
+    {
+      "params": {
+        "min_mask_tokens": 2,
+        "min_fragment_chars": 40,
+        "min_flagged_share": 0.0,
+        "text_rule_decisive": true
+      },
+      "dev": {
+        "tp": 72,
+        "fp": 7,
+        "fn": 24,
+        "tn": 78,
+        "precision": 0.9114,
+        "recall": 0.75,
+        "f1": 0.8229,
+        "fpr": 0.0824,
+        "flagged_share": 0.4365,
+        "pairs": 181
+      }
+    },
+    {
+      "params": {
+        "min_mask_tokens": 2,
+        "min_fragment_chars": 20,
+        "min_flagged_share": 0.02,
+        "text_rule_decisive": true
+      },
+      "dev": {
+        "tp": 72,
+        "fp": 7,
+        "fn": 24,
+        "tn": 78,
+        "precision": 0.9114,
+        "recall": 0.75,
+        "f1": 0.8229,
+        "fpr": 0.0824,
+        "flagged_share": 0.4365,
+        "pairs": 181
+      }
+    },
+    {
+      "params": {
+        "min_mask_tokens": 2,
+        "min_fragment_chars": 0,
+        "min_flagged_share": 0.02,
+        "text_rule_decisive": true
+      },
+      "dev": {
+        "tp": 72,
+        "fp": 7,
+        "fn": 24,
+        "tn": 78,
+        "precision": 0.9114,
+        "recall": 0.75,
+        "f1": 0.8229,
+        "fpr": 0.0824,
+        "flagged_share": 0.4365,
+        "pairs": 181
+      }
+    },
+    {
+      "params": {
+        "min_mask_tokens": 3,
+        "min_fragment_chars": 60,
+        "min_flagged_share": 0.0,
+        "text_rule_decisive": true
+      },
+      "dev": {
+        "tp": 71,
+        "fp": 7,
+        "fn": 25,
+        "tn": 78,
+        "precision": 0.9103,
+        "recall": 0.7396,
+        "f1": 0.8161,
+        "fpr": 0.0824,
+        "flagged_share": 0.4309,
+        "pairs": 181
+      }
+    },
+    {
+      "params": {
+        "min_mask_tokens": 3,
+        "min_fragment_chars": 40,
+        "min_flagged_share": 0.0,
+        "text_rule_decisive": true
+      },
+      "dev": {
+        "tp": 71,
+        "fp": 7,
+        "fn": 25,
+        "tn": 78,
+        "precision": 0.9103,
+        "recall": 0.7396,
+        "f1": 0.8161,
+        "fpr": 0.0824,
+        "flagged_share": 0.4309,
+        "pairs": 181
+      }
+    },
+    {
+      "params": {
+        "min_mask_tokens": 3,
+        "min_fragment_chars": 20,
+        "min_flagged_share": 0.02,
+        "text_rule_decisive": true
+      },
+      "dev": {
+        "tp": 71,
+        "fp": 7,
+        "fn": 25,
+        "tn": 78,
+        "precision": 0.9103,
+        "recall": 0.7396,
+        "f1": 0.8161,
+        "fpr": 0.0824,
+        "flagged_share": 0.4309,
+        "pairs": 181
+      }
+    },
+    {
+      "params": {
+        "min_mask_tokens": 3,
+        "min_fragment_chars": 0,
+        "min_flagged_share": 0.02,
+        "text_rule_decisive": true
+      },
+      "dev": {
+        "tp": 71,
+        "fp": 7,
+        "fn": 25,
+        "tn": 78,
+        "precision": 0.9103,
+        "recall": 0.7396,
+        "f1": 0.8161,
+        "fpr": 0.0824,
+        "flagged_share": 0.4309,
+        "pairs": 181
+      }
+    },
+    {
+      "params": {
+        "min_mask_tokens": 2,
+        "min_fragment_chars": 60,
+        "min_flagged_share": 0.02,
+        "text_rule_decisive": true
+      },
+      "dev": {
+        "tp": 71,
+        "fp": 7,
+        "fn": 25,
+        "tn": 78,
+        "precision": 0.9103,
+        "recall": 0.7396,
+        "f1": 0.8161,
+        "fpr": 0.0824,
+        "flagged_share": 0.4309,
+        "pairs": 181
+      }
+    },
+    {
+      "params": {
+        "min_mask_tokens": 2,
+        "min_fragment_chars": 40,
+        "min_flagged_share": 0.02,
+        "text_rule_decisive": true
+      },
+      "dev": {
+        "tp": 71,
+        "fp": 7,
+        "fn": 25,
+        "tn": 78,
+        "precision": 0.9103,
+        "recall": 0.7396,
+        "f1": 0.8161,
+        "fpr": 0.0824,
+        "flagged_share": 0.4309,
+        "pairs": 181
+      }
+    },
+    {
+      "params": {
+        "min_mask_tokens": 3,
+        "min_fragment_chars": 60,
+        "min_flagged_share": 0.02,
+        "text_rule_decisive": true
+      },
+      "dev": {
+        "tp": 70,
+        "fp": 7,
+        "fn": 26,
+        "tn": 78,
+        "precision": 0.9091,
+        "recall": 0.7292,
+        "f1": 0.8092,
+        "fpr": 0.0824,
+        "flagged_share": 0.4254,
+        "pairs": 181
+      }
+    },
+    {
+      "params": {
+        "min_mask_tokens": 3,
+        "min_fragment_chars": 40,
+        "min_flagged_share": 0.02,
+        "text_rule_decisive": true
+      },
+      "dev": {
+        "tp": 70,
+        "fp": 7,
+        "fn": 26,
+        "tn": 78,
+        "precision": 0.9091,
+        "recall": 0.7292,
+        "f1": 0.8092,
+        "fpr": 0.0824,
+        "flagged_share": 0.4254,
+        "pairs": 181
+      }
+    },
+    {
+      "params": {
+        "min_mask_tokens": 2,
+        "min_fragment_chars": 80,
+        "min_flagged_share": 0.0,
+        "text_rule_decisive": true
+      },
+      "dev": {
+        "tp": 70,
+        "fp": 7,
+        "fn": 26,
+        "tn": 78,
+        "precision": 0.9091,
+        "recall": 0.7292,
+        "f1": 0.8092,
+        "fpr": 0.0824,
+        "flagged_share": 0.4254,
+        "pairs": 181
+      }
+    },
+    {
+      "params": {
+        "min_mask_tokens": 2,
+        "min_fragment_chars": 80,
+        "min_flagged_share": 0.02,
+        "text_rule_decisive": true
+      },
+      "dev": {
+        "tp": 70,
+        "fp": 7,
+        "fn": 26,
+        "tn": 78,
+        "precision": 0.9091,
+        "recall": 0.7292,
+        "f1": 0.8092,
+        "fpr": 0.0824,
+        "flagged_share": 0.4254,
+        "pairs": 181
+      }
+    },
+    {
+      "params": {
+        "min_mask_tokens": 16,
+        "min_fragment_chars": 400,
+        "min_flagged_share": 0.0,
+        "text_rule_decisive": true
+      },
+      "dev": {
+        "tp": 69,
+        "fp": 7,
+        "fn": 27,
+        "tn": 78,
+        "precision": 0.9079,
+        "recall": 0.7188,
+        "f1": 0.8023,
+        "fpr": 0.0824,
+        "flagged_share": 0.4199,
+        "pairs": 181
+      }
+    },
+    {
+      "params": {
+        "min_mask_tokens": 16,
+        "min_fragment_chars": 400,
+        "min_flagged_share": 0.02,
+        "text_rule_decisive": true
+      },
+      "dev": {
+        "tp": 69,
+        "fp": 7,
+        "fn": 27,
+        "tn": 78,
+        "precision": 0.9079,
+        "recall": 0.7188,
+        "f1": 0.8023,
+        "fpr": 0.0824,
+        "flagged_share": 0.4199,
+        "pairs": 181
+      }
+    },
+    {
+      "params": {
+        "min_mask_tokens": 16,
+        "min_fragment_chars": 400,
+        "min_flagged_share": 0.05,
+        "text_rule_decisive": true
+      },
+      "dev": {
+        "tp": 69,
+        "fp": 7,
+        "fn": 27,
+        "tn": 78,
+        "precision": 0.9079,
+        "recall": 0.7188,
+        "f1": 0.8023,
+        "fpr": 0.0824,
+        "flagged_share": 0.4199,
+        "pairs": 181
+      }
+    },
+    {
+      "params": {
+        "min_mask_tokens": 16,
+        "min_fragment_chars": 400,
+        "min_flagged_share": 0.1,
+        "text_rule_decisive": true
+      },
+      "dev": {
+        "tp": 69,
+        "fp": 7,
+        "fn": 27,
+        "tn": 78,
+        "precision": 0.9079,
+        "recall": 0.7188,
+        "f1": 0.8023,
+        "fpr": 0.0824,
+        "flagged_share": 0.4199,
+        "pairs": 181
+      }
+    },
+    {
+      "params": {
+        "min_mask_tokens": 16,
+        "min_fragment_chars": 400,
+        "min_flagged_share": 0.15,
+        "text_rule_decisive": true
+      },
+      "dev": {
+        "tp": 69,
+        "fp": 7,
+        "fn": 27,
+        "tn": 78,
+        "precision": 0.9079,
+        "recall": 0.7188,
+        "f1": 0.8023,
+        "fpr": 0.0824,
+        "flagged_share": 0.4199,
+        "pairs": 181
+      }
+    },
+    {
+      "params": {
+        "min_mask_tokens": 16,
+        "min_fragment_chars": 400,
+        "min_flagged_share": 0.2,
+        "text_rule_decisive": true
+      },
+      "dev": {
+        "tp": 69,
+        "fp": 7,
+        "fn": 27,
+        "tn": 78,
+        "precision": 0.9079,
+        "recall": 0.7188,
+        "f1": 0.8023,
+        "fpr": 0.0824,
+        "flagged_share": 0.4199,
+        "pairs": 181
+      }
+    },
+    {
+      "params": {
+        "min_mask_tokens": 16,
+        "min_fragment_chars": 400,
+        "min_flagged_share": 0.3,
+        "text_rule_decisive": true
+      },
+      "dev": {
+        "tp": 69,
+        "fp": 7,
+        "fn": 27,
+        "tn": 78,
+        "precision": 0.9079,
+        "recall": 0.7188,
+        "f1": 0.8023,
+        "fpr": 0.0824,
+        "flagged_share": 0.4199,
+        "pairs": 181
+      }
+    }
+  ],
+  "rule_statement": "вердикт — из прогона: параметры агрегации перебраны и выбраны на dev, заморожены в config/verdict.json, test снят один раз после заморозки; старые правила посчитаны на той же таблице"
+}
