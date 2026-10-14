@@ -106,7 +106,10 @@ def main() -> int:
             "pairs": len(pairs_a),
             "split": report.stats.get("split", {}),
         },
-        "corpus_b": {
+        # Ключ называется alt_generator, а не corpus_b: в METRICS.json «corpus_b» —
+        # это внешний набор RusHallu-RAG (1000 пар), и два разных набора под одним
+        # именем смешивать нельзя (правило проекта: у каждого набора своя метка).
+        "alt_generator": {
             "name": "alt-generator 1.0 (числа словами, другие шаблоны)",
             "pairs": len(pairs_b),
             "seed": args.alt_seed,

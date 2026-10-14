@@ -18,3 +18,7 @@ __pycache__/
 # SPANVERIFY_CONTRACT_PDF (scripts/contract_check.py → contract.source).
 Договор_*.pdf
 Договор *.pdf
+
+# Обученный на A3 бандл калибровки вердикта: воспроизводится из train-части
+# (scripts/calibrate_verdict.py --save-bundle), в репозиторий не коммитится.
+spanverify-module/reports/verdict/bundle_*.json

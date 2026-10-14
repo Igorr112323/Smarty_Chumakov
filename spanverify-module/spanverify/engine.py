@@ -77,10 +77,71 @@ SMOOTH_WINDOW = 3
 #   покрытие фактов) по-прежнему решают даже в одиночку, но одиночный токен
 #   статистической маски ответ «спорным» больше не делает: нужен хотя бы
 #   второй помеченный токен либо скор ответа выше порога.
+# * "corroborated" — калибруемое: параметры агрегации (минимальное число
+#   помеченных токенов, минимальная длина самого длинного фрагмента, доля
+#   помеченных токенов, решающая роль текстовых правил) подбираются на dev
+#   официального разбиения скриптом scripts/calibrate_verdict.py и
+#   замораживаются в config/verdict.json. Причина: маска работает по токенам, а
+#   вердикт — по ответу, и на длинном ответе из ~100 токенов даже токенный FPR
+#   6 % почти всегда даёт пару ложных токенов. Без отдельной калибровки агрегации
+#   вердикт помечает почти все честные ответы реальных актов (прогон 37609202780:
+#   FPR 0.775 в режиме hf, 0.3875 в режиме demo).
 VERDICT_ANY_SPAN = "any_span"
 VERDICT_MIN_TWO_TOKENS = "min_two_tokens"
-VERDICT_RULES = (VERDICT_ANY_SPAN, VERDICT_MIN_TWO_TOKENS)
-DEFAULT_VERDICT_RULE = VERDICT_MIN_TWO_TOKENS
+VERDICT_CORROBORATED = "corroborated"
+VERDICT_RULES = (VERDICT_ANY_SPAN, VERDICT_MIN_TWO_TOKENS, VERDICT_CORROBORATED)
+DEFAULT_VERDICT_RULE = VERDICT_CORROBORATED
+# Замороженные параметры агрегации вердикта (артефакт калибровки на dev).
+VERDICT_CONFIG_FILENAME = "config/verdict.json"
+# Параметры по умолчанию — самые строгие из осмысленных: пока калибровка на dev
+# не выполнена, «спорным» ответ делает только скор выше порога.
+DEFAULT_VERDICT_PARAMS: dict[str, Any] = {
+    "min_mask_tokens": 3,
+    "min_fragment_chars": 0,
+    "min_flagged_share": 0.0,
+    "text_rule_decisive": True,
+}
+
+
+def verdict_config_from_params(params: Mapping[str, Any]) -> dict[str, Any]:
+    """Собрать замороженный конфиг правила вердикта из набора параметров."""
+    return {
+        "rule": VERDICT_CORROBORATED,
+        "params": {
+            "min_mask_tokens": int(params["min_mask_tokens"]),
+            "min_fragment_chars": int(params["min_fragment_chars"]),
+            "min_flagged_share": float(params["min_flagged_share"]),
+            "text_rule_decisive": bool(params["text_rule_decisive"]),
+        },
+    }
+
+
+def load_verdict_config() -> dict[str, Any] | None:
+    """Прочитать замороженный конфигурационный файл правила вердикта, если он есть.
+
+    Файл — артефакт калибровки (``scripts/calibrate_verdict.py``): параметры
+    выбраны на dev и не пересчитываются на старте сервиса. Если файла нет
+    (например, запуск из исходников без артефакта), берётся правило
+    ``min_two_tokens`` — историческое поведение.
+    """
+    for root in runtime_roots():
+        path = root / VERDICT_CONFIG_FILENAME
+        if not path.is_file():
+            continue
+        try:
+            payload = json.loads(path.read_text(encoding="utf-8"))
+        except (OSError, ValueError):
+            return None
+        rule = payload.get("rule")
+        params = payload.get("params") or {}
+        if rule not in VERDICT_RULES:
+            return None
+        merged = dict(DEFAULT_VERDICT_PARAMS)
+        for key in DEFAULT_VERDICT_PARAMS:
+            if key in params:
+                merged[key] = params[key]
+        return {"rule": rule, "params": merged, "file": str(path), "frozen": True}
+    return None
 
 
 @dataclass
@@ -235,13 +296,25 @@ class Verifier:
         *,
         coverage: bool = False,
         features_cache: Mapping[str, FeatureMatrix] | None = None,
-        verdict_rule: str = DEFAULT_VERDICT_RULE,
+        verdict_rule: str | None = None,
         span_filter_min_chars: int = 0,
+        verdict_params: Mapping[str, Any] | None = None,
     ) -> None:
         self.config = config or Config.load()
+        # Правило вердикта берётся из замороженного артефакта калибровки
+        # (config/verdict.json), если он есть; явный аргумент имеет приоритет.
+        frozen = load_verdict_config()
+        if verdict_rule is None:
+            verdict_rule = (frozen or {}).get("rule") or VERDICT_MIN_TWO_TOKENS
         if verdict_rule not in VERDICT_RULES:
             raise ValueError(f"неизвестное правило вердикта: {verdict_rule!r}, допустимо {VERDICT_RULES}")
         self.verdict_rule = verdict_rule
+        self.verdict_params: dict[str, Any] = dict(DEFAULT_VERDICT_PARAMS)
+        if frozen and frozen.get("rule") == verdict_rule:
+            self.verdict_params.update(frozen.get("params") or {})
+        if verdict_params:
+            self.verdict_params.update(verdict_params)
+        self.verdict_config_file = (frozen or {}).get("file")
         # Фильтр коротких фрагментов маски (вариант сравнения маски): фрагмент
         # маски короче стольких знаков без числа, даты или денежной суммы не
         # помечается. 0 — фильтр выключен (текущее поведение). Порог задаётся
@@ -440,7 +513,7 @@ class Verifier:
             latency_ms=(time.perf_counter() - started) * 1000,
             mode=self.mode,
             warning=self.warning,
-            verdict=_verdict(score, threshold, spans, self.verdict_rule),
+            verdict=_verdict(score, threshold, spans, self.verdict_rule, self.verdict_params, stats),
         )
 
     # ---------------------------------------------------------------- оценка
@@ -1192,15 +1265,26 @@ def _verdict(
     threshold: float,
     spans: Sequence[SpanResult],
     rule: str = DEFAULT_VERDICT_RULE,
+    params: Mapping[str, Any] | None = None,
+    stats: Mapping[str, Any] | None = None,
 ) -> str:
     """Вердикт: недостоверно → спорно → подтверждено контекстом.
 
     Правило ``any_span`` (историческое): любой фрагмент делает ответ спорным,
-    даже один токен маски. Правило ``min_two_tokens`` (текущее): фрагменты
-    текстовых правил по-прежнему решают в одиночку, но одиночный токен
-    статистической маски спорным ответ больше не делает — иначе почти каждый
-    ответ оказывался «спорным» (прогон 37532050295: помечено 1047 из 1200,
-    вердикт FPR 0.893).
+    даже один токен маски. Правило ``min_two_tokens``: фрагменты текстовых
+    правил по-прежнему решают в одиночку, но одиночный токен статистической
+    маски спорным ответ больше не делает — иначе почти каждый ответ оказывался
+    «спорным» (прогон 37532050295: помечено 1047 из 1200, вердикт FPR 0.893).
+
+    Правило ``corroborated`` (текущее): агрегация калибруется отдельно от маски.
+    Фрагмент маски делает ответ спорным, только если свидетельство
+    подтверждается сразу несколькими условиями из параметров — числом помеченных
+    токенов (``min_mask_tokens``), длиной самого длинного фрагмента
+    (``min_fragment_chars``) и долей помеченных токенов (``min_flagged_share``).
+    Текстовые правила (привязка числа к объекту, покрытие фактов) остаются
+    решающими, если это разрешено параметром ``text_rule_decisive``. Параметры
+    подбираются на dev и замораживаются в ``config/verdict.json``: правило
+    читает их, а не подбирает на ходу.
     """
     if score >= threshold:
         return "likely_hallucination"
@@ -1208,10 +1292,33 @@ def _verdict(
         return "grounded"
     if rule == VERDICT_ANY_SPAN:
         return "doubtful"
-    if any(span.source != "mask" for span in spans):
+    if rule == VERDICT_MIN_TWO_TOKENS:
+        if any(span.source != "mask" for span in spans):
+            return "doubtful"
+        flagged_tokens = sum(span.n_tokens for span in spans)
+        return "doubtful" if flagged_tokens >= 2 else "grounded"
+    # rule == VERDICT_CORROBORATED
+    values = dict(DEFAULT_VERDICT_PARAMS)
+    if params:
+        for key in values:
+            if key in params:
+                values[key] = params[key]
+    mask_spans = [span for span in spans if span.source == "mask"]
+    text_spans = [span for span in spans if span.source != "mask"]
+    if text_spans and values["text_rule_decisive"]:
         return "doubtful"
-    flagged_tokens = sum(span.n_tokens for span in spans)
-    return "doubtful" if flagged_tokens >= 2 else "grounded"
+    if not mask_spans:
+        return "grounded"
+    mask_tokens = sum(int(span.n_tokens) for span in mask_spans)
+    longest = max((len(span.text) for span in mask_spans), default=0)
+    scored = int((stats or {}).get("scored_tokens") or 0)
+    share = mask_tokens / scored if scored else 0.0
+    corroborated = (
+        mask_tokens >= int(values["min_mask_tokens"])
+        and longest >= int(values["min_fragment_chars"])
+        and share >= float(values["min_flagged_share"])
+    )
+    return "doubtful" if corroborated else "grounded"
 
 
 def verify_text(

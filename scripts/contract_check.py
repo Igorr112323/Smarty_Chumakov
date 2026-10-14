@@ -2544,6 +2544,259 @@ def _table_lines(payload: dict[str, Any]) -> list[str]:
     return lines
 
 
+def _fact_value(payload: dict[str, Any], check_id: str, *path: str) -> Any:
+    """Достать число из факта проверки: ``check_id`` + путь по ключам."""
+    for item in payload["checks"]:
+        if item["id"] != check_id:
+            continue
+        value: Any = item.get("fact")
+        for key in path:
+            if not isinstance(value, dict) or key not in value:
+                return None
+            value = value[key]
+        return value
+    return None
+
+
+def _json_artifact(*parts: str) -> dict[str, Any]:
+    """Прочитать вспомогательный артефакт (числа берутся из файла, а не из памяти)."""
+    path = ROOT.joinpath(*parts)
+    if not path.is_file():
+        return {}
+    try:
+        return json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        return {}
+
+
+# Таблица запаса: договорное число → факт → запас в процентах.
+# Направление: "max" — «не более нормы» (запас = (норма − факт) / норма),
+# "min" — «не менее нормы» (запас = (факт − норма) / норма).
+RESERVE_ROWS: tuple[dict[str, Any], ...] = (
+    {
+        "point": "ТЗ п. 4.1 треб. 1",
+        "what": "Предельный вход 2 000 000 знаков: время обработки",
+        "norm": 30.0,
+        "direction": "max",
+        "unit": "с",
+        "source": "reports/contract/4.1.1-text-limit.json",
+        "value": lambda payload: _fact_value(payload, "4.1.1-text-limit", "seconds"),
+    },
+    {
+        "point": "ТЗ п. 4.1 треб. 7",
+        "what": "Быстродействие на 1000 знаков (худший замер, предельный текст)",
+        "norm": 30.0,
+        "direction": "max",
+        "unit": "мс",
+        "source": "reports/contract/4.1.7-performance.json",
+        "value": lambda payload: _fact_value(payload, "4.1.7-performance", "limit_run", "ms_per_1000_chars"),
+    },
+    {
+        "point": "ТЗ п. 4.1 треб. 7",
+        "what": "Предельный текст 2 000 000 знаков: полное время",
+        "norm": 60.0,
+        "direction": "max",
+        "unit": "с",
+        "source": "reports/contract/4.1.7-performance.json",
+        "value": lambda payload: _fact_value(payload, "4.1.7-performance", "limit_run", "seconds"),
+    },
+    {
+        "point": "ТЗ п. 4.1 треб. 6",
+        "what": "F1 по токенам на отложенной части корпуса A",
+        "norm": 0.50,
+        "direction": "min",
+        "unit": "",
+        "source": "reports/contract/4.1.6-gate-corpus-a.json",
+        "value": lambda payload: _fact_value(payload, "4.1.6-gate-corpus-a", "tokens", "f1"),
+    },
+    {
+        "point": "ТЗ п. 4.1 треб. 6",
+        "what": "FPR по токенам на отложенной части корпуса A",
+        "norm": 0.40,
+        "direction": "max",
+        "unit": "",
+        "source": "reports/contract/4.1.6-gate-corpus-a.json",
+        "value": lambda payload: _fact_value(payload, "4.1.6-gate-corpus-a", "tokens", "fpr"),
+    },
+    {
+        "point": "ТЗ п. 4.1 треб. 4",
+        "what": "Ошибка доли участия ИИ (MAE), цель проекта",
+        "norm": 0.03,
+        "direction": "max",
+        "unit": "",
+        "source": "reports/contract/4.1.4-ai-participation.json",
+        "value": lambda payload: _fact_value(payload, "4.1.4-ai-participation", "mae"),
+    },
+    {
+        "point": "ТЗ п. 4.2",
+        "what": "Размер .exe в релизе",
+        "norm": 9_000_000.0,
+        "direction": "max",
+        "unit": "байт",
+        "source": "reports/release_sizes.json",
+        "value": lambda payload: _json_artifact("reports", "release_sizes.json").get("exe_bytes"),
+    },
+    {
+        "point": "ТЗ п. 4.2",
+        "what": "Размер переносимого пакета .pyz",
+        "norm": 600_000.0,
+        "direction": "max",
+        "unit": "байт",
+        "source": "reports/contract/4.1.9-delivery-artifacts.json",
+        "value": lambda payload: _fact_value(payload, "4.1.9-delivery-artifacts", "pyz_size_bytes"),
+    },
+    {
+        "point": "ТЗ п. 4.2 треб. 6",
+        "what": "Хранение с весами режима hf",
+        "norm": 1500.0,
+        "direction": "max",
+        "unit": "МБ",
+        "source": "reports/contract/4.2.6-storage.json",
+        "value": lambda payload: _fact_value(payload, "4.2.6-storage", "with_weights_mb"),
+    },
+    {
+        "point": "ТЗ п. 4.2 треб. 6",
+        "what": "Поставка без весов",
+        "norm": 100.0,
+        "direction": "max",
+        "unit": "МБ",
+        "source": "reports/contract/4.2.6-storage.json",
+        "value": lambda payload: _fact_value(payload, "4.2.6-storage", "module_size_mb"),
+    },
+)
+
+# Внутренние планки проекта: договор их не требует, но работа ориентируется на них.
+# Здесь честно видно, где запас взят, а где цель пока не достигнута.
+PROJECT_TARGET_ROWS: tuple[dict[str, Any], ...] = (
+    {
+        "what": "Тесты: не меньше 600",
+        "norm": 600.0,
+        "direction": "min",
+        "unit": "",
+        "source": "spanverify-module/reports/METRICS.json (tests.collected)",
+        "value": lambda payload: (
+            _json_artifact("spanverify-module", "reports", "METRICS.json").get("tests") or {}
+        ).get("collected"),
+    },
+    {
+        "what": "Покрытие тестами: не меньше 90 %",
+        "norm": 90.0,
+        "direction": "min",
+        "unit": "%",
+        "source": "spanverify-module/reports/METRICS.json (tests.coverage_percent)",
+        "value": lambda payload: (
+            _json_artifact("spanverify-module", "reports", "METRICS.json").get("tests") or {}
+        ).get("coverage_percent"),
+    },
+    {
+        "what": "Внутренний ориентир качества: F1 по токенам ≥ 0,90 при FPR ≤ 0,10 (корпус A)",
+        "norm": 0.90,
+        "direction": "min",
+        "unit": "",
+        "source": "reports/contract/4.1.6-gate-corpus-a.json",
+        "value": lambda payload: _fact_value(payload, "4.1.6-gate-corpus-a", "tokens", "f1"),
+    },
+    {
+        "what": "Вердикт уровня ответа на реальных актах (A3): F1",
+        "norm": 0.80,
+        "direction": "min",
+        "unit": "",
+        "source": "spanverify-module/reports/verdict_calibration.json (test)",
+        "value": lambda payload: (
+            (_json_artifact("spanverify-module", "reports", "verdict_calibration.json").get("test") or {})
+            .get("rule_corroborated")
+            or {}
+        ).get("f1"),
+    },
+    {
+        "what": "Вердикт уровня ответа на реальных актах (A3): FPR",
+        "norm": 0.10,
+        "direction": "max",
+        "unit": "",
+        "source": "spanverify-module/reports/verdict_calibration.json (test)",
+        "value": lambda payload: (
+            (_json_artifact("spanverify-module", "reports", "verdict_calibration.json").get("test") or {})
+            .get("rule_corroborated")
+            or {}
+        ).get("fpr"),
+    },
+    {
+        "what": "Размер .exe с запасом не меньше 5 %",
+        "norm": 8_500_000.0,
+        "direction": "max",
+        "unit": "байт",
+        "source": "reports/release_sizes.json",
+        "value": lambda payload: _json_artifact("reports", "release_sizes.json").get("exe_bytes"),
+    },
+)
+
+
+def _reserve_lines(rows: tuple[dict[str, Any], ...], payload: dict[str, Any], *, with_point: bool) -> list[str]:
+    """Собрать таблицу запаса: норма → факт → запас в процентах."""
+    header = "| Пункт | Что меряется | Норма | Факт | Запас | Источник |"
+    if not with_point:
+        header = "| Что меряется | Норма | Факт | Запас | Источник |"
+    lines = [header, "| --- | --- | --- | --- | --- | --- |"]
+    if not with_point:
+        lines[1] = "| --- | --- | --- | --- | --- |"
+    for row in rows:
+        value = row["value"](payload)
+        norm = float(row["norm"])
+        if value is None:
+            lines.append(
+                "| " + " | ".join([*( [row["point"]] if with_point else [] ), row["what"], f"{norm:g}", "не измерено", "—", row["source"]]) + " |"
+            )
+            continue
+        fact = float(value)
+        if row["direction"] == "max":
+            reserve = (norm - fact) / norm * 100 if norm else 0.0
+        else:
+            reserve = (fact - norm) / norm * 100 if norm else 0.0
+        if reserve >= 0:
+            verdict = f"+{reserve:.1f} %"
+        else:
+            verdict = f"{reserve:.1f} % — запас не взят"
+        fact_text = f"{fact:g} {row['unit']}".strip()
+        norm_text = f"{'≤' if row['direction'] == 'max' else '≥'} {norm:g} {row['unit']}".strip()
+        lines.append(
+            "| "
+            + " | ".join(
+                [*([row["point"]] if with_point else []), row["what"], norm_text, fact_text, verdict, row["source"]]
+            )
+            + " |"
+        )
+    return lines
+
+
+def _reserve_block(payload: dict[str, Any]) -> list[str]:
+    """Таблица запаса «факт строго лучше нормы» по договорным числам + внутренние планки."""
+    lines = [
+        "## Запас по договорным числам (норма → факт → запас)",
+        "",
+        "Запас — это факт по сравнению с нормой, а не отдельное обещание: положительный",
+        "запас означает, что требование выполнено с запасом, отрицательный честно помечен.",
+        "Числа берутся из артефактов прогонов; строка «не измерено» означает, что прогона",
+        "в этом окружении не было.",
+        "",
+    ]
+    lines += _reserve_lines(RESERVE_ROWS, payload, with_point=True)
+    lines += [
+        "",
+        "## Внутренние планки проекта (договор их не требует)",
+        "",
+    ]
+    lines += _reserve_lines(PROJECT_TARGET_ROWS, payload, with_point=False)
+    lines += [
+        "",
+        "Ориентиры ТЗ на объёмы режима `hf` (библиотеки ≈ 500 МБ и веса ≈ 530 МБ) —",
+        "оценки, а не жёсткие пределы: связывающий лимит договора — 1,5 ГБ хранения с",
+        "весами (строка выше), он выполнен. Фактические 813,8 МБ библиотек и 554,3 МБ",
+        "весов не занижаются и не выдаются за выполнение оценки ТЗ.",
+        "",
+    ]
+    return lines
+
+
 def _reproduction_block() -> list[str]:
     return [
         "## Воспроизведение",
@@ -2592,6 +2845,7 @@ def render_report_appendix(payload: dict[str, Any]) -> str:
         "",
     ]
     appendix += _table_lines(payload)
+    appendix += [""] + _reserve_block(payload)
     appendix += ["", "## Замечания по непройденным и неизмеренным пунктам", ""]
     for item in payload["checks"]:
         if item["status"] == STATUS_OK:
@@ -2659,6 +2913,7 @@ def render_closing_doc(payload: dict[str, Any]) -> str:
         "",
     ]
     lines += _table_lines(payload)
+    lines += [""] + _reserve_block(payload)
     lines += ["", "## Не достигнуто и не измерено (с причиной)", ""]
     for item in payload["checks"]:
         if item["status"] == STATUS_OK:

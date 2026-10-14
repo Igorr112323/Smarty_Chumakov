@@ -693,7 +693,10 @@ def collect(dataset: str, seed: int, release_dir: Path, coverage_json: Path) -> 
             "cross_corpus_f1": cross["cross_corpus"]["tokens"]["f1"],
             "drop": cross.get("token_f1_drop"),
             "cross_fpr": cross["cross_corpus"]["tokens"]["fpr"],
-            "corpus_b": cross["corpus_b"],
+            # alt_generator — набор «числа словами, другие шаблоны» (240 пар).
+            # Прежнее имя ключа (corpus_b) конфликтовало с внешним набором
+            # RusHallu-RAG и оставлено только для чтения старых артефактов.
+            "alt_generator": cross.get("alt_generator") or cross.get("corpus_b"),
         }
 
     pilot_path = ROOT / "reports" / "pilot" / "pilot.json"
