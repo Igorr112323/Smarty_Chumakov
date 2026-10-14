@@ -1,10 +1,10 @@
 {
   "id": "numbers.registry",
-  "commit": "50c6d586611fb7257b810d5f33627c02ac004632",
+  "commit": "b3d8933aef25ec95ebc63e8d5b0ebe3f99d1f8cc",
   "seed": 42,
   "mode": "demo",
   "dataset": "reports/NUMBERS.json",
-  "date": "2026-10-14T14:06:52Z",
+  "date": "2026-10-14T14:58:29Z",
   "command": "",
   "metrics": {
     "entries": 66,
