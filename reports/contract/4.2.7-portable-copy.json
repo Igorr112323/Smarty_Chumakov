@@ -1,16 +1,16 @@
 {
   "id": "4.2.7-portable-copy",
-  "commit": "50c6d586611fb7257b810d5f33627c02ac004632",
+  "commit": "b3d8933aef25ec95ebc63e8d5b0ebe3f99d1f8cc",
   "seed": 42,
   "mode": "demo",
   "dataset": "spanverify.pyz",
-  "date": "2026-10-14T14:06:52Z",
+  "date": "2026-10-14T14:58:29Z",
   "command": "",
   "metrics": {
     "copy_sha256_equal": true,
-    "pyz_sha256": "5b9fc0c2f0a796ad98414e144e69e9c171900ddeeb953860538283bdf1ce6120",
+    "pyz_sha256": "457298907596ee0352d414eb46cab5975308705bec8585945a7cbf22fce9ff33",
     "checksum_helper": true,
-    "release_tag": "v1.3.0",
+    "release_tag": "v1.3.1",
     "release_checksum_verified": null
   },
   "note": "перенос копированием подтверждён (суммы копии совпали), инструмент сверки проверен; сверка суммы опубликованного пакета в этом окружении не выполнялась",

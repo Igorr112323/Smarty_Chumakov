@@ -478,15 +478,30 @@ jobs:
             }
             exit 0
           }
-          $content = [Convert]::ToBase64String([IO.File]::ReadAllBytes($source))
-          $path = "reports/release_sizes.json"
-          $sha = ""
-          try { $sha = (gh api "repos/$repo/contents/$path`?ref=$target" --jq ".sha") 2>$null } catch { $sha = "" }
-          $apiArgs = @("api", "-X", "PUT", "repos/$repo/contents/$path",
-                    "-f", "message=сборка ${{ github.ref_name }}: измеренные размеры поставки [skip ci]",
-                    "-f", "content=$content", "-f", "branch=$target")
-          if ($sha) { $apiArgs += @("-f", "sha=$sha") }
-          gh @apiArgs | Out-Null
+          # Для тега путь через contents API: кладём не только размеры поставки, но
+          # и реестр чисел. Шаг «Обновить реестр» пересобрал NUMBERS.json внутри
+          # прогона; если его не отправить, реестр на main разойдётся с
+          # release_sizes.json, и контрактное задание («Реестр чисел и его сверка
+          # с артефактами») станет красным — проверено на сборке v1.3.1.
+          function Push-File([string]$path, [string]$localPath, [string]$message) {
+            if (-not (Test-Path $localPath)) {
+              Write-Host "::error title=реестр::нет файла $localPath"
+              exit 1
+            }
+            $content = [Convert]::ToBase64String([IO.File]::ReadAllBytes($localPath))
+            $sha = ""
+            try { $sha = (gh api "repos/$repo/contents/$path`?ref=$target" --jq ".sha") 2>$null } catch { $sha = "" }
+            $apiArgs = @("api", "-X", "PUT", "repos/$repo/contents/$path",
+                      "-f", "message=$message",
+                      "-f", "content=$content", "-f", "branch=$target")
+            if ($sha) { $apiArgs += @("-f", "sha=$sha") }
+            gh @apiArgs | Out-Null
+            Write-Host "обновлено: $path"
+          }
+          $message = "сборка ${{ github.ref_name }}: измеренные размеры поставки [skip ci]"
+          Push-File "reports/release_sizes.json" $source $message
+          Push-File "spanverify-module/reports/release_sizes.json" "reports/release_sizes.json" $message
+          Push-File "reports/NUMBERS.json" "../reports/NUMBERS.json" $message
 
       - name: Артефакты сборки
         uses: actions/upload-artifact@v4
