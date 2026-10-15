@@ -4,11 +4,11 @@
   "seed": 42,
   "mode": "demo",
   "dataset": "spanverify.pyz",
-  "date": "2026-10-14T20:36:01Z",
+  "date": "2026-10-15T19:54:05Z",
   "command": "",
   "metrics": {
     "copy_sha256_equal": true,
-    "pyz_sha256": "6637a18ef0f3855bd7bb94360d48dfc1a9335e436fc6e61bd52c00e3819402a6",
+    "pyz_sha256": "3a513a8f85d1053bfa01c87ee0e455c92afc3dd5b72dc56b061c3253ca9598fa",
     "checksum_helper": true,
     "release_tag": "v1.3.1",
     "release_checksum_verified": null
