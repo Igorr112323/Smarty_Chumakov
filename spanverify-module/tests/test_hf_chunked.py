@@ -4,10 +4,13 @@
 Цель: увеличить покрытие features.py (сейчас 69.9%) и предотвратить незаметные
 поломки hf-ветки.
 """
-import pytest
+
 from unittest.mock import patch
-from spanverify.features import hf_features_chunked, FeatureMatrix
+
+import pytest
+
 from spanverify.chunking import chunk_document
+from spanverify.features import FeatureMatrix, hf_features_chunked
 
 
 @pytest.fixture
@@ -45,9 +48,7 @@ def test_hf_features_chunked_short_context(mock_hf_backend, mock_hf_features):
     answer = "Это короткий ответ"
     context = "Короткий контекст"  # Менее 380 токенов
 
-    result = hf_features_chunked(
-        answer, context, model_name="test-model", max_length=512
-    )
+    result = hf_features_chunked(answer, context, model_name="test-model", max_length=512)
 
     # Должен быть вызван hf_features один раз (без чанкинга)
     assert mock_hf_features.call_count == 1
@@ -60,9 +61,7 @@ def test_hf_features_chunked_long_context(mock_hf_backend, mock_hf_features):
     long_context = " ".join([f"Предложение номер {i}." for i in range(100)])
     answer = "Это ответ на длинный документ"
 
-    result = hf_features_chunked(
-        answer, long_context, model_name="test-model", max_length=512
-    )
+    result = hf_features_chunked(answer, long_context, model_name="test-model", max_length=512)
 
     # Должен быть вызван hf_features несколько раз (по числу релевантных чанков)
     assert mock_hf_features.call_count >= 1
@@ -74,9 +73,7 @@ def test_hf_features_chunked_empty_answer(mock_hf_backend, mock_hf_features):
     answer = ""
     context = "Какой-то контекст"
 
-    result = hf_features_chunked(
-        answer, context, model_name="test-model", max_length=512
-    )
+    result = hf_features_chunked(answer, context, model_name="test-model", max_length=512)
 
     # Должен вернуть пустой FeatureMatrix
     assert len(result) == 0
@@ -88,9 +85,7 @@ def test_hf_features_chunked_empty_context(mock_hf_backend, mock_hf_features):
     answer = "Ответ без контекста"
     context = ""
 
-    result = hf_features_chunked(
-        answer, context, model_name="test-model", max_length=512
-    )
+    hf_features_chunked(answer, context, model_name="test-model", max_length=512)
 
     # Должен быть вызван hf_features один раз
     assert mock_hf_features.call_count == 1
@@ -124,9 +119,7 @@ def test_hf_features_chunked_aggregation(mock_hf_backend):
         long_context = " ".join([f"Предложение номер {i}." for i in range(100)])
         answer = "Это ответ"
 
-        result = hf_features_chunked(
-            answer, long_context, model_name="test-model", max_length=512
-        )
+        result = hf_features_chunked(answer, long_context, model_name="test-model", max_length=512)
 
         # Если было несколько вызовов, проверяем агрегацию (максимум)
         if call_count[0] > 1:

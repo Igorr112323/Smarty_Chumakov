@@ -1,4 +1,5 @@
 """Тесты для scripts/check_numbers.py — сверка чисел в документах."""
+
 import json
 import sys
 from pathlib import Path
@@ -73,15 +74,12 @@ def test_trap_wrong_coverage(tmp_path):
     problems = check_numbers.check_docs([doc], metrics, repo_root=real_repo_root)
 
     # Должна быть проблема с покрытием
-    assert len(problems) > 0, f"Expected coverage problem, got no problems"
+    assert len(problems) > 0, "Expected coverage problem, got no problems"
     # Проверяем, что проблема связана с покрытием (50.0 не должно быть в allowed)
-    coverage_problems = [
-        p for p in problems
-        if "coverage" in p.lower() or "50" in p or str(real_coverage) in p
-    ]
-    assert len(coverage_problems) > 0, (
-        f"Expected coverage problem for {wrong_coverage} vs {real_coverage}, got: {problems}"
-    )
+    coverage_problems = [p for p in problems if "coverage" in p.lower() or "50" in p or str(real_coverage) in p]
+    assert (
+        len(coverage_problems) > 0
+    ), f"Expected coverage problem for {wrong_coverage} vs {real_coverage}, got: {problems}"
 
 
 def test_correct_coverage_is_silent(tmp_path):
@@ -100,6 +98,6 @@ def test_correct_coverage_is_silent(tmp_path):
 
     # Не должно быть проблем именно с этим файлом probe.md (могут быть другие проблемы с ИТОГ.md и т.д.)
     probe_problems = [p for p in problems if "probe.md" in p]
-    assert len(probe_problems) == 0, (
-        f"Expected no problems for probe.md with correct coverage {real_coverage}, got: {probe_problems}"
-    )
+    assert (
+        len(probe_problems) == 0
+    ), f"Expected no problems for probe.md with correct coverage {real_coverage}, got: {probe_problems}"

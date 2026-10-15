@@ -12,7 +12,7 @@
     - soft: любое пересечение чанка с релевантным регионом
     - coverage_50: чанк покрывает ≥50% релевантного региона
 """
-import json
+
 import sys
 from pathlib import Path
 
@@ -117,10 +117,7 @@ def calc_recall(pairs, corpus_name, criteria="soft"):
                                 overlap_end = min(c.end, idx + region_length)
                                 if overlap_end > overlap_start:
                                     overlap_length = overlap_end - overlap_start
-                                    if (
-                                        overlap_length / region_length >= 0.5
-                                        and i not in containing
-                                    ):
+                                    if overlap_length / region_length >= 0.5 and i not in containing:
                                         containing.append(i)
 
                     match_start = idx + 1
