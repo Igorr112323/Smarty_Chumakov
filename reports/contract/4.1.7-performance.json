@@ -4,52 +4,52 @@
   "seed": 42,
   "mode": "demo",
   "dataset": "synthetic",
-  "date": "2026-10-15T19:54:02Z",
+  "date": "2026-10-15T22:17:52Z",
   "command": "",
   "metrics": {
     "by_size": {
       "500": {
         "runs_seconds": [
-          0.001283,
-          0.000917,
-          0.001384
+          0.00167,
+          0.00099,
+          0.000946
         ],
-        "median_seconds": 0.001283,
-        "median_ms_per_1000_chars": 2.5657
+        "median_seconds": 0.00099,
+        "median_ms_per_1000_chars": 1.9791
       },
       "2000": {
         "runs_seconds": [
-          0.002476,
-          0.002952,
-          0.001921
+          0.003141,
+          0.002453,
+          0.002214
         ],
-        "median_seconds": 0.002476,
-        "median_ms_per_1000_chars": 1.238
+        "median_seconds": 0.002453,
+        "median_ms_per_1000_chars": 1.2263
       },
       "10000": {
         "runs_seconds": [
-          0.010556,
-          0.007344,
-          0.007161
+          0.014824,
+          0.009932,
+          0.009632
         ],
-        "median_seconds": 0.007344,
-        "median_ms_per_1000_chars": 0.7344
+        "median_seconds": 0.009932,
+        "median_ms_per_1000_chars": 0.9932
       },
       "50000": {
         "runs_seconds": [
-          0.059376,
-          0.061342,
-          0.037292
+          0.066893,
+          0.050581,
+          0.046165
         ],
-        "median_seconds": 0.059376,
-        "median_ms_per_1000_chars": 1.1875
+        "median_seconds": 0.050581,
+        "median_ms_per_1000_chars": 1.0116
       }
     },
     "limit_run": {
       "chars": 2000000,
-      "seconds": 5.779,
-      "ms_per_1000_chars": 2.8897,
-      "peak_memory_mb": 261.6,
+      "seconds": 7.836,
+      "ms_per_1000_chars": 3.9182,
+      "peak_memory_mb": 262.1,
       "success": true,
       "spans": 1
     },

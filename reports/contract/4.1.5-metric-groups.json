@@ -4,7 +4,7 @@
   "seed": 42,
   "mode": "demo",
   "dataset": "corpus_a1_synthetic/test",
-  "date": "2026-10-15T19:54:02Z",
+  "date": "2026-10-15T22:17:52Z",
   "command": "",
   "metrics": {
     "tokens": {
@@ -55,8 +55,8 @@
     },
     "pairs": 180,
     "iou_threshold": 0.5,
-    "iou_test_passed": true
+    "iou_test_passed": false
   },
-  "note": "три группы метрик и порог IoU 0.5 присутствуют",
+  "note": "тест схемы фрагмента не прошёл",
   "gate": null
 }

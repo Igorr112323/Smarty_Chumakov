@@ -8,13 +8,13 @@
     "cpu_count": 2,
     "seed": 42,
     "commit": "fc438ea7069b4a3c8ad78097f4c29df1767937ec",
-    "date": "2026-10-15T19:54:06Z"
+    "date": "2026-10-15T22:17:55Z"
   },
-  "generated_at": "2026-10-15T19:54:06Z",
-  "duration_s": 29.6,
+  "generated_at": "2026-10-15T22:17:55Z",
+  "duration_s": 38.5,
   "summary": {
-    "соответствует": 32,
-    "не соответствует": 0,
+    "соответствует": 30,
+    "не соответствует": 2,
     "не измерено": 3
   },
   "checks": [
@@ -27,16 +27,16 @@
       "status": "соответствует",
       "fact": {
         "chars": 2000000,
-        "seconds": 5.779,
-        "peak_memory_mb": 261.6,
+        "seconds": 7.836,
+        "peak_memory_mb": 262.1,
         "spans": 1,
         "dataset": "synthetic-2000000"
       },
       "note": "текст 2 000 000 знаков обработан",
       "artifact": "reports/contract/4.1.1-text-limit.json",
       "commit": "fc438ea7069b4a3c8ad78097f4c29df1767937ec",
-      "date": "2026-10-15T19:53:36Z",
-      "duration_s": 5.93
+      "date": "2026-10-15T22:17:17Z",
+      "duration_s": 8.1
     },
     {
       "id": "4.1.2-api-schema",
@@ -78,8 +78,8 @@
       "note": "схема ответа соответствует требованию",
       "artifact": "reports/contract/4.1.2-api-schema.json",
       "commit": "fc438ea7069b4a3c8ad78097f4c29df1767937ec",
-      "date": "2026-10-15T19:53:36Z",
-      "duration_s": 0.59
+      "date": "2026-10-15T22:17:17Z",
+      "duration_s": 0.62
     },
     {
       "id": "4.1.3-five-features",
@@ -110,8 +110,8 @@
       "note": "дамп содержит ровно пять конечных признаков",
       "artifact": "reports/contract/4.1.3-five-features.json",
       "commit": "fc438ea7069b4a3c8ad78097f4c29df1767937ec",
-      "date": "2026-10-15T19:53:36Z",
-      "duration_s": 0.09
+      "date": "2026-10-15T22:17:17Z",
+      "duration_s": 0.1
     },
     {
       "id": "4.1.4-ai-participation",
@@ -155,8 +155,8 @@
       "note": "калибровка воспроизводима, шаг смеси 0,25",
       "artifact": "reports/contract/4.1.4-ai-participation.json",
       "commit": "fc438ea7069b4a3c8ad78097f4c29df1767937ec",
-      "date": "2026-10-15T19:53:36Z",
-      "duration_s": 18.69
+      "date": "2026-10-15T22:17:17Z",
+      "duration_s": 25.85
     },
     {
       "id": "4.1.5-metric-groups",
@@ -164,7 +164,7 @@
       "requirement": "precision, recall, F1, FPR по токенам, ответам, фрагментам; IoU ≥ 0.5",
       "how": "команда evaluate: три группы метрик + порог IoU в отчёте; тест расчёта IoU",
       "command": "python -m spanverify evaluate --dataset data/corpus_a/splits/test.jsonl --json",
-      "status": "соответствует",
+      "status": "не соответствует",
       "fact": {
         "tokens": {
           "precision": 1.0,
@@ -214,14 +214,14 @@
         },
         "pairs": 180,
         "iou_threshold": 0.5,
-        "iou_test_passed": true,
+        "iou_test_passed": false,
         "dataset": "corpus_a1_synthetic/test"
       },
-      "note": "три группы метрик и порог IoU 0.5 присутствуют",
+      "note": "тест схемы фрагмента не прошёл",
       "artifact": "reports/contract/4.1.5-metric-groups.json",
       "commit": "fc438ea7069b4a3c8ad78097f4c29df1767937ec",
-      "date": "2026-10-15T19:53:36Z",
-      "duration_s": 0.55
+      "date": "2026-10-15T22:17:17Z",
+      "duration_s": 0.42
     },
     {
       "id": "4.1.6-hf",
@@ -299,7 +299,7 @@
       "note": "числа hf не измерены (нужен прогон через CI)",
       "artifact": "reports/contract/4.1.6-hf.json",
       "commit": "fc438ea7069b4a3c8ad78097f4c29df1767937ec",
-      "date": "2026-10-15T19:53:36Z",
+      "date": "2026-10-15T22:17:17Z",
       "duration_s": 0.0
     },
     {
@@ -379,7 +379,7 @@
       "note": "числа hf не измерены (нужен прогон через CI)",
       "artifact": "reports/contract/4.1.6-hf-a3.json",
       "commit": "fc438ea7069b4a3c8ad78097f4c29df1767937ec",
-      "date": "2026-10-15T19:53:36Z",
+      "date": "2026-10-15T22:17:17Z",
       "duration_s": 0.0
     },
     {
@@ -454,7 +454,7 @@
       "note": "диагностика: demo-режим (лексические суррогаты); договорная строка качества — 4.1.6-hf; внутренний ориентир проекта (F1 ≥ 0.90 при FPR ≤ 0.10) остаётся не достигнут",
       "artifact": "reports/contract/4.1.6-demo.json",
       "commit": "fc438ea7069b4a3c8ad78097f4c29df1767937ec",
-      "date": "2026-10-15T19:53:36Z",
+      "date": "2026-10-15T22:17:17Z",
       "duration_s": 0.0
     },
     {
@@ -468,46 +468,46 @@
         "by_size": {
           "500": {
             "runs_seconds": [
-              0.001283,
-              0.000917,
-              0.001384
+              0.00167,
+              0.00099,
+              0.000946
             ],
-            "median_seconds": 0.001283,
-            "median_ms_per_1000_chars": 2.5657
+            "median_seconds": 0.00099,
+            "median_ms_per_1000_chars": 1.9791
           },
           "2000": {
             "runs_seconds": [
-              0.002476,
-              0.002952,
-              0.001921
+              0.003141,
+              0.002453,
+              0.002214
             ],
-            "median_seconds": 0.002476,
-            "median_ms_per_1000_chars": 1.238
+            "median_seconds": 0.002453,
+            "median_ms_per_1000_chars": 1.2263
           },
           "10000": {
             "runs_seconds": [
-              0.010556,
-              0.007344,
-              0.007161
+              0.014824,
+              0.009932,
+              0.009632
             ],
-            "median_seconds": 0.007344,
-            "median_ms_per_1000_chars": 0.7344
+            "median_seconds": 0.009932,
+            "median_ms_per_1000_chars": 0.9932
           },
           "50000": {
             "runs_seconds": [
-              0.059376,
-              0.061342,
-              0.037292
+              0.066893,
+              0.050581,
+              0.046165
             ],
-            "median_seconds": 0.059376,
-            "median_ms_per_1000_chars": 1.1875
+            "median_seconds": 0.050581,
+            "median_ms_per_1000_chars": 1.0116
           }
         },
         "limit_run": {
           "chars": 2000000,
-          "seconds": 5.779,
-          "ms_per_1000_chars": 2.8897,
-          "peak_memory_mb": 261.6,
+          "seconds": 7.836,
+          "ms_per_1000_chars": 3.9182,
+          "peak_memory_mb": 262.1,
           "success": true,
           "spans": 1
         },
@@ -518,8 +518,8 @@
       "note": "быстродействие в пределах договорных значений",
       "artifact": "reports/contract/4.1.7-performance.json",
       "commit": "fc438ea7069b4a3c8ad78097f4c29df1767937ec",
-      "date": "2026-10-15T19:53:36Z",
-      "duration_s": 0.26
+      "date": "2026-10-15T22:17:17Z",
+      "duration_s": 0.28
     },
     {
       "id": "4.1.8-interfaces",
@@ -555,8 +555,8 @@
       "note": "все три интерфейса отвечают",
       "artifact": "reports/contract/4.1.8-interfaces.json",
       "commit": "fc438ea7069b4a3c8ad78097f4c29df1767937ec",
-      "date": "2026-10-15T19:53:36Z",
-      "duration_s": 0.08
+      "date": "2026-10-15T22:17:17Z",
+      "duration_s": 0.1
     },
     {
       "id": "4.1.9-delivery-artifacts",
@@ -571,7 +571,7 @@
         "pyz_size_bytes": 180203,
         "pyz_size_mb": 0.1719,
         "pyz_size_mb_decimal": 0.1802,
-        "pyz_sha256": "3a513a8f85d1053bfa01c87ee0e455c92afc3dd5b72dc56b061c3253ca9598fa",
+        "pyz_sha256": "8e6b245b1ccb2dfd6b687993e3dfaba199d5872a0cc567c4c5a9f4a1267fa7c7",
         "smoke_returncode": 0,
         "smoke_tail": "вейера и интерфейса, а не достоверность ответа. Подмена числа ловится, если число есть у другого объекта документа (например, «первичные — пять лет» против «вторичные — десять лет»); перефразирования и таблицы требуют режима 'hf'. Научные выводы возможны только в режиме 'hf'.\nВсе проверки пройдены.\n",
         "copy_sha256_equal": true,
@@ -618,8 +618,8 @@
       "note": "переносимый пакет собран, смоук-тест прошёл, сумма копии совпала; в релизе опубликованы spanverify.exe, spanverify-win.zip, spanverify.pyz и SHA256SUMS.txt (состав и размеры прочитаны через API); сверка суммы опубликованного файла в этом окружении не выполнена — файлы релиза отдаются хранилищем, недоступным из сети прогона, поэтому это «не измерено», а не «соответствует»",
       "artifact": "reports/contract/4.1.9-delivery-artifacts.json",
       "commit": "fc438ea7069b4a3c8ad78097f4c29df1767937ec",
-      "date": "2026-10-15T19:53:36Z",
-      "duration_s": 2.41
+      "date": "2026-10-15T22:17:17Z",
+      "duration_s": 2.31
     },
     {
       "id": "4.1.10-no-network",
@@ -648,8 +648,8 @@
       "note": "verify и evaluate работают при полностью заблокированных сокетах",
       "artifact": "reports/contract/4.1.10-no-network.json",
       "commit": "fc438ea7069b4a3c8ad78097f4c29df1767937ec",
-      "date": "2026-10-15T19:53:36Z",
-      "duration_s": 0.07
+      "date": "2026-10-15T22:17:17Z",
+      "duration_s": 0.08
     },
     {
       "id": "4.2.1-delivery-size",
@@ -677,7 +677,7 @@
       "note": "второй вариант поставки выполнен: пакет 180203 байт (0.1719 МиБ / 0.1802 МБ) укладывается в 0,6 МБ при любой трактовке; опубликованный файл .exe — 8969008 байт",
       "artifact": "reports/contract/4.2.1-delivery-size.json",
       "commit": "fc438ea7069b4a3c8ad78097f4c29df1767937ec",
-      "date": "2026-10-15T19:53:36Z",
+      "date": "2026-10-15T22:17:17Z",
       "duration_s": 0.0
     },
     {
@@ -695,7 +695,7 @@
       "note": "сервис поднялся на порту 8765 и ответил",
       "artifact": "reports/contract/4.2.2-port-8765.json",
       "commit": "fc438ea7069b4a3c8ad78097f4c29df1767937ec",
-      "date": "2026-10-15T19:53:36Z",
+      "date": "2026-10-15T22:17:17Z",
       "duration_s": 0.0
     },
     {
@@ -728,8 +728,8 @@
       "note": "запуск из копии работает, запись остаётся внутри каталога",
       "artifact": "reports/contract/4.2.3-no-install.json",
       "commit": "fc438ea7069b4a3c8ad78097f4c29df1767937ec",
-      "date": "2026-10-15T19:53:36Z",
-      "duration_s": 0.26
+      "date": "2026-10-15T22:17:17Z",
+      "duration_s": 0.31
     },
     {
       "id": "4.2.4-build-sha256",
@@ -755,8 +755,8 @@
       "note": "сборка автоматическая, SHA256SUMS.txt формируется и публикуется в релизе; инструмент сверки проверен самопроверкой; сверка суммы опубликованного файла в этом окружении не выполнялась (файлы релиза недоступны из сети прогона) — это указано как ограничение",
       "artifact": "reports/contract/4.2.4-build-sha256.json",
       "commit": "fc438ea7069b4a3c8ad78097f4c29df1767937ec",
-      "date": "2026-10-15T19:53:36Z",
-      "duration_s": 0.03
+      "date": "2026-10-15T22:17:17Z",
+      "duration_s": 0.04
     },
     {
       "id": "4.2.5-hf-footprint",
@@ -787,7 +787,7 @@
       "note": "измерено на раннере: библиотеки 813.8 МБ (ориентир договора 500 МБ, отклонение 62.8 % — это оценка из ТЗ, жёсткого предела у неё нет; предел хранения 1,5 ГБ проверяет 4.2.6), веса 554.3 МБ (ориентир 530 МБ, отклонение 4.6 %)",
       "artifact": "reports/contract/4.2.5-hf-footprint.json",
       "commit": "fc438ea7069b4a3c8ad78097f4c29df1767937ec",
-      "date": "2026-10-15T19:53:36Z",
+      "date": "2026-10-15T22:17:17Z",
       "duration_s": 0.0
     },
     {
@@ -818,7 +818,7 @@
       "note": "поставка без весов 41.046 МБ ≤ 100 МБ; измеренное хранение с весами 1368.2 МБ ≤ 1500 МБ (поставка + библиотеки режима hf + веса одной ревизии в одном формате); кеш загрузчика в этом прогоне занимал 1919.6 МБ — в нём лежал лишний файл весов другой ревизии (не тот, что загружает программа): его можно удалить, работоспособность не меняется. Если считать кеш как есть, объём выше предела — это видно здесь, а не спрятано",
       "artifact": "reports/contract/4.2.6-storage.json",
       "commit": "fc438ea7069b4a3c8ad78097f4c29df1767937ec",
-      "date": "2026-10-15T19:53:36Z",
+      "date": "2026-10-15T22:17:17Z",
       "duration_s": 0.0
     },
     {
@@ -830,7 +830,7 @@
       "status": "соответствует",
       "fact": {
         "copy_sha256_equal": true,
-        "pyz_sha256": "3a513a8f85d1053bfa01c87ee0e455c92afc3dd5b72dc56b061c3253ca9598fa",
+        "pyz_sha256": "8e6b245b1ccb2dfd6b687993e3dfaba199d5872a0cc567c4c5a9f4a1267fa7c7",
         "checksum_helper": true,
         "release_tag": "v1.3.1",
         "release_checksum_verified": null,
@@ -839,7 +839,7 @@
       "note": "перенос копированием подтверждён (суммы копии совпали), инструмент сверки проверен; сверка суммы опубликованного пакета в этом окружении не выполнялась",
       "artifact": "reports/contract/4.2.7-portable-copy.json",
       "commit": "fc438ea7069b4a3c8ad78097f4c29df1767937ec",
-      "date": "2026-10-15T19:53:36Z",
+      "date": "2026-10-15T22:17:17Z",
       "duration_s": 0.03
     },
     {
@@ -854,17 +854,17 @@
         "machine": "x86_64",
         "cpu_count": 2,
         "memory_total_gb": 3.85,
-        "disk_free_gb": 19.2,
+        "disk_free_gb": 19.22,
         "gpu": false,
         "network_used_in_checks": false,
         "dataset": "environment",
-        "measured_peak_memory_mb": 261.6,
+        "measured_peak_memory_mb": 262.1,
         "memory_headroom_ok": true
       },
-      "note": "измерено: пик памяти процесса 261.6 МБ (предельный текст 2 000 000 знаков), поставка 19.2 ГБ свободного диска, GPU не используется, сеть не используется; машина эталонной конфигурации заказчика (≥4 ГБ ОЗУ, ≥8 ГБ с весами) не проверялась: в окружении прогона 3.85 ГБ ОЗУ, и это указано честно",
+      "note": "измерено: пик памяти процесса 262.1 МБ (предельный текст 2 000 000 знаков), поставка 19.22 ГБ свободного диска, GPU не используется, сеть не используется; машина эталонной конфигурации заказчика (≥4 ГБ ОЗУ, ≥8 ГБ с весами) не проверялась: в окружении прогона 3.85 ГБ ОЗУ, и это указано честно",
       "artifact": "reports/contract/4.2.8-runtime-config.json",
       "commit": "fc438ea7069b4a3c8ad78097f4c29df1767937ec",
-      "date": "2026-10-15T19:53:36Z",
+      "date": "2026-10-15T22:17:17Z",
       "duration_s": 0.0
     },
     {
@@ -886,7 +886,7 @@
       "note": "процедура обновления заменой целиком описана в руководстве",
       "artifact": "reports/contract/4.2.9-update-procedure.json",
       "commit": "fc438ea7069b4a3c8ad78097f4c29df1767937ec",
-      "date": "2026-10-15T19:53:36Z",
+      "date": "2026-10-15T22:17:17Z",
       "duration_s": 0.0
     },
     {
@@ -910,7 +910,7 @@
       "note": "чек-лист руководства покрывает эксплуатацию без спецподготовки",
       "artifact": "reports/contract/4.2.10-qualification.json",
       "commit": "fc438ea7069b4a3c8ad78097f4c29df1767937ec",
-      "date": "2026-10-15T19:53:36Z",
+      "date": "2026-10-15T22:17:17Z",
       "duration_s": 0.0
     },
     {
@@ -919,21 +919,20 @@
       "requirement": "Все тесты проходят, включая контрактные; покрытие пакета не меньше 85 %",
       "how": "перечень тестов собирается pytest, процент покрытия — из отчёта прогона с покрытием",
       "command": "python -m pytest -q --cov=spanverify --cov-report=json:reports/coverage.json --cov-fail-under=85",
-      "status": "соответствует",
+      "status": "не соответствует",
       "fact": {
-        "collect_returncode": 0,
-        "collected": 639,
-        "coverage_file": "spanverify-module/reports/coverage.json",
-        "coverage_percent": 87.88,
+        "collect_returncode": 1,
+        "collected": 0,
+        "coverage_file": null,
+        "coverage_percent": null,
         "coverage_gate_percent": 85,
-        "dataset": "spanverify-module/tests",
-        "coverage_written": "2026-10-15T19:51:29Z"
+        "dataset": "spanverify-module/tests"
       },
-      "note": "собрано тестов 639, покрытие 87.88 % при пороге 85 %",
+      "note": "тесты не собираются; нет отчёта покрытия: прогон с --cov не выполнялся в этом окружении",
       "artifact": "reports/contract/dod.tests.json",
       "commit": "fc438ea7069b4a3c8ad78097f4c29df1767937ec",
-      "date": "2026-10-15T19:53:36Z",
-      "duration_s": 0.34
+      "date": "2026-10-15T22:17:17Z",
+      "duration_s": 0.02
     },
     {
       "id": "plan.stages",
@@ -958,7 +957,7 @@
       "note": "календарный план: 2 этапа по 6 месяцев с суммами 200 000 и 300 000 руб.",
       "artifact": "reports/contract/plan.stages.json",
       "commit": "fc438ea7069b4a3c8ad78097f4c29df1767937ec",
-      "date": "2026-10-15T19:53:36Z",
+      "date": "2026-10-15T22:17:17Z",
       "duration_s": 0.0
     },
     {
@@ -983,7 +982,7 @@
       "note": "перечень отчётности обоих этапов и срок 20 дней указаны",
       "artifact": "reports/contract/plan.reporting.json",
       "commit": "fc438ea7069b4a3c8ad78097f4c29df1767937ec",
-      "date": "2026-10-15T19:53:36Z",
+      "date": "2026-10-15T22:17:17Z",
       "duration_s": 0.0
     },
     {
@@ -1012,7 +1011,7 @@
       "note": "структура шаблона соответствует Приложению № 10",
       "artifact": "reports/contract/report.structure.json",
       "commit": "fc438ea7069b4a3c8ad78097f4c29df1767937ec",
-      "date": "2026-10-15T19:53:36Z",
+      "date": "2026-10-15T22:17:17Z",
       "duration_s": 0.0
     },
     {
@@ -1040,7 +1039,7 @@
       "note": "реферат содержит сведения об объёме и 7 ключевых слов",
       "artifact": "reports/contract/report.abstract.json",
       "commit": "fc438ea7069b4a3c8ad78097f4c29df1767937ec",
-      "date": "2026-10-15T19:53:36Z",
+      "date": "2026-10-15T22:17:17Z",
       "duration_s": 0.0
     },
     {
@@ -1060,7 +1059,7 @@
       "note": "фактический процент оригинальности не измерен: нужна внешняя система проверки текста; в шаблоне поле и процедура описаны",
       "artifact": "reports/contract/report.originality.json",
       "commit": "fc438ea7069b4a3c8ad78097f4c29df1767937ec",
-      "date": "2026-10-15T19:53:36Z",
+      "date": "2026-10-15T22:17:17Z",
       "duration_s": 0.0
     },
     {
@@ -1073,15 +1072,17 @@
       "fact": {
         "entries": 66,
         "measured": 31,
-        "missing": [],
+        "missing": [
+          "tests.coverage_percent"
+        ],
         "check_ok": true,
         "dataset": "reports/NUMBERS.json"
       },
-      "note": "реестр собран: 66 записей, не измерено 0",
+      "note": "реестр собран: 66 записей, не измерено 1",
       "artifact": "reports/contract/numbers.registry.json",
       "commit": "fc438ea7069b4a3c8ad78097f4c29df1767937ec",
-      "date": "2026-10-15T19:53:36Z",
-      "duration_s": 0.07
+      "date": "2026-10-15T22:17:17Z",
+      "duration_s": 0.08
     },
     {
       "id": "docs.compliance",
@@ -1100,7 +1101,7 @@
       "note": "документ соответствия сгенерирован из CONTRACT.json",
       "artifact": "reports/contract/docs.compliance.json",
       "commit": "fc438ea7069b4a3c8ad78097f4c29df1767937ec",
-      "date": "2026-10-15T19:53:36Z",
+      "date": "2026-10-15T22:17:17Z",
       "duration_s": 0.0
     },
     {
@@ -1122,7 +1123,7 @@
       "note": "программа приёмки построена на тех же проверках, что и CI",
       "artifact": "reports/contract/docs.acceptance.json",
       "commit": "fc438ea7069b4a3c8ad78097f4c29df1767937ec",
-      "date": "2026-10-15T19:53:36Z",
+      "date": "2026-10-15T22:17:17Z",
       "duration_s": 0.0
     },
     {
@@ -1145,7 +1146,7 @@
       "note": "job contract запускает тесты, контрактную проверку и сверку чисел",
       "artifact": "reports/contract/ci.contract-job.json",
       "commit": "fc438ea7069b4a3c8ad78097f4c29df1767937ec",
-      "date": "2026-10-15T19:53:36Z",
+      "date": "2026-10-15T22:17:17Z",
       "duration_s": 0.0
     },
     {
@@ -1251,8 +1252,8 @@
       "note": "13 требований договора совпали с константами кода; проверено по: извлечение требований",
       "artifact": "reports/contract/contract.source.json",
       "commit": "fc438ea7069b4a3c8ad78097f4c29df1767937ec",
-      "date": "2026-10-15T19:53:36Z",
-      "duration_s": 0.04
+      "date": "2026-10-15T22:17:17Z",
+      "duration_s": 0.05
     },
     {
       "id": "contract.doc-hash",
@@ -1275,7 +1276,7 @@
       "note": "SHA-256 договора зафиксирован и совпадает с реестром чисел; хеш из извлечения (файл не в репозитории)",
       "artifact": "reports/contract/contract.doc-hash.json",
       "commit": "fc438ea7069b4a3c8ad78097f4c29df1767937ec",
-      "date": "2026-10-15T19:53:36Z",
+      "date": "2026-10-15T22:17:17Z",
       "duration_s": 0.0
     },
     {
@@ -1294,12 +1295,11 @@
       "note": "числа документов сверены с реестром: расхождений нет",
       "artifact": "reports/contract/numbers.check.json",
       "commit": "fc438ea7069b4a3c8ad78097f4c29df1767937ec",
-      "date": "2026-10-15T19:54:06Z",
-      "duration_s": 0.07
+      "date": "2026-10-15T22:17:55Z",
+      "duration_s": 0.06
     }
   ],
   "rule": "статус «соответствует» ставится только по факту выполненной проверки; «не измерено» допустимо лишь с обоснованием",
-  "provenance": "ci",
-  "note": "Сертифицирован CI прогоном 38802920373 (2026-10-15). Все job-ы: success, включая «Единый файл чисел (METRICS.json) и сверка документов».",
-  "ci_run_id": "38802920373"
+  "provenance": "local",
+  "note": "Локальный прогон. CI-прогон 38808393575 зелёный (https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/38808393575)"
 }

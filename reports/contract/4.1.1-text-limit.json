@@ -4,12 +4,12 @@
   "seed": 42,
   "mode": "demo",
   "dataset": "synthetic-2000000",
-  "date": "2026-10-15T19:53:42Z",
+  "date": "2026-10-15T22:17:25Z",
   "command": "",
   "metrics": {
     "chars": 2000000,
-    "seconds": 5.779,
-    "peak_memory_mb": 261.6,
+    "seconds": 7.836,
+    "peak_memory_mb": 262.1,
     "spans": 1
   },
   "note": "текст 2 000 000 знаков обработан",

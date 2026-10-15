@@ -4,7 +4,7 @@
   "seed": 42,
   "mode": "demo",
   "dataset": "api-smoke",
-  "date": "2026-10-15T19:54:02Z",
+  "date": "2026-10-15T22:17:52Z",
   "command": "",
   "metrics": {
     "cli_returncode": 1,

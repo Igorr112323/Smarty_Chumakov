@@ -4,16 +4,15 @@
   "seed": 42,
   "mode": "demo",
   "dataset": "spanverify-module/tests",
-  "date": "2026-10-15T19:54:06Z",
+  "date": "2026-10-15T22:17:55Z",
   "command": "",
   "metrics": {
-    "collect_returncode": 0,
-    "collected": 639,
-    "coverage_file": "spanverify-module/reports/coverage.json",
-    "coverage_percent": 87.88,
-    "coverage_gate_percent": 85,
-    "coverage_written": "2026-10-15T19:51:29Z"
+    "collect_returncode": 1,
+    "collected": 0,
+    "coverage_file": null,
+    "coverage_percent": null,
+    "coverage_gate_percent": 85
   },
-  "note": "собрано тестов 639, покрытие 87.88 % при пороге 85 %",
+  "note": "тесты не собираются; нет отчёта покрытия: прогон с --cov не выполнялся в этом окружении",
   "gate": null
 }

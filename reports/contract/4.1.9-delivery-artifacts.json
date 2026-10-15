@@ -4,7 +4,7 @@
   "seed": 42,
   "mode": "demo",
   "dataset": "spanverify.pyz / release v1.3.0",
-  "date": "2026-10-15T19:54:05Z",
+  "date": "2026-10-15T22:17:55Z",
   "command": "",
   "metrics": {
     "build_returncode": 0,
@@ -12,7 +12,7 @@
     "pyz_size_bytes": 180203,
     "pyz_size_mb": 0.1719,
     "pyz_size_mb_decimal": 0.1802,
-    "pyz_sha256": "3a513a8f85d1053bfa01c87ee0e455c92afc3dd5b72dc56b061c3253ca9598fa",
+    "pyz_sha256": "8e6b245b1ccb2dfd6b687993e3dfaba199d5872a0cc567c4c5a9f4a1267fa7c7",
     "smoke_returncode": 0,
     "smoke_tail": "вейера и интерфейса, а не достоверность ответа. Подмена числа ловится, если число есть у другого объекта документа (например, «первичные — пять лет» против «вторичные — десять лет»); перефразирования и таблицы требуют режима 'hf'. Научные выводы возможны только в режиме 'hf'.\nВсе проверки пройдены.\n",
     "copy_sha256_equal": true,

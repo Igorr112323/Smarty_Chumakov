@@ -4,14 +4,16 @@
   "seed": 42,
   "mode": "demo",
   "dataset": "reports/NUMBERS.json",
-  "date": "2026-10-15T19:54:06Z",
+  "date": "2026-10-15T22:17:55Z",
   "command": "",
   "metrics": {
     "entries": 66,
     "measured": 31,
-    "missing": [],
+    "missing": [
+      "tests.coverage_percent"
+    ],
     "check_ok": true
   },
-  "note": "реестр собран: 66 записей, не измерено 0",
+  "note": "реестр собран: 66 записей, не измерено 1",
   "gate": null
 }

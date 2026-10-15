@@ -4,7 +4,7 @@
   "seed": 42,
   "mode": "hf",
   "dataset": "corpus_a3_real",
-  "date": "2026-10-15T19:54:02Z",
+  "date": "2026-10-15T22:17:52Z",
   "command": "python -m spanverify evaluate --dataset data/corpus_a3/splits/test.jsonl --mode hf",
   "metrics": {
     "id": "4.1.6-hf-gate-a3",
