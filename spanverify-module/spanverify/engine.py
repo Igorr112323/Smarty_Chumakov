@@ -56,6 +56,7 @@ from .features import (
     combine,
     extract_features,
     feature_cache_key,
+    hf_features_chunked,
     is_scored_token,
     number_attribution,
 )
@@ -616,14 +617,29 @@ class Verifier:
     def _features(self, answer: str, context: str | Sequence[str] | None, tokens: Sequence[Token]) -> FeatureMatrix:
         cache = self.features_cache
         if self.mode == "hf":
+            max_length = getattr(self.config, "hf_max_tokens", 512)
             if cache is not None:
                 # Ключ считается здесь, а не внутри extract_features: модель
-                # известна наверняка только верификатору.
-                key = feature_cache_key(answer, context, "hf", self.model_name)
+                # известна наверняка только верификатору. Включаем chunking=True
+                # чтобы ключ отличался от не-чанкованного кеша.
+                key = feature_cache_key(
+                    answer,
+                    context,
+                    "hf",
+                    self.model_name,
+                    chunking=True,
+                    max_length=max_length,
+                )
                 hit = cache.get(key)
                 if hit is not None:
                     return hit
-            return extract_features(answer, context, mode="hf", model_name=self.model_name, answer_tokens=tokens)
+            return hf_features_chunked(
+                answer,
+                context,
+                model_name=self.model_name,
+                max_length=max_length,
+                answer_tokens=tokens,
+            )
         return extract_features(answer, context, mode="demo", answer_tokens=tokens)
 
     def _span_threshold(self, risk: Sequence[float]) -> float:

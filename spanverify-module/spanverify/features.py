@@ -1150,7 +1150,7 @@ def hf_features(
     model_name: str = "ai-forever/rugpt3small_based_on_gpt2",
     k: int = 5,
     device: str | None = None,
-    max_length: int = 1024,
+    max_length: int = 512,
     answer_tokens: Sequence[Token] | None = None,
     layer: int | str = "last",
 ) -> FeatureMatrix:
@@ -1381,6 +1381,160 @@ def hf_features(
     )
 
 
+def hf_features_chunked(
+    answer: str,
+    context: str | Sequence[str] | None,
+    model_name: str = "ai-forever/rugpt3small_based_on_gpt2",
+    k: int = 5,
+    device: str | None = None,
+    max_length: int = 512,
+    answer_tokens: Sequence[Token] | None = None,
+    layer: int | str = "last",
+    top_k_chunks: int = 3,
+    max_tokens_per_chunk: int = 380,
+) -> FeatureMatrix:
+    """Признаки с чанкингом: документ разбивается на фрагменты, отбираются релевантные.
+
+    Вместо подачи всего контекста в модель (что приводит к обрезке длинных
+    документов) — документ разбивается на чанки, отбираются top-k релевантных
+    (BM25), и для каждого чанка делается отдельный проход модели.
+
+    Признаки для каждого токена ответа агрегируются по чанкам:
+    - Для признаков опоры (ctx_attention_mass, ctx_max_similarity, embedding_density):
+      максимум по чанкам (больше опоры = достовернее)
+    - Для attention_entropy: максимум (выше энтропия = подозрительнее)
+
+    Если чанкинг не нужен (короткий контекст) — fallback к обычному hf_features.
+    """
+    from .backends.base import BackendUnavailable  # noqa: PLC0415
+    from .backends.hf import HFBackend  # noqa: PLC0415
+    from .chunking import chunk_document, estimate_tokens, select_relevant_chunks  # noqa: PLC0415
+    from .core import tokenize_with_offsets  # noqa: PLC0415
+
+    ok, reason = HFBackend.dependencies()
+    if not ok:
+        raise BackendUnavailable(reason)
+
+    tokens = list(answer_tokens) if answer_tokens is not None else tokenize_with_offsets(answer)
+    if not tokens:
+        return FeatureMatrix(meta={"backend": "hf", "empty": True, "chunked": True})
+
+    # Если контекст короткий — обычный проход
+    if isinstance(context, str):
+        context_text = context
+    elif context:
+        context_text = "\n".join(str(item) for item in context)
+    else:
+        context_text = ""
+
+    if not context_text or estimate_tokens(context_text) <= max_tokens_per_chunk:
+        # Контекст помещается целиком — обычный проход
+        result = hf_features(
+            answer,
+            context,
+            model_name=model_name,
+            k=k,
+            device=device,
+            max_length=max_length,
+            answer_tokens=tokens,
+            layer=layer,
+        )
+        result.meta["chunked"] = False
+        return result
+
+    # Разбить контекст на чанки
+    doc_chunks = chunk_document(context_text, max_tokens_per_chunk=max_tokens_per_chunk)
+    if len(doc_chunks.chunks) <= 1:
+        result = hf_features(
+            answer,
+            context,
+            model_name=model_name,
+            k=k,
+            device=device,
+            max_length=max_length,
+            answer_tokens=tokens,
+            layer=layer,
+        )
+        result.meta["chunked"] = False
+        return result
+
+    # Отбрать релевантные чанки
+    relevant_indices = select_relevant_chunks(answer, doc_chunks, top_k=top_k_chunks)
+    if not relevant_indices:
+        relevant_indices = [0]
+
+    # Для каждого релевантного чанка сделать проход модели
+    chunk_matrices: list[FeatureMatrix] = []
+    for chunk_idx in relevant_indices:
+        chunk = doc_chunks.chunks[chunk_idx]
+        try:
+            fm = hf_features(
+                answer,
+                chunk.text,
+                model_name=model_name,
+                k=k,
+                device=device,
+                max_length=max_length,
+                answer_tokens=tokens,
+                layer=layer,
+            )
+            chunk_matrices.append(fm)
+        except Exception:
+            # Если проход по чанку не удался — пропускаем
+            continue
+
+    if not chunk_matrices:
+        # Fallback: обычный проход
+        result = hf_features(
+            answer,
+            context,
+            model_name=model_name,
+            k=k,
+            device=device,
+            max_length=max_length,
+            answer_tokens=tokens,
+            layer=layer,
+        )
+        result.meta["chunked"] = False
+        return result
+
+    # Объединить признаки: максимум по каждому токену
+    n_tokens = len(tokens)
+    merged = FeatureMatrix(
+        meta={
+            "backend": "hf",
+            "model": model_name,
+            "chunked": True,
+            "n_chunks_total": len(doc_chunks.chunks),
+            "n_chunks_relevant": len(relevant_indices),
+            "relevant_indices": relevant_indices,
+        }
+    )
+
+    for feat in (
+        "attention_entropy",
+        "ctx_attention_mass",
+        "embedding_density",
+        "ctx_attention_mass_norm",
+        "ctx_max_similarity",
+    ):
+        values = []
+        for tok_idx in range(n_tokens):
+            feat_vals = []
+            for fm in chunk_matrices:
+                feat_list = getattr(fm, feat, [])
+                if tok_idx < len(feat_list):
+                    feat_vals.append(feat_list[tok_idx])
+            # Для признаков опоры: максимум = больше опоры
+            # Для attention_entropy: максимум = подозрительнее (риск выше)
+            # В обоих случаях: максимум = максимальный сигнал
+            values.append(max(feat_vals) if feat_vals else 0.0)
+        setattr(merged, feat, values)
+
+    merged.meta["n_chunks_processed"] = len(chunk_matrices)
+    return merged
+
+
 def resolve_layer(layer: int | str, total: int) -> int:
     """Индекс слоя внимания по имени или числу.
 
@@ -1506,19 +1660,27 @@ def load_feature_cache(paths: Any, counting: bool = False) -> dict[str, FeatureM
 # падала, если torch не установлен.
 HF_MODEL_DEFAULT = "ai-forever/rugpt3small_based_on_gpt2"
 
+# Версия чанкинга — включается в ключ кеша, чтобы при изменении алгоритма
+# отбора фрагментов старый кеш не использовался с новыми признаками.
+CHUNKING_VERSION = "v2-chunked-bm25-top3"
+
 
 def feature_cache_key(
     answer: str,
     context: str | Sequence[str] | None,
     mode: str,
     model_name: str = "",
+    chunking: bool = False,
+    max_length: int = 512,
 ) -> str:
-    """Ключ кеша признаков: ответ + контекст + режим + модель.
+    """Ключ кеша признаков: ответ + контекст + режим + модель + версия чанкинга + окно.
 
     Счёт признаков на реальной модели занимает минуты на пару, и в
     кросс-валидации каждая пара встречается в нескольких фолдах. Кеш делает
     дорогой проход однократным. Ключ включает модель и режим: признаки разных
     моделей несопоставимы, и подмена одного другим исказила бы результат.
+    При chunking=True добавляется версия алгоритма чанкинга.
+    max_length включён: признаки при разном окне несопоставимы.
     """
     import hashlib  # noqa: PLC0415
 
@@ -1528,7 +1690,8 @@ def feature_cache_key(
         context_text = "\n".join(str(item) for item in context)
     else:
         context_text = ""
-    payload = f"{mode}|{model_name}|{answer}|{context_text}"
+    chunk_tag = f"|chunking={CHUNKING_VERSION}" if chunking else ""
+    payload = f"{mode}|{model_name}|{max_length}|{answer}|{context_text}{chunk_tag}"
     return hashlib.sha256(payload.encode("utf-8")).hexdigest()
 
 

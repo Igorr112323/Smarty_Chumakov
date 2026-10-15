@@ -1187,10 +1187,95 @@ def check_metric_groups(runner: Runner) -> tuple[str, dict[str, Any], str]:
 
 
 @check(
-    id="4.1.6-gate-corpus-a",
+    id="4.1.6-hf",
     point="ТЗ п. 4.1 треб. 6",
-    requirement="F1 ≥ 0.50 при FPR ≤ 0.40 на отложенной по документам части набора 1200 пар",
-    how="прогон на корпусе A: разбиение по документам, shared_groups = 0, порог и ориентир в отчёте",
+    requirement="F1 ≥ 0.50 при FPR ≤ 0.40 на отложенной по документам части набора 1200 пар (режим hf, реальная языковая модель)",
+    how="прогон в режиме hf с чанкингом: корпус A (1200 пар, shared_groups=0); порог и ориентир в отчёте",
+    command="python -m spanverify evaluate --dataset data/corpus_a/splits/test.jsonl --mode hf",
+)
+def check_gate_hf(runner: Runner) -> tuple[str, dict[str, Any], str]:
+    """Шлюз качества в режиме hf (договорная строка).
+
+    Качество заявляется именно по hf, а не по demo. Demo остаётся отдельной
+    диагностической строкой (baseline для сравнения).
+    """
+    artifact = ARTIFACTS / "4.1.6-hf-gate.json"
+    if not artifact.exists():
+        return STATUS_UNKNOWN, {"reason": "артефакт не создан"}, "нет файла 4.1.6-hf-gate.json"
+    data = json.loads(artifact.read_text(encoding="utf-8"))
+    if data.get("mode") != "hf":
+        return STATUS_FAIL, data, f"mode={data.get('mode')}, ожидался hf"
+    metrics = data.get("metrics") or {}
+    tokens = metrics.get("tokens") or {}
+    f1 = tokens.get("f1")
+    fpr = tokens.get("fpr")
+    if f1 is None or fpr is None:
+        return STATUS_UNKNOWN, data, "числа hf не измерены (нужен прогон через CI)"
+    gate_status = metrics.get("gate")
+    problems: list[str] = []
+    if f1 < 0.50:
+        problems.append(f"tokens F1={f1:.4f} < 0.50")
+    if fpr > 0.40:
+        problems.append(f"tokens FPR={fpr:.4f} > 0.40")
+    if gate_status == "НЕ достигнут":
+        problems.append("шлюз hf НЕ достигнут")
+    verdicts = metrics.get("verdicts") or {}
+    note_parts = [f"tokens F1={f1:.4f}, FPR={fpr:.4f}"]
+    if verdicts.get("fpr") is not None:
+        note_parts.append(f"verdicts FPR={verdicts['fpr']:.4f}")
+    note_parts.append(f"run_id={data.get('run_id', 'нет')}")
+    return (
+        STATUS_OK if not problems else STATUS_FAIL,
+        data,
+        "; ".join(note_parts) + (" — " + "; ".join(problems) if problems else " — шлюз hf достигнут"),
+    )
+
+
+@check(
+    id="4.1.6-hf-a3",
+    point="ТЗ п. 4.1 треб. 6",
+    requirement="F1 ≥ 0.50 при FPR ≤ 0.40 на реальных актах (корпус A3, 1200 пар, режим hf)",
+    how="прогон в режиме hf с чанкингом: корпус A3 (1200 пар, 409 документов)",
+    command="python -m spanverify evaluate --dataset data/corpus_a3/splits/test.jsonl --mode hf",
+)
+def check_gate_hf_a3(runner: Runner) -> tuple[str, dict[str, Any], str]:
+    """Шлюз качества в режиме hf на реальных актах."""
+    artifact = ARTIFACTS / "4.1.6-hf-gate-a3.json"
+    if not artifact.exists():
+        return STATUS_UNKNOWN, {"reason": "артефакт не создан"}, "нет файла 4.1.6-hf-gate-a3.json"
+    data = json.loads(artifact.read_text(encoding="utf-8"))
+    if data.get("mode") != "hf":
+        return STATUS_FAIL, data, f"mode={data.get('mode')}, ожидался hf"
+    metrics = data.get("metrics") or {}
+    tokens = metrics.get("tokens") or {}
+    f1 = tokens.get("f1")
+    fpr = tokens.get("fpr")
+    if f1 is None or fpr is None:
+        return STATUS_UNKNOWN, data, "числа hf не измерены (нужен прогон через CI)"
+    problems: list[str] = []
+    if f1 < 0.50:
+        problems.append(f"tokens F1={f1:.4f} < 0.50")
+    if fpr > 0.40:
+        problems.append(f"tokens FPR={fpr:.4f} > 0.40")
+    verdicts = metrics.get("verdicts") or {}
+    note_parts = [f"tokens F1={f1:.4f}, FPR={fpr:.4f}"]
+    if verdicts.get("fpr") is not None:
+        note_parts.append(f"verdicts FPR={verdicts['fpr']:.4f}")
+    width = metrics.get("spans", {}).get("mean_width_ratio")
+    if width is not None:
+        note_parts.append(f"width_ratio={width:.2f}")
+    return (
+        STATUS_OK if not problems else STATUS_FAIL,
+        data,
+        "; ".join(note_parts) + (" — " + "; ".join(problems) if problems else " — шлюз hf достигнут"),
+    )
+
+
+@check(
+    id="4.1.6-demo",
+    point="ТЗ п. 4.1 треб. 6 (диагностика, не договорная строка)",
+    requirement="F1 ≥ 0.50 при FPR ≤ 0.40 на корпусе A (режим demo, baseline для сравнения с hf)",
+    how="прогон на корпусе A в demo-режиме: разбиение по документам, shared_groups = 0",
     command="python -m spanverify evaluate --dataset data/corpus_a/splits/test.jsonl",
 )
 def check_gate_corpus_a(runner: Runner) -> tuple[str, dict[str, Any], str]:
@@ -1223,10 +1308,11 @@ def check_gate_corpus_a(runner: Runner) -> tuple[str, dict[str, Any], str]:
         "gate_numbers": contract.get("gate"),
         "internal": (gates.get("tokens") or {}).get("internal"),
         "dataset": "corpus_a1_synthetic",
+        "mode": "demo",
     }
     note = "; ".join(problems) or (
-        "договорный ориентир достигнут; внутренний ориентир проекта (F1 ≥ 0.90 при FPR ≤ 0.10) "
-        "остаётся не достигнут — это отдельная строка отчёта"
+        "диагностика: demo-режим (лексические суррогаты); договорная строка качества — 4.1.6-hf; "
+        "внутренний ориентир проекта (F1 ≥ 0.90 при FPR ≤ 0.10) остаётся не достигнут"
     )
     return (STATUS_OK if not problems else STATUS_FAIL), fact, note
 
@@ -2497,6 +2583,7 @@ def run_checks(
     fast: bool,
     runner: Runner | None = None,
     skip_after_docs: bool = False,
+    id_filter: set[str] | None = None,
 ) -> tuple[list[dict[str, Any]], int]:
     runner = runner or Runner(fast=fast)
     results: list[dict[str, Any]] = []
@@ -2505,6 +2592,8 @@ def run_checks(
         if only and check_item.id != only:
             continue
         if skip_after_docs and check_item.after_docs:
+            continue
+        if id_filter is not None and check_item.id not in id_filter:
             continue
         if fast and check_item.heavy:
             results.append(
@@ -3091,17 +3180,17 @@ def main() -> int:
         REPORT_APPENDIX_DOC.write_text(
             render_report_appendix(preliminary), encoding="utf-8"
         )
-    deferred, deferred_failures = run_checks(args.only, args.fast, runner=runner)
-    deferred = [
-        item
-        for item in deferred
-        if item["id"] in {check.id for check in CHECKS if check.after_docs}
-    ]
+    after_docs_ids = {check.id for check in CHECKS if check.after_docs}
+    deferred, deferred_failures = run_checks(
+        args.only, args.fast, runner=runner, id_filter=after_docs_ids
+    )
+    deferred = [item for item in deferred if item["id"] in after_docs_ids]
     results.extend(deferred)
-    failures += deferred_failures
+    # Считаем summary по фактическому списку results, а не по сумме counters,
+    # чтобы избежать двойного счёта при повторных прогонах.
     summary = {
         STATUS_OK: sum(1 for item in results if item["status"] == STATUS_OK),
-        STATUS_FAIL: failures,
+        STATUS_FAIL: sum(1 for item in results if item["status"] == STATUS_FAIL),
         STATUS_UNKNOWN: sum(1 for item in results if item["status"] == STATUS_UNKNOWN),
     }
     payload = {
