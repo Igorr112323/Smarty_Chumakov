@@ -31,7 +31,6 @@ def test_contract_provenance_local_or_ci():
         )
 
         # commit must match the artifact reference
-        source_artifact = contract["source_artifact"]
         commit = contract["commit"]
 
         # Verify commit is not a base commit (must be from the CI run)
