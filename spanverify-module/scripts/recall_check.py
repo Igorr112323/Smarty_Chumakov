@@ -12,7 +12,7 @@
     - soft: любое пересечение чанка с релевантным регионом
     - coverage_50: чанк покрывает ≥50% релевантного региона
 """
-
+import json
 import sys
 from pathlib import Path
 
@@ -78,13 +78,20 @@ def calc_recall(pairs, corpus_name, criteria="soft"):
                     continue
 
                 results["n"] += 1
-                indices = select_relevant_chunks(answer, dc, top_k=5)
 
-                if indices and indices[0] in containing:
+                # Для recall@1 используем top_k=1 (истинный топ-1)
+                indices_1 = select_relevant_chunks(answer, dc, top_k=1)
+                if indices_1 and indices_1[0] in containing:
                     results["recall@1"] += 1
-                if any(idx in containing for idx in indices[:3]):
+
+                # Для recall@3 используем top_k=3
+                indices_3 = select_relevant_chunks(answer, dc, top_k=3)
+                if any(idx in containing for idx in indices_3):
                     results["recall@3"] += 1
-                if any(idx in containing for idx in indices[:5]):
+
+                # Для recall@5 используем top_k=5
+                indices_5 = select_relevant_chunks(answer, dc, top_k=5)
+                if any(idx in containing for idx in indices_5):
                     results["recall@5"] += 1
 
             else:  # corpus_a
@@ -110,7 +117,10 @@ def calc_recall(pairs, corpus_name, criteria="soft"):
                                 overlap_end = min(c.end, idx + region_length)
                                 if overlap_end > overlap_start:
                                     overlap_length = overlap_end - overlap_start
-                                    if overlap_length / region_length >= 0.5 and i not in containing:
+                                    if (
+                                        overlap_length / region_length >= 0.5
+                                        and i not in containing
+                                    ):
                                         containing.append(i)
 
                     match_start = idx + 1
@@ -119,13 +129,20 @@ def calc_recall(pairs, corpus_name, criteria="soft"):
                     continue
 
                 results["n"] += 1
-                indices = select_relevant_chunks(answer, dc, top_k=5)
 
-                if indices and indices[0] in containing:
+                # Для recall@1 используем top_k=1 (истинный топ-1)
+                indices_1 = select_relevant_chunks(answer, dc, top_k=1)
+                if indices_1 and indices_1[0] in containing:
                     results["recall@1"] += 1
-                if any(idx in containing for idx in indices[:3]):
+
+                # Для recall@3 используем top_k=3
+                indices_3 = select_relevant_chunks(answer, dc, top_k=3)
+                if any(idx in containing for idx in indices_3):
                     results["recall@3"] += 1
-                if any(idx in containing for idx in indices[:5]):
+
+                # Для recall@5 используем top_k=5
+                indices_5 = select_relevant_chunks(answer, dc, top_k=5)
+                if any(idx in containing for idx in indices_5):
                     results["recall@5"] += 1
 
     if results["n"] > 0:
