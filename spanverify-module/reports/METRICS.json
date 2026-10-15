@@ -1775,5 +1775,7 @@
   },
   "pilot": null,
   "release": null,
-  "duration_s": 40.5
+  "duration_s": 40.5,
+  "ci_run_id": "38787531249",
+  "ci_status": "success"
 }
