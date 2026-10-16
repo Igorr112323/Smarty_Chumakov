@@ -56,6 +56,14 @@ jobs:
           python -m pip install --upgrade pip
           python -m pip install -r requirements.txt
 
+      - name: Проверка маркеров конфликтов слияния
+        run: |
+          if grep -rn "^<<<<<<< \|^>>>>>>> \|^=======$" --exclude-dir=.git --exclude-dir=__pycache__ .; then
+            echo "::error title=маркеры конфликта::в дереве остались маркеры слияния"
+            exit 1
+          fi
+          echo "✓ Маркеры конфликтов отсутствуют"
+
       - name: Линтер (ruff)
         run: python -m ruff check .
 
