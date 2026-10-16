@@ -26,10 +26,10 @@ permissions:
   contents: write
 
 jobs:
-  # Сухой прогон стоимости hf с чанкингом (50 пар, шард 0/8)
-  # Замер времени и памяти перед полным прогоном 2б.
+  # Сухой прогон стоимости hf с чанкингом (шард 0/8, ~150 пар)
+  # Репетиция реального шарда для 2б. Замер времени перед полным прогоном.
   dry-run-cost:
-    name: "Стоимость hf с чанкингом (50 пар, шард 0/8)"
+    name: "Стоимость hf с чанкингом (шард 0/8, ~150 пар)"
     runs-on: ubuntu-latest
     timeout-minutes: 30
     steps:
@@ -56,7 +56,7 @@ jobs:
           python -m pip install -q "torch~=2.14" --index-url https://download.pytorch.org/whl/cpu
           python -m pip install -q -r requirements-hf.txt
 
-      - name: "Сухой прогон: 50 пар с чанкингом"
+      - name: "Сухой прогон: шард 0/8 без limit (~150 пар)"
         working-directory: spanverify-module
         timeout-minutes: 25
         env:
@@ -66,7 +66,7 @@ jobs:
           time python scripts/precompute_features.py \
             --dataset data/corpus_a3/pairs.jsonl \
             --mode hf --chunked \
-            --shard 0 --shards 8 --limit 50 \
+            --shard 0 --shards 8 \
             --out reports/hf-cache-v2
 
       - uses: actions/upload-artifact@v4
