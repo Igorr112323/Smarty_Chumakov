@@ -2358,7 +2358,7 @@ seed 42, режим demo, набор данных — синтетический
 | Калибровка агрегации вердикта | `.venv/bin/python scripts/calibrate_verdict.py --dataset data/corpus_a3/pairs.jsonl --splits data/corpus_a3/splits --mode demo --seed 42 --target-fpr 0.1 --freeze config/verdict.json --out reports/verdict_calibration.json --also data/corpus_a/pairs.jsonl --evidence-dir reports/verdict --save-bundle reports/verdict/bundle_a3_demo.json` | dev 181 / test 177; выбрано `min_mask_tokens=2, min_fragment_chars=20`; тест: **F1 0.8315, FPR 0.0875** (было 0.7005 / 0.3875); контроль на корпусе A без изменений (F1 0.7853, FPR 0) |
 | Правило вердикта | `tests/test_verdict_calibration.py` (14 тестов), вкупе с `test_verdict_rule`, `test_number_attribution`, `test_number_words_in_answer` | 37 тестов проходят: конфиг ↔ отчёт ↔ движок ↔ таблицы свидетельств |
 | Числа документов | `scripts/refresh_metrics.py`, `scripts/build_numbers.py`, `scripts/check_numbers.py` | тестов 641, покрытие 87.88 %; реестр 66 записей, 31 измерено |
-| Контур договора | `python scripts/contract_check.py` | **32 соответствует, 0 не соответствует, 1 не измерено** (процент оригинальности — внешняя система, зона получателя); в документы добавлена таблица запаса |
+| Контур договора | `python scripts/contract_check.py` | **32 соответствует, 0 не соответствует, 3 не измерено** (процент оригинальности — внешняя система, зона получателя); в документы добавлена таблица запаса |
 | Тесты целиком | `python -m pytest -q` | 641 теста, все проходят |
 
 Что улучшено по сути, а не подгонкой:
