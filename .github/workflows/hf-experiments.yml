@@ -26,6 +26,58 @@ permissions:
   contents: write
 
 jobs:
+  # Сухой прогон стоимости hf с чанкингом (50 пар, шард 0/8)
+  # Замер времени и памяти перед полным прогоном 2б.
+  dry-run-cost:
+    name: "Стоимость hf с чанкингом (50 пар, шард 0/8)"
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: "Кеш модели HuggingFace (~1.1 ГБ)"
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/huggingface
+          key: hf-model-rugpt3small-${{ runner.os }}
+          restore-keys: |
+            hf-model-rugpt3small-
+
+      - name: "Зависимости и CPU-версия torch"
+        working-directory: spanverify-module
+        timeout-minutes: 20
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -q -r requirements.txt
+          python -m pip install -q "torch~=2.14" --index-url https://download.pytorch.org/whl/cpu
+          python -m pip install -q -r requirements-hf.txt
+
+      - name: "Сухой прогон: 50 пар с чанкингом"
+        working-directory: spanverify-module
+        timeout-minutes: 25
+        env:
+          OMP_NUM_THREADS: "4"
+          HF_HOME: "/home/runner/.cache/huggingface"
+        run: |
+          time python scripts/precompute_features.py \
+            --dataset data/corpus_a3/pairs.jsonl \
+            --mode hf --chunked \
+            --shard 0 --shards 8 --limit 50 \
+            --out reports/hf-cache-v2
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: dry-run-hf-cost
+          path: |
+            spanverify-module/reports/hf-cache-v2/precompute_shard0of8-chunked.json
+            spanverify-module/reports/hf-cache-v2/features_shard0of8-chunked.jsonl
+          if-no-files-found: warn
+          retention-days: 30
+
   # Цепочки корпусов независимы: падение корпуса A не должно отменять
   # уже посчитанный A3. Именно так и случилось в первый раз — шард A не влез
   # в лимит (в корпусе A 1200 пар, а не 240), и experiment для A3 ушёл в skipped,
