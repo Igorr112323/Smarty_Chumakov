@@ -12,7 +12,7 @@
     "repeats": 3,
     "warmup": true,
     "memory": "tracemalloc (память Python-объектов; RSS процесса не покрывается)",
-    "text_source": "/home/user/Smarty_Chumakov/АктыРеальны",
+    "text_source": "АктыРеальны",
     "acts_used": 20,
     "corpus_chars": 201045
   },

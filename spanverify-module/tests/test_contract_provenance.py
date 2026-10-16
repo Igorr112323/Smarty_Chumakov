@@ -41,6 +41,11 @@ def test_contract_provenance_local_or_ci():
             artifact["commit"] == contract["commit"]
         ), "commit в CONTRACT.json не совпадает с commit в артефакте прогона"
 
+        # Verify summary matches the artifact (not just commit)
+        assert (
+            artifact["summary"] == contract["summary"]
+        ), "summary в CONTRACT.json не совпадает с summary в артефакте прогона"
+
         # Verify source_artifact is specified
         assert contract.get("source_artifact"), "не указан id артефакта в source_artifact"
 

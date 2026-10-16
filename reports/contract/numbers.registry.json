@@ -1,19 +1,17 @@
 {
   "id": "numbers.registry",
-  "commit": "9e1a332e61526fa472ae732d204fc4adeef48c3c",
+  "commit": "fc438ea7069b4a3c8ad78097f4c29df1767937ec",
   "seed": 42,
   "mode": "demo",
   "dataset": "reports/NUMBERS.json",
-  "date": "2026-10-15T22:53:10Z",
+  "date": "2026-10-16T11:49:33Z",
   "command": "",
   "metrics": {
     "entries": 66,
     "measured": 31,
-    "missing": [
-      "tests.coverage_percent"
-    ],
+    "missing": [],
     "check_ok": true
   },
-  "note": "реестр собран: 66 записей, не измерено 1",
+  "note": "реестр собран: 66 записей, не измерено 0",
   "gate": null
 }
