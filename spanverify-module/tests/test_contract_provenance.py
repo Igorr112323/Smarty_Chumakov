@@ -3,6 +3,7 @@
 Ensures that if provenance is "ci", the artifact must have source_artifact
 and commit matching the artifact.
 """
+
 import json
 from pathlib import Path
 
@@ -23,12 +24,8 @@ def test_contract_provenance_local_or_ci():
 
     if provenance == "ci":
         # If provenance is "ci", must have source_artifact and commit
-        assert "source_artifact" in contract, (
-            "CONTRACT.json with provenance='ci' must have 'source_artifact' field"
-        )
-        assert "commit" in contract, (
-            "CONTRACT.json with provenance='ci' must have 'commit' field"
-        )
+        assert "source_artifact" in contract, "CONTRACT.json with provenance='ci' must have 'source_artifact' field"
+        assert "commit" in contract, "CONTRACT.json with provenance='ci' must have 'commit' field"
 
         # commit must match the artifact reference
         commit = contract["commit"]
@@ -45,6 +42,4 @@ def test_contract_provenance_local_or_ci():
         pass
 
     else:
-        pytest.fail(
-            f"CONTRACT.json provenance must be 'local' or 'ci', got: {provenance}"
-        )
+        pytest.fail(f"CONTRACT.json provenance must be 'local' or 'ci', got: {provenance}")
