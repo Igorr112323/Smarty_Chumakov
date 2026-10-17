@@ -360,7 +360,9 @@ def main(argv: list[str] | None = None) -> int:
     # Кеш признаков: без него режим hf пересчитывает прямой проход модели в
     # каждом фолде кросс-валидации, и эксперимент не укладывается в лимит job'а
     # (прогон 37446204812 выбрал 120 минут целиком).
-    cache = load_feature_cache(args.features_cache, counting=True) if args.features_cache else None
+    # strict=True ловит старый формат кеша (без двух полей) до обучения, а не
+    # через 40 минут в train.py:138.
+    cache = load_feature_cache(args.features_cache, counting=True, strict=True) if args.features_cache else None
     set_feature_cache(cache)
     if cache:
         print(f"кеш признаков: {len(cache)} ключей из {len(args.features_cache)} пути(ей)", flush=True)

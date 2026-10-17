@@ -830,7 +830,16 @@ def train(
 
     # 6. Сквозная проверка: те же параметры, но через публичный verify() — то, что
     #    реально увидит пользователь API. Числа берутся из настоящего пути.
-    end_to_end = Verifier(mode=mode, weights=bundle).evaluate(test_pairs)
+    #    Кеш признаков передаём: без него HF-режим заново считает признаки на
+    #    каждой паре отложенной выборки (360 × 6,4 с ≈ 38 мин — упирается в
+    #    таймаут 30 мин). Признаки из кеша идентичны тем, что считались в
+    #    кросс-валидации (та же модель, окно, чанкинг) — это не подмена числа.
+    end_to_end = Verifier(
+        mode=mode,
+        weights=bundle,
+        model_name=getattr(verifier, "model_name", None),
+        features_cache=getattr(verifier, "features_cache", None),
+    ).evaluate(test_pairs)
 
     report = TrainReport(
         bundle=bundle,

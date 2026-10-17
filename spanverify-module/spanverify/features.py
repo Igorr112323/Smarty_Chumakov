@@ -1616,11 +1616,17 @@ class CountingFeatureCache(dict):
         return f"<CountingFeatureCache {len(self)} ключей, попаданий {self.hits}, промахов {self.misses}>"
 
 
-def load_feature_cache(paths: Any, counting: bool = False) -> dict[str, FeatureMatrix]:
+def load_feature_cache(paths: Any, counting: bool = False, strict: bool = False) -> dict[str, FeatureMatrix]:
     """Прочитать кеш из файла(.ов) JSONL или из каталога с шардами.
 
     Шарды пишутся независимыми job'ами в ``features_*.jsonl``; здесь они
     склеиваются в один словарь. Порядок не важен: обращение по ключу.
+
+    Если ``strict=True``, проверяет полноту кеша: все 5 признаков из
+    FEATURE_NAMES должны быть непустыми. Используется экспериментом, чтобы
+    поймать старый формат кеша (без двух полей) до обучения, а не через
+    40 минут в train.py:138. По умолчанию ``strict=False`` — тесты пишут
+    частичные кеши для режима demo, им проверка не нужна.
     """
     import json  # noqa: PLC0415
     from pathlib import Path  # noqa: PLC0415
@@ -1654,15 +1660,16 @@ def load_feature_cache(paths: Any, counting: bool = False) -> dict[str, FeatureM
                     embedding_density=[float(x) for x in row.get("embedding_density", [])],
                     meta={"from_cache": True, "pair_id": row.get("pair_id")},
                 )
-    # Проверка полноты: если кеш старого формата (без двух полей), ловим сразу,
-    # а не через 40 минут в train.py:138.
-    for check_key, matrix in cache.items():
-        missing = [n for n in FEATURE_NAMES if not getattr(matrix, n)]
-        if missing:
-            raise ValueError(
-                f"кеш неполон для ключа {check_key[:40]}... "
-                f"(нет полей {missing}); пересчитайте precompute_features.py --chunked"
-            )
+    # Проверка полноты: если strict=True и кеш старого формата (без двух полей),
+    # ловим сразу, а не через 40 минут в train.py:138.
+    if strict:
+        for check_key, matrix in cache.items():
+            missing = [n for n in FEATURE_NAMES if not getattr(matrix, n)]
+            if missing:
+                raise ValueError(
+                    f"кеш неполон для ключа {check_key[:40]}... "
+                    f"(нет полей {missing}); пересчитайте precompute_features.py --chunked"
+                )
     return cache
 
 

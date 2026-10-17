@@ -70,7 +70,7 @@ def test_dump_load_roundtrip_preserves_all_features():
 
 
 def test_load_feature_cache_detects_old_format():
-    """load_feature_cache падает, если кеш старого формата (без двух полей)."""
+    """load_feature_cache падает, если кеш старого формата (без двух полей) и strict=True."""
     # Имитируем кеш старого формата (только 3 признака)
     old_row = {
         "key": "test|model|512|answer|context",
@@ -85,10 +85,14 @@ def test_load_feature_cache_detects_old_format():
         cache_file = Path(tmpdir) / "features_old.jsonl"
         cache_file.write_text(json.dumps(old_row, ensure_ascii=False) + "\n", encoding="utf-8")
 
-        # Ожидаем ValueError с явным сообщением
+        # Без strict=False кеш старого формата проходит (для совместимости с demo-теста)
+        cache = load_feature_cache(cache_file, strict=False)
+        assert len(cache) == 1
+
+        # С strict=True ожидаем ValueError с явным сообщением
         try:
-            load_feature_cache(cache_file)
-            assert False, "load_feature_cache не упал на кеше старого формата"
+            load_feature_cache(cache_file, strict=True)
+            assert False, "load_feature_cache не упал на кеше старого формата с strict=True"
         except ValueError as exc:
             assert "кеш неполон" in str(exc) or "пересчитайте" in str(exc)
 
