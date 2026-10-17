@@ -300,6 +300,7 @@ class Verifier:
         verdict_rule: str | None = None,
         span_filter_min_chars: int = 0,
         verdict_params: Mapping[str, Any] | None = None,
+        span_expansion: str = "clause",
     ) -> None:
         self.config = config or Config.load()
         # Правило вердикта берётся из замороженного артефакта калибровки
@@ -321,6 +322,15 @@ class Verifier:
         # помечается. 0 — фильтр выключен (текущее поведение). Порог задаётся
         # снаружи и по тесту не подбирается.
         self.span_filter_min_chars = int(span_filter_min_chars)
+        # Расширение границ фрагментов маски:
+        # - clause (текущий): до границ клаузы (предложение, суженное до запятых/тире)
+        # - mask: ровно по помеченным токенам, без расширения
+        # - clause_capped: клауза, но не шире max(40 знаков, 2 × ширина маски)
+        # - mask_padded: маска + по одному соседнему токену слева и справа
+        # Вариант выбирается на dev и не подстраивается под тест.
+        if span_expansion not in ("clause", "mask", "clause_capped", "mask_padded"):
+            raise ValueError(f"неизвестный span_expansion: {span_expansion!r}")
+        self.span_expansion = span_expansion
         # Явно переданные веса имеют приоритет: иначе обучение, которое считает
         # сквозные метрики «в памяти», случайно перечитало бы файл с диска.
         self.bundle = weights if weights is not None else WeightsBundle.load(weights_path)
@@ -820,7 +830,43 @@ class Verifier:
         for group in groups:
             keep_start = tokens[group[0]].start
             keep_end = tokens[group[-1]].end
-            start, end = _shrink_to_clause(answer, keep_start, keep_end, keep_start, keep_end)
+            # Выбор стратегии расширения границ в зависимости от span_expansion
+            if self.span_expansion == "mask":
+                # Ровно по помеченным токенам, без расширения
+                start, end = keep_start, keep_end
+            elif self.span_expansion == "clause":
+                # Текущее поведение: расширение до границ клаузы
+                start, end = _shrink_to_clause(answer, keep_start, keep_end, keep_start, keep_end)
+            elif self.span_expansion == "clause_capped":
+                # Клауза, но не шире max(40 знаков, 2 × ширина маски)
+                clause_start, clause_end = _shrink_to_clause(answer, keep_start, keep_end, keep_start, keep_end)
+                mask_width = keep_end - keep_start
+                max_width = max(40, 2 * mask_width)
+                # Обрезаем клаузу до max_width, центрируя на маске
+                clause_width = clause_end - clause_start
+                if clause_width > max_width:
+                    # Центрируем на середине маски
+                    mask_mid = (keep_start + keep_end) // 2
+                    start = max(clause_start, mask_mid - max_width // 2)
+                    end = min(clause_end, start + max_width)
+                    # Убеждаемся, что маска полностью внутри
+                    start = min(start, keep_start)
+                    end = max(end, keep_end)
+                else:
+                    start, end = clause_start, clause_end
+            elif self.span_expansion == "mask_padded":
+                # Маска + по одному соседнему токену слева и справа
+                start = keep_start
+                end = keep_end
+                # Добавляем токен слева, если есть
+                if group[0] > 0:
+                    start = tokens[group[0] - 1].start
+                # Добавляем токен справа, если есть
+                if group[-1] < len(tokens) - 1:
+                    end = tokens[group[-1] + 1].end
+            else:
+                # Не должно произойти из-за проверки в __init__
+                raise ValueError(f"неизвестный span_expansion: {self.span_expansion!r}")
             fragment = answer[start:end]
             if not fragment.strip():
                 continue

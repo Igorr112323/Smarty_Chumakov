@@ -357,6 +357,12 @@ def main(argv: list[str] | None = None) -> int:
         action="store_true",
         help="не трогать официальный тест: промежуточный прогон (P0-шаги 1–3)",
     )
+    parser.add_argument(
+        "--span-expansion",
+        default="clause",
+        choices=("clause", "mask", "clause_capped", "mask_padded"),
+        help="стратегия расширения границ фрагментов (P0 шаг 1)",
+    )
     args = parser.parse_args(argv)
 
     dataset = Path(args.dataset)
@@ -419,6 +425,7 @@ def main(argv: list[str] | None = None) -> int:
         mode=args.mode,
         model_name=args.model,
         features_cache=cache,
+        span_expansion=args.span_expansion,
         weights=WeightsBundle(weights=dict(DEFAULT_WEIGHTS), threshold=0.5, mode=args.mode),
     )
     print(f"модель признаков: {train_verifier.model_name}", flush=True)
@@ -461,6 +468,7 @@ def main(argv: list[str] | None = None) -> int:
             model_name=args.model,
             weights=bundle,
             features_cache=cache,
+            span_expansion=args.span_expansion,
         )
         mask_scan = _mask_scan(verifier_for_scan, splits["train"], bundle, args.target_fpr)
         print(mask_scan["statement"], flush=True)
@@ -475,6 +483,7 @@ def main(argv: list[str] | None = None) -> int:
                 model_name=args.model,
                 weights=bundle,
                 features_cache=cache,
+                span_expansion=args.span_expansion,
                 span_filter_min_chars=span_filter_chars,
             )
             filtered_scan = _mask_scan(verifier_filtered_scan, splits["train"], bundle, args.target_fpr)
@@ -529,6 +538,7 @@ def main(argv: list[str] | None = None) -> int:
         model_name=args.model,
         weights=bundle,
         features_cache=cache,
+        span_expansion=args.span_expansion,
         span_filter_min_chars=chosen_span_filter,
     )
     metrics = verifier.evaluate(records)
@@ -565,6 +575,7 @@ def main(argv: list[str] | None = None) -> int:
                 model_name=args.model,
                 weights=bundle,
                 features_cache=cache,
+                span_expansion=args.span_expansion,
                 verdict_rule=VERDICT_ANY_SPAN,
                 span_filter_min_chars=chosen_span_filter,
             )

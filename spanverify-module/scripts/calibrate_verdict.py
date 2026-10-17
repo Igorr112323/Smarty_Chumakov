@@ -331,6 +331,12 @@ def main(argv: list[str] | None = None) -> int:
         metavar="PATH",
         help="кеш предпосчитанных признаков (файл JSONL или каталог с шардами); " "можно указать несколько раз",
     )
+    parser.add_argument(
+        "--span-expansion",
+        default="clause",
+        choices=("clause", "mask", "clause_capped", "mask_padded"),
+        help="стратегия расширения границ фрагментов (P0 шаг 1)",
+    )
     args = parser.parse_args(argv)
 
     dataset = Path(args.dataset)
@@ -354,10 +360,16 @@ def main(argv: list[str] | None = None) -> int:
         print(f"кеш признаков: {len(cache)} ключей", flush=True)
 
     if args.no_train:
-        verifier = Verifier(mode=args.mode, model_name=args.model, weights_path=args.bundle, features_cache=cache)
+        verifier = Verifier(
+            mode=args.mode, model_name=args.model, weights_path=args.bundle, features_cache=cache,
+            span_expansion=args.span_expansion,
+        )
         bundle_note = f"бандл из {args.bundle} (обучение не запускалось)"
     else:
-        train_verifier = Verifier(mode=args.mode, model_name=args.model, features_cache=cache)
+        train_verifier = Verifier(
+            mode=args.mode, model_name=args.model, features_cache=cache,
+            span_expansion=args.span_expansion,
+        )
         report = train(
             splits["train"],
             mode=args.mode,
@@ -368,7 +380,10 @@ def main(argv: list[str] | None = None) -> int:
             verifier=train_verifier,
         )
         bundle = report.bundle
-        verifier = Verifier(mode=args.mode, model_name=args.model, weights=bundle, features_cache=cache)
+        verifier = Verifier(
+            mode=args.mode, model_name=args.model, weights=bundle, features_cache=cache,
+            span_expansion=args.span_expansion,
+        )
         bundle_note = f"обучение на train ({len(splits['train'])} пар), seed {args.seed}, фолдов {args.folds}"
 
     if args.save_bundle:
