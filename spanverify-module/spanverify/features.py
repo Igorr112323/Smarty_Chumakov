@@ -1582,7 +1582,9 @@ _ACTIVE_FEATURE_CACHE: dict[str, FeatureMatrix] | None = None
 def set_feature_cache(cache: Mapping[str, FeatureMatrix] | None) -> None:
     """Включить (или выключить при ``None``) глобальный кеш признаков."""
     global _ACTIVE_FEATURE_CACHE  # noqa: PLW0603
-    _ACTIVE_FEATURE_CACHE = dict(cache) if cache is not None else None
+    # НЕ конвертируем CountingFeatureCache в dict — теряется счётчик hits/misses.
+    # Передаём как есть, чтобы лог эксперимента показывал попадания/промахи.
+    _ACTIVE_FEATURE_CACHE = cache if cache is not None else None
 
 
 def get_feature_cache() -> Mapping[str, FeatureMatrix] | None:
