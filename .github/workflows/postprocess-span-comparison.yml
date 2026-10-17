@@ -1,0 +1,117 @@
+# Лёгкая постобработка: извлечение dev-чисел из существующего прогона
+# Не запускает precompute, не использует torch/HF модель
+# Только скачивает артефакты и создаёт сравнительную таблицу
+name: Постобработка span_expansion
+on:
+  workflow_dispatch:
+    inputs:
+      source_run_id:
+        description: 'ID исходного workflow run (например, 39060670054)'
+        required: true
+        type: string
+
+permissions:
+  actions: read
+  contents: read
+
+jobs:
+  extract-comparison:
+    name: Извлечение и сравнение
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            spanverify-module/scripts/compare_span_expansion.py
+      
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      
+      - name: Download artifacts from source run
+        uses: actions/download-artifact@v4
+        with:
+          pattern: hf-experiment-a3-*
+          path: reports/experiments/a3/raw
+          run-id: ${{ inputs.source_run_id }}
+      
+      - name: Normalize artifact structure
+        run: |
+          set -e
+          
+          echo "Структура после скачивания:"
+          find reports/experiments/a3/raw -type f | sort
+          
+          # Перемещаем файлы в ожидаемую структуру
+          mkdir -p reports/experiments/a3
+          for variant in clause mask clause_capped mask_padded; do
+            src_dir="reports/experiments/a3/raw/hf-experiment-a3-${variant}"
+            dst_dir="reports/experiments/a3/${variant}"
+            
+            if [ ! -d "$src_dir" ]; then
+              echo "❌ Директория $src_dir не найдена"
+              exit 1
+            fi
+            
+            # Ищем experiment.json в любой вложенности
+            exp_file=$(find "$src_dir" -name "experiment.json" -type f)
+            
+            if [ -z "$exp_file" ]; then
+              echo "❌ experiment.json не найден в $src_dir"
+              exit 1
+            fi
+            
+            count=$(echo "$exp_file" | wc -l)
+            if [ "$count" -gt 1 ]; then
+              echo "❌ Найдено несколько experiment.json:"
+              echo "$exp_file"
+              exit 1
+            fi
+            
+            mkdir -p "$dst_dir"
+            cp "$exp_file" "$dst_dir/experiment.json"
+            echo "✓ Вариант $variant: скопирован $exp_file"
+          done
+          
+          # Удаляем raw директорию
+          rm -rf reports/experiments/a3/raw
+          
+          echo "Итоговая структура:"
+          find reports/experiments/a3 -type f | sort
+      
+      - name: Run comparison script
+        run: |
+          set -e
+          
+          python3 spanverify-module/scripts/compare_span_expansion.py \
+            --input-dir reports/experiments/a3 \
+            --out reports/experiments/a3/comparison.md \
+            --source-run-id ${{ inputs.source_run_id }} \
+            --source-commit $(git rev-parse HEAD)
+      
+      - name: Upload comparison artifact
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: hf-p0-span-comparison
+          path: |
+            reports/experiments/a3/comparison.md
+            reports/experiments/a3/comparison.json
+            reports/experiments/a3/*/experiment.json
+          retention-days: 30
+          if-no-files-found: error
+      
+      - name: Print summary
+        if: always()
+        run: |
+          if [ -f reports/experiments/a3/comparison.md ]; then
+            echo "### Сравнение вариантов span_expansion" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            cat reports/experiments/a3/comparison.md >> $GITHUB_STEP_SUMMARY
+          else
+            echo "❌ comparison.md не создан" >> $GITHUB_STEP_SUMMARY
+          fi
