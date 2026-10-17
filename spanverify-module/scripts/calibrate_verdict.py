@@ -337,6 +337,11 @@ def main(argv: list[str] | None = None) -> int:
         choices=("clause", "mask", "clause_capped", "mask_padded"),
         help="стратегия расширения границ фрагментов (P0 шаг 1)",
     )
+    parser.add_argument(
+        "--no-test",
+        action="store_true",
+        help="промежуточный прогон P0: не оценивать официальный test (только dev)",
+    )
     args = parser.parse_args(argv)
 
     dataset = Path(args.dataset)
@@ -418,15 +423,21 @@ def main(argv: list[str] | None = None) -> int:
     print("dev, три правила на одной таблице: " + json.dumps(dev_rules, ensure_ascii=False), flush=True)
 
     # Тест — один раз и уже замороженным правилом.
-    test_rows = evidence(verifier, splits["test"])
-    dump_evidence("test", test_rows)
-    test_rules = rules_report(test_rows, params)
-    print("test (один прогон, правило заморожено): " + json.dumps(test_rules, ensure_ascii=False), flush=True)
+    # При --no-test (промежуточный прогон P0) тест не трогаем.
+    test_rows = None
+    test_rules = None
+    if args.no_test:
+        print("ТЕСТ НЕ ОЦЕНИВАЛСЯ (--no-test): промежуточный прогон P0", flush=True)
+    else:
+        test_rows = evidence(verifier, splits["test"])
+        dump_evidence("test", test_rows)
+        test_rules = rules_report(test_rows, params)
+        print("test (один прогон, правило заморожено): " + json.dumps(test_rules, ensure_ascii=False), flush=True)
 
     # Контроль на втором корпусе: замороженное правило применяется как есть,
     # ничего не подбирается. Нужно, чтобы видеть перенос правила на другой корпус.
     control: dict[str, Any] | None = None
-    if args.also:
+    if args.also and not args.no_test:
         also = Path(args.also)
         if also.is_file():
             control_rows = {}

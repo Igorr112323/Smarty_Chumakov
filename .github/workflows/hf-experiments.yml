@@ -201,7 +201,7 @@ jobs:
       - name: "Счётчик кеша: попаданий / промахов"
         working-directory: spanverify-module
         run: |
-          grep -E "кеш признаков: попаданий|промахов" reports/experiments-a3.log || true
+          grep -E "кеш признаков: попаданий|промахов" reports/experiments-a3-${{ matrix.span_expansion }}.log || true
           # Если промахов > 0, это признак рассинхронизации ключей.
           # Без --require-cache это не фатально, но предупреждение важно.
 
@@ -297,9 +297,33 @@ jobs:
 
       - uses: actions/download-artifact@v4
         with:
-          name: hf-experiment-a3
-          path: spanverify-module/reports/experiments/a3
-          merge-multiple: true
+          pattern: hf-experiment-a3-*
+          path: spanverify-module/reports/experiments/a3-variants
+          merge-multiple: false
+
+      - name: "Разложить варианты по папкам"
+        working-directory: spanverify-module
+        run: |
+          # Артефакты скачались в a3-variants/{artifact-name}/
+          # Перекладываем в a3/{variant}/ для единообразия
+          for variant in clause mask clause_capped mask_padded; do
+            src="reports/experiments/a3-variants/hf-experiment-a3-${variant}"
+            dst="reports/experiments/a3/${variant}"
+            if [ -d "$src" ]; then
+              mkdir -p "$dst"
+              cp -r "$src"/* "$dst"/ 2>/dev/null || true
+              echo "✓ ${variant}: $(ls -1 "$dst" | wc -l) файлов"
+            else
+              echo "✗ ${variant}: не найдено"
+            fi
+          done
+          # Удаляем временную папку
+          rm -rf reports/experiments/a3-variants
+
+      - name: "Сравнить варианты span_expansion"
+        working-directory: spanverify-module
+        run: |
+          python scripts/compare_span_expansion.py --out reports/experiments/a3/comparison.md || true
 
       - uses: actions/download-artifact@v4
         with:

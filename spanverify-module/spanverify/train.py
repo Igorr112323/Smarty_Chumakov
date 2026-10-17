@@ -32,6 +32,7 @@ from .calibration import IsotonicCalibrator, choose_threshold_report, metrics_at
 from .core import tokenize_with_offsets
 from .engine import (
     SMOOTH_WINDOW,
+    VERDICT_MIN_TWO_TOKENS,
     Verifier,
     WeightsBundle,
     _answer_score,
@@ -839,6 +840,9 @@ def train(
         weights=bundle,
         model_name=getattr(verifier, "model_name", None),
         features_cache=getattr(verifier, "features_cache", None),
+        span_expansion=getattr(verifier, "span_expansion", "clause"),
+        span_filter_min_chars=getattr(verifier, "span_filter_min_chars", 0),
+        verdict_rule=getattr(verifier, "verdict_rule", VERDICT_MIN_TWO_TOKENS),
     ).evaluate(test_pairs)
 
     report = TrainReport(
