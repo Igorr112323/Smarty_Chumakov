@@ -1647,9 +1647,20 @@ def load_feature_cache(paths: Any, counting: bool = False) -> dict[str, FeatureM
                 cache[key] = FeatureMatrix(
                     attention_entropy=[float(x) for x in row.get("attention_entropy", [])],
                     ctx_attention_mass=[float(x) for x in row.get("ctx_attention_mass", [])],
+                    ctx_attention_mass_norm=[float(x) for x in row.get("ctx_attention_mass_norm", [])],
+                    ctx_max_similarity=[float(x) for x in row.get("ctx_max_similarity", [])],
                     embedding_density=[float(x) for x in row.get("embedding_density", [])],
                     meta={"from_cache": True, "pair_id": row.get("pair_id")},
                 )
+    # Проверка полноты: если кеш старого формата (без двух полей), ловим сразу,
+    # а не через 40 минут в train.py:138.
+    for check_key, matrix in cache.items():
+        missing = [n for n in FEATURE_NAMES if not getattr(matrix, n)]
+        if missing:
+            raise ValueError(
+                f"кеш неполон для ключа {check_key[:40]}... "
+                f"(нет полей {missing}); пересчитайте precompute_features.py --chunked"
+            )
     return cache
 
 

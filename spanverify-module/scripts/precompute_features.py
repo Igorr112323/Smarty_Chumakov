@@ -78,12 +78,14 @@ DEFAULT_MAX_LENGTH = 512
 
 
 def dump_matrix(key: str, matrix, pair_id: str, max_length: int, chunked: bool) -> dict:
-    """Строка кеша: ключ и три рабочих признака."""
+    """Строка кеша: ключ и все пять рабочих признаков."""
     row: dict = {
         "key": key,
         "pair_id": pair_id,
         "attention_entropy": [float(x) for x in matrix.attention_entropy],
         "ctx_attention_mass": [float(x) for x in matrix.ctx_attention_mass],
+        "ctx_attention_mass_norm": [float(x) for x in matrix.ctx_attention_mass_norm],
+        "ctx_max_similarity": [float(x) for x in matrix.ctx_max_similarity],
         "embedding_density": [float(x) for x in matrix.embedding_density],
         "max_length": max_length,
         "chunked": chunked,
