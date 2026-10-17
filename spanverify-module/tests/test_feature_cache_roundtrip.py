@@ -11,6 +11,7 @@ load_feature_cache не обновили. Кеш хранил только 3 п�
 2. Длины массивов равны длине ответа (не пустые)
 3. train.py:collect_samples проходит на загруженной матрице
 """
+
 import json
 import tempfile
 from pathlib import Path
@@ -38,6 +39,7 @@ def test_dump_load_roundtrip_preserves_all_features():
     """dump_matrix → load_feature_cache сохраняет все FEATURE_NAMES."""
     # Импортируем dump_matrix локально, чтобы не добавлять зависимость в модуль
     import sys
+
     sys.path.insert(0, str(Path(__file__).parent.parent / "scripts"))
     from precompute_features import dump_matrix
 
@@ -101,6 +103,7 @@ def test_collect_samples_works_with_cached_matrix():
     """train.py:collect_samples проходит на матрице из кеша (все 5 полей)."""
     # Импортируем dump_matrix локально
     import sys
+
     sys.path.insert(0, str(Path(__file__).parent.parent / "scripts"))
     from precompute_features import dump_matrix
 
