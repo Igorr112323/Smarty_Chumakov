@@ -21,7 +21,6 @@ from spanverify.features import (
     FeatureMatrix,
     load_feature_cache,
 )
-from spanverify.train import collect_samples
 
 
 def _make_matrix(answer_len: int = 5) -> FeatureMatrix:
@@ -94,7 +93,7 @@ def test_load_feature_cache_detects_old_format():
         # С strict=True ожидаем ValueError с явным сообщением
         try:
             load_feature_cache(cache_file, strict=True)
-            assert False, "load_feature_cache не упал на кеше старого формата с strict=True"
+            raise AssertionError("load_feature_cache не упал на кеше старого формата с strict=True")
         except ValueError as exc:
             assert "кеш неполон" in str(exc) or "пересчитайте" in str(exc)
 
