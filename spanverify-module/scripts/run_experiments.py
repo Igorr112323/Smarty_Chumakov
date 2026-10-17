@@ -352,6 +352,11 @@ def main(argv: list[str] | None = None) -> int:
             "0 — сравнение выключено; порог не подбирается по тесту"
         ),
     )
+    parser.add_argument(
+        "--no-test",
+        action="store_true",
+        help="не трогать официальный тест: промежуточный прогон (P0-шаги 1–3)",
+    )
     args = parser.parse_args(argv)
 
     dataset = Path(args.dataset)
@@ -545,7 +550,7 @@ def main(argv: list[str] | None = None) -> int:
     by_type: dict[str, dict] = {}
     clean_block: dict | None = None
     verdict_comparison: dict | None = None
-    if splits:
+    if not args.no_test and splits:
         test_pairs = splits.get("test") or []
         dev_pairs = splits.get("dev") or []
         if test_pairs:
@@ -599,6 +604,13 @@ def main(argv: list[str] | None = None) -> int:
                     "числа — измерение фиксированным бандлом, не подбор"
                 ),
             }
+    elif args.no_test:
+        print("ТЕСТ НЕ ИЗМЕРЯЛСЯ (--no-test)", flush=True)
+        # dev всё равно считаем — он нужен для промежуточных прогонов P0-шагов 1–3
+        if splits:
+            dev_pairs = splits.get("dev") or []
+            if dev_pairs:
+                dev_block = _metrics_block(verifier.evaluate(dev_pairs))
 
     out_dir = Path(args.out)
     out_dir.mkdir(parents=True, exist_ok=True)
@@ -620,7 +632,9 @@ def main(argv: list[str] | None = None) -> int:
     stats = corpus_statistics(records)
 
     official_section = ""
-    if test_block is not None and mask_scan is not None:
+    if args.no_test:
+        official_section = "\n## Официальный test\n\nОфициальный тест не измерялся (промежуточный прогон, --no-test).\n"
+    elif test_block is not None and mask_scan is not None:
         by_type_rows = "\n".join(
             f"| {mode_name} | {row['pairs']} | {row['token_recall']:.3f} | {row['token_f1']:.3f} "
             f"| {row['span_coverage']:.3f} |"
