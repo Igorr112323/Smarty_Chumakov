@@ -66,22 +66,59 @@ def format_metric(value, fmt=".3f") -> str:
     return f"{value:{fmt}}"
 
 
-def check_tokens_identical(results: dict) -> bool:
-    """Проверить, что токены идентичны во всех вариантах."""
+def check_tokens_identical(results: dict) -> dict:
+    """Проверить, что токены идентичны во всех вариантах.
+    
+    Возвращает словарь:
+    {
+        "identical": bool,  # True если все 6 полей совпадают во всех вариантах
+        "missing_fields": dict,  # {variant: [отсутствующие поля]}
+        "mismatched_fields": dict,  # {field: {variant: value}}
+    }
+    """
+    required_keys = ["tp", "fp", "fn", "tn", "f1", "fpr"]
+    
+    result = {
+        "identical": True,
+        "missing_fields": {},
+        "mismatched_fields": {},
+    }
+    
     variants = list(results.keys())
     if len(variants) < 2:
-        return True
+        return result
     
-    baseline = results[variants[0]]["dev_official"]["tokens"]
-    baseline_keys = ["tp", "fp", "fn", "tn", "f1", "fpr"]
-    
-    for variant in variants[1:]:
+    # Проверяем наличие всех обязательных полей в каждом варианте
+    for variant in variants:
         tokens = results[variant]["dev_official"]["tokens"]
-        for key in baseline_keys:
-            if baseline.get(key) != tokens.get(key):
-                return False
+        missing = [key for key in required_keys if key not in tokens]
+        if missing:
+            result["missing_fields"][variant] = missing
+            result["identical"] = False
     
-    return True
+    # Если есть отсутствующие поля, не сравниваем значения
+    if result["missing_fields"]:
+        return result
+    
+    # Сравниваем значения полей между вариантами
+    baseline_variant = variants[0]
+    baseline = results[baseline_variant]["dev_official"]["tokens"]
+    
+    for key in required_keys:
+        baseline_value = baseline[key]
+        mismatches = {baseline_variant: baseline_value}
+        
+        for variant in variants[1:]:
+            tokens = results[variant]["dev_official"]["tokens"]
+            variant_value = tokens[key]
+            mismatches[variant] = variant_value
+            
+            if baseline_value != variant_value:
+                result["mismatched_fields"][key] = mismatches
+                result["identical"] = False
+                break
+    
+    return result
 
 
 def main():
@@ -185,11 +222,26 @@ def main():
         "",
     ])
     
-    tokens_identical = check_tokens_identical(results)
-    if tokens_identical:
+    tokens_check = check_tokens_identical(results)
+    
+    if tokens_check["missing_fields"]:
+        lines.append("**❌ Отсутствуют обязательные поля токенов:**")
+        for variant, fields in tokens_check["missing_fields"].items():
+            lines.append(f"- {variant}: {', '.join(fields)}")
+        lines.append("")
+        lines.append("Без полных данных TP/FP/FN/TN/F1/FPR проверка равенства невозможна.")
+    elif tokens_check["identical"]:
         lines.append("**✅ Токены идентичны** во всех вариантах (TP/FP/FN/TN/F1/FPR совпадают)")
+        lines.append("")
+        lines.append("Это подтверждает, что изменение стратегии расширения границ не влияет на токены.")
     else:
-        lines.append("**❌ Токены различаются** между вариантами — это указывает на проблему")
+        lines.append("**❌ Токены различаются** между вариантами:")
+        for field, variant_values in tokens_check["mismatched_fields"].items():
+            lines.append(f"- {field}:")
+            for variant, value in variant_values.items():
+                lines.append(f"  - {variant}: {value}")
+        lines.append("")
+        lines.append("Это указывает на проблему: токены не должны меняться при изменении стратегии границ.")
     
     # Определяем лучший вариант
     best_variant = None
@@ -291,7 +343,9 @@ def main():
             "verdicts": dev["verdicts"],
         }
     
-    json_data["tokens_identical"] = tokens_identical
+    json_data["tokens_identical"] = tokens_check["identical"]
+    json_data["tokens_missing_fields"] = tokens_check.get("missing_fields", {})
+    json_data["tokens_mismatched_fields"] = list(tokens_check.get("mismatched_fields", {}).keys())
     json_data["best_variant"] = best_variant
     
     if best_variant:
