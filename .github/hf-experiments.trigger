@@ -6,3 +6,4 @@ hf: эксперименты с кешем, волна 2 — шарды для A
 # Trigger full cache recalc with 5 features: 2026-10-17T08:45:16+00:00
 # Trigger full cache recalc with CountingFeatureCache fix: 2026-10-17T10:12:30+00:00
 # Trigger stage 2b with train.py:833 fix: 2026-10-17T15:37:36+00:00
+P0 step 1: span_expansion scan 2026-10-17T17:19:54+00:00
