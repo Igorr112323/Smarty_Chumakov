@@ -2,8 +2,9 @@
 #
 # Шаг 2б: полный прогон с чанкингом. Сухой прогон (dry-run-cost) на голове
 # 7218317e дал честное число: 6,4 с/пара, 150 пар = 16:57, 1200 пар ≈ 2 часа.
-# Отсюда: A3 — 8 шардов по 150 пар (~16–17 мин), A — 6 шардов по 200 пар
-# (~19 мин). Лимит шага precompute 25 мин, лимит job 35 мин — оба проходим.
+# Отсюда: A3 — 8 шардов по 150 пар (~16–17 мин), A — 8 шардов по 150 пар
+# (~20-25 мин; корпус A оказался тяжелее из-за длинных контекстов с синтетики).
+# Лимит шага precompute 30 мин, лимит job 40 мин — оба проходим.
 #
 # Все precompute пишут чанкованные ключи (chunking=True, max_length=512)
 # в reports/hf-cache-v2. Эксперимент читает из того же каталога и тем же
@@ -85,15 +86,15 @@ jobs:
           if-no-files-found: error
           retention-days: 14
 
-  # ─── A: 6 шардов по 200 пар, чанкинг, ~19 мин каждый ──────────────────
+  # ─── A: 8 шардов по 150 пар, чанкинг, ~20-25 мин каждый ──────────────
   precompute-a:
-    name: "Признаки A (шард ${{ matrix.shard }}/6, чанкинг)"
+    name: "Признаки A (шард ${{ matrix.shard }}/8, чанкинг)"
     runs-on: ubuntu-latest
-    timeout-minutes: 35
+    timeout-minutes: 40
     strategy:
       fail-fast: false
       matrix:
-        shard: [0, 1, 2, 3, 4, 5]
+        shard: [0, 1, 2, 3, 4, 5, 6, 7]
     steps:
       - uses: actions/checkout@v4
 
@@ -118,9 +119,9 @@ jobs:
           python -m pip install -q "torch~=2.14" --index-url https://download.pytorch.org/whl/cpu
           python -m pip install -q -r requirements-hf.txt
 
-      - name: "Предпосчёт признаков шарда (чанкинг, ~200 пар)"
+      - name: "Предпосчёт признаков шарда (чанкинг, ~150 пар)"
         working-directory: spanverify-module
-        timeout-minutes: 25
+        timeout-minutes: 30
         env:
           OMP_NUM_THREADS: "4"
           HF_HOME: "/home/runner/.cache/huggingface"
@@ -128,15 +129,15 @@ jobs:
           time python scripts/precompute_features.py \
             --dataset data/corpus_a/pairs.jsonl \
             --mode hf --chunked \
-            --shard ${{ matrix.shard }} --shards 6 \
+            --shard ${{ matrix.shard }} --shards 8 \
             --out reports/hf-cache-v2
 
       - uses: actions/upload-artifact@v4
         with:
           name: hf-cache-a-v2-${{ matrix.shard }}
           path: |
-            spanverify-module/reports/hf-cache-v2/precompute_shard${{ matrix.shard }}of6-chunked.json
-            spanverify-module/reports/hf-cache-v2/features_shard${{ matrix.shard }}of6-chunked.jsonl
+            spanverify-module/reports/hf-cache-v2/precompute_shard${{ matrix.shard }}of8-chunked.json
+            spanverify-module/reports/hf-cache-v2/features_shard${{ matrix.shard }}of8-chunked.jsonl
           if-no-files-found: error
           retention-days: 14
 
