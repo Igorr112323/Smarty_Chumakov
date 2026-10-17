@@ -141,12 +141,16 @@ jobs:
           if-no-files-found: error
           retention-days: 14
 
-  # ─── Эксперимент A3: читает чанкованный кеш, без пересчёта ────────────
+  # ─── P0 шаг 1: сканирование 4 вариантов span_expansion на A3 dev ────────
   experiment-a3:
-    name: "Эксперимент A3 (реальные акты, чанкованный кеш)"
+    name: "P0 шаг 1: A3 span_expansion=${{ matrix.span_expansion }}"
     runs-on: ubuntu-latest
     timeout-minutes: 40
     needs: precompute-a3
+    strategy:
+      fail-fast: false
+      matrix:
+        span_expansion: [clause, mask, clause_capped, mask_padded]
     steps:
       - uses: actions/checkout@v4
 
@@ -178,7 +182,7 @@ jobs:
           echo "--- total lines ---"
           wc -l reports/hf-cache-v2/features_*-chunked.jsonl | tail -1
 
-      - name: "Эксперимент: кросс-валидация на кеше"
+      - name: "Эксперимент: кросс-валидация на кеше (span_expansion=${{ matrix.span_expansion }})"
         working-directory: spanverify-module
         timeout-minutes: 30
         shell: bash -o pipefail {0}
@@ -189,8 +193,10 @@ jobs:
           python scripts/run_experiments.py \
             --dataset data/corpus_a3/pairs.jsonl \
             --mode hf --seed 42 --folds 5 --target-fpr 0.1 \
+            --span-expansion ${{ matrix.span_expansion }} \
             --features-cache reports/hf-cache-v2 \
-            --out reports/experiments/a3 2>&1 | tee reports/experiments-a3.log
+            --no-test \
+            --out reports/experiments/a3 2>&1 | tee reports/experiments-a3-${{ matrix.span_expansion }}.log
 
       - name: "Счётчик кеша: попаданий / промахов"
         working-directory: spanverify-module
@@ -201,10 +207,10 @@ jobs:
 
       - uses: actions/upload-artifact@v4
         with:
-          name: hf-experiment-a3
+          name: hf-experiment-a3-${{ matrix.span_expansion }}
           path: |
             spanverify-module/reports/experiments/a3
-            spanverify-module/reports/experiments-a3.log
+            spanverify-module/reports/experiments-a3-${{ matrix.span_expansion }}.log
           if-no-files-found: warn
           retention-days: 30
 
