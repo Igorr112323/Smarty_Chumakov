@@ -1,10 +1,10 @@
 {
   "id": "docs.acceptance",
-  "commit": "b3d8933aef25ec95ebc63e8d5b0ebe3f99d1f8cc",
+  "commit": "fc438ea7069b4a3c8ad78097f4c29df1767937ec",
   "seed": 42,
   "mode": "demo",
   "dataset": "docs",
-  "date": "2026-10-14T14:58:29Z",
+  "date": "2026-10-16T11:49:33Z",
   "command": "",
   "metrics": {
     "document": "docs/ПРОГРАММА_И_МЕТОДИКА_ПРИЁМКИ.md",

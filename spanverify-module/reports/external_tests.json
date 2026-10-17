@@ -76,7 +76,7 @@
       "pairs": 900,
       "pairs_total_in_file": 900,
       "limit": null,
-      "source_file": "/home/user/Smarty_Chumakov/spanverify-module/data/external/adapted/ragtruth_summary_test.jsonl",
+      "source_file": "spanverify-module/data/external/adapted/ragtruth_summary_test.jsonl",
       "duration_s": 114.5,
       "label_origin": {
         "human": 900
@@ -142,7 +142,7 @@
       "pairs": 900,
       "pairs_total_in_file": 900,
       "limit": null,
-      "source_file": "/home/user/Smarty_Chumakov/spanverify-module/data/external/adapted/ragtruth_data2txt_test.jsonl",
+      "source_file": "spanverify-module/data/external/adapted/ragtruth_data2txt_test.jsonl",
       "duration_s": 126.1,
       "label_origin": {
         "human": 900

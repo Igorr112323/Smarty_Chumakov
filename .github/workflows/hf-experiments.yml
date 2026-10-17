@@ -1,11 +1,16 @@
 # Реальные метрики режима hf на корпусах A3 и A.
 #
-# Почему так, а не одним job'ом: прогон 37446204812 выбрал 120 минут и был снят
-# по таймауту, потому что считал признаки реальной моделью в каждом из пяти
-# фолдов кросс-валидации — один и тот же прямой проход пять раз. Теперь признаки
-# считаются один раз (job precompute) и складываются в кеш, а эксперимент
-# читает готовое. Шарды нужны, чтобы и этот единственный проход уложился в лимит
-# job'а: четыре части корпуса A3 считаются параллельно.
+# Шаг 2б: полный прогон с чанкингом. Сухой прогон (dry-run-cost) на голове
+# 7218317e дал честное число: 6,4 с/пара, 150 пар = 16:57, 1200 пар ≈ 2 часа.
+# Отсюда: A3 — 8 шардов по 150 пар (~16–17 мин), A — 8 шардов по 150 пар
+# (~20-25 мин; корпус A оказался тяжелее из-за длинных контекстов с синтетики).
+# Лимит шага precompute 30 мин, лимит job 40 мин — оба проходим.
+#
+# Все precompute пишут чанкованные ключи (chunking=True, max_length=512)
+# в reports/hf-cache-v2. Эксперимент читает из того же каталога и тем же
+# ключом (engine._features ищет chunking=True). Без --chunked в precompute
+# ключи не совпадают с engine, и experiment уходит в таймаут — это уже
+# случилось в прогоне 38970621969 (оба эксперимента по 30 минут и обрыв).
 #
 # Запуск — правкой .github/hf-experiments.trigger либо вручную (workflow_dispatch).
 # Результаты — в артефакты и в ветку данных data/metrics, всегда с [skip ci].
@@ -26,24 +31,29 @@ permissions:
   contents: write
 
 jobs:
-  # Цепочки корпусов независимы: падение корпуса A не должно отменять
-  # уже посчитанный A3. Именно так и случилось в первый раз — шард A не влез
-  # в лимит (в корпусе A 1200 пар, а не 240), и experiment для A3 ушёл в skipped,
-  # хотя признаки для него были готовы полностью.
+  # ─── A3: 8 шардов по 150 пар, чанкинг, ~16–17 мин каждый ──────────────
   precompute-a3:
-    name: "Признаки A3 (шард ${{ matrix.shard }}/4)"
+    name: "Признаки A3 (шард ${{ matrix.shard }}/8, чанкинг)"
     runs-on: ubuntu-latest
     timeout-minutes: 35
     strategy:
       fail-fast: false
       matrix:
-        shard: [0, 1, 2, 3]
+        shard: [0, 1, 2, 3, 4, 5, 6, 7]
     steps:
       - uses: actions/checkout@v4
 
       - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
+
+      - name: "Кеш модели HuggingFace (~1.1 ГБ)"
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/huggingface
+          key: hf-model-rugpt3small-${{ runner.os }}
+          restore-keys: |
+            hf-model-rugpt3small-
 
       - name: "Зависимости и CPU-версия torch"
         working-directory: spanverify-module
@@ -54,38 +64,51 @@ jobs:
           python -m pip install -q "torch~=2.14" --index-url https://download.pytorch.org/whl/cpu
           python -m pip install -q -r requirements-hf.txt
 
-      - name: "Предпосчёт признаков шарда"
+      - name: "Предпосчёт признаков шарда (чанкинг, ~150 пар)"
         working-directory: spanverify-module
-        timeout-minutes: 30
+        timeout-minutes: 25
         env:
           OMP_NUM_THREADS: "4"
+          HF_HOME: "/home/runner/.cache/huggingface"
         run: |
-          python scripts/precompute_features.py \
+          time python scripts/precompute_features.py \
             --dataset data/corpus_a3/pairs.jsonl \
-            --mode hf --shard ${{ matrix.shard }} --shards 4 \
-            --out reports/hf-cache
+            --mode hf --chunked \
+            --shard ${{ matrix.shard }} --shards 8 \
+            --out reports/hf-cache-v2
 
       - uses: actions/upload-artifact@v4
         with:
-          name: hf-cache-a3-${{ matrix.shard }}
-          path: spanverify-module/reports/hf-cache
+          name: hf-cache-a3-v2-${{ matrix.shard }}
+          path: |
+            spanverify-module/reports/hf-cache-v2/precompute_shard${{ matrix.shard }}of8-chunked.json
+            spanverify-module/reports/hf-cache-v2/features_shard${{ matrix.shard }}of8-chunked.jsonl
           if-no-files-found: error
           retention-days: 14
 
+  # ─── A: 8 шардов по 150 пар, чанкинг, ~20-25 мин каждый ──────────────
   precompute-a:
-    name: "Признаки A (шард ${{ matrix.shard }}/5)"
+    name: "Признаки A (шард ${{ matrix.shard }}/8, чанкинг)"
     runs-on: ubuntu-latest
-    timeout-minutes: 35
+    timeout-minutes: 40
     strategy:
       fail-fast: false
       matrix:
-        shard: [0, 1, 2, 3, 4]
+        shard: [0, 1, 2, 3, 4, 5, 6, 7]
     steps:
       - uses: actions/checkout@v4
 
       - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
+
+      - name: "Кеш модели HuggingFace (~1.1 ГБ)"
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/huggingface
+          key: hf-model-rugpt3small-${{ runner.os }}
+          restore-keys: |
+            hf-model-rugpt3small-
 
       - name: "Зависимости и CPU-версия torch"
         working-directory: spanverify-module
@@ -96,29 +119,38 @@ jobs:
           python -m pip install -q "torch~=2.14" --index-url https://download.pytorch.org/whl/cpu
           python -m pip install -q -r requirements-hf.txt
 
-      - name: "Предпосчёт признаков шарда"
+      - name: "Предпосчёт признаков шарда (чанкинг, ~150 пар)"
         working-directory: spanverify-module
         timeout-minutes: 30
         env:
           OMP_NUM_THREADS: "4"
+          HF_HOME: "/home/runner/.cache/huggingface"
         run: |
-          python scripts/precompute_features.py \
+          time python scripts/precompute_features.py \
             --dataset data/corpus_a/pairs.jsonl \
-            --mode hf --shard ${{ matrix.shard }} --shards 5 \
-            --out reports/hf-cache
+            --mode hf --chunked \
+            --shard ${{ matrix.shard }} --shards 8 \
+            --out reports/hf-cache-v2
 
       - uses: actions/upload-artifact@v4
         with:
-          name: hf-cache-a-${{ matrix.shard }}
-          path: spanverify-module/reports/hf-cache
+          name: hf-cache-a-v2-${{ matrix.shard }}
+          path: |
+            spanverify-module/reports/hf-cache-v2/precompute_shard${{ matrix.shard }}of8-chunked.json
+            spanverify-module/reports/hf-cache-v2/features_shard${{ matrix.shard }}of8-chunked.jsonl
           if-no-files-found: error
           retention-days: 14
 
+  # ─── P0 шаг 1: сканирование 4 вариантов span_expansion на A3 dev ────────
   experiment-a3:
-    name: "Эксперимент A3 (реальные акты)"
+    name: "P0 шаг 1: A3 span_expansion=${{ matrix.span_expansion }}"
     runs-on: ubuntu-latest
     timeout-minutes: 40
     needs: precompute-a3
+    strategy:
+      fail-fast: false
+      matrix:
+        span_expansion: [clause, mask, clause_capped, mask_padded]
     steps:
       - uses: actions/checkout@v4
 
@@ -137,38 +169,54 @@ jobs:
 
       - uses: actions/download-artifact@v4
         with:
-          pattern: hf-cache-a3-*
-          path: spanverify-module/reports/hf-cache
+          pattern: hf-cache-a3-v2-*
+          path: spanverify-module/reports/hf-cache-v2
           merge-multiple: true
 
-      - name: "Кеш признаков: сколько собралось"
+      - name: "Кеш признаков A3: сколько собралось"
         working-directory: spanverify-module
         run: |
-          ls -la reports/hf-cache
-          cat reports/hf-cache/precompute_*.json
-          wc -l reports/hf-cache/features_*.jsonl | tail -1
+          ls -la reports/hf-cache-v2/
+          echo "--- summary per shard ---"
+          cat reports/hf-cache-v2/precompute_*-chunked.json
+          echo "--- total lines ---"
+          wc -l reports/hf-cache-v2/features_*-chunked.jsonl | tail -1
 
-      - name: "Эксперимент: кросс-валидация на кеше"
+      - name: "Эксперимент: кросс-валидация на кеше (span_expansion=${{ matrix.span_expansion }})"
         working-directory: spanverify-module
         timeout-minutes: 30
+        shell: bash -o pipefail {0}
         env:
           OMP_NUM_THREADS: "4"
         run: |
+          mkdir -p reports/experiments/a3
           python scripts/run_experiments.py \
             --dataset data/corpus_a3/pairs.jsonl \
             --mode hf --seed 42 --folds 5 --target-fpr 0.1 \
-            --features-cache reports/hf-cache \
-            --out reports/experiments-a3
+            --span-expansion ${{ matrix.span_expansion }} \
+            --features-cache reports/hf-cache-v2 \
+            --no-test \
+            --out reports/experiments/a3 2>&1 | tee reports/experiments-a3-${{ matrix.span_expansion }}.log
+
+      - name: "Счётчик кеша: попаданий / промахов"
+        working-directory: spanverify-module
+        run: |
+          grep -E "кеш признаков: попаданий|промахов" reports/experiments-a3-${{ matrix.span_expansion }}.log || true
+          # Если промахов > 0, это признак рассинхронизации ключей.
+          # Без --require-cache это не фатально, но предупреждение важно.
 
       - uses: actions/upload-artifact@v4
         with:
-          name: hf-experiment-a3
-          path: spanverify-module/reports/experiments-a3
+          name: hf-experiment-a3-${{ matrix.span_expansion }}
+          path: |
+            spanverify-module/reports/experiments/a3
+            spanverify-module/reports/experiments-a3-${{ matrix.span_expansion }}.log
           if-no-files-found: warn
           retention-days: 30
 
+  # ─── Эксперимент A: читает чанкованный кеш, без пересчёта ─────────────
   experiment-a:
-    name: "Эксперимент A (синтетика)"
+    name: "Эксперимент A (синтетика, чанкованный кеш)"
     runs-on: ubuntu-latest
     timeout-minutes: 40
     needs: precompute-a
@@ -190,35 +238,48 @@ jobs:
 
       - uses: actions/download-artifact@v4
         with:
-          pattern: hf-cache-a-*
-          path: spanverify-module/reports/hf-cache
+          pattern: hf-cache-a-v2-*
+          path: spanverify-module/reports/hf-cache-v2
           merge-multiple: true
 
-      - name: "Кеш признаков: сколько собралось"
+      - name: "Кеш признаков A: сколько собралось"
         working-directory: spanverify-module
         run: |
-          ls -la reports/hf-cache
-          wc -l reports/hf-cache/features_*.jsonl | tail -1
+          ls -la reports/hf-cache-v2/
+          echo "--- summary per shard ---"
+          cat reports/hf-cache-v2/precompute_*-chunked.json
+          echo "--- total lines ---"
+          wc -l reports/hf-cache-v2/features_*-chunked.jsonl | tail -1
 
       - name: "Эксперимент: кросс-валидация на кеше"
         working-directory: spanverify-module
         timeout-minutes: 30
+        shell: bash -o pipefail {0}
         env:
           OMP_NUM_THREADS: "4"
         run: |
+          mkdir -p reports/experiments/a
           python scripts/run_experiments.py \
             --dataset data/corpus_a/pairs.jsonl \
             --mode hf --seed 42 --folds 5 --target-fpr 0.1 \
-            --features-cache reports/hf-cache \
-            --out reports/experiments-a
+            --features-cache reports/hf-cache-v2 \
+            --out reports/experiments/a 2>&1 | tee reports/experiments-a.log
+
+      - name: "Счётчик кеша: попаданий / промахов"
+        working-directory: spanverify-module
+        run: |
+          grep -E "кеш признаков: попаданий|промахов" reports/experiments-a.log || true
 
       - uses: actions/upload-artifact@v4
         with:
           name: hf-experiment-a
-          path: spanverify-module/reports/experiments-a
+          path: |
+            spanverify-module/reports/experiments/a
+            spanverify-module/reports/experiments-a.log
           if-no-files-found: warn
           retention-days: 30
 
+  # ─── Сведение результатов ─────────────────────────────────────────────
   publish:
     name: "Свести числа и сохранить"
     runs-on: ubuntu-latest
@@ -236,13 +297,39 @@ jobs:
 
       - uses: actions/download-artifact@v4
         with:
-          name: hf-experiment-a3
-          path: spanverify-module/reports/experiments-a3
+          pattern: hf-experiment-a3-*
+          path: spanverify-module/reports/experiments/a3-variants
+          merge-multiple: false
+
+      - name: "Разложить варианты по папкам"
+        working-directory: spanverify-module
+        run: |
+          # Артефакты скачались в a3-variants/{artifact-name}/
+          # Перекладываем в a3/{variant}/ для единообразия
+          for variant in clause mask clause_capped mask_padded; do
+            src="reports/experiments/a3-variants/hf-experiment-a3-${variant}"
+            dst="reports/experiments/a3/${variant}"
+            if [ -d "$src" ]; then
+              mkdir -p "$dst"
+              cp -r "$src"/* "$dst"/ 2>/dev/null || true
+              echo "✓ ${variant}: $(ls -1 "$dst" | wc -l) файлов"
+            else
+              echo "✗ ${variant}: не найдено"
+            fi
+          done
+          # Удаляем временную папку
+          rm -rf reports/experiments/a3-variants
+
+      - name: "Сравнить варианты span_expansion"
+        working-directory: spanverify-module
+        run: |
+          python scripts/compare_span_expansion.py --out reports/experiments/a3/comparison.md || true
 
       - uses: actions/download-artifact@v4
         with:
           name: hf-experiment-a
-          path: spanverify-module/reports/experiments-a
+          path: spanverify-module/reports/experiments/a
+          merge-multiple: true
 
       - name: "Зависимости"
         working-directory: spanverify-module
@@ -295,7 +382,7 @@ jobs:
           cp /tmp/keepexp/reports/METRICS.json experiments/METRICS-hf-${{ github.run_number }}.json 2>/dev/null || true
           git add -A experiments
           git diff --cached --quiet && echo "изменений нет" && exit 0
-          git commit -m "hf: эксперименты с кешем признаков, прогон ${{ github.run_number }} [skip ci]"
+          git commit -m "hf: эксперименты с кешем признаков (чанкинг), прогон ${{ github.run_number }} [skip ci]"
           for attempt in 1 2 3 4 5; do
             if git push origin HEAD:data/metrics; then
               echo "ветка данных обновлена с попытки $attempt"

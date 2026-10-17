@@ -9,6 +9,7 @@
 
 pytest~=9.1          # тесты
 pytest-cov~=7.1      # покрытие (порог 85 % в CI)
+pytest-timeout~=2.4  # таймаут тестов (используется в CI и preflight)
 ruff~=0.16           # линтер
 black~=26.5          # форматирование
 pyinstaller~=6.22    # сборка .exe / zipapp-обвязка (scripts/make_exe.ps1)

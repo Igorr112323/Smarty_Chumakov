@@ -94,7 +94,7 @@ NUMBER_PATTERNS = (
 )
 
 TOLERANT_PATTERNS = (
-    (re.compile(r"покрыти\w*[^0-9\n]{0,25}(\d{1,3})\s*%"), "coverage"),
+    (re.compile(r"покрыти\w*[^0-9\n]{0,25}([\d]+[.,][\d]+|\d{1,3})\s*%", re.IGNORECASE), "coverage"),
     (re.compile(r"(\d{2,4})\s*(?:тест|кейс)"), "tests"),
     (re.compile(r"(\d+)\s+токен"), "tokens"),
 )

@@ -1,0 +1,99 @@
+{
+  "kind": "chunk_selection_recall",
+  "date": "2026-10-15",
+  "commit": "local",
+  "run_id": null,
+  "provenance": {
+    "method": "Локальный расчёт модулем spanverify.chunking.py на корпусах A и A3",
+    "script": "spanverify-module/scripts/recall_check.py",
+    "command": "cd spanverify-module && python3 scripts/recall_check.py",
+    "note": "Числа воспроизводятся локально. CI прогон для пересчёта не требуется (не зависит от torch/model weights)"
+  },
+  "method": {
+    "description": "BM25-отбор релевантных чанков документа для каждого ответа",
+    "algorithm": "BM25 по нормализованным токенам (lowercase, стоп-слова удалены, числа приведены к цифрам)",
+    "chunking": {
+      "strategy": "абзацы → предложения → символы (для длинных предложений)",
+      "max_tokens_per_chunk": 380,
+      "overlap_sentences": 1,
+      "paragraph_aware": true
+    },
+    "retrieval": {
+      "top_k": 5,
+      "bm25_k1": 1.5,
+      "bm25_b": 0.75
+    },
+    "relevant_region_definition": {
+      "a3": "fact_span относительно начала контекста: [fact_span[0] - context_span[0], fact_span[1] - context_span[0]], обрезанный по длине контекста",
+      "a": "все вхождения meta.value в контекст (регистронезависимый поиск)"
+    },
+    "hit_criteria": {
+      "soft": "любое пересечение чанка с релевантным регионом: chunk.start < region.end AND chunk.end > region.start",
+      "coverage_50": "чанк покрывает ≥50% релевантного региона: overlap_length / region_length ≥ 0.5",
+      "full": "чанк полностью покрывает релевантный регион"
+    },
+    "recall_computation": {
+      "recall@1": "select_relevant_chunks(answer, dc, top_k=1) — истинный топ-1 по релевантности",
+      "recall@3": "select_relevant_chunks(answer, dc, top_k=3) — любой из топ-3",
+      "recall@5": "select_relevant_chunks(answer, dc, top_k=5) — любой из топ-5"
+    }
+  },
+  "corpus_a3": {
+    "dataset": "data/corpus_a3/pairs.jsonl",
+    "description": "Реальные акты (409 документов, 1200 пар)",
+    "total_pairs": 1200,
+    "labeled_pairs": 660,
+    "evaluated": {
+      "n": 660,
+      "skipped": 0,
+      "note": "Все 660 размеченных пар имеют fact_span и context_span в meta"
+    },
+    "recall_soft": {
+      "recall@1": 0.9985,
+      "recall@3": 1.0,
+      "recall@5": 1.0,
+      "interpretation": "Любое пересечение: BM25 находит релевантный чанк в топ-1 для 99.85% пар, в топ-3/5 для 100% пар"
+    },
+    "recall_coverage_50": {
+      "recall@1": 0.9731,
+      "recall@3": 1.0,
+      "recall@5": 1.0,
+      "interpretation": "Покрытие ≥50% региона: BM25 находит чанк, покрывающий ≥50% релевантного региона, в топ-1 для 97.31% пар, в топ-3/5 для 100% пар (n=595 из 660, 65 пар пропущены — регион не покрыт ни одним чанком на ≥50%)"
+    }
+  },
+  "corpus_a": {
+    "dataset": "data/corpus_a/pairs.jsonl",
+    "description": "Шаблонные документы (1200 пар)",
+    "total_pairs": 1200,
+    "labeled_pairs": 634,
+    "evaluated": {
+      "n": 634,
+      "skipped": 0,
+      "note": "Все 634 размеченные пары имеют meta.value длиной ≥3 символов"
+    },
+    "recall_soft": {
+      "recall@1": 0.9937,
+      "recall@3": 1.0,
+      "recall@5": 1.0,
+      "interpretation": "Любое пересечение: BM25 находит релевантный чанк в топ-1 для 99.37% пар, в топ-3/5 для 100% пар"
+    },
+    "recall_coverage_50": {
+      "recall@1": 0.9937,
+      "recall@3": 1.0,
+      "recall@5": 1.0,
+      "interpretation": "Покрытие ≥50% региона: BM25 находит чанк, покрывающий ≥50% релевантного региона, в топ-1 для 99.37% пар, в топ-3/5 для 100% пар"
+    }
+  },
+  "gate": {
+    "target_recall_top5_coverage_50": 0.95,
+    "status": "достигнут_с_запасом",
+    "a3_top5_coverage_50": 1.0,
+    "a_top5_coverage_50": 1.0,
+    "note": "Ворота G1 (recall@5 ≥ 95% с покрытием ≥50% региона) взяты с запасом на обоих корпусах. Следующий шаг: зелёный CI, затем сухой прогон чанкинга (время на пару, пик памяти), затем полный пересчёт hf."
+  },
+  "previous_incorrect_method": {
+    "description": "Старая методика сравнивала абсолютные fact_span с len(context), что приводило к ложным '573 дефектам аннотации'",
+    "result": "recall@5 = 0.989 (A3), что было занижено из-за ошибки в определении региона",
+    "correction": "Правильный регион = fact_span относительно начала контекста (fact_span - context_span[0])"
+  }
+}

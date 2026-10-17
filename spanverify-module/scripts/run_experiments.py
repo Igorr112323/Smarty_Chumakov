@@ -352,6 +352,17 @@ def main(argv: list[str] | None = None) -> int:
             "0 — сравнение выключено; порог не подбирается по тесту"
         ),
     )
+    parser.add_argument(
+        "--no-test",
+        action="store_true",
+        help="не трогать официальный тест: промежуточный прогон (P0-шаги 1–3)",
+    )
+    parser.add_argument(
+        "--span-expansion",
+        default="clause",
+        choices=("clause", "mask", "clause_capped", "mask_padded"),
+        help="стратегия расширения границ фрагментов (P0 шаг 1)",
+    )
     args = parser.parse_args(argv)
 
     dataset = Path(args.dataset)
@@ -360,7 +371,9 @@ def main(argv: list[str] | None = None) -> int:
     # Кеш признаков: без него режим hf пересчитывает прямой проход модели в
     # каждом фолде кросс-валидации, и эксперимент не укладывается в лимит job'а
     # (прогон 37446204812 выбрал 120 минут целиком).
-    cache = load_feature_cache(args.features_cache, counting=True) if args.features_cache else None
+    # strict=True ловит старый формат кеша (без двух полей) до обучения, а не
+    # через 40 минут в train.py:138.
+    cache = load_feature_cache(args.features_cache, counting=True, strict=True) if args.features_cache else None
     set_feature_cache(cache)
     if cache:
         print(f"кеш признаков: {len(cache)} ключей из {len(args.features_cache)} пути(ей)", flush=True)
@@ -412,6 +425,7 @@ def main(argv: list[str] | None = None) -> int:
         mode=args.mode,
         model_name=args.model,
         features_cache=cache,
+        span_expansion=args.span_expansion,
         weights=WeightsBundle(weights=dict(DEFAULT_WEIGHTS), threshold=0.5, mode=args.mode),
     )
     print(f"модель признаков: {train_verifier.model_name}", flush=True)
@@ -454,6 +468,7 @@ def main(argv: list[str] | None = None) -> int:
             model_name=args.model,
             weights=bundle,
             features_cache=cache,
+            span_expansion=args.span_expansion,
         )
         mask_scan = _mask_scan(verifier_for_scan, splits["train"], bundle, args.target_fpr)
         print(mask_scan["statement"], flush=True)
@@ -468,6 +483,7 @@ def main(argv: list[str] | None = None) -> int:
                 model_name=args.model,
                 weights=bundle,
                 features_cache=cache,
+                span_expansion=args.span_expansion,
                 span_filter_min_chars=span_filter_chars,
             )
             filtered_scan = _mask_scan(verifier_filtered_scan, splits["train"], bundle, args.target_fpr)
@@ -522,68 +538,55 @@ def main(argv: list[str] | None = None) -> int:
         model_name=args.model,
         weights=bundle,
         features_cache=cache,
+        span_expansion=args.span_expansion,
         span_filter_min_chars=chosen_span_filter,
     )
-    metrics = verifier.evaluate(records)
-    if cache is not None:
-        hits = getattr(cache, "hits", 0)
-        misses = getattr(cache, "misses", 0)
-        print(f"кеш признаков: попаданий {hits}, промахов {misses}", flush=True)
-        if misses:
+
+    # --no-test: изоляция официального теста
+    # При --no-test обучение и оценка не должны трогать официальный test.
+    # Если разбиения не найдены — ошибка, а не переход к оценке всего корпуса.
+    if args.no_test:
+        if not splits:
             print(
-                "ВНИМАНИЕ: часть пар считана моделью, а не из кеша — ключи разошлись "
-                "или кеш неполон; время прогона это покажет",
+                "ОШИБКА: --no-test требует официальных разбиений (splits/train.jsonl, splits/dev.jsonl, splits/test.jsonl), "
+                "но они не найдены. Без разбиений невозможно изолировать тест.",
                 file=sys.stderr,
                 flush=True,
             )
-
-    # Официальный test, отдельно от всех пар: в выборе порога и маски не участвовал.
-    test_block: dict | None = None
-    dev_block: dict | None = None
-    by_type: dict[str, dict] = {}
-    clean_block: dict | None = None
-    verdict_comparison: dict | None = None
-    if splits:
-        test_pairs = splits.get("test") or []
+            return 3
+        # Исключаем test из records для оценки
+        test_ids = {pair.get("id") for pair in splits.get("test", [])}
+        records_no_test = [
+            pair for pair in records
+            if pair.get("id") not in test_ids
+        ]
+        print(
+            f"ТЕСТ ИЗОЛИРОВАН (--no-test): оцениваем {len(records_no_test)} пар "
+            f"(train+dev), исключаем {len(test_ids)} тестовых пар",
+            flush=True,
+        )
+        # Оценка на train+dev (без test)
+        metrics = verifier.evaluate(records_no_test)
+        if cache is not None:
+            hits = getattr(cache, "hits", 0)
+            misses = getattr(cache, "misses", 0)
+            print(f"кеш признаков: попаданий {hits}, промахов {misses}", flush=True)
+            if misses:
+                print(
+                    "ВНИМАНИЕ: часть пар считана моделью, а не из кеша — ключи разошлись "
+                    "или кеш неполон; время прогона это покажет",
+                    file=sys.stderr,
+                    flush=True,
+                )
+        # Dev для промежуточных прогонов P0
         dev_pairs = splits.get("dev") or []
-        if test_pairs:
-            test_metrics = verifier.evaluate(test_pairs)
-            test_block = _metrics_block(test_metrics)
-            by_type = _by_type_on_split(verifier, test_pairs)
-            # Сравнение правила вердикта на одном и том же тесте: старое
-            # («любой фрагмент») против нового. Токенные метрики от него не
-            # зависят, меняются только вердикты уровня ответа.
-            legacy = Verifier(
-                mode=args.mode,
-                model_name=args.model,
-                weights=bundle,
-                features_cache=cache,
-                verdict_rule=VERDICT_ANY_SPAN,
-                span_filter_min_chars=chosen_span_filter,
-            )
-            legacy_metrics = legacy.evaluate(test_pairs)
-            legacy_flagged = legacy_metrics["verdicts"]["tp"] + legacy_metrics["verdicts"]["fp"]
-            new_flagged = test_metrics["verdicts"]["tp"] + test_metrics["verdicts"]["fp"]
-            verdict_comparison = {
-                "test_pairs": len(test_pairs),
-                "rule_any_span": {
-                    key: legacy_metrics["verdicts"][key]
-                    for key in ("tp", "fp", "fn", "tn", "precision", "recall", "f1", "fpr", "flagged_share")
-                },
-                "rule_min_two_tokens": {
-                    key: test_metrics["verdicts"][key]
-                    for key in ("tp", "fp", "fn", "tn", "precision", "recall", "f1", "fpr", "flagged_share")
-                },
-                "flagged_answers": {"any_span": legacy_flagged, "min_two_tokens": new_flagged},
-                "tokens_identical": (
-                    legacy_metrics["tokens"]["tp"] == test_metrics["tokens"]["tp"]
-                    and legacy_metrics["tokens"]["fp"] == test_metrics["tokens"]["fp"]
-                    and legacy_metrics["tokens"]["fn"] == test_metrics["tokens"]["fn"]
-                ),
-            }
-        if dev_pairs:
-            dev_block = _metrics_block(verifier.evaluate(dev_pairs))
-        clean = [pair for pair in records if _is_clean(pair)]
+        dev_block = _metrics_block(verifier.evaluate(dev_pairs)) if dev_pairs else None
+        test_block = None
+        by_type = {}
+        clean_block = None
+        verdict_comparison = None
+        # Clean пары тоже без test
+        clean = [pair for pair in records_no_test if _is_clean(pair)]
         if clean:
             clean_metrics = verifier.evaluate(clean)
             clean_block = {
@@ -593,10 +596,86 @@ def main(argv: list[str] | None = None) -> int:
                 "flagged_pairs": clean_metrics["verdicts"]["tp"] + clean_metrics["verdicts"]["fp"],
                 "flagged_share": clean_metrics["verdicts"]["flagged_share"],
                 "note": (
-                    "чистые пары всего корпуса (без фрагментов недостоверности в разметке); "
+                    "чистые пары train+dev (без фрагментов недостоверности в разметке); "
                     "числа — измерение фиксированным бандлом, не подбор"
                 ),
             }
+    else:
+        # Обычный режим: оценка всего корпуса
+        metrics = verifier.evaluate(records)
+        if cache is not None:
+            hits = getattr(cache, "hits", 0)
+            misses = getattr(cache, "misses", 0)
+            print(f"кеш признаков: попаданий {hits}, промахов {misses}", flush=True)
+            if misses:
+                print(
+                    "ВНИМАНИЕ: часть пар считана моделью, а не из кеша — ключи разошлись "
+                    "или кеш неполон; время прогона это покажет",
+                    file=sys.stderr,
+                    flush=True,
+                )
+
+        # Официальный test, отдельно от всех пар: в выборе порога и маски не участвовал.
+        test_block: dict | None = None
+        dev_block: dict | None = None
+        by_type: dict[str, dict] = {}
+        clean_block: dict | None = None
+        verdict_comparison: dict | None = None
+        if splits:
+            test_pairs = splits.get("test") or []
+            dev_pairs = splits.get("dev") or []
+            if test_pairs:
+                test_metrics = verifier.evaluate(test_pairs)
+                test_block = _metrics_block(test_metrics)
+                by_type = _by_type_on_split(verifier, test_pairs)
+                # Сравнение правила вердикта на одном и том же тесте: старое
+                # («любой фрагмент») против нового. Токенные метрики от него не
+                # зависят, меняются только вердикты уровня ответа.
+                legacy = Verifier(
+                    mode=args.mode,
+                    model_name=args.model,
+                    weights=bundle,
+                    features_cache=cache,
+                    span_expansion=args.span_expansion,
+                    verdict_rule=VERDICT_ANY_SPAN,
+                    span_filter_min_chars=chosen_span_filter,
+                )
+                legacy_metrics = legacy.evaluate(test_pairs)
+                legacy_flagged = legacy_metrics["verdicts"]["tp"] + legacy_metrics["verdicts"]["fp"]
+                new_flagged = test_metrics["verdicts"]["tp"] + test_metrics["verdicts"]["fp"]
+                verdict_comparison = {
+                    "test_pairs": len(test_pairs),
+                    "rule_any_span": {
+                        key: legacy_metrics["verdicts"][key]
+                        for key in ("tp", "fp", "fn", "tn", "precision", "recall", "f1", "fpr", "flagged_share")
+                    },
+                    "rule_min_two_tokens": {
+                        key: test_metrics["verdicts"][key]
+                        for key in ("tp", "fp", "fn", "tn", "precision", "recall", "f1", "fpr", "flagged_share")
+                    },
+                    "flagged_answers": {"any_span": legacy_flagged, "min_two_tokens": new_flagged},
+                    "tokens_identical": (
+                        legacy_metrics["tokens"]["tp"] == test_metrics["tokens"]["tp"]
+                        and legacy_metrics["tokens"]["fp"] == test_metrics["tokens"]["fp"]
+                        and legacy_metrics["tokens"]["fn"] == test_metrics["tokens"]["fn"]
+                    ),
+                }
+            if dev_pairs:
+                dev_block = _metrics_block(verifier.evaluate(dev_pairs))
+            clean = [pair for pair in records if _is_clean(pair)]
+            if clean:
+                clean_metrics = verifier.evaluate(clean)
+                clean_block = {
+                    "pairs": len(clean),
+                    "token_fpr": round(clean_metrics["tokens"]["fpr"], 4),
+                    "verdict_fpr": clean_metrics["verdicts"]["fpr"],
+                    "flagged_pairs": clean_metrics["verdicts"]["tp"] + clean_metrics["verdicts"]["fp"],
+                    "flagged_share": clean_metrics["verdicts"]["flagged_share"],
+                    "note": (
+                        "чистые пары всего корпуса (без фрагментов недостоверности в разметке); "
+                        "числа — измерение фиксированным бандлом, не подбор"
+                    ),
+                }
 
     out_dir = Path(args.out)
     out_dir.mkdir(parents=True, exist_ok=True)
@@ -618,7 +697,21 @@ def main(argv: list[str] | None = None) -> int:
     stats = corpus_statistics(records)
 
     official_section = ""
-    if test_block is not None and mask_scan is not None:
+    if args.no_test:
+        official_section = "\n## Официальный test\n\nОфициальный тест не измерялся (промежуточный прогон, --no-test).\n"
+        if dev_block is not None:
+            official_section += (
+                "\n## Dev (промежуточная оценка, не финальная приёмка)\n\n"
+                f"Пар: {dev_block['pairs']}. Токены: F1={dev_block['tokens']['f1']:.3f} "
+                f"FPR={dev_block['tokens']['fpr']:.3f}. "
+                f"Strict span F1 (IoU≥0.5): {dev_block['spans']['strict_f1_iou_0_5']:.3f}. "
+                f"Containment: {dev_block['spans']['coverage']:.3f}. "
+                f"Width ratio: {dev_block['spans']['mean_width_ratio']:.2f}×. "
+                f"Answer F1: {dev_block['answers']['f1']:.3f}. "
+                f"Verdict F1: {dev_block['verdicts']['f1']:.3f} "
+                f"FPR: {dev_block['verdicts']['fpr']:.3f}.\n"
+            )
+    elif test_block is not None and mask_scan is not None:
         by_type_rows = "\n".join(
             f"| {mode_name} | {row['pairs']} | {row['token_recall']:.3f} | {row['token_f1']:.3f} "
             f"| {row['span_coverage']:.3f} |"
@@ -744,6 +837,16 @@ def main(argv: list[str] | None = None) -> int:
             f"официальный test ({test_block['pairs']} пар): "
             f"token F1={test_block['tokens']['f1']:.3f} FPR={test_block['tokens']['fpr']:.3f} "
             f"вердикт F1={test_block['verdicts']['f1']:.3f} FPR={test_block['verdicts']['fpr']:.3f}"
+        )
+    if args.no_test and dev_block is not None:
+        print(
+            f"dev ({dev_block['pairs']} пар): "
+            f"token F1={dev_block['tokens']['f1']:.3f} FPR={dev_block['tokens']['fpr']:.3f} "
+            f"strict span F1={dev_block['spans']['strict_f1_iou_0_5']:.3f} "
+            f"width={dev_block['spans']['mean_width_ratio']:.2f}× "
+            f"containment={dev_block['spans']['coverage']:.3f} "
+            f"answer F1={dev_block['answers']['f1']:.3f} "
+            f"verdict F1={dev_block['verdicts']['f1']:.3f} FPR={dev_block['verdicts']['fpr']:.3f}"
         )
     return 0
 

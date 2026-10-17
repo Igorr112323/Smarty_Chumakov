@@ -1,0 +1,492 @@
+{
+  "dataset": "data/corpus_a3/pairs.jsonl",
+  "mode": "hf",
+  "model": "ai-forever/rugpt3small_based_on_gpt2",
+  "seed": 42,
+  "run_id": "39060670054",
+  "git_commit": "14ea3a0792e0ca9502d9b78870dd2caf874f1163",
+  "duration_s": 547.43,
+  "corpus": {
+    "pairs": 1200,
+    "kinds": {
+      "corpus_a3_real": 1200
+    },
+    "hallucination_rate": 0.0,
+    "mean_answer_chars": 525.4,
+    "mean_context_chars": 1069.3,
+    "flagged_share_of_answers": 0.0211,
+    "vocabulary": 13914,
+    "dataset_version": "2.0-synthetic-pairs"
+  },
+  "splits": {
+    "source": "data/corpus_a3/splits",
+    "sizes": {
+      "train": 842,
+      "dev": 181,
+      "test": 177
+    },
+    "rule": "порог и маска выбраны только на официальной обучающей части; тест в выборе не участвовал"
+  },
+  "metrics": {
+    "tokens": {
+      "precision": 0.1568668190317889,
+      "recall": 0.45182525433871934,
+      "f1": 0.2328809376927822,
+      "fpr": 0.07670352518665532,
+      "tp": 755,
+      "fp": 4058,
+      "fn": 916,
+      "tn": 48847,
+      "auc": 0.8585053796335934
+    },
+    "spans": {
+      "precision": 0.09706774519716886,
+      "recall": 0.3410301953818828,
+      "f1": 0.15112160566706023,
+      "tp": 192,
+      "fp": 1786,
+      "fn": 371,
+      "iou_threshold": 0.5,
+      "recall_containment": 0.34991119005328597,
+      "f1_expanded_labels": 0.05037386855568674,
+      "mean_width_ratio": 12.33202843180641
+    },
+    "answers": {
+      "threshold": 0.5951219522195121,
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1": 0.0,
+      "fpr": 0.0,
+      "auc": 0.5129681828712642,
+      "tp": 0,
+      "fp": 0,
+      "fn": 563,
+      "tn": 460
+    },
+    "verdicts": {
+      "tp": 342,
+      "fp": 230,
+      "fn": 221,
+      "tn": 230,
+      "precision": 0.5979,
+      "recall": 0.6075,
+      "f1": 0.6026,
+      "fpr": 0.5,
+      "flagged_share": 0.5591
+    },
+    "gates": {
+      "tokens": {
+        "family": "tokens",
+        "contract": {
+          "gate": {
+            "f1_min": 0.5,
+            "fpr_max": 0.4
+          },
+          "source": "договор № 20478ГУ/2026, проект 117812, ТЗ п. 4.1 треб. 6",
+          "f1": 0.2328809376927822,
+          "fpr": 0.07670352518665532,
+          "status": "НЕ достигнут"
+        },
+        "internal": {
+          "gate": {
+            "f1_min": 0.9,
+            "fpr_max": 0.1
+          },
+          "source": "мастер-промт проекта (внутренний ориентир, не приёмка)",
+          "f1": 0.2328809376927822,
+          "fpr": 0.07670352518665532,
+          "status": "НЕ достигнут"
+        }
+      },
+      "answers": {
+        "family": "answers",
+        "contract": {
+          "gate": {
+            "f1_min": 0.5,
+            "fpr_max": 0.4
+          },
+          "source": "договор № 20478ГУ/2026, проект 117812, ТЗ п. 4.1 треб. 6",
+          "f1": 0.0,
+          "fpr": 0.0,
+          "status": "НЕ достигнут"
+        },
+        "internal": {
+          "gate": {
+            "f1_min": 0.9,
+            "fpr_max": 0.1
+          },
+          "source": "мастер-промт проекта (внутренний ориентир, не приёмка)",
+          "f1": 0.0,
+          "fpr": 0.0,
+          "status": "НЕ достигнут"
+        }
+      },
+      "spans": {
+        "family": "spans",
+        "contract": {
+          "gate": {
+            "f1_min": 0.5,
+            "fpr_max": 0.4
+          },
+          "source": "договор № 20478ГУ/2026, проект 117812, ТЗ п. 4.1 треб. 6",
+          "f1": 0.15112160566706023,
+          "fpr": 0.07670352518665532,
+          "status": "НЕ достигнут"
+        },
+        "internal": {
+          "gate": {
+            "f1_min": 0.9,
+            "fpr_max": 0.1
+          },
+          "source": "мастер-промт проекта (внутренний ориентир, не приёмка)",
+          "f1": 0.15112160566706023,
+          "fpr": 0.07670352518665532,
+          "status": "НЕ достигнут"
+        }
+      }
+    },
+    "pairs": 1023,
+    "mode": "hf",
+    "warning": ""
+  },
+  "test_official": null,
+  "dev_official": {
+    "pairs": 181,
+    "tokens": {
+      "precision": 0.1783,
+      "recall": 0.4808,
+      "f1": 0.2601,
+      "fpr": 0.0828,
+      "auc": 0.8489,
+      "tp": 138,
+      "fp": 636,
+      "fn": 149,
+      "tn": 7046
+    },
+    "spans": {
+      "strict_f1_iou_0_5": 0.155,
+      "coverage": 0.3958,
+      "soft_f1_expanded": 0.0484,
+      "mean_width_ratio": 14.41
+    },
+    "answers": {
+      "threshold": 0.5951,
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1": 0.0,
+      "fpr": 0.0,
+      "auc": 0.5071
+    },
+    "verdicts": {
+      "tp": 56,
+      "fp": 43,
+      "fn": 40,
+      "tn": 42,
+      "precision": 0.5657,
+      "recall": 0.5833,
+      "f1": 0.5744,
+      "fpr": 0.5059,
+      "flagged_share": 0.547
+    }
+  },
+  "by_type_test": {},
+  "clean_pairs": {
+    "pairs": 460,
+    "token_fpr": 0.0817,
+    "verdict_fpr": 0.5,
+    "flagged_pairs": 230,
+    "flagged_share": 0.5,
+    "note": "чистые пары train+dev (без фрагментов недостоверности в разметке); числа — измерение фиксированным бандлом, не подбор"
+  },
+  "mask_scan": {
+    "signal": "logreg",
+    "split": "official_train",
+    "target_fpr": 0.1,
+    "points_total": 343,
+    "points_within_target": 328,
+    "selected": {
+      "span_z": 1.5,
+      "span_floor": 0.05,
+      "span_cap": 0.5,
+      "token_f1": 0.2433,
+      "token_precision": 0.1546,
+      "token_recall": 0.5701,
+      "token_fpr": 0.0954,
+      "within_target": true
+    },
+    "best_within_target": {
+      "span_z": 1.5,
+      "span_floor": 0.05,
+      "span_cap": 0.5,
+      "token_f1": 0.2433,
+      "token_precision": 0.1546,
+      "token_recall": 0.5701,
+      "token_fpr": 0.0954,
+      "within_target": true
+    },
+    "adopted": false,
+    "statement": "Точка лучше текущей при FPR ≤ 0.1 на обучающей части не найдена: выбранная точка остаётся.",
+    "curve_top": [
+      {
+        "span_z": 1.5,
+        "span_floor": 0.05,
+        "span_cap": 0.5,
+        "token_f1": 0.2433,
+        "token_precision": 0.1546,
+        "token_recall": 0.5701,
+        "token_fpr": 0.0954,
+        "within_target": true
+      },
+      {
+        "span_z": 1.5,
+        "span_floor": 0.05,
+        "span_cap": 0.55,
+        "token_f1": 0.2433,
+        "token_precision": 0.1546,
+        "token_recall": 0.5701,
+        "token_fpr": 0.0954,
+        "within_target": true
+      },
+      {
+        "span_z": 1.5,
+        "span_floor": 0.05,
+        "span_cap": 0.6,
+        "token_f1": 0.2433,
+        "token_precision": 0.1546,
+        "token_recall": 0.5701,
+        "token_fpr": 0.0954,
+        "within_target": true
+      },
+      {
+        "span_z": 1.5,
+        "span_floor": 0.05,
+        "span_cap": 0.7,
+        "token_f1": 0.2433,
+        "token_precision": 0.1546,
+        "token_recall": 0.5701,
+        "token_fpr": 0.0954,
+        "within_target": true
+      },
+      {
+        "span_z": 1.5,
+        "span_floor": 0.05,
+        "span_cap": 0.8,
+        "token_f1": 0.2433,
+        "token_precision": 0.1546,
+        "token_recall": 0.5701,
+        "token_fpr": 0.0954,
+        "within_target": true
+      },
+      {
+        "span_z": 1.0,
+        "span_floor": 0.05,
+        "span_cap": 0.5,
+        "token_f1": 0.2499,
+        "token_precision": 0.1564,
+        "token_recall": 0.6214,
+        "token_fpr": 0.1026,
+        "within_target": false
+      },
+      {
+        "span_z": 1.0,
+        "span_floor": 0.05,
+        "span_cap": 0.55,
+        "token_f1": 0.2499,
+        "token_precision": 0.1564,
+        "token_recall": 0.6214,
+        "token_fpr": 0.1026,
+        "within_target": false
+      },
+      {
+        "span_z": 1.0,
+        "span_floor": 0.05,
+        "span_cap": 0.6,
+        "token_f1": 0.2499,
+        "token_precision": 0.1564,
+        "token_recall": 0.6214,
+        "token_fpr": 0.1026,
+        "within_target": false
+      },
+      {
+        "span_z": 1.0,
+        "span_floor": 0.05,
+        "span_cap": 0.7,
+        "token_f1": 0.2499,
+        "token_precision": 0.1564,
+        "token_recall": 0.6214,
+        "token_fpr": 0.1026,
+        "within_target": false
+      },
+      {
+        "span_z": 1.0,
+        "span_floor": 0.05,
+        "span_cap": 0.8,
+        "token_f1": 0.2499,
+        "token_precision": 0.1564,
+        "token_recall": 0.6214,
+        "token_fpr": 0.1026,
+        "within_target": false
+      }
+    ]
+  },
+  "span_filter_comparison": null,
+  "verdict_rule_comparison": null,
+  "bundle": {
+    "weights": {
+      "attention_entropy": 0.1,
+      "ctx_attention_mass": 0.0,
+      "ctx_attention_mass_norm": 0.1,
+      "ctx_max_similarity": 0.8,
+      "embedding_density": 0.0
+    },
+    "threshold": 0.595122,
+    "target_fpr": 0.1,
+    "span_z": 1.5,
+    "span_floor": 0.05,
+    "span_cap": 0.5,
+    "isotonic": {
+      "x": [
+        0.031932,
+        0.046263,
+        0.186666
+      ],
+      "y": [
+        0.446429,
+        0.544715,
+        0.595122
+      ]
+    },
+    "head": {
+      "type": "logreg",
+      "file": "config/head.json",
+      "model": {
+        "weights": [
+          0.03666970156537714,
+          1.1854483970576135,
+          -0.0775125767573126,
+          0.49847674829551203,
+          0.7358028291086088,
+          -0.5989210775165079
+        ],
+        "bias": -3.9133973457420965
+      },
+      "scaler": {
+        "means": [
+          0.5501159947444255,
+          0.5479743692375475,
+          0.5274685210017036,
+          0.39450515393736507,
+          0.4855991899923061,
+          0.391755866611771
+        ],
+        "scales": [
+          0.10248868969266559,
+          0.33473377283468164,
+          0.31248631164895446,
+          0.332772474960433,
+          0.2874505711412228,
+          0.19464741362952337
+        ]
+      }
+    },
+    "folds": [
+      {
+        "fold": 0,
+        "n_train": 27205,
+        "n_test": 6801,
+        "auc": 0.869889363842092
+      },
+      {
+        "fold": 1,
+        "n_train": 27205,
+        "n_test": 6801,
+        "auc": 0.8733039893802836
+      },
+      {
+        "fold": 2,
+        "n_train": 27205,
+        "n_test": 6801,
+        "auc": 0.8520990248092892
+      },
+      {
+        "fold": 3,
+        "n_train": 27205,
+        "n_test": 6801,
+        "auc": 0.8704494936840548
+      },
+      {
+        "fold": 4,
+        "n_train": 27204,
+        "n_test": 6802,
+        "auc": 0.8308022425064894
+      }
+    ],
+    "seed": 42,
+    "version": "1.3.1",
+    "mode": "hf",
+    "meta": {
+      "dataset": "data/corpus_a3/pairs.jsonl (официальная обучающая часть)",
+      "synthetic": false,
+      "signal": "logreg",
+      "threshold_report": {
+        "threshold": 0.5951219522195121,
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0,
+        "fpr": 0.0,
+        "hdr": 1.0,
+        "accuracy": 0.4295415959252971,
+        "tp": 0.0,
+        "fp": 0.0,
+        "tn": 253.0,
+        "fn": 336.0,
+        "constraint_met": 1.0
+      },
+      "note": "Демонстрационный корпус: параметры проверяют конвейер, а не качество на реальных документах. Для боевой калибровки используйте размеченные реальные пары в режиме hf.",
+      "participation": {
+        "type": "participation-logreg",
+        "auc_out_of_fold": 0.0,
+        "calibrated_on": "пропущено: кеш признаков не содержит корпус участия"
+      }
+    }
+  },
+  "folds": [
+    {
+      "fold": 0,
+      "n_train": 27205,
+      "n_test": 6801,
+      "auc": 0.869889363842092
+    },
+    {
+      "fold": 1,
+      "n_train": 27205,
+      "n_test": 6801,
+      "auc": 0.8733039893802836
+    },
+    {
+      "fold": 2,
+      "n_train": 27205,
+      "n_test": 6801,
+      "auc": 0.8520990248092892
+    },
+    {
+      "fold": 3,
+      "n_train": 27205,
+      "n_test": 6801,
+      "auc": 0.8704494936840548
+    },
+    {
+      "fold": 4,
+      "n_train": 27204,
+      "n_test": 6802,
+      "auc": 0.8308022425064894
+    }
+  ],
+  "gate": "НЕ достигнут",
+  "gate_test_official": null,
+  "head_inline": true,
+  "artifacts": {
+    "weights": "reports/experiments/a3/weights.json",
+    "head": "reports/experiments/a3/config/head.json"
+  }
+}

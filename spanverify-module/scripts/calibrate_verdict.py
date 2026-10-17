@@ -52,6 +52,7 @@ from spanverify.engine import (  # noqa: E402
     Verifier,
     verdict_config_from_params,
 )
+from spanverify.features import load_feature_cache, set_feature_cache  # noqa: E402
 from spanverify.train import train  # noqa: E402
 
 DEFAULT_FREEZE = "config/verdict.json"
@@ -323,6 +324,24 @@ def main(argv: list[str] | None = None) -> int:
         help="каталог для таблиц свидетельств (dev/test) — позволяет пересчитывать правила без обучения",
     )
     parser.add_argument("--save-bundle", default=None, help="сохранить обученный бандл по указанному пути")
+    parser.add_argument(
+        "--features-cache",
+        action="append",
+        default=[],
+        metavar="PATH",
+        help="кеш предпосчитанных признаков (файл JSONL или каталог с шардами); " "можно указать несколько раз",
+    )
+    parser.add_argument(
+        "--span-expansion",
+        default="clause",
+        choices=("clause", "mask", "clause_capped", "mask_padded"),
+        help="стратегия расширения границ фрагментов (P0 шаг 1)",
+    )
+    parser.add_argument(
+        "--no-test",
+        action="store_true",
+        help="промежуточный прогон P0: не оценивать официальный test (только dev)",
+    )
     args = parser.parse_args(argv)
 
     dataset = Path(args.dataset)
@@ -338,11 +357,24 @@ def main(argv: list[str] | None = None) -> int:
         splits[name] = list(read_pairs(path))
     print("разбиения: " + ", ".join(f"{name} {len(part)}" for name, part in splits.items()), flush=True)
 
+    # Кеш признаков: в режиме hf без кеша каждый вызов verifier.verify() считает
+    # признаки моделью заново (~6,4 с/пара × 1200 пар ≈ 2 часа). С кешем — минуты.
+    cache = load_feature_cache(args.features_cache, counting=True, strict=True) if args.features_cache else None
+    set_feature_cache(cache)
+    if cache:
+        print(f"кеш признаков: {len(cache)} ключей", flush=True)
+
     if args.no_train:
-        verifier = Verifier(mode=args.mode, model_name=args.model, weights_path=args.bundle)
+        verifier = Verifier(
+            mode=args.mode, model_name=args.model, weights_path=args.bundle, features_cache=cache,
+            span_expansion=args.span_expansion,
+        )
         bundle_note = f"бандл из {args.bundle} (обучение не запускалось)"
     else:
-        train_verifier = Verifier(mode=args.mode, model_name=args.model)
+        train_verifier = Verifier(
+            mode=args.mode, model_name=args.model, features_cache=cache,
+            span_expansion=args.span_expansion,
+        )
         report = train(
             splits["train"],
             mode=args.mode,
@@ -353,7 +385,10 @@ def main(argv: list[str] | None = None) -> int:
             verifier=train_verifier,
         )
         bundle = report.bundle
-        verifier = Verifier(mode=args.mode, model_name=args.model, weights=bundle)
+        verifier = Verifier(
+            mode=args.mode, model_name=args.model, weights=bundle, features_cache=cache,
+            span_expansion=args.span_expansion,
+        )
         bundle_note = f"обучение на train ({len(splits['train'])} пар), seed {args.seed}, фолдов {args.folds}"
 
     if args.save_bundle:
@@ -388,15 +423,21 @@ def main(argv: list[str] | None = None) -> int:
     print("dev, три правила на одной таблице: " + json.dumps(dev_rules, ensure_ascii=False), flush=True)
 
     # Тест — один раз и уже замороженным правилом.
-    test_rows = evidence(verifier, splits["test"])
-    dump_evidence("test", test_rows)
-    test_rules = rules_report(test_rows, params)
-    print("test (один прогон, правило заморожено): " + json.dumps(test_rules, ensure_ascii=False), flush=True)
+    # При --no-test (промежуточный прогон P0) тест не трогаем.
+    test_rows = None
+    test_rules = None
+    if args.no_test:
+        print("ТЕСТ НЕ ОЦЕНИВАЛСЯ (--no-test): промежуточный прогон P0", flush=True)
+    else:
+        test_rows = evidence(verifier, splits["test"])
+        dump_evidence("test", test_rows)
+        test_rules = rules_report(test_rows, params)
+        print("test (один прогон, правило заморожено): " + json.dumps(test_rules, ensure_ascii=False), flush=True)
 
     # Контроль на втором корпусе: замороженное правило применяется как есть,
     # ничего не подбирается. Нужно, чтобы видеть перенос правила на другой корпус.
     control: dict[str, Any] | None = None
-    if args.also:
+    if args.also and not args.no_test:
         also = Path(args.also)
         if also.is_file():
             control_rows = {}
@@ -455,6 +496,11 @@ def main(argv: list[str] | None = None) -> int:
             encoding="utf-8",
         )
         print(f"заморожено: {freeze_path}", flush=True)
+
+    if cache is not None:
+        hits = getattr(cache, "hits", 0)
+        misses = getattr(cache, "misses", 0)
+        print(f"кеш признаков: попаданий {hits}, промахов {misses}", flush=True)
 
     print(f"отчёт: {out}", flush=True)
     return 0

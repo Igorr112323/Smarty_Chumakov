@@ -599,7 +599,9 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--bootstrap", type=int, default=5000, help="итераций бутстрэпа")
     parser.add_argument("--seed", type=int, default=2026)
     parser.add_argument("--model", default=MODEL_DEFAULT)
-    parser.add_argument("--max-length", type=int, default=768)
+    parser.add_argument(
+        "--max-length", type=int, default=512, help="окно модели (по умолчанию 512, совпадает с config.hf_max_tokens)"
+    )
     parser.add_argument("--out", default="reports/pilot")
     parser.add_argument(
         "--fail-on-contrast",

@@ -13,6 +13,22 @@
 готовые признаки (``--features-cache``), и кросс-валидация стоит минуты, а не
 часы.
 
+Окно модели (max_length)
+------------------------
+
+Единый параметр ``--max-length`` (по умолчанию 512) — совпадает с продуктовым
+``config.hf_max_tokens``. Все три пути (продукт, эксперименты, пилот) читают
+одно и то же окно; расхождение ключа кеша делает невозможным подхват старого
+кеша, посчитанного другим окном.
+
+Чанкинг (--chunked)
+-------------------
+
+При ``--chunked`` документ разбивается на фрагменты, отбираются top-k
+релевантных (BM25), и для каждого делается отдельный проход модели. Это
+решает проблему обрезки длинных документов: модель видит релевантные
+фрагменты целиком, а не только начало.
+
 Шарды
 -----
 
@@ -21,9 +37,9 @@
 параллельными job'ами и склеиваются простым объединением файлов — порядок в
 кеше не важен, обращение идёт по ключу.
 
-Ключ кеша — ``feature_cache_key`` (ответ + контекст + режим + модель). Он же
-используется верификатором при чтении, поэтому расхождение невозможно: считать
-и читать будет один и тот же код.
+Ключ кеша — ``feature_cache_key`` (ответ + контекст + режим + модель +
+max_length + chunking). Он же используется верификатором при чтении, поэтому
+расхождение невозможно: считать и читать будет один и тот же код.
 
 Выход
 -----
@@ -49,21 +65,38 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 from spanverify.dataset import read_pairs  # noqa: E402
-from spanverify.features import HF_MODEL_DEFAULT, extract_features, feature_cache_key  # noqa: E402
+from spanverify.features import (  # noqa: E402
+    HF_MODEL_DEFAULT,
+    extract_features,
+    feature_cache_key,
+    hf_features_chunked,
+)
 
 MODEL_DEFAULT = HF_MODEL_DEFAULT
 PROGRESS_EVERY = 10
+DEFAULT_MAX_LENGTH = 512
 
 
-def dump_matrix(key: str, matrix, pair_id: str) -> dict:
-    """Строка кеша: ключ и три рабочих признака."""
-    return {
+def dump_matrix(key: str, matrix, pair_id: str, max_length: int, chunked: bool) -> dict:
+    """Строка кеша: ключ и все пять рабочих признаков."""
+    row: dict = {
         "key": key,
         "pair_id": pair_id,
         "attention_entropy": [float(x) for x in matrix.attention_entropy],
         "ctx_attention_mass": [float(x) for x in matrix.ctx_attention_mass],
+        "ctx_attention_mass_norm": [float(x) for x in matrix.ctx_attention_mass_norm],
+        "ctx_max_similarity": [float(x) for x in matrix.ctx_max_similarity],
         "embedding_density": [float(x) for x in matrix.embedding_density],
+        "max_length": max_length,
+        "chunked": chunked,
     }
+    # Дополнительные поля из chunked-режима
+    if chunked and hasattr(matrix, "meta"):
+        meta = matrix.meta or {}
+        row["n_chunks_total"] = meta.get("n_chunks_total")
+        row["n_chunks_relevant"] = meta.get("n_chunks_relevant")
+        row["n_chunks_processed"] = meta.get("n_chunks_processed")
+    return row
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -76,6 +109,17 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--shards", type=int, default=1)
     parser.add_argument("--limit", type=int, default=0, help="взять только первые N пар (0 — все)")
     parser.add_argument("--progress-every", type=int, default=PROGRESS_EVERY)
+    parser.add_argument(
+        "--max-length",
+        type=int,
+        default=DEFAULT_MAX_LENGTH,
+        help=f"окно модели в токенах (по умолчанию {DEFAULT_MAX_LENGTH}, совпадает с config.hf_max_tokens)",
+    )
+    parser.add_argument(
+        "--chunked",
+        action="store_true",
+        help="использовать чанкинг: документ разбивается на фрагменты, отбираются релевантные",
+    )
     args = parser.parse_args(argv)
 
     if args.shards < 1 or not (0 <= args.shard < args.shards):
@@ -93,14 +137,16 @@ def main(argv: list[str] | None = None) -> int:
 
     out_dir = Path(args.out)
     out_dir.mkdir(parents=True, exist_ok=True)
+    chunked_tag = "-chunked" if args.chunked else ""
     suffix = f"shard{args.shard}of{args.shards}" if args.shards > 1 else "all"
-    features_path = out_dir / f"features_{suffix}.jsonl"
-    skipped_path = out_dir / f"skipped_{suffix}.jsonl"
-    summary_path = out_dir / f"precompute_{suffix}.json"
+    features_path = out_dir / f"features_{suffix}{chunked_tag}.jsonl"
+    skipped_path = out_dir / f"skipped_{suffix}{chunked_tag}.jsonl"
+    summary_path = out_dir / f"precompute_{suffix}{chunked_tag}.json"
 
     print(
         f"шард {args.shard}/{args.shards}: пар в шарде {len(selected)} из {len(records)} "
-        f"({dataset}), режим {args.mode}, модель {args.model}",
+        f"({dataset}), режим {args.mode}, модель {args.model}, "
+        f"max_length={args.max_length}, chunked={args.chunked}",
         flush=True,
     )
 
@@ -116,11 +162,34 @@ def main(argv: list[str] | None = None) -> int:
             # model_name понимает только режим hf: demo-признаки лексические и
             # модели у них нет (иначе demo_features упадёт на лишнем аргументе).
             model_name = args.model if args.mode == "hf" else ""
-            call_kwargs = {"model_name": model_name} if args.mode == "hf" else {}
+            call_kwargs: dict = {"model_name": model_name} if args.mode == "hf" else {}
+            if args.mode == "hf":
+                call_kwargs["max_length"] = args.max_length
             try:
-                matrix = extract_features(answer, context, mode=args.mode, **call_kwargs)
-                key = feature_cache_key(answer, context, args.mode, model_name)
-                out.write(json.dumps(dump_matrix(key, matrix, pair_id), ensure_ascii=False) + "\n")
+                if args.chunked and args.mode == "hf":
+                    matrix = hf_features_chunked(
+                        answer,
+                        context,
+                        model_name=model_name,
+                        max_length=args.max_length,
+                    )
+                else:
+                    matrix = extract_features(answer, context, mode=args.mode, **call_kwargs)
+                key = feature_cache_key(
+                    answer,
+                    context,
+                    args.mode,
+                    model_name,
+                    chunking=args.chunked,
+                    max_length=args.max_length,
+                )
+                out.write(
+                    json.dumps(
+                        dump_matrix(key, matrix, pair_id, args.max_length, args.chunked),
+                        ensure_ascii=False,
+                    )
+                    + "\n"
+                )
                 out.flush()
                 done += 1
             except Exception as exc:  # noqa: BLE001 - причина записывается в файл пропусков
@@ -149,6 +218,8 @@ def main(argv: list[str] | None = None) -> int:
         "dataset": str(dataset),
         "mode": args.mode,
         "model": args.model,
+        "max_length": args.max_length,
+        "chunked": args.chunked,
         "shard": args.shard,
         "shards": args.shards,
         "pairs_total": len(records),
