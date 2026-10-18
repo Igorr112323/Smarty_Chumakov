@@ -1,0 +1,9 @@
+{
+  "timestamp": "2026-10-18T17:53:55.004922Z",
+  "train_pairs": 842,
+  "dev_pairs": 181,
+  "p1_invariant": true,
+  "drift_count": 0,
+  "p2_influences_token_risk": true,
+  "status": "✅ P2 интеграция работает"
+}

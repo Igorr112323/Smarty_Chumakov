@@ -1,0 +1,19 @@
+{
+  "type": "token_gbdt",
+  "schema_version": "token_gbdt_v1",
+  "n_features": 8,
+  "learning_rate": 0.1,
+  "initial_prediction": 0.0,
+  "trees": [
+    {
+      "threshold": 0.5,
+      "feature": 0,
+      "left": {
+        "value": 0.2
+      },
+      "right": {
+        "value": 0.8
+      }
+    }
+  ]
+}
