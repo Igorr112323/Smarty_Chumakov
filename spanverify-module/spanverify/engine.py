@@ -477,7 +477,8 @@ class Verifier:
         # Пунктуация и короткие служебные слова не могут быть выдумкой: их риск
         # обнуляется до сглаживания, иначе соседние пики «размываются» их шумом.
         scored_indices = [i for i, token in enumerate(tokens) if is_scored_token(token.text)]
-        masked = [risk[i] if i in set(scored_indices) else 0.0 for i in range(len(risk))]
+        scored_set = set(scored_indices)  # Вычисляем один раз
+        masked = [risk[i] if i in scored_set else 0.0 for i in range(len(risk))]
         smoothed = _smooth(masked, SMOOTH_WINDOW)
         scored = [smoothed[i] for i in scored_indices] or [0.0]
         span_threshold = span_threshold_for(scored, self.bundle.span_z, self.bundle.span_floor, self.bundle.span_cap)
@@ -500,8 +501,8 @@ class Verifier:
         if self._answer_head_model is not None:
             # P1 answer-голова: извлекаем 37 признаков из полных FeatureMatrix
             from .answer_head import extract_answer_features
-            # Создаём scored_mask для всех токенов
-            scored_mask = [i in set(scored_indices) for i in range(len(tokens))]
+            # Создаём scored_mask для всех токенов (используем уже вычисленный scored_set)
+            scored_mask = [i in scored_set for i in range(len(tokens))]
             # Извлекаем признаки для всех токенов
             features_list = []
             for i in range(len(tokens)):
