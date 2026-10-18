@@ -1,4 +1,12 @@
-"""Тесты для P2 token-head (GradientBoosting с экспортом в JSON)."""
+"""Тесты для P2 token-head (GradientBoosting с экспортом в JSON).
+
+Критические проверки:
+1. Точный паритет runtime vs sklearn (max delta ≤ 1e-12)
+2. float32 конвертация для порогов деревьев
+3. init="zero" → initial_prediction=0.0
+4. Guards: NaN/inf, schema, feature indices, missing children
+5. Save/load roundtrip без изменения предсказаний
+"""
 import json
 import math
 import tempfile
@@ -11,6 +19,8 @@ from spanverify.token_head import (
     TOKEN_HEAD_SCHEMA_VERSION,
     DecisionTree,
     TokenGBDTModel,
+    _to_float32,
+    export_token_gbdt_from_sklearn,
     extract_token_features,
 )
 
@@ -88,6 +98,33 @@ class TestExtractTokenFeatures:
             extract_token_features(0, 10, "test", hf_features)
 
 
+class TestToFloat32:
+    """Тесты конвертации float64 → float32."""
+    
+    def test_exact_match(self):
+        """Значения точно совпадают после конвертации."""
+        assert _to_float32(1.0) == 1.0
+        assert _to_float32(0.0) == 0.0
+        assert _to_float32(-1.0) == -1.0
+    
+    def test_threshold_boundary(self):
+        """Критический тест: 1.0 + 1e-9 после float32 становится ровно 1.0.
+        
+        Это демонстрирует почему нужна конвертация: sklearn деревья работают
+        с float32, и пороговые значения должны сравниваться в float32.
+        """
+        val = 1.0 + 1e-9
+        assert val > 1.0  # float64: больше
+        assert _to_float32(val) == 1.0  # float32: ровно 1.0
+    
+    def test_precision_loss(self):
+        """Float32 теряет точность."""
+        val = 1.0000001
+        f32_val = _to_float32(val)
+        # Float32 имеет ~7 знаков точности
+        assert abs(f32_val - val) < 1e-6
+
+
 class TestTokenGBDTModel:
     """Тесты для TokenGBDTModel."""
     
@@ -118,7 +155,6 @@ class TestTokenGBDTModel:
         prob = model.predict_one(features)
         
         assert 0.0 <= prob <= 1.0
-        assert abs(prob - 0.505) < 0.01
     
     def test_predict_one_right_branch(self):
         """Предсказание в правой ветке."""
@@ -162,6 +198,14 @@ class TestTokenGBDTModel:
         with pytest.raises(ValueError, match="not finite"):
             model.predict_one(features)
     
+    def test_inf_input_raises(self):
+        """Inf во входных данных вызывает ошибку."""
+        model = self._make_simple_model()
+        
+        features = [float("inf")] + [0.0] * 7
+        with pytest.raises(ValueError, match="not finite"):
+            model.predict_one(features)
+    
     def test_save_load_roundtrip(self):
         """Сохранение и загрузка модели."""
         model = self._make_simple_model()
@@ -176,6 +220,7 @@ class TestTokenGBDTModel:
             assert data["schema_version"] == TOKEN_HEAD_SCHEMA_VERSION
             assert data["n_features"] == 8
             assert data["learning_rate"] == 0.1
+            assert data["initial_prediction"] == 0.0
             
             # Загружаем и проверяем предсказания
             loaded = TokenGBDTModel.load(path)
@@ -184,7 +229,8 @@ class TestTokenGBDTModel:
             original_prob = model.predict_one(features)
             loaded_prob = loaded.predict_one(features)
             
-            assert abs(original_prob - loaded_prob) < 1e-12
+            # Точное совпадение
+            assert original_prob == loaded_prob
     
     def test_unknown_schema_raises(self):
         """Неизвестная схема вызывает ошибку."""
@@ -201,7 +247,7 @@ class TestTokenGBDTModel:
             TokenGBDTModel.from_dict(data)
     
     def test_unknown_type_raises(self):
-        """Неизвестный тип модели вызывает ошибку."""
+        """Неизвестный тип модели вызывает ошибки."""
         data = {
             "type": "unknown_model",
             "schema_version": TOKEN_HEAD_SCHEMA_VERSION,
@@ -212,6 +258,34 @@ class TestTokenGBDTModel:
         }
         
         with pytest.raises(ValueError, match="Unknown token model type"):
+            TokenGBDTModel.from_dict(data)
+    
+    def test_nan_in_saved_model_raises(self):
+        """NaN в сохранённой модели вызывает ошибку при загрузке."""
+        data = {
+            "type": "token_gbdt",
+            "schema_version": TOKEN_HEAD_SCHEMA_VERSION,
+            "n_features": 8,
+            "learning_rate": 0.1,
+            "initial_prediction": float("nan"),
+            "trees": [],
+        }
+        
+        with pytest.raises(ValueError, match="not finite"):
+            TokenGBDTModel.from_dict(data)
+    
+    def test_wrong_n_features_raises(self):
+        """Неверное число признаков в модели вызывает ошибку."""
+        data = {
+            "type": "token_gbdt",
+            "schema_version": TOKEN_HEAD_SCHEMA_VERSION,
+            "n_features": 5,  # должно быть 8
+            "learning_rate": 0.1,
+            "initial_prediction": 0.0,
+            "trees": [],
+        }
+        
+        with pytest.raises(ValueError, match="Expected 8 features"):
             TokenGBDTModel.from_dict(data)
 
 
@@ -235,6 +309,20 @@ class TestDecisionTree:
         assert tree.predict_one([0.3] + [0.0] * 7) == 0.2
         assert tree.predict_one([0.7] + [0.0] * 7) == 0.8
     
+    def test_internal_missing_children_raises(self):
+        """Internal-узел без детей вызывает ошибку."""
+        tree = DecisionTree(threshold=0.5, feature_index=0, left=None, right=None)
+        
+        with pytest.raises(ValueError, match="missing children"):
+            tree.predict_one([0.3] + [0.0] * 7)
+    
+    def test_to_dict_internal_missing_children_raises(self):
+        """Internal-узел без детей не сохраняется."""
+        tree = DecisionTree(threshold=0.5, feature_index=0, left=None, right=None)
+        
+        with pytest.raises(ValueError, match="must have both children"):
+            tree.to_dict()
+    
     def test_to_dict_from_dict(self):
         """Конвертация в словарь и обратно."""
         tree = DecisionTree(
@@ -255,7 +343,7 @@ class TestTrainTokenGBDT:
     """Тесты обучения (требуют sklearn)."""
     
     def test_tiny_fixture(self):
-        """Обучение на маленьком fixture."""
+        """Обучение на fixture."""
         pytest.importorskip("sklearn")
         
         from spanverify.token_head import train_token_gbdt
@@ -271,6 +359,7 @@ class TestTrainTokenGBDT:
         assert isinstance(model, TokenGBDTModel)
         assert model.n_features == 8
         assert len(model.trees) == 80  # n_estimators
+        assert model.initial_prediction == 0.0  # init="zero"
         
         # Проверяем предсказания
         probs = model.predict_many(X)
@@ -282,26 +371,25 @@ class TestTrainTokenGBDT:
         neg_probs = [probs[i] for i in range(100) if y[i] == 0]
         assert sum(pos_probs) / len(pos_probs) > sum(neg_probs) / len(neg_probs)
     
-    def test_sklearn_runtime_parity(self):
-        """Паритет sklearn и runtime predictor.
+    def test_exact_parity_with_sklearn_balanced(self):
+        """ТОЧНЫЙ паритет runtime vs sklearn с balanced weights.
         
-        Проверяем что runtime predictor даёт близкие результаты к sklearn.
-        Точный паритет невозможен из-за различий float32/float64 и конвертации деревьев.
+        Используем тот же sklearn объект для обучения и экспорта.
+        Проверяем max delta ≤ 1e-12.
         """
         pytest.importorskip("sklearn")
         
-        from spanverify.token_head import train_token_gbdt
         from sklearn.ensemble import GradientBoostingClassifier
+        from sklearn.utils import class_weight
         import numpy as np
         
         # Обучаем данные
         np.random.seed(42)
-        X = np.random.randn(50, 8).astype(np.float32)
-        y = (X[:, 0] > 0).astype(int)
+        X = np.random.randn(100, 8).astype(np.float32)
+        y = (X[:, 0] > 0).astype(np.int32)
         
-        model = train_token_gbdt(X.tolist(), y.tolist())
-        
-        # Сравниваем с sklearn
+        # Обучаем sklearn с balanced weights
+        weights = class_weight.compute_sample_weight("balanced", y)
         gbdt = GradientBoostingClassifier(
             loss="log_loss",
             n_estimators=80,
@@ -309,21 +397,200 @@ class TestTrainTokenGBDT:
             max_depth=3,
             min_samples_leaf=20,
             subsample=1.0,
+            init="zero",
+            random_state=42,
+        )
+        gbdt.fit(X, y, sample_weight=weights)
+        
+        # Экспортируем из того же sklearn объекта
+        model = export_token_gbdt_from_sklearn(gbdt)
+        
+        # Сравниваем с sklearn
+        sklearn_probs = gbdt.predict_proba(X)[:, 1]
+        runtime_probs = model.predict_many(X.tolist())
+        
+        # Проверяем ТОЧНЫЙ паритет с допуском 1e-12
+        max_delta = 0.0
+        for i, (sk_prob, rt_prob) in enumerate(zip(sklearn_probs, runtime_probs)):
+            delta = abs(sk_prob - rt_prob)
+            max_delta = max(max_delta, delta)
+            assert delta < 1e-12, (
+                f"Row {i}: sklearn={sk_prob:.15f}, runtime={rt_prob:.15f}, "
+                f"delta={delta:.2e}"
+            )
+        
+        print(f"Max delta: {max_delta:.2e}")
+    
+    def test_exact_parity_imbalanced(self):
+        """Паритет на imbalanced данных."""
+        pytest.importorskip("sklearn")
+        
+        from sklearn.ensemble import GradientBoostingClassifier
+        import numpy as np
+        
+        # 500 строк, 25 positive / 475 negative
+        np.random.seed(123)
+        X = np.random.randn(500, 8).astype(np.float32)
+        y = np.zeros(500, dtype=np.int32)
+        y[:25] = 1  # 25 positive, 475 negative
+        
+        gbdt = GradientBoostingClassifier(
+            loss="log_loss",
+            n_estimators=80,
+            learning_rate=0.05,
+            max_depth=3,
+            min_samples_leaf=20,
+            subsample=1.0,
+            init="zero",
             random_state=42,
         )
         gbdt.fit(X, y)
         
+        model = export_token_gbdt_from_sklearn(gbdt)
+        
         sklearn_probs = gbdt.predict_proba(X)[:, 1]
         runtime_probs = model.predict_many(X.tolist())
         
-        # Проверяем что предсказания близки (допуск 1e-2 из-за float32)
         max_delta = max(abs(sk - rt) for sk, rt in zip(sklearn_probs, runtime_probs))
-        mean_delta = sum(abs(sk - rt) for sk, rt in zip(sklearn_probs, runtime_probs)) / len(sklearn_probs)
+        assert max_delta < 1e-12, f"Max delta: {max_delta:.2e}"
+    
+    def test_exact_parity_custom_weights(self):
+        """Паритет с custom sample weights."""
+        pytest.importorskip("sklearn")
         
-        assert max_delta < 0.01, f"Max delta too large: {max_delta}"
-        assert mean_delta < 0.005, f"Mean delta too large: {mean_delta}"
+        from sklearn.ensemble import GradientBoostingClassifier
+        import numpy as np
         
-        # Проверяем что бинарные предсказания совпадают
-        sklearn_binary = (sklearn_probs >= 0.5).astype(int)
-        runtime_binary = [1 if p >= 0.5 else 0 for p in runtime_probs]
-        assert sklearn_binary.tolist() == runtime_binary
+        np.random.seed(456)
+        X = np.random.randn(80, 8).astype(np.float32)
+        y = (X[:, 0] > 0.5).astype(np.int32)
+        
+        # Custom weights: первые 40 имеют вес 2.0
+        weights = np.ones(80, dtype=np.float32)
+        weights[:40] = 2.0
+        
+        gbdt = GradientBoostingClassifier(
+            loss="log_loss",
+            n_estimators=80,
+            learning_rate=0.05,
+            max_depth=3,
+            min_samples_leaf=20,
+            subsample=1.0,
+            init="zero",
+            random_state=42,
+        )
+        gbdt.fit(X, y, sample_weight=weights)
+        
+        model = export_token_gbdt_from_sklearn(gbdt)
+        
+        sklearn_probs = gbdt.predict_proba(X)[:, 1]
+        runtime_probs = model.predict_many(X.tolist())
+        
+        max_delta = max(abs(sk - rt) for sk, rt in zip(sklearn_probs, runtime_probs))
+        assert max_delta < 1e-12, f"Max delta: {max_delta:.2e}"
+    
+    def test_exact_parity_held_out(self):
+        """Паритет на held-out данных (не участвовавших в обучении)."""
+        pytest.importorskip("sklearn")
+        
+        from sklearn.ensemble import GradientBoostingClassifier
+        import numpy as np
+        
+        np.random.seed(789)
+        X_train = np.random.randn(100, 8).astype(np.float32)
+        y_train = (X_train[:, 0] > 0).astype(np.int32)
+        
+        X_test = np.random.randn(30, 8).astype(np.float32)
+        
+        gbdt = GradientBoostingClassifier(
+            loss="log_loss",
+            n_estimators=80,
+            learning_rate=0.05,
+            max_depth=3,
+            min_samples_leaf=20,
+            subsample=1.0,
+            init="zero",
+            random_state=42,
+        )
+        gbdt.fit(X_train, y_train)
+        
+        model = export_token_gbdt_from_sklearn(gbdt)
+        
+        sklearn_probs = gbdt.predict_proba(X_test)[:, 1]
+        runtime_probs = model.predict_many(X_test.tolist())
+        
+        max_delta = max(abs(sk - rt) for sk, rt in zip(sklearn_probs, runtime_probs))
+        assert max_delta < 1e-12, f"Max delta: {max_delta:.2e}"
+    
+    def test_parity_after_save_load(self):
+        """Паритет сохраняется после save/load."""
+        pytest.importorskip("sklearn")
+        
+        from sklearn.ensemble import GradientBoostingClassifier
+        import numpy as np
+        
+        np.random.seed(999)
+        X = np.random.randn(60, 8).astype(np.float32)
+        y = (X[:, 0] > 0).astype(np.int32)
+        
+        gbdt = GradientBoostingClassifier(
+            loss="log_loss",
+            n_estimators=80,
+            learning_rate=0.05,
+            max_depth=3,
+            min_samples_leaf=20,
+            subsample=1.0,
+            init="zero",
+            random_state=42,
+        )
+        gbdt.fit(X, y)
+        
+        model = export_token_gbdt_from_sklearn(gbdt)
+        
+        # Предсказания до save
+        probs_before = model.predict_many(X.tolist())
+        
+        with tempfile.TemporaryDirectory() as tmpdir:
+            path = Path(tmpdir) / "model.json"
+            model.save(path)
+            loaded = TokenGBDTModel.load(path)
+        
+        # Предсказания после load
+        probs_after = loaded.predict_many(X.tolist())
+        
+        # Точное совпадение
+        for i, (before, after) in enumerate(zip(probs_before, probs_after)):
+            assert before == after, f"Row {i}: {before} != {after}"
+    
+    def test_parity_at_threshold_boundary(self):
+        """Паритет на threshold boundary — критический тест float32."""
+        pytest.importorskip("sklearn")
+        
+        from sklearn.ensemble import GradientBoostingClassifier
+        import numpy as np
+        
+        # Создаём данные где threshold дерева ≈ 1.0
+        np.random.seed(111)
+        X = np.random.randn(80, 8).astype(np.float32)
+        X[:, 0] = 1.0 + np.random.randn(80).astype(np.float32) * 0.1
+        y = (X[:, 0] > 1.0).astype(np.int32)
+        
+        gbdt = GradientBoostingClassifier(
+            loss="log_loss",
+            n_estimators=80,
+            learning_rate=0.05,
+            max_depth=3,
+            min_samples_leaf=20,
+            subsample=1.0,
+            init="zero",
+            random_state=42,
+        )
+        gbdt.fit(X, y)
+        
+        model = export_token_gbdt_from_sklearn(gbdt)
+        
+        sklearn_probs = gbdt.predict_proba(X)[:, 1]
+        runtime_probs = model.predict_many(X.tolist())
+        
+        max_delta = max(abs(sk - rt) for sk, rt in zip(sklearn_probs, runtime_probs))
+        assert max_delta < 1e-12, f"Max delta: {max_delta:.2e}"

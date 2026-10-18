@@ -10,12 +10,18 @@
 6: position = token_index / max(1, total_token_count)
 7: length = min(1, len(token.text.strip()) / 20)
 8: has_digit = int(any(ch.isdigit() for ch in token.text))
+
+Критические детали экспорта:
+- init="zero" при обучении → initial_prediction=0.0
+- Runtime конвертирует входы в float32 для паритета с sklearn
+- Точный паритет с sklearn.predict_proba[:,1] при max_delta ≤ 1e-12
 """
 from __future__ import annotations
 
 import json
 import math
-from dataclasses import dataclass, field
+import struct
+from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, List, Optional
 
@@ -24,6 +30,15 @@ from .features import FEATURE_NAMES
 
 TOKEN_HEAD_SCHEMA_VERSION = "token_gbdt_v1"
 N_TOKEN_FEATURES = 8  # 5 HF + position + length + has_digit
+
+
+def _to_float32(value: float) -> float:
+    """Конвертировать float64 в float32 и обратно для паритета с sklearn.
+    
+    sklearn деревья обрабатывают входы как float32. Для точного паритета
+    runtime должен делать то же самое.
+    """
+    return struct.unpack('f', struct.pack('f', float(value)))[0]
 
 
 def extract_token_features(
@@ -42,6 +57,9 @@ def extract_token_features(
     
     Returns:
         Список из 8 float значений
+    
+    Raises:
+        ValueError: если отсутствует HF-признак или значение не finite
     """
     features = []
     
@@ -81,32 +99,54 @@ class DecisionTree:
     def to_dict(self) -> dict[str, Any]:
         if self.value is not None:
             return {"value": self.value}
+        if self.left is None or self.right is None:
+            raise ValueError("Internal node must have both children")
         return {
             "threshold": self.threshold,
             "feature": self.feature_index,
-            "left": self.left.to_dict() if self.left else None,
-            "right": self.right.to_dict() if self.right else None,
+            "left": self.left.to_dict(),
+            "right": self.right.to_dict(),
         }
     
     @classmethod
     def from_dict(cls, data: dict[str, Any]) -> DecisionTree:
         if "value" in data:
-            return cls(threshold=0.0, feature_index=0, value=data["value"])
+            val = float(data["value"])
+            if not math.isfinite(val):
+                raise ValueError(f"Leaf value is not finite: {val}")
+            return cls(threshold=0.0, feature_index=0, value=val)
+        
+        # Internal node
+        if "left" not in data or "right" not in data:
+            raise ValueError("Internal node must have left and right children")
+        if "threshold" not in data or "feature" not in data:
+            raise ValueError("Internal node must have threshold and feature")
+        
+        threshold = float(data["threshold"])
+        feature_index = int(data["feature"])
+        
+        if not math.isfinite(threshold):
+            raise ValueError(f"Threshold is not finite: {threshold}")
+        if feature_index < 0 or feature_index >= N_TOKEN_FEATURES:
+            raise ValueError(f"Feature index out of range: {feature_index}")
+        
         return cls(
-            threshold=data["threshold"],
-            feature_index=data["feature"],
-            left=cls.from_dict(data["left"]) if data.get("left") else None,
-            right=cls.from_dict(data["right"]) if data.get("right") else None,
+            threshold=threshold,
+            feature_index=feature_index,
+            left=cls.from_dict(data["left"]),
+            right=cls.from_dict(data["right"]),
         )
     
     def predict_one(self, features: list[float]) -> float:
         """Предсказать значение для одного вектора признаков."""
         if self.value is not None:
             return self.value
+        if self.left is None or self.right is None:
+            raise ValueError("Internal node has missing children")
         if features[self.feature_index] <= self.threshold:
-            return self.left.predict_one(features) if self.left else 0.0
+            return self.left.predict_one(features)
         else:
-            return self.right.predict_one(features) if self.right else 0.0
+            return self.right.predict_one(features)
 
 
 @dataclass
@@ -119,6 +159,10 @@ class TokenGBDTModel:
     n_features: int = N_TOKEN_FEATURES
     
     def to_dict(self) -> dict[str, Any]:
+        if not math.isfinite(self.learning_rate):
+            raise ValueError(f"Learning rate is not finite: {self.learning_rate}")
+        if not math.isfinite(self.initial_prediction):
+            raise ValueError(f"Initial prediction is not finite: {self.initial_prediction}")
         return {
             "type": "token_gbdt",
             "schema_version": self.schema_version,
@@ -136,12 +180,27 @@ class TokenGBDTModel:
             raise ValueError(
                 f"Unsupported schema version: {data.get('schema_version')}"
             )
+        
+        n_features = int(data.get("n_features", N_TOKEN_FEATURES))
+        if n_features != N_TOKEN_FEATURES:
+            raise ValueError(
+                f"Expected {N_TOKEN_FEATURES} features, got {n_features}"
+            )
+        
+        learning_rate = float(data["learning_rate"])
+        initial_prediction = float(data["initial_prediction"])
+        
+        if not math.isfinite(learning_rate):
+            raise ValueError(f"Learning rate is not finite: {learning_rate}")
+        if not math.isfinite(initial_prediction):
+            raise ValueError(f"Initial prediction is not finite: {initial_prediction}")
+        
         return cls(
             trees=[DecisionTree.from_dict(t) for t in data["trees"]],
-            learning_rate=data["learning_rate"],
-            initial_prediction=data["initial_prediction"],
+            learning_rate=learning_rate,
+            initial_prediction=initial_prediction,
             schema_version=data["schema_version"],
-            n_features=data.get("n_features", N_TOKEN_FEATURES),
+            n_features=n_features,
         )
     
     def save(self, path: str | Path) -> None:
@@ -161,6 +220,9 @@ class TokenGBDTModel:
         
         Returns:
             Вероятность в [0, 1]
+        
+        Raises:
+            ValueError: если неверное число признаков или NaN/inf
         """
         if len(features) != self.n_features:
             raise ValueError(
@@ -172,12 +234,15 @@ class TokenGBDTModel:
             if not math.isfinite(val):
                 raise ValueError(f"Feature {i} is not finite: {val}")
         
+        # Конвертация в float32 для паритета с sklearn
+        features_f32 = [_to_float32(f) for f in features]
+        
         # Sum of tree predictions
         raw_score = self.initial_prediction
         for tree in self.trees:
-            raw_score += self.learning_rate * tree.predict_one(features)
+            raw_score += self.learning_rate * tree.predict_one(features_f32)
         
-        # Sigmoid
+        # Stable sigmoid с защитой от переполнения
         raw_score = max(-30.0, min(30.0, raw_score))
         return 1.0 / (1.0 + math.exp(-raw_score))
     
@@ -202,6 +267,11 @@ def train_token_gbdt(
         Обученная TokenGBDTModel
     
     Эта функция требует scikit-learn и используется только при обучении.
+    
+    Критические детали:
+    - init="zero" → initial_prediction=0.0 всегда
+    - Если заданы sample_weights, они используются для обучения
+    - Экспорт использует тот же sklearn объект для паритета
     """
     try:
         from sklearn.ensemble import GradientBoostingClassifier
@@ -224,7 +294,7 @@ def train_token_gbdt(
     else:
         weights = np.array(sample_weights, dtype=np.float32)
     
-    # Обучение GradientBoosting
+    # Обучение GradientBoosting с init="zero"
     gbdt = GradientBoostingClassifier(
         loss="log_loss",
         n_estimators=80,
@@ -232,23 +302,57 @@ def train_token_gbdt(
         max_depth=3,
         min_samples_leaf=20,
         subsample=1.0,
+        init="zero",  # КРИТИЧНО: zero init → initial_prediction=0.0
         random_state=42,
     )
     
     gbdt.fit(X_array, y_array, sample_weight=weights)
     
-    # Извлечение initial prediction
-    # Для binary classification init_ - это DummyClassifier с стратегией prior
-    # Начальное предсказание = log(prior probability class 1)
-    n_pos = np.sum(y_array == 1)
-    n_neg = np.sum(y_array == 0)
-    prior_pos = n_pos / len(y_array)
-    initial_pred = float(np.log(prior_pos / (1 - prior_pos))) if prior_pos > 0 and prior_pos < 1 else 0.0
+    # С init="zero" начальное предсказание всегда 0.0
+    initial_pred = 0.0
     
     # Конвертация деревьев в наш формат
     trees = []
     for tree_ensemble in gbdt.estimators_[:, 0]:  # shape: (n_estimators,)
         # Каждый элемент - это DecisionTreeRegressor
+        tree = _convert_sklearn_tree(tree_ensemble.tree_)
+        trees.append(tree)
+    
+    return TokenGBDTModel(
+        trees=trees,
+        learning_rate=gbdt.learning_rate,
+        initial_prediction=initial_pred,
+    )
+
+
+def export_token_gbdt_from_sklearn(gbdt) -> TokenGBDTModel:
+    """Экспортировать уже обученный sklearn GradientBoosting в наш формат.
+    
+    Эта функция используется для точного паритета: берём тот же sklearn объект,
+    который использовался для обучения, и конвертируем его в наш формат.
+    
+    Args:
+        gbdt: обученный sklearn.ensemble.GradientBoostingClassifier
+    
+    Returns:
+        TokenGBDTModel с теми же деревьями
+    
+    Raises:
+        ValueError: если init не "zero"
+    """
+    # Проверяем что init="zero"
+    if hasattr(gbdt, 'init_') and gbdt.init_ is not None:
+        # sklearn >= 1.1 использует init_ атрибут
+        if not isinstance(gbdt.init_, str) or gbdt.init_ != "zero":
+            raise ValueError(
+                f"Only init='zero' is supported, got {gbdt.init_}"
+            )
+    
+    initial_pred = 0.0  # init="zero" всегда даёт 0.0
+    
+    # Конвертация деревьев
+    trees = []
+    for tree_ensemble in gbdt.estimators_[:, 0]:
         tree = _convert_sklearn_tree(tree_ensemble.tree_)
         trees.append(tree)
     
@@ -271,6 +375,8 @@ def _convert_node(sklearn_tree, node_id: int) -> DecisionTree:
     if sklearn_tree.children_left[node_id] == -1:
         # Value для regression tree
         value = float(sklearn_tree.value[node_id, 0, 0])
+        if not math.isfinite(value):
+            raise ValueError(f"Tree leaf value is not finite: {value}")
         return DecisionTree(threshold=0.0, feature_index=0, value=value)
     
     # Internal node
@@ -278,6 +384,11 @@ def _convert_node(sklearn_tree, node_id: int) -> DecisionTree:
     threshold = float(sklearn_tree.threshold[node_id])
     left_child = int(sklearn_tree.children_left[node_id])
     right_child = int(sklearn_tree.children_right[node_id])
+    
+    if not math.isfinite(threshold):
+        raise ValueError(f"Tree threshold is not finite: {threshold}")
+    if feature < 0 or feature >= N_TOKEN_FEATURES:
+        raise ValueError(f"Tree feature index out of range: {feature}")
     
     left = _convert_node(sklearn_tree, left_child)
     right = _convert_node(sklearn_tree, right_child)

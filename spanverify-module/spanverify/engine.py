@@ -374,6 +374,9 @@ class Verifier:
         # P1 answer-голова: отдельная модель на сводках HF-признаков (37 признаков).
         # Если в бандле есть answer_head, загружаем его как AnswerHeadModel.
         self._answer_head_model = self._load_answer_head()
+        # P2 token-голова: GradientBoosting на 8 признаках (5 HF + position + length + has_digit).
+        # Если в бандле есть token_head, загружаем его как TokenGBDTModel.
+        self._token_head_model = self._load_token_head()
 
     # ---------------------------------------------------------------- доступ
 
@@ -403,6 +406,22 @@ class Verifier:
     def answer_head_model(self) -> Any | None:
         """P1 answer-голова (AnswerHeadModel), если загружена."""
         return self._answer_head_model
+
+    def _load_token_head(self) -> Any | None:
+        """Загрузить P2 token-голову из бандла, если есть."""
+        if self.bundle.token_head is None:
+            return None
+        try:
+            from .token_head import TokenGBDTModel
+
+            return TokenGBDTModel.from_dict(self.bundle.token_head)
+        except (ValueError, KeyError, TypeError) as exc:
+            raise ValueError("Invalid P2 token_head in bundle") from exc
+
+    @property
+    def token_head_model(self) -> Any | None:
+        """P2 token-голова (TokenGBDTModel), если загружена."""
+        return self._token_head_model
 
     @property
     def detector(self) -> Detector:
@@ -468,19 +487,45 @@ class Verifier:
             coverage_context = ""
         tokens = tokenize_with_offsets(answer)
         features = self._features(answer, context_text, tokens)
-        risk = combine(
-            features.attention_entropy,
-            features.ctx_attention_mass,
-            features.embedding_density,
-            self.bundle.weights,
-            entropy_quantile=self.entropy_quantile,
-            mass_norm=features.ctx_attention_mass_norm,
-            max_similarity=features.ctx_max_similarity,
-        )
-        if self.bundle.head and self.bundle.head.get("type") == "logreg":
-            head_risk = _head_risk(self.bundle.head, features, risk, tokens)
-            if head_risk is not None:
-                risk = head_risk
+        
+        # P2 token-head или legacy token risk
+        if self._token_head_model is not None:
+            # P2: GradientBoosting на 8 признаках
+            from .token_head import extract_token_features
+            
+            total_tokens = len(tokens)
+            token_features_matrix = []
+            for i, token in enumerate(tokens):
+                # Извлекаем 5 HF признаков для этого токена
+                hf_features_dict = {
+                    name: getattr(features, name)[i] for name in FEATURE_NAMES
+                }
+                # Извлекаем 8 признаков (5 HF + position + length + has_digit)
+                token_features = extract_token_features(
+                    token_index=i,
+                    total_tokens=total_tokens,
+                    token_text=token.text,
+                    hf_features=hf_features_dict,
+                )
+                token_features_matrix.append(token_features)
+            
+            # Предсказываем token risk через P2
+            risk = self._token_head_model.predict_many(token_features_matrix)
+        else:
+            # Legacy: combine() + head
+            risk = combine(
+                features.attention_entropy,
+                features.ctx_attention_mass,
+                features.embedding_density,
+                self.bundle.weights,
+                entropy_quantile=self.entropy_quantile,
+                mass_norm=features.ctx_attention_mass_norm,
+                max_similarity=features.ctx_max_similarity,
+            )
+            if self.bundle.head and self.bundle.head.get("type") == "logreg":
+                head_risk = _head_risk(self.bundle.head, features, risk, tokens)
+                if head_risk is not None:
+                    risk = head_risk
         # Пунктуация и короткие служебные слова не могут быть выдумкой: их риск
         # обнуляется до сглаживания, иначе соседние пики «размываются» их шумом.
         scored_indices = [i for i, token in enumerate(tokens) if is_scored_token(token.text)]
