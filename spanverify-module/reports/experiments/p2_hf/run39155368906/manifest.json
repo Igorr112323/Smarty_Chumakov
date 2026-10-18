@@ -1,0 +1,50 @@
+{
+  "run_id": "39155368906",
+  "code_sha": "7e0ed4454180c9c1ff0bf39ffbec5b993e41ade5",
+  "cache_source_run": 39060670054,
+  "baseline": "reports/experiments/p1_public_replay/run39144872719",
+  "baseline_sha256": "f29a00cd03cdc11493df2b57c66c9913a9446b743732fa9b9f730963330d2b68",
+  "runtime": {
+    "schema": "frozen-p1-runtime-v1",
+    "mode": "hf",
+    "model_name": "ai-forever/rugpt3small_based_on_gpt2",
+    "hf_max_tokens": 512,
+    "chunking": true,
+    "span_expansion": "mask",
+    "cache_source_run_id": 39060670054,
+    "answer_target_fpr": 0.3,
+    "source_measurement_run_id": 39116955685,
+    "source_measurement_commit": "b87850781b73d8630832cb972037158d0ec88927"
+  },
+  "python": "3.11.17",
+  "numpy": "1.26.4",
+  "sklearn": "1.5.2",
+  "cache_hits": 1928,
+  "cache_misses": 0,
+  "train_pairs": 842,
+  "dev_pairs": 181,
+  "fit": {
+    "pairs": 842,
+    "tokens": 46607,
+    "positive": 1384,
+    "negative": 45223
+  },
+  "elapsed_seconds": 141.204744479,
+  "sizes": {
+    "dev_evidence.jsonl": 3932617,
+    "tau_selection.json": 301453,
+    "all_family_metrics.json": 6962,
+    "p2_token_head.json": 97494,
+    "fold_receipts.json": 40562,
+    "dev_answers.jsonl": 34717,
+    "measurement.log": 691,
+    "cache_coverage.json": 52,
+    "oof_states.jsonl": 5742956,
+    "combined_bundle.json": 115068,
+    "tests.log": 80,
+    "p1_invariance.json": 379,
+    "runtime_config.json": 367
+  },
+  "fresh_inference": false,
+  "official_test": false
+}
