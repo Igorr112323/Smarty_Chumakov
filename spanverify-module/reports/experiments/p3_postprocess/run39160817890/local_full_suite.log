@@ -1,0 +1,192 @@
+.................................................F..............F.F..... [  8%]
+...................F.................................................... [ 17%]
+...................................................................F.... [ 26%]
+..........................F............................................. [ 35%]
+........................................................................ [ 43%]
+............................F.F......................................... [ 52%]
+......s.........FF.FFF.................F.....F.......................... [ 61%]
+................................................................s....... [ 70%]
+...F...........F....F................................................... [ 78%]
+...................................................................FF... [ 87%]
+.......................................................FF............... [ 96%]
+.............................                                            [100%]
+=================================== FAILURES ===================================
+__________________ test_cross_validate_reports_folds_and_mean __________________
+tests/test_calibration.py:129: in test_cross_validate_reports_folds_and_mean
+    assert report["mean"]["f1"] > 0.8
+E   assert 0.6 > 0.8
+________________________ test_coverage_pattern_decimal _________________________
+tests/test_check_numbers.py:30: in test_coverage_pattern_decimal
+    assert match is not None, f"Pattern should match '{text}'"
+E   AssertionError: Pattern should match 'покрытие 58.89 %'
+E   assert None is not None
+___________________________ test_trap_wrong_coverage ___________________________
+tests/test_check_numbers.py:77: in test_trap_wrong_coverage
+    assert len(problems) > 0, "Expected coverage problem, got no problems"
+E   AssertionError: Expected coverage problem, got no problems
+E   assert 0 > 0
+E    +  where 0 = len([])
+______________________ test_document_lists_every_workflow ______________________
+tests/test_ci_workflows.py:46: in test_document_lists_every_workflow
+    assert len(names) == len(list(WORKFLOWS.glob("*.yml"))), "не все файлы заданий попали в реестр"
+E   AssertionError: не все файлы заданий попали в реестр
+E   assert 12 == 20
+E    +  where 12 = len(['build-and-release-exe', 'ci', 'Корпус A3 (реальные акты, срезы)', 'Разбор ложных пометок по кешу', 'Свести числа экспериментов hf', 'Эксперименты hf (корпуса A3 и A)', ...])
+E    +  and   20 = len([PosixPath('/home/user/Smarty_Chumakov/.github/workflows/build-and-release-exe.yml'), PosixPath('/home/user/Smarty_Chu.../.github/workflows/hf-collect.yml'), PosixPath('/home/user/Smarty_Chumakov/.github/workflows/hf-experiments.yml'), ...])
+E    +    where [PosixPath('/home/user/Smarty_Chumakov/.github/workflows/build-and-release-exe.yml'), PosixPath('/home/user/Smarty_Chu.../.github/workflows/hf-collect.yml'), PosixPath('/home/user/Smarty_Chumakov/.github/workflows/hf-experiments.yml'), ...] = list(<generator object Path.glob at 0x7fe1d6d31ad0>)
+E    +      where <generator object Path.glob at 0x7fe1d6d31ad0> = glob('*.yml')
+E    +        where glob = PosixPath('/home/user/Smarty_Chumakov/.github/workflows').glob
+_______________________ test_train_produces_valid_bundle _______________________
+tests/test_context_stack.py:759: in test_train_produces_valid_bundle
+    assert 0.0 <= bundle.threshold <= 1.0
+E   AssertionError: assert 1.000000001 <= 1.0
+E    +  where 1.000000001 = WeightsBundle(weights={'attention_entropy': 0.1, 'ctx_attention_mass': 0.0, 'ctx_attention_mass_norm': 0.4, 'ctx_max_s...old': 1.0, 'calibrated_on': 'synthetic-participation-corpus 1.0 (два стиля, доля смеси известна)'}}, source='defaults').threshold
+_____________________ test_contract_provenance_local_or_ci _____________________
+tests/test_contract_provenance.py:57: in test_contract_provenance_local_or_ci
+    pytest.fail(f"CONTRACT.json provenance must be 'local' or 'ci', got: {provenance}")
+E   Failed: CONTRACT.json provenance must be 'local' or 'ci', got: None
+_______________ test_dump_load_roundtrip_preserves_all_features ________________
+tests/test_feature_cache_roundtrip.py:50: in test_dump_load_roundtrip_preserves_all_features
+    row = dump_matrix(key, matrix, pair_id, max_length=512, chunked=False)
+E   TypeError: dump_matrix() got an unexpected keyword argument 'max_length'
+________________ test_collect_samples_works_with_cached_matrix _________________
+tests/test_feature_cache_roundtrip.py:114: in test_collect_samples_works_with_cached_matrix
+    row = dump_matrix(key, matrix, pair_id, max_length=512, chunked=False)
+E   TypeError: dump_matrix() got an unexpected keyword argument 'max_length'
+__________________ test_metrics_file_is_not_behind_the_suite ___________________
+tests/test_metrics_files.py:187: in test_metrics_file_is_not_behind_the_suite
+    assert tests_block.get("collected") == collected, (
+E   AssertionError: reports/METRICS.json отстал от состава тестов: в файле 606, собрано 821; пересоберите файл (scripts/collect_metrics.py) и обновите документы
+E   assert 606 == 821
+E    +  where 606 = <built-in method get of dict object at 0x7fe1d6193380>('collected')
+E    +    where <built-in method get of dict object at 0x7fe1d6193380> = {'collected': 606, 'coverage_gate_percent': 85, 'coverage_percent': 87.82}.get
+_________________ test_document_test_claims_match_this_session _________________
+tests/test_metrics_files.py:215: in test_document_test_claims_match_this_session
+    assert problems == [], "документы заявляют число тестов, которого нет в этом прогоне:\n" + "\n".join(problems)
+E   AssertionError: документы заявляют число тестов, которого нет в этом прогоне:
+E     /home/user/Smarty_Chumakov/README.md:39: tests=606 нет в METRICS.json (допустимо: ['821']) → python -m pytest -q                                             # 606 тестов
+E     /home/user/Smarty_Chumakov/ИТОГ.md:56: tests=606 нет в METRICS.json (допустимо: ['821']) → | 1 | Тесты проходят | `python -m pytest -q` | **606 тестов, все проходят** |
+E     /home/user/Smarty_Chumakov/ИТОГ.md:155: tests=606 нет в METRICS.json (допустимо: ['821']) → 4. **Тесты и покрытие**: 606 тестов проходят, покрытие 87.82 % (шаги CI «Тесты с
+E     /home/user/Smarty_Chumakov/ИТОГ.md:195: tests=606 нет в METRICS.json (допустимо: ['821']) → | 606 тестов, покрытие 87.82 % | подтверждается в CI | job «Тесты (Python 3.10–3.12)» и «Л
+E     /home/user/Smarty_Chumakov/docs/ОТЧЁТ_о_НИР_шаблон.md:302: tests=606 нет в METRICS.json (допустимо: ['821']) → | Автоматические тесты | 606 тестов, все проходят |
+E     /home/user/Smarty_Chumakov/spanverify-module/README.md:26: tests=606 нет в METRICS.json (допустимо: ['821']) → | Конвейер (признаки → риск → фрагменты → калибровка → вердикт) | реализован, 606 тестов, 
+E     /home/user/Smarty_Chumakov/spanverify-module/README.md:248: tests=606 нет в METRICS.json (допустимо: ['821']) → ├── tests/               606 тестов (pytest), у каждого теста — docstring о смысле проверк
+E   assert ['/home/user/...естов, ', ...] == []
+E     
+E     Left contains 7 more items, first extra item: "/home/user/Smarty_Chumakov/README.md:39: tests=606 нет в METRICS.json (допустимо: ['821']) → python -m pytest -q                                             # 606 тестов"
+E     Use -v to get more diff
+____________________ test_evaluate_reports_verdict_metrics _____________________
+tests/test_metrics_files.py:295: in test_evaluate_reports_verdict_metrics
+    assert verdicts["tn"] == 1, "чистый ответ не должен получать замечание"
+E   AssertionError: чистый ответ не должен получать замечание
+E   assert 0 == 1
+______________________ test_no_test_without_splits_errors ______________________
+tests/test_no_test_isolation.py:95: in test_no_test_without_splits_errors
+    exit_code = run_experiments_main([
+scripts/run_experiments.py:355: in main
+    args = parser.parse_args(argv)
+/usr/lib/python3.11/argparse.py:1877: in parse_args
+    self.error(msg % ' '.join(argv))
+/usr/lib/python3.11/argparse.py:2633: in error
+    self.exit(2, _('%(prog)s: error: %(message)s\n') % args)
+/usr/lib/python3.11/argparse.py:2620: in exit
+    _sys.exit(status)
+E   SystemExit: 2
+----------------------------- Captured stderr call -----------------------------
+usage: __main__.py [-h] [--dataset DATASET] [--out OUT] [--mode {demo,hf}]
+                   [--model MODEL] [--seed SEED] [--folds FOLDS]
+                   [--target-fpr TARGET_FPR] [--pairs PAIRS]
+                   [--splits-dir SPLITS_DIR] [--no-splits]
+                   [--features-cache PATH] [--require-cache]
+                   [--compare-span-filter-chars COMPARE_SPAN_FILTER_CHARS]
+__main__.py: error: unrecognized arguments: --no-test
+____________________ test_no_test_with_splits_excludes_test ____________________
+tests/test_no_test_isolation.py:129: in test_no_test_with_splits_excludes_test
+    exit_code = run_experiments_main([
+scripts/run_experiments.py:355: in main
+    args = parser.parse_args(argv)
+/usr/lib/python3.11/argparse.py:1877: in parse_args
+    self.error(msg % ' '.join(argv))
+/usr/lib/python3.11/argparse.py:2633: in error
+    self.exit(2, _('%(prog)s: error: %(message)s\n') % args)
+/usr/lib/python3.11/argparse.py:2620: in exit
+    _sys.exit(status)
+E   SystemExit: 2
+----------------------------- Captured stderr call -----------------------------
+usage: __main__.py [-h] [--dataset DATASET] [--out OUT] [--mode {demo,hf}]
+                   [--model MODEL] [--seed SEED] [--folds FOLDS]
+                   [--target-fpr TARGET_FPR] [--pairs PAIRS]
+                   [--splits-dir SPLITS_DIR] [--no-splits]
+                   [--features-cache PATH] [--require-cache]
+                   [--compare-span-filter-chars COMPARE_SPAN_FILTER_CHARS]
+__main__.py: error: unrecognized arguments: --no-test
+__________________ test_attribution_requires_two_measurements __________________
+tests/test_number_attribution.py:97: in test_attribution_requires_two_measurements
+    assert Verifier(mode="demo").verify(answer, context).verdict == "grounded"
+E   AssertionError: assert 'likely_hallucination' == 'grounded'
+E     
+E     - grounded
+E     + likely_hallucination
+_________________ test_answer_with_number_in_words_is_grounded _________________
+tests/test_number_words_in_answer.py:55: in test_answer_with_number_in_words_is_grounded
+    assert digits.verdict == "grounded"
+E   AssertionError: assert 'likely_hallucination' == 'grounded'
+E     
+E     - grounded
+E     + likely_hallucination
+___________________ test_service_verify_accepts_context_list ___________________
+tests/test_server_cli.py:140: in test_service_verify_accepts_context_list
+    assert body["verdict"] in {"grounded", "doubtful"}
+E   AssertionError: assert 'likely_hallucination' in {'doubtful', 'grounded'}
+_______________________ test_cli_verify_confirmed_answer _______________________
+tests/test_server_cli.py:249: in test_cli_verify_confirmed_answer
+    assert code == EXIT_OK
+E   assert 1 == 0
+___________________________ test_cli_selftest_passes ___________________________
+tests/test_server_cli.py:291: in test_cli_selftest_passes
+    assert code == EXIT_OK
+E   assert 2 == 0
+_______________ test_demo_pair_single_token_verdict_before_after _______________
+tests/test_verdict_rule.py:89: in test_demo_pair_single_token_verdict_before_after
+    assert current_result.score < current_result.threshold
+E   assert 1.0 < 1.0
+E    +  where 1.0 = VerificationResult(score=1.0, is_hallucination=True, ai_share=1.0, ai_share_hard=1.0, ai_participation=0.4548320701468...ирования и таблицы требуют режима 'hf'. Научные выводы возможны только в режиме 'hf'.", verdict='likely_hallucination').score
+E    +  and   1.0 = VerificationResult(score=1.0, is_hallucination=True, ai_share=1.0, ai_share_hard=1.0, ai_participation=0.4548320701468...ирования и таблицы требуют режима 'hf'. Научные выводы возможны только в режиме 'hf'.", verdict='likely_hallucination').threshold
+_______________ test_evaluate_tokens_identical_under_both_rules ________________
+tests/test_verdict_rule.py:103: in test_evaluate_tokens_identical_under_both_rules
+    assert (
+E   AssertionError: правила обязаны различаться хотя бы на одном вердикте этого кейса
+E   assert (0.0 != 0.0 or 1.0 != 1.0)
+______ test_no_job_is_longer_than_the_limit[postprocess-p0-answer-p1.yml] ______
+tests/test_workflow_limits.py:70: in test_no_job_is_longer_than_the_limit
+    assert not over, f"{path.name}: job'ы дольше {limit} минут: {over}"
+E   AssertionError: postprocess-p0-answer-p1.yml: job'ы дольше 40 минут: {'measure-p1': 60}
+E   assert not {'measure-p1': 60}
+_______ test_no_job_is_longer_than_the_limit[postprocess-p0-answer.yml] ________
+tests/test_workflow_limits.py:70: in test_no_job_is_longer_than_the_limit
+    assert not over, f"{path.name}: job'ы дольше {limit} минут: {over}"
+E   AssertionError: postprocess-p0-answer.yml: job'ы дольше 40 минут: {'measure-aggregators': 60}
+E   assert not {'measure-aggregators': 60}
+=========================== short test summary info ============================
+FAILED tests/test_calibration.py::test_cross_validate_reports_folds_and_mean
+FAILED tests/test_check_numbers.py::test_coverage_pattern_decimal - Assertion...
+FAILED tests/test_check_numbers.py::test_trap_wrong_coverage - AssertionError...
+FAILED tests/test_ci_workflows.py::test_document_lists_every_workflow - Asser...
+FAILED tests/test_context_stack.py::test_train_produces_valid_bundle - Assert...
+FAILED tests/test_contract_provenance.py::test_contract_provenance_local_or_ci
+FAILED tests/test_feature_cache_roundtrip.py::test_dump_load_roundtrip_preserves_all_features
+FAILED tests/test_feature_cache_roundtrip.py::test_collect_samples_works_with_cached_matrix
+FAILED tests/test_metrics_files.py::test_metrics_file_is_not_behind_the_suite
+FAILED tests/test_metrics_files.py::test_document_test_claims_match_this_session
+FAILED tests/test_metrics_files.py::test_evaluate_reports_verdict_metrics - A...
+FAILED tests/test_no_test_isolation.py::test_no_test_without_splits_errors - ...
+FAILED tests/test_no_test_isolation.py::test_no_test_with_splits_excludes_test
+FAILED tests/test_number_attribution.py::test_attribution_requires_two_measurements
+FAILED tests/test_number_words_in_answer.py::test_answer_with_number_in_words_is_grounded
+FAILED tests/test_server_cli.py::test_service_verify_accepts_context_list - A...
+FAILED tests/test_server_cli.py::test_cli_verify_confirmed_answer - assert 1 ...
+FAILED tests/test_server_cli.py::test_cli_selftest_passes - assert 2 == 0
+FAILED tests/test_verdict_rule.py::test_demo_pair_single_token_verdict_before_after
+FAILED tests/test_verdict_rule.py::test_evaluate_tokens_identical_under_both_rules
+FAILED tests/test_workflow_limits.py::test_no_job_is_longer_than_the_limit[postprocess-p0-answer-p1.yml]
+FAILED tests/test_workflow_limits.py::test_no_job_is_longer_than_the_limit[postprocess-p0-answer.yml]
