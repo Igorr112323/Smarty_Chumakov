@@ -76,7 +76,7 @@ def environment():
         "commit": subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=ROOT, text=True).strip(),
         "run_url": f"https://github.com/{os.getenv('GITHUB_REPOSITORY')}/actions/runs/{os.getenv('GITHUB_RUN_ID')}",
         "bundle_sha256": SHA,
-        "feature_cache": False,
+        "feature_cache": "action-specific; benchmarks do not supply a feature cache",
     }
 
 

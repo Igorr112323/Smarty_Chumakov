@@ -325,6 +325,10 @@ jobs:
               -Method Post -Body ([System.Text.Encoding]::UTF8.GetBytes($payload)) `
               -ContentType "application/json; charset=utf-8" -TimeoutSec 60
             if ($bad.spans.Count -lt 1) { throw "автономный .exe не нашёл подмену" }
+            $health | ConvertTo-Json -Depth 30 | Set-Content -Encoding utf8 release/autonomy-health.json
+            $payload | Set-Content -Encoding utf8 release/autonomy-request.json
+            $bad | ConvertTo-Json -Depth 30 | Set-Content -Encoding utf8 release/autonomy-response.json
+            @{ clean_directory = $sandbox; config_adjacent = (Test-Path (Join-Path $sandbox "config")); mode = "demo"; code_sha = "${{ github.sha }}"; passed = $true } | ConvertTo-Json | Set-Content -Encoding utf8 release/autonomy.json
             Write-Host "АВТОНОМНОСТЬ ПОДТВЕРЖДЕНА"
           } catch {
             foreach ($name in @("out.log", "err.log")) {
@@ -465,6 +469,7 @@ jobs:
             spanverify-module/release/sizes.json
             spanverify-module/reports/release_sizes.json
             spanverify-module/release/README.md
+            spanverify-module/release/autonomy*.json
           retention-days: 90
 
       - name: Публикация релиза (только после успешного смоук-теста)
