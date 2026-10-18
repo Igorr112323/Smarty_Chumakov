@@ -163,6 +163,7 @@ class WeightsBundle:
     token_threshold: float | None = None  # Global token threshold для P2
     context_features_spec: dict[str, Any] | None = None
     localization_decoder: dict[str, Any] | None = None  # Versioned P3 postprocessor only
+    span_filter: dict[str, Any] | None = None  # P5, frozen P4 risks + keep/drop
     folds: list[dict[str, Any]] | None = None
     seed: int = 42
     version: str = "1.1.0"
@@ -171,6 +172,12 @@ class WeightsBundle:
     source: str = "defaults"  # откуда взяты параметры: disk | embedded | defaults
 
     def __post_init__(self):
+        if self.span_filter is not None:
+            from .span_filter import validate_filter
+
+            validate_filter(self.span_filter)
+            if self.token_head is None or self.context_features_spec is None or self.localization_decoder is None:
+                raise ValueError("P5 requires the frozen context token head and decoder")
         if self.context_features_spec is not None:
             from .context_head import validate_spec
 
@@ -196,6 +203,7 @@ class WeightsBundle:
             "answer_head": self.answer_head,
             "token_head": self.token_head,
             "localization_decoder": self.localization_decoder,
+            "span_filter": self.span_filter,
             "context_features_spec": self.context_features_spec,
             "token_threshold": float(self.token_threshold) if self.token_threshold is not None else None,
             "folds": self.folds or [],
@@ -241,6 +249,7 @@ class WeightsBundle:
             answer_head=data.get("answer_head"),
             token_head=data.get("token_head"),
             localization_decoder=data.get("localization_decoder"),
+            span_filter=data.get("span_filter"),
             context_features_spec=data.get("context_features_spec"),
             token_threshold=float(data["token_threshold"]) if data.get("token_threshold") is not None else None,
             folds=list(data.get("folds", [])),
@@ -589,6 +598,19 @@ class Verifier:
             raw_score = _answer_score(scored)
         score = self._calibrate(raw_score)
         threshold = self.bundle.threshold
+        if self.bundle.span_filter is not None:
+            from .span_filter import build_candidates, filter_candidates
+
+            cfg = self.bundle.span_filter
+            rules = [
+                *self._attribution_spans(answer, context_text, tokens, smoothed, self._span_threshold(scored)),
+                *self._coverage_spans(answer, coverage_context, tokens, self._span_threshold(scored)),
+            ]
+            candidates = build_candidates(
+                answer, tokens, smoothed, [i in scored_set for i in range(len(tokens))], cfg["generator"], score, rules
+            )
+            kept_flagged, spans = filter_candidates(answer, tokens, candidates, cfg, rules)
+            span_threshold = cfg["generator"]["tau_low"]
         ai_share_soft, ai_share_hard = self._shares(tokens, smoothed, scored_indices, spans, kept_flagged)
         ai_participation = self.participation.estimate(answer, features) if self.participation is not None else 0.0
 
