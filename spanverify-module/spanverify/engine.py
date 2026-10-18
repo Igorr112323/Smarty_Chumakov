@@ -531,8 +531,7 @@ class Verifier:
         # обнуляется до сглаживания, иначе соседние пики «размываются» их шумом.
         scored_indices = [i for i, token in enumerate(tokens) if is_scored_token(token.text)]
         scored_set = set(scored_indices)  # Вычисляем один раз
-        masked = [risk[i] if i in scored_set else 0.0 for i in range(len(risk))]
-        smoothed = _smooth(masked, SMOOTH_WINDOW)
+        smoothed = smooth_token_risks(risk, [i in scored_set for i in range(len(tokens))])
         scored = [smoothed[i] for i in scored_indices] or [0.0]
         span_threshold, spans, kept_flagged = self._localize(
             answer, context_text, coverage_context, tokens, smoothed, scored)
@@ -750,6 +749,9 @@ class Verifier:
             ]
         )
 
+        if self.bundle.token_threshold is not None:
+            selected = {i for i,t in enumerate(tokens) if is_scored_token(t.text) and smoothed[i] >= span_threshold}
+            kept_flagged = selected if kept_flagged is None else selected & kept_flagged
         return span_threshold, spans, kept_flagged
 
     def _span_threshold(self, risk: Sequence[float]) -> float:
@@ -1385,6 +1387,13 @@ def _merge_spans(spans: Sequence[SpanResult]) -> list[SpanResult]:
         else:
             merged.append(span)
     return merged
+
+
+def smooth_token_risks(risks, scored_mask):
+    """Canonical full-sequence zero-mask and smoothing, shared with P2 OOF."""
+    if len(risks) != len(scored_mask):
+        raise ValueError("Risk/mask length mismatch")
+    return _smooth([float(r) if m else 0.0 for r,m in zip(risks,scored_mask)], SMOOTH_WINDOW)
 
 
 def _token_payload(

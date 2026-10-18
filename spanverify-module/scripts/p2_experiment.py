@@ -11,7 +11,7 @@ from spanverify.core import tokenize_with_offsets
 from spanverify.features import is_scored_token
 from spanverify.features import FEATURE_NAMES, load_feature_cache, set_feature_cache, feature_cache_key
 from spanverify.dataset import read_pairs
-from spanverify.engine import WeightsBundle, _smooth, SMOOTH_WINDOW, _binary_metrics, _span_f1
+from spanverify.engine import WeightsBundle, smooth_token_risks, _binary_metrics, _span_f1
 from spanverify.token_head import extract_token_features, train_token_gbdt
 from replay_p1_dev import make_verifier, collect_public_rows, compare_records, metrics, read_json, read_jsonl, write_json, write_jsonl
 
@@ -34,7 +34,10 @@ def selection(verifier, states, tau):
         labels.extend(y for y,m in zip(s['gold'],s['scored']) if m)
         flags.extend((i in kept if kept is not None else r >= tau) for i,(r,m) in enumerate(zip(s['smoothed'],s['scored'])) if m)
         predicted.append([(p.start,p.end) for p in spans]); truth.append(s['truth'])
-    tm = _binary_metrics(labels, flags); sm = _span_f1(predicted, truth, iou_threshold=0.5)
+    tm = _binary_metrics(labels, flags)
+    tp,fp,fn,tn = (tm[k] for k in ('tp','fp','fn','tn'))
+    tm.update(precision=tp/(tp+fp) if tp+fp else 0.0, recall=tp/(tp+fn) if tp+fn else 0.0, f1=2*tp/(2*tp+fp+fn) if 2*tp+fp+fn else 0.0, fpr=fp/(fp+tn) if fp+tn else 0.0)
+    sm = _span_f1(predicted, truth, iou_threshold=0.5)
     return {'tau':float(tau), 'tokens':tm, 'spans':sm, 'objective':min(tm['f1'],sm['f1'])}
 
 def run(cache_dir, out):
@@ -75,7 +78,7 @@ def run(cache_dir, out):
             if s['doc'] not in held: continue
             assert 'fold' not in s
             raw=model.predict_many(s['X'])
-            s['smoothed']=_smooth([r if m else 0.0 for r,m in zip(raw,s['scored'])],SMOOTH_WINDOW); s['fold']=fold
+            s['smoothed']=smooth_token_risks(raw,s['scored']); s['fold']=fold
         write_json(out/'fold_receipts.json',receipts)
         print('Completed fold',fold,counts,flush=True)
     assert all('fold' in s for s in states)
