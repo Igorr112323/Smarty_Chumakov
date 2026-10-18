@@ -161,6 +161,7 @@ class WeightsBundle:
     answer_head: dict[str, Any] | None = None
     token_head: dict[str, Any] | None = None  # P2 token-head (GradientBoosting)
     token_threshold: float | None = None  # Global token threshold для P2
+    context_features_spec: dict[str, Any] | None = None
     localization_decoder: dict[str, Any] | None = None  # Versioned P3 postprocessor only
     folds: list[dict[str, Any]] | None = None
     seed: int = 42
@@ -170,6 +171,10 @@ class WeightsBundle:
     source: str = "defaults"  # откуда взяты параметры: disk | embedded | defaults
 
     def __post_init__(self):
+        if self.context_features_spec is not None:
+            from .context_head import validate_spec
+
+            validate_spec(self.context_features_spec)
         if self.localization_decoder is not None:
             from .localization import validate_decoder
 
@@ -191,6 +196,7 @@ class WeightsBundle:
             "answer_head": self.answer_head,
             "token_head": self.token_head,
             "localization_decoder": self.localization_decoder,
+            "context_features_spec": self.context_features_spec,
             "token_threshold": float(self.token_threshold) if self.token_threshold is not None else None,
             "folds": self.folds or [],
             "seed": self.seed,
@@ -235,6 +241,7 @@ class WeightsBundle:
             answer_head=data.get("answer_head"),
             token_head=data.get("token_head"),
             localization_decoder=data.get("localization_decoder"),
+            context_features_spec=data.get("context_features_spec"),
             token_threshold=float(data["token_threshold"]) if data.get("token_threshold") is not None else None,
             folds=list(data.get("folds", [])),
             seed=int(data.get("seed", 42)),
@@ -420,10 +427,21 @@ class Verifier:
     def _load_token_head(self) -> Any | None:
         """Загрузить P2 token-голову из бандла, если есть."""
         if self.bundle.token_head is None:
+            if self.bundle.context_features_spec is not None:
+                raise ValueError("Context spec without token head")
             return None
         try:
             from .token_head import TokenGBDTModel
 
+            if self.bundle.token_head.get("type") == "context_token_gbdt":
+                from .context_head import ContextGBDTModel
+
+                model = ContextGBDTModel.from_dict(self.bundle.token_head)
+                if model.context_features != self.bundle.context_features_spec:
+                    raise ValueError("Context model/bundle spec mismatch")
+                return model
+            if self.bundle.context_features_spec is not None:
+                raise ValueError("Context spec requires context token model")
             return TokenGBDTModel.from_dict(self.bundle.token_head)
         except (ValueError, KeyError, TypeError) as exc:
             raise ValueError("Invalid P2 token_head in bundle") from exc
@@ -517,7 +535,13 @@ class Verifier:
                 )
                 token_features_matrix.append(token_features)
 
-            # Предсказываем token risk через P2
+            if self.bundle.context_features_spec is not None:
+                from .context_head import build_context_features
+
+                token_features_matrix = build_context_features(
+                    token_features_matrix, [is_scored_token(t.text) for t in tokens], self.bundle.context_features_spec
+                )
+            # Предсказываем token risk через P2/P4 (raw HF matrix is unchanged)
             risk = self._token_head_model.predict_many(token_features_matrix)
         else:
             # Legacy: combine() + head
