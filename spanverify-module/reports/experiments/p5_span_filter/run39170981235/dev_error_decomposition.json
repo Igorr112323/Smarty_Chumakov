@@ -1,0 +1,7 @@
+{
+  "fp_clean": 22,
+  "fp_dirty": 10,
+  "no_overlap": 29,
+  "overlap_below_05": 3,
+  "gold_without_overlap": 47
+}

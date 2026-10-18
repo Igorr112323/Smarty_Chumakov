@@ -1,0 +1,36 @@
+{
+  "selected": {
+    "cell": 218,
+    "head": "pooled_logreg_C1",
+    "keep_threshold": 0.5081811955031305,
+    "tokens": {
+      "tp": 919,
+      "fp": 422,
+      "fn": 465,
+      "tn": 44801,
+      "precision": 0.6853094705443699,
+      "recall": 0.6640173410404624,
+      "f1": 0.6744954128440367,
+      "fpr": 0.009331534838467152
+    },
+    "spans": {
+      "precision": 0.670846394984326,
+      "recall": 0.4582441113490364,
+      "f1": 0.544529262086514,
+      "tp": 214,
+      "fp": 105,
+      "fn": 253,
+      "iou_threshold": 0.5
+    },
+    "objective": 0.544529262086514
+  },
+  "generator": {
+    "tau_low": 0.4186579753072923,
+    "tau_high": 0.4186579753072923,
+    "bridge": 1,
+    "min_seed": 1
+  },
+  "criterion": "max min(token F1,strict span F1), token FPR<=.30, tie smaller FPR then fixed iteration order",
+  "grid_points": 4794,
+  "source": "TRAIN OOF ONLY; not independent acceptance"
+}

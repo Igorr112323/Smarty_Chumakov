@@ -1,0 +1,54 @@
+{
+  "head": "one pooled standardized logreg shared across all generator cells",
+  "recipe": {
+    "C": 1.0,
+    "penalty": "l2",
+    "class_weight": "balanced",
+    "solver": "lbfgs",
+    "max_iter": 1000,
+    "tol": 1e-06,
+    "random_state": 42
+  },
+  "low_quantiles": [
+    0.5,
+    0.6,
+    0.7,
+    0.75,
+    0.8,
+    0.85,
+    0.9
+  ],
+  "high_quantiles": [
+    0.9,
+    0.94,
+    0.96,
+    0.975,
+    0.985
+  ],
+  "keep_quantiles": [
+    0,
+    0.05,
+    0.1,
+    0.2,
+    0.3,
+    0.4,
+    0.5,
+    0.6,
+    0.7,
+    0.8,
+    0.9,
+    0.95,
+    0.975,
+    0.99,
+    1
+  ],
+  "keep_controls": [
+    "all_keep=0",
+    "all_drop=nextafter(1,2)"
+  ],
+  "criterion": "max min(token F1,strict span F1), token FPR<=.30, tie smaller FPR then fixed iteration order",
+  "rule_policy": "unfiltered evidence included in strict spans AND token flags",
+  "label": "per-cell previous greedy IoU>=.5, no gold boundary snap",
+  "official_test_read": false,
+  "dev_opened": false
+}
