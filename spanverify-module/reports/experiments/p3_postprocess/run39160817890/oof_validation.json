@@ -1,0 +1,9 @@
+{
+  "pairs": 842,
+  "documents": 265,
+  "folds": 5,
+  "scored_tokens": 46607,
+  "missing_states": 0,
+  "shared_documents": 0,
+  "coverage": "each pair/document held exactly once; no placeholders inserted"
+}

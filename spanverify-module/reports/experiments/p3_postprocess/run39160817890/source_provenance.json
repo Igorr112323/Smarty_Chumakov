@@ -1,0 +1,19 @@
+{
+  "run_id": 39155368906,
+  "artifact_id": 12146627081,
+  "code_sha": "7e0ed4454180c9c1ff0bf39ffbec5b993e41ade5",
+  "files": {
+    "oof_states.jsonl": {
+      "sha256": "5ca0ff5121707e950a4a710c8d733c092aeca477857ca146847c5de0ef98959b",
+      "bytes": 5742956,
+      "gzip_sha256": "96facdab18c9cb01c7a53a523c700c1b829c0105714fdc68a2cddf12ff01297d",
+      "gzip_bytes": 1379585
+    },
+    "dev_evidence.jsonl": {
+      "sha256": "e54d290b4894246e61a256af5568af500bc979997d7ab72e7f6ea237129d31ce",
+      "bytes": 3932617,
+      "gzip_sha256": "926ca9d19ca100017df9349af2f8c4c69c6adc56ee5a4baca0dea4c0e15d1465",
+      "gzip_bytes": 570090
+    }
+  }
+}

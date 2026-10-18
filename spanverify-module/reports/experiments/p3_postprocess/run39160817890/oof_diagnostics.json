@@ -1,0 +1,300 @@
+{
+  "mask": {
+    "precision": 0.15967078189300413,
+    "recall": 0.41541755888650966,
+    "f1": 0.2306777645659929,
+    "tp": 194,
+    "fp": 1021,
+    "fn": 273,
+    "iou_threshold": 0.5,
+    "fp_clean": 495,
+    "fp_dirty": 526,
+    "no_overlap_spans": 913,
+    "overlap_below_iou_05_spans": 108,
+    "gold_with_multiple_overlapping_predictions": 54,
+    "char_widths": {
+      "count": 1215,
+      "quantiles": {
+        "min": 1.0,
+        "p25": 4.0,
+        "p50": 9.0,
+        "p75": 16.0,
+        "p90": 26.0,
+        "p95": 31.0,
+        "p99": 37.0,
+        "max": 54.0
+      }
+    },
+    "components_per_pair": {
+      "count": 842,
+      "quantiles": {
+        "min": 0.0,
+        "p25": 0.0,
+        "p50": 1.0,
+        "p75": 2.0,
+        "p90": 3.0,
+        "p95": 4.0,
+        "p99": 7.590000000000032,
+        "max": 15.0
+      }
+    },
+    "containment": 0.10492505353319058,
+    "mean_width_ratio_containment_only": 2.078168666734093
+  },
+  "attribution": {
+    "precision": 0.07017543859649122,
+    "recall": 0.008565310492505354,
+    "f1": 0.015267175572519085,
+    "tp": 4,
+    "fp": 53,
+    "fn": 463,
+    "iou_threshold": 0.5,
+    "fp_clean": 11,
+    "fp_dirty": 42,
+    "no_overlap_spans": 17,
+    "overlap_below_iou_05_spans": 35,
+    "gold_with_multiple_overlapping_predictions": 5,
+    "char_widths": {
+      "count": 57,
+      "quantiles": {
+        "min": 2.0,
+        "p25": 40.0,
+        "p50": 70.0,
+        "p75": 96.0,
+        "p90": 163.39999999999998,
+        "p95": 199.2,
+        "p99": 204.83999999999997,
+        "max": 211.0
+      }
+    },
+    "components_per_pair": {
+      "count": 842,
+      "quantiles": {
+        "min": 0.0,
+        "p25": 0.0,
+        "p50": 0.0,
+        "p75": 0.0,
+        "p90": 0.0,
+        "p95": 1.0,
+        "p99": 1.0,
+        "max": 3.0
+      }
+    },
+    "containment": 0.0728051391862955,
+    "mean_width_ratio_containment_only": 17.913137424732533
+  },
+  "coverage": {
+    "precision": 0.0,
+    "recall": 0.0,
+    "f1": 0.0,
+    "tp": 0,
+    "fp": 0,
+    "fn": 467,
+    "iou_threshold": 0.5,
+    "fp_clean": 0,
+    "fp_dirty": 0,
+    "no_overlap_spans": 0,
+    "overlap_below_iou_05_spans": 0,
+    "gold_with_multiple_overlapping_predictions": 0,
+    "char_widths": {
+      "count": 0,
+      "quantiles": {}
+    },
+    "components_per_pair": {
+      "count": 842,
+      "quantiles": {
+        "min": 0.0,
+        "p25": 0.0,
+        "p50": 0.0,
+        "p75": 0.0,
+        "p90": 0.0,
+        "p95": 0.0,
+        "p99": 0.0,
+        "max": 0.0
+      }
+    },
+    "containment": 0.0,
+    "mean_width_ratio_containment_only": 0.0
+  },
+  "final": {
+    "precision": 0.1529790660225443,
+    "recall": 0.4068522483940043,
+    "f1": 0.2223522527794032,
+    "tp": 190,
+    "fp": 1052,
+    "fn": 277,
+    "iou_threshold": 0.5,
+    "fp_clean": 505,
+    "fp_dirty": 547,
+    "no_overlap_spans": 921,
+    "overlap_below_iou_05_spans": 131,
+    "gold_with_multiple_overlapping_predictions": 53,
+    "char_widths": {
+      "count": 1242,
+      "quantiles": {
+        "min": 1.0,
+        "p25": 4.0,
+        "p50": 10.0,
+        "p75": 16.0,
+        "p90": 30.90000000000009,
+        "p95": 32.0,
+        "p99": 92.94999999999959,
+        "max": 211.0
+      }
+    },
+    "components_per_pair": {
+      "count": 842,
+      "quantiles": {
+        "min": 0.0,
+        "p25": 0.0,
+        "p50": 1.0,
+        "p75": 2.0,
+        "p90": 3.0,
+        "p95": 4.0,
+        "p99": 7.590000000000032,
+        "max": 15.0
+      }
+    },
+    "containment": 0.1670235546038544,
+    "mean_width_ratio_containment_only": 9.022812368571776
+  },
+  "exact_attribution": {
+    "precision": 0.10526315789473684,
+    "recall": 0.01284796573875803,
+    "f1": 0.022900763358778626,
+    "tp": 6,
+    "fp": 51,
+    "fn": 461,
+    "iou_threshold": 0.5,
+    "fp_clean": 11,
+    "fp_dirty": 40,
+    "no_overlap_spans": 21,
+    "overlap_below_iou_05_spans": 30,
+    "gold_with_multiple_overlapping_predictions": 3,
+    "char_widths": {
+      "count": 57,
+      "quantiles": {
+        "min": 1.0,
+        "p25": 2.0,
+        "p50": 2.0,
+        "p75": 3.0,
+        "p90": 5.0,
+        "p95": 5.0,
+        "p99": 6.439999999999998,
+        "max": 7.0
+      }
+    },
+    "components_per_pair": {
+      "count": 842,
+      "quantiles": {
+        "min": 0.0,
+        "p25": 0.0,
+        "p50": 0.0,
+        "p75": 0.0,
+        "p90": 0.0,
+        "p95": 1.0,
+        "p99": 1.0,
+        "max": 3.0
+      }
+    },
+    "containment": 0.014989293361884369,
+    "mean_width_ratio_containment_only": 1.8571428571428572
+  },
+  "final_exact_anchor": {
+    "precision": 0.15843949044585987,
+    "recall": 0.4261241970021413,
+    "f1": 0.2309924550203134,
+    "tp": 199,
+    "fp": 1057,
+    "fn": 268,
+    "iou_threshold": 0.5,
+    "fp_clean": 505,
+    "fp_dirty": 552,
+    "no_overlap_spans": 931,
+    "overlap_below_iou_05_spans": 126,
+    "gold_with_multiple_overlapping_predictions": 57,
+    "char_widths": {
+      "count": 1256,
+      "quantiles": {
+        "min": 1.0,
+        "p25": 4.0,
+        "p50": 9.0,
+        "p75": 16.0,
+        "p90": 26.0,
+        "p95": 31.0,
+        "p99": 37.0,
+        "max": 54.0
+      }
+    },
+    "components_per_pair": {
+      "count": 842,
+      "quantiles": {
+        "min": 0.0,
+        "p25": 0.0,
+        "p50": 1.0,
+        "p75": 2.0,
+        "p90": 3.0,
+        "p95": 4.0,
+        "p99": 7.590000000000032,
+        "max": 15.0
+      }
+    },
+    "containment": 0.11777301927194861,
+    "mean_width_ratio_containment_only": 2.051459357635828
+  },
+  "merge_loss": {
+    "gold_mask_matches_lost_after_final_merge": 5
+  },
+  "mask_component_tokens": {
+    "count": 1215,
+    "quantiles": {
+      "min": 1.0,
+      "p25": 1.0,
+      "p50": 2.0,
+      "p75": 3.0,
+      "p90": 3.0,
+      "p95": 4.0,
+      "p99": 5.0,
+      "max": 16.0
+    }
+  },
+  "eligible_token_gaps": {
+    "count": 1853,
+    "quantiles": {
+      "min": 0.0,
+      "p25": 0.0,
+      "p50": 0.0,
+      "p75": 3.0,
+      "p90": 18.0,
+      "p95": 40.0,
+      "p99": 150.32000000000016,
+      "max": 373.0
+    }
+  },
+  "scored_risk_inside_gold": {
+    "count": 1384,
+    "quantiles": {
+      "min": 0.05808842508229926,
+      "p25": 0.4966305215003517,
+      "p50": 0.5912433597620852,
+      "p75": 0.7397192458811124,
+      "p90": 0.8767993045784374,
+      "p95": 0.9092389244372097,
+      "p99": 0.9362073159395309,
+      "max": 0.9453229639371549
+    }
+  },
+  "scored_risk_outside_gold": {
+    "count": 45223,
+    "quantiles": {
+      "min": 0.010318270436074395,
+      "p25": 0.06563719590033085,
+      "p50": 0.11405724079812823,
+      "p75": 0.22673683344418982,
+      "p90": 0.4306733293172784,
+      "p95": 0.5240734112715177,
+      "p99": 0.6869431843007212,
+      "max": 0.9228294336791736
+    }
+  }
+}
