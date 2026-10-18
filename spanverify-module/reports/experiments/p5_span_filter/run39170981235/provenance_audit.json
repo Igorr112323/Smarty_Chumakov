@@ -1,0 +1,46 @@
+{
+  "supplemental_posthoc_only": true,
+  "source_reference_raw_hashes": {
+    "source_oof_states.jsonl.gz": {
+      "raw_bytes": 5742956,
+      "raw_sha256": "5ca0ff5121707e950a4a710c8d733c092aeca477857ca146847c5de0ef98959b"
+    },
+    "source_dev_evidence.jsonl.gz": {
+      "raw_bytes": 3932617,
+      "raw_sha256": "e54d290b4894246e61a256af5568af500bc979997d7ab72e7f6ea237129d31ce"
+    }
+  },
+  "source_p4_control_max_risk_delta": 0.0,
+  "original_inventory_difference": {},
+  "note": "stdout tee may append after inventory; original runner files are not edited",
+  "all_pool_folds_real": true,
+  "fold_fit_held_intersections": [
+    [],
+    [],
+    [],
+    [],
+    []
+  ],
+  "candidate_pool_audit": {
+    "rows": 195124,
+    "positive": 53146,
+    "negative": 141978,
+    "fold_counts": {
+      "0": 40384,
+      "1": 39471,
+      "2": 35491,
+      "3": 41178,
+      "4": 38600
+    },
+    "duplicate_cell_offsets": 0,
+    "probability_alignment_mismatches": 0,
+    "nonfinite_features": 0,
+    "feature_columns": 19
+  },
+  "corpus_source_hashes": {
+    "train": "75c2504acefb6a3c325f8b3b94c1e4da9ec441d9440c1cfd07c16eb8e49040a2",
+    "dev": "cba705f836d9c25f28fc162b5cbf89b52bfabe7c47c56e2a4d6d652cded2c2dd"
+  },
+  "pairs_hash_manifest_declaration": "b9a4cf05a9078644dd539470481a1b8079aed2d9201e195c3ecd901276ff7c8e",
+  "official_test_read": false
+}

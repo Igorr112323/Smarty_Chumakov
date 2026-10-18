@@ -1,0 +1,25 @@
+{
+  "scope": "reconstructed defaults in measured pinned sklearn1.5.2; no fit performed",
+  "logreg": {
+    "C": 1.0,
+    "class_weight": "balanced",
+    "dual": false,
+    "fit_intercept": true,
+    "intercept_scaling": 1,
+    "l1_ratio": null,
+    "max_iter": 1000,
+    "multi_class": "deprecated",
+    "n_jobs": null,
+    "penalty": "l2",
+    "random_state": 42,
+    "solver": "lbfgs",
+    "tol": 1e-06,
+    "verbose": 0,
+    "warm_start": false
+  },
+  "scaler": {
+    "copy": true,
+    "with_mean": true,
+    "with_std": true
+  }
+}
