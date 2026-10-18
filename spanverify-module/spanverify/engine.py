@@ -158,6 +158,8 @@ class WeightsBundle:
     isotonic: IsotonicCalibrator | None = None
     head: dict[str, Any] | None = None
     answer_head: dict[str, Any] | None = None
+    token_head: dict[str, Any] | None = None  # P2 token-head (GradientBoosting)
+    token_threshold: float | None = None  # Global token threshold для P2
     folds: list[dict[str, Any]] | None = None
     seed: int = 42
     version: str = "1.1.0"
@@ -179,6 +181,8 @@ class WeightsBundle:
             },
             "head": self.head or {"type": "none", "file": None},
             "answer_head": self.answer_head,
+            "token_head": self.token_head,
+            "token_threshold": float(self.token_threshold) if self.token_threshold is not None else None,
             "folds": self.folds or [],
             "seed": self.seed,
             "version": self.version,
@@ -220,6 +224,8 @@ class WeightsBundle:
             isotonic=calibrator,
             head=data.get("head"),
             answer_head=data.get("answer_head"),
+            token_head=data.get("token_head"),
+            token_threshold=float(data["token_threshold"]) if data.get("token_threshold") is not None else None,
             folds=list(data.get("folds", [])),
             seed=int(data.get("seed", 42)),
             version=str(data.get("version", "1.1.0")),
