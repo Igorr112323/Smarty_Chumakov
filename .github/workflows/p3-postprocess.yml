@@ -2,12 +2,7 @@ name: P3 frozen-model structural localization
 on:
   push:
     branches: [arena/c5f69767-smarty-chumakov]
-    paths:
-      - .github/p3-postprocess.trigger
-      - .github/workflows/p3-postprocess.yml
-      - spanverify-module/scripts/p3_postprocess.py
-      - spanverify-module/spanverify/localization.py
-      - spanverify-module/tests/test_p3_localization.py
+    paths: [.github/p3-postprocess.trigger]
   workflow_dispatch:
 permissions:
   actions: read

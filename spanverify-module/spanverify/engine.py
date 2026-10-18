@@ -172,6 +172,7 @@ class WeightsBundle:
     def __post_init__(self):
         if self.localization_decoder is not None:
             from .localization import validate_decoder
+
             validate_decoder(self.localization_decoder)
 
     def to_dict(self) -> dict[str, Any]:
@@ -496,19 +497,17 @@ class Verifier:
             coverage_context = ""
         tokens = tokenize_with_offsets(answer)
         features = self._features(answer, context_text, tokens)
-        
+
         # P2 token-head или legacy token risk
         if self._token_head_model is not None:
             # P2: GradientBoosting на 8 признаках
             from .token_head import extract_token_features
-            
+
             total_tokens = len(tokens)
             token_features_matrix = []
             for i, token in enumerate(tokens):
                 # Извлекаем 5 HF признаков для этого токена
-                hf_features_dict = {
-                    name: getattr(features, name)[i] for name in FEATURE_NAMES
-                }
+                hf_features_dict = {name: getattr(features, name)[i] for name in FEATURE_NAMES}
                 # Извлекаем 8 признаков (5 HF + position + length + has_digit)
                 token_features = extract_token_features(
                     token_index=i,
@@ -517,7 +516,7 @@ class Verifier:
                     hf_features=hf_features_dict,
                 )
                 token_features_matrix.append(token_features)
-            
+
             # Предсказываем token risk через P2
             risk = self._token_head_model.predict_many(token_features_matrix)
         else:
@@ -542,7 +541,8 @@ class Verifier:
         smoothed = smooth_token_risks(risk, [i in scored_set for i in range(len(tokens))])
         scored = [smoothed[i] for i in scored_indices] or [0.0]
         span_threshold, spans, kept_flagged = self._localize(
-            answer, context_text, coverage_context, tokens, smoothed, scored)
+            answer, context_text, coverage_context, tokens, smoothed, scored
+        )
 
         # Вычисление raw answer score
         if self._answer_head_model is not None:
@@ -743,13 +743,19 @@ class Verifier:
     def _localize(self, answer, context_text, coverage_context, tokens, smoothed, scored):
         if self.bundle.localization_decoder is not None:
             from .localization import localize_state
+
             config = self.bundle.localization_decoder
             # Keep rule confidence semantics on the frozen P2 threshold.
             rule_threshold = self._span_threshold(scored)
-            kept, _, spans = localize_state(answer, tokens, smoothed,
-                [is_scored_token(t.text) for t in tokens], config,
+            kept, _, spans = localize_state(
+                answer,
+                tokens,
+                smoothed,
+                [is_scored_token(t.text) for t in tokens],
+                config,
                 self._attribution_spans(answer, context_text, tokens, smoothed, rule_threshold),
-                self._coverage_spans(answer, coverage_context, tokens, rule_threshold))
+                self._coverage_spans(answer, coverage_context, tokens, rule_threshold),
+            )
             return config["tau_low"], spans, kept
         span_threshold = self._span_threshold(scored)
         mask_spans = self._build_spans(answer, tokens, smoothed, span_threshold)
@@ -768,7 +774,7 @@ class Verifier:
         )
 
         if self.bundle.token_threshold is not None:
-            selected = {i for i,t in enumerate(tokens) if is_scored_token(t.text) and smoothed[i] >= span_threshold}
+            selected = {i for i, t in enumerate(tokens) if is_scored_token(t.text) and smoothed[i] >= span_threshold}
             kept_flagged = selected if kept_flagged is None else selected & kept_flagged
         return span_threshold, spans, kept_flagged
 
@@ -851,7 +857,11 @@ class Verifier:
                 if id(token) in allowed and token.start >= start and token.end <= end
             ]
             risk_value = max([*token_risk, threshold])
-            span_start, span_end = (start, end) if self.bundle.localization_decoder is not None else _shrink_to_clause(answer, start, end, start, end)
+            span_start, span_end = (
+                (start, end)
+                if self.bundle.localization_decoder is not None
+                else _shrink_to_clause(answer, start, end, start, end)
+            )
             fragment = answer[span_start:span_end]
             if not fragment.strip():
                 continue
@@ -1416,7 +1426,7 @@ def smooth_token_risks(risks, scored_mask):
     """Canonical full-sequence zero-mask and smoothing, shared with P2 OOF."""
     if len(risks) != len(scored_mask):
         raise ValueError("Risk/mask length mismatch")
-    return _smooth([float(r) if m else 0.0 for r,m in zip(risks,scored_mask)], SMOOTH_WINDOW)
+    return _smooth([float(r) if m else 0.0 for r, m in zip(risks, scored_mask, strict=False)], SMOOTH_WINDOW)
 
 
 def _token_payload(
