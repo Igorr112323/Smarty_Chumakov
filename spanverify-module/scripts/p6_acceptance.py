@@ -148,6 +148,7 @@ def check_schema(result, answer):
 
 def worker(args):
     a, c = document(args.size, args.scenario)
+    started = time.perf_counter()
     v = verifier(args.mode)
     warmup_seconds = None
     if args.thermal == "warm-model":
@@ -163,17 +164,22 @@ def worker(args):
 
     if hasattr(signal, "SIGTERM"):
         signal.signal(signal.SIGTERM, interrupted)
-    started = time.perf_counter()
-    profiler.enable()
+    if args.thermal == "warm-model":
+        started = time.perf_counter()
+    save(str(args.out) + ".startup.json", {"timed_start_monotonic": time.monotonic(), "warmup_seconds": warmup_seconds})
+    if args.profile:
+        profiler.enable()
     result = v.verify(a, c)
-    profiler.disable()
     elapsed = time.perf_counter() - started
-    profiler.dump_stats(str(args.out) + ".prof")
+    if args.profile:
+        profiler.disable()
+        profiler.dump_stats(str(args.out) + ".prof")
     check_schema(result, a)
     save(
         args.out,
         {
             "status": "completed",
+            "profile_enabled": args.profile,
             "seconds": elapsed,
             "warmup_seconds": warmup_seconds,
             "answer_chars": len(a),
@@ -252,6 +258,57 @@ def benchmark(args):
                     "limit_seconds": limit,
                     "status": "достигнут" if complete and max(values) <= limit else "не достигнут",
                 }
+                if row["status"] == "не достигнут":
+                    # Separate profiling pass; its duration NEVER enters benchmark statistics.
+                    profile_path = args.out / f"profile-{args.mode}-{scenario}-{size}-{thermal}.json"
+                    profile_command = [
+                        sys.executable,
+                        __file__,
+                        "worker",
+                        "--mode",
+                        args.mode,
+                        "--size",
+                        str(size),
+                        "--scenario",
+                        scenario,
+                        "--thermal",
+                        thermal,
+                        "--profile",
+                        "--out",
+                        str(profile_path),
+                    ]
+                    with (args.out / f"{profile_path.stem}.log").open("w") as log:
+                        proc = subprocess.Popen(profile_command, stdout=log, stderr=log)
+                        try:
+                            proc.wait(timeout=75)
+                        except subprocess.TimeoutExpired:
+                            proc.terminate()
+                            try:
+                                proc.wait(timeout=10)
+                            except subprocess.TimeoutExpired:
+                                proc.kill()
+                                proc.wait()
+                    row["diagnostic_profile"] = str(profile_path.name) + ".prof"
+                    if Path(str(profile_path) + ".prof").exists():
+                        import pstats
+
+                        stats = pstats.Stats(str(profile_path) + ".prof").stats
+                        top = sorted(stats.items(), key=lambda entry: entry[1][3], reverse=True)[:30]
+                        save(
+                            str(profile_path) + ".summary.json",
+                            [
+                                {
+                                    "file": key[0],
+                                    "line": key[1],
+                                    "function": key[2],
+                                    "primitive_calls": value[0],
+                                    "calls": value[1],
+                                    "self_seconds": value[2],
+                                    "cumulative_seconds": value[3],
+                                }
+                                for key, value in top
+                            ],
+                        )
                 rows.append(row)
                 save(args.out / "benchmark.json", rows)
                 print(args.mode, scenario, size, thermal, row["status"], flush=True)
@@ -397,6 +454,7 @@ def main():
     p.add_argument("--out", type=Path, required=True)
     p.add_argument("--cache", type=Path)
     p.add_argument("--mode", choices=["demo", "hf"], default="hf")
+    p.add_argument("--profile", action="store_true", help="Separate diagnostic run, never a native benchmark sample")
     p.add_argument("--size", type=int, default=1000)
     p.add_argument("--scenario", default="document-context")
     p.add_argument("--thermal", default="cold-process")
