@@ -167,15 +167,15 @@ class WeightsBundle:
 
     def to_dict(self) -> dict[str, Any]:
         return {
-            "weights": {name: round(self.weights.get(name, 0.0), 4) for name in FEATURE_NAMES},
-            "threshold": round(self.threshold, 6),
+            "weights": {name: float(self.weights.get(name, 0.0)) for name in FEATURE_NAMES},
+            "threshold": float(self.threshold),
             "target_fpr": self.target_fpr,
             "span_z": self.span_z,
             "span_floor": self.span_floor,
             "span_cap": self.span_cap,
             "isotonic": {
-                "x": [round(v, 6) for v in (self.isotonic.thresholds if self.isotonic else [])],
-                "y": [round(v, 6) for v in (self.isotonic.values if self.isotonic else [])],
+                "x": [float(v) for v in (self.isotonic.thresholds if self.isotonic else [])],
+                "y": [float(v) for v in (self.isotonic.values if self.isotonic else [])],
             },
             "head": self.head or {"type": "none", "file": None},
             "answer_head": self.answer_head,
@@ -381,17 +381,18 @@ class Verifier:
                 except (OSError, ValueError, KeyError):
                     return None
         return None
-    
+
     def _load_answer_head(self) -> Any | None:
         """Загрузить P1 answer-голову из бандла, если есть."""
         if self.bundle.answer_head is None:
             return None
         try:
             from .answer_head import AnswerHeadModel
+
             return AnswerHeadModel.from_dict(self.bundle.answer_head)
-        except (ValueError, KeyError):
-            return None
-    
+        except (ValueError, KeyError, TypeError) as exc:
+            raise ValueError("Invalid P1 answer_head in bundle") from exc
+
     @property
     def answer_head_model(self) -> Any | None:
         """P1 answer-голова (AnswerHeadModel), если загружена."""
@@ -443,7 +444,7 @@ class Verifier:
                 ai_share_hard=0.0,
                 threshold=self.bundle.threshold,
                 spans=[],
-                stats={"token_count": 0, "empty": True, "warning": self.warning},
+                stats={"token_count": 0, "empty": True, "warning": self.warning, "raw_score_full": 0.0},
                 latency_ms=(time.perf_counter() - started) * 1000,
                 mode=self.mode,
                 warning=self.warning,
@@ -501,6 +502,7 @@ class Verifier:
         if self._answer_head_model is not None:
             # P1 answer-голова: извлекаем 37 признаков из полных FeatureMatrix
             from .answer_head import extract_answer_features
+
             # Создаём scored_mask для всех токенов (используем уже вычисленный scored_set)
             scored_mask = [i in scored_set for i in range(len(tokens))]
             # Извлекаем признаки для всех токенов
@@ -538,6 +540,7 @@ class Verifier:
             "mean_risk": round(mean(scored), 4),
             "p90_risk": round(_percentile(scored, 90), 4),
             "raw_score": round(raw_score, 4),
+            "raw_score_full": float(raw_score),
             "span_threshold": round(span_threshold, 4),
             "span_z": self.bundle.span_z,
             "span_floor": self.bundle.span_floor,

@@ -4,135 +4,127 @@ on:
     branches:
       - arena/c5f69767-smarty-chumakov
     paths:
-      - '.github/workflows/p1-public-replay.yml'
-      - 'spanverify-module/scripts/build_p1_candidate.py'
-      - 'spanverify-module/scripts/replay_p1_dev.py'
-      - 'spanverify-module/reports/experiments/p1_raw/run39116955685/p1_model.json'
-      - 'spanverify-module/reports/experiments/p1_raw/run39116955685/calibrator_p1.json'
-      - 'spanverify-module/reports/experiments/p1_raw/run39116955685/thresholds.json'
-      - 'spanverify-module/reports/experiments/p1_raw/run39116955685/baseline_bundle.json'
+      - .github/workflows/p1-public-replay.yml
+      - spanverify-module/scripts/build_p1_candidate.py
+      - spanverify-module/scripts/replay_p1_dev.py
+      - spanverify-module/tests/test_p1_replay_contract.py
   workflow_dispatch:
+
+permissions:
+  actions: read
+  contents: write
 
 jobs:
   replay:
     runs-on: ubuntu-latest
-    timeout-minutes: 60
-    
+    timeout-minutes: 20
     steps:
-    - uses: actions/checkout@v4
-    
-    - name: Set up Python
-      uses: actions/setup-python@v5
-      with:
-        python-version: '3.11'
-    
-    - name: Install dependencies
-      working-directory: spanverify-module
-      run: |
-        pip install -q --upgrade pip
-        pip install -q -r requirements.txt
-        pip install -q "torch~=2.14" --index-url https://download.pytorch.org/whl/cpu
-    
-    - name: Download cache from source run
-      uses: actions/download-artifact@v4
-      with:
-        pattern: hf-cache-a3-v2-*
-        path: spanverify-module/reports/hf-cache-v2-raw
-        run-id: 39060670054
-        github-token: ${{ secrets.GITHUB_TOKEN }}
-    
-    - name: Merge cache artifacts
-      working-directory: spanverify-module
-      run: |
-        set -euo pipefail
-        mkdir -p reports/hf-cache-v2
-        
-        for file in reports/hf-cache-v2-raw/*/features_shard*.jsonl; do
-          if [ -f "$file" ]; then
-            cp "$file" reports/hf-cache-v2/
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install ordinary project dependencies
+        working-directory: spanverify-module
+        run: python -m pip install -q -r requirements.txt
+
+      - name: Fast builder, loader and entrypoint regression tests
+        working-directory: spanverify-module
+        run: |
+          set -euo pipefail
+          OUT="reports/p1_replay/run${GITHUB_RUN_ID}"
+          mkdir -p "$OUT"
+          python -m pytest tests/test_p1_replay_contract.py tests/test_p1_integration.py tests/test_answer_head.py -q \
+            2>&1 | tee "$OUT/tests.log"
+
+      - name: Download compatible cached HF features
+        uses: actions/download-artifact@v4
+        with:
+          pattern: hf-cache-a3-v2-*
+          merge-multiple: false
+          path: spanverify-module/reports/hf-cache-v2-raw
+          run-id: 39060670054
+          github-token: ${{ github.token }}
+
+      - name: Normalize cache files and verify source dataset
+        working-directory: spanverify-module
+        run: |
+          set -euo pipefail
+          mkdir -p reports/hf-cache-v2
+          mapfile -d '' files < <(find reports/hf-cache-v2-raw -type f -name 'features_*.jsonl' -print0)
+          test "${#files[@]}" -eq 8
+          for file in "${files[@]}"; do
+            target="reports/hf-cache-v2/$(basename "$file")"
+            if [ -f "$target" ]; then cmp "$file" "$target"; else cp "$file" "$target"; fi
+          done
+          test "$(find reports/hf-cache-v2 -maxdepth 1 -name 'features_*.jsonl' | wc -l)" -eq 8
+          test -s data/corpus_a3/splits/dev.jsonl
+          wc -l data/corpus_a3/splits/dev.jsonl
+
+      - name: Build the frozen candidate with public calibration schema
+        id: build
+        working-directory: spanverify-module
+        run: |
+          set -euo pipefail
+          OUT="reports/p1_replay/run${GITHUB_RUN_ID}"
+          mkdir -p "$OUT"
+          python -u scripts/build_p1_candidate.py \
+            reports/experiments/p1_raw/run39116955685 --output-dir "$OUT" \
+            2>&1 | tee "$OUT/build.log"
+
+      - name: Public dev replay and lossless save-load parity
+        id: replay
+        working-directory: spanverify-module
+        run: |
+          set -euo pipefail
+          OUT="reports/p1_replay/run${GITHUB_RUN_ID}"
+          python -u -X faulthandler scripts/replay_p1_dev.py \
+            reports/experiments/p1_raw/run39116955685 reports/hf-cache-v2 \
+            --candidate "$OUT/p1_candidate_bundle.json" \
+            --runtime-config "$OUT/runtime_config.json" \
+            --dev "$PWD/data/corpus_a3/splits/dev.jsonl" --output-dir "$OUT" \
+            2>&1 | tee "$OUT/replay.log"
+
+      - name: Upload replay outputs even on failure
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: p1-public-replay-${{ github.run_id }}
+          path: spanverify-module/reports/p1_replay/run${{ github.run_id }}/
+          retention-days: 30
+          if-no-files-found: warn
+
+      - name: Publish measured outputs or failure logs without force push
+        if: always()
+        env:
+          BUILD_OUTCOME: ${{ steps.build.outcome || 'not_started' }}
+          REPLAY_OUTCOME: ${{ steps.replay.outcome || 'not_started' }}
+        run: |
+          set -euo pipefail
+          OUT="spanverify-module/reports/p1_replay/run${GITHUB_RUN_ID}"
+          mkdir -p "$OUT"
+          printf '{"run_id":"%s","code_sha":"%s","build":"%s","replay":"%s"}\n' \
+            "$GITHUB_RUN_ID" "$GITHUB_SHA" "$BUILD_OUTCOME" "$REPLAY_OUTCOME" > "$OUT/workflow_status.json"
+          BRANCH="arena/c5f69767-smarty-chumakov"
+          git fetch --no-tags origin "$BRANCH"
+          PUB="$RUNNER_TEMP/p1-replay-publish-${GITHUB_RUN_ID}"
+          git worktree add --detach "$PUB" FETCH_HEAD
+          DEST="spanverify-module/reports/experiments/p1_public_replay/run${GITHUB_RUN_ID}"
+          mkdir -p "$PUB/$DEST"
+          cp -R "$OUT/." "$PUB/$DEST/"
+          git -C "$PUB" config user.name "github-actions[bot]"
+          git -C "$PUB" config user.email "github-actions[bot]@users.noreply.github.com"
+          git -C "$PUB" add -f -- "$DEST"
+          if ! git -C "$PUB" diff --cached --quiet; then
+            git -C "$PUB" commit -m "reports: P1 public replay run ${GITHUB_RUN_ID} (${REPLAY_OUTCOME}) [skip ci]"
+            pushed=0
+            for attempt in 1 2 3; do
+              if git -C "$PUB" push origin "HEAD:refs/heads/${BRANCH}"; then pushed=1; break; fi
+              git -C "$PUB" fetch --no-tags origin "$BRANCH"
+              if ! git -C "$PUB" rebase FETCH_HEAD; then git -C "$PUB" rebase --abort; exit 1; fi
+            done
+            test "$pushed" -eq 1
           fi
-        done
-        
-        echo "Объединённые файлы кеша:"
-        ls -lh reports/hf-cache-v2/
-    
-    - name: Verify source artifacts
-      working-directory: spanverify-module
-      run: |
-        set -euo pipefail
-        
-        SOURCE_DIR="reports/experiments/p1_raw/run39116955685"
-        
-        echo "Проверка исходных артефактов..."
-        
-        for file in p1_model.json calibrator_p1.json thresholds.json baseline_bundle.json dev_predictions.jsonl; do
-          if [ -f "$SOURCE_DIR/$file" ]; then
-            echo "✓ $file"
-          else
-            echo "✗ $file NOT FOUND"
-            exit 1
-          fi
-        done
-        
-        echo ""
-        echo "SHA-256 checksums:"
-        sha256sum "$SOURCE_DIR/p1_model.json"
-        sha256sum "$SOURCE_DIR/calibrator_p1.json"
-        sha256sum "$SOURCE_DIR/thresholds.json"
-    
-    - name: Build P1 candidate
-      working-directory: spanverify-module
-      run: |
-        set -euo pipefail
-        
-        SOURCE_DIR="reports/experiments/p1_raw/run39116955685"
-        
-        echo "Сборка P1 кандидата..."
-        python3 scripts/build_p1_candidate.py "$SOURCE_DIR"
-        
-        echo ""
-        echo "P1 кандидат:"
-        ls -lh "$SOURCE_DIR/p1_candidate_bundle.json"
-        sha256sum "$SOURCE_DIR/p1_candidate_bundle.json"
-    
-    - name: Public replay on dev
-      working-directory: spanverify-module
-      run: |
-        set -euo pipefail
-        
-        SOURCE_DIR="reports/experiments/p1_raw/run39116955685"
-        
-        echo "Публичный replay через Verifier..."
-        python3 scripts/replay_p1_dev.py "$SOURCE_DIR" reports/hf-cache-v2 2>&1 | tee "$SOURCE_DIR/replay.log"
-        
-        echo ""
-        echo "Результаты replay:"
-        cat "$SOURCE_DIR/score_parity_report.json"
-    
-    - name: Upload replay results
-      uses: actions/upload-artifact@v4
-      if: always()
-      with:
-        name: p1-replay-results
-        path: |
-          spanverify-module/reports/experiments/p1_raw/run39116955685/p1_candidate_bundle.json
-          spanverify-module/reports/experiments/p1_raw/run39116955685/public_replay.jsonl
-          spanverify-module/reports/experiments/p1_raw/run39116955685/score_parity_report.json
-          spanverify-module/reports/experiments/p1_raw/run39116955685/replay.log
-        retention-days: 30
-    
-    - name: Commit replay results
-      if: success()
-      run: |
-        set -euo pipefail
-        
-        git config user.name "github-actions[bot]"
-        git config user.email "github-actions[bot]@users.noreply.github.com"
-        
-        git add spanverify-module/reports/experiments/p1_raw/run39116955685/p1_candidate_bundle.json
-        git add spanverify-module/reports/experiments/p1_raw/run39116955685/public_replay.jsonl
-        git add spanverify-module/reports/experiments/p1_raw/run39116955685/score_parity_report.json
-        git add spanverify-module/reports/experiments/p1_raw/run39116955685/replay.log
-        
-        git commit -m "reports: P1 public replay on dev [skip ci]"
-        git push origin arena/c5f69767-smarty-chumakov
+          SHA="$(git -C "$PUB" rev-parse HEAD)"
+          echo "Replay outcome: $REPLAY_OUTCOME" >> "$GITHUB_STEP_SUMMARY"
+          echo "Outputs: https://github.com/${GITHUB_REPOSITORY}/tree/${SHA}/${DEST}" >> "$GITHUB_STEP_SUMMARY"
+          echo "REPORT_COMMIT=$SHA"
