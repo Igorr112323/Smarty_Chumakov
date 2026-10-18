@@ -47,5 +47,5 @@
 
 - **Source run:** 39060670054
 - **Source commit:** 14ea3a0792e0ca9502d9b78870dd2caf874f1163
-- **Generated at:** 2026-10-17T20:22:43.499975
+- **Generated at:** 2026-10-18T10:28:54.906757
 - **Script:** compare_span_expansion.py
