@@ -185,6 +185,7 @@ def run_module(args: list[str], timeout: int = 900) -> subprocess.CompletedProce
         text=True,
         timeout=timeout,
         env={**os.environ, "PYTHONPATH": str(MODULE), "PYTHONUTF8": "1"},
+        check=False,
     )
 
 
@@ -198,6 +199,7 @@ def run_python(
         text=True,
         timeout=timeout,
         env={**os.environ, "PYTHONPATH": str(MODULE), "PYTHONUTF8": "1"},
+        check=False,
     )
 
 
@@ -775,6 +777,7 @@ print(json.dumps({{
             text=True,
             timeout=900,
             env={**os.environ, "PYTHONPATH": str(MODULE), "PYTHONUTF8": "1"},
+            check=False,
         )
         payload: dict[str, Any] = {
             "build_returncode": proc.returncode,
@@ -795,6 +798,7 @@ print(json.dumps({{
                 text=True,
                 timeout=900,
                 env={**os.environ, "PYTHONUTF8": "1"},
+                check=False,
             )
             payload["smoke_returncode"] = smoke.returncode
             payload["smoke_tail"] = (smoke.stdout or smoke.stderr)[-300:]
@@ -831,6 +835,7 @@ print(json.dumps({{
             capture_output=True,
             text=True,
             timeout=120,
+            check=False,
         )
         if info.returncode != 0:
             self.shared["release"] = {
@@ -864,6 +869,7 @@ print(json.dumps({{
             capture_output=True,
             text=True,
             timeout=120,
+            check=False,
         )
         workflow_runs = json.loads(runs.stdout) if runs.returncode == 0 else []
         result: dict[str, Any] = {
@@ -902,6 +908,7 @@ print(json.dumps({{
                 capture_output=True,
                 text=True,
                 timeout=600,
+                check=False,
             )
             result["download_returncode"] = download.returncode
             pyz = workdir / "spanverify.pyz"
@@ -932,6 +939,7 @@ print(json.dumps({{
                     capture_output=True,
                     text=True,
                     timeout=300,
+                    check=False,
                 )
                 result["checksum_verified"] = verify.returncode == 0
                 result["checksum_tail"] = (
@@ -965,6 +973,7 @@ print(json.dumps({{
             capture_output=True,
             text=True,
             timeout=900,
+            check=False,
         )
         count = 0
         for line in collected.stdout.splitlines():
@@ -1203,6 +1212,7 @@ def check_metric_groups(runner: Runner) -> tuple[str, dict[str, Any], str]:
         capture_output=True,
         text=True,
         timeout=600,
+        check=False,
     )
     if proc.returncode != 0:
         problems.append("тест схемы фрагмента не прошёл")
@@ -1403,8 +1413,10 @@ def check_delivery(runner: Runner) -> tuple[str, dict[str, Any], str]:
         return (
             STATUS_UNKNOWN,
             fact,
-            "переносимый пакет собран, смоук-тест и сверка суммы копии пройдены; "
-            "опубликованный релиз недоступен из окружения прогона, поэтому размер .exe и его сумма не проверены",
+            (
+                "переносимый пакет собран, смоук-тест и сверка суммы копии пройдены; "
+                "опубликованный релиз недоступен из окружения прогона, поэтому размер .exe и его сумма не проверены"
+            ),
         )
     checksum = release.get("checksum_verified")
     if checksum is True:
@@ -1492,9 +1504,11 @@ def check_delivery_size(runner: Runner) -> tuple[str, dict[str, Any], str]:
         return (
             STATUS_OK,
             fact,
-            f"второй вариант поставки выполнен: пакет {pyz_bytes} байт "
-            f"({round(pyz_bytes / 1_048_576, 4)} МиБ / {round(pyz_bytes / 1_000_000, 4)} МБ) "
-            f"укладывается в 0,6 МБ при любой трактовке; опубликованный файл .exe — {exe_bytes} байт",
+            (
+                f"второй вариант поставки выполнен: пакет {pyz_bytes} байт "
+                f"({round(pyz_bytes / 1_048_576, 4)} МиБ / {round(pyz_bytes / 1_000_000, 4)} МБ) "
+                f"укладывается в 0,6 МБ при любой трактовке; опубликованный файл .exe — {exe_bytes} байт"
+            ),
         )
     if exe_ok and exe_ok_decimal:
         return (
@@ -1505,9 +1519,11 @@ def check_delivery_size(runner: Runner) -> tuple[str, dict[str, Any], str]:
     return (
         STATUS_FAIL,
         fact,
-        f"пакет {pyz_bytes} байт не укладывается в 0,6 МБ, файл {exe_bytes} байт — "
-        f"в 9 МБ ({'МиБ' if exe_ok else ''}{'МБ' if exe_ok_decimal else ''}): ни один вариант не выполнен "
-        "при строгой трактовке мегабайта",
+        (
+            f"пакет {pyz_bytes} байт не укладывается в 0,6 МБ, файл {exe_bytes} байт — "
+            f"в 9 МБ ({'МиБ' if exe_ok else ''}{'МБ' if exe_ok_decimal else ''}): ни один вариант не выполнен "
+            "при строгой трактовке мегабайта"
+        ),
     )
 
 
@@ -1618,6 +1634,7 @@ def check_build_checksum(runner: Runner) -> tuple[str, dict[str, Any], str]:
             capture_output=True,
             text=True,
             timeout=300,
+            check=False,
         ).returncode
         != 0
     ):
@@ -1640,9 +1657,11 @@ def check_build_checksum(runner: Runner) -> tuple[str, dict[str, Any], str]:
         return (
             STATUS_OK,
             fact,
-            "сборка автоматическая, SHA256SUMS.txt формируется и публикуется в релизе; "
-            "инструмент сверки проверен самопроверкой; сверка суммы опубликованного файла в этом окружении "
-            "не выполнялась (файлы релиза недоступны из сети прогона) — это указано как ограничение",
+            (
+                "сборка автоматическая, SHA256SUMS.txt формируется и публикуется в релизе; "
+                "инструмент сверки проверен самопроверкой; сверка суммы опубликованного файла в этом окружении "
+                "не выполнялась (файлы релиза недоступны из сети прогона) — это указано как ограничение"
+            ),
         )
     return STATUS_OK, fact, "сборка автоматическая, суммы публикуются и сверены"
 
@@ -1677,9 +1696,11 @@ def check_hf_footprint(runner: Runner) -> tuple[str, dict[str, Any], str]:
         return (
             STATUS_UNKNOWN,
             fact,
-            "прогон не выполнен: в этом окружении нет torch/transformers и кэша "
-            "весов модели; нужна машина с доступом к хранилищу весов — артефакт "
-            "создаёт CI-задание hf-footprint (.github/workflows/hf-footprint.yml)",
+            (
+                "прогон не выполнен: в этом окружении нет torch/transformers и кэша "
+                "весов модели; нужна машина с доступом к хранилищу весов — артефакт "
+                "создаёт CI-задание hf-footprint (.github/workflows/hf-footprint.yml)"
+            ),
         )
     metrics = payload["metrics"]
     fact.update(
@@ -1712,10 +1733,12 @@ def check_hf_footprint(runner: Runner) -> tuple[str, dict[str, Any], str]:
     return (
         STATUS_OK,
         fact,
-        f"измерено на раннере: библиотеки {fact['libraries_mb']} МБ "
-        f"(ориентир договора 500 МБ, отклонение {libs_dev} % — это оценка из ТЗ, "
-        f"жёсткого предела у неё нет; предел хранения 1,5 ГБ проверяет 4.2.6), "
-        f"веса {fact['weights_mb']} МБ (ориентир 530 МБ, отклонение {weights_dev} %)",
+        (
+            f"измерено на раннере: библиотеки {fact['libraries_mb']} МБ "
+            f"(ориентир договора 500 МБ, отклонение {libs_dev} % — это оценка из ТЗ, "
+            f"жёсткого предела у неё нет; предел хранения 1,5 ГБ проверяет 4.2.6), "
+            f"веса {fact['weights_mb']} МБ (ориентир 530 МБ, отклонение {weights_dev} %)"
+        ),
     )
 
 
@@ -1756,9 +1779,11 @@ def check_storage(runner: Runner) -> tuple[str, dict[str, Any], str]:
         return (
             STATUS_UNKNOWN,
             fact,
-            f"объём без весов {module_mb} МБ укладывается в 100 МБ; объём с весами "
-            "(≤ 1,5 ГБ) в этом окружении не измеряется — нет кэша весов модели, "
-            "его измеряет CI-задание hf-footprint",
+            (
+                f"объём без весов {module_mb} МБ укладывается в 100 МБ; объём с весами "
+                "(≤ 1,5 ГБ) в этом окружении не измеряется — нет кэша весов модели, "
+                "его измеряет CI-задание hf-footprint"
+            ),
         )
     metrics = weights_payload["metrics"]
     with_weights = metrics.get("storage_with_weights_mb")
@@ -1827,6 +1852,7 @@ def check_portable_copy(runner: Runner) -> tuple[str, dict[str, Any], str]:
             text=True,
             timeout=300,
             env={**os.environ, "PYTHONUTF8": "1"},
+            check=False,
         )
         if proc.returncode != 0:
             problems.append("самопроверка скрипта суммы не прошла")
@@ -2168,8 +2194,10 @@ def check_originality(runner: Runner) -> tuple[str, dict[str, Any], str]:
     return (
         STATUS_UNKNOWN,
         fact,
-        "фактический процент оригинальности не измерен: нужна внешняя система проверки текста; "
-        "в шаблоне поле и процедура описаны",
+        (
+            "фактический процент оригинальности не измерен: нужна внешняя система проверки текста; "
+            "в шаблоне поле и процедура описаны"
+        ),
     )
 
 
@@ -2191,6 +2219,7 @@ def check_numbers_registry(runner: Runner) -> tuple[str, dict[str, Any], str]:
         text=True,
         timeout=300,
         env={**os.environ, "PYTHONUTF8": "1"},
+        check=False,
     )
     if proc.returncode != 0:
         return STATUS_FAIL, {"stderr": proc.stderr[-400:]}, "реестр чисел не собрался"
@@ -2204,6 +2233,7 @@ def check_numbers_registry(runner: Runner) -> tuple[str, dict[str, Any], str]:
         text=True,
         timeout=300,
         env={**os.environ, "PYTHONUTF8": "1"},
+        check=False,
     )
     fact = {
         "entries": len(payload["entries"]),
@@ -2244,6 +2274,7 @@ def check_numbers_script(runner: Runner) -> tuple[str, dict[str, Any], str]:
         text=True,
         timeout=600,
         env={**os.environ, "PYTHONUTF8": "1"},
+        check=False,
     )
     # В факт идёт счёт расхождений и первая строка, а не весь список: этот
     # артефакт потом попадает в документ соответствия, который та же проверка
@@ -2450,8 +2481,10 @@ def check_contract_source(runner: Runner) -> tuple[str, dict[str, Any], str]:
     return (
         STATUS_OK,
         fact,
-        f"{fact['compared_total']} требований договора совпали с константами кода; "
-        f"проверено по: {where}",
+        (
+            f"{fact['compared_total']} требований договора совпали с константами кода; "
+            f"проверено по: {where}"
+        ),
     )
 
 
@@ -2982,8 +3015,10 @@ def render_report_appendix(payload: dict[str, Any]) -> str:
         "- Договор № 20478ГУ/2026 (проект 117812), ТЗ (Приложение № 3), календарный план (Приложение № 4)",
         f"- Коммит прогона: `{payload['commit']}`",
         f"- Дата: {payload['environment']['date']}",
-        f"- Проверок: {len(payload['checks'])}; соответствует — {payload['summary'][STATUS_OK]}, "
-        f"не соответствует — {payload['summary'][STATUS_FAIL]}, не измерено — {payload['summary'][STATUS_UNKNOWN]}",
+        (
+            f"- Проверок: {len(payload['checks'])}; соответствует — {payload['summary'][STATUS_OK]}, "
+            f"не соответствует — {payload['summary'][STATUS_FAIL]}, не измерено — {payload['summary'][STATUS_UNKNOWN]}"
+        ),
         "",
         "## Таблица соответствия",
         "",
@@ -3047,11 +3082,15 @@ def render_closing_doc(payload: dict[str, Any]) -> str:
         "",
         f"- Коммит прогона: `{payload['commit']}`",
         f"- Дата прогона: {payload['environment']['date']}",
-        f"- Окружение: Python {payload['environment']['python']}, "
-        f"{payload['environment']['platform']}, ядер {payload['environment']['cpu_count']}",
-        f"- Проверок: {len(payload['checks'])}; соответствует — {payload['summary'][STATUS_OK]}, "
-        f"не соответствует — {payload['summary'][STATUS_FAIL]}, "
-        f"не измерено — {payload['summary'][STATUS_UNKNOWN]}",
+        (
+            f"- Окружение: Python {payload['environment']['python']}, "
+            f"{payload['environment']['platform']}, ядер {payload['environment']['cpu_count']}"
+        ),
+        (
+            f"- Проверок: {len(payload['checks'])}; соответствует — {payload['summary'][STATUS_OK]}, "
+            f"не соответствует — {payload['summary'][STATUS_FAIL]}, "
+            f"не измерено — {payload['summary'][STATUS_UNKNOWN]}"
+        ),
         "",
         "## Пункт договора → статус → команда → факт → файл-источник",
         "",
@@ -3104,10 +3143,14 @@ def render_compliance_doc(payload: dict[str, Any]) -> str:
         "",
         f"- Коммит прогона: `{payload['commit']}`",
         f"- Дата прогона: {payload['environment']['date']}",
-        f"- Окружение: Python {payload['environment']['python']}, {payload['environment']['platform']}, "
-        f"ядер {payload['environment']['cpu_count']}, seed {payload['environment']['seed']}",
-        f"- Проверок: {len(payload['checks'])}; соответствует — {payload['summary'][STATUS_OK]}, "
-        f"не соответствует — {payload['summary'][STATUS_FAIL]}, не измерено — {payload['summary'][STATUS_UNKNOWN]}",
+        (
+            f"- Окружение: Python {payload['environment']['python']}, {payload['environment']['platform']}, "
+            f"ядер {payload['environment']['cpu_count']}, seed {payload['environment']['seed']}"
+        ),
+        (
+            f"- Проверок: {len(payload['checks'])}; соответствует — {payload['summary'][STATUS_OK]}, "
+            f"не соответствует — {payload['summary'][STATUS_FAIL]}, не измерено — {payload['summary'][STATUS_UNKNOWN]}"
+        ),
         "",
         "Статус «не измерено» означает, что прогон в этом окружении невозможен; причина указана в столбце «факт».",
         "",
