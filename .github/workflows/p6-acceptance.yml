@@ -75,3 +75,44 @@ jobs:
           name: p6-product-${{ matrix.mode }}
           path: reports/acceptance/${{ matrix.mode }}/
           retention-days: 90
+  publish-evidence:
+    needs: [parity, product]
+    if: always()
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: write
+      actions: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: p6-*
+          path: .arena/p6-results
+      - name: Publish receipts, never model files, preserve branch history
+        env:
+          CODE_SHA: ${{ github.sha }}
+          RUN_ID: ${{ github.run_id }}
+        run: |
+          set -euo pipefail
+          BRANCH=arena/c5f69767-smarty-chumakov
+          git fetch origin "$BRANCH"
+          git worktree add --detach "$RUNNER_TEMP/p6-publish" FETCH_HEAD
+          python - <<'PY'
+          import os, pathlib, shutil, json
+          root=pathlib.Path(os.environ['RUNNER_TEMP'])/'p6-publish'
+          dest=root/'reports/acceptance'/('run'+os.environ['RUN_ID'])
+          dest.mkdir(parents=True, exist_ok=True)
+          for p in pathlib.Path('.arena/p6-results').rglob('*'):
+              if p.is_file() and p.suffix in ('.json','.log','.html'):
+                  q=dest/p.relative_to('.arena/p6-results')
+                  q.parent.mkdir(parents=True,exist_ok=True)
+                  shutil.copyfile(p,q)
+          (dest/'receipt.json').write_text(json.dumps({'code_sha':os.environ['CODE_SHA'],'run_id':os.environ['RUN_ID'],'url':'https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/'+os.environ['RUN_ID']}))
+          PY
+          cd "$RUNNER_TEMP/p6-publish"
+          git config user.name spanverify-bot
+          git config user.email bot@spanverify.local
+          git add reports/acceptance
+          git commit -m "P6 runner receipts $RUN_ID [skip ci]"
+          git push origin "HEAD:$BRANCH"

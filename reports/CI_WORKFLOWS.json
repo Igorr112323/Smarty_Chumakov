@@ -1,7 +1,7 @@
 {
   "kind": "ci_workflows",
   "runs_considered": 100,
-  "generated_at": "2026-10-18T23:32:32Z",
+  "generated_at": "2026-10-18T23:38:38Z",
   "command": "python scripts/collect_ci_workflows.py",
   "source": ".github/workflows/*.yml + reports/CI_RUNS.json",
   "registry": {
@@ -674,6 +674,13 @@
           "timeout_minutes": 40,
           "steps": 8,
           "uploads_artifacts": true,
+          "runs_python": "ubuntu-latest"
+        },
+        {
+          "name": "publish-evidence",
+          "timeout_minutes": 10,
+          "steps": 3,
+          "uploads_artifacts": false,
           "runs_python": "ubuntu-latest"
         }
       ],

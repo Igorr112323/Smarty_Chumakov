@@ -373,11 +373,12 @@ def _compress(
     # PAVA thresholds are UPPER boundaries. Keep the previous point at a
     # transition, not the first point of the next plateau: otherwise a new
     # observation in the zero plateau is assigned the following value (1).
-    keep: list[int] = []
+    keep: list[int] = [0]
     last_y = ys[0]
     for i in range(1, len(xs)):
         if abs(ys[i] - last_y) >= tolerance:
-            keep.append(i - 1)
+            if keep[-1] != i - 1:
+                keep.append(i - 1)
             last_y = ys[i]
     keep.append(len(xs) - 1)  # Всегда сохраняем последнюю точку
 

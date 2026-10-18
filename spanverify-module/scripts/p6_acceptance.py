@@ -104,6 +104,7 @@ def parity(cache_path, out):
             "tokens": result.tokens,
             "verdict": result.verdict,
         }
+        actual = json.loads(json.dumps(actual))  # JSON tuple/list normalization only
         if actual != expected:
             mismatches.append(p["id"])
         a = answer_ref[p["id"]]
@@ -125,6 +126,7 @@ def parity(cache_path, out):
         "environment": environment(),
     }
     save(out / "parity.json", report)
+    print("::notice title=P6 parity::" + json.dumps(report, ensure_ascii=False))
     assert report["passed"], report
 
 
@@ -408,4 +410,8 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    except Exception as error:
+        print("::error title=P6 acceptance::" + repr(error).replace("\n", " "), flush=True)
+        raise
