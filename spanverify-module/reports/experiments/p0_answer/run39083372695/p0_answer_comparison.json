@@ -1,0 +1,3970 @@
+{
+  "source_run_id": "39060670054",
+  "source_commit": "14ea3a0792e0ca9502d9b78870dd2caf874f1163",
+  "measurement_run_id": "39083372695",
+  "measurement_commit": "bdd28007d64fc14504dbc9c3f5d8772d69daf1e6",
+  "cache_source_run_id": "39060670054",
+  "bundle_hash": "09fdf87fd91356aaa5afcac983637b4d23531fa2589c20eeeebce1e11c3a5755",
+  "aggregators": {
+    "current": {
+      "name": "current",
+      "calibrator_info": {
+        "threshold": 0.5758354755784062,
+        "threshold_report": {
+          "threshold": 0.5758354755784062,
+          "precision": 0.5302325581395348,
+          "recall": 0.24411134903640258,
+          "f1": 0.3343108504398826,
+          "fpr": 0.2693333333333333,
+          "hdr": 0.7306666666666667,
+          "accuracy": 0.46080760095011875,
+          "tp": 114,
+          "fp": 101,
+          "tn": 274,
+          "fn": 353,
+          "constraint_met": true
+        },
+        "n_folds": 5,
+        "fold_sizes": [
+          170,
+          153,
+          171,
+          156,
+          192
+        ]
+      },
+      "dev_results": {
+        "tp": 0,
+        "fp": 0,
+        "fn": 96,
+        "tn": 85,
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0,
+        "fpr": 0.0,
+        "raw_auc": 0.5031862745098039,
+        "calibrated_auc": 0.5,
+        "threshold": 0.5758354755784062,
+        "n_positive_predictions": 0,
+        "evidence": [
+          {
+            "pair_id": "corpus-a3-00090",
+            "label": 1,
+            "raw_score": 0.050210858930570236,
+            "calibrated_score": 0.4805194805194805,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00667",
+            "label": 0,
+            "raw_score": 0.05553771670830117,
+            "calibrated_score": 0.4805194805194805,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00088",
+            "label": 1,
+            "raw_score": 0.08390488384264859,
+            "calibrated_score": 0.4805194805194805,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00203",
+            "label": 1,
+            "raw_score": 0.02191624707679386,
+            "calibrated_score": 0.4805194805194805,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00854",
+            "label": 1,
+            "raw_score": 0.036768949348995945,
+            "calibrated_score": 0.4805194805194805,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00170",
+            "label": 0,
+            "raw_score": 0.04656867711403517,
+            "calibrated_score": 0.4805194805194805,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00747",
+            "label": 0,
+            "raw_score": 0.11249077558378068,
+            "calibrated_score": 0.4805194805194805,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00815",
+            "label": 0,
+            "raw_score": 0.05572485753559861,
+            "calibrated_score": 0.4805194805194805,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00006",
+            "label": 0,
+            "raw_score": 0.049176499483812634,
+            "calibrated_score": 0.4805194805194805,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00192",
+            "label": 0,
+            "raw_score": 0.07849020708005396,
+            "calibrated_score": 0.4805194805194805,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00939",
+            "label": 0,
+            "raw_score": 0.05122457545883295,
+            "calibrated_score": 0.4805194805194805,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-01112",
+            "label": 0,
+            "raw_score": 0.09857124115181184,
+            "calibrated_score": 0.4805194805194805,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00899",
+            "label": 0,
+            "raw_score": 0.03015989640944787,
+            "calibrated_score": 0.4805194805194805,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-01148",
+            "label": 1,
+            "raw_score": 0.06989701824898853,
+            "calibrated_score": 0.4805194805194805,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00218",
+            "label": 0,
+            "raw_score": 0.0537266202636585,
+            "calibrated_score": 0.4805194805194805,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00265",
+            "label": 1,
+            "raw_score": 0.018159292216526592,
+            "calibrated_score": 0.4805194805194805,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00438",
+            "label": 1,
+            "raw_score": 0.07482852321459019,
+            "calibrated_score": 0.4805194805194805,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00525",
+            "label": 1,
+            "raw_score": 0.04003500689630907,
+            "calibrated_score": 0.4805194805194805,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00690",
+            "label": 1,
+            "raw_score": 0.023892000087906953,
+            "calibrated_score": 0.4805194805194805,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00250",
+            "label": 0,
+            "raw_score": 0.052200691899387607,
+            "calibrated_score": 0.4805194805194805,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00320",
+            "label": 1,
+            "raw_score": 0.061796534551158785,
+            "calibrated_score": 0.4805194805194805,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00380",
+            "label": 1,
+            "raw_score": 0.04307218549297197,
+            "calibrated_score": 0.4805194805194805,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00687",
+            "label": 0,
+            "raw_score": 0.07790908376240814,
+            "calibrated_score": 0.4805194805194805,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00928",
+            "label": 1,
+            "raw_score": 0.054469973238362945,
+            "calibrated_score": 0.4805194805194805,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-01003",
+            "label": 1,
+            "raw_score": 0.0527853511290169,
+            "calibrated_score": 0.4805194805194805,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-01063",
+            "label": 0,
+            "raw_score": 0.026457431701593453,
+            "calibrated_score": 0.4805194805194805,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00222",
+            "label": 0,
+            "raw_score": 0.06076288966611101,
+            "calibrated_score": 0.4805194805194805,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00523",
+            "label": 0,
+            "raw_score": 0.035862095166089354,
+            "calibrated_score": 0.4805194805194805,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00901",
+            "label": 0,
+            "raw_score": 0.0458338193832782,
+            "calibrated_score": 0.4805194805194805,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-01151",
+            "label": 0,
+            "raw_score": 0.0547204674425448,
+            "calibrated_score": 0.4805194805194805,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00670",
+            "label": 1,
+            "raw_score": 0.042379427910380026,
+            "calibrated_score": 0.4805194805194805,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00223",
+            "label": 0,
+            "raw_score": 0.03482859273394362,
+            "calibrated_score": 0.4805194805194805,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00436",
+            "label": 1,
+            "raw_score": 0.027365160641391183,
+            "calibrated_score": 0.4805194805194805,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00902",
+            "label": 0,
+            "raw_score": 0.04485440286800778,
+            "calibrated_score": 0.4805194805194805,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00206",
+            "label": 1,
+            "raw_score": 0.06875783666108921,
+            "calibrated_score": 0.4805194805194805,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00424",
+            "label": 0,
+            "raw_score": 0.026027698265358497,
+            "calibrated_score": 0.4805194805194805,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00676",
+            "label": 1,
+            "raw_score": 0.09671490468777566,
+            "calibrated_score": 0.4805194805194805,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00779",
+            "label": 0,
+            "raw_score": 0.11170482013406176,
+            "calibrated_score": 0.4805194805194805,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00302",
+            "label": 1,
+            "raw_score": 0.06413382167913832,
+            "calibrated_score": 0.4805194805194805,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00912",
+            "label": 1,
+            "raw_score": 0.08017751183893328,
+            "calibrated_score": 0.4805194805194805,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-01103",
+            "label": 1,
+            "raw_score": 0.05126114123137828,
+            "calibrated_score": 0.4805194805194805,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00706",
+            "label": 1,
+            "raw_score": 0.06572275313691771,
+            "calibrated_score": 0.4805194805194805,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00543",
+            "label": 0,
+            "raw_score": 0.0804679913193279,
+            "calibrated_score": 0.4805194805194805,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00642",
+            "label": 1,
+            "raw_score": 0.07552226147779134,
+            "calibrated_score": 0.4805194805194805,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00699",
+            "label": 1,
+            "raw_score": 0.04521433834371531,
+            "calibrated_score": 0.4805194805194805,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00893",
+            "label": 1,
+            "raw_score": 0.0682654429956041,
+            "calibrated_score": 0.4805194805194805,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-01142",
+            "label": 1,
+            "raw_score": 0.06921783903963079,
+            "calibrated_score": 0.4805194805194805,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-01183",
+            "label": 1,
+            "raw_score": 0.07091955419577323,
+            "calibrated_score": 0.4805194805194805,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00381",
+            "label": 1,
+            "raw_score": 0.040381086169276284,
+            "calibrated_score": 0.4805194805194805,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00936",
+            "label": 1,
+            "raw_score": 0.048686776163123655,
+            "calibrated_score": 0.4805194805194805,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-01110",
+            "label": 1,
+            "raw_score": 0.09125850458872523,
+            "calibrated_score": 0.4805194805194805,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00460",
+            "label": 0,
+            "raw_score": 0.07760117971029465,
+            "calibrated_score": 0.4805194805194805,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00864",
+            "label": 0,
+            "raw_score": 0.07601663530660696,
+            "calibrated_score": 0.4805194805194805,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00249",
+            "label": 1,
+            "raw_score": 0.03465087198620479,
+            "calibrated_score": 0.4805194805194805,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00686",
+            "label": 0,
+            "raw_score": 0.039736621085188065,
+            "calibrated_score": 0.4805194805194805,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00972",
+            "label": 0,
+            "raw_score": 0.04151982631644577,
+            "calibrated_score": 0.4805194805194805,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-01062",
+            "label": 0,
+            "raw_score": 0.039380689982323296,
+            "calibrated_score": 0.4805194805194805,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00114",
+            "label": 1,
+            "raw_score": 0.015152103182560814,
+            "calibrated_score": 0.4805194805194805,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00183",
+            "label": 0,
+            "raw_score": 0.052980175521556025,
+            "calibrated_score": 0.4805194805194805,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00231",
+            "label": 0,
+            "raw_score": 0.08725215035090966,
+            "calibrated_score": 0.4805194805194805,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00758",
+            "label": 0,
+            "raw_score": 0.05700248332141859,
+            "calibrated_score": 0.4805194805194805,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00969",
+            "label": 1,
+            "raw_score": 0.06783652656304026,
+            "calibrated_score": 0.4805194805194805,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-01029",
+            "label": 0,
+            "raw_score": 0.054831015389413505,
+            "calibrated_score": 0.4805194805194805,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00343",
+            "label": 1,
+            "raw_score": 0.09848619791207298,
+            "calibrated_score": 0.4805194805194805,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00736",
+            "label": 0,
+            "raw_score": 0.06380872051415037,
+            "calibrated_score": 0.4805194805194805,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00905",
+            "label": 0,
+            "raw_score": 0.04491076874436827,
+            "calibrated_score": 0.4805194805194805,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-01167",
+            "label": 0,
+            "raw_score": 0.044833871970992444,
+            "calibrated_score": 0.4805194805194805,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00622",
+            "label": 0,
+            "raw_score": 0.05241632859272524,
+            "calibrated_score": 0.4805194805194805,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00661",
+            "label": 1,
+            "raw_score": 0.08113631349978284,
+            "calibrated_score": 0.4805194805194805,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-01176",
+            "label": 0,
+            "raw_score": 0.040491750677411245,
+            "calibrated_score": 0.4805194805194805,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00329",
+            "label": 1,
+            "raw_score": 0.03898732966153686,
+            "calibrated_score": 0.4805194805194805,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00934",
+            "label": 1,
+            "raw_score": 0.05023268943590674,
+            "calibrated_score": 0.4805194805194805,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-01069",
+            "label": 1,
+            "raw_score": 0.0546872824767615,
+            "calibrated_score": 0.4805194805194805,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-01108",
+            "label": 1,
+            "raw_score": 0.04953586359816736,
+            "calibrated_score": 0.4805194805194805,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00056",
+            "label": 0,
+            "raw_score": 0.06775184531006584,
+            "calibrated_score": 0.4805194805194805,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00657",
+            "label": 1,
+            "raw_score": 0.044643443655719,
+            "calibrated_score": 0.4805194805194805,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00770",
+            "label": 1,
+            "raw_score": 0.07587025761185542,
+            "calibrated_score": 0.4805194805194805,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00100",
+            "label": 1,
+            "raw_score": 0.04896656521045443,
+            "calibrated_score": 0.4805194805194805,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00160",
+            "label": 0,
+            "raw_score": 0.05928510227732452,
+            "calibrated_score": 0.4805194805194805,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00405",
+            "label": 1,
+            "raw_score": 0.08401255458765666,
+            "calibrated_score": 0.4805194805194805,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00557",
+            "label": 1,
+            "raw_score": 0.07264301339733976,
+            "calibrated_score": 0.4805194805194805,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00868",
+            "label": 1,
+            "raw_score": 0.047887539529856034,
+            "calibrated_score": 0.4805194805194805,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-01018",
+            "label": 0,
+            "raw_score": 0.04019239767797868,
+            "calibrated_score": 0.4805194805194805,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00826",
+            "label": 0,
+            "raw_score": 0.06989335544488123,
+            "calibrated_score": 0.4805194805194805,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00827",
+            "label": 1,
+            "raw_score": 0.07549082466781593,
+            "calibrated_score": 0.4805194805194805,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-01115",
+            "label": 1,
+            "raw_score": 0.04613962635567834,
+            "calibrated_score": 0.4805194805194805,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00238",
+            "label": 1,
+            "raw_score": 0.11532866516490389,
+            "calibrated_score": 0.4805194805194805,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00352",
+            "label": 0,
+            "raw_score": 0.06513210168465441,
+            "calibrated_score": 0.4805194805194805,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00767",
+            "label": 1,
+            "raw_score": 0.1016868731845813,
+            "calibrated_score": 0.4805194805194805,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-01036",
+            "label": 0,
+            "raw_score": 0.108651496547732,
+            "calibrated_score": 0.4805194805194805,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00082",
+            "label": 0,
+            "raw_score": 0.047207558599882966,
+            "calibrated_score": 0.4805194805194805,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00309",
+            "label": 1,
+            "raw_score": 0.04791733569788552,
+            "calibrated_score": 0.4805194805194805,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00500",
+            "label": 1,
+            "raw_score": 0.041552363269193204,
+            "calibrated_score": 0.4805194805194805,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00236",
+            "label": 0,
+            "raw_score": 0.03468619968608201,
+            "calibrated_score": 0.4805194805194805,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00350",
+            "label": 1,
+            "raw_score": 0.04372518323012395,
+            "calibrated_score": 0.4805194805194805,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00651",
+            "label": 1,
+            "raw_score": 0.052618450929967156,
+            "calibrated_score": 0.4805194805194805,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00765",
+            "label": 1,
+            "raw_score": 0.04851872256358003,
+            "calibrated_score": 0.4805194805194805,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-01034",
+            "label": 0,
+            "raw_score": 0.05126327997817469,
+            "calibrated_score": 0.4805194805194805,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00453",
+            "label": 0,
+            "raw_score": 0.051514878824793116,
+            "calibrated_score": 0.4805194805194805,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00446",
+            "label": 1,
+            "raw_score": 0.07693717164055196,
+            "calibrated_score": 0.4805194805194805,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00959",
+            "label": 1,
+            "raw_score": 0.03597361447096729,
+            "calibrated_score": 0.4805194805194805,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00344",
+            "label": 1,
+            "raw_score": 0.10891015547182936,
+            "calibrated_score": 0.4805194805194805,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00737",
+            "label": 0,
+            "raw_score": 0.03379376160409153,
+            "calibrated_score": 0.4805194805194805,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-01168",
+            "label": 1,
+            "raw_score": 0.056265459434103236,
+            "calibrated_score": 0.4805194805194805,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00079",
+            "label": 1,
+            "raw_score": 0.040720933274274694,
+            "calibrated_score": 0.4805194805194805,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00361",
+            "label": 1,
+            "raw_score": 0.061956422587064075,
+            "calibrated_score": 0.4805194805194805,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00658",
+            "label": 1,
+            "raw_score": 0.04465870580652888,
+            "calibrated_score": 0.4805194805194805,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00776",
+            "label": 0,
+            "raw_score": 0.04989706233484927,
+            "calibrated_score": 0.4805194805194805,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-01047",
+            "label": 1,
+            "raw_score": 0.0340165114406387,
+            "calibrated_score": 0.4805194805194805,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00518",
+            "label": 0,
+            "raw_score": 0.0715816418181727,
+            "calibrated_score": 0.4805194805194805,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00858",
+            "label": 1,
+            "raw_score": 0.06944349225009917,
+            "calibrated_score": 0.4805194805194805,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00229",
+            "label": 0,
+            "raw_score": 0.05252441758230092,
+            "calibrated_score": 0.4805194805194805,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00538",
+            "label": 1,
+            "raw_score": 0.05369791597821641,
+            "calibrated_score": 0.4805194805194805,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00824",
+            "label": 0,
+            "raw_score": 0.05961135305382169,
+            "calibrated_score": 0.4805194805194805,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00846",
+            "label": 1,
+            "raw_score": 0.06005130534274043,
+            "calibrated_score": 0.4805194805194805,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00910",
+            "label": 1,
+            "raw_score": 0.060076752053031604,
+            "calibrated_score": 0.4805194805194805,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00493",
+            "label": 1,
+            "raw_score": 0.05175481534404852,
+            "calibrated_score": 0.4805194805194805,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00755",
+            "label": 1,
+            "raw_score": 0.05527301790404669,
+            "calibrated_score": 0.4805194805194805,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00820",
+            "label": 0,
+            "raw_score": 0.03711653048558449,
+            "calibrated_score": 0.4805194805194805,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00795",
+            "label": 0,
+            "raw_score": 0.08307013175315818,
+            "calibrated_score": 0.4805194805194805,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00943",
+            "label": 0,
+            "raw_score": 0.0465484670081618,
+            "calibrated_score": 0.4805194805194805,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00844",
+            "label": 0,
+            "raw_score": 0.057956203130784326,
+            "calibrated_score": 0.4805194805194805,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00272",
+            "label": 1,
+            "raw_score": 0.06619489733838893,
+            "calibrated_score": 0.4805194805194805,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00441",
+            "label": 0,
+            "raw_score": 0.08982240149824945,
+            "calibrated_score": 0.4805194805194805,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00527",
+            "label": 0,
+            "raw_score": 0.08921438641859199,
+            "calibrated_score": 0.4805194805194805,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00337",
+            "label": 1,
+            "raw_score": 0.06560057449058135,
+            "calibrated_score": 0.4805194805194805,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00980",
+            "label": 0,
+            "raw_score": 0.07579121186795744,
+            "calibrated_score": 0.4805194805194805,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-01190",
+            "label": 0,
+            "raw_score": 0.04130487597019336,
+            "calibrated_score": 0.4805194805194805,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00066",
+            "label": 0,
+            "raw_score": 0.06406019535999563,
+            "calibrated_score": 0.4805194805194805,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00123",
+            "label": 1,
+            "raw_score": 0.054584406738536304,
+            "calibrated_score": 0.4805194805194805,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00290",
+            "label": 1,
+            "raw_score": 0.0612528382063751,
+            "calibrated_score": 0.4805194805194805,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00955",
+            "label": 1,
+            "raw_score": 0.07182753521657353,
+            "calibrated_score": 0.4805194805194805,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-01041",
+            "label": 1,
+            "raw_score": 0.016654510416212857,
+            "calibrated_score": 0.4805194805194805,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00046",
+            "label": 1,
+            "raw_score": 0.05411672993921195,
+            "calibrated_score": 0.4805194805194805,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00104",
+            "label": 0,
+            "raw_score": 0.04148537656166284,
+            "calibrated_score": 0.4805194805194805,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00174",
+            "label": 1,
+            "raw_score": 0.04588362145283645,
+            "calibrated_score": 0.4805194805194805,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00499",
+            "label": 0,
+            "raw_score": 0.07470157539759045,
+            "calibrated_score": 0.4805194805194805,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00830",
+            "label": 1,
+            "raw_score": 0.04717007832429125,
+            "calibrated_score": 0.4805194805194805,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-01119",
+            "label": 0,
+            "raw_score": 0.02783167807006402,
+            "calibrated_score": 0.4805194805194805,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00797",
+            "label": 1,
+            "raw_score": 0.09737222555317013,
+            "calibrated_score": 0.4805194805194805,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00494",
+            "label": 0,
+            "raw_score": 0.06184608999054976,
+            "calibrated_score": 0.4805194805194805,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00952",
+            "label": 0,
+            "raw_score": 0.05566098628592406,
+            "calibrated_score": 0.4805194805194805,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00212",
+            "label": 0,
+            "raw_score": 0.09306416262885843,
+            "calibrated_score": 0.4805194805194805,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00513",
+            "label": 1,
+            "raw_score": 0.052550418987581705,
+            "calibrated_score": 0.4805194805194805,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00609",
+            "label": 1,
+            "raw_score": 0.02680543690928906,
+            "calibrated_score": 0.4805194805194805,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00791",
+            "label": 1,
+            "raw_score": 0.016902660000902372,
+            "calibrated_score": 0.4805194805194805,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00200",
+            "label": 0,
+            "raw_score": 0.055377183336738287,
+            "calibrated_score": 0.4805194805194805,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00620",
+            "label": 1,
+            "raw_score": 0.05123133446274525,
+            "calibrated_score": 0.4805194805194805,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-01174",
+            "label": 1,
+            "raw_score": 0.06341618053000822,
+            "calibrated_score": 0.4805194805194805,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00146",
+            "label": 1,
+            "raw_score": 0.05691394517767864,
+            "calibrated_score": 0.4805194805194805,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00013",
+            "label": 0,
+            "raw_score": 0.023717362697214216,
+            "calibrated_score": 0.4805194805194805,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00299",
+            "label": 0,
+            "raw_score": 0.0949219184218033,
+            "calibrated_score": 0.4805194805194805,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00648",
+            "label": 1,
+            "raw_score": 0.0684405784047602,
+            "calibrated_score": 0.4805194805194805,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00987",
+            "label": 0,
+            "raw_score": 0.10117429049801746,
+            "calibrated_score": 0.4805194805194805,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-01095",
+            "label": 0,
+            "raw_score": 0.049263643787242586,
+            "calibrated_score": 0.4805194805194805,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00486",
+            "label": 1,
+            "raw_score": 0.0342970825042526,
+            "calibrated_score": 0.4805194805194805,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00800",
+            "label": 0,
+            "raw_score": 0.04173351061361252,
+            "calibrated_score": 0.4805194805194805,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-01135",
+            "label": 0,
+            "raw_score": 0.06426008561673462,
+            "calibrated_score": 0.4805194805194805,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00253",
+            "label": 0,
+            "raw_score": 0.08058897760429418,
+            "calibrated_score": 0.4805194805194805,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00324",
+            "label": 0,
+            "raw_score": 0.056780159827896644,
+            "calibrated_score": 0.4805194805194805,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00932",
+            "label": 1,
+            "raw_score": 0.061607911614820404,
+            "calibrated_score": 0.4805194805194805,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-01067",
+            "label": 0,
+            "raw_score": 0.05999352349183316,
+            "calibrated_score": 0.4805194805194805,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00391",
+            "label": 0,
+            "raw_score": 0.04197523748260554,
+            "calibrated_score": 0.4805194805194805,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00542",
+            "label": 0,
+            "raw_score": 0.09048549497285324,
+            "calibrated_score": 0.4805194805194805,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00641",
+            "label": 0,
+            "raw_score": 0.0605321103958985,
+            "calibrated_score": 0.4805194805194805,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00698",
+            "label": 0,
+            "raw_score": 0.041939379222492905,
+            "calibrated_score": 0.4805194805194805,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-01090",
+            "label": 1,
+            "raw_score": 0.07696184643948253,
+            "calibrated_score": 0.4805194805194805,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00172",
+            "label": 1,
+            "raw_score": 0.052452908448307314,
+            "calibrated_score": 0.4805194805194805,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00489",
+            "label": 1,
+            "raw_score": 0.06796847650489028,
+            "calibrated_score": 0.4805194805194805,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00565",
+            "label": 1,
+            "raw_score": 0.05711378960006182,
+            "calibrated_score": 0.4805194805194805,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00907",
+            "label": 1,
+            "raw_score": 0.0486374161732919,
+            "calibrated_score": 0.4805194805194805,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00024",
+            "label": 0,
+            "raw_score": 0.0865714278682306,
+            "calibrated_score": 0.4805194805194805,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00843",
+            "label": 1,
+            "raw_score": 0.11395974020449136,
+            "calibrated_score": 0.4805194805194805,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00364",
+            "label": 1,
+            "raw_score": 0.04017260398568486,
+            "calibrated_score": 0.4805194805194805,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00413",
+            "label": 0,
+            "raw_score": 0.04731268871793165,
+            "calibrated_score": 0.4805194805194805,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00850",
+            "label": 0,
+            "raw_score": 0.04996188215714571,
+            "calibrated_score": 0.4805194805194805,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-01105",
+            "label": 1,
+            "raw_score": 0.03223809295870762,
+            "calibrated_score": 0.4805194805194805,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00126",
+            "label": 1,
+            "raw_score": 0.10247069114550136,
+            "calibrated_score": 0.4805194805194805,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00316",
+            "label": 0,
+            "raw_score": 0.037646737989842576,
+            "calibrated_score": 0.4805194805194805,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00416",
+            "label": 1,
+            "raw_score": 0.07086021727068242,
+            "calibrated_score": 0.4805194805194805,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00712",
+            "label": 0,
+            "raw_score": 0.027513922321493127,
+            "calibrated_score": 0.4805194805194805,
+            "prediction": 0
+          }
+        ]
+      }
+    },
+    "max": {
+      "name": "max",
+      "calibrator_info": {
+        "threshold": 0.5719237435008665,
+        "threshold_report": {
+          "threshold": 0.5719237435008665,
+          "precision": 0.5126582278481012,
+          "recall": 0.1734475374732334,
+          "f1": 0.25920000000000004,
+          "fpr": 0.20533333333333334,
+          "hdr": 0.7946666666666666,
+          "accuracy": 0.4501187648456057,
+          "tp": 81,
+          "fp": 77,
+          "tn": 298,
+          "fn": 386,
+          "constraint_met": true
+        },
+        "n_folds": 5,
+        "fold_sizes": [
+          170,
+          153,
+          171,
+          156,
+          192
+        ]
+      },
+      "dev_results": {
+        "tp": 0,
+        "fp": 0,
+        "fn": 96,
+        "tn": 85,
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0,
+        "fpr": 0.0,
+        "raw_auc": 0.47095588235294117,
+        "calibrated_auc": 0.5,
+        "threshold": 0.5719237435008665,
+        "n_positive_predictions": 0,
+        "evidence": [
+          {
+            "pair_id": "corpus-a3-00090",
+            "label": 1,
+            "raw_score": 0.10700795788246145,
+            "calibrated_score": 0.5,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00667",
+            "label": 0,
+            "raw_score": 0.08891592851315375,
+            "calibrated_score": 0.5,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00088",
+            "label": 1,
+            "raw_score": 0.13054455751705385,
+            "calibrated_score": 0.5,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00203",
+            "label": 1,
+            "raw_score": 0.0793488312707989,
+            "calibrated_score": 0.5,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00854",
+            "label": 1,
+            "raw_score": 0.05336017443352073,
+            "calibrated_score": 0.5,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00170",
+            "label": 0,
+            "raw_score": 0.10892073674338208,
+            "calibrated_score": 0.5,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00747",
+            "label": 0,
+            "raw_score": 0.1547475398546981,
+            "calibrated_score": 0.5,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00815",
+            "label": 0,
+            "raw_score": 0.14749798277973675,
+            "calibrated_score": 0.5,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00006",
+            "label": 0,
+            "raw_score": 0.10790160982273857,
+            "calibrated_score": 0.5,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00192",
+            "label": 0,
+            "raw_score": 0.14874635388674257,
+            "calibrated_score": 0.5,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00939",
+            "label": 0,
+            "raw_score": 0.09559164487860274,
+            "calibrated_score": 0.5,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-01112",
+            "label": 0,
+            "raw_score": 0.1418861173927206,
+            "calibrated_score": 0.5,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00899",
+            "label": 0,
+            "raw_score": 0.07731811672063568,
+            "calibrated_score": 0.5,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-01148",
+            "label": 1,
+            "raw_score": 0.12651298298284389,
+            "calibrated_score": 0.5,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00218",
+            "label": 0,
+            "raw_score": 0.15745433041468448,
+            "calibrated_score": 0.5,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00265",
+            "label": 1,
+            "raw_score": 0.04285769164326834,
+            "calibrated_score": 0.5,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00438",
+            "label": 1,
+            "raw_score": 0.11684569496535865,
+            "calibrated_score": 0.5,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00525",
+            "label": 1,
+            "raw_score": 0.09775579050941853,
+            "calibrated_score": 0.5,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00690",
+            "label": 1,
+            "raw_score": 0.0774585665293209,
+            "calibrated_score": 0.5,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00250",
+            "label": 0,
+            "raw_score": 0.08303544811192898,
+            "calibrated_score": 0.5,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00320",
+            "label": 1,
+            "raw_score": 0.12391819274638619,
+            "calibrated_score": 0.5,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00380",
+            "label": 1,
+            "raw_score": 0.05809741021016956,
+            "calibrated_score": 0.5,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00687",
+            "label": 0,
+            "raw_score": 0.12183256757254161,
+            "calibrated_score": 0.5,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00928",
+            "label": 1,
+            "raw_score": 0.10418805680078169,
+            "calibrated_score": 0.5,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-01003",
+            "label": 1,
+            "raw_score": 0.07208180507841283,
+            "calibrated_score": 0.5,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-01063",
+            "label": 0,
+            "raw_score": 0.11878648534430758,
+            "calibrated_score": 0.5,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00222",
+            "label": 0,
+            "raw_score": 0.09951739367798212,
+            "calibrated_score": 0.5,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00523",
+            "label": 0,
+            "raw_score": 0.054150674902055405,
+            "calibrated_score": 0.5,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00901",
+            "label": 0,
+            "raw_score": 0.08190345786214931,
+            "calibrated_score": 0.5,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-01151",
+            "label": 0,
+            "raw_score": 0.10039506041309182,
+            "calibrated_score": 0.5,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00670",
+            "label": 1,
+            "raw_score": 0.08951911910584542,
+            "calibrated_score": 0.5,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00223",
+            "label": 0,
+            "raw_score": 0.050423473917359574,
+            "calibrated_score": 0.5,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00436",
+            "label": 1,
+            "raw_score": 0.08895738827600719,
+            "calibrated_score": 0.5,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00902",
+            "label": 0,
+            "raw_score": 0.077276169050763,
+            "calibrated_score": 0.5,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00206",
+            "label": 1,
+            "raw_score": 0.08814936171192352,
+            "calibrated_score": 0.5,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00424",
+            "label": 0,
+            "raw_score": 0.06646786154906782,
+            "calibrated_score": 0.5,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00676",
+            "label": 1,
+            "raw_score": 0.14093540424874867,
+            "calibrated_score": 0.5,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00779",
+            "label": 0,
+            "raw_score": 0.142709143565536,
+            "calibrated_score": 0.5,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00302",
+            "label": 1,
+            "raw_score": 0.11579347542187737,
+            "calibrated_score": 0.5,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00912",
+            "label": 1,
+            "raw_score": 0.11721435829320184,
+            "calibrated_score": 0.5,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-01103",
+            "label": 1,
+            "raw_score": 0.10018565911392875,
+            "calibrated_score": 0.5,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00706",
+            "label": 1,
+            "raw_score": 0.10106777236734739,
+            "calibrated_score": 0.5,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00543",
+            "label": 0,
+            "raw_score": 0.11358810018129183,
+            "calibrated_score": 0.5,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00642",
+            "label": 1,
+            "raw_score": 0.08933123861060205,
+            "calibrated_score": 0.5,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00699",
+            "label": 1,
+            "raw_score": 0.19088859439948247,
+            "calibrated_score": 0.5,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00893",
+            "label": 1,
+            "raw_score": 0.09848092688837722,
+            "calibrated_score": 0.5,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-01142",
+            "label": 1,
+            "raw_score": 0.13597470877361767,
+            "calibrated_score": 0.5,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-01183",
+            "label": 1,
+            "raw_score": 0.1429663521051956,
+            "calibrated_score": 0.5,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00381",
+            "label": 1,
+            "raw_score": 0.07595379354834991,
+            "calibrated_score": 0.5,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00936",
+            "label": 1,
+            "raw_score": 0.09769144328012884,
+            "calibrated_score": 0.5,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-01110",
+            "label": 1,
+            "raw_score": 0.16258098604297916,
+            "calibrated_score": 0.5,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00460",
+            "label": 0,
+            "raw_score": 0.15259428251430063,
+            "calibrated_score": 0.5,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00864",
+            "label": 0,
+            "raw_score": 0.136448695502005,
+            "calibrated_score": 0.5,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00249",
+            "label": 1,
+            "raw_score": 0.040094458706335864,
+            "calibrated_score": 0.5,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00686",
+            "label": 0,
+            "raw_score": 0.04764254347295292,
+            "calibrated_score": 0.5,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00972",
+            "label": 0,
+            "raw_score": 0.05156150543346617,
+            "calibrated_score": 0.5,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-01062",
+            "label": 0,
+            "raw_score": 0.050978912659086065,
+            "calibrated_score": 0.5,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00114",
+            "label": 1,
+            "raw_score": 0.048100309149217195,
+            "calibrated_score": 0.5,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00183",
+            "label": 0,
+            "raw_score": 0.09304124782571746,
+            "calibrated_score": 0.5,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00231",
+            "label": 0,
+            "raw_score": 0.11750697394676679,
+            "calibrated_score": 0.5,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00758",
+            "label": 0,
+            "raw_score": 0.11498436988572125,
+            "calibrated_score": 0.5,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00969",
+            "label": 1,
+            "raw_score": 0.11727100046609244,
+            "calibrated_score": 0.5,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-01029",
+            "label": 0,
+            "raw_score": 0.11130252469734901,
+            "calibrated_score": 0.5,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00343",
+            "label": 1,
+            "raw_score": 0.15053927127667763,
+            "calibrated_score": 0.5,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00736",
+            "label": 0,
+            "raw_score": 0.08202079815348143,
+            "calibrated_score": 0.5,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00905",
+            "label": 0,
+            "raw_score": 0.09005758149019082,
+            "calibrated_score": 0.5,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-01167",
+            "label": 0,
+            "raw_score": 0.08922056985399057,
+            "calibrated_score": 0.5,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00622",
+            "label": 0,
+            "raw_score": 0.07662112419530458,
+            "calibrated_score": 0.5,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00661",
+            "label": 1,
+            "raw_score": 0.16800003547344783,
+            "calibrated_score": 0.5,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-01176",
+            "label": 0,
+            "raw_score": 0.047983015862543686,
+            "calibrated_score": 0.5,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00329",
+            "label": 1,
+            "raw_score": 0.05426385515155058,
+            "calibrated_score": 0.5,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00934",
+            "label": 1,
+            "raw_score": 0.06498244438638327,
+            "calibrated_score": 0.5,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-01069",
+            "label": 1,
+            "raw_score": 0.0784281533859813,
+            "calibrated_score": 0.5,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-01108",
+            "label": 1,
+            "raw_score": 0.0649834926940005,
+            "calibrated_score": 0.5,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00056",
+            "label": 0,
+            "raw_score": 0.1399340961423725,
+            "calibrated_score": 0.5,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00657",
+            "label": 1,
+            "raw_score": 0.11226775850752528,
+            "calibrated_score": 0.5,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00770",
+            "label": 1,
+            "raw_score": 0.11849593292711456,
+            "calibrated_score": 0.5,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00100",
+            "label": 1,
+            "raw_score": 0.07970871528840145,
+            "calibrated_score": 0.5,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00160",
+            "label": 0,
+            "raw_score": 0.08794876306268508,
+            "calibrated_score": 0.5,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00405",
+            "label": 1,
+            "raw_score": 0.16619999813275252,
+            "calibrated_score": 0.5,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00557",
+            "label": 1,
+            "raw_score": 0.11780905039444312,
+            "calibrated_score": 0.5,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00868",
+            "label": 1,
+            "raw_score": 0.07489208301983151,
+            "calibrated_score": 0.5,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-01018",
+            "label": 0,
+            "raw_score": 0.1078214697403797,
+            "calibrated_score": 0.5,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00826",
+            "label": 0,
+            "raw_score": 0.1157188881464742,
+            "calibrated_score": 0.5,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00827",
+            "label": 1,
+            "raw_score": 0.11698568380155883,
+            "calibrated_score": 0.5,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-01115",
+            "label": 1,
+            "raw_score": 0.08298276780649332,
+            "calibrated_score": 0.5,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00238",
+            "label": 1,
+            "raw_score": 0.19707142636684727,
+            "calibrated_score": 0.5,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00352",
+            "label": 0,
+            "raw_score": 0.08957239912746327,
+            "calibrated_score": 0.5,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00767",
+            "label": 1,
+            "raw_score": 0.13246347400973577,
+            "calibrated_score": 0.5,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-01036",
+            "label": 0,
+            "raw_score": 0.16420243173677282,
+            "calibrated_score": 0.5,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00082",
+            "label": 0,
+            "raw_score": 0.09919184444472598,
+            "calibrated_score": 0.5,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00309",
+            "label": 1,
+            "raw_score": 0.0903267660866279,
+            "calibrated_score": 0.5,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00500",
+            "label": 1,
+            "raw_score": 0.0545028659974716,
+            "calibrated_score": 0.5,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00236",
+            "label": 0,
+            "raw_score": 0.16938460760021473,
+            "calibrated_score": 0.5,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00350",
+            "label": 1,
+            "raw_score": 0.14688807120455602,
+            "calibrated_score": 0.5,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00651",
+            "label": 1,
+            "raw_score": 0.09738850560930845,
+            "calibrated_score": 0.5,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00765",
+            "label": 1,
+            "raw_score": 0.09369876953297873,
+            "calibrated_score": 0.5,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-01034",
+            "label": 0,
+            "raw_score": 0.12428986294231985,
+            "calibrated_score": 0.5,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00453",
+            "label": 0,
+            "raw_score": 0.07237434234264067,
+            "calibrated_score": 0.5,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00446",
+            "label": 1,
+            "raw_score": 0.1268625789627795,
+            "calibrated_score": 0.5,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00959",
+            "label": 1,
+            "raw_score": 0.08151352004676539,
+            "calibrated_score": 0.5,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00344",
+            "label": 1,
+            "raw_score": 0.13147594694837123,
+            "calibrated_score": 0.5,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00737",
+            "label": 0,
+            "raw_score": 0.07335117159577972,
+            "calibrated_score": 0.5,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-01168",
+            "label": 1,
+            "raw_score": 0.07540506718289254,
+            "calibrated_score": 0.5,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00079",
+            "label": 1,
+            "raw_score": 0.048706029775645754,
+            "calibrated_score": 0.5,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00361",
+            "label": 1,
+            "raw_score": 0.0816783406866438,
+            "calibrated_score": 0.5,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00658",
+            "label": 1,
+            "raw_score": 0.058685162555078836,
+            "calibrated_score": 0.5,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00776",
+            "label": 0,
+            "raw_score": 0.10895590369098349,
+            "calibrated_score": 0.5,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-01047",
+            "label": 1,
+            "raw_score": 0.06794188359414946,
+            "calibrated_score": 0.5,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00518",
+            "label": 0,
+            "raw_score": 0.12287288685160005,
+            "calibrated_score": 0.5,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00858",
+            "label": 1,
+            "raw_score": 0.11394962150107434,
+            "calibrated_score": 0.5,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00229",
+            "label": 0,
+            "raw_score": 0.1297332693318337,
+            "calibrated_score": 0.5,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00538",
+            "label": 1,
+            "raw_score": 0.12703692654861665,
+            "calibrated_score": 0.5,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00824",
+            "label": 0,
+            "raw_score": 0.11780959827381735,
+            "calibrated_score": 0.5,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00846",
+            "label": 1,
+            "raw_score": 0.09815846033553485,
+            "calibrated_score": 0.5,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00910",
+            "label": 1,
+            "raw_score": 0.0983516964997189,
+            "calibrated_score": 0.5,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00493",
+            "label": 1,
+            "raw_score": 0.07351161997561112,
+            "calibrated_score": 0.5,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00755",
+            "label": 1,
+            "raw_score": 0.10877690838063594,
+            "calibrated_score": 0.5,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00820",
+            "label": 0,
+            "raw_score": 0.055398195306221885,
+            "calibrated_score": 0.5,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00795",
+            "label": 0,
+            "raw_score": 0.11482481401498201,
+            "calibrated_score": 0.5,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00943",
+            "label": 0,
+            "raw_score": 0.06846505719332112,
+            "calibrated_score": 0.5,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00844",
+            "label": 0,
+            "raw_score": 0.12065213790282482,
+            "calibrated_score": 0.5,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00272",
+            "label": 1,
+            "raw_score": 0.10195915770548389,
+            "calibrated_score": 0.5,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00441",
+            "label": 0,
+            "raw_score": 0.1363025612999606,
+            "calibrated_score": 0.5,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00527",
+            "label": 0,
+            "raw_score": 0.13078079917638766,
+            "calibrated_score": 0.5,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00337",
+            "label": 1,
+            "raw_score": 0.10563904408295369,
+            "calibrated_score": 0.5,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00980",
+            "label": 0,
+            "raw_score": 0.10055530852260694,
+            "calibrated_score": 0.5,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-01190",
+            "label": 0,
+            "raw_score": 0.05655298428730761,
+            "calibrated_score": 0.5,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00066",
+            "label": 0,
+            "raw_score": 0.11055068760735205,
+            "calibrated_score": 0.5,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00123",
+            "label": 1,
+            "raw_score": 0.09362125372860232,
+            "calibrated_score": 0.5,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00290",
+            "label": 1,
+            "raw_score": 0.11434429980316485,
+            "calibrated_score": 0.5,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00955",
+            "label": 1,
+            "raw_score": 0.10776918557368961,
+            "calibrated_score": 0.5,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-01041",
+            "label": 1,
+            "raw_score": 0.04024402830876211,
+            "calibrated_score": 0.5,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00046",
+            "label": 1,
+            "raw_score": 0.11529637231989845,
+            "calibrated_score": 0.5,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00104",
+            "label": 0,
+            "raw_score": 0.06309369927147404,
+            "calibrated_score": 0.5,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00174",
+            "label": 1,
+            "raw_score": 0.054816748377217304,
+            "calibrated_score": 0.5,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00499",
+            "label": 0,
+            "raw_score": 0.10658946349584782,
+            "calibrated_score": 0.5,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00830",
+            "label": 1,
+            "raw_score": 0.06867029394836585,
+            "calibrated_score": 0.5,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-01119",
+            "label": 0,
+            "raw_score": 0.1167714390646569,
+            "calibrated_score": 0.5,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00797",
+            "label": 1,
+            "raw_score": 0.1365750427461122,
+            "calibrated_score": 0.5,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00494",
+            "label": 0,
+            "raw_score": 0.08610099027878342,
+            "calibrated_score": 0.5,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00952",
+            "label": 0,
+            "raw_score": 0.11482080310686751,
+            "calibrated_score": 0.5,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00212",
+            "label": 0,
+            "raw_score": 0.14461525719371796,
+            "calibrated_score": 0.5,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00513",
+            "label": 1,
+            "raw_score": 0.09177079756037075,
+            "calibrated_score": 0.5,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00609",
+            "label": 1,
+            "raw_score": 0.08221604828084528,
+            "calibrated_score": 0.5,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00791",
+            "label": 1,
+            "raw_score": 0.04294225455528587,
+            "calibrated_score": 0.5,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00200",
+            "label": 0,
+            "raw_score": 0.1153537218698126,
+            "calibrated_score": 0.5,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00620",
+            "label": 1,
+            "raw_score": 0.12379089381645979,
+            "calibrated_score": 0.5,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-01174",
+            "label": 1,
+            "raw_score": 0.08868100477338269,
+            "calibrated_score": 0.5,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00146",
+            "label": 1,
+            "raw_score": 0.08987594878564338,
+            "calibrated_score": 0.5,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00013",
+            "label": 0,
+            "raw_score": 0.04837312112399634,
+            "calibrated_score": 0.5,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00299",
+            "label": 0,
+            "raw_score": 0.16687688527897943,
+            "calibrated_score": 0.5,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00648",
+            "label": 1,
+            "raw_score": 0.10514730206982661,
+            "calibrated_score": 0.5,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00987",
+            "label": 0,
+            "raw_score": 0.16517373675506414,
+            "calibrated_score": 0.5,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-01095",
+            "label": 0,
+            "raw_score": 0.10193578035749319,
+            "calibrated_score": 0.5,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00486",
+            "label": 1,
+            "raw_score": 0.06246601422720785,
+            "calibrated_score": 0.5,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00800",
+            "label": 0,
+            "raw_score": 0.06512217602628033,
+            "calibrated_score": 0.5,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-01135",
+            "label": 0,
+            "raw_score": 0.0942786250434264,
+            "calibrated_score": 0.5,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00253",
+            "label": 0,
+            "raw_score": 0.1205792644539552,
+            "calibrated_score": 0.5,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00324",
+            "label": 0,
+            "raw_score": 0.11532138765554273,
+            "calibrated_score": 0.5,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00932",
+            "label": 1,
+            "raw_score": 0.09145156164666622,
+            "calibrated_score": 0.5,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-01067",
+            "label": 0,
+            "raw_score": 0.11129339896368932,
+            "calibrated_score": 0.5,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00391",
+            "label": 0,
+            "raw_score": 0.04648214177951146,
+            "calibrated_score": 0.5,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00542",
+            "label": 0,
+            "raw_score": 0.12565149669772568,
+            "calibrated_score": 0.5,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00641",
+            "label": 0,
+            "raw_score": 0.14134547609199102,
+            "calibrated_score": 0.5,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00698",
+            "label": 0,
+            "raw_score": 0.048839572695334336,
+            "calibrated_score": 0.5,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-01090",
+            "label": 1,
+            "raw_score": 0.11382289879337207,
+            "calibrated_score": 0.5,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00172",
+            "label": 1,
+            "raw_score": 0.08530268024439504,
+            "calibrated_score": 0.5,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00489",
+            "label": 1,
+            "raw_score": 0.11760984402136085,
+            "calibrated_score": 0.5,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00565",
+            "label": 1,
+            "raw_score": 0.0912743302213615,
+            "calibrated_score": 0.5,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00907",
+            "label": 1,
+            "raw_score": 0.07300658507482632,
+            "calibrated_score": 0.5,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00024",
+            "label": 0,
+            "raw_score": 0.10248873895738153,
+            "calibrated_score": 0.5,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00843",
+            "label": 1,
+            "raw_score": 0.19525520057755225,
+            "calibrated_score": 0.5,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00364",
+            "label": 1,
+            "raw_score": 0.08557554448161371,
+            "calibrated_score": 0.5,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00413",
+            "label": 0,
+            "raw_score": 0.08067398808354247,
+            "calibrated_score": 0.5,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00850",
+            "label": 0,
+            "raw_score": 0.08410160897641974,
+            "calibrated_score": 0.5,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-01105",
+            "label": 1,
+            "raw_score": 0.1302616394840489,
+            "calibrated_score": 0.5,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00126",
+            "label": 1,
+            "raw_score": 0.15224894723955834,
+            "calibrated_score": 0.5,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00316",
+            "label": 0,
+            "raw_score": 0.05895464378023702,
+            "calibrated_score": 0.5,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00416",
+            "label": 1,
+            "raw_score": 0.10530359998463285,
+            "calibrated_score": 0.5,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00712",
+            "label": 0,
+            "raw_score": 0.07697719955326685,
+            "calibrated_score": 0.5,
+            "prediction": 0
+          }
+        ]
+      }
+    },
+    "mean_top3": {
+      "name": "mean_top3",
+      "calibrator_info": {
+        "threshold": 0.5681159420289855,
+        "threshold_report": {
+          "threshold": 0.5681159420289855,
+          "precision": 0.5303867403314917,
+          "recall": 0.20556745182012848,
+          "f1": 0.2962962962962963,
+          "fpr": 0.22666666666666666,
+          "hdr": 0.7733333333333333,
+          "accuracy": 0.4584323040380047,
+          "tp": 96,
+          "fp": 85,
+          "tn": 290,
+          "fn": 371,
+          "constraint_met": true
+        },
+        "n_folds": 5,
+        "fold_sizes": [
+          170,
+          153,
+          171,
+          156,
+          192
+        ]
+      },
+      "dev_results": {
+        "tp": 0,
+        "fp": 0,
+        "fn": 96,
+        "tn": 85,
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0,
+        "fpr": 0.0,
+        "raw_auc": 0.5078431372549019,
+        "calibrated_auc": 0.5,
+        "threshold": 0.5681159420289855,
+        "n_positive_predictions": 0,
+        "evidence": [
+          {
+            "pair_id": "corpus-a3-00090",
+            "label": 1,
+            "raw_score": 0.09045793864354885,
+            "calibrated_score": 0.5546318289786223,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00667",
+            "label": 0,
+            "raw_score": 0.0848692841062199,
+            "calibrated_score": 0.5546318289786223,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00088",
+            "label": 1,
+            "raw_score": 0.09915619581614521,
+            "calibrated_score": 0.5546318289786223,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00203",
+            "label": 1,
+            "raw_score": 0.062387470646586084,
+            "calibrated_score": 0.5546318289786223,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00854",
+            "label": 1,
+            "raw_score": 0.03177053771407463,
+            "calibrated_score": 0.5546318289786223,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00170",
+            "label": 0,
+            "raw_score": 0.06862296907447843,
+            "calibrated_score": 0.5546318289786223,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00747",
+            "label": 0,
+            "raw_score": 0.11908055733026858,
+            "calibrated_score": 0.5546318289786223,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00815",
+            "label": 0,
+            "raw_score": 0.1019819072977229,
+            "calibrated_score": 0.5546318289786223,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00006",
+            "label": 0,
+            "raw_score": 0.08819442138001533,
+            "calibrated_score": 0.5546318289786223,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00192",
+            "label": 0,
+            "raw_score": 0.12677235320956817,
+            "calibrated_score": 0.5546318289786223,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00939",
+            "label": 0,
+            "raw_score": 0.0689058245244949,
+            "calibrated_score": 0.5546318289786223,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-01112",
+            "label": 0,
+            "raw_score": 0.1381272657535274,
+            "calibrated_score": 0.5546318289786223,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00899",
+            "label": 0,
+            "raw_score": 0.06470646727388758,
+            "calibrated_score": 0.5546318289786223,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-01148",
+            "label": 1,
+            "raw_score": 0.1069028088949412,
+            "calibrated_score": 0.5546318289786223,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00218",
+            "label": 0,
+            "raw_score": 0.12448212175051865,
+            "calibrated_score": 0.5546318289786223,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00265",
+            "label": 1,
+            "raw_score": 0.041889716134232056,
+            "calibrated_score": 0.5546318289786223,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00438",
+            "label": 1,
+            "raw_score": 0.10748197943901161,
+            "calibrated_score": 0.5546318289786223,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00525",
+            "label": 1,
+            "raw_score": 0.07943503492603843,
+            "calibrated_score": 0.5546318289786223,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00690",
+            "label": 1,
+            "raw_score": 0.06626607393026811,
+            "calibrated_score": 0.5546318289786223,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00250",
+            "label": 0,
+            "raw_score": 0.06825236758012275,
+            "calibrated_score": 0.5546318289786223,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00320",
+            "label": 1,
+            "raw_score": 0.10300773676686666,
+            "calibrated_score": 0.5546318289786223,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00380",
+            "label": 1,
+            "raw_score": 0.03844226833367157,
+            "calibrated_score": 0.5546318289786223,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00687",
+            "label": 0,
+            "raw_score": 0.11171451190426711,
+            "calibrated_score": 0.5546318289786223,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00928",
+            "label": 1,
+            "raw_score": 0.09769536126571414,
+            "calibrated_score": 0.5546318289786223,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-01003",
+            "label": 1,
+            "raw_score": 0.06644988715197765,
+            "calibrated_score": 0.5546318289786223,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-01063",
+            "label": 0,
+            "raw_score": 0.10007447616293631,
+            "calibrated_score": 0.5546318289786223,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00222",
+            "label": 0,
+            "raw_score": 0.09054680206663485,
+            "calibrated_score": 0.5546318289786223,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00523",
+            "label": 0,
+            "raw_score": 0.051500074930187635,
+            "calibrated_score": 0.5546318289786223,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00901",
+            "label": 0,
+            "raw_score": 0.07732254503006335,
+            "calibrated_score": 0.5546318289786223,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-01151",
+            "label": 0,
+            "raw_score": 0.08222299613129923,
+            "calibrated_score": 0.5546318289786223,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00670",
+            "label": 1,
+            "raw_score": 0.08511863274270141,
+            "calibrated_score": 0.5546318289786223,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00223",
+            "label": 0,
+            "raw_score": 0.04550889560608882,
+            "calibrated_score": 0.5546318289786223,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00436",
+            "label": 1,
+            "raw_score": 0.07392101175943663,
+            "calibrated_score": 0.5546318289786223,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00902",
+            "label": 0,
+            "raw_score": 0.06624560848059817,
+            "calibrated_score": 0.5546318289786223,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00206",
+            "label": 1,
+            "raw_score": 0.07632483072066139,
+            "calibrated_score": 0.5546318289786223,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00424",
+            "label": 0,
+            "raw_score": 0.05597150512893265,
+            "calibrated_score": 0.5546318289786223,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00676",
+            "label": 1,
+            "raw_score": 0.13074241165719275,
+            "calibrated_score": 0.5546318289786223,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00779",
+            "label": 0,
+            "raw_score": 0.09938710642480192,
+            "calibrated_score": 0.5546318289786223,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00302",
+            "label": 1,
+            "raw_score": 0.1028605438803512,
+            "calibrated_score": 0.5546318289786223,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00912",
+            "label": 1,
+            "raw_score": 0.10868026440857294,
+            "calibrated_score": 0.5546318289786223,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-01103",
+            "label": 1,
+            "raw_score": 0.08990228630946219,
+            "calibrated_score": 0.5546318289786223,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00706",
+            "label": 1,
+            "raw_score": 0.08421595323639024,
+            "calibrated_score": 0.5546318289786223,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00543",
+            "label": 0,
+            "raw_score": 0.08683646980294168,
+            "calibrated_score": 0.5546318289786223,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00642",
+            "label": 1,
+            "raw_score": 0.08438319350885293,
+            "calibrated_score": 0.5546318289786223,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00699",
+            "label": 1,
+            "raw_score": 0.16111962312678657,
+            "calibrated_score": 0.5546318289786223,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00893",
+            "label": 1,
+            "raw_score": 0.0754420158270812,
+            "calibrated_score": 0.5546318289786223,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-01142",
+            "label": 1,
+            "raw_score": 0.1241434608330762,
+            "calibrated_score": 0.5546318289786223,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-01183",
+            "label": 1,
+            "raw_score": 0.12029465734449835,
+            "calibrated_score": 0.5546318289786223,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00381",
+            "label": 1,
+            "raw_score": 0.0731251345743741,
+            "calibrated_score": 0.5546318289786223,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00936",
+            "label": 1,
+            "raw_score": 0.09069306048043026,
+            "calibrated_score": 0.5546318289786223,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-01110",
+            "label": 1,
+            "raw_score": 0.14156037129066654,
+            "calibrated_score": 0.5546318289786223,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00460",
+            "label": 0,
+            "raw_score": 0.11687216389887269,
+            "calibrated_score": 0.5546318289786223,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00864",
+            "label": 0,
+            "raw_score": 0.12760334018349936,
+            "calibrated_score": 0.5546318289786223,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00249",
+            "label": 1,
+            "raw_score": 0.03703740903463682,
+            "calibrated_score": 0.5546318289786223,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00686",
+            "label": 0,
+            "raw_score": 0.04319274761726383,
+            "calibrated_score": 0.5546318289786223,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00972",
+            "label": 0,
+            "raw_score": 0.0450599696300689,
+            "calibrated_score": 0.5546318289786223,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-01062",
+            "label": 0,
+            "raw_score": 0.043967935234133386,
+            "calibrated_score": 0.5546318289786223,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00114",
+            "label": 1,
+            "raw_score": 0.040984358995550425,
+            "calibrated_score": 0.5546318289786223,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00183",
+            "label": 0,
+            "raw_score": 0.08308557187849361,
+            "calibrated_score": 0.5546318289786223,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00231",
+            "label": 0,
+            "raw_score": 0.102054274557701,
+            "calibrated_score": 0.5546318289786223,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00758",
+            "label": 0,
+            "raw_score": 0.06632347307527019,
+            "calibrated_score": 0.5546318289786223,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00969",
+            "label": 1,
+            "raw_score": 0.1072855290081428,
+            "calibrated_score": 0.5546318289786223,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-01029",
+            "label": 0,
+            "raw_score": 0.06250971284482044,
+            "calibrated_score": 0.5546318289786223,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00343",
+            "label": 1,
+            "raw_score": 0.08578127777653101,
+            "calibrated_score": 0.5546318289786223,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00736",
+            "label": 0,
+            "raw_score": 0.07313020260971481,
+            "calibrated_score": 0.5546318289786223,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00905",
+            "label": 0,
+            "raw_score": 0.06787543687487856,
+            "calibrated_score": 0.5546318289786223,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-01167",
+            "label": 0,
+            "raw_score": 0.07924321045590706,
+            "calibrated_score": 0.5546318289786223,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00622",
+            "label": 0,
+            "raw_score": 0.067172100713067,
+            "calibrated_score": 0.5546318289786223,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00661",
+            "label": 1,
+            "raw_score": 0.1518645429061979,
+            "calibrated_score": 0.5546318289786223,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-01176",
+            "label": 0,
+            "raw_score": 0.042620453026420015,
+            "calibrated_score": 0.5546318289786223,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00329",
+            "label": 1,
+            "raw_score": 0.032802751591499986,
+            "calibrated_score": 0.5546318289786223,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00934",
+            "label": 1,
+            "raw_score": 0.06204211367989204,
+            "calibrated_score": 0.5546318289786223,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-01069",
+            "label": 1,
+            "raw_score": 0.07624371813154761,
+            "calibrated_score": 0.5546318289786223,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-01108",
+            "label": 1,
+            "raw_score": 0.06032616824715495,
+            "calibrated_score": 0.5546318289786223,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00056",
+            "label": 0,
+            "raw_score": 0.12888045218985963,
+            "calibrated_score": 0.5546318289786223,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00657",
+            "label": 1,
+            "raw_score": 0.11061765477983244,
+            "calibrated_score": 0.5546318289786223,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00770",
+            "label": 1,
+            "raw_score": 0.10183472005449214,
+            "calibrated_score": 0.5546318289786223,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00100",
+            "label": 1,
+            "raw_score": 0.0649489666130445,
+            "calibrated_score": 0.5546318289786223,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00160",
+            "label": 0,
+            "raw_score": 0.0826349158049045,
+            "calibrated_score": 0.5546318289786223,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00405",
+            "label": 1,
+            "raw_score": 0.1395872025141742,
+            "calibrated_score": 0.5546318289786223,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00557",
+            "label": 1,
+            "raw_score": 0.08381740651311359,
+            "calibrated_score": 0.5546318289786223,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00868",
+            "label": 1,
+            "raw_score": 0.06472568718680884,
+            "calibrated_score": 0.5546318289786223,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-01018",
+            "label": 0,
+            "raw_score": 0.09133099010831953,
+            "calibrated_score": 0.5546318289786223,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00826",
+            "label": 0,
+            "raw_score": 0.10354582131408614,
+            "calibrated_score": 0.5546318289786223,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00827",
+            "label": 1,
+            "raw_score": 0.10650410131201217,
+            "calibrated_score": 0.5546318289786223,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-01115",
+            "label": 1,
+            "raw_score": 0.06705432057701836,
+            "calibrated_score": 0.5546318289786223,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00238",
+            "label": 1,
+            "raw_score": 0.1781106302415023,
+            "calibrated_score": 0.5546318289786223,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00352",
+            "label": 0,
+            "raw_score": 0.08399066678945664,
+            "calibrated_score": 0.5546318289786223,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00767",
+            "label": 1,
+            "raw_score": 0.11723960895779643,
+            "calibrated_score": 0.5546318289786223,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-01036",
+            "label": 0,
+            "raw_score": 0.1526517186682152,
+            "calibrated_score": 0.5546318289786223,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00082",
+            "label": 0,
+            "raw_score": 0.08165218701891448,
+            "calibrated_score": 0.5546318289786223,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00309",
+            "label": 1,
+            "raw_score": 0.07177854996466841,
+            "calibrated_score": 0.5546318289786223,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00500",
+            "label": 1,
+            "raw_score": 0.03596737254817683,
+            "calibrated_score": 0.5546318289786223,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00236",
+            "label": 0,
+            "raw_score": 0.1464262181757872,
+            "calibrated_score": 0.5546318289786223,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00350",
+            "label": 1,
+            "raw_score": 0.13345193683625786,
+            "calibrated_score": 0.5546318289786223,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00651",
+            "label": 1,
+            "raw_score": 0.09182595720138335,
+            "calibrated_score": 0.5546318289786223,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00765",
+            "label": 1,
+            "raw_score": 0.09133933491348324,
+            "calibrated_score": 0.5546318289786223,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-01034",
+            "label": 0,
+            "raw_score": 0.08491722515685611,
+            "calibrated_score": 0.5546318289786223,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00453",
+            "label": 0,
+            "raw_score": 0.06894901903809968,
+            "calibrated_score": 0.5546318289786223,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00446",
+            "label": 1,
+            "raw_score": 0.12177999280773395,
+            "calibrated_score": 0.5546318289786223,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00959",
+            "label": 1,
+            "raw_score": 0.07215194738287992,
+            "calibrated_score": 0.5546318289786223,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00344",
+            "label": 1,
+            "raw_score": 0.1210240808876234,
+            "calibrated_score": 0.5546318289786223,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00737",
+            "label": 0,
+            "raw_score": 0.06269192858557626,
+            "calibrated_score": 0.5546318289786223,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-01168",
+            "label": 1,
+            "raw_score": 0.07368085677024762,
+            "calibrated_score": 0.5546318289786223,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00079",
+            "label": 1,
+            "raw_score": 0.045961612798060825,
+            "calibrated_score": 0.5546318289786223,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00361",
+            "label": 1,
+            "raw_score": 0.058687336626368464,
+            "calibrated_score": 0.5546318289786223,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00658",
+            "label": 1,
+            "raw_score": 0.039587850850983264,
+            "calibrated_score": 0.5546318289786223,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00776",
+            "label": 0,
+            "raw_score": 0.10615797126894568,
+            "calibrated_score": 0.5546318289786223,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-01047",
+            "label": 1,
+            "raw_score": 0.06698028394012762,
+            "calibrated_score": 0.5546318289786223,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00518",
+            "label": 0,
+            "raw_score": 0.09949907839635087,
+            "calibrated_score": 0.5546318289786223,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00858",
+            "label": 1,
+            "raw_score": 0.09631721758880596,
+            "calibrated_score": 0.5546318289786223,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00229",
+            "label": 0,
+            "raw_score": 0.11721241947379392,
+            "calibrated_score": 0.5546318289786223,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00538",
+            "label": 1,
+            "raw_score": 0.11117218439744457,
+            "calibrated_score": 0.5546318289786223,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00824",
+            "label": 0,
+            "raw_score": 0.10849916253425644,
+            "calibrated_score": 0.5546318289786223,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00846",
+            "label": 1,
+            "raw_score": 0.0857845893417557,
+            "calibrated_score": 0.5546318289786223,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00910",
+            "label": 1,
+            "raw_score": 0.09253419057717155,
+            "calibrated_score": 0.5546318289786223,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00493",
+            "label": 1,
+            "raw_score": 0.06595510370125397,
+            "calibrated_score": 0.5546318289786223,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00755",
+            "label": 1,
+            "raw_score": 0.08084902025861647,
+            "calibrated_score": 0.5546318289786223,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00820",
+            "label": 0,
+            "raw_score": 0.04682828106662954,
+            "calibrated_score": 0.5546318289786223,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00795",
+            "label": 0,
+            "raw_score": 0.08971285811231049,
+            "calibrated_score": 0.5546318289786223,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00943",
+            "label": 0,
+            "raw_score": 0.052743729871476346,
+            "calibrated_score": 0.5546318289786223,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00844",
+            "label": 0,
+            "raw_score": 0.10193816331453946,
+            "calibrated_score": 0.5546318289786223,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00272",
+            "label": 1,
+            "raw_score": 0.09826104615032398,
+            "calibrated_score": 0.5546318289786223,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00441",
+            "label": 0,
+            "raw_score": 0.08747807150264764,
+            "calibrated_score": 0.5546318289786223,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00527",
+            "label": 0,
+            "raw_score": 0.08753813445304781,
+            "calibrated_score": 0.5546318289786223,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00337",
+            "label": 1,
+            "raw_score": 0.09496083094449252,
+            "calibrated_score": 0.5546318289786223,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00980",
+            "label": 0,
+            "raw_score": 0.09258439157121055,
+            "calibrated_score": 0.5546318289786223,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-01190",
+            "label": 0,
+            "raw_score": 0.04970989104187168,
+            "calibrated_score": 0.5546318289786223,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00066",
+            "label": 0,
+            "raw_score": 0.09886190213130681,
+            "calibrated_score": 0.5546318289786223,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00123",
+            "label": 1,
+            "raw_score": 0.08107293116898277,
+            "calibrated_score": 0.5546318289786223,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00290",
+            "label": 1,
+            "raw_score": 0.09753554871085222,
+            "calibrated_score": 0.5546318289786223,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00955",
+            "label": 1,
+            "raw_score": 0.1001710153838209,
+            "calibrated_score": 0.5546318289786223,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-01041",
+            "label": 1,
+            "raw_score": 0.03975330807341045,
+            "calibrated_score": 0.5546318289786223,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00046",
+            "label": 1,
+            "raw_score": 0.09867274676653075,
+            "calibrated_score": 0.5546318289786223,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00104",
+            "label": 0,
+            "raw_score": 0.0627737328862123,
+            "calibrated_score": 0.5546318289786223,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00174",
+            "label": 1,
+            "raw_score": 0.05361323873035182,
+            "calibrated_score": 0.5546318289786223,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00499",
+            "label": 0,
+            "raw_score": 0.08454223694984737,
+            "calibrated_score": 0.5546318289786223,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00830",
+            "label": 1,
+            "raw_score": 0.04044665538855978,
+            "calibrated_score": 0.5546318289786223,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-01119",
+            "label": 0,
+            "raw_score": 0.09860894121840702,
+            "calibrated_score": 0.5546318289786223,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00797",
+            "label": 1,
+            "raw_score": 0.12356923663899157,
+            "calibrated_score": 0.5546318289786223,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00494",
+            "label": 0,
+            "raw_score": 0.05143001957584222,
+            "calibrated_score": 0.5546318289786223,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00952",
+            "label": 0,
+            "raw_score": 0.08990928600059302,
+            "calibrated_score": 0.5546318289786223,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00212",
+            "label": 0,
+            "raw_score": 0.12161363025123333,
+            "calibrated_score": 0.5546318289786223,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00513",
+            "label": 1,
+            "raw_score": 0.08776618888065273,
+            "calibrated_score": 0.5546318289786223,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00609",
+            "label": 1,
+            "raw_score": 0.06638083143937054,
+            "calibrated_score": 0.5546318289786223,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00791",
+            "label": 1,
+            "raw_score": 0.04162741363755029,
+            "calibrated_score": 0.5546318289786223,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00200",
+            "label": 0,
+            "raw_score": 0.07839087928635342,
+            "calibrated_score": 0.5546318289786223,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00620",
+            "label": 1,
+            "raw_score": 0.10037862111072748,
+            "calibrated_score": 0.5546318289786223,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-01174",
+            "label": 1,
+            "raw_score": 0.0852184969632042,
+            "calibrated_score": 0.5546318289786223,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00146",
+            "label": 1,
+            "raw_score": 0.08544754773690034,
+            "calibrated_score": 0.5546318289786223,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00013",
+            "label": 0,
+            "raw_score": 0.04114239902721153,
+            "calibrated_score": 0.5546318289786223,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00299",
+            "label": 0,
+            "raw_score": 0.15207032394712014,
+            "calibrated_score": 0.5546318289786223,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00648",
+            "label": 1,
+            "raw_score": 0.09509969650880384,
+            "calibrated_score": 0.5546318289786223,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00987",
+            "label": 0,
+            "raw_score": 0.1317135244629938,
+            "calibrated_score": 0.5546318289786223,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-01095",
+            "label": 0,
+            "raw_score": 0.08555025975923987,
+            "calibrated_score": 0.5546318289786223,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00486",
+            "label": 1,
+            "raw_score": 0.05892241189033239,
+            "calibrated_score": 0.5546318289786223,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00800",
+            "label": 0,
+            "raw_score": 0.05395482736690358,
+            "calibrated_score": 0.5546318289786223,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-01135",
+            "label": 0,
+            "raw_score": 0.09130074339402028,
+            "calibrated_score": 0.5546318289786223,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00253",
+            "label": 0,
+            "raw_score": 0.07978751727016148,
+            "calibrated_score": 0.5546318289786223,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00324",
+            "label": 0,
+            "raw_score": 0.09111976257184046,
+            "calibrated_score": 0.5546318289786223,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00932",
+            "label": 1,
+            "raw_score": 0.0592920172352527,
+            "calibrated_score": 0.5546318289786223,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-01067",
+            "label": 0,
+            "raw_score": 0.09784441927560424,
+            "calibrated_score": 0.5546318289786223,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00391",
+            "label": 0,
+            "raw_score": 0.0455212755192311,
+            "calibrated_score": 0.5546318289786223,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00542",
+            "label": 0,
+            "raw_score": 0.1212017701396569,
+            "calibrated_score": 0.5546318289786223,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00641",
+            "label": 0,
+            "raw_score": 0.11658230807830543,
+            "calibrated_score": 0.5546318289786223,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00698",
+            "label": 0,
+            "raw_score": 0.04377422907611794,
+            "calibrated_score": 0.5546318289786223,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-01090",
+            "label": 1,
+            "raw_score": 0.10413196874150377,
+            "calibrated_score": 0.5546318289786223,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00172",
+            "label": 1,
+            "raw_score": 0.06601108377026485,
+            "calibrated_score": 0.5546318289786223,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00489",
+            "label": 1,
+            "raw_score": 0.10823735479554832,
+            "calibrated_score": 0.5546318289786223,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00565",
+            "label": 1,
+            "raw_score": 0.07953457504915162,
+            "calibrated_score": 0.5546318289786223,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00907",
+            "label": 1,
+            "raw_score": 0.04267908071555434,
+            "calibrated_score": 0.5546318289786223,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00024",
+            "label": 0,
+            "raw_score": 0.0935720877807505,
+            "calibrated_score": 0.5546318289786223,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00843",
+            "label": 1,
+            "raw_score": 0.16749846936018234,
+            "calibrated_score": 0.5546318289786223,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00364",
+            "label": 1,
+            "raw_score": 0.06782193950837828,
+            "calibrated_score": 0.5546318289786223,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00413",
+            "label": 0,
+            "raw_score": 0.06454314732648818,
+            "calibrated_score": 0.5546318289786223,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00850",
+            "label": 0,
+            "raw_score": 0.07009348834835367,
+            "calibrated_score": 0.5546318289786223,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-01105",
+            "label": 1,
+            "raw_score": 0.08919547067383078,
+            "calibrated_score": 0.5546318289786223,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00126",
+            "label": 1,
+            "raw_score": 0.1306476589159062,
+            "calibrated_score": 0.5546318289786223,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00316",
+            "label": 0,
+            "raw_score": 0.05634167648488739,
+            "calibrated_score": 0.5546318289786223,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00416",
+            "label": 1,
+            "raw_score": 0.09746228287326685,
+            "calibrated_score": 0.5546318289786223,
+            "prediction": 0
+          },
+          {
+            "pair_id": "corpus-a3-00712",
+            "label": 0,
+            "raw_score": 0.06714243189525358,
+            "calibrated_score": 0.5546318289786223,
+            "prediction": 0
+          }
+        ]
+      }
+    }
+  },
+  "best_aggregator": "current",
+  "token_control": {
+    "control_passed": true,
+    "expected": {
+      "precision": 0.1783,
+      "recall": 0.4808,
+      "f1": 0.2601,
+      "fpr": 0.0828,
+      "auc": 0.8489,
+      "tp": 138,
+      "fp": 636,
+      "fn": 149,
+      "tn": 7046
+    },
+    "actual": {
+      "tp": 138,
+      "fp": 636,
+      "fn": 149,
+      "tn": 7046,
+      "precision": 0.1783,
+      "recall": 0.4808,
+      "f1": 0.2601,
+      "fpr": 0.0828,
+      "auc": 0.8489
+    },
+    "mismatches": []
+  }
+}

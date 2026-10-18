@@ -1,0 +1,288 @@
+# Лёгкая постобработка: извлечение dev-чисел из существующего прогона
+# Не запускает precompute, не использует torch/HF модель
+# Только скачивает артефакты и создаёт сравнительную таблицу
+name: Постобработка span_expansion
+
+on:
+  push:
+    branches:
+      - arena/c5f69767-smarty-chumakov
+    paths:
+      - .github/postprocess-span-comparison.trigger
+  workflow_dispatch:
+    inputs:
+      source_run_id:
+        description: 'ID исходного прогона'
+        required: true
+        default: '39060670054'
+        type: string
+
+env:
+  SOURCE_RUN_ID: ${{ inputs.source_run_id || '39060670054' }}
+
+permissions:
+  actions: read
+  contents: write
+
+jobs:
+  extract-comparison:
+    name: Извлечение и сравнение
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      
+      - name: Validate SOURCE_RUN_ID
+        run: |
+          set -euo pipefail
+          if [[ ! "$SOURCE_RUN_ID" =~ ^[0-9]+$ ]]; then
+            echo "❌ SOURCE_RUN_ID должен быть числом: $SOURCE_RUN_ID"
+            exit 1
+          fi
+          echo "✓ SOURCE_RUN_ID валиден: $SOURCE_RUN_ID"
+      
+      - name: Get source run metadata
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          mkdir -p reports/experiments/a3
+          
+          gh api "repos/${GITHUB_REPOSITORY}/actions/runs/${SOURCE_RUN_ID}" \
+            > reports/experiments/a3/source_run.json
+          
+          SOURCE_COMMIT="$(python3 -c 'import json; print(json.load(open("reports/experiments/a3/source_run.json"))["head_sha"])')"
+          printf 'SOURCE_COMMIT=%s\n' "$SOURCE_COMMIT" >> "$GITHUB_ENV"
+          
+          echo "✓ Исходный run: $SOURCE_RUN_ID"
+          echo "✓ Исходный commit: $SOURCE_COMMIT"
+      
+      - name: Download artifacts from source run
+        uses: actions/download-artifact@v4
+        with:
+          repository: ${{ github.repository }}
+          run-id: ${{ env.SOURCE_RUN_ID }}
+          github-token: ${{ github.token }}
+          pattern: hf-experiment-a3-*
+          merge-multiple: false
+          path: reports/experiments/a3/raw
+      
+      - name: Normalize artifact structure
+        run: |
+          set -euo pipefail
+          
+          echo "Структура после скачивания:"
+          find reports/experiments/a3/raw -type f | sort
+          
+          # Проверяем наличие всех 4 вариантов
+          for variant in clause mask clause_capped mask_padded; do
+            src_dir="reports/experiments/a3/raw/hf-experiment-a3-${variant}"
+            
+            if [ ! -d "$src_dir" ]; then
+              echo "❌ Директория $src_dir не найдена"
+              exit 1
+            fi
+          done
+          
+          echo "✓ Все 4 варианта найдены"
+          
+          # Извлекаем experiment.json для каждого варианта
+          for variant in clause mask clause_capped mask_padded; do
+            src_dir="reports/experiments/a3/raw/hf-experiment-a3-${variant}"
+            dst_dir="reports/experiments/a3/${variant}"
+            
+            # Ищем experiment.json в любой вложенности
+            exp_file=$(find "$src_dir" -name "experiment.json" -type f)
+            
+            if [ -z "$exp_file" ]; then
+              echo "❌ experiment.json не найден в $src_dir"
+              exit 1
+            fi
+            
+            count=$(echo "$exp_file" | wc -l)
+            if [ "$count" -gt 1 ]; then
+              echo "❌ Найдено несколько experiment.json:"
+              echo "$exp_file"
+              exit 1
+            fi
+            
+            mkdir -p "$dst_dir"
+            cp "$exp_file" "$dst_dir/experiment.json"
+            echo "✓ Вариант $variant: скопирован $exp_file"
+          done
+          
+          # Не удаляем raw — оставляем для артефакта
+          echo "✓ Нормализация завершена"
+      
+      - name: Validate experiment.json files
+        run: |
+          set -euo pipefail
+          
+          python3 << 'PYEOF'
+          import json
+          import sys
+          from pathlib import Path
+          
+          variants = ["clause", "mask", "clause_capped", "mask_padded"]
+          errors = []
+          
+          for variant in variants:
+              exp_path = Path(f"reports/experiments/a3/{variant}/experiment.json")
+              if not exp_path.exists():
+                  errors.append(f"{variant}: файл не найден")
+                  continue
+              
+              data = json.loads(exp_path.read_text())
+              
+              # Проверяем mode
+              if data.get("mode") != "hf":
+                  errors.append(f"{variant}: mode != 'hf' (получено {data.get('mode')})")
+              
+              # Проверяем source_run_id
+              if str(data.get("run_id")) != "${{ env.SOURCE_RUN_ID }}":
+                  errors.append(f"{variant}: run_id mismatch (ожидался ${{ env.SOURCE_RUN_ID }}, получено {data.get('run_id')})")
+              
+              # Проверяем git_commit
+              if data.get("git_commit") != "${{ env.SOURCE_COMMIT }}":
+                  errors.append(f"{variant}: git_commit mismatch (ожидался ${{ env.SOURCE_COMMIT }}, получено {data.get('git_commit')})")
+              
+              # Проверяем test_official == null
+              if data.get("test_official") is not None:
+                  errors.append(f"{variant}: test_official должен быть null (получено {type(data.get('test_official')).__name__})")
+              
+              # Проверяем dev_official
+              dev = data.get("dev_official")
+              if not dev:
+                  errors.append(f"{variant}: dev_official отсутствует или пуст")
+                  continue
+              
+              if not dev.get("pairs") or dev["pairs"] <= 0:
+                  errors.append(f"{variant}: dev_official.pairs отсутствует или <= 0")
+              
+              # Проверяем обязательные метрики
+              for section in ["tokens", "spans", "answers", "verdicts"]:
+                  if section not in dev:
+                      errors.append(f"{variant}: dev_official.{section} отсутствует")
+                      continue
+                  
+                  # Проверяем token TP/FP/FN/TN/F1/FPR
+                  if section == "tokens":
+                      for key in ["tp", "fp", "fn", "tn", "f1", "fpr"]:
+                          if key not in dev["tokens"]:
+                              errors.append(f"{variant}: dev_official.tokens.{key} отсутствует")
+                          elif not isinstance(dev["tokens"][key], (int, float)):
+                              errors.append(f"{variant}: dev_official.tokens.{key} не число")
+          
+          if errors:
+              print("❌ Ошибки валидации:")
+              for err in errors:
+                  print(f"  - {err}")
+              sys.exit(1)
+          
+          print("✓ Все 4 файла валидны")
+          PYEOF
+      
+      - name: Run comparison script
+        run: |
+          set -euo pipefail
+          
+          python3 spanverify-module/scripts/compare_span_expansion.py \
+            --input-dir reports/experiments/a3 \
+            --out reports/experiments/a3/comparison.md \
+            --source-run-id "$SOURCE_RUN_ID" \
+            --source-commit "$SOURCE_COMMIT"
+          
+          # Проверяем создание файлов
+          if [ ! -f reports/experiments/a3/comparison.md ]; then
+            echo "❌ comparison.md не создан"
+            exit 1
+          fi
+          
+          if [ ! -f reports/experiments/a3/comparison.json ]; then
+            echo "❌ comparison.json не создан"
+            exit 1
+          fi
+          
+          echo "✓ Сравнение создано"
+      
+      - name: Upload comparison artifact
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: hf-p0-span-comparison
+          path: |
+            reports/experiments/a3/comparison.md
+            reports/experiments/a3/comparison.json
+            reports/experiments/a3/source_run.json
+            reports/experiments/a3/*/experiment.json
+            reports/experiments/a3/raw/**/*
+          retention-days: 30
+          if-no-files-found: error
+      
+      - name: Print summary
+        if: always()
+        run: |
+          if [ -f reports/experiments/a3/comparison.md ]; then
+            {
+              echo "### Сравнение вариантов span_expansion"
+              echo ""
+              echo "**Source run:** ${{ env.SOURCE_RUN_ID }}"
+              echo "**Source commit:** ${{ env.SOURCE_COMMIT }}"
+              echo "**Postprocess run:** ${{ github.run_id }}"
+              echo "**Postprocess commit:** ${{ github.sha }}"
+              echo ""
+              cat reports/experiments/a3/comparison.md
+            } >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "❌ comparison.md не создан" >> "$GITHUB_STEP_SUMMARY"
+          fi
+      
+      - name: Save report to branch
+        if: success()
+        run: |
+          set -euo pipefail
+          
+          # Создаём директорию для отчёта
+          REPORT_DIR="spanverify-module/reports/experiments/p0_span/run${SOURCE_RUN_ID}"
+          mkdir -p "$REPORT_DIR"
+          
+          # Копируем файлы отчёта
+          cp reports/experiments/a3/comparison.md "$REPORT_DIR/"
+          cp reports/experiments/a3/comparison.json "$REPORT_DIR/"
+          cp reports/experiments/a3/source_run.json "$REPORT_DIR/"
+          
+          for variant in clause mask clause_capped mask_padded; do
+            mkdir -p "$REPORT_DIR/${variant}"
+            cp "reports/experiments/a3/${variant}/experiment.json" "$REPORT_DIR/${variant}/"
+          done
+          
+          echo "✓ Отчёт сохранён в $REPORT_DIR"
+          
+          # Конфигурируем git
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          
+          # Добавляем только отчётную директорию
+          git add "$REPORT_DIR"
+          
+          # Коммитим и пушим с [skip ci]
+          git commit -m "chore: сохранить отчёт P0 span_expansion из run ${SOURCE_RUN_ID} [skip ci]"
+          
+          # Проверяем ветку перед push
+          CURRENT_BRANCH=$(git branch --show-current)
+          if [ "$CURRENT_BRANCH" != "arena/c5f69767-smarty-chumakov" ]; then
+            echo "❌ Ожидалась ветка arena/c5f69767-smarty-chumakov, получена $CURRENT_BRANCH"
+            exit 1
+          fi
+          
+          # Пушим
+          git push origin arena/c5f69767-smarty-chumakov
+          
+          echo "✓ Отчёт запушен в ветку"

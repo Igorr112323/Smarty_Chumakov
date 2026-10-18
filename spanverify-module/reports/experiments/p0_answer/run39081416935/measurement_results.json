@@ -1,0 +1,11 @@
+{
+  "measurement_run_id": "39081416935",
+  "measurement_commit": "7d3aa94246a04ece5dedbce17a0b4df764f3f694",
+  "cache_source_run_id": "39060670054",
+  "timestamp": "2026-10-18T00:05:11.985211Z",
+  "status": "success",
+  "message": "Упрощённое измерение завершено (тестовый режим)",
+  "train_pairs": 10,
+  "dev_pairs": 10,
+  "cache_files": 8
+}

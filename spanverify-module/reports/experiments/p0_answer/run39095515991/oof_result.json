@@ -1,0 +1,11 @@
+{
+  "status": "success",
+  "message": "OOF-\u043e\u0431\u0443\u0447\u0435\u043d\u0438\u0435 \u0440\u0430\u0431\u043e\u0442\u0430\u0435\u0442",
+  "train_pairs": 842,
+  "dev_pairs": 181,
+  "cache_keys": 1195,
+  "oof_pairs": 842,
+  "oof_auc": 0.5058155785630758,
+  "threshold": 0.580110498237569,
+  "duration_s": 339.06
+}

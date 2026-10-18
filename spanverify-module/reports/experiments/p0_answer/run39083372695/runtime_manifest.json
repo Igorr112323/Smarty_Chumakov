@@ -1,0 +1,59 @@
+{
+  "experiment_type": "p0_answer_aggregators_comparison",
+  "timestamp": "2026-10-18T00:38:04Z",
+  "duration_s": 48.55,
+  "dataset": "data/corpus_a3/pairs.jsonl",
+  "splits_dir": "data/corpus_a3/splits",
+  "train_pairs": 842,
+  "dev_pairs": 181,
+  "cache_source_run_id": "39060670054",
+  "measurement_run_id": "39083372695",
+  "measurement_commit": "bdd28007d64fc14504dbc9c3f5d8772d69daf1e6",
+  "baseline_bundle": {
+    "source_file": "reports/experiments/p0_span/run39060670054/clause_capped/experiment.json",
+    "source_run_id": "39060670054",
+    "source_commit": "14ea3a0792e0ca9502d9b78870dd2caf874f1163",
+    "model": "ai-forever/rugpt3small_based_on_gpt2",
+    "bundle_hash": "09fdf87fd91356aaa5afcac983637b4d23531fa2589c20eeeebce1e11c3a5755",
+    "span_z": 1.5,
+    "span_floor": 0.05,
+    "span_cap": 0.5,
+    "threshold": 0.595122
+  },
+  "verifier_config": {
+    "mode": "hf",
+    "model_name": "ai-forever/rugpt3small_based_on_gpt2",
+    "span_expansion": "clause_capped"
+  },
+  "cache_stats": {
+    "hits": 13354,
+    "misses": 0
+  },
+  "token_control": {
+    "control_passed": true,
+    "expected": {
+      "precision": 0.1783,
+      "recall": 0.4808,
+      "f1": 0.2601,
+      "fpr": 0.0828,
+      "auc": 0.8489,
+      "tp": 138,
+      "fp": 636,
+      "fn": 149,
+      "tn": 7046
+    },
+    "actual": {
+      "tp": 138,
+      "fp": 636,
+      "fn": 149,
+      "tn": 7046,
+      "precision": 0.1783,
+      "recall": 0.4808,
+      "f1": 0.2601,
+      "fpr": 0.0828,
+      "auc": 0.8489
+    },
+    "mismatches": []
+  },
+  "best_aggregator": "current"
+}
