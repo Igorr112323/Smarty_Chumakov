@@ -1556,3 +1556,26 @@ def extract_features(
     if mode == "hf":
         return hf_features(answer, context, **kwargs)
     return demo_features(answer, context, **kwargs)
+
+
+def hf_features_chunked(
+    answer: str,
+    context: str | Sequence[str] | None,
+    model_name: str = "ai-forever/rugpt3small_based_on_gpt2",
+    max_length: int = 1024,
+    answer_tokens: Sequence[Token] | None = None,
+    layer: int | str = "last",
+) -> FeatureMatrix:
+    """HF-признаки с обработкой по чанкам для длинных текстов.
+    
+    Для recovery не используется, но требуется для совместимости импорта.
+    Делегирует к hf_features с параметром max_length.
+    """
+    return hf_features(
+        answer=answer,
+        context=context,
+        model_name=model_name,
+        max_length=max_length,
+        answer_tokens=answer_tokens,
+        layer=layer,
+    )

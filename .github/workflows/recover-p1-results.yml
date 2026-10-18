@@ -1,0 +1,117 @@
+name: Recover P1 Results
+on:
+  push:
+    branches:
+      - arena/c5f69767-smarty-chumakov
+    paths:
+      - '.github/workflows/recover-p1-results.yml'
+      - 'scripts/recover_p1_results.py'
+  workflow_dispatch:
+
+jobs:
+  recover:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    
+    permissions:
+      actions: read
+      contents: write
+    
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+    
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
+    
+    - name: Download source artifacts
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        set -euo pipefail
+        SOURCE_RUN_ID=39116955685
+        mkdir -p /tmp/recovery_artifacts
+        
+        echo "Скачивание артефактов из run $SOURCE_RUN_ID..."
+        
+        # Скачиваем p1-comparison
+        gh run download "$SOURCE_RUN_ID" \
+          -n "p1-comparison-$SOURCE_RUN_ID" \
+          -D /tmp/recovery_artifacts/p1-comparison \
+          || echo "Warning: p1-comparison not found"
+        
+        # Скачиваем measurement logs
+        gh run download "$SOURCE_RUN_ID" \
+          -n "p1-measurement-logs-$SOURCE_RUN_ID" \
+          -D /tmp/recovery_artifacts/p1-measurement-logs \
+          || echo "Warning: p1-measurement-logs not found"
+        
+        echo "Содержимое артефактов:"
+        find /tmp/recovery_artifacts -type f | head -20
+        
+        ls -lh /tmp/recovery_artifacts/p1-comparison/ || true
+        ls -lh /tmp/recovery_artifacts/p1-measurement-logs/ || true
+    
+    - name: Run recovery script
+      run: |
+        set -euo pipefail
+        
+        SOURCE_RUN_ID=39116955685
+        SOURCE_SHA=b87850781b73d8630832cb972037158d0ec88927
+        
+        python3 scripts/recover_p1_results.py \
+          --artifacts-dir /tmp/recovery_artifacts \
+          --source-run-id "$SOURCE_RUN_ID" \
+          --source-sha "$SOURCE_SHA" \
+          --output-dir /tmp/recovery_output
+        
+        echo ""
+        echo "=== Результаты восстановления ==="
+        ls -lh /tmp/recovery_output/
+        
+        echo ""
+        echo "=== RECOVERED_RESULTS.md ==="
+        cat /tmp/recovery_output/RECOVERED_RESULTS.md || true
+    
+    - name: Commit and push recovered results
+      if: success()
+      run: |
+        set -euo pipefail
+        
+        RECOVERY_DIR="spanverify-module/reports/experiments/p1_recovered/run39116955685"
+        mkdir -p "$RECOVERY_DIR"
+        
+        cp -r /tmp/recovery_output/* "$RECOVERY_DIR/"
+        
+        git config user.name "github-actions[bot]"
+        git config user.email "github-actions[bot]@users.noreply.github.com"
+        
+        git add "$RECOVERY_DIR"
+        
+        RECOVERY_COMMIT=$(git rev-parse HEAD)
+        git commit -m "chore: восстановить P1-метрики из run 39116955685
+        
+        Source run: 39116955685
+        Source SHA: b87850781b73d8630832cb972037158d0ec88927
+        Recovery commit: $RECOVERY_COMMIT
+        
+        Независимый пересчёт метрик из evidence без переобучения.
+        [skip ci]" || echo "No changes to commit"
+        
+        git push origin arena/c5f69767-smarty-chumakov || {
+          echo "Push failed, attempting with retry..."
+          sleep 5
+          git pull --rebase origin arena/c5f69767-smarty-chumakov || true
+          git push origin arena/c5f69767-smarty-chumakov
+        }
+    
+    - name: Upload recovery summary
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: p1-recovery-summary-${{ github.run_id }}
+        path: /tmp/recovery_output/
+        retention-days: 30
