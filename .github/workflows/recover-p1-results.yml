@@ -58,10 +58,16 @@ jobs:
     - name: Run recovery script
       run: |
         set -euo pipefail
+        set -x  # Включить вывод команд
         
         SOURCE_RUN_ID=39116955685
         SOURCE_SHA=b87850781b73d8630832cb972037158d0ec88927
         
+        echo "=== Проверка артефактов ==="
+        ls -lhR /tmp/recovery_artifacts/ || echo "Артефакты не найдены"
+        
+        echo ""
+        echo "=== Запуск recovery script ==="
         python3 scripts/recover_p1_results.py \
           --artifacts-dir /tmp/recovery_artifacts \
           --source-run-id "$SOURCE_RUN_ID" \
@@ -113,5 +119,8 @@ jobs:
       if: always()
       with:
         name: p1-recovery-summary-${{ github.run_id }}
-        path: /tmp/recovery_output/
+        path: |
+          /tmp/recovery_output/
+          /tmp/recovery_artifacts/
         retention-days: 30
+        if-no-files-found: warn
