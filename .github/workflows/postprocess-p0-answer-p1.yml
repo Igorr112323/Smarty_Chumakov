@@ -1,0 +1,202 @@
+name: P0-3 P1 Answer Head
+on:
+  push:
+    branches:
+      - arena/c5f69767-smarty-chumakov
+    paths:
+      - 'spanverify-module/spanverify/answer_head.py'
+      - 'spanverify-module/spanverify/oof.py'
+      - 'spanverify-module/scripts/measure_p1.py'
+      - 'spanverify-module/tests/test_answer_head.py'
+      - '.github/workflows/postprocess-p0-answer-p1.yml'
+  workflow_dispatch:
+
+jobs:
+  measure-p1:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
+    
+    - name: Install dependencies
+      working-directory: spanverify-module
+      run: |
+        pip install -q --upgrade pip
+        pip install -q -r requirements.txt
+        pip install -q "torch~=2.14" --index-url https://download.pytorch.org/whl/cpu
+    
+    - name: Download cache from source run
+      uses: actions/download-artifact@v4
+      with:
+        pattern: hf-cache-a3-v2-*
+        path: spanverify-module/reports/hf-cache-v2-raw
+        run-id: 39060670054
+        github-token: ${{ secrets.GITHUB_TOKEN }}
+    
+    - name: Merge cache artifacts
+      working-directory: spanverify-module
+      run: |
+        set -euo pipefail
+        mkdir -p reports/hf-cache-v2
+        
+        for file in reports/hf-cache-v2-raw/*/features_shard*.jsonl; do
+          if [ -f "$file" ]; then
+            cp "$file" reports/hf-cache-v2/
+          fi
+        done
+        
+        echo "Объединённые файлы кеша:"
+        ls -lh reports/hf-cache-v2/
+    
+    - name: Download experiment artifact
+      uses: actions/download-artifact@v4
+      with:
+        name: hf-experiment-a3-clause_capped
+        path: spanverify-module/reports/experiments/p0_span/run39060670054/clause_capped
+        run-id: 39060670054
+        github-token: ${{ secrets.GITHUB_TOKEN }}
+    
+    - name: Verify cache and data
+      working-directory: spanverify-module
+      run: |
+        set -euo pipefail
+        
+        echo "=== Структура кеша ==="
+        ls -lh reports/hf-cache-v2/ || echo "Кеш не найден"
+        
+        echo ""
+        echo "=== Проверка baseline experiment ==="
+        if [ -f reports/experiments/p0_span/run39060670054/clause_capped/experiment.json ]; then
+          echo "✓ experiment.json найден"
+        else
+          echo "❌ experiment.json не найден!"
+          exit 1
+        fi
+        
+        echo ""
+        echo "=== Проверка данных ==="
+        echo "Train pairs: $(wc -l < data/corpus_a3/splits/train.jsonl)"
+        echo "Dev pairs: $(wc -l < data/corpus_a3/splits/dev.jsonl)"
+    
+    - name: Run regression tests
+      working-directory: spanverify-module
+      run: |
+        python -m pytest tests/test_answer_label.py tests/test_gold_counts.py tests/test_oof_protocol.py tests/test_calibration_fix.py tests/test_oof_public_pipeline.py tests/test_answer_head.py -v
+    
+    - name: Measure P1 answer head
+      id: measure
+      working-directory: spanverify-module
+      run: |
+        set -euo pipefail
+        mkdir -p reports/p0_answer_comparison
+        
+        echo "=== Запуск измерения P1 answer-головы ==="
+        
+        python -u -X faulthandler scripts/measure_p1.py \
+          --dataset data/corpus_a3/pairs.jsonl \
+          --splits data/corpus_a3/splits \
+          --mode hf \
+          --features-cache reports/hf-cache-v2 \
+          --baseline-experiment reports/experiments/p0_span/run39060670054/clause_capped/experiment.json \
+          --out reports/p0_answer_comparison \
+          --cache-source-run-id 39060670054 \
+          --measurement-run-id ${{ github.run_id }} \
+          --measurement-commit ${{ github.sha }} 2>&1 | tee reports/p0_answer_comparison/measurement.log
+        
+        echo ""
+        echo "=== Измерение завершено ==="
+        ls -lh reports/p0_answer_comparison/
+    
+    - name: Upload measurement logs
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: p1-measurement-logs-${{ github.run_id }}
+        path: |
+          spanverify-module/reports/p0_answer_comparison/measurement.log
+        retention-days: 7
+        if-no-files-found: warn
+    
+    - name: Upload results
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: p1-comparison-${{ github.run_id }}
+        path: |
+          spanverify-module/reports/p0_answer_comparison/
+        retention-days: 30
+        if-no-files-found: warn
+    
+    - name: Publish failure diagnostics to branch
+      if: failure()
+      run: |
+        set -euo pipefail
+        
+        MEASUREMENT_RUN_ID="${{ github.run_id }}"
+        DIAG_DIR="spanverify-module/reports/experiments/p0_answer/run${MEASUREMENT_RUN_ID}"
+        mkdir -p "$DIAG_DIR"
+        
+        # Копируем всё, что есть
+        if [ -d spanverify-module/reports/p0_answer_comparison ]; then
+          cp -r spanverify-module/reports/p0_answer_comparison/* "$DIAG_DIR/" || true
+        fi
+        
+        # Добавляем diagnostic manifest
+        cat > "$DIAG_DIR/diagnostic_manifest.json" <<DIAG_EOF
+        {
+          "status": "failure",
+          "run_id": "$MEASUREMENT_RUN_ID",
+          "commit": "${{ github.sha }}",
+          "workflow_run_url": "https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}",
+          "failed_step": "${{ steps.measure.outcome }}",
+          "timestamp": "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+        }
+        DIAG_EOF
+        
+        echo "Диагностические файлы:"
+        ls -lhR "$DIAG_DIR/"
+        
+        git config user.name "github-actions[bot]"
+        git config user.email "github-actions[bot]@users.noreply.github.com"
+        
+        git add "$DIAG_DIR"
+        git commit -m "chore: P1 diagnostic из failed run ${MEASUREMENT_RUN_ID} [skip ci]"
+        git push origin arena/c5f69767-smarty-chumakov
+    
+    - name: Save report to branch
+      if: success()
+      run: |
+        set -euo pipefail
+        
+        MEASUREMENT_RUN_ID="${{ github.run_id }}"
+        REPORT_DIR="spanverify-module/reports/experiments/p0_answer/run${MEASUREMENT_RUN_ID}"
+        mkdir -p "$REPORT_DIR"
+        
+        cp -r spanverify-module/reports/p0_answer_comparison/* "$REPORT_DIR/"
+        
+        echo "✓ Отчёт сохранён в $REPORT_DIR"
+        echo "  Файлы:"
+        ls -lh "$REPORT_DIR"
+        
+        git config user.name "github-actions[bot]"
+        git config user.email "github-actions[bot]@users.noreply.github.com"
+        
+        git add "$REPORT_DIR"
+        
+        git commit -m "chore: сохранить отчёт P1 сравнение baseline vs answer-head из run ${MEASUREMENT_RUN_ID} [skip ci]"
+        
+        CURRENT_BRANCH=$(git branch --show-current)
+        if [ "$CURRENT_BRANCH" != "arena/c5f69767-smarty-chumakov" ]; then
+          echo "❌ Ожидалась ветка arena/c5f69767-smarty-chumakov, получена $CURRENT_BRANCH"
+          exit 1
+        fi
+        
+        git push origin arena/c5f69767-smarty-chumakov
+        
+        echo "✓ Отчёт запушен в ветку"

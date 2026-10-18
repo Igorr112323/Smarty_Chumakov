@@ -56,6 +56,7 @@ from .features import (
     combine,
     extract_features,
     feature_cache_key,
+    hf_features_chunked,
     is_scored_token,
     number_attribution,
 )
@@ -156,6 +157,7 @@ class WeightsBundle:
     span_cap: float = 0.6
     isotonic: IsotonicCalibrator | None = None
     head: dict[str, Any] | None = None
+    answer_head: dict[str, Any] | None = None
     folds: list[dict[str, Any]] | None = None
     seed: int = 42
     version: str = "1.1.0"
@@ -176,6 +178,7 @@ class WeightsBundle:
                 "y": [round(v, 6) for v in (self.isotonic.values if self.isotonic else [])],
             },
             "head": self.head or {"type": "none", "file": None},
+            "answer_head": self.answer_head,
             "folds": self.folds or [],
             "seed": self.seed,
             "version": self.version,
@@ -216,6 +219,7 @@ class WeightsBundle:
             span_cap=float(data.get("span_cap", 0.6)),
             isotonic=calibrator,
             head=data.get("head"),
+            answer_head=data.get("answer_head"),
             folds=list(data.get("folds", [])),
             seed=int(data.get("seed", 42)),
             version=str(data.get("version", "1.1.0")),
@@ -299,6 +303,7 @@ class Verifier:
         verdict_rule: str | None = None,
         span_filter_min_chars: int = 0,
         verdict_params: Mapping[str, Any] | None = None,
+        span_expansion: str = "clause",
     ) -> None:
         self.config = config or Config.load()
         # Правило вердикта берётся из замороженного артефакта калибровки
@@ -320,6 +325,15 @@ class Verifier:
         # помечается. 0 — фильтр выключен (текущее поведение). Порог задаётся
         # снаружи и по тесту не подбирается.
         self.span_filter_min_chars = int(span_filter_min_chars)
+        # Расширение границ фрагментов маски:
+        # - clause (текущий): до границ клаузы (предложение, суженное до запятых/тире)
+        # - mask: ровно по помеченным токенам, без расширения
+        # - clause_capped: клауза, но не шире max(40 знаков, 2 × ширина маски)
+        # - mask_padded: маска + по одному соседнему токену слева и справа
+        # Вариант выбирается на dev и не подстраивается под тест.
+        if span_expansion not in ("clause", "mask", "clause_capped", "mask_padded"):
+            raise ValueError(f"неизвестный span_expansion: {span_expansion!r}")
+        self.span_expansion = span_expansion
         # Явно переданные веса имеют приоритет: иначе обучение, которое считает
         # сквозные метрики «в памяти», случайно перечитало бы файл с диска.
         self.bundle = weights if weights is not None else WeightsBundle.load(weights_path)
@@ -351,6 +365,9 @@ class Verifier:
         # Оценка доли участия ИИ (требование заявки) — отдельная голова; если
         # файла нет, поле остаётся нулевым и это видно в stats.
         self.participation = self._load_participation()
+        # P1 answer-голова: отдельная модель на сводках HF-признаков (37 признаков).
+        # Если в бандле есть answer_head, загружаем его как AnswerHeadModel.
+        self._answer_head_model = self._load_answer_head()
 
     # ---------------------------------------------------------------- доступ
 
@@ -364,6 +381,21 @@ class Verifier:
                 except (OSError, ValueError, KeyError):
                     return None
         return None
+    
+    def _load_answer_head(self) -> Any | None:
+        """Загрузить P1 answer-голову из бандла, если есть."""
+        if self.bundle.answer_head is None:
+            return None
+        try:
+            from .answer_head import AnswerHeadModel
+            return AnswerHeadModel.from_dict(self.bundle.answer_head)
+        except (ValueError, KeyError):
+            return None
+    
+    @property
+    def answer_head_model(self) -> Any | None:
+        """P1 answer-голова (AnswerHeadModel), если загружена."""
+        return self._answer_head_model
 
     @property
     def detector(self) -> Detector:
@@ -464,7 +496,24 @@ class Verifier:
             ]
         )
 
-        raw_score = _answer_score(scored)
+        # Вычисление raw answer score
+        if self._answer_head_model is not None:
+            # P1 answer-голова: извлекаем 37 признаков из полных FeatureMatrix
+            from .answer_head import extract_answer_features
+            # Создаём scored_mask для всех токенов
+            scored_mask = [i in set(scored_indices) for i in range(len(tokens))]
+            # Извлекаем признаки для всех токенов
+            features_list = []
+            for i in range(len(tokens)):
+                features_dict = {name: getattr(features, name)[i] for name in FEATURE_NAMES}
+                features_list.append(features_dict)
+            # Извлекаем answer-признаки (37)
+            answer_features_vector = extract_answer_features(features_list, scored_mask)
+            # Предсказываем raw score через P1
+            raw_score = self._answer_head_model.predict(answer_features_vector)
+        else:
+            # Legacy: token-head risk → current агрегатор
+            raw_score = _answer_score(scored)
         score = self._calibrate(raw_score)
         threshold = self.bundle.threshold
         ai_share_soft, ai_share_hard = self._shares(tokens, smoothed, scored_indices, spans)
@@ -616,14 +665,29 @@ class Verifier:
     def _features(self, answer: str, context: str | Sequence[str] | None, tokens: Sequence[Token]) -> FeatureMatrix:
         cache = self.features_cache
         if self.mode == "hf":
+            max_length = getattr(self.config, "hf_max_tokens", 512)
             if cache is not None:
                 # Ключ считается здесь, а не внутри extract_features: модель
-                # известна наверняка только верификатору.
-                key = feature_cache_key(answer, context, "hf", self.model_name)
+                # известна наверняка только верификатору. Включаем chunking=True
+                # чтобы ключ отличался от не-чанкованного кеша.
+                key = feature_cache_key(
+                    answer,
+                    context,
+                    "hf",
+                    self.model_name,
+                    chunking=True,
+                    max_length=max_length,
+                )
                 hit = cache.get(key)
                 if hit is not None:
                     return hit
-            return extract_features(answer, context, mode="hf", model_name=self.model_name, answer_tokens=tokens)
+            return hf_features_chunked(
+                answer,
+                context,
+                model_name=self.model_name,
+                max_length=max_length,
+                answer_tokens=tokens,
+            )
         return extract_features(answer, context, mode="demo", answer_tokens=tokens)
 
     def _span_threshold(self, risk: Sequence[float]) -> float:
@@ -804,7 +868,43 @@ class Verifier:
         for group in groups:
             keep_start = tokens[group[0]].start
             keep_end = tokens[group[-1]].end
-            start, end = _shrink_to_clause(answer, keep_start, keep_end, keep_start, keep_end)
+            # Выбор стратегии расширения границ в зависимости от span_expansion
+            if self.span_expansion == "mask":
+                # Ровно по помеченным токенам, без расширения
+                start, end = keep_start, keep_end
+            elif self.span_expansion == "clause":
+                # Текущее поведение: расширение до границ клаузы
+                start, end = _shrink_to_clause(answer, keep_start, keep_end, keep_start, keep_end)
+            elif self.span_expansion == "clause_capped":
+                # Клауза, но не шире max(40 знаков, 2 × ширина маски)
+                clause_start, clause_end = _shrink_to_clause(answer, keep_start, keep_end, keep_start, keep_end)
+                mask_width = keep_end - keep_start
+                max_width = max(40, 2 * mask_width)
+                # Обрезаем клаузу до max_width, центрируя на маске
+                clause_width = clause_end - clause_start
+                if clause_width > max_width:
+                    # Центрируем на середине маски
+                    mask_mid = (keep_start + keep_end) // 2
+                    start = max(clause_start, mask_mid - max_width // 2)
+                    end = min(clause_end, start + max_width)
+                    # Убеждаемся, что маска полностью внутри
+                    start = min(start, keep_start)
+                    end = max(end, keep_end)
+                else:
+                    start, end = clause_start, clause_end
+            elif self.span_expansion == "mask_padded":
+                # Маска + по одному соседнему токену слева и справа
+                start = keep_start
+                end = keep_end
+                # Добавляем токен слева, если есть
+                if group[0] > 0:
+                    start = tokens[group[0] - 1].start
+                # Добавляем токен справа, если есть
+                if group[-1] < len(tokens) - 1:
+                    end = tokens[group[-1] + 1].end
+            else:
+                # Не должно произойти из-за проверки в __init__
+                raise ValueError(f"неизвестный span_expansion: {self.span_expansion!r}")
             fragment = answer[start:end]
             if not fragment.strip():
                 continue
@@ -1249,6 +1349,7 @@ def _token_payload(
                     if index < len(getattr(features, name))
                 },
                 "risk": round(risk[index], 4),
+                "raw_risk": risk[index],  # Неокруглённое значение для точных вычислений
                 "flagged": flagged,
                 "label": (
                     "likely_hallucination"
