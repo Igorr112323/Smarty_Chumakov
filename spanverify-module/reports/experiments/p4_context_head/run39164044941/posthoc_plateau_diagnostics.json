@@ -1,0 +1,105 @@
+{
+  "posthoc_only": true,
+  "fit_or_search": false,
+  "public_state_mismatches": [],
+  "p4_by_source": {
+    "mask": {
+      "precision": 0.40229885057471265,
+      "recall": 0.3645833333333333,
+      "f1": 0.38251366120218583,
+      "tp": 35,
+      "fp": 52,
+      "fn": 61,
+      "iou_threshold": 0.5,
+      "fp_clean_spans": 38,
+      "fp_dirty_spans": 14,
+      "no_overlap_predictions": 50,
+      "overlap_below_05_predictions": 2,
+      "gold_with_multiple_overlapping_predictions": 0
+    },
+    "attribution": {
+      "precision": 0.25,
+      "recall": 0.020833333333333332,
+      "f1": 0.038461538461538464,
+      "tp": 2,
+      "fp": 6,
+      "fn": 94,
+      "iou_threshold": 0.5,
+      "fp_clean_spans": 1,
+      "fp_dirty_spans": 5,
+      "no_overlap_predictions": 1,
+      "overlap_below_05_predictions": 5,
+      "gold_with_multiple_overlapping_predictions": 1
+    },
+    "coverage": {
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1": 0.0,
+      "tp": 0,
+      "fp": 0,
+      "fn": 96,
+      "iou_threshold": 0.5,
+      "fp_clean_spans": 0,
+      "fp_dirty_spans": 0,
+      "no_overlap_predictions": 0,
+      "overlap_below_05_predictions": 0,
+      "gold_with_multiple_overlapping_predictions": 0
+    },
+    "final": {
+      "precision": 0.4065934065934066,
+      "recall": 0.3854166666666667,
+      "f1": 0.39572192513368987,
+      "tp": 37,
+      "fp": 54,
+      "fn": 59,
+      "iou_threshold": 0.5,
+      "fp_clean_spans": 39,
+      "fp_dirty_spans": 15,
+      "no_overlap_predictions": 51,
+      "overlap_below_05_predictions": 3,
+      "gold_with_multiple_overlapping_predictions": 0
+    }
+  },
+  "p4_gold_geometry": {
+    "gold_without_eligible_scored_token": 17,
+    "gold_with_eligible_but_no_retained_mask_overlap": 40,
+    "gold_with_retained_overlap_but_no_final_strict_match": 2,
+    "gold_strict_matched_by_final": 37
+  },
+  "p4_token_errors": {
+    "fn_edge_tokens": 92,
+    "fn_interior_tokens": 24,
+    "fp_clean_tokens": 146,
+    "fp_dirty_tokens": 51
+  },
+  "historical_final_errors": {
+    "p2": {
+      "precision": 0.1625,
+      "recall": 0.40625,
+      "f1": 0.23214285714285718,
+      "tp": 39,
+      "fp": 201,
+      "fn": 57,
+      "iou_threshold": 0.5,
+      "fp_clean_spans": 102,
+      "fp_dirty_spans": 99,
+      "no_overlap_predictions": 165,
+      "overlap_below_05_predictions": 36,
+      "gold_with_multiple_overlapping_predictions": 14
+    },
+    "p3": {
+      "precision": 0.3469387755102041,
+      "recall": 0.3541666666666667,
+      "f1": 0.3505154639175258,
+      "tp": 34,
+      "fp": 64,
+      "fn": 62,
+      "iou_threshold": 0.5,
+      "fp_clean_spans": 43,
+      "fp_dirty_spans": 21,
+      "no_overlap_predictions": 59,
+      "overlap_below_05_predictions": 5,
+      "gold_with_multiple_overlapping_predictions": 0
+    }
+  }
+}

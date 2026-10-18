@@ -1,0 +1,6 @@
+# Optional CPU token-head fit/export tests (P2/P4), installed explicitly by CI.
+# NOT a runtime / delivery / executable build dependency. No tests are skipped.
+# Same measured training stack as the P4 runner; pure runtime stays stdlib-only.
+numpy==1.26.4
+scipy==1.13.1
+scikit-learn==1.5.2

@@ -1,0 +1,8 @@
+{
+  "train_documents": 265,
+  "dev_documents": 62,
+  "shared_documents": [],
+  "shared_groups": [],
+  "official_test_read": false,
+  "scope": "independent post-run audit of unchanged train/dev IDs; fit-fold preflight is separately in fit_receipts.json"
+}

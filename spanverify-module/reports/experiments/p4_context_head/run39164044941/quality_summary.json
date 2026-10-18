@@ -1,0 +1,16 @@
+{
+  "independent_scope": "public dev181, not official acceptance",
+  "contract_joint_f1_min": 0.5,
+  "contract_fpr_max": 0.4,
+  "contract_all_families_passed": false,
+  "token_gate_passed": true,
+  "answer_gate_passed": true,
+  "strict_span_gate_passed": false,
+  "span_fpr_definition": "existing token FPR proxy, no invented span TN",
+  "reserve_f1_min": 0.6,
+  "reserve_fpr_max": 0.3,
+  "reserve_joint_passed": false,
+  "verdict_watch_max_fpr": 0.3,
+  "verdict_watch_passed": true,
+  "official_test_read": false
+}

@@ -54,7 +54,7 @@ jobs:
       - name: Зависимости проверки
         run: |
           python -m pip install --upgrade pip
-          python -m pip install -r requirements.txt
+          python -m pip install -r requirements.txt -r requirements-token-head-tests.txt
 
       - name: Линтер (ruff)
         run: python -m ruff check .
@@ -147,7 +147,7 @@ jobs:
       - name: Зависимости
         run: |
           python -m pip install --upgrade pip
-          python -m pip install -r spanverify-module/requirements.txt
+          python -m pip install -r spanverify-module/requirements.txt -r spanverify-module/requirements-token-head-tests.txt
 
       - name: Контрактные тесты
         working-directory: spanverify-module
@@ -202,7 +202,7 @@ jobs:
       - name: Зависимости тестов
         run: |
           python -m pip install --upgrade pip
-          python -m pip install pytest "pyyaml~=6.0"
+          python -m pip install pytest "pyyaml~=6.0" -r requirements-token-head-tests.txt
 
       - name: Тесты
         run: python -m pytest -q
@@ -356,7 +356,7 @@ jobs:
       - name: Зависимости
         run: |
           python -m pip install --upgrade pip
-          python -m pip install -r requirements.txt
+          python -m pip install -r requirements.txt -r requirements-token-head-tests.txt
 
       - name: Скачать отчёт покрытия
         uses: actions/download-artifact@v4

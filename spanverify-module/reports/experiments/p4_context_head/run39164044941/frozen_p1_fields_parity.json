@@ -1,0 +1,12 @@
+{
+  "identical_except_allowed_token_fields": true,
+  "allowed_changed_fields": [
+    "context_features_spec",
+    "localization_decoder",
+    "token_head"
+  ],
+  "source_p2_code_sha": "7e0ed4454180c9c1ff0bf39ffbec5b993e41ade5",
+  "source_p3_code_sha": "36d92c5524c96a7ea7e05ce8490aff94e507d69a",
+  "source_train_sha256": "75c2504acefb6a3c325f8b3b94c1e4da9ec441d9440c1cfd07c16eb8e49040a2",
+  "source_dev_sha256": "cba705f836d9c25f28fc162b5cbf89b52bfabe7c47c56e2a4d6d652cded2c2dd"
+}
