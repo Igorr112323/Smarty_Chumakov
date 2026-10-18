@@ -1,0 +1,93 @@
+{
+  "run_id": "39164044941",
+  "code_sha": "4f0099384e165bae7006a64fbca52e2440cc4c18",
+  "source": {
+    "p2_run": 39155368906,
+    "p3_run": 39160817890,
+    "p3_code": "36d92c5524c96a7ea7e05ce8490aff94e507d69a",
+    "sources": {
+      "source_oof_states.jsonl.gz": {
+        "raw_sha256": "5ca0ff5121707e950a4a710c8d733c092aeca477857ca146847c5de0ef98959b",
+        "gzip_sha256": "96facdab18c9cb01c7a53a523c700c1b829c0105714fdc68a2cddf12ff01297d",
+        "bytes": 5742956
+      },
+      "source_dev_evidence.jsonl.gz": {
+        "raw_sha256": "e54d290b4894246e61a256af5568af500bc979997d7ab72e7f6ea237129d31ce",
+        "gzip_sha256": "926ca9d19ca100017df9349af2f8c4c69c6adc56ee5a4baca0dea4c0e15d1465",
+        "bytes": 3932617
+      }
+    }
+  },
+  "recipe": {
+    "loss": "log_loss",
+    "n_estimators": 80,
+    "learning_rate": 0.05,
+    "max_depth": 3,
+    "min_samples_leaf": 20,
+    "subsample": 1.0,
+    "init": "zero",
+    "random_state": 42
+  },
+  "train_pairs": 842,
+  "dev_pairs": 181,
+  "official_test_read": false,
+  "pairs_file_read": false,
+  "corpus_hash_scope": "actual train/dev; pairs/test hashes verified as manifest declarations only to avoid reading test",
+  "cache_keys": 1195,
+  "cache_hits": 1928,
+  "cache_misses": 0,
+  "fresh_hf_inference": false,
+  "classifiers_fit": 51,
+  "timings": {
+    "validation_and_pre_fit_diagnostics": 1.995179358999998,
+    "all_10_models_oof": 2014.2462149859998,
+    "registered_decoder_selection": 28.40443875400024,
+    "final_fit": 54.644700644000295,
+    "dev_replay_and_parity": 6.5594011829998635
+  },
+  "total_seconds": 2110.545009613,
+  "python": "3.11.17",
+  "numpy": "1.26.4",
+  "sklearn": "1.5.2",
+  "candidate_sha256": "e6c96ea4390dbf124540c413594110180f84d9be9d5c13ad1577232b70ee9e48",
+  "sizes": {
+    "dev_error_decomposition.json": 59,
+    "source_dev_evidence.jsonl.gz": 570090,
+    "p1_parity.json": 372,
+    "p4_token_head.json": 100127,
+    "context_diagnostics.json": 84144,
+    "k1_w4_oof.jsonl.gz": 608714,
+    "all_family_metrics.json": 10458,
+    "selected_decoder.json": 969,
+    "oof_oracle_diagnostic.json": 412,
+    "k3_w1_oof.jsonl.gz": 618264,
+    "k3_w4_oof.jsonl.gz": 620197,
+    "dev_answers.jsonl": 34717,
+    "selected_model.json": 757,
+    "dev_evidence.jsonl.gz": 575319,
+    "historical_evidence_parity.json": 2560,
+    "measurement.log": 8906,
+    "source_oof_states.jsonl.gz": 1379585,
+    "k2_w4_oof.jsonl.gz": 619069,
+    "fit_receipts.json": 409572,
+    "k2_w2_oof.jsonl.gz": 620652,
+    "kNone_w1_oof.jsonl.gz": 588459,
+    "p2_control_parity.json": 1285,
+    "k2_w1_oof.jsonl.gz": 614730,
+    "combined_bundle.json": 120455,
+    "source_provenance.json": 616,
+    "grid_scores.jsonl.gz": 99109,
+    "oof_validation.json": 206,
+    "model_grid_scores.json": 8283,
+    "runtime_parity.json": 161,
+    "tests.log": 160,
+    "numeric_candidates.json": 1594,
+    "feature_specs.json": 7764,
+    "k1_w2_oof.jsonl.gz": 608874,
+    "final_fit.json": 129,
+    "k1_w1_oof.jsonl.gz": 607796,
+    "selection_protocol.json": 820,
+    "runtime_config.json": 2969,
+    "k3_w2_oof.jsonl.gz": 621532
+  }
+}

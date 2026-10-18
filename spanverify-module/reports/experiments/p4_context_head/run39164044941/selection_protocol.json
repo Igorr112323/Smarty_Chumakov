@@ -1,0 +1,57 @@
+{
+  "candidates": [
+    [
+      null,
+      1
+    ],
+    [
+      1,
+      1
+    ],
+    [
+      1,
+      2
+    ],
+    [
+      1,
+      4
+    ],
+    [
+      2,
+      1
+    ],
+    [
+      2,
+      2
+    ],
+    [
+      2,
+      4
+    ],
+    [
+      3,
+      1
+    ],
+    [
+      3,
+      2
+    ],
+    [
+      3,
+      4
+    ]
+  ],
+  "class_weights": "fit-only balanced sample weights times positive multiplier w; control matches P2",
+  "recipe": {
+    "loss": "log_loss",
+    "n_estimators": 80,
+    "learning_rate": 0.05,
+    "max_depth": 3,
+    "min_samples_leaf": 20,
+    "subsample": 1.0,
+    "init": "zero",
+    "random_state": 42
+  },
+  "model_selection": "max min(token F1, strict span F1), FPR<=.30, tie lower FPR under FROZEN P3 decoder; then registered 1300-point procedure on winner only",
+  "dev_tuning": false
+}

@@ -1,0 +1,7 @@
+{
+  "sklearn_export_max_delta": 0.0,
+  "fit_tokens": 46607,
+  "positive": 1384,
+  "negative": 45223,
+  "positive_multiplier": 1
+}

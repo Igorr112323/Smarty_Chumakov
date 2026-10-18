@@ -1,0 +1,17 @@
+{
+  "p2_run": 39155368906,
+  "p3_run": 39160817890,
+  "p3_code": "36d92c5524c96a7ea7e05ce8490aff94e507d69a",
+  "sources": {
+    "source_oof_states.jsonl.gz": {
+      "raw_sha256": "5ca0ff5121707e950a4a710c8d733c092aeca477857ca146847c5de0ef98959b",
+      "gzip_sha256": "96facdab18c9cb01c7a53a523c700c1b829c0105714fdc68a2cddf12ff01297d",
+      "bytes": 5742956
+    },
+    "source_dev_evidence.jsonl.gz": {
+      "raw_sha256": "e54d290b4894246e61a256af5568af500bc979997d7ab72e7f6ea237129d31ce",
+      "gzip_sha256": "926ca9d19ca100017df9349af2f8c4c69c6adc56ee5a4baca0dea4c0e15d1465",
+      "bytes": 3932617
+    }
+  }
+}
