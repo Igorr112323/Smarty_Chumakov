@@ -1,0 +1,138 @@
+name: P1 Public Replay
+on:
+  push:
+    branches:
+      - arena/c5f69767-smarty-chumakov
+    paths:
+      - '.github/workflows/p1-public-replay.yml'
+      - 'spanverify-module/scripts/build_p1_candidate.py'
+      - 'spanverify-module/scripts/replay_p1_dev.py'
+      - 'spanverify-module/reports/experiments/p1_raw/run39116955685/p1_model.json'
+      - 'spanverify-module/reports/experiments/p1_raw/run39116955685/calibrator_p1.json'
+      - 'spanverify-module/reports/experiments/p1_raw/run39116955685/thresholds.json'
+      - 'spanverify-module/reports/experiments/p1_raw/run39116955685/baseline_bundle.json'
+  workflow_dispatch:
+
+jobs:
+  replay:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
+    
+    - name: Install dependencies
+      working-directory: spanverify-module
+      run: |
+        pip install -q --upgrade pip
+        pip install -q -r requirements.txt
+        pip install -q "torch~=2.14" --index-url https://download.pytorch.org/whl/cpu
+    
+    - name: Download cache from source run
+      uses: actions/download-artifact@v4
+      with:
+        pattern: hf-cache-a3-v2-*
+        path: spanverify-module/reports/hf-cache-v2-raw
+        run-id: 39060670054
+        github-token: ${{ secrets.GITHUB_TOKEN }}
+    
+    - name: Merge cache artifacts
+      working-directory: spanverify-module
+      run: |
+        set -euo pipefail
+        mkdir -p reports/hf-cache-v2
+        
+        for file in reports/hf-cache-v2-raw/*/features_shard*.jsonl; do
+          if [ -f "$file" ]; then
+            cp "$file" reports/hf-cache-v2/
+          fi
+        done
+        
+        echo "Объединённые файлы кеша:"
+        ls -lh reports/hf-cache-v2/
+    
+    - name: Verify source artifacts
+      working-directory: spanverify-module
+      run: |
+        set -euo pipefail
+        
+        SOURCE_DIR="reports/experiments/p1_raw/run39116955685"
+        
+        echo "Проверка исходных артефактов..."
+        
+        for file in p1_model.json calibrator_p1.json thresholds.json baseline_bundle.json dev_predictions.jsonl; do
+          if [ -f "$SOURCE_DIR/$file" ]; then
+            echo "✓ $file"
+          else
+            echo "✗ $file NOT FOUND"
+            exit 1
+          fi
+        done
+        
+        echo ""
+        echo "SHA-256 checksums:"
+        sha256sum "$SOURCE_DIR/p1_model.json"
+        sha256sum "$SOURCE_DIR/calibrator_p1.json"
+        sha256sum "$SOURCE_DIR/thresholds.json"
+    
+    - name: Build P1 candidate
+      working-directory: spanverify-module
+      run: |
+        set -euo pipefail
+        
+        SOURCE_DIR="reports/experiments/p1_raw/run39116955685"
+        
+        echo "Сборка P1 кандидата..."
+        python3 scripts/build_p1_candidate.py "$SOURCE_DIR"
+        
+        echo ""
+        echo "P1 кандидат:"
+        ls -lh "$SOURCE_DIR/p1_candidate_bundle.json"
+        sha256sum "$SOURCE_DIR/p1_candidate_bundle.json"
+    
+    - name: Public replay on dev
+      working-directory: spanverify-module
+      run: |
+        set -euo pipefail
+        
+        SOURCE_DIR="reports/experiments/p1_raw/run39116955685"
+        
+        echo "Публичный replay через Verifier..."
+        python3 scripts/replay_p1_dev.py "$SOURCE_DIR" reports/hf-cache-v2 2>&1 | tee "$SOURCE_DIR/replay.log"
+        
+        echo ""
+        echo "Результаты replay:"
+        cat "$SOURCE_DIR/score_parity_report.json"
+    
+    - name: Upload replay results
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: p1-replay-results
+        path: |
+          spanverify-module/reports/experiments/p1_raw/run39116955685/p1_candidate_bundle.json
+          spanverify-module/reports/experiments/p1_raw/run39116955685/public_replay.jsonl
+          spanverify-module/reports/experiments/p1_raw/run39116955685/score_parity_report.json
+          spanverify-module/reports/experiments/p1_raw/run39116955685/replay.log
+        retention-days: 30
+    
+    - name: Commit replay results
+      if: success()
+      run: |
+        set -euo pipefail
+        
+        git config user.name "github-actions[bot]"
+        git config user.email "github-actions[bot]@users.noreply.github.com"
+        
+        git add spanverify-module/reports/experiments/p1_raw/run39116955685/p1_candidate_bundle.json
+        git add spanverify-module/reports/experiments/p1_raw/run39116955685/public_replay.jsonl
+        git add spanverify-module/reports/experiments/p1_raw/run39116955685/score_parity_report.json
+        git add spanverify-module/reports/experiments/p1_raw/run39116955685/replay.log
+        
+        git commit -m "reports: P1 public replay on dev [skip ci]"
+        git push origin arena/c5f69767-smarty-chumakov
