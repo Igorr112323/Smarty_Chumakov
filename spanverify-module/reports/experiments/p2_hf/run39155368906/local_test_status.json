@@ -1,0 +1,33 @@
+{
+  "code_sha": "7e0ed4454180c9c1ff0bf39ffbec5b993e41ade5",
+  "targeted_tests": 56,
+  "targeted_status": "passed local and runner",
+  "full_suite": "failed",
+  "failure_count": 22,
+  "failure_nodes": [
+    "FAILED tests/test_calibration.py::test_cross_validate_reports_folds_and_mean",
+    "FAILED tests/test_check_numbers.py::test_coverage_pattern_decimal - Assertion...",
+    "FAILED tests/test_check_numbers.py::test_trap_wrong_coverage - AssertionError...",
+    "FAILED tests/test_ci_workflows.py::test_document_lists_every_workflow - Asser...",
+    "FAILED tests/test_context_stack.py::test_train_produces_valid_bundle - Assert...",
+    "FAILED tests/test_contract_provenance.py::test_contract_provenance_local_or_ci",
+    "FAILED tests/test_feature_cache_roundtrip.py::test_dump_load_roundtrip_preserves_all_features",
+    "FAILED tests/test_feature_cache_roundtrip.py::test_collect_samples_works_with_cached_matrix",
+    "FAILED tests/test_metrics_files.py::test_metrics_file_is_not_behind_the_suite",
+    "FAILED tests/test_metrics_files.py::test_document_test_claims_match_this_session",
+    "FAILED tests/test_metrics_files.py::test_evaluate_reports_verdict_metrics - A...",
+    "FAILED tests/test_no_test_isolation.py::test_no_test_without_splits_errors - ...",
+    "FAILED tests/test_no_test_isolation.py::test_no_test_with_splits_excludes_test",
+    "FAILED tests/test_number_attribution.py::test_attribution_requires_two_measurements",
+    "FAILED tests/test_number_words_in_answer.py::test_answer_with_number_in_words_is_grounded",
+    "FAILED tests/test_server_cli.py::test_service_verify_accepts_context_list - A...",
+    "FAILED tests/test_server_cli.py::test_cli_verify_confirmed_answer - assert 1 ...",
+    "FAILED tests/test_server_cli.py::test_cli_selftest_passes - assert 2 == 0",
+    "FAILED tests/test_verdict_rule.py::test_demo_pair_single_token_verdict_before_after",
+    "FAILED tests/test_verdict_rule.py::test_evaluate_tokens_identical_under_both_rules",
+    "FAILED tests/test_workflow_limits.py::test_no_job_is_longer_than_the_limit[postprocess-p0-answer-p1.yml]",
+    "FAILED tests/test_workflow_limits.py::test_no_job_is_longer_than_the_limit[postprocess-p0-answer.yml]"
+  ],
+  "yaml_dependency": "PyYAML 6.0.2 installed; no YAML import/parser error",
+  "workflow_limit_failures": "two historical postprocess workflows request 60 minutes against 40-minute limit; P2 now respects 40"
+}

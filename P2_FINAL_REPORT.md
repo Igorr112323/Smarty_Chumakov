@@ -1,3 +1,5 @@
+> Актуальный реальный HF-результат: [P2_HF_REPORT.md](P2_HF_REPORT.md), run 39155368906. P2 quality norms НЕ достигнуты. Ниже — исторический отчёт.
+
 > Historical diagnostic report, NOT a quality run. The percentage below is not measured contractual readiness. run1 used demo, handwritten placeholder, fitting_pairs=0, dev_pairs_checked=10, influence_pairs=1.
 
 # P2 Token-Head: Финальный отчёт
