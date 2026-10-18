@@ -1,3 +1,5 @@
+> Historical diagnostic report, NOT a quality run. The percentage below is not measured contractual readiness. run1 used demo, handwritten placeholder, fitting_pairs=0, dev_pairs_checked=10, influence_pairs=1.
+
 # P2 Token-Head: Финальный отчёт
 
 **Дата:** 2026-10-18  

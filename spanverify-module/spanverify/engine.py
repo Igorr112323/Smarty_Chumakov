@@ -21,6 +21,7 @@
 from __future__ import annotations
 
 import json
+import math
 import re
 import sys
 import time
@@ -533,21 +534,8 @@ class Verifier:
         masked = [risk[i] if i in scored_set else 0.0 for i in range(len(risk))]
         smoothed = _smooth(masked, SMOOTH_WINDOW)
         scored = [smoothed[i] for i in scored_indices] or [0.0]
-        span_threshold = span_threshold_for(scored, self.bundle.span_z, self.bundle.span_floor, self.bundle.span_cap)
-        mask_spans = self._build_spans(answer, tokens, smoothed, span_threshold)
-        # Вариант маски «короткий фрагмент без числа не помечается»: токены
-        # отброшенных фрагментов перестают считаться помеченными и в метриках.
-        kept_flagged: set[int] | None = None
-        if self.span_filter_min_chars > 0:
-            mask_spans, kept_flagged = self._filter_short_mask_spans(mask_spans)
-        # Правило привязки числа к объекту (дефект D): текстовое, поверх маски.
-        spans = _merge_spans(
-            [
-                *mask_spans,
-                *self._attribution_spans(answer, context_text, tokens, smoothed, span_threshold),
-                *self._coverage_spans(answer, coverage_context, tokens, span_threshold),
-            ]
-        )
+        span_threshold, spans, kept_flagged = self._localize(
+            answer, context_text, coverage_context, tokens, smoothed, scored)
 
         # Вычисление raw answer score
         if self._answer_head_model is not None:
@@ -592,7 +580,7 @@ class Verifier:
             "p90_risk": round(_percentile(scored, 90), 4),
             "raw_score": round(raw_score, 4),
             "raw_score_full": float(raw_score),
-            "span_threshold": round(span_threshold, 4),
+            "span_threshold": span_threshold,
             "span_z": self.bundle.span_z,
             "span_floor": self.bundle.span_floor,
             "weights": {name: round(self.bundle.weights.get(name, 0.0), 3) for name in FEATURE_NAMES},
@@ -745,8 +733,32 @@ class Verifier:
             )
         return extract_features(answer, context, mode="demo", answer_tokens=tokens)
 
+    def _localize(self, answer, context_text, coverage_context, tokens, smoothed, scored):
+        span_threshold = self._span_threshold(scored)
+        mask_spans = self._build_spans(answer, tokens, smoothed, span_threshold)
+        # Вариант маски «короткий фрагмент без числа не помечается»: токены
+        # отброшенных фрагментов перестают считаться помеченными и в метриках.
+        kept_flagged: set[int] | None = None
+        if self.span_filter_min_chars > 0:
+            mask_spans, kept_flagged = self._filter_short_mask_spans(mask_spans)
+        # Правило привязки числа к объекту (дефект D): текстовое, поверх маски.
+        spans = _merge_spans(
+            [
+                *mask_spans,
+                *self._attribution_spans(answer, context_text, tokens, smoothed, span_threshold),
+                *self._coverage_spans(answer, coverage_context, tokens, span_threshold),
+            ]
+        )
+
+        return span_threshold, spans, kept_flagged
+
     def _span_threshold(self, risk: Sequence[float]) -> float:
         """Порог маски для текущего набора весов (см. :func:`span_threshold_for`)."""
+        if self.bundle.token_threshold is not None:
+            tau = float(self.bundle.token_threshold)
+            if not math.isfinite(tau) or tau < 0:
+                raise ValueError("token_threshold must be finite and nonnegative (above-one sentinel allowed)")
+            return tau
         return span_threshold_for(risk, self.bundle.span_z, self.bundle.span_floor, self.bundle.span_cap)
 
     def _calibrate(self, raw_score: float) -> float:
@@ -774,12 +786,7 @@ class Verifier:
         """
         if not scored_indices:
             return 0.0, 0.0
-        mask_threshold = span_threshold_for(
-            [smoothed[index] for index in scored_indices],
-            self.bundle.span_z,
-            self.bundle.span_floor,
-            self.bundle.span_cap,
-        )
+        mask_threshold = self._span_threshold([smoothed[i] for i in scored_indices])
         # Токены, попавшие в отчётные фрагменты (в том числе по правилу привязки
         # числа к объекту), считаются помеченными: иначе ответ с найденным
         # фрагментом сообщал бы «доля спорного текста 0.000».

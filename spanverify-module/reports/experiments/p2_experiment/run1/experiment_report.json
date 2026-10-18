@@ -5,5 +5,12 @@
   "p1_invariant": true,
   "drift_count": 0,
   "p2_influences_token_risk": true,
-  "status": "✅ P2 интеграция работает"
+  "status": "✅ P2 интеграция работает",
+  "diagnostic_only": true,
+  "quality_run": false,
+  "mode": "demo",
+  "model": "handwritten placeholder",
+  "fitting_pairs": 0,
+  "checked_dev_pairs": 10,
+  "influence_pairs": 1
 }

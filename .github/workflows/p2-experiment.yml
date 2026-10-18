@@ -1,0 +1,67 @@
+name: P2 cached HF experiment
+on:
+  push:
+    branches: [arena/c5f69767-smarty-chumakov]
+    paths:
+      - .github/workflows/p2-experiment.yml
+      - spanverify-module/scripts/p2_experiment.py
+      - spanverify-module/spanverify/engine.py
+      - spanverify-module/tests/test_p2_tau.py
+  workflow_dispatch:
+permissions:
+  actions: read
+  contents: write
+jobs:
+  measurement:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    defaults:
+      run:
+        working-directory: spanverify-module
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install train-only stack
+        run: pip install numpy==1.26.4 scipy==1.13.1 scikit-learn==1.5.2 pytest==8.3.5 pyyaml==6.0.2
+      - name: Behavioral preflight
+        run: |
+          set -o pipefail
+          mkdir -p reports/p2/run${GITHUB_RUN_ID}
+          python -m pytest tests/test_token_head.py tests/test_p2_public_influence.py tests/test_p2_tau.py tests/test_p1_replay_contract.py -q 2>&1 | tee reports/p2/run${GITHUB_RUN_ID}/tests.log
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: hf-cache-a3-v2-*
+          merge-multiple: false
+          path: spanverify-module/reports/hf-cache-v2-raw
+          run-id: 39060670054
+          github-token: ${{ github.token }}
+      - name: Measure trained P2 on cached HF
+        run: |
+          set -o pipefail
+          python -u scripts/p2_experiment.py --cache reports/hf-cache-v2-raw --output reports/p2/run${GITHUB_RUN_ID} 2>&1 | tee reports/p2/run${GITHUB_RUN_ID}/measurement.log
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: p2-hf-${{ github.run_id }}
+          path: spanverify-module/reports/p2/run${{ github.run_id }}/
+          retention-days: 30
+      - name: Publish small diagnostics on success or failure
+        if: always()
+        working-directory: .
+        run: |
+          set -euo pipefail
+          BRANCH=arena/c5f69767-smarty-chumakov
+          git fetch origin "$BRANCH"
+          PUB="$RUNNER_TEMP/p2-publish-${GITHUB_RUN_ID}"
+          git worktree add --detach "$PUB" FETCH_HEAD
+          DEST="spanverify-module/reports/experiments/p2_hf/run${GITHUB_RUN_ID}"
+          mkdir -p "$PUB/$DEST"
+          find "spanverify-module/reports/p2/run${GITHUB_RUN_ID}" -maxdepth 1 -type f ! -name '*states.jsonl' ! -name 'dev_evidence.jsonl' -exec cp {} "$PUB/$DEST/" \;
+          printf '{"run_id":"%s","code_sha":"%s","job_status":"%s"}\n' "$GITHUB_RUN_ID" "$GITHUB_SHA" '${{ job.status }}' > "$PUB/$DEST/workflow_status.json"
+          git -C "$PUB" config user.name 'github-actions[bot]'
+          git -C "$PUB" config user.email 'github-actions[bot]@users.noreply.github.com'
+          git -C "$PUB" add -f "$DEST"
+          git -C "$PUB" commit -m "reports: P2 HF run ${GITHUB_RUN_ID} [skip ci]"
+          git -C "$PUB" push origin "HEAD:refs/heads/$BRANCH"
