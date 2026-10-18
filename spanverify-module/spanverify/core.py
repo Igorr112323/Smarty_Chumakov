@@ -222,6 +222,7 @@ class SpanResult:
     # целенаправленные находки, поэтому вердикт реагирует на них даже при
     # одном токене, а на одиночный токен маски — нет (см. ``_verdict``).
     source: str = "mask"
+    sources: tuple[str, ...] = ()  # P3 merged provenance, legacy source remains compatible
 
     @property
     def confidence(self) -> float:

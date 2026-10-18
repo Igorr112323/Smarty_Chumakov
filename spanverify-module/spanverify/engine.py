@@ -161,12 +161,18 @@ class WeightsBundle:
     answer_head: dict[str, Any] | None = None
     token_head: dict[str, Any] | None = None  # P2 token-head (GradientBoosting)
     token_threshold: float | None = None  # Global token threshold для P2
+    localization_decoder: dict[str, Any] | None = None  # Versioned P3 postprocessor only
     folds: list[dict[str, Any]] | None = None
     seed: int = 42
     version: str = "1.1.0"
     mode: str = "demo"
     meta: dict[str, Any] | None = None
     source: str = "defaults"  # откуда взяты параметры: disk | embedded | defaults
+
+    def __post_init__(self):
+        if self.localization_decoder is not None:
+            from .localization import validate_decoder
+            validate_decoder(self.localization_decoder)
 
     def to_dict(self) -> dict[str, Any]:
         return {
@@ -183,6 +189,7 @@ class WeightsBundle:
             "head": self.head or {"type": "none", "file": None},
             "answer_head": self.answer_head,
             "token_head": self.token_head,
+            "localization_decoder": self.localization_decoder,
             "token_threshold": float(self.token_threshold) if self.token_threshold is not None else None,
             "folds": self.folds or [],
             "seed": self.seed,
@@ -226,6 +233,7 @@ class WeightsBundle:
             head=data.get("head"),
             answer_head=data.get("answer_head"),
             token_head=data.get("token_head"),
+            localization_decoder=data.get("localization_decoder"),
             token_threshold=float(data["token_threshold"]) if data.get("token_threshold") is not None else None,
             folds=list(data.get("folds", [])),
             seed=int(data.get("seed", 42)),
@@ -557,7 +565,7 @@ class Verifier:
             raw_score = _answer_score(scored)
         score = self._calibrate(raw_score)
         threshold = self.bundle.threshold
-        ai_share_soft, ai_share_hard = self._shares(tokens, smoothed, scored_indices, spans)
+        ai_share_soft, ai_share_hard = self._shares(tokens, smoothed, scored_indices, spans, kept_flagged)
         ai_participation = self.participation.estimate(answer, features) if self.participation is not None else 0.0
 
         tokens_payload = _token_payload(tokens, features, smoothed, span_threshold, flagged_override=kept_flagged)
@@ -733,6 +741,16 @@ class Verifier:
         return extract_features(answer, context, mode="demo", answer_tokens=tokens)
 
     def _localize(self, answer, context_text, coverage_context, tokens, smoothed, scored):
+        if self.bundle.localization_decoder is not None:
+            from .localization import localize_state
+            config = self.bundle.localization_decoder
+            # Keep rule confidence semantics on the frozen P2 threshold.
+            rule_threshold = self._span_threshold(scored)
+            kept, _, spans = localize_state(answer, tokens, smoothed,
+                [is_scored_token(t.text) for t in tokens], config,
+                self._attribution_spans(answer, context_text, tokens, smoothed, rule_threshold),
+                self._coverage_spans(answer, coverage_context, tokens, rule_threshold))
+            return config["tau_low"], spans, kept
         span_threshold = self._span_threshold(scored)
         mask_spans = self._build_spans(answer, tokens, smoothed, span_threshold)
         # Вариант маски «короткий фрагмент без числа не помечается»: токены
@@ -774,6 +792,7 @@ class Verifier:
         smoothed: Sequence[float],
         scored_indices: Sequence[int],
         spans: Sequence[SpanResult] = (),
+        retained_mask: set[int] | None = None,
     ) -> tuple[float, float]:
         """Доли «недостоверного» текста в ответе (поля ai_share/ai_share_hard).
 
@@ -798,6 +817,10 @@ class Verifier:
         probabilities = [1.0 if index in in_span else self._calibrate(smoothed[index]) for index in scored_indices]
         soft = sum(probabilities) / len(probabilities)
         hard_numerator = sum(1 for index in scored_indices if index in in_span or smoothed[index] >= mask_threshold)
+        if self.bundle.localization_decoder is not None:
+            if retained_mask is None:
+                raise ValueError("P3 retained mask must be explicit, including empty set")
+            hard_numerator = sum(i in retained_mask for i in scored_indices)
         hard = hard_numerator / len(scored_indices)
         return min(1.0, max(0.0, soft)), min(1.0, max(0.0, hard))
 
@@ -828,7 +851,7 @@ class Verifier:
                 if id(token) in allowed and token.start >= start and token.end <= end
             ]
             risk_value = max([*token_risk, threshold])
-            span_start, span_end = _shrink_to_clause(answer, start, end, start, end)
+            span_start, span_end = (start, end) if self.bundle.localization_decoder is not None else _shrink_to_clause(answer, start, end, start, end)
             fragment = answer[span_start:span_end]
             if not fragment.strip():
                 continue

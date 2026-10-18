@@ -2,11 +2,7 @@ name: P2 cached HF experiment
 on:
   push:
     branches: [arena/c5f69767-smarty-chumakov]
-    paths:
-      - .github/workflows/p2-experiment.yml
-      - spanverify-module/scripts/p2_experiment.py
-      - spanverify-module/spanverify/engine.py
-      - spanverify-module/tests/test_p2_tau.py
+    paths: [.github/p2-training.trigger]
   workflow_dispatch:
 permissions:
   actions: read
