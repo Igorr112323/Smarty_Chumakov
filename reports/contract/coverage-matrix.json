@@ -367,9 +367,9 @@
     {
       "id": "number",
       "requirement": "Robustness: numeric substitutions",
-      "status": "частично",
+      "status": "не достигнут",
       "scope": "current P4 candidate; historical evidence is explicitly qualified",
-      "note": "A3 corpus modes and real pooled dev metrics exist, but no separate passing P4 per-case robustness acceptance artifact.",
+      "note": "Pooled A3 dev metrics are not dedicated robustness acceptance: no separately measured passing P4 challenge/control artifact. Paraphrase is not an explicit A3 mode.",
       "evidence": [
         {
           "path": "spanverify-module/data/corpus_a3/manifest.json",
@@ -385,9 +385,9 @@
     {
       "id": "contradiction",
       "requirement": "Robustness: contradiction",
-      "status": "частично",
+      "status": "не достигнут",
       "scope": "current P4 candidate; historical evidence is explicitly qualified",
-      "note": "A3 corpus modes and real pooled dev metrics exist, but no separate passing P4 per-case robustness acceptance artifact.",
+      "note": "Pooled A3 dev metrics are not dedicated robustness acceptance: no separately measured passing P4 challenge/control artifact. Paraphrase is not an explicit A3 mode.",
       "evidence": [
         {
           "path": "spanverify-module/data/corpus_a3/manifest.json",
@@ -403,9 +403,9 @@
     {
       "id": "paraphrase",
       "requirement": "Robustness: paraphrase",
-      "status": "частично",
+      "status": "не достигнут",
       "scope": "current P4 candidate; historical evidence is explicitly qualified",
-      "note": "A3 corpus modes and real pooled dev metrics exist, but no separate passing P4 per-case robustness acceptance artifact.",
+      "note": "Pooled A3 dev metrics are not dedicated robustness acceptance: no separately measured passing P4 challenge/control artifact. Paraphrase is not an explicit A3 mode.",
       "evidence": [
         {
           "path": "spanverify-module/data/corpus_a3/manifest.json",
@@ -421,9 +421,9 @@
     {
       "id": "omission",
       "requirement": "Robustness: omission",
-      "status": "частично",
+      "status": "не достигнут",
       "scope": "current P4 candidate; historical evidence is explicitly qualified",
-      "note": "A3 corpus modes and real pooled dev metrics exist, but no separate passing P4 per-case robustness acceptance artifact.",
+      "note": "Pooled A3 dev metrics are not dedicated robustness acceptance: no separately measured passing P4 challenge/control artifact. Paraphrase is not an explicit A3 mode.",
       "evidence": [
         {
           "path": "spanverify-module/data/corpus_a3/manifest.json",

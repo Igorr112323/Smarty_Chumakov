@@ -17,5 +17,12 @@
       "published": 12667
     }
   },
-  "note": "measurement.log continues through tee after manifest generation; final inventory below supersedes its pre-stdout size only. Original runner evidence is not edited."
+  "note": "measurement.log continues through tee after manifest generation; final inventory below supersedes its pre-stdout size only. Original runner evidence is not edited.",
+  "dev_full_token_risks": 13150,
+  "token_oracle_threshold_counts_replayed": {
+    "tp": 696,
+    "fp": 439,
+    "fn": 688,
+    "f1": 0.5526002381897578
+  }
 }

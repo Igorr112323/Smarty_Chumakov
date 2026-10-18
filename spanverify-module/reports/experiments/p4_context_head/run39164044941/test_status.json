@@ -34,5 +34,14 @@
   "full_skipped": 2,
   "full_total": 840,
   "full_seconds": 325.12,
-  "ordinary_ci_collection_fix": "explicit token-head-tests dependency file in CI, never skip new tests; no default/runtime/build dependency changes"
+  "ordinary_ci_collection_fix": "explicit token-head-tests dependency file in CI, never skip new tests; no default/runtime/build dependency changes",
+  "ordinary_ci_after_fix": {
+    "run": 39167643400,
+    "code_sha": "d915308da031ffe3905da3909d6306d5b5016f24",
+    "status": "failure",
+    "test_job_exit_code": 1,
+    "previous_test_job_exit_code": 2,
+    "collection_error_fixed": true,
+    "runner_test_node_counts": "not asserted: use local JUnit/traceback for exact 840/22 counts"
+  }
 }

@@ -184,8 +184,8 @@ def main():
         row(
             id_,
             text,
-            "частично",
-            "A3 corpus modes and real pooled dev metrics exist, but no separate passing P4 per-case robustness acceptance artifact.",
+            "не достигнут",
+            "Pooled A3 dev metrics are not dedicated robustness acceptance: no separately measured passing P4 challenge/control artifact. Paraphrase is not an explicit A3 mode.",
             "spanverify-module/data/corpus_a3/manifest.json",
             P4 + "/dev_error_decomposition.json",
         )
