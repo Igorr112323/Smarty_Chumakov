@@ -1,0 +1,27 @@
+{
+  "replay_run_id": "39177127063",
+  "replay_code_commit": "5ff79f9a7bed33c00c6278f67d68ddff73f8325c",
+  "runtime": {
+    "schema": "frozen-p1-runtime-v1",
+    "mode": "hf",
+    "model_name": "ai-forever/rugpt3small_based_on_gpt2",
+    "hf_max_tokens": 512,
+    "chunking": true,
+    "span_expansion": "clause_capped",
+    "cache_source_run_id": 39060670054,
+    "answer_target_fpr": 0.3,
+    "source_measurement_run_id": 39116955685,
+    "source_measurement_commit": "b87850781b73d8630832cb972037158d0ec88927"
+  },
+  "python": "3.11.17 (main, Oct  1 2026, 14:32:31) [GCC 13.3.0]",
+  "candidate_sha256": "9801ac1e6dc56efccce943f4b26a6ea7c7d56988a0135651a711288deeb36326",
+  "dev_sha256": "cba705f836d9c25f28fc162b5cbf89b52bfabe7c47c56e2a4d6d652cded2c2dd",
+  "pairs": 181,
+  "cache_keys": 1195,
+  "cache_hits": 543,
+  "cache_misses": 0,
+  "fresh_hf_inference": false,
+  "official_test_evaluated": false,
+  "parity_passed": true,
+  "whole_contract_closed": false
+}
