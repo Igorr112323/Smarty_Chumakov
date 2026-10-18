@@ -1,0 +1,6 @@
+kind=raw_copy_only_no_training_no_recompute
+requested_source_run_id=39116955685
+requested_source_sha=b87850781b73d8630832cb972037158d0ec88927
+source_artifact=p1-comparison-39116955685
+export_run_id=39125627036
+export_code_sha=afd20b76002b9e5fcb8fae3e34d413ce80967dd7

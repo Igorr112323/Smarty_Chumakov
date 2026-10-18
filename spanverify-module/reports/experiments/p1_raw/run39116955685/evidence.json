@@ -1,0 +1,77 @@
+{
+  "schema_version": "p1-evidence-v2",
+  "created_at": "2026-10-18T10:05:59Z",
+  "train_pairs_count": 842,
+  "dev_pairs_count": 181,
+  "train_positive_count": 467,
+  "dev_positive_count": 96,
+  "oof_lines": 842,
+  "dev_lines": 181,
+  "fold_receipts": [
+    {
+      "fold": 0,
+      "fit_doc_count": 212,
+      "fit_sample_count": 659,
+      "held_out_doc_count": 53,
+      "held_out_sample_count": 183,
+      "held_out_positive": 93,
+      "held_out_negative": 90,
+      "fit_doc_ids_hash": 3318489534300283444,
+      "held_out_doc_ids_hash": 1627086150500358645
+    },
+    {
+      "fold": 1,
+      "fit_doc_count": 212,
+      "fit_sample_count": 683,
+      "held_out_doc_count": 53,
+      "held_out_sample_count": 159,
+      "held_out_positive": 87,
+      "held_out_negative": 72,
+      "fit_doc_ids_hash": -4615039327820662716,
+      "held_out_doc_ids_hash": 6728208436562959912
+    },
+    {
+      "fold": 2,
+      "fit_doc_count": 212,
+      "fit_sample_count": 687,
+      "held_out_doc_count": 53,
+      "held_out_sample_count": 155,
+      "held_out_positive": 97,
+      "held_out_negative": 58,
+      "fit_doc_ids_hash": 1778586520018701377,
+      "held_out_doc_ids_hash": 957670207046985685
+    },
+    {
+      "fold": 3,
+      "fit_doc_count": 212,
+      "fit_sample_count": 672,
+      "held_out_doc_count": 53,
+      "held_out_sample_count": 170,
+      "held_out_positive": 88,
+      "held_out_negative": 82,
+      "fit_doc_ids_hash": 1957694765500635961,
+      "held_out_doc_ids_hash": -7390861935681455645
+    },
+    {
+      "fold": 4,
+      "fit_doc_count": 212,
+      "fit_sample_count": 667,
+      "held_out_doc_count": 53,
+      "held_out_sample_count": 175,
+      "held_out_positive": 102,
+      "held_out_negative": 73,
+      "fit_doc_ids_hash": -884552495376359521,
+      "held_out_doc_ids_hash": 955541698671215793
+    }
+  ],
+  "artifacts": {
+    "p1_model": "reports/p0_answer_comparison/p1_model.json",
+    "baseline_bundle": "reports/p0_answer_comparison/baseline_bundle.json",
+    "calibrator_baseline": "reports/p0_answer_comparison/calibrator_baseline.json",
+    "calibrator_p1": "reports/p0_answer_comparison/calibrator_p1.json",
+    "thresholds": "reports/p0_answer_comparison/thresholds.json",
+    "oof_predictions": "reports/p0_answer_comparison/oof_predictions.jsonl",
+    "dev_predictions": "reports/p0_answer_comparison/dev_predictions.jsonl",
+    "comparison": "reports/p0_answer_comparison/p1_comparison.json"
+  }
+}
