@@ -345,10 +345,11 @@ def main() -> int:
     print("\nСохранение результатов...")
     
     # recovery_audit.json
+    import datetime
     audit = {
         "source_run_id": args.source_run_id,
         "source_sha": args.source_sha,
-        "recovery_timestamp": Path.ctime(Path("/")),
+        "recovery_timestamp": datetime.datetime.now().isoformat(),
         "artifacts_found": {
             "comparison": str(comparison_file),
             "oof_predictions": str(oof_file) if oof_file else None,
