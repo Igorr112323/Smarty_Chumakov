@@ -6,6 +6,8 @@ from dataclasses import replace, asdict
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 import numpy as np
 import sklearn
+from functools import lru_cache
+import spanverify.engine as engine_module
 from sklearn.model_selection import KFold
 from spanverify.core import tokenize_with_offsets
 from spanverify.features import is_scored_token
@@ -48,6 +50,7 @@ def run(cache_dir, out):
     baseline=WeightsBundle.load(BASE/'p1_candidate_bundle.json'); original=baseline.to_dict()
     train=list(read_pairs(Path('data/corpus_a3/splits/train.jsonl'))); dev=list(read_pairs(Path('data/corpus_a3/splits/dev.jsonl')))
     assert len(train)==842 and len(dev)==181
+    assert len({p['id'] for p in train})==842 and len({p['id'] for p in dev})==181
     shards=sorted(cache_dir.rglob('features_*.jsonl'))
     assert len(shards)==8 and len({hashlib.sha256(p.read_bytes()).hexdigest() for p in shards})==8, 'Need eight distinct shards'
     cache=load_feature_cache([str(p) for p in shards],counting=True,strict=True); set_feature_cache(cache)
@@ -87,6 +90,10 @@ def run(cache_dir, out):
     candidates=sorted(set([0.0,float(np.nextafter(max(risks),np.inf)),*map(float,np.quantile(risks,np.linspace(0,1,500)))]))
     p2runtime={**runtime,'span_expansion':'mask'}
     selector=make_verifier(baseline,p2runtime,cache)
+    # Pure text rules are tau-independent; memoize their unchanged outputs.
+    # Spans/merging still use canonical _localize at every cutoff.
+    engine_module.cover_facts = lru_cache(maxsize=2048)(engine_module.cover_facts)
+    engine_module.number_attribution = lru_cache(maxsize=2048)(engine_module.number_attribution)
     points=[]
     for i,tau in enumerate(candidates):
         points.append(selection(selector,states,tau))

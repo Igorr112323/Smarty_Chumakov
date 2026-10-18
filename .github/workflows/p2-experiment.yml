@@ -14,7 +14,7 @@ permissions:
 jobs:
   measurement:
     runs-on: ubuntu-latest
-    timeout-minutes: 120
+    timeout-minutes: 40
     defaults:
       run:
         working-directory: spanverify-module

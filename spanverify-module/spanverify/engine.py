@@ -647,7 +647,7 @@ class Verifier:
                 token_rows = result.tokens[index] if index < len(result.tokens) else {}
                 labels.append(1 if any(token.start < end and token.end > start for start, end in pair_truth) else 0)
                 flags.append(bool(token_rows.get("flagged")))
-                risks.append(float(token_rows.get("risk", 0.0)))
+                risks.append(float(token_rows.get("raw_risk", token_rows.get("risk", 0.0))))
 
             answer_labels.append(1 if pair_truth else 0)
             answer_scores.append(result.score)
