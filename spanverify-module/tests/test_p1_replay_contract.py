@@ -10,6 +10,7 @@ import sys
 from pathlib import Path
 
 import pytest
+
 from spanverify.answer_head import AnswerHeadModel, extract_answer_features
 from spanverify.calibration import IsotonicCalibrator
 from spanverify.core import tokenize_with_offsets

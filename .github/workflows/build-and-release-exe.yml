@@ -21,9 +21,9 @@ on:
   workflow_dispatch:
     inputs:
       publish_release:
-        description: "Публиковать релиз (ссылка /releases/latest/download/spanverify.exe)"
+        description: "Publish P6 RC prerelease, never latest"
         type: boolean
-        default: true
+        default: false
   push:
     tags:
       - "v*"
@@ -72,7 +72,7 @@ jobs:
       - name: Зависимости (пины из requirements.txt)
         run: |
           python -m pip install --upgrade pip
-          python -m pip install -r requirements.txt
+          python -m pip install -r requirements.txt -r requirements-token-head-tests.txt
 
       - name: Тесты
         run: python -m pytest -q
@@ -105,7 +105,7 @@ jobs:
       - name: Зависимости сборки
         run: |
           python -m pip install --upgrade pip
-          python -m pip install -r requirements.txt
+          python -m pip install -r requirements.txt -r requirements-token-head-tests.txt
 
       - name: Версия пакета совпадает с тегом
         shell: pwsh
@@ -123,12 +123,14 @@ jobs:
             Write-Host "Не тег: версия пакета $version (проверка пропущена)"
           }
 
-      - name: Убедиться, что веса обучены (обучить, если нет)
+      - name: Validate frozen weights; no training fallback
         shell: pwsh
         run: |
-          if (-not (Test-Path "config/weights.json")) {
-            python -m spanverify train --dataset data/demo_pairs.jsonl --out config/weights.json --seed 42 --folds 5
-          }
+          if (-not (Test-Path "config/weights.json")) { throw "missing demo weights: training forbidden" }
+          $frozen = "reports/experiments/p5_span_filter/run39170981235/combined_bundle.json"
+          if ((Get-FileHash $frozen -Algorithm SHA256).Hash.ToLower() -ne "e0b13c693a058dfd66ed24a52fc14e9c70964e95885358e7b99cc1f328ad6892") { throw "P5 hash drift" }
+          Copy-Item $frozen config/frozen-p5.json
+          Copy-Item reports/experiments/p4_context_head/run39164044941/runtime_config.json config/p5-runtime.json
           python -m spanverify config
 
       - name: Сборка onefile spanverify.exe
@@ -187,6 +189,8 @@ jobs:
           Copy-Item config release/config -Recurse -Force
           Copy-Item data release/data -Recurse -Force
           Copy-Item README.md release/README.md -Force
+          Copy-Item config/frozen-p5.json release/frozen-p5.json
+          Copy-Item config/p5-runtime.json release/p5-runtime.json
 
       - name: Смоук-тест собранного .exe (Приложение Б)
         shell: pwsh
@@ -373,7 +377,7 @@ jobs:
         working-directory: spanverify-module/release
         run: |
           Compress-Archive -Path "spanverify-win/*" -DestinationPath "spanverify-win.zip" -Force
-          $files = @("spanverify.exe", "spanverify-win.zip", "spanverify.pyz")
+          $files = @("spanverify.exe", "spanverify-win.zip", "spanverify.pyz", "frozen-p5.json", "p5-runtime.json")
           $lines = foreach ($f in $files) {
             $hash = (Get-FileHash $f -Algorithm SHA256).Hash.ToLower()
             "{0}  {1}" -f $hash, $f
@@ -444,65 +448,7 @@ jobs:
         # иначе файл размеров и реестр разъезжаются, и CI краснеет на сверке.
         run: python ../scripts/build_numbers.py
 
-      - name: Записать измеренные размеры в репозиторий
-        # Файл reports/release_sizes.json читают реестр чисел (scripts/build_numbers.py)
-        # и документ закрытия договора. Числа пишет сам прогон: сначала пробуем
-        # положить файл в ветку прогона (это работает на ветках и проверено на
-        # задании hf-footprint), для тегов — в ветку по умолчанию через API.
-        # Побочный коммит помечен [skip ci].
-        continue-on-error: true
-        shell: pwsh
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          $repo = "${{ github.repository }}"
-          $target = if ("${{ github.ref }}".StartsWith("refs/heads/")) { "${{ github.ref_name }}" } else { "${{ github.event.repository.default_branch }}" }
-          # Рабочий каталог задания — spanverify-module, поэтому путь к корню
-          # репозитория начинается с ../. Реестр чисел читает файл из reports/
-          # корня; копию в spanverify-module/reports оставляет шаг проверки размеров.
-          $source = "../reports/release_sizes.json"
-          if (-not (Test-Path $source)) {
-            Write-Host "::error title=размеры::нет файла $source после сборки"
-            exit 1
-          }
-          if ("${{ github.ref }}".StartsWith("refs/heads/")) {
-            git config user.name "spanverify-bot"
-            git config user.email "bot@spanverify.local"
-            git add reports/release_sizes.json ../reports/release_sizes.json ../reports/NUMBERS.json
-            git diff --cached --quiet && Write-Host "изменений нет" && exit 0
-            git commit -m "сборка ${{ github.ref_name }}: измеренные размеры поставки [skip ci]"
-            for ($attempt = 1; $attempt -le 3; $attempt++) {
-              git push origin "HEAD:$target" && break
-              git pull --rebase origin $target || git rebase --abort
-              Start-Sleep -Seconds ($attempt * 5)
-            }
-            exit 0
-          }
-          # Для тега путь через contents API: кладём не только размеры поставки, но
-          # и реестр чисел. Шаг «Обновить реестр» пересобрал NUMBERS.json внутри
-          # прогона; если его не отправить, реестр на main разойдётся с
-          # release_sizes.json, и контрактное задание («Реестр чисел и его сверка
-          # с артефактами») станет красным — проверено на сборке v1.3.1.
-          function Push-File([string]$path, [string]$localPath, [string]$message) {
-            if (-not (Test-Path $localPath)) {
-              Write-Host "::error title=реестр::нет файла $localPath"
-              exit 1
-            }
-            $content = [Convert]::ToBase64String([IO.File]::ReadAllBytes($localPath))
-            $sha = ""
-            try { $sha = (gh api "repos/$repo/contents/$path`?ref=$target" --jq ".sha") 2>$null } catch { $sha = "" }
-            $apiArgs = @("api", "-X", "PUT", "repos/$repo/contents/$path",
-                      "-f", "message=$message",
-                      "-f", "content=$content", "-f", "branch=$target")
-            if ($sha) { $apiArgs += @("-f", "sha=$sha") }
-            gh @apiArgs | Out-Null
-            Write-Host "обновлено: $path"
-          }
-          $message = "сборка ${{ github.ref_name }}: измеренные размеры поставки [skip ci]"
-          Push-File "reports/release_sizes.json" $source $message
-          Push-File "spanverify-module/reports/release_sizes.json" "reports/release_sizes.json" $message
-          Push-File "reports/NUMBERS.json" "../reports/NUMBERS.json" $message
-
+      # P6: evidence is an artifact, never an automatic commit to any branch.
       - name: Артефакты сборки
         uses: actions/upload-artifact@v4
         with:
@@ -513,6 +459,8 @@ jobs:
             spanverify-module/release/spanverify.pyz
             spanverify-module/release/SHA256SUMS.txt
             spanverify-module/release/pyz-verify.json
+            spanverify-module/release/frozen-p5.json
+            spanverify-module/release/p5-runtime.json
             spanverify-module/release/size.txt
             spanverify-module/release/sizes.json
             spanverify-module/reports/release_sizes.json
@@ -526,35 +474,10 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         working-directory: spanverify-module/release
         run: |
-          $tag = if ("${{ github.ref }}".StartsWith("refs/tags/")) { "${{ github.ref_name }}" } else { "v1.0.1" }
-          $title = "SpanVerify $tag"
-          $notes = @"
-          Проверка ответа по документу: находит фрагменты ответа, которые контекст не подтверждает, и оценивает риск недостоверности.
-
-          ## Файлы
-          * ``spanverify.exe`` — основной вариант (Windows x64, один файл, Python не нужен). Запуск двойным кликом откроет браузер с интерфейсом.
-          * ``spanverify-win.zip`` — распаковать и запустить ``spanverify-win\spanverify.exe`` (вариант для антивирусов, не любящих onefile).
-          * ``spanverify.pyz`` — страховка: нужен Python 3.10+ (``python spanverify.pyz server --port 8765``).
-          * ``SHA256SUMS.txt`` — контрольные суммы.
-
-          ## Как проверить за минуту
-          1. Скачать ``spanverify.exe`` (в браузере может появиться предупреждение SmartScreen — «Подробнее» → «Выполнить в любом случае»: файл не подписан сертификатом).
-          2. Запустить двойным кликом; откроется страница ``http://localhost:8765``.
-          3. Нажать «Пример: подмена факта» → «Проверить»: строка с неверным числом подсветится, появится риск и порог.
-          4. Для сравнения нажать «Пример: подтверждённый» → «Проверить»: вердикт «Ответ подтверждается документом».
-
-          ## Что проверено автоматически перед публикацией
-          Смоук-тест на windows-раннере: запуск ``.exe``, ``GET /health`` (калибровка загрузилась из бандла), ``POST /v1/verify`` с подменой числа (найден фрагмент с меткой ``doubtful``/``likely_hallucination``), ``POST /v1/verify`` с подтверждённым ответом (вердикт ``grounded``), ``GET /v1/model``, ``GET /v1/config``, отдача интерфейса, отдельный смоук-тест ``spanverify.pyz``, тесты на Python 3.10–3.12.
-
-          ## Ограничение (важно)
-          В поставке — режим ``demo``: признаки считаются лексическими суррогатами без весов языковой модели, а веса обучены на синтетическом корпусе. Это проверяет конвейер и интерфейс, а не даёт научный вывод о достоверности. Для реальной работы нужен режим ``hf`` (torch + transformers) и калибровка на ваших размеченных парах — см. ``docs/РУКОВОДСТВО.md``.
-          "@
-          $notes = $notes -replace '(?m)^\s+', ''
-          if (gh release view $tag --repo "${{ github.repository }}") {
-            gh release upload $tag spanverify.exe spanverify-win.zip spanverify.pyz SHA256SUMS.txt --clobber --repo "${{ github.repository }}"
-            gh release edit $tag --title $title --notes $notes --latest --repo "${{ github.repository }}"
-          } else {
-            gh release create $tag spanverify.exe spanverify-win.zip spanverify.pyz SHA256SUMS.txt `
-              --repo "${{ github.repository }}" --title $title --notes $notes --latest
-          }
+          $tag = "v1.3.1-rc.p6.${{ github.run_id }}"
+          $notes = "P6 RC only; code ${{ github.sha }}. No stable acceptance or official test177 claim. Default executable is demo; frozen P5 HF bundle/runtime supplied separately. HF requires external model weights (~530 MB) and compatible libraries (~500 MB); not part of the small executable. See reports/acceptance."
+          gh release create $tag spanverify.exe spanverify-win.zip spanverify.pyz frozen-p5.json p5-runtime.json SHA256SUMS.txt `
+            --repo "${{ github.repository }}" --target "${{ github.sha }}" --title "SpanVerify P6 RC" `
+            --notes $notes --prerelease --latest=false
+          if ($LASTEXITCODE -ne 0) { throw "RC publication failed" }
           gh release view $tag --repo "${{ github.repository }}" --json url,assets

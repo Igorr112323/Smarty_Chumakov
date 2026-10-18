@@ -49,20 +49,20 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 from spanverify.dataset import read_pairs  # noqa: E402
-from spanverify.features import HF_MODEL_DEFAULT, extract_features, feature_cache_key  # noqa: E402
+from spanverify.features import FEATURE_NAMES, HF_MODEL_DEFAULT, extract_features, feature_cache_key  # noqa: E402
 
 MODEL_DEFAULT = HF_MODEL_DEFAULT
 PROGRESS_EVERY = 10
 
 
-def dump_matrix(key: str, matrix, pair_id: str) -> dict:
-    """Строка кеша: ключ и три рабочих признака."""
+def dump_matrix(key: str, matrix, pair_id: str, *, max_length: int = 512, chunked: bool = True) -> dict:
+    """Serialize every feature, including window provenance; no inference or fitting."""
     return {
         "key": key,
         "pair_id": pair_id,
-        "attention_entropy": [float(x) for x in matrix.attention_entropy],
-        "ctx_attention_mass": [float(x) for x in matrix.ctx_attention_mass],
-        "embedding_density": [float(x) for x in matrix.embedding_density],
+        "max_length": max_length,
+        "chunked": chunked,
+        **{name: [float(x) for x in getattr(matrix, name)] for name in FEATURE_NAMES},
     }
 
 

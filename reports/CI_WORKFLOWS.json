@@ -1,7 +1,7 @@
 {
   "kind": "ci_workflows",
   "runs_considered": 100,
-  "generated_at": "2026-10-14T00:45:19Z",
+  "generated_at": "2026-10-18T23:32:32Z",
   "command": "python scripts/collect_ci_workflows.py",
   "source": ".github/workflows/*.yml + reports/CI_RUNS.json",
   "registry": {
@@ -41,7 +41,7 @@
         {
           "name": "Сборка и проверка .exe",
           "timeout_minutes": 40,
-          "steps": 19,
+          "steps": 18,
           "uploads_artifacts": true,
           "runs_python": "windows-latest"
         }
@@ -473,6 +473,318 @@
           "name": "Сравнение двух вариантов маски на кеше (выбор по train)",
           "timeout_minutes": 40,
           "steps": 9,
+          "uploads_artifacts": true,
+          "runs_python": "ubuntu-latest"
+        }
+      ],
+      "manual_only": true,
+      "never_runs_by_itself": false
+    },
+    {
+      "file": ".github/workflows/p1-build-test.yml",
+      "name": "P1 Build Test",
+      "triggers": [
+        "push"
+      ],
+      "schedule": [],
+      "push_paths": [
+        ".github/workflows/p1-build-test.yml",
+        "spanverify-module/scripts/build_p1_candidate.py",
+        "test_p1_build.py"
+      ],
+      "push_branches": [
+        "arena/c5f69767-smarty-chumakov"
+      ],
+      "push_tags": [],
+      "jobs": [
+        {
+          "name": "test",
+          "timeout_minutes": 10,
+          "steps": 5,
+          "uploads_artifacts": false,
+          "runs_python": "ubuntu-latest"
+        }
+      ],
+      "manual_only": false,
+      "never_runs_by_itself": false
+    },
+    {
+      "file": ".github/workflows/p1-public-replay.yml",
+      "name": "P1 Public Replay",
+      "triggers": [
+        "push",
+        "workflow_dispatch"
+      ],
+      "schedule": [],
+      "push_paths": [
+        ".github/workflows/p1-public-replay.yml",
+        "spanverify-module/scripts/build_p1_candidate.py",
+        "spanverify-module/scripts/replay_p1_dev.py",
+        "spanverify-module/tests/test_p1_replay_contract.py"
+      ],
+      "push_branches": [
+        "arena/c5f69767-smarty-chumakov"
+      ],
+      "push_tags": [],
+      "jobs": [
+        {
+          "name": "replay",
+          "timeout_minutes": 20,
+          "steps": 10,
+          "uploads_artifacts": true,
+          "runs_python": "ubuntu-latest"
+        }
+      ],
+      "manual_only": true,
+      "never_runs_by_itself": false
+    },
+    {
+      "file": ".github/workflows/p2-experiment.yml",
+      "name": "P2 cached HF experiment",
+      "triggers": [
+        "push",
+        "workflow_dispatch"
+      ],
+      "schedule": [],
+      "push_paths": [
+        ".github/p2-training.trigger"
+      ],
+      "push_branches": [
+        "arena/c5f69767-smarty-chumakov"
+      ],
+      "push_tags": [],
+      "jobs": [
+        {
+          "name": "measurement",
+          "timeout_minutes": 40,
+          "steps": 8,
+          "uploads_artifacts": true,
+          "runs_python": "ubuntu-latest"
+        }
+      ],
+      "manual_only": true,
+      "never_runs_by_itself": false
+    },
+    {
+      "file": ".github/workflows/p3-postprocess.yml",
+      "name": "P3 frozen-model structural localization",
+      "triggers": [
+        "push",
+        "workflow_dispatch"
+      ],
+      "schedule": [],
+      "push_paths": [
+        ".github/p3-postprocess.trigger"
+      ],
+      "push_branches": [
+        "arena/c5f69767-smarty-chumakov"
+      ],
+      "push_tags": [],
+      "jobs": [
+        {
+          "name": "postprocess",
+          "timeout_minutes": 40,
+          "steps": 9,
+          "uploads_artifacts": true,
+          "runs_python": "ubuntu-latest"
+        }
+      ],
+      "manual_only": true,
+      "never_runs_by_itself": false
+    },
+    {
+      "file": ".github/workflows/p4-context-head.yml",
+      "name": "P4 context token head",
+      "triggers": [
+        "push",
+        "workflow_dispatch"
+      ],
+      "schedule": [],
+      "push_paths": [
+        ".github/p4-context.trigger"
+      ],
+      "push_branches": [
+        "arena/c5f69767-smarty-chumakov"
+      ],
+      "push_tags": [],
+      "jobs": [
+        {
+          "name": "measurement",
+          "timeout_minutes": 40,
+          "steps": 9,
+          "uploads_artifacts": true,
+          "runs_python": "ubuntu-latest"
+        }
+      ],
+      "manual_only": true,
+      "never_runs_by_itself": false
+    },
+    {
+      "file": ".github/workflows/p5-span-filter.yml",
+      "name": "P5 span keep/drop filter",
+      "triggers": [
+        "push",
+        "workflow_dispatch"
+      ],
+      "schedule": [],
+      "push_paths": [
+        ".github/p5-span.trigger"
+      ],
+      "push_branches": [
+        "arena/c5f69767-smarty-chumakov"
+      ],
+      "push_tags": [],
+      "jobs": [
+        {
+          "name": "measurement",
+          "timeout_minutes": 40,
+          "steps": 8,
+          "uploads_artifacts": true,
+          "runs_python": "ubuntu-latest"
+        }
+      ],
+      "manual_only": true,
+      "never_runs_by_itself": false
+    },
+    {
+      "file": ".github/workflows/p6-acceptance.yml",
+      "name": "P6 frozen product acceptance",
+      "triggers": [
+        "workflow_dispatch",
+        "push"
+      ],
+      "schedule": [],
+      "push_paths": [
+        ".github/p6-acceptance.trigger"
+      ],
+      "push_branches": [
+        "arena/c5f69767-smarty-chumakov"
+      ],
+      "push_tags": [],
+      "jobs": [
+        {
+          "name": "parity",
+          "timeout_minutes": 40,
+          "steps": 6,
+          "uploads_artifacts": true,
+          "runs_python": "ubuntu-latest"
+        },
+        {
+          "name": "product",
+          "timeout_minutes": 40,
+          "steps": 8,
+          "uploads_artifacts": true,
+          "runs_python": "ubuntu-latest"
+        }
+      ],
+      "manual_only": true,
+      "never_runs_by_itself": false
+    },
+    {
+      "file": ".github/workflows/postprocess-p0-answer-p1.yml",
+      "name": "P0-3 P1 Answer Head",
+      "triggers": [
+        "push",
+        "workflow_dispatch"
+      ],
+      "schedule": [],
+      "push_paths": [
+        "spanverify-module/spanverify/answer_head.py",
+        "spanverify-module/spanverify/oof.py",
+        "spanverify-module/scripts/measure_p1.py",
+        "spanverify-module/tests/test_answer_head.py",
+        ".github/workflows/postprocess-p0-answer-p1.yml"
+      ],
+      "push_branches": [
+        "arena/c5f69767-smarty-chumakov"
+      ],
+      "push_tags": [],
+      "jobs": [
+        {
+          "name": "measure-p1",
+          "timeout_minutes": 40,
+          "steps": 13,
+          "uploads_artifacts": true,
+          "runs_python": "ubuntu-latest"
+        }
+      ],
+      "manual_only": true,
+      "never_runs_by_itself": false
+    },
+    {
+      "file": ".github/workflows/postprocess-p0-answer.yml",
+      "name": "P0-2 Ответы",
+      "triggers": [
+        "push",
+        "workflow_dispatch"
+      ],
+      "schedule": [],
+      "push_paths": [
+        ".github/postprocess-p0-answer.trigger"
+      ],
+      "push_branches": [
+        "arena/c5f69767-smarty-chumakov"
+      ],
+      "push_tags": [],
+      "jobs": [
+        {
+          "name": "Измерение агрегаторов",
+          "timeout_minutes": 40,
+          "steps": 13,
+          "uploads_artifacts": true,
+          "runs_python": "ubuntu-latest"
+        }
+      ],
+      "manual_only": true,
+      "never_runs_by_itself": false
+    },
+    {
+      "file": ".github/workflows/postprocess-span-comparison.yml",
+      "name": "Постобработка span_expansion",
+      "triggers": [
+        "push",
+        "workflow_dispatch"
+      ],
+      "schedule": [],
+      "push_paths": [
+        ".github/postprocess-span-comparison.trigger"
+      ],
+      "push_branches": [
+        "arena/c5f69767-smarty-chumakov"
+      ],
+      "push_tags": [],
+      "jobs": [
+        {
+          "name": "Извлечение и сравнение",
+          "timeout_minutes": 10,
+          "steps": 11,
+          "uploads_artifacts": true,
+          "runs_python": "ubuntu-latest"
+        }
+      ],
+      "manual_only": true,
+      "never_runs_by_itself": false
+    },
+    {
+      "file": ".github/workflows/recover-p1-results.yml",
+      "name": "Export existing P1 raw files",
+      "triggers": [
+        "push",
+        "workflow_dispatch"
+      ],
+      "schedule": [],
+      "push_paths": [
+        ".github/workflows/recover-p1-results.yml"
+      ],
+      "push_branches": [
+        "arena/c5f69767-smarty-chumakov"
+      ],
+      "push_tags": [],
+      "jobs": [
+        {
+          "name": "Copy downloaded evidence to the working branch",
+          "timeout_minutes": 10,
+          "steps": 5,
           "uploads_artifacts": true,
           "runs_python": "ubuntu-latest"
         }

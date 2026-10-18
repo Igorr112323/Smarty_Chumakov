@@ -33,7 +33,7 @@ def _make_corpus(corpus_dir: Path, n_train=3, n_dev=2, n_test=2):
         if i % 3 != 2:  # Не все пары имеют labels
             # labels: [[start, end, is_contradiction]]
             labels = [[10, 30, 1]]
-        
+
         pair = {
             "id": f"pair_{i:03d}",
             "context": f"Документ {i}: некоторые данные для анализа.",
@@ -50,8 +50,8 @@ def _make_corpus(corpus_dir: Path, n_train=3, n_dev=2, n_test=2):
     splits_dir.mkdir()
 
     train = all_pairs[:n_train]
-    dev = all_pairs[n_train:n_train + n_dev]
-    test = all_pairs[n_train + n_dev:]
+    dev = all_pairs[n_train : n_train + n_dev]
+    test = all_pairs[n_train + n_dev :]
 
     _write_jsonl(splits_dir / "train.jsonl", train)
     _write_jsonl(splits_dir / "dev.jsonl", dev)
@@ -78,13 +78,15 @@ def test_no_test_without_splits_errors():
         for i in range(6):
             answer = f"Ответ {i} содержит информацию о событиях"
             labels = [[10, 20, 1]] if i % 3 != 2 else []
-            pairs.append({
-                "id": f"pair_{i:03d}",
-                "context": f"Документ {i}: данные.",
-                "answer": answer,
-                "labels": labels,
-                "meta": {},
-            })
+            pairs.append(
+                {
+                    "id": f"pair_{i:03d}",
+                    "context": f"Документ {i}: данные.",
+                    "answer": answer,
+                    "labels": labels,
+                    "meta": {},
+                }
+            )
 
         pairs_file = corpus_dir / "pairs.jsonl"
         _write_jsonl(pairs_file, pairs)
@@ -92,12 +94,17 @@ def test_no_test_without_splits_errors():
         out_dir = tmppath / "output"
         out_dir.mkdir()
 
-        exit_code = run_experiments_main([
-            "--dataset", str(pairs_file),
-            "--mode", "demo",
-            "--no-test",
-            "--out", str(out_dir),
-        ])
+        exit_code = run_experiments_main(
+            [
+                "--dataset",
+                str(pairs_file),
+                "--mode",
+                "demo",
+                "--no-test",
+                "--out",
+                str(out_dir),
+            ]
+        )
 
         assert exit_code == 3, f"Ожидался код 3 (--no-test без splits), получен {exit_code}"
 
@@ -126,12 +133,17 @@ def test_no_test_with_splits_excludes_test():
             return original_evaluate(self, pairs)
 
         with patch.object(Verifier, "evaluate", tracking_evaluate):
-            exit_code = run_experiments_main([
-                "--dataset", str(pairs_file),
-                "--mode", "demo",
-                "--no-test",
-                "--out", str(out_dir),
-            ])
+            exit_code = run_experiments_main(
+                [
+                    "--dataset",
+                    str(pairs_file),
+                    "--mode",
+                    "demo",
+                    "--no-test",
+                    "--out",
+                    str(out_dir),
+                ]
+            )
 
         assert exit_code == 0, f"Ожидался код 0, получен {exit_code}"
 
@@ -150,15 +162,11 @@ def test_no_test_with_splits_excludes_test():
         assert experiment_json.is_file(), "experiment.json не создан"
         data = json.loads(experiment_json.read_text(encoding="utf-8"))
         assert data["test_official"] is None, (
-            f"test_official должен быть null при --no-test, "
-            f"получено: {data.get('test_official')}"
+            f"test_official должен быть null при --no-test, " f"получено: {data.get('test_official')}"
         )
 
         # dev_official должен быть заполнен
-        assert data["dev_official"] is not None, (
-            "dev_official должен быть заполнен при --no-test с splits"
-        )
+        assert data["dev_official"] is not None, "dev_official должен быть заполнен при --no-test с splits"
         assert data["dev_official"]["pairs"] == len(split_ids["dev"]), (
-            f"dev_official.pairs = {data['dev_official']['pairs']}, "
-            f"ожидается {len(split_ids['dev'])}"
+            f"dev_official.pairs = {data['dev_official']['pairs']}, " f"ожидается {len(split_ids['dev'])}"
         )

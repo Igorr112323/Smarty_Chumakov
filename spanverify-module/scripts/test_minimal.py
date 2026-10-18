@@ -1,8 +1,7 @@
 #!/usr/bin/env python3
 """Минимальный тест для диагностики проблемы с measure_aggregators.py"""
+
 import sys
-import json
-from pathlib import Path
 
 print("=" * 60)
 print("Минимальный тест measure_aggregators")
@@ -14,6 +13,7 @@ errors = []
 print("\n[1/6] Тест импорта модулей...")
 try:
     from spanverify.dataset import read_pairs
+
     print("  ✓ read_pairs")
 except Exception as e:
     print(f"  ❌ read_pairs: {e}")
@@ -21,27 +21,29 @@ except Exception as e:
 
 try:
     from spanverify.engine import Verifier, WeightsBundle
+
     print("  ✓ Verifier, WeightsBundle")
 except Exception as e:
     print(f"  ❌ Verifier: {e}")
     errors.append(f"Verifier: {e}")
 
 try:
-    from spanverify.features import load_feature_cache, set_feature_cache, is_scored_token
+    from spanverify.features import load_feature_cache, set_feature_cache
+
     print("  ✓ load_feature_cache, set_feature_cache, is_scored_token")
 except Exception as e:
     print(f"  ❌ features: {e}")
     errors.append(f"features: {e}")
 
 try:
-    from spanverify.calibration import IsotonicCalibrator, choose_threshold_report
+
     print("  ✓ IsotonicCalibrator, choose_threshold_report")
 except Exception as e:
     print(f"  ❌ calibration: {e}")
     errors.append(f"calibration: {e}")
 
 try:
-    from spanverify.train import auc_score
+
     print("  ✓ auc_score")
 except Exception as e:
     print(f"  ❌ auc_score: {e}")
@@ -55,6 +57,7 @@ try:
 except Exception as e:
     print(f"  ❌ Загрузка данных: {e}")
     import traceback
+
     traceback.print_exc()
     errors.append(f"Загрузка данных: {e}")
     pairs = []
@@ -68,6 +71,7 @@ try:
 except Exception as e:
     print(f"  ❌ Загрузка кеша: {e}")
     import traceback
+
     traceback.print_exc()
     errors.append(f"Загрузка кеша: {e}")
     cache = {}
@@ -75,15 +79,14 @@ except Exception as e:
 # Тест 4: Загрузка бандла
 print("\n[4/6] Тест загрузки бандла...")
 try:
-    bundle = WeightsBundle.from_file(
-        "reports/experiments/p0_span/run39060670054/clause_capped/experiment.json"
-    )
-    print(f"  ✓ Бандл загружен")
+    bundle = WeightsBundle.from_file("reports/experiments/p0_span/run39060670054/clause_capped/experiment.json")
+    print("  ✓ Бандл загружен")
     print(f"    Model: {bundle.model}")
     print(f"    Threshold: {bundle.threshold}")
 except Exception as e:
     print(f"  ❌ Загрузка бандла: {e}")
     import traceback
+
     traceback.print_exc()
     errors.append(f"Загрузка бандла: {e}")
     bundle = None
@@ -94,10 +97,11 @@ verifier = None
 if bundle is not None:
     try:
         verifier = Verifier(mode="hf", weights=bundle)
-        print(f"  ✓ Verifier создан")
+        print("  ✓ Verifier создан")
     except Exception as e:
         print(f"  ❌ Создание верификатора: {e}")
         import traceback
+
         traceback.print_exc()
         errors.append(f"Создание верификатора: {e}")
 else:
@@ -113,14 +117,15 @@ if verifier is not None and pairs:
         print(f"  Тестовая пара: {test_pair.get('id', 'unknown')}")
         print(f"  Answer length: {len(answer)}")
         print(f"  Context length: {len(context)}")
-        
+
         result = verifier.verify(answer, context, with_tokens=True)
-        print(f"  ✓ Проверка выполнена")
+        print("  ✓ Проверка выполнена")
         print(f"    Score: {result.score:.4f}")
         print(f"    Tokens: {len(result.tokens)}")
     except Exception as e:
         print(f"  ❌ Проверка пары: {e}")
         import traceback
+
         traceback.print_exc()
         errors.append(f"Проверка пары: {e}")
 else:

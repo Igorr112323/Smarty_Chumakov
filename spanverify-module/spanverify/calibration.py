@@ -30,12 +30,12 @@ def pava(scores: Sequence[float], labels: Sequence[float]) -> tuple[list[float],
     """Изотоническая регрессия методом смежных нарушителей (PAVA).
 
     Возвращает (thresholds, values) — кусочно-постоянную неубывающую функцию от score.
-    
+
     Алгоритм:
     1. Группируем наблюдения по одинаковым x (scores), суммируем labels и веса
     2. Применяем взвешенный PAVA к уникальным x
     3. Возвращаем thresholds (верхние границы блоков) и values
-    
+
     Порядок строк с одинаковым score не влияет на результат.
     """
     if len(scores) != len(labels):
@@ -45,33 +45,34 @@ def pava(scores: Sequence[float], labels: Sequence[float]) -> tuple[list[float],
 
     # Шаг 1: Группируем по одинаковым x
     from collections import defaultdict
+
     groups = defaultdict(lambda: [0.0, 0.0])  # x -> [sum_y, count]
     for x, y in zip(scores, labels, strict=False):
         xf = float(x)
         groups[xf][0] += float(y)
         groups[xf][1] += 1.0
-    
+
     # Сортируем по x
     unique_x = sorted(groups.keys())
-    
+
     # Шаг 2: Применяем взвешенный PAVA к уникальным x
     # Блоки: [sum_y, count, upper_bound]
     blocks: list[list[float]] = []
     for x in unique_x:
         sum_y, count = groups[x]
         blocks.append([sum_y, count, x])
-        
+
         # Объединяем блоки, если нарушена монотонность
         while len(blocks) > 1 and blocks[-2][0] / blocks[-2][1] > blocks[-1][0] / blocks[-1][1]:
             sum_y2, count2, x2 = blocks.pop()
             sum_y1, count1, _ = blocks.pop()
             # При слиянии сохраняем верхнюю границу правого блока
             blocks.append([sum_y1 + sum_y2, count1 + count2, x2])
-    
+
     # Шаг 3: Извлекаем thresholds (верхние границы) и values
     thresholds = [block[2] for block in blocks]
     values = [block[0] / block[1] for block in blocks]
-    
+
     return thresholds, values
 
 
@@ -91,7 +92,7 @@ class IsotonicCalibrator:
 
     def transform_one(self, score: float) -> float:
         """Преобразовать сырую оценку в калиброванную вероятность.
-        
+
         Thresholds — верхние границы блоков PAVA. Используем bisect_left для
         нахождения первого threshold >= score. Если score <= thresholds[0],
         то idx=0 и возвращаем values[0]. Если score > thresholds[-1], то
@@ -99,13 +100,13 @@ class IsotonicCalibrator:
         """
         if not self.values:
             return float(score)
-        
+
         idx = bisect.bisect_left(self.thresholds, score)
-        
+
         # Если score больше всех thresholds, возвращаем последнее значение
         if idx >= len(self.values):
             return float(self.values[-1])
-        
+
         return float(self.values[idx])
 
     def transform(self, scores: Iterable[float]) -> list[float]:
@@ -128,7 +129,7 @@ class IsotonicCalibrator:
         PAVA на десятках тысяч токенов даёт тысячи блоков; для хранения и
         быстрого применения оставляем только точки, где значение меняется
         заметно (``tolerance``), но не больше ``max_points``.
-        
+
         Если compress=False, используется точный PAVA без прореживания.
         Это важно для answer-калибровки, где нужно сохранить все ступени.
         """
@@ -341,7 +342,7 @@ def _compress(
     max_points: int = 2000,
 ) -> tuple[list[float], list[float]]:
     """Прореживание изотонной ступенчатой функции.
-    
+
     Thresholds — верхние границы блоков. Сохраняем последнюю точку блока
     с одинаковым значением, чтобы при transform score попадал в правильный блок.
     Также объединяем блоки с одинаковыми thresholds, используя последнее значение
@@ -362,21 +363,22 @@ def _compress(
         else:
             merged_xs.append(x)
             merged_ys.append(y)
-    
+
     xs = merged_xs
     ys = merged_ys
-    
+
     if len(xs) <= 2:
         return [float(x) for x in xs], [float(y) for y in ys]
 
-    # Сохраняем точки с учётом tolerance от последней СОХРАНЁННОЙ точки
-    # Всегда сохраняем первую и последнюю точки
-    keep: list[int] = [0]  # Всегда сохраняем первую точку
-    for i in range(1, len(xs) - 1):
-        # Сохраняем точку, если её значение отличается от последней сохранённой на >= tolerance
-        last_kept_y = ys[keep[-1]]
-        if abs(ys[i] - last_kept_y) >= tolerance:
-            keep.append(i)
+    # PAVA thresholds are UPPER boundaries. Keep the previous point at a
+    # transition, not the first point of the next plateau: otherwise a new
+    # observation in the zero plateau is assigned the following value (1).
+    keep: list[int] = []
+    last_y = ys[0]
+    for i in range(1, len(xs)):
+        if abs(ys[i] - last_y) >= tolerance:
+            keep.append(i - 1)
+            last_y = ys[i]
     keep.append(len(xs) - 1)  # Всегда сохраняем последнюю точку
 
     if len(keep) > max_points:

@@ -352,10 +352,18 @@ def main(argv: list[str] | None = None) -> int:
             "0 — сравнение выключено; порог не подбирается по тесту"
         ),
     )
+    parser.add_argument("--no-test", action="store_true", help="Never read or evaluate the official test split")
     args = parser.parse_args(argv)
 
     dataset = Path(args.dataset)
-    records = load_records(dataset, args.pairs, 1312)
+    if args.no_test:
+        splits_dir = Path(args.splits_dir) if args.splits_dir else dataset.parent / "splits"
+        if args.no_splits or not (splits_dir / "train.jsonl").is_file():
+            print("--no-test requires official train/dev splits", file=sys.stderr)
+            return 3
+        records = _read_split(splits_dir, "train") + _read_split(splits_dir, "dev")
+    else:
+        records = load_records(dataset, args.pairs, 1312)
 
     # Кеш признаков: без него режим hf пересчитывает прямой проход модели в
     # каждом фолде кросс-валидации, и эксперимент не укладывается в лимит job'а
@@ -393,7 +401,7 @@ def main(argv: list[str] | None = None) -> int:
             train_split = _read_split(splits_dir, "train")
             if train_split:
                 splits["train"] = train_split
-                for name in ("dev", "test"):
+                for name in (("dev",) if args.no_test else ("dev", "test")):
                     part = _read_split(splits_dir, name)
                     if part:
                         splits[name] = part

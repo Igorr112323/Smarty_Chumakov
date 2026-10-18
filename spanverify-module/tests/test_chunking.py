@@ -119,7 +119,7 @@ class TestSelectRelevantChunks:
 
     def test_on_corpus_a3_sample(self) -> None:
         """BM25 should find relevant chunks on real data."""
-        data_path = __file__.rsplit("tests/", 1)[0] + "data/corpus_a3/pairs.jsonl"
+        data_path = __file__.rsplit("tests/", 1)[0] + "data/corpus_a3/splits/train.jsonl"
         try:
             with open(data_path, encoding="utf-8") as f:
                 pairs = [json.loads(line) for line in f][:20]

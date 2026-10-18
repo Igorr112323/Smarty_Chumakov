@@ -5,7 +5,7 @@
 (что оно делало в последний раз). Числа и номера прогонов не вписаны
 руками: их источник — реестр прогонов.
 
-Команда: `python scripts/collect_ci_workflows.py` (запуск: 2026-10-14T00:45:19Z).
+Команда: `python scripts/collect_ci_workflows.py` (запуск: 2026-10-18T23:32:32Z).
 
 | Задание | Запуск | Последний прогон | Артефакты | Числа в реестре |
 | --- | --- | --- | --- | --- |
@@ -21,6 +21,17 @@
 | `Тяжёлые прогоны hf` | вручную, на пуш; пуш `.github/hf-runs.trigger`; ветки `arena/**` | прогонов нет | да | — |
 | `Забрать числа hf` | вручную, на пуш; пуш `.github/hf-salvage.trigger`; ветки `arena/**` | прогонов нет | нет | — |
 | `Маска: сравнение варианта с фильтром коротких фрагментов` | вручную, на пуш; пуш `.github/hf-span-filter.trigger`; ветки `arena/**` | прогонов нет | да | — |
+| `P1 Build Test` | на пуш; пуш `.github/workflows/p1-build-test.yml`, `spanverify-module/scripts/build_p1_candidate.py`, `test_p1_build.py`; ветки `arena/c5f69767-smarty-chumakov` | прогонов нет | нет | — |
+| `P1 Public Replay` | на пуш, вручную; пуш `.github/workflows/p1-public-replay.yml`, `spanverify-module/scripts/build_p1_candidate.py`, `spanverify-module/scripts/replay_p1_dev.py`, `spanverify-module/tests/test_p1_replay_contract.py`; ветки `arena/c5f69767-smarty-chumakov` | прогонов нет | да | — |
+| `P2 cached HF experiment` | на пуш, вручную; пуш `.github/p2-training.trigger`; ветки `arena/c5f69767-smarty-chumakov` | прогонов нет | да | — |
+| `P3 frozen-model structural localization` | на пуш, вручную; пуш `.github/p3-postprocess.trigger`; ветки `arena/c5f69767-smarty-chumakov` | прогонов нет | да | — |
+| `P4 context token head` | на пуш, вручную; пуш `.github/p4-context.trigger`; ветки `arena/c5f69767-smarty-chumakov` | прогонов нет | да | — |
+| `P5 span keep/drop filter` | на пуш, вручную; пуш `.github/p5-span.trigger`; ветки `arena/c5f69767-smarty-chumakov` | прогонов нет | да | — |
+| `P6 frozen product acceptance` | вручную, на пуш; пуш `.github/p6-acceptance.trigger`; ветки `arena/c5f69767-smarty-chumakov` | прогонов нет | да | — |
+| `P0-3 P1 Answer Head` | на пуш, вручную; пуш `spanverify-module/spanverify/answer_head.py`, `spanverify-module/spanverify/oof.py`, `spanverify-module/scripts/measure_p1.py`, `spanverify-module/tests/test_answer_head.py`, `.github/workflows/postprocess-p0-answer-p1.yml`; ветки `arena/c5f69767-smarty-chumakov` | прогонов нет | да | — |
+| `P0-2 Ответы` | на пуш, вручную; пуш `.github/postprocess-p0-answer.trigger`; ветки `arena/c5f69767-smarty-chumakov` | прогонов нет | да | — |
+| `Постобработка span_expansion` | на пуш, вручную; пуш `.github/postprocess-span-comparison.trigger`; ветки `arena/c5f69767-smarty-chumakov` | прогонов нет | да | — |
+| `Export existing P1 raw files` | на пуш, вручную; пуш `.github/workflows/recover-p1-results.yml`; ветки `arena/c5f69767-smarty-chumakov` | прогонов нет | да | — |
 
 Источник колонки «Последний прогон» — `reports/CI_RUNS.json`: последние 100 прогонов репозитория. Поэтому «прогонов нет» означает «нет в этом списке», а не «задание никогда не запускалось»; пересобрать список — `python scripts/collect_ci_runs.py --limit 100`.
 

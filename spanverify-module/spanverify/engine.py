@@ -836,6 +836,12 @@ class Verifier:
     def _calibrate(self, raw_score: float) -> float:
         if self.bundle.isotonic is None:
             return raw_score
+        if (self.bundle.meta or {}).get("isotonic_threshold_semantics") == "lower_bounds_legacy_v1":
+            # Old demo compression saved FIRST points; P1/P5 remains upper-bound.
+            import bisect
+
+            index = max(0, bisect.bisect_right(self.bundle.isotonic.thresholds, raw_score) - 1)
+            return float(self.bundle.isotonic.values[index])
         return self.bundle.isotonic.transform_one(raw_score)
 
     def _shares(

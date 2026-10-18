@@ -1138,5 +1138,7 @@
       "duration_s": 0.05
     }
   ],
-  "rule": "статус «соответствует» ставится только по факту выполненной проверки; «не измерено» допустимо лишь с обоснованием"
+  "rule": "статус «соответствует» ставится только по факту выполненной проверки; «не измерено» допустимо лишь с обоснованием",
+  "provenance": "local",
+  "provenance_note": "Historical locally generated report, not a CI artifact; no acceptance claim for frozen P5."
 }

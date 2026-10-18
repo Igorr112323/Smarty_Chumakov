@@ -40,6 +40,9 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--port", type=int, default=DEFAULT_PORT)
     parser.add_argument("--host", default="0.0.0.0")
     parser.add_argument("--mode", choices=["demo", "hf"], default="demo")
+    parser.add_argument("--weights", default="config/weights.json")
+    parser.add_argument("--model", default=None)
+    parser.add_argument("--runtime-dir", default=None, help="Portable external Python libraries directory (HF only)")
     parser.add_argument("--no-browser", action="store_true")
     parser.add_argument("--quiet", action="store_true")
     parser.add_argument(
@@ -50,6 +53,8 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--version", action="version", version=f"SpanVerify {__version__}")
     args = parser.parse_args(argv)
 
+    if args.runtime_dir:
+        sys.path.insert(0, str(Path(args.runtime_dir).resolve()))
     port = free_port(args.port)
     if not args.quiet or args.port_file:
         print(f"[spanverify] сервис будет запущен на http://127.0.0.1:{port}", flush=True)
@@ -65,7 +70,7 @@ def main(argv: list[str] | None = None) -> int:
             webbrowser.open(f"http://127.0.0.1:{port}")
         except Exception:  # noqa: BLE001 - в среде без браузера это не ошибка
             pass
-    serve(host=args.host, port=port, mode=args.mode, quiet=args.quiet)
+    serve(host=args.host, port=port, mode=args.mode, weights_path=args.weights, model_name=args.model, quiet=args.quiet)
     return 0
 
 

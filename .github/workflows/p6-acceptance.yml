@@ -1,0 +1,77 @@
+name: P6 frozen product acceptance
+on:
+  workflow_dispatch:
+  push:
+    branches: [arena/c5f69767-smarty-chumakov]
+    paths: [.github/p6-acceptance.trigger]
+permissions:
+  contents: read
+  actions: read
+jobs:
+  parity:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: pip install -r spanverify-module/requirements-token-head-tests.txt
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: hf-cache-a3-v2-*
+          merge-multiple: false
+          path: .arena/hf-reference
+          run-id: 39060670054
+          github-token: ${{ github.token }}
+      - name: Actual frozen public dev replay; zero drift required, no fitting
+        working-directory: spanverify-module
+        run: python scripts/p6_acceptance.py parity --cache ../.arena/hf-reference --out ../reports/acceptance/parity
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: p6-parity
+          path: reports/acceptance/parity/
+  product:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    strategy:
+      fail-fast: false
+      matrix:
+        mode: [demo, hf]
+    env:
+      OMP_NUM_THREADS: '2'
+      MKL_NUM_THREADS: '2'
+      OPENBLAS_NUM_THREADS: '2'
+      PYTHONUTF8: '1'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Product HF dependencies, not experimental inference
+        if: matrix.mode == 'hf'
+        run: |
+          pip install 'torch~=2.14' --index-url https://download.pytorch.org/whl/cpu
+          pip install 'transformers~=5.18' 'sentencepiece~=0.2'
+      - name: Download weights by one public product request (separately timed, no benchmark credit)
+        if: matrix.mode == 'hf'
+        working-directory: spanverify-module
+        run: |
+          mkdir -p ../reports/acceptance/hf
+          /usr/bin/time -v python scripts/p6_acceptance.py worker --mode hf --out ../reports/acceptance/hf/download-product-request.json 2> ../reports/acceptance/hf/download.log
+      - name: Three cold and warm repeats, both input roles, profiles, 2M UTF-8 evidence
+        working-directory: spanverify-module
+        run: python -u scripts/p6_acceptance.py benchmark --mode ${{ matrix.mode }} --out ../reports/acceptance/${{ matrix.mode }}
+      - name: Real CLI, local web 8765, HTTP requests and responses
+        working-directory: spanverify-module
+        run: python scripts/p6_acceptance.py interfaces --mode ${{ matrix.mode }} --out ../reports/acceptance/${{ matrix.mode }}/interfaces
+      - name: Known train-only synthetic mixtures, no calibration
+        working-directory: spanverify-module
+        run: python scripts/p6_acceptance.py shares --mode ${{ matrix.mode }} --out ../reports/acceptance/${{ matrix.mode }}
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: p6-product-${{ matrix.mode }}
+          path: reports/acceptance/${{ matrix.mode }}/
+          retention-days: 90
