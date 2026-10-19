@@ -98,3 +98,89 @@ def test_cached_cosine_norms_are_float_exact():
     norms = [sum(x * x for x in row) ** 0.5 for row in vectors]
     actual = _dense_cosine_scores_exact(query, vectors, norm, norms)
     assert [x.hex() for x in actual] == [_cosine_dense(query, row).hex() for row in vectors]
+
+
+def test_sentence_index_matches_prefix_reference_and_style_rows():
+    import re
+
+    from spanverify.features import FeatureMatrix, is_scored_token
+    from spanverify.participation import _cliche_rate, _len_norm, _sentence_bounds, _sentence_of, token_rows
+    from spanverify.text import _SENT_BOUNDARY, ABBREV, sentences
+
+    rng = random.Random(251)
+    for _ in range(100):
+        text = "".join(
+            rng.choice(["А. ", "ст. 15. ", "г. Москва. ", "Десять лет!\n", "«ёлка». ", " \t", "\u00a0", "Один? "])
+            for _ in range(20)
+        )
+        cuts = []
+        for m in _SENT_BOUNDARY.finditer(text):
+            last = re.split(r'[\s«"(]', text[: m.start()].rstrip())[-1].strip(".,!?…").lower()
+            if last and len(last) <= 4 and last in ABBREV:
+                continue
+            cuts.append(m.end())
+        starts = [0] + cuts
+        ends = cuts + [len(text)]
+        expected = [(a, b) for a, b in zip(starts, ends, strict=True) if text[a:b].strip()]
+        assert sentences(text) == expected
+        tokens = tokenize_with_offsets(text)
+        matrix = FeatureMatrix(
+            attention_entropy=[0.2] * len(tokens),
+            ctx_attention_mass=[0.3] * len(tokens),
+            embedding_density=[0.4] * len(tokens),
+        )
+        legacy = []
+        for t in tokens:
+            if is_scored_token(t.text):
+                a, b = _sentence_of(t.start, _sentence_bounds(text))
+                frag = text[a:b]
+                legacy.append([0.2, 0.3, 0.4, _cliche_rate(frag), _len_norm(frag)])
+        assert token_rows(text, matrix)[0] == legacy
+
+
+def test_share_calibration_is_monotone_versioned_and_quality_invariant(monkeypatch):
+    import json
+    from pathlib import Path
+
+    import pytest
+
+    from spanverify.engine import Verifier, WeightsBundle
+    from spanverify.share_calibration import AiShareCalibrator
+
+    sha = "e0b13c693a058dfd66ed24a52fc14e9c70964e95885358e7b99cc1f328ad6892"
+    c = AiShareCalibrator.fit([0.1, 0.1, 0.3, 0.5, 0.8], [1.0, 0.0, 0.9, 0.2, 0.4], mode="demo", bundle_sha256=sha)
+    clone = AiShareCalibrator.from_dict(c.to_dict())
+    assert [clone.transform(x / 100) for x in range(101)] == sorted(clone.transform(x / 100) for x in range(101))
+    for bad in [float("nan"), -1.0, 2.0]:
+        with pytest.raises(ValueError):
+            clone.transform(bad)
+    for bad in [
+        {},
+        {"v2": {}},
+        {c.schema: {"extra": 1}},
+        {c.schema: dict(upper=[1.0, 0.1], values=[0.2, 0.5], mode="demo", bundle_sha256=sha)},
+        {c.schema: dict(upper=[], values=[], mode="demo", bundle_sha256=sha)},
+    ]:
+        with pytest.raises(ValueError):
+            AiShareCalibrator.from_dict(bad)
+    with pytest.raises(ValueError):
+        AiShareCalibrator.fit([], [], mode="demo", bundle_sha256=sha)
+    bundle = WeightsBundle.load(
+        Path(__file__).parents[1] / "reports/experiments/p5_span_filter/run39170981235/combined_bundle.json"
+    )
+    raw = Verifier(mode="demo", weights=bundle, span_expansion="mask").verify(
+        "Срок 10 лет.", "Срок 5 лет.", with_tokens=True
+    )
+    v = Verifier(mode="demo", weights=bundle, span_expansion="mask", ai_share_calibrator=c.to_dict())
+    after = v.verify("Срок 10 лет.", "Срок 5 лет.", with_tokens=True)
+    assert json.dumps(raw.tokens, sort_keys=True) == json.dumps(after.tokens, sort_keys=True)
+    assert raw.score == after.score and raw.spans == after.spans and raw.verdict == after.verdict
+    assert raw.ai_share == after.stats["ai_share_raw"] and after.ai_share == c.transform(raw.ai_share)
+    assert v.verify("", "").ai_share == 0.0
+    wrong = c.to_dict()
+    wrong[c.schema]["mode"] = "hf"
+    with pytest.raises(ValueError):
+        Verifier(mode="demo", weights=bundle, ai_share_calibrator=wrong)
+    monkeypatch.setenv("SPANVERIFY_AI_SHARE_CALIBRATOR", "missing-calibrator.json")
+    with pytest.raises(FileNotFoundError):
+        Verifier(mode="demo", weights=bundle)

@@ -452,6 +452,17 @@ jobs:
           }
           Write-Host "::notice title=размеры поставки::exe $exe байт ($exeMb МБ), pyz $pyz байт ($pyzMb МБ)"
 
+      - name: P7 Windows HF autonomy, external libraries/weights, firewall offline
+        shell: pwsh
+        run: ./scripts/p7_windows_hf.ps1 -ReleaseDir release -OutputDir release/hf-autonomy
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: p7-windows-hf-autonomy
+          path: spanverify-module/release/hf-autonomy/
+          retention-days: 90
+
       - name: Обновить реестр чисел (reports/NUMBERS.json)
         # Число без источника в реестре — дефект, поэтому реестр обновляется там же,
         # где получено измерение (тот же порядок, что в задании hf-footprint):
@@ -485,10 +496,10 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         working-directory: spanverify-module/release
         run: |
-          $tag = "v1.3.1-rc.p6.${{ github.run_id }}"
-          $notes = "P6 RC only; code ${{ github.sha }}. No stable acceptance or official test177 claim. Default executable is demo; frozen P5 HF bundle/runtime supplied separately. HF requires external model weights (~530 MB) and compatible libraries (~500 MB); not part of the small executable. See reports/acceptance."
+          $tag = "v1.3.1-rc.p7.${{ github.run_id }}"
+          $notes = "P7 RC only; code ${{ github.sha }}. No stable acceptance or official test177 claim. Default executable is demo; frozen P5 HF bundle/runtime supplied separately. HF requires external model weights (~530 MB) and compatible libraries (~500 MB); not part of the small executable. See reports/acceptance."
           gh release create $tag spanverify.exe spanverify-win.zip spanverify.pyz frozen-p5.json p5-runtime.json SHA256SUMS.txt `
-            --repo "${{ github.repository }}" --target "${{ github.sha }}" --title "SpanVerify P6 RC" `
+            --repo "${{ github.repository }}" --target "${{ github.sha }}" --title "SpanVerify P7 RC" `
             --notes $notes --prerelease --latest=false
           if ($LASTEXITCODE -ne 0) { throw "RC publication failed" }
           gh release view $tag --repo "${{ github.repository }}" --json url,assets

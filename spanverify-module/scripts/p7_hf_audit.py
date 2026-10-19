@@ -29,6 +29,10 @@ def main(out):
             .sha256(json.dumps([(p["id"], p["answer"]) for p in pairs], ensure_ascii=False).encode())
             .hexdigest(),
         )
+    print("::notice title=P7 truncation audit::" + json.dumps(audit))
+    assert (
+        audit["train"]["answer_over_512"] == 0 and audit["dev"]["answer_over_512"] == 0
+    ), "Long-answer change would affect saved OOF/dev states; reject it"
     source = subprocess.check_output(["git", "show", "14a018a:spanverify-module/spanverify/features.py"], text=True)
     old = types.ModuleType("spanverify._p7_legacy_features")
     old.__package__ = "spanverify"

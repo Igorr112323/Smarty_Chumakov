@@ -13,7 +13,7 @@
 установки зависимостей (режим `hf` требует `torch` и `transformers`).
 
 ```
-python -m spanverify server                       # сервис + интерфейс: http://localhost:8765
+python -m spanverify server                       # сервис + интерфейс: http://localhost:8835
 python -m spanverify verify --answer "..." --context "..."
 ```
 
@@ -23,7 +23,7 @@ python -m spanverify verify --answer "..." --context "..."
 
 | Что | Состояние |
 |---|---|
-| Конвейер (признаки → риск → фрагменты → калибровка → вердикт) | реализован, 876 тестов, покрытие [текущий отчёт покрытия CI](https://github.com/Igorr112323/Smarty_Chumakov/actions/workflows/ci.yml) |
+| Конвейер (признаки → риск → фрагменты → калибровка → вердикт) | реализован, 883 тестов, покрытие [текущий отчёт покрытия CI](https://github.com/Igorr112323/Smarty_Chumakov/actions/workflows/ci.yml) |
 | Режим `demo` (без зависимостей) | работает; признаки — лексические суррогаты, годится для проверки конвейера, интерфейса и обучения на своих данных |
 | Режим `hf` (реальная модель: внимание + скрытые состояния) | реализован; путь проверен на локально собранной модели, пилот на `rugpt3small` выполняется в CI |
 | Числа качества | получены на **синтетическом** корпусе: переносить их на реальные документы нельзя |
@@ -40,7 +40,7 @@ python -m spanverify verify --answer "..." --context "..."
 cd spanverify-module
 
 python -m spanverify selftest                     # само-проверка конвейера
-python -m spanverify server --port 8765           # сервис и веб-интерфейс
+python -m spanverify server --port 8835           # сервис и веб-интерфейс
 python -m spanverify verify --answer "Срок хранения составляет 3 года." \
                             --context "Регламент: срок хранения составляет 10 лет."
 python -m spanverify evaluate --dataset data/demo_pairs.jsonl
@@ -90,7 +90,7 @@ https://github.com/Igorr112323/Smarty_Chumakov/releases/latest/download/spanveri
 ```
 
 ```bash
-curl -s localhost:8765/v1/verify -H 'Content-Type: application/json' \
+curl -s localhost:8835/v1/verify -H 'Content-Type: application/json' \
   -d '{"answer":"Срок хранения составляет 3 года.","context":"Регламент: срок хранения составляет 10 лет."}' \
   | python -m json.tool
 ```
@@ -239,13 +239,13 @@ spanverify-module/
 │   ├── dataset.py       генератор демонстрационного корпуса с разметкой
 │   ├── train.py         веса, голова, маска, калибровка, отчёт об обучении
 │   ├── calibration.py   PAVA, пороги, метрики, AUC, кросс-валидация
-│   ├── server.py        HTTP-сервис на stdlib (порт 8765, контракт /v1/*)
+│   ├── server.py        HTTP-сервис на stdlib (порт 8835, контракт /v1/*)
 │   ├── cli.py           verify / train / calibrate / evaluate / selftest / server / demo / analyze
 │   ├── webui.py         встроенный интерфейс (одна страница, без внешних файлов)
 │   └── detector.py, backends/, vectors.py, training.py, text.py   исторический детектор «текст написан ИИ»
 ├── scripts/             exe_launcher.py, make_demo_dataset.py, make_markup_template.py,
 │                        run_experiments.py, pilot_rugpt3small.py, make_zipapp.py, make_exe.ps1
-├── tests/               876 тестов (pytest), у каждого теста — docstring о смысле проверки
+├── tests/               883 тестов (pytest), у каждого теста — docstring о смысле проверки
 ├── config/              weights.json (веса, порог, изотоника, голова), head.json, config.json
 ├── data/                demo_pairs.jsonl (демонстрационный корпус), demo_dataset.jsonl (исторический)
 ├── reports/             отчёты экспериментов и демо-прогонов

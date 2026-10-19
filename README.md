@@ -18,7 +18,7 @@
 https://github.com/Igorr112323/Smarty_Chumakov/releases/latest/download/spanverify.exe
 ```
 
-Двойной щелчок → откроется страница `http://localhost:8765` → вставить документ
+Двойной щелчок → откроется страница `http://localhost:8835` → вставить документ
 и ответ → «Проверить». Пошаговая инструкция (включая предупреждение SmartScreen
 и как удалить программу) — в [`docs/РУКОВОДСТВО.md`](docs/РУКОВОДСТВО.md).
 
@@ -35,8 +35,8 @@ python -m spanverify verify --answer "Срок хранения составля
 python -m spanverify train --dataset data/demo_pairs.jsonl --out config/weights.json
 python -m spanverify evaluate --dataset data/demo_pairs.jsonl   # метрики и критерий качества
 python -m spanverify selftest                                   # само-проверка конвейера
-python -m spanverify server --port 8765                         # API + веб-интерфейс
-python -m pytest -q                                             # 876 тестов
+python -m spanverify server --port 8835                         # API + веб-интерфейс
+python -m pytest -q                                             # 883 тестов
 ```
 
 Коды возврата `verify`: `0` — ответ подтверждён, `1` — найдены спорные
@@ -45,7 +45,7 @@ python -m pytest -q                                             # 876 тесто
 ## HTTP API (контракт)
 
 ```bash
-curl -X POST http://localhost:8765/v1/verify -H "Content-Type: application/json" -d '{
+curl -X POST http://localhost:8835/v1/verify -H "Content-Type: application/json" -d '{
   "answer": "Срок хранения первичных документов составляет 3 года.",
   "context": "Регламент 343: срок хранения первичных документов составляет 10 лет."
 }'

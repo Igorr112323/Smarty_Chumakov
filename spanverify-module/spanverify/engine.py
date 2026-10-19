@@ -336,6 +336,7 @@ class Verifier:
         span_filter_min_chars: int = 0,
         verdict_params: Mapping[str, Any] | None = None,
         span_expansion: str = "clause",
+        ai_share_calibrator=None,
     ) -> None:
         self.config = config or Config.load()
         # Правило вердикта берётся из замороженного артефакта калибровки
@@ -372,6 +373,25 @@ class Verifier:
         self.weights_loaded = weights is not None or self.bundle.loaded
         self.mode = (mode or self.bundle.mode or self.config.backend or "demo").lower()
         self.model_name = model_name or getattr(self.config, "hf_model", "ai-forever/rugpt3small_based_on_gpt2")
+        # Explicit opt-in only. Frozen ai_share raw, P1 score and token/span risks
+        # are never used as calibration targets or changed by this adapter.
+        import os
+
+        from .share_calibration import AiShareCalibrator
+
+        artifact = ai_share_calibrator or os.environ.get("SPANVERIFY_AI_SHARE_CALIBRATOR")
+        self._share_calibrator = None
+        if artifact is not None:
+            if isinstance(artifact, (str, Path)):
+                artifact = json.loads(Path(artifact).read_text(encoding="utf-8"))
+            self._share_calibrator = AiShareCalibrator.from_dict(artifact)
+            if self._share_calibrator.mode != self.mode or not self.bundle.span_filter:
+                raise ValueError("AI-share calibrator requires matching mode and frozen P5 bundle")
+            if (
+                self._share_calibrator.bundle_sha256
+                != "e0b13c693a058dfd66ed24a52fc14e9c70964e95885358e7b99cc1f328ad6892"
+            ):
+                raise ValueError("AI-share calibrator belongs to a different raw model")
         self._detector = detector
         # Проверка покрытия фактов документа ответом (типы missing и partial).
         #
@@ -645,7 +665,7 @@ class Verifier:
             "warning": self.warning,
         }
 
-        return VerificationResult(
+        result = VerificationResult(
             score=score,
             is_hallucination=score >= threshold,
             ai_share=ai_share_soft,
@@ -660,6 +680,16 @@ class Verifier:
             warning=self.warning,
             verdict=_verdict(score, threshold, spans, self.verdict_rule, self.verdict_params, stats),
         )
+
+        if self._share_calibrator is not None:
+            result.stats["ai_share_raw"] = result.ai_share
+            result.ai_share = self._share_calibrator.transform(result.ai_share)
+            result.stats["ai_share_calibrator_v1"] = {
+                "mode": self.mode,
+                "bundle_sha256": self._share_calibrator.bundle_sha256,
+                "scope": "synthetic train-only calibration, not real-LLM authorship validation",
+            }
+        return result
 
     # ---------------------------------------------------------------- оценка
 

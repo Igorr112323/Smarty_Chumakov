@@ -50,8 +50,8 @@ jobs:
           python-version: '3.11'
       - name: Fixed product HF dependencies
         run: |
-          pip install 'torch~=2.14' --index-url https://download.pytorch.org/whl/cpu
-          pip install 'transformers~=5.18' 'sentencepiece~=0.2'
+          pip install 'torch==2.14.1+cpu' --index-url https://download.pytorch.org/whl/cpu
+          pip install 'transformers==5.20.1' 'sentencepiece==0.2.2' 'numpy==2.4.6'
       - name: Actual HF golden, train/dev tokenizer audit and long-answer coverage
         run: python spanverify-module/scripts/p7_hf_audit.py reports/p7/hf-contract
       - uses: actions/upload-artifact@v4
@@ -59,4 +59,115 @@ jobs:
         with:
           name: p7-hf-contract
           path: reports/p7/hf-contract/
+          retention-days: 90
+  benchmark:
+    needs: [parity, hf-contract]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 40
+    strategy:
+      fail-fast: false
+      matrix:
+        mode: [demo, hf]
+    env:
+      OMP_NUM_THREADS: '2'
+      MKL_NUM_THREADS: '2'
+      OPENBLAS_NUM_THREADS: '2'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Fixed P6 product stack
+        if: matrix.mode == 'hf'
+        run: |
+          pip install 'torch==2.14.1+cpu' --index-url https://download.pytorch.org/whl/cpu
+          pip install 'transformers==5.20.1' 'sentencepiece==0.2.2' 'numpy==2.4.6'
+          python spanverify-module/scripts/p6_acceptance.py worker --mode hf --out reports/p7/hf/download.json
+      - name: Three cold/warm native repeats and independent profiles
+        run: python -u spanverify-module/scripts/p6_acceptance.py benchmark --mode ${{ matrix.mode }} --out reports/p7/benchmark-${{ matrix.mode }}
+      - name: Seconds per 1000 chars and uncensored evidence references
+        run: python spanverify-module/scripts/p7_measurements.py rates --out reports/p7/benchmark-${{ matrix.mode }}
+      - name: Actual product interfaces
+        run: python spanverify-module/scripts/p6_acceptance.py interfaces --mode ${{ matrix.mode }} --out reports/p7/interfaces-${{ matrix.mode }}
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: p7-benchmark-${{ matrix.mode }}
+          path: reports/p7/
+          retention-days: 90
+  calibration:
+    needs: [parity, hf-contract]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 40
+    strategy:
+      fail-fast: false
+      matrix:
+        mode: [demo, hf]
+    env:
+      OMP_NUM_THREADS: '2'
+      MKL_NUM_THREADS: '2'
+      OPENBLAS_NUM_THREADS: '2'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Fixed product dependencies
+        if: matrix.mode == 'hf'
+        run: |
+          pip install 'torch==2.14.1+cpu' --index-url https://download.pytorch.org/whl/cpu
+          pip install 'transformers==5.20.1' 'sentencepiece==0.2.2' 'numpy==2.4.6'
+      - name: Original five document folds, frozen raw, train-only isotonic
+        run: python -u spanverify-module/scripts/p7_share_calibration.py --mode ${{ matrix.mode }} --out reports/p7/calibration-${{ matrix.mode }}
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: p7-calibration-${{ matrix.mode }}
+          path: reports/p7/calibration-${{ matrix.mode }}/
+          retention-days: 90
+  full-hf-input:
+    needs: [parity, hf-contract]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 40
+    env:
+      OMP_NUM_THREADS: '2'
+      MKL_NUM_THREADS: '2'
+      OPENBLAS_NUM_THREADS: '2'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: |
+          pip install 'torch==2.14.1+cpu' --index-url https://download.pytorch.org/whl/cpu
+          pip install 'transformers==5.20.1' 'sentencepiece==0.2.2' 'numpy==2.4.6'
+      - name: Full real HF 2M answer, no truncation or synthetic tail
+        run: timeout 1800 python -u spanverify-module/scripts/p7_measurements.py functional --mode hf --out reports/p7/full-hf
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: p7-full-hf
+          path: reports/p7/full-hf/
+          retention-days: 90
+  acceptance-archive:
+    needs: [parity, hf-contract, benchmark, calibration, full-hf-input]
+    if: always()
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: p7-*
+          path: reports/p7/workflow-evidence
+      - name: Acceptance archive, never release asset upload
+        run: |
+          python -c "import shutil; shutil.make_archive('p7-acceptance', 'zip', 'reports/p7')"
+          sha256sum p7-acceptance.zip > p7-acceptance.zip.sha256
+      - uses: actions/upload-artifact@v4
+        with:
+          name: p7-acceptance-archive
+          path: |
+            p7-acceptance.zip
+            p7-acceptance.zip.sha256
           retention-days: 90

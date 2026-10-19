@@ -1557,6 +1557,17 @@ def hf_features_chunked(
         }
     )
 
+    if any(m.meta.get("full_answer") for m in chunk_matrices):
+        if not all(m.meta.get("all_answer_tokens_mapped") for m in chunk_matrices):
+            raise ValueError("Incomplete HF answer coverage; refusing mixed/truncated matrices")
+        merged.meta.update(
+            full_answer=True,
+            all_answer_tokens_mapped=True,
+            scored_answer_tokens=n_tokens,
+            answer_last_end=tokens[-1].end,
+            answer_windows=[m.meta["answer_windows"] for m in chunk_matrices],
+        )
+
     for feat in (
         "attention_entropy",
         "ctx_attention_mass",

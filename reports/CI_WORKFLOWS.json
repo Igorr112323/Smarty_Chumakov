@@ -1,7 +1,7 @@
 {
   "kind": "ci_workflows",
   "runs_considered": 100,
-  "generated_at": "2026-10-19T07:25:24Z",
+  "generated_at": "2026-10-19T07:43:23Z",
   "command": "python scripts/collect_ci_workflows.py",
   "source": ".github/workflows/*.yml + reports/CI_RUNS.json",
   "registry": {
@@ -41,7 +41,7 @@
         {
           "name": "Сборка и проверка .exe",
           "timeout_minutes": 40,
-          "steps": 18,
+          "steps": 20,
           "uploads_artifacts": true,
           "runs_python": "windows-latest"
         }
@@ -716,6 +716,34 @@
           "steps": 5,
           "uploads_artifacts": true,
           "runs_python": "ubuntu-latest"
+        },
+        {
+          "name": "benchmark",
+          "timeout_minutes": 40,
+          "steps": 7,
+          "uploads_artifacts": true,
+          "runs_python": "ubuntu-24.04"
+        },
+        {
+          "name": "calibration",
+          "timeout_minutes": 40,
+          "steps": 5,
+          "uploads_artifacts": true,
+          "runs_python": "ubuntu-24.04"
+        },
+        {
+          "name": "full-hf-input",
+          "timeout_minutes": 40,
+          "steps": 5,
+          "uploads_artifacts": true,
+          "runs_python": "ubuntu-24.04"
+        },
+        {
+          "name": "acceptance-archive",
+          "timeout_minutes": 10,
+          "steps": 4,
+          "uploads_artifacts": true,
+          "runs_python": "ubuntu-24.04"
         }
       ],
       "manual_only": true,
