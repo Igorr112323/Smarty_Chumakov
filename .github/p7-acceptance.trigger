@@ -12,3 +12,4 @@ P7 robust path resolution, complete benchmark receipts, bounded repeated-window 
 P7 actual legacy combined-token audit and complete acceptance; Windows error body
 P7 exact interval lookup, full2M public golden, native repeat acceptance
 P7 preserve existing40min guard; final full-input and native gates
+P7 current inventory888 across all documentation, no scientific changes

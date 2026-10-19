@@ -1,7 +1,7 @@
 {
   "kind": "ci_workflows",
   "runs_considered": 100,
-  "generated_at": "2026-10-19T09:47:16Z",
+  "generated_at": "2026-10-19T09:48:52Z",
   "command": "python scripts/collect_ci_workflows.py",
   "source": ".github/workflows/*.yml + reports/CI_RUNS.json",
   "registry": {
