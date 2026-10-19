@@ -1,0 +1,20 @@
+{
+  "cpu_model": "Intel(R) Xeon(R) Processor @ 2.60GHz",
+  "cpu_logical": 2,
+  "cpu_affinity": [
+    0,
+    1
+  ],
+  "meminfo_first_line": "MemTotal:        4034452 kB",
+  "os": "Linux-6.1.158+-x86_64-with-glibc2.36",
+  "python": "3.11.2 (main, Apr  8 2026, 01:58:00) [GCC 12.2.0]",
+  "git_sha": "dd0755e26242c1a210a3a4462317abe07a38cea2",
+  "git_branch": "speed/r1",
+  "env_threads": {
+    "OMP_NUM_THREADS": "1",
+    "OPENBLAS_NUM_THREADS": "1",
+    "MKL_NUM_THREADS": "1"
+  },
+  "bundle_sha256": "e0b13c693a058dfd66ed24a52fc14e9c70964e95885358e7b99cc1f328ad6892",
+  "model": "ai-forever/rugpt3small_based_on_gpt2"
+}

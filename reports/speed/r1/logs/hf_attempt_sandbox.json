@@ -1,0 +1,49 @@
+{
+  "fingerprint": {
+    "cpu_model": "Intel(R) Xeon(R) Processor @ 2.60GHz",
+    "cpu_logical": 2,
+    "cpu_affinity": [
+      0,
+      1
+    ],
+    "meminfo_first_line": "MemTotal:        4034452 kB",
+    "os": "Linux-6.1.158+-x86_64-with-glibc2.36",
+    "python": "3.11.2 (main, Apr  8 2026, 01:58:00) [GCC 12.2.0]",
+    "git_sha": "dd0755e26242c1a210a3a4462317abe07a38cea2",
+    "git_branch": "speed/r1",
+    "env_threads": {
+      "OMP_NUM_THREADS": "unset",
+      "OPENBLAS_NUM_THREADS": "unset",
+      "MKL_NUM_THREADS": "unset"
+    },
+    "bundle_sha256": "e0b13c693a058dfd66ed24a52fc14e9c70964e95885358e7b99cc1f328ad6892",
+    "model": "ai-forever/rugpt3small_based_on_gpt2"
+  },
+  "rows": [
+    {
+      "mode": "hf",
+      "scenario": "answer-text",
+      "chars": 1000,
+      "thermal": "warm-model",
+      "repeats": 2,
+      "raw_seconds": [
+        null,
+        null
+      ],
+      "median_s": null,
+      "p95_s": null,
+      "mean_s": null,
+      "min_s": null,
+      "max_s": null,
+      "limit_s": 0.03,
+      "pass": "ERROR",
+      "details_first": {
+        "status": "warmup_failed",
+        "error": "режим 'hf' требует torch и transformers: pip install -r requirements-hf.txt (причина: ModuleNotFoundError: No module named 'torch')",
+        "weights_load_s": 0.006294542999967234,
+        "verifier_init_s": 0.002901220999774523
+      }
+    }
+  ],
+  "fixed_marginal": []
+}

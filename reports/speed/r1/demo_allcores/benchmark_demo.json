@@ -1,0 +1,1088 @@
+[
+  {
+    "mode": "demo",
+    "scenario": "answer-text",
+    "chars": 1000,
+    "thermal": "cold-process",
+    "repeats": 10,
+    "raw_seconds": [
+      0.05622856399986631,
+      0.013572279999834791,
+      0.013531439999951544,
+      0.013405585999862524,
+      0.013815123000085805,
+      0.013471111999933782,
+      0.013948407000043517,
+      0.013501796000127797,
+      0.013421565000044211,
+      0.01346476999992774
+    ],
+    "median_s": 0.01351661800003967,
+    "p95_s": 0.03720249334994608,
+    "mean_s": 0.017836064299967803,
+    "min_s": 0.013405585999862524,
+    "max_s": 0.05622856399986631,
+    "limit_s": 0.03,
+    "pass": "PASS",
+    "details_first": {
+      "status": "completed",
+      "mode": "demo",
+      "scenario": "answer-text",
+      "chars": 1000,
+      "thermal": "cold-process",
+      "weights_load_s": 0.004684954000140351,
+      "verifier_init_s": 0.0028935929999533982,
+      "warmup_s": null,
+      "tokenization_s": 0.00024832000008245814,
+      "verify_s": 0.05622856399986631,
+      "serialization_s": 6.493000000773463e-06,
+      "total_s": 0.06381360399996083,
+      "latency_ms_reported": 56.12573199982762,
+      "profile_top": [
+        {
+          "file": "/home/user/Smarty_Chumakov/spanverify-module/spanverify/token_head.py",
+          "line": 141,
+          "function": "predict_one",
+          "calls": 46080,
+          "self_seconds": 0.013888008,
+          "cumulative_seconds": 0.013888008
+        },
+        {
+          "file": "/home/user/Smarty_Chumakov/spanverify-module/spanverify/token_head.py",
+          "line": 216,
+          "function": "predict_one",
+          "calls": 144,
+          "self_seconds": 0.0045571760000000005,
+          "cumulative_seconds": 0.025381670000000002
+        },
+        {
+          "file": "/home/user/Smarty_Chumakov/spanverify-module/spanverify/token_head.py",
+          "line": 35,
+          "function": "_to_float32",
+          "calls": 8064,
+          "self_seconds": 0.003274716,
+          "cumulative_seconds": 0.004791182000000001
+        },
+        {
+          "file": "/home/user/Smarty_Chumakov/spanverify-module/spanverify/core.py",
+          "line": 130,
+          "function": "tokenize_with_offsets",
+          "calls": 8,
+          "self_seconds": 0.002761528,
+          "cumulative_seconds": 0.004187096
+        },
+        {
+          "file": "/home/user/Smarty_Chumakov/spanverify-module/spanverify/context_head.py",
+          "line": 52,
+          "function": "build_context_features",
+          "calls": 1,
+          "self_seconds": 0.002126137,
+          "cumulative_seconds": 0.0057269700000000005
+        },
+        {
+          "file": "/home/user/Smarty_Chumakov/spanverify-module/spanverify/token_head.py",
+          "line": 234,
+          "function": "<listcomp>",
+          "calls": 144,
+          "self_seconds": 0.0015627610000000002,
+          "cumulative_seconds": 0.006353943000000001
+        },
+        {
+          "file": "/home/user/Smarty_Chumakov/spanverify-module/spanverify/core.py",
+          "line": 205,
+          "function": "number_value",
+          "calls": 1296,
+          "self_seconds": 0.001484667,
+          "cumulative_seconds": 0.0029566400000000004
+        },
+        {
+          "file": "~",
+          "line": 0,
+          "function": "<built-in method builtins.max>",
+          "calls": 5927,
+          "self_seconds": 0.001032556,
+          "cumulative_seconds": 0.001032556
+        },
+        {
+          "file": "/home/user/Smarty_Chumakov/spanverify-module/spanverify/core.py",
+          "line": 97,
+          "function": "word",
+          "calls": 2320,
+          "self_seconds": 0.000997752,
+          "cumulative_seconds": 0.001536173
+        },
+        {
+          "file": "/home/user/Smarty_Chumakov/spanverify-module/spanverify/features.py",
+          "line": 417,
+          "function": "demo_features",
+          "calls": 1,
+          "self_seconds": 0.000902186,
+          "cumulative_seconds": 0.009185499
+        },
+        {
+          "file": "/home/user/Smarty_Chumakov/spanverify-module/spanverify/context_head.py",
+          "line": 70,
+          "function": "<listcomp>",
+          "calls": 728,
+          "self_seconds": 0.000865739,
+          "cumulative_seconds": 0.001366564
+        },
+        {
+          "file": "~",
+          "line": 0,
+          "function": "<built-in method builtins.len>",
+          "calls": 10290,
+          "self_seconds": 0.0008438030000000001,
+          "cumulative_seconds": 0.0008692480000000001
+        },
+        {
+          "file": "~",
+          "line": 0,
+          "function": "<built-in method _struct.pack>",
+          "calls": 8064,
+          "self_seconds": 0.0008156610000000001,
+          "cumulative_seconds": 0.0008156610000000001
+        },
+        {
+          "file": "~",
+          "line": 0,
+          "function": "<method 'strip' of 'str' objects>",
+          "calls": 6613,
+          "self_seconds": 0.000783976,
+          "cumulative_seconds": 0.000783976
+        },
+        {
+          "file": "/home/user/Smarty_Chumakov/spanverify-module/spanverify/features.py",
+          "line": 548,
+          "function": "_group_number_values",
+          "calls": 6,
+          "self_seconds": 0.000783472,
+          "cumulative_seconds": 0.0034122790000000003
+        }
+      ],
+      "features_meta": {
+        "backend": "demo",
+        "token_count": 144,
+        "context_tokens": 70,
+        "context_numbers": [
+          "1",
+          "12",
+          "2",
+          "2022",
+          "4"
+        ],
+        "k": 5
+      },
+      "spans": 0,
+      "token_count": 144,
+      "mean_risk": 0.1712,
+      "answer_chars": 1000,
+      "context_chars": 494
+    }
+  },
+  {
+    "mode": "demo",
+    "scenario": "answer-text",
+    "chars": 1000,
+    "thermal": "warm-model",
+    "repeats": 10,
+    "raw_seconds": [
+      0.05371929799980535,
+      0.013324634000127844,
+      0.014575021999917226,
+      0.013211384999976872,
+      0.013590753000016775,
+      0.01327002299990454,
+      0.013218293999898378,
+      0.013410883999995349,
+      0.013387543000135338,
+      0.013214810000135913
+    ],
+    "median_s": 0.013356088500131591,
+    "p95_s": 0.036104373799855725,
+    "mean_s": 0.01749226459999136,
+    "min_s": 0.013211384999976872,
+    "max_s": 0.05371929799980535,
+    "limit_s": 0.03,
+    "pass": "PASS",
+    "details_first": {
+      "status": "completed",
+      "mode": "demo",
+      "scenario": "answer-text",
+      "chars": 1000,
+      "thermal": "warm-model",
+      "weights_load_s": 0.001846905999855153,
+      "verifier_init_s": 0.0014013119998708135,
+      "warmup_s": 0.003497772999935478,
+      "tokenization_s": 0.00022558799992111744,
+      "verify_s": 0.05371929799980535,
+      "serialization_s": 6.7099999796482734e-06,
+      "total_s": 0.06047199899944644,
+      "latency_ms_reported": 53.606525000077454,
+      "profile_top": [
+        {
+          "file": "/home/user/Smarty_Chumakov/spanverify-module/spanverify/token_head.py",
+          "line": 141,
+          "function": "predict_one",
+          "calls": 46080,
+          "self_seconds": 0.013804539000000001,
+          "cumulative_seconds": 0.013804539000000001
+        },
+        {
+          "file": "/home/user/Smarty_Chumakov/spanverify-module/spanverify/token_head.py",
+          "line": 216,
+          "function": "predict_one",
+          "calls": 144,
+          "self_seconds": 0.004452476,
+          "cumulative_seconds": 0.024897529
+        },
+        {
+          "file": "/home/user/Smarty_Chumakov/spanverify-module/spanverify/token_head.py",
+          "line": 35,
+          "function": "_to_float32",
+          "calls": 8064,
+          "self_seconds": 0.0031423450000000004,
+          "cumulative_seconds": 0.004581658000000001
+        },
+        {
+          "file": "/home/user/Smarty_Chumakov/spanverify-module/spanverify/core.py",
+          "line": 130,
+          "function": "tokenize_with_offsets",
+          "calls": 7,
+          "self_seconds": 0.0025406,
+          "cumulative_seconds": 0.003835536
+        },
+        {
+          "file": "/home/user/Smarty_Chumakov/spanverify-module/spanverify/context_head.py",
+          "line": 52,
+          "function": "build_context_features",
+          "calls": 1,
+          "self_seconds": 0.0020605050000000002,
+          "cumulative_seconds": 0.005581387
+        },
+        {
+          "file": "/home/user/Smarty_Chumakov/spanverify-module/spanverify/token_head.py",
+          "line": 234,
+          "function": "<listcomp>",
+          "calls": 144,
+          "self_seconds": 0.0015028630000000001,
+          "cumulative_seconds": 0.006084521000000001
+        },
+        {
+          "file": "/home/user/Smarty_Chumakov/spanverify-module/spanverify/core.py",
+          "line": 205,
+          "function": "number_value",
+          "calls": 1226,
+          "self_seconds": 0.0014363940000000001,
+          "cumulative_seconds": 0.0028369230000000003
+        },
+        {
+          "file": "/home/user/Smarty_Chumakov/spanverify-module/spanverify/core.py",
+          "line": 97,
+          "function": "word",
+          "calls": 2228,
+          "self_seconds": 0.000978228,
+          "cumulative_seconds": 0.001493963
+        },
+        {
+          "file": "~",
+          "line": 0,
+          "function": "<built-in method builtins.max>",
+          "calls": 5890,
+          "self_seconds": 0.0009129740000000001,
+          "cumulative_seconds": 0.0009129740000000001
+        },
+        {
+          "file": "/home/user/Smarty_Chumakov/spanverify-module/spanverify/context_head.py",
+          "line": 70,
+          "function": "<listcomp>",
+          "calls": 728,
+          "self_seconds": 0.0008829380000000001,
+          "cumulative_seconds": 0.001340162
+        },
+        {
+          "file": "/home/user/Smarty_Chumakov/spanverify-module/spanverify/features.py",
+          "line": 417,
+          "function": "demo_features",
+          "calls": 1,
+          "self_seconds": 0.000814296,
+          "cumulative_seconds": 0.007985088000000001
+        },
+        {
+          "file": "~",
+          "line": 0,
+          "function": "<built-in method builtins.len>",
+          "calls": 10060,
+          "self_seconds": 0.0008053320000000001,
+          "cumulative_seconds": 0.00082956
+        },
+        {
+          "file": "~",
+          "line": 0,
+          "function": "<built-in method _struct.pack>",
+          "calls": 8064,
+          "self_seconds": 0.000757677,
+          "cumulative_seconds": 0.000757677
+        },
+        {
+          "file": "~",
+          "line": 0,
+          "function": "<method 'strip' of 'str' objects>",
+          "calls": 6303,
+          "self_seconds": 0.0007440260000000001,
+          "cumulative_seconds": 0.0007440260000000001
+        },
+        {
+          "file": "/home/user/Smarty_Chumakov/spanverify-module/spanverify/features.py",
+          "line": 548,
+          "function": "_group_number_values",
+          "calls": 6,
+          "self_seconds": 0.000737578,
+          "cumulative_seconds": 0.003448071
+        }
+      ],
+      "features_meta": {
+        "backend": "demo",
+        "token_count": 144,
+        "context_tokens": 70,
+        "context_numbers": [
+          "1",
+          "12",
+          "2",
+          "2022",
+          "4"
+        ],
+        "k": 5
+      },
+      "spans": 0,
+      "token_count": 144,
+      "mean_risk": 0.1712,
+      "answer_chars": 1000,
+      "context_chars": 494
+    }
+  },
+  {
+    "mode": "demo",
+    "scenario": "answer-text",
+    "chars": 50000,
+    "thermal": "cold-process",
+    "repeats": 10,
+    "raw_seconds": [
+      2.4976427080000576,
+      0.6060442729999522,
+      0.6046775620000062,
+      0.6658112630000232,
+      0.6765021020000859,
+      0.6040394179999566,
+      0.7390299740000046,
+      0.6190009419999569,
+      0.6290432969999529,
+      0.5980027220000466
+    ],
+    "median_s": 0.6240221194999549,
+    "p95_s": 1.706266977700035,
+    "mean_s": 0.8239794261000043,
+    "min_s": 0.5980027220000466,
+    "max_s": 2.4976427080000576,
+    "limit_s": 1.0,
+    "pass": "PASS",
+    "details_first": {
+      "status": "completed",
+      "mode": "demo",
+      "scenario": "answer-text",
+      "chars": 50000,
+      "thermal": "cold-process",
+      "weights_load_s": 0.0019341409999924508,
+      "verifier_init_s": 0.0014620439999362134,
+      "warmup_s": null,
+      "tokenization_s": 0.015835186000003887,
+      "verify_s": 2.4976427080000576,
+      "serialization_s": 1.5417999975397834e-05,
+      "total_s": 2.5010543109999617,
+      "latency_ms_reported": 2492.721751999852,
+      "profile_top": [
+        {
+          "file": "/home/user/Smarty_Chumakov/spanverify-module/spanverify/token_head.py",
+          "line": 141,
+          "function": "predict_one",
+          "calls": 2263360,
+          "self_seconds": 0.675901874,
+          "cumulative_seconds": 0.675901874
+        },
+        {
+          "file": "/home/user/Smarty_Chumakov/spanverify-module/spanverify/token_head.py",
+          "line": 216,
+          "function": "predict_one",
+          "calls": 7073,
+          "self_seconds": 0.221645746,
+          "cumulative_seconds": 1.2217726640000002
+        },
+        {
+          "file": "/home/user/Smarty_Chumakov/spanverify-module/spanverify/token_head.py",
+          "line": 35,
+          "function": "_to_float32",
+          "calls": 396088,
+          "self_seconds": 0.15303368,
+          "cumulative_seconds": 0.22465551700000003
+        },
+        {
+          "file": "/home/user/Smarty_Chumakov/spanverify-module/spanverify/context_head.py",
+          "line": 52,
+          "function": "build_context_features",
+          "calls": 1,
+          "self_seconds": 0.10749974400000001,
+          "cumulative_seconds": 0.29321064
+        },
+        {
+          "file": "/home/user/Smarty_Chumakov/spanverify-module/spanverify/core.py",
+          "line": 130,
+          "function": "tokenize_with_offsets",
+          "calls": 7,
+          "self_seconds": 0.100341093,
+          "cumulative_seconds": 0.152677255
+        },
+        {
+          "file": "/home/user/Smarty_Chumakov/spanverify-module/spanverify/token_head.py",
+          "line": 234,
+          "function": "<listcomp>",
+          "calls": 7073,
+          "self_seconds": 0.072932781,
+          "cumulative_seconds": 0.29758829800000003
+        },
+        {
+          "file": "/home/user/Smarty_Chumakov/spanverify-module/spanverify/core.py",
+          "line": 205,
+          "function": "number_value",
+          "calls": 56258,
+          "self_seconds": 0.062632935,
+          "cumulative_seconds": 0.12342546200000001
+        },
+        {
+          "file": "/home/user/Smarty_Chumakov/spanverify-module/spanverify/context_head.py",
+          "line": 70,
+          "function": "<listcomp>",
+          "calls": 35560,
+          "self_seconds": 0.049390501,
+          "cumulative_seconds": 0.073418208
+        },
+        {
+          "file": "~",
+          "line": 0,
+          "function": "<built-in method builtins.max>",
+          "calls": 287417,
+          "self_seconds": 0.047173378,
+          "cumulative_seconds": 0.047173378
+        },
+        {
+          "file": "/home/user/Smarty_Chumakov/spanverify-module/spanverify/core.py",
+          "line": 97,
+          "function": "word",
+          "calls": 97239,
+          "self_seconds": 0.040115424000000004,
+          "cumulative_seconds": 0.06266405500000001
+        },
+        {
+          "file": "~",
+          "line": 0,
+          "function": "<built-in method builtins.len>",
+          "calls": 470185,
+          "self_seconds": 0.039305218,
+          "cumulative_seconds": 0.040356901
+        },
+        {
+          "file": "/home/user/Smarty_Chumakov/spanverify-module/spanverify/features.py",
+          "line": 417,
+          "function": "demo_features",
+          "calls": 1,
+          "self_seconds": 0.037495299,
+          "cumulative_seconds": 0.314571412
+        },
+        {
+          "file": "~",
+          "line": 0,
+          "function": "<built-in method _struct.pack>",
+          "calls": 396088,
+          "self_seconds": 0.037277660000000004,
+          "cumulative_seconds": 0.037277660000000004
+        },
+        {
+          "file": "~",
+          "line": 0,
+          "function": "<built-in method _struct.unpack>",
+          "calls": 396088,
+          "self_seconds": 0.034344177000000004,
+          "cumulative_seconds": 0.034344177000000004
+        },
+        {
+          "file": "/home/user/Smarty_Chumakov/spanverify-module/spanverify/features.py",
+          "line": 548,
+          "function": "_group_number_values",
+          "calls": 6,
+          "self_seconds": 0.033732285,
+          "cumulative_seconds": 0.155488917
+        }
+      ],
+      "features_meta": {
+        "backend": "demo",
+        "token_count": 7073,
+        "context_tokens": 70,
+        "context_numbers": [
+          "1",
+          "12",
+          "2",
+          "2022",
+          "4"
+        ],
+        "k": 5
+      },
+      "spans": 0,
+      "token_count": 7073,
+      "mean_risk": 0.1688,
+      "answer_chars": 50000,
+      "context_chars": 494
+    }
+  },
+  {
+    "mode": "demo",
+    "scenario": "answer-text",
+    "chars": 50000,
+    "thermal": "warm-model",
+    "repeats": 10,
+    "raw_seconds": [
+      2.5328811429999405,
+      0.6023209160000533,
+      0.6046485319998283,
+      0.7418248589999621,
+      0.7371128899999349,
+      0.6063889759998347,
+      0.6051597719999791,
+      0.6016658259998167,
+      0.6017803940001158,
+      0.6051569779999681
+    ],
+    "median_s": 0.6051583749999736,
+    "p95_s": 1.7269058151999517,
+    "mean_s": 0.8238940285999433,
+    "min_s": 0.6016658259998167,
+    "max_s": 2.5328811429999405,
+    "limit_s": 1.0,
+    "pass": "PASS",
+    "details_first": {
+      "status": "completed",
+      "mode": "demo",
+      "scenario": "answer-text",
+      "chars": 50000,
+      "thermal": "warm-model",
+      "weights_load_s": 0.0018620999999257037,
+      "verifier_init_s": 0.001331135999862454,
+      "warmup_s": 0.0031425429999671906,
+      "tokenization_s": 0.011568074000024353,
+      "verify_s": 2.5328811429999405,
+      "serialization_s": 1.356200004920538e-05,
+      "total_s": 2.539230483999745,
+      "latency_ms_reported": 2528.7268090000907,
+      "profile_top": [
+        {
+          "file": "/home/user/Smarty_Chumakov/spanverify-module/spanverify/token_head.py",
+          "line": 141,
+          "function": "predict_one",
+          "calls": 2263360,
+          "self_seconds": 0.7067351420000001,
+          "cumulative_seconds": 0.7067351420000001
+        },
+        {
+          "file": "/home/user/Smarty_Chumakov/spanverify-module/spanverify/token_head.py",
+          "line": 216,
+          "function": "predict_one",
+          "calls": 7073,
+          "self_seconds": 0.23120422000000002,
+          "cumulative_seconds": 1.2790374310000001
+        },
+        {
+          "file": "/home/user/Smarty_Chumakov/spanverify-module/spanverify/token_head.py",
+          "line": 35,
+          "function": "_to_float32",
+          "calls": 396088,
+          "self_seconds": 0.161162099,
+          "cumulative_seconds": 0.23629606300000003
+        },
+        {
+          "file": "/home/user/Smarty_Chumakov/spanverify-module/spanverify/context_head.py",
+          "line": 52,
+          "function": "build_context_features",
+          "calls": 1,
+          "self_seconds": 0.104113414,
+          "cumulative_seconds": 0.28042478200000004
+        },
+        {
+          "file": "/home/user/Smarty_Chumakov/spanverify-module/spanverify/core.py",
+          "line": 130,
+          "function": "tokenize_with_offsets",
+          "calls": 7,
+          "self_seconds": 0.102710195,
+          "cumulative_seconds": 0.154302092
+        },
+        {
+          "file": "/home/user/Smarty_Chumakov/spanverify-module/spanverify/token_head.py",
+          "line": 234,
+          "function": "<listcomp>",
+          "calls": 7073,
+          "self_seconds": 0.076772253,
+          "cumulative_seconds": 0.313068316
+        },
+        {
+          "file": "/home/user/Smarty_Chumakov/spanverify-module/spanverify/core.py",
+          "line": 205,
+          "function": "number_value",
+          "calls": 56258,
+          "self_seconds": 0.063397128,
+          "cumulative_seconds": 0.125757529
+        },
+        {
+          "file": "/home/user/Smarty_Chumakov/spanverify-module/spanverify/context_head.py",
+          "line": 70,
+          "function": "<listcomp>",
+          "calls": 35560,
+          "self_seconds": 0.046536235,
+          "cumulative_seconds": 0.069675319
+        },
+        {
+          "file": "~",
+          "line": 0,
+          "function": "<built-in method builtins.max>",
+          "calls": 287417,
+          "self_seconds": 0.045943596,
+          "cumulative_seconds": 0.045943596
+        },
+        {
+          "file": "/home/user/Smarty_Chumakov/spanverify-module/spanverify/core.py",
+          "line": 97,
+          "function": "word",
+          "calls": 97239,
+          "self_seconds": 0.041246305000000004,
+          "cumulative_seconds": 0.064348141
+        },
+        {
+          "file": "~",
+          "line": 0,
+          "function": "<built-in method _struct.pack>",
+          "calls": 396088,
+          "self_seconds": 0.039535185,
+          "cumulative_seconds": 0.039535185
+        },
+        {
+          "file": "~",
+          "line": 0,
+          "function": "<built-in method builtins.len>",
+          "calls": 470185,
+          "self_seconds": 0.038455217,
+          "cumulative_seconds": 0.039512041000000005
+        },
+        {
+          "file": "/home/user/Smarty_Chumakov/spanverify-module/spanverify/features.py",
+          "line": 417,
+          "function": "demo_features",
+          "calls": 1,
+          "self_seconds": 0.038048852,
+          "cumulative_seconds": 0.318510738
+        },
+        {
+          "file": "~",
+          "line": 0,
+          "function": "<built-in method _struct.unpack>",
+          "calls": 396088,
+          "self_seconds": 0.035598779000000004,
+          "cumulative_seconds": 0.035598779000000004
+        },
+        {
+          "file": "/home/user/Smarty_Chumakov/spanverify-module/spanverify/features.py",
+          "line": 548,
+          "function": "_group_number_values",
+          "calls": 6,
+          "self_seconds": 0.034890346,
+          "cumulative_seconds": 0.15834124000000002
+        }
+      ],
+      "features_meta": {
+        "backend": "demo",
+        "token_count": 7073,
+        "context_tokens": 70,
+        "context_numbers": [
+          "1",
+          "12",
+          "2",
+          "2022",
+          "4"
+        ],
+        "k": 5
+      },
+      "spans": 0,
+      "token_count": 7073,
+      "mean_risk": 0.1688,
+      "answer_chars": 50000,
+      "context_chars": 494
+    }
+  },
+  {
+    "mode": "demo",
+    "scenario": "answer-text",
+    "chars": 2000000,
+    "thermal": "cold-process",
+    "repeats": 10,
+    "raw_seconds": [
+      103.81746537999993,
+      26.947006182999985,
+      26.655994099000054,
+      27.560037620000003,
+      28.156274389999908,
+      26.784396395000158,
+      27.976925749999964,
+      27.991412065000077,
+      27.093890345999853,
+      27.56541205999997
+    ],
+    "median_s": 27.562724839999987,
+    "p95_s": 69.76992943449997,
+    "mean_s": 35.05488142879999,
+    "min_s": 26.655994099000054,
+    "max_s": 103.81746537999993,
+    "limit_s": 60.0,
+    "pass": "PASS",
+    "details_first": {
+      "status": "completed",
+      "mode": "demo",
+      "scenario": "answer-text",
+      "chars": 2000000,
+      "thermal": "cold-process",
+      "weights_load_s": 0.0019154609999532113,
+      "verifier_init_s": 0.0013216509998983383,
+      "warmup_s": null,
+      "tokenization_s": 0.5165425000000141,
+      "verify_s": 103.81746537999993,
+      "serialization_s": 2.5956000172300264e-05,
+      "total_s": 103.82072844799995,
+      "latency_ms_reported": 103616.19269100015,
+      "profile_top": [
+        {
+          "file": "/home/user/Smarty_Chumakov/spanverify-module/spanverify/token_head.py",
+          "line": 141,
+          "function": "predict_one",
+          "calls": 90505600,
+          "self_seconds": 27.508607528000002,
+          "cumulative_seconds": 27.508607528000002
+        },
+        {
+          "file": "/home/user/Smarty_Chumakov/spanverify-module/spanverify/token_head.py",
+          "line": 216,
+          "function": "predict_one",
+          "calls": 282830,
+          "self_seconds": 8.922170201,
+          "cumulative_seconds": 49.647249462000005
+        },
+        {
+          "file": "/home/user/Smarty_Chumakov/spanverify-module/spanverify/token_head.py",
+          "line": 35,
+          "function": "_to_float32",
+          "calls": 15838480,
+          "self_seconds": 6.252784861,
+          "cumulative_seconds": 9.124369786
+        },
+        {
+          "file": "/home/user/Smarty_Chumakov/spanverify-module/spanverify/core.py",
+          "line": 130,
+          "function": "tokenize_with_offsets",
+          "calls": 7,
+          "self_seconds": 5.045293754,
+          "cumulative_seconds": 7.2814768590000005
+        },
+        {
+          "file": "/home/user/Smarty_Chumakov/spanverify-module/spanverify/context_head.py",
+          "line": 52,
+          "function": "build_context_features",
+          "calls": 1,
+          "self_seconds": 4.644996416000001,
+          "cumulative_seconds": 12.319431644000002
+        },
+        {
+          "file": "/home/user/Smarty_Chumakov/spanverify-module/spanverify/token_head.py",
+          "line": 234,
+          "function": "<listcomp>",
+          "calls": 282830,
+          "self_seconds": 3.0066449420000003,
+          "cumulative_seconds": 12.131014728
+        },
+        {
+          "file": "/home/user/Smarty_Chumakov/spanverify-module/spanverify/core.py",
+          "line": 205,
+          "function": "number_value",
+          "calls": 2246564,
+          "self_seconds": 2.5913100630000003,
+          "cumulative_seconds": 5.122168697
+        },
+        {
+          "file": "/home/user/Smarty_Chumakov/spanverify-module/spanverify/context_head.py",
+          "line": 70,
+          "function": "<listcomp>",
+          "calls": 1422248,
+          "self_seconds": 1.993966504,
+          "cumulative_seconds": 2.9623418430000004
+        },
+        {
+          "file": "~",
+          "line": 0,
+          "function": "<built-in method builtins.max>",
+          "calls": 11493841,
+          "self_seconds": 1.878698511,
+          "cumulative_seconds": 1.878698511
+        },
+        {
+          "file": "~",
+          "line": 0,
+          "function": "<built-in method builtins.len>",
+          "calls": 18785992,
+          "self_seconds": 1.668088049,
+          "cumulative_seconds": 1.712341222
+        },
+        {
+          "file": "/home/user/Smarty_Chumakov/spanverify-module/spanverify/core.py",
+          "line": 97,
+          "function": "word",
+          "calls": 3879060,
+          "self_seconds": 1.6638544560000001,
+          "cumulative_seconds": 2.607795646
+        },
+        {
+          "file": "/home/user/Smarty_Chumakov/spanverify-module/spanverify/features.py",
+          "line": 417,
+          "function": "demo_features",
+          "calls": 1,
+          "self_seconds": 1.552331579,
+          "cumulative_seconds": 13.062009962000001
+        },
+        {
+          "file": "~",
+          "line": 0,
+          "function": "<built-in method _struct.pack>",
+          "calls": 15838480,
+          "self_seconds": 1.4941067110000001,
+          "cumulative_seconds": 1.4941067110000001
+        },
+        {
+          "file": "/home/user/Smarty_Chumakov/spanverify-module/spanverify/features.py",
+          "line": 548,
+          "function": "_group_number_values",
+          "calls": 6,
+          "self_seconds": 1.4142982270000002,
+          "cumulative_seconds": 6.451402927
+        },
+        {
+          "file": "~",
+          "line": 0,
+          "function": "<method 'strip' of 'str' objects>",
+          "calls": 11346023,
+          "self_seconds": 1.3953520730000002,
+          "cumulative_seconds": 1.3953520730000002
+        }
+      ],
+      "features_meta": {
+        "backend": "demo",
+        "token_count": 282830,
+        "context_tokens": 70,
+        "context_numbers": [
+          "1",
+          "12",
+          "2",
+          "2022",
+          "4"
+        ],
+        "k": 5
+      },
+      "spans": 0,
+      "token_count": 282830,
+      "mean_risk": 0.169,
+      "answer_chars": 2000000,
+      "context_chars": 494
+    }
+  },
+  {
+    "mode": "demo",
+    "scenario": "answer-text",
+    "chars": 2000000,
+    "thermal": "warm-model",
+    "repeats": 10,
+    "raw_seconds": [
+      105.50230531099987,
+      26.97796034399994,
+      27.199088115999984,
+      27.0481214670001,
+      26.360510288000114,
+      26.696904412000094,
+      27.335772746999965,
+      26.737456763000182,
+      26.5574652360001,
+      27.124982356000146
+    ],
+    "median_s": 27.01304090550002,
+    "p95_s": 70.32736565719998,
+    "mean_s": 34.75405670400005,
+    "min_s": 26.360510288000114,
+    "max_s": 105.50230531099987,
+    "limit_s": 60.0,
+    "pass": "PASS",
+    "details_first": {
+      "status": "completed",
+      "mode": "demo",
+      "scenario": "answer-text",
+      "chars": 2000000,
+      "thermal": "warm-model",
+      "weights_load_s": 0.0030897009999080183,
+      "verifier_init_s": 0.0014216919998943922,
+      "warmup_s": 0.0033303339998838055,
+      "tokenization_s": 0.5607786879998002,
+      "verify_s": 105.50230531099987,
+      "serialization_s": 2.704799999264651e-05,
+      "total_s": 105.51017408599955,
+      "latency_ms_reported": 105300.94186299993,
+      "profile_top": [
+        {
+          "file": "/home/user/Smarty_Chumakov/spanverify-module/spanverify/token_head.py",
+          "line": 141,
+          "function": "predict_one",
+          "calls": 90505600,
+          "self_seconds": 28.309345731,
+          "cumulative_seconds": 28.309345731
+        },
+        {
+          "file": "/home/user/Smarty_Chumakov/spanverify-module/spanverify/token_head.py",
+          "line": 216,
+          "function": "predict_one",
+          "calls": 282830,
+          "self_seconds": 9.144290409,
+          "cumulative_seconds": 51.216310832000005
+        },
+        {
+          "file": "/home/user/Smarty_Chumakov/spanverify-module/spanverify/token_head.py",
+          "line": 35,
+          "function": "_to_float32",
+          "calls": 15838480,
+          "self_seconds": 6.563189321,
+          "cumulative_seconds": 9.537775951
+        },
+        {
+          "file": "/home/user/Smarty_Chumakov/spanverify-module/spanverify/core.py",
+          "line": 130,
+          "function": "tokenize_with_offsets",
+          "calls": 7,
+          "self_seconds": 5.367045348,
+          "cumulative_seconds": 7.606020202000001
+        },
+        {
+          "file": "/home/user/Smarty_Chumakov/spanverify-module/spanverify/context_head.py",
+          "line": 52,
+          "function": "build_context_features",
+          "calls": 1,
+          "self_seconds": 4.688772259,
+          "cumulative_seconds": 12.051204174
+        },
+        {
+          "file": "/home/user/Smarty_Chumakov/spanverify-module/spanverify/token_head.py",
+          "line": 234,
+          "function": "<listcomp>",
+          "calls": 282830,
+          "self_seconds": 3.123714761,
+          "cumulative_seconds": 12.661490712
+        },
+        {
+          "file": "/home/user/Smarty_Chumakov/spanverify-module/spanverify/core.py",
+          "line": 205,
+          "function": "number_value",
+          "calls": 2246564,
+          "self_seconds": 2.5975051820000004,
+          "cumulative_seconds": 5.1605116550000005
+        },
+        {
+          "file": "/home/user/Smarty_Chumakov/spanverify-module/spanverify/context_head.py",
+          "line": 70,
+          "function": "<listcomp>",
+          "calls": 1422248,
+          "self_seconds": 1.980512684,
+          "cumulative_seconds": 2.93229992
+        },
+        {
+          "file": "~",
+          "line": 0,
+          "function": "<built-in method builtins.max>",
+          "calls": 11493840,
+          "self_seconds": 1.867455405,
+          "cumulative_seconds": 1.867455405
+        },
+        {
+          "file": "/home/user/Smarty_Chumakov/spanverify-module/spanverify/core.py",
+          "line": 97,
+          "function": "word",
+          "calls": 3879060,
+          "self_seconds": 1.682702568,
+          "cumulative_seconds": 2.6392057490000003
+        },
+        {
+          "file": "~",
+          "line": 0,
+          "function": "<built-in method builtins.len>",
+          "calls": 18785990,
+          "self_seconds": 1.6549382840000002,
+          "cumulative_seconds": 1.7002561390000002
+        },
+        {
+          "file": "/home/user/Smarty_Chumakov/spanverify-module/spanverify/features.py",
+          "line": 417,
+          "function": "demo_features",
+          "calls": 1,
+          "self_seconds": 1.574176776,
+          "cumulative_seconds": 13.079917531000001
+        },
+        {
+          "file": "~",
+          "line": 0,
+          "function": "<built-in method _struct.pack>",
+          "calls": 15838480,
+          "self_seconds": 1.5500444320000002,
+          "cumulative_seconds": 1.5500444320000002
+        },
+        {
+          "file": "~",
+          "line": 0,
+          "function": "<built-in method _struct.unpack>",
+          "calls": 15838480,
+          "self_seconds": 1.4245421980000001,
+          "cumulative_seconds": 1.4245421980000001
+        },
+        {
+          "file": "/home/user/Smarty_Chumakov/spanverify-module/spanverify/features.py",
+          "line": 548,
+          "function": "_group_number_values",
+          "calls": 6,
+          "self_seconds": 1.4108798020000002,
+          "cumulative_seconds": 6.502134229
+        }
+      ],
+      "features_meta": {
+        "backend": "demo",
+        "token_count": 282830,
+        "context_tokens": 70,
+        "context_numbers": [
+          "1",
+          "12",
+          "2",
+          "2022",
+          "4"
+        ],
+        "k": 5
+      },
+      "spans": 0,
+      "token_count": 282830,
+      "mean_risk": 0.169,
+      "answer_chars": 2000000,
+      "context_chars": 494
+    }
+  }
+]
