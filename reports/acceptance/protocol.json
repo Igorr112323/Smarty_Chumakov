@@ -7,19 +7,25 @@
   "mode_mapping_before_numbers": {
     "numeric_substitutions": {
       "corpus_mode": "number_attribution",
-      "expected_train_pairs": 132
+      "declared_corpus_pairs": 132
     },
     "contradictions": {
       "corpus_mode": "contradiction",
-      "expected_train_pairs": 144
+      "declared_corpus_pairs": 144
     },
     "wording_changes": {
-      "corpus_mode": "partial",
-      "interpretation": "partial/unconfirmed proxy, NOT paraphrase robustness proof"
+      "interpretation": "partial/unconfirmed proxy, NOT paraphrase robustness proof",
+      "corpus_modes": [
+        "partial",
+        "unconfirmed"
+      ]
     },
     "omissions": {
-      "corpus_mode": "missing",
-      "interpretation": "missing/oversight proxy"
+      "interpretation": "missing/oversight proxy",
+      "corpus_modes": [
+        "missing",
+        "oversight"
+      ]
     }
   },
   "token_convention": "P5 scored positions inside kept spans plus mandatory rules. Historical P2/P3/P4 numbers are not recomputed.",
@@ -66,5 +72,6 @@
     "source": "train contexts plus explicitly programmatically generated machine-style blocks; no external generation, fitting or calibration",
     "caution": "ai_share measures unsupportedness; ai_participation is a separate style estimate. Neither synthetic mixture test certifies real authorship calibration."
   },
-  "release": "RC prerelease only, never latest; immutable measured commit; no automatic repository writes"
+  "release": "RC prerelease only, never latest; immutable measured commit; no automatic repository writes",
+  "mode_mapping_note": "132/144 are declared whole-corpus mode counts, not train counts (train 92/104). All saved evidence modes are reported, with no selection. Lists clarify the user-requested partial/unconfirmed and missing/oversight grouping; no fitting or metric changes."
 }

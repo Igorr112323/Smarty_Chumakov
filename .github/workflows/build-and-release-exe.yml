@@ -128,6 +128,7 @@ jobs:
         run: |
           if (-not (Test-Path "config/weights.json")) { throw "missing demo weights: training forbidden" }
           $frozen = "reports/experiments/p5_span_filter/run39170981235/combined_bundle.json"
+          Write-Host ("::notice title=frozen-P5::bytes=" + (Get-Item $frozen).Length + " SHA256=" + (Get-FileHash $frozen -Algorithm SHA256).Hash.ToLower())
           if ((Get-FileHash $frozen -Algorithm SHA256).Hash.ToLower() -ne "e0b13c693a058dfd66ed24a52fc14e9c70964e95885358e7b99cc1f328ad6892") { throw "P5 hash drift" }
           Copy-Item $frozen config/frozen-p5.json
           Copy-Item reports/experiments/p4_context_head/run39164044941/runtime_config.json config/p5-runtime.json
@@ -289,8 +290,10 @@ jobs:
           Remove-Item $sandbox -Recurse -Force -ErrorAction SilentlyContinue
           New-Item -ItemType Directory -Force -Path $sandbox | Out-Null
           Copy-Item "release/spanverify.exe" (Join-Path $sandbox "spanverify.exe") -Force
+          $registryKeys = @("HKCU:\Software\SpanVerify", "HKLM:\Software\SpanVerify")
+          $registryBefore = @($registryKeys | ForEach-Object { Test-Path $_ })
           $portFile = Join-Path $sandbox "port.txt"
-          $proc = Start-Process -FilePath (Join-Path $sandbox "spanverify.exe") `
+          $proc = Start-Process -WorkingDirectory $sandbox -FilePath (Join-Path $sandbox "spanverify.exe") `
             -ArgumentList "--port", "8788", "--no-browser", "--port-file", $portFile -PassThru `
             -RedirectStandardOutput (Join-Path $sandbox "out.log") `
             -RedirectStandardError (Join-Path $sandbox "err.log")
@@ -325,6 +328,9 @@ jobs:
               -Method Post -Body ([System.Text.Encoding]::UTF8.GetBytes($payload)) `
               -ContentType "application/json; charset=utf-8" -TimeoutSec 60
             if ($bad.spans.Count -lt 1) { throw "автономный .exe не нашёл подмену" }
+            $registryAfter = @($registryKeys | ForEach-Object { Test-Path $_ })
+            if (Compare-Object $registryBefore $registryAfter) { throw "product registry key changed" }
+            @{ keys = $registryKeys; before = $registryBefore; after = $registryAfter; note = "Product keys only; not a global OS registry trace" } | ConvertTo-Json -Depth 10 | Set-Content -Encoding utf8 release/autonomy-registry.json
             $health | ConvertTo-Json -Depth 30 | Set-Content -Encoding utf8 release/autonomy-health.json
             $payload | Set-Content -Encoding utf8 release/autonomy-request.json
             $bad | ConvertTo-Json -Depth 30 | Set-Content -Encoding utf8 release/autonomy-response.json

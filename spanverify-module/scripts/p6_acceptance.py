@@ -361,7 +361,12 @@ def interfaces(args):
     import urllib.request
 
     env = dict(os.environ, SPANVERIFY_HF_MODEL=MODEL, SPANVERIFY_HF_MAX_TOKENS="512")
-    a, c = document(1000, "document-context")
+    # Canonical pre-existing number-attribution contract fixture, not selected by dev scores.
+    a = "Срок хранения первичных документов составляет десять лет."
+    c = (
+        "Согласно регламенту, срок хранения первичных документов составляет пять лет. "
+        "Срок хранения вторичных документов составляет десять лет."
+    )
     ap, cp = args.out / "answer.txt", args.out / "context.txt"
     ap.write_text(a, encoding="utf-8")
     cp.write_text(c, encoding="utf-8")
@@ -427,8 +432,14 @@ def interfaces(args):
             with urllib.request.urlopen(req, timeout=120) as response:
                 api = json.load(response)
                 save(args.out / "http-response.json", api)
+            assert api["spans"], "mandatory numeric attribution must return a span"
+            for span in api["spans"]:
+                assert 0 <= span["start"] < span["end"] <= len(a)
+                assert a[span["start"] : span["end"]] == span["text"]
+                assert span["label"] and 0 <= span["risk"] <= 1 and 0 <= span["confidence"] <= 1
             for key in ("score", "threshold", "verdict", "spans", "ai_share", "ai_participation"):
                 assert payload[key] == api[key], key
+            print("::notice title=P6 HTTP response::" + json.dumps(api, ensure_ascii=False), flush=True)
             save(
                 args.out / "interfaces.json",
                 {

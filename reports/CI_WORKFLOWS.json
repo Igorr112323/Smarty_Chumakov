@@ -1,7 +1,7 @@
 {
   "kind": "ci_workflows",
   "runs_considered": 100,
-  "generated_at": "2026-10-18T23:45:17Z",
+  "generated_at": "2026-10-19T00:19:52Z",
   "command": "python scripts/collect_ci_workflows.py",
   "source": ".github/workflows/*.yml + reports/CI_RUNS.json",
   "registry": {
@@ -85,8 +85,8 @@
         {
           "name": "Тесты (Python ${{ matrix.python }}, ${{ matrix.os }})",
           "timeout_minutes": 30,
-          "steps": 6,
-          "uploads_artifacts": false,
+          "steps": 7,
+          "uploads_artifacts": true,
           "runs_python": "${{ matrix.os }}"
         },
         {

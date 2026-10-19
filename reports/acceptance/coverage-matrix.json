@@ -1,0 +1,1307 @@
+{
+  "stage": "P6",
+  "tests_excluded": false,
+  "token_convention": "P5 kept spans + mandatory rules; historical baseline counts unchanged",
+  "requirements": [
+    {
+      "id": "speed-demo",
+      "status": "не достигнут",
+      "receipt": "reports/acceptance/run39177834081/p6-product-demo/benchmark.json",
+      "run_url": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39177834081",
+      "source_sha": "34a82a565f2e7cc84648f4d85b35826b558cd2e8"
+    },
+    {
+      "id": "interfaces-demo",
+      "status": "подтверждено",
+      "receipt": "reports/acceptance/run39177834081/p6-product-demo/interfaces/interfaces.json",
+      "run_url": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39177834081",
+      "fact": {
+        "mode": "demo",
+        "cli_returncode": 0,
+        "cli_command": [
+          "/opt/hostedtoolcache/Python/3.11.17/x64/bin/python",
+          "-m",
+          "spanverify",
+          "verify",
+          "--answer-file",
+          "../reports/acceptance/demo/interfaces/answer.txt",
+          "--context-file",
+          "../reports/acceptance/demo/interfaces/context.txt",
+          "--json",
+          "--mode",
+          "demo",
+          "--weights",
+          "/home/runner/work/Smarty_Chumakov/Smarty_Chumakov/spanverify-module/reports/experiments/p5_span_filter/run39170981235/combined_bundle.json"
+        ],
+        "server_command": [
+          "/opt/hostedtoolcache/Python/3.11.17/x64/bin/python",
+          "-m",
+          "spanverify",
+          "server",
+          "--host",
+          "0.0.0.0",
+          "--port",
+          "8765",
+          "--no-browser",
+          "--quiet",
+          "--mode",
+          "demo",
+          "--weights",
+          "/home/runner/work/Smarty_Chumakov/Smarty_Chumakov/spanverify-module/reports/experiments/p5_span_filter/run39170981235/combined_bundle.json"
+        ],
+        "web_status": 200,
+        "http_status": 200,
+        "parity_fields": [
+          "score",
+          "threshold",
+          "verdict",
+          "spans",
+          "ai_share"
+        ],
+        "passed": true,
+        "environment": {
+          "python": "3.11.17 (main, Oct  1 2026, 14:32:31) [GCC 13.3.0]",
+          "platform": "Linux-6.17.0-1022-azure-x86_64-with-glibc2.39",
+          "cpu_count": 4,
+          "cpuinfo": "processor\t: 0\nvendor_id\t: AuthenticAMD\ncpu family\t: 26\nmodel\t\t: 2\nmodel name\t: AMD EPYC 9V45 96-Core Processor\nstepping\t: 1\nmicrocode\t: 0xffffffff\ncpu MHz\t\t: 4535.797\ncache size\t: 1024 KB\nphysical id\t: 0\nsiblings\t: 4\ncore id\t\t: 0\ncpu cores\t: 2\napicid\t\t: 0\ninitial apicid\t: 0\nfpu\t\t: yes\nfpu_exception\t: yes\ncpuid level\t: 28\nwp\t\t: yes\nflags\t\t: fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush mmx fxsr sse sse2 ht syscall nx mmxext fxsr_opt pdpe1gb rdtscp lm constant_tsc rep_good nopl xtopology tsc_reliable nonstop_tsc cpuid extd_apicid aperfmperf tsc_known_freq pni pclmulqdq ssse3 fma cx16 pcid sse4_1 sse4_2 x2apic movbe popcnt aes xsave avx f16c rdrand hypervisor lahf_lm cmp_legacy svm cr8_legacy abm sse4a misalignsse 3dnowprefetch osvw topoext vmmcall fsgsbase bmi1 avx2 smep bmi2 erms invpcid avx512f avx512dq rdseed adx smap avx512ifma clflushopt clwb avx512cd sha_ni avx512bw avx512vl xsaveopt xsavec xgetbv1 xsaves user_shstk avx_vnni avx512_bf16 clzero xsaveerptr rdpru arat npt nrip_save tsc_scale vmcb_clean flushbyasid decodeassists pausefilter pfthreshold v_vmsave_vmload avx512vbmi umip avx512_vbmi2 gfni vaes vpclmulqdq avx512_vnni avx512_bitalg avx512_vpopcntdq rdpid fsrm avx512_vp2intersect\nbugs\t\t: sysret_ss_attrs null_seg spectre_v1 spectre_v2 spec_store_bypass srso spectre_v2_user\nbogomips\t: 5192.19\nTLB size\t: 192 4K pages\nclflush size\t: 64\ncache_alignment\t: 64\naddress sizes\t: 48 bits physical, 48 bits virtual\npower management:\n\nprocessor\t: 1\nvendor_id\t: AuthenticAMD\ncpu family\t: 26\nmodel\t\t: 2\nmodel name\t: AMD EPYC 9V45 96-Core Processor\nstepping\t: 1\nmicrocode\t: 0xffffffff\ncpu MHz\t\t: 4302.949\ncache size\t: 1024 KB\nphysical id\t: 0\nsiblings\t: 4\ncore id\t\t: 0\ncpu cores\t: 2\napicid\t\t: 1\ninitial apicid\t: 1\nfpu\t\t: yes\nfpu_exception\t: yes\ncpuid level\t: 28\nwp\t\t: yes\nflags\t\t: fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush mmx fxsr sse sse2 ht syscall nx mmxext fxsr_opt pdpe1gb rdtscp lm constant_tsc rep_good nopl xtopology tsc_reliable nonstop_tsc cpuid extd_apicid aperfmperf tsc_known_freq pni pclmulqdq ssse3 fma cx16 pcid sse4_1 sse4_2 x2apic movbe popcnt aes xsave avx f16c rdrand hypervisor lahf_lm cmp_legacy svm cr8_legacy abm sse4a misalignsse 3dnowprefetch osvw topoext vmmcall fsgsbase bmi1 avx2 smep bmi2 erms invpcid avx512f avx512dq rdseed adx smap avx512ifma clflushopt clwb avx512cd sha_ni avx512bw avx512vl xsaveopt xsavec xgetbv1 xsaves user_shstk avx_vnni avx512_bf16 clzero xsaveerptr rdpru arat npt nrip_save tsc_scale vmcb_clean flushbyasid decodeassists pausefilter pfthreshold v_vmsave_vmload avx512vbmi umip avx512_vbmi2 gfni vaes vpclmulqdq avx512_vnni avx512_bitalg avx512_vpopcntdq rdpid fsrm avx512_vp2intersect\nbugs\t\t: sysret_ss_attrs null_seg spectre_v1 spectre_v2 spec_store_bypass srso spectre_v2_user\nbogomips\t: 5192.19\nTLB size\t: 192 4K pages\nclflush size\t: 64\ncache_alignment\t: 64\naddress sizes\t: 48 bits physical, 48 bits virtual\npower management:\n\nprocessor\t: 2\nvendor_id\t: AuthenticAMD\ncpu family\t: 26\nmodel\t\t: 2\nmodel name\t: AMD EPYC 9V45 96-Core Processor\nstepping\t: 1\nmicrocode\t: 0xffffffff\ncpu MHz\t\t: 4533.080\ncache size\t: 1024 KB\nphysical id\t: 0\nsiblings\t: 4\ncore id\t\t: 1\ncpu cores\t: 2\napicid\t\t: 2\ninitial apicid\t: 2\nfpu\t\t: yes\nfpu_exception\t: yes\ncpuid level\t: 28\nwp\t\t: yes\nflags\t\t: fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush mmx fxsr sse sse2 ht syscall nx mmxext fxsr_opt pdpe1gb rdtscp lm constant_tsc rep_good nopl xtopology tsc_reliable nonstop_tsc cpuid extd_apicid aperfmperf tsc_known_freq pni pclmulqdq ssse3 fma cx16 pcid sse4_1 sse4_2 x2apic movbe popcnt aes xsave avx f16c rdrand hypervisor lahf_lm cmp_legacy svm cr8_legacy abm sse4a misalignsse 3dnowprefetch osvw topoext vmmcall fsgsbase bmi1 avx2 smep bmi2 erms invpcid avx512f avx512dq rdseed adx smap avx512ifma clflushopt clwb avx512cd sha_ni avx512bw avx512vl xsaveopt xsavec xgetbv1 xsaves user_shstk avx_vnni avx512_bf16 clzero xsaveerptr rdpru arat npt nrip_save tsc_scale vmcb_clean flushbyasid decodeassists pausefilter pfthreshold v_vmsave_vmload avx512vbmi umip avx512_vbmi2 gfni vaes vpclmulqdq avx512_vnni avx512_bitalg avx512_vpopcntdq rdpid fsrm avx512_vp2intersect\nbugs\t\t: sysret_ss_attrs null_seg spectre_v1 spectre_v2 spec_store_bypass srso spectre_v2_user\nbogomips\t: 5192.19\nTLB size\t: 192 4K pages\nclflush size\t: 64\ncache_alignment\t: 64\naddress sizes\t: 48 bits physical, 48 bits virtual\npower management:\n\nprocessor\t: 3\nvendor_id\t: AuthenticAMD\ncpu family\t: 26\nmodel\t\t: 2\nmodel name\t: AMD EPYC 9V45 96-Core Processor\nstepping\t: 1\nmicrocode\t: 0xffffffff\ncpu MHz\t\t: 4546.891\ncache size\t: 1024 KB\nphysical id\t: 0\nsiblings\t: 4\ncore id\t\t: 1\ncpu cores\t: 2\napicid\t\t: 3\ninitial apicid\t: 3\nfpu\t\t: yes\nfpu_exception\t: yes\ncpuid level\t: 28\nwp\t\t: yes\nflags\t\t: fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush mmx fxsr sse sse2 ht syscall nx mmxext fxsr_opt pdpe1gb rdtscp lm constant_tsc rep_good nopl xtopology tsc_reliable nonstop_tsc cpuid extd_apicid aperfmperf tsc_known_freq pni pclmulqdq ssse3 fma cx16 pcid sse4_1 sse4_2 x2apic movbe popcnt aes xsave avx f16c rdrand hypervisor lahf_lm cmp_legacy svm cr8_legacy abm sse4a misalignsse 3dnowprefetch osvw topoext vmmcall fsgsbase bmi1 avx2 smep bmi2 erms invpcid avx512f avx512dq rdseed adx smap avx512ifma clflushopt clwb avx512cd sha_ni avx512bw avx512vl xsaveopt xsavec xgetbv1 xsaves user_shstk avx_vnni avx512_bf16 clzero xsaveerptr rdpru arat npt nrip_save tsc_scale vmcb_clean flushbyasid decodeassists pausefilter pfthreshold v_vmsave_vmload avx512vbmi umip avx512_vbmi2 gfni vaes vpclmulqdq avx512_vnni avx512_bitalg avx512_vpopcntdq rdpid fsrm avx512_vp2intersect\nbugs\t\t: sysret_ss_attrs null_seg spectre_v1 spectre_v2 spec_store_bypass srso spectre_v2_user\nbogomips\t: 5192.19\nTLB size\t: 192 4K pages\nclflush size\t: 64\ncache_alignment\t: 64\naddress sizes\t: 48 bits physical, 48 bits virtual\npower management:\n\n",
+          "meminfo": "MemTotal:       16373452 kB\nMemFree:        13056884 kB\nMemAvailable:   15401816 kB\nBuffers:           87104 kB\nCached:          2516208 kB\nSwapCached:            0 kB\nActive:           719312 kB\nInactive:        2174440 kB\nActive(anon):     346356 kB\nInactive(anon):        0 kB\nActive(file):     372956 kB\nInactive(file):  2174440 kB\nUnevictable:       46728 kB\nMlocked:           43656 kB\nSwapTotal:       3145724 kB\nSwapFree:        3145724 kB\nZswap:                 0 kB\nZswapped:              0 kB\nDirty:               176 kB\nWriteback:            96 kB\nAnonPages:        335544 kB\nMapped:           324800 kB\nShmem:             47184 kB\nKReclaimable:     117788 kB\nSlab:             195132 kB\nSReclaimable:     117788 kB\nSUnreclaim:        77344 kB\nKernelStack:        3744 kB\nPageTables:         6184 kB\nSecPageTables:         0 kB\nNFS_Unstable:          0 kB\nBounce:                0 kB\nWritebackTmp:          0 kB\nCommitLimit:    11332448 kB\nCommitted_AS:    2057356 kB\nVmallocTotal:   34359738367 kB\nVmallocUsed:       37492 kB\nVmallocChunk:          0 kB\nPercpu:             2240 kB\nHardwareCorrupted:     0 kB\nAnonHugePages:    161792 kB\nShmemHugePages:        0 kB\nShmemPmdMapped:        0 kB\nFileHugePages:         0 kB\nFilePmdMapped:         0 kB\nCmaTotal:              0 kB\nCmaFree:               0 kB\nUnaccepted:            0 kB\nBalloon:               0 kB\nHugePages_Total:       0\nHugePages_Free:        0\nHugePages_Rsvd:        0\nHugePages_Surp:        0\nHugepagesize:       2048 kB\nHugetlb:               0 kB\nDirectMap4k:      109696 kB\nDirectMap2M:     4079616 kB\nDirectMap1G:    14680064 kB\n",
+          "versions": {
+            "setuptools": "79.0.1",
+            "pip": "26.2.1"
+          },
+          "commit": "34a82a565f2e7cc84648f4d85b35826b558cd2e8",
+          "run_url": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39177834081",
+          "bundle_sha256": "e0b13c693a058dfd66ed24a52fc14e9c70964e95885358e7b99cc1f328ad6892",
+          "feature_cache": "action-specific; benchmarks do not supply a feature cache"
+        }
+      }
+    },
+    {
+      "id": "ai-share-demo",
+      "status": "измерено, не доказательство калибровки",
+      "receipt": "reports/acceptance/run39177834081/p6-product-demo/ai-share.json",
+      "run_url": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39177834081",
+      "fact": {
+        "rows": [
+          {
+            "train_pair_id": "corpus-a3-00119",
+            "fraction": 0.0,
+            "machine_chars": 0,
+            "total_chars": 800,
+            "ai_share": 0.1011647187400035,
+            "ai_participation": 0.910818948000069
+          },
+          {
+            "train_pair_id": "corpus-a3-00119",
+            "fraction": 0.25,
+            "machine_chars": 200,
+            "total_chars": 800,
+            "ai_share": 0.09796836573458424,
+            "ai_participation": 0.8831969971925396
+          },
+          {
+            "train_pair_id": "corpus-a3-00119",
+            "fraction": 0.5,
+            "machine_chars": 400,
+            "total_chars": 800,
+            "ai_share": 0.08205376197701178,
+            "ai_participation": 0.9405923039655436
+          },
+          {
+            "train_pair_id": "corpus-a3-00119",
+            "fraction": 0.75,
+            "machine_chars": 600,
+            "total_chars": 800,
+            "ai_share": 0.04799391047531435,
+            "ai_participation": 0.9021773269691571
+          },
+          {
+            "train_pair_id": "corpus-a3-00119",
+            "fraction": 1.0,
+            "machine_chars": 800,
+            "total_chars": 800,
+            "ai_share": 0.02624403410155888,
+            "ai_participation": 0.9992195064473915
+          },
+          {
+            "train_pair_id": "corpus-a3-00188",
+            "fraction": 0.0,
+            "machine_chars": 0,
+            "total_chars": 800,
+            "ai_share": 0.07296900878756454,
+            "ai_participation": 0.9530741286197506
+          },
+          {
+            "train_pair_id": "corpus-a3-00188",
+            "fraction": 0.25,
+            "machine_chars": 200,
+            "total_chars": 800,
+            "ai_share": 0.090272999274051,
+            "ai_participation": 0.9211450733901185
+          },
+          {
+            "train_pair_id": "corpus-a3-00188",
+            "fraction": 0.5,
+            "machine_chars": 400,
+            "total_chars": 800,
+            "ai_share": 0.07135656453101386,
+            "ai_participation": 0.9537439153375136
+          },
+          {
+            "train_pair_id": "corpus-a3-00188",
+            "fraction": 0.75,
+            "machine_chars": 600,
+            "total_chars": 800,
+            "ai_share": 0.036630550767462855,
+            "ai_participation": 0.9155950038885301
+          },
+          {
+            "train_pair_id": "corpus-a3-00188",
+            "fraction": 1.0,
+            "machine_chars": 800,
+            "total_chars": 800,
+            "ai_share": 0.027073778318108834,
+            "ai_participation": 0.9992306161535873
+          },
+          {
+            "train_pair_id": "corpus-a3-00836",
+            "fraction": 0.0,
+            "machine_chars": 0,
+            "total_chars": 800,
+            "ai_share": 0.04313410825815406,
+            "ai_participation": 0.9999978917482966
+          },
+          {
+            "train_pair_id": "corpus-a3-00836",
+            "fraction": 0.25,
+            "machine_chars": 200,
+            "total_chars": 800,
+            "ai_share": 0.06431371150158002,
+            "ai_participation": 0.9652855137111277
+          },
+          {
+            "train_pair_id": "corpus-a3-00836",
+            "fraction": 0.5,
+            "machine_chars": 400,
+            "total_chars": 800,
+            "ai_share": 0.05379846537491563,
+            "ai_participation": 0.9999999235299292
+          },
+          {
+            "train_pair_id": "corpus-a3-00836",
+            "fraction": 0.75,
+            "machine_chars": 600,
+            "total_chars": 800,
+            "ai_share": 0.015463291940760545,
+            "ai_participation": 0.9571436882773193
+          },
+          {
+            "train_pair_id": "corpus-a3-00836",
+            "fraction": 1.0,
+            "machine_chars": 800,
+            "total_chars": 800,
+            "ai_share": 0.027073778318108834,
+            "ai_participation": 0.9992243743491591
+          }
+        ],
+        "mae": 0.47180164156475,
+        "mean_curve": [
+          0.07242261192857403,
+          0.08418502550340509,
+          0.06906959729431375,
+          0.03336258439451258,
+          0.02679719691259218
+        ],
+        "monotone_mean": false,
+        "synthetic_generator_only": true,
+        "calibration_fitted": false,
+        "mode": "demo"
+      }
+    },
+    {
+      "id": "speed-hf",
+      "status": "не достигнут",
+      "receipt": "reports/acceptance/run39177834081/p6-product-hf/benchmark.json",
+      "run_url": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39177834081",
+      "source_sha": "34a82a565f2e7cc84648f4d85b35826b558cd2e8"
+    },
+    {
+      "id": "interfaces-hf",
+      "status": "подтверждено",
+      "receipt": "reports/acceptance/run39177834081/p6-product-hf/interfaces/interfaces.json",
+      "run_url": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39177834081",
+      "fact": {
+        "mode": "hf",
+        "cli_returncode": 0,
+        "cli_command": [
+          "/opt/hostedtoolcache/Python/3.11.17/x64/bin/python",
+          "-m",
+          "spanverify",
+          "verify",
+          "--answer-file",
+          "../reports/acceptance/hf/interfaces/answer.txt",
+          "--context-file",
+          "../reports/acceptance/hf/interfaces/context.txt",
+          "--json",
+          "--mode",
+          "hf",
+          "--weights",
+          "/home/runner/work/Smarty_Chumakov/Smarty_Chumakov/spanverify-module/reports/experiments/p5_span_filter/run39170981235/combined_bundle.json"
+        ],
+        "server_command": [
+          "/opt/hostedtoolcache/Python/3.11.17/x64/bin/python",
+          "-m",
+          "spanverify",
+          "server",
+          "--host",
+          "0.0.0.0",
+          "--port",
+          "8765",
+          "--no-browser",
+          "--quiet",
+          "--mode",
+          "hf",
+          "--weights",
+          "/home/runner/work/Smarty_Chumakov/Smarty_Chumakov/spanverify-module/reports/experiments/p5_span_filter/run39170981235/combined_bundle.json"
+        ],
+        "web_status": 200,
+        "http_status": 200,
+        "parity_fields": [
+          "score",
+          "threshold",
+          "verdict",
+          "spans",
+          "ai_share"
+        ],
+        "passed": true,
+        "environment": {
+          "python": "3.11.17 (main, Oct  1 2026, 14:32:31) [GCC 13.3.0]",
+          "platform": "Linux-6.17.0-1022-azure-x86_64-with-glibc2.39",
+          "cpu_count": 4,
+          "cpuinfo": "processor\t: 0\nvendor_id\t: AuthenticAMD\ncpu family\t: 25\nmodel\t\t: 1\nmodel name\t: AMD EPYC 7763 64-Core Processor\nstepping\t: 1\nmicrocode\t: 0xffffffff\ncpu MHz\t\t: 2445.431\ncache size\t: 512 KB\nphysical id\t: 0\nsiblings\t: 4\ncore id\t\t: 0\ncpu cores\t: 2\napicid\t\t: 0\ninitial apicid\t: 0\nfpu\t\t: yes\nfpu_exception\t: yes\ncpuid level\t: 13\nwp\t\t: yes\nflags\t\t: fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush mmx fxsr sse sse2 ht syscall nx mmxext fxsr_opt pdpe1gb rdtscp lm constant_tsc rep_good nopl tsc_reliable nonstop_tsc cpuid extd_apicid aperfmperf tsc_known_freq pni pclmulqdq ssse3 fma cx16 pcid sse4_1 sse4_2 movbe popcnt aes xsave avx f16c rdrand hypervisor lahf_lm cmp_legacy svm cr8_legacy abm sse4a misalignsse 3dnowprefetch osvw topoext vmmcall fsgsbase bmi1 avx2 smep bmi2 erms invpcid rdseed adx smap clflushopt clwb sha_ni xsaveopt xsavec xgetbv1 xsaves user_shstk clzero xsaveerptr rdpru arat npt nrip_save tsc_scale vmcb_clean flushbyasid decodeassists pausefilter pfthreshold v_vmsave_vmload umip vaes vpclmulqdq rdpid fsrm\nbugs\t\t: sysret_ss_attrs null_seg spectre_v1 spectre_v2 spec_store_bypass srso spectre_v2_user tsa\nbogomips\t: 4890.86\nTLB size\t: 2560 4K pages\nclflush size\t: 64\ncache_alignment\t: 64\naddress sizes\t: 48 bits physical, 48 bits virtual\npower management:\n\nprocessor\t: 1\nvendor_id\t: AuthenticAMD\ncpu family\t: 25\nmodel\t\t: 1\nmodel name\t: AMD EPYC 7763 64-Core Processor\nstepping\t: 1\nmicrocode\t: 0xffffffff\ncpu MHz\t\t: 3243.617\ncache size\t: 512 KB\nphysical id\t: 0\nsiblings\t: 4\ncore id\t\t: 0\ncpu cores\t: 2\napicid\t\t: 1\ninitial apicid\t: 1\nfpu\t\t: yes\nfpu_exception\t: yes\ncpuid level\t: 13\nwp\t\t: yes\nflags\t\t: fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush mmx fxsr sse sse2 ht syscall nx mmxext fxsr_opt pdpe1gb rdtscp lm constant_tsc rep_good nopl tsc_reliable nonstop_tsc cpuid extd_apicid aperfmperf tsc_known_freq pni pclmulqdq ssse3 fma cx16 pcid sse4_1 sse4_2 movbe popcnt aes xsave avx f16c rdrand hypervisor lahf_lm cmp_legacy svm cr8_legacy abm sse4a misalignsse 3dnowprefetch osvw topoext vmmcall fsgsbase bmi1 avx2 smep bmi2 erms invpcid rdseed adx smap clflushopt clwb sha_ni xsaveopt xsavec xgetbv1 xsaves user_shstk clzero xsaveerptr rdpru arat npt nrip_save tsc_scale vmcb_clean flushbyasid decodeassists pausefilter pfthreshold v_vmsave_vmload umip vaes vpclmulqdq rdpid fsrm\nbugs\t\t: sysret_ss_attrs null_seg spectre_v1 spectre_v2 spec_store_bypass srso spectre_v2_user tsa\nbogomips\t: 4890.86\nTLB size\t: 2560 4K pages\nclflush size\t: 64\ncache_alignment\t: 64\naddress sizes\t: 48 bits physical, 48 bits virtual\npower management:\n\nprocessor\t: 2\nvendor_id\t: AuthenticAMD\ncpu family\t: 25\nmodel\t\t: 1\nmodel name\t: AMD EPYC 7763 64-Core Processor\nstepping\t: 1\nmicrocode\t: 0xffffffff\ncpu MHz\t\t: 3244.041\ncache size\t: 512 KB\nphysical id\t: 0\nsiblings\t: 4\ncore id\t\t: 1\ncpu cores\t: 2\napicid\t\t: 2\ninitial apicid\t: 2\nfpu\t\t: yes\nfpu_exception\t: yes\ncpuid level\t: 13\nwp\t\t: yes\nflags\t\t: fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush mmx fxsr sse sse2 ht syscall nx mmxext fxsr_opt pdpe1gb rdtscp lm constant_tsc rep_good nopl tsc_reliable nonstop_tsc cpuid extd_apicid aperfmperf tsc_known_freq pni pclmulqdq ssse3 fma cx16 pcid sse4_1 sse4_2 movbe popcnt aes xsave avx f16c rdrand hypervisor lahf_lm cmp_legacy svm cr8_legacy abm sse4a misalignsse 3dnowprefetch osvw topoext vmmcall fsgsbase bmi1 avx2 smep bmi2 erms invpcid rdseed adx smap clflushopt clwb sha_ni xsaveopt xsavec xgetbv1 xsaves user_shstk clzero xsaveerptr rdpru arat npt nrip_save tsc_scale vmcb_clean flushbyasid decodeassists pausefilter pfthreshold v_vmsave_vmload umip vaes vpclmulqdq rdpid fsrm\nbugs\t\t: sysret_ss_attrs null_seg spectre_v1 spectre_v2 spec_store_bypass srso spectre_v2_user tsa\nbogomips\t: 4890.86\nTLB size\t: 2560 4K pages\nclflush size\t: 64\ncache_alignment\t: 64\naddress sizes\t: 48 bits physical, 48 bits virtual\npower management:\n\nprocessor\t: 3\nvendor_id\t: AuthenticAMD\ncpu family\t: 25\nmodel\t\t: 1\nmodel name\t: AMD EPYC 7763 64-Core Processor\nstepping\t: 1\nmicrocode\t: 0xffffffff\ncpu MHz\t\t: 3245.716\ncache size\t: 512 KB\nphysical id\t: 0\nsiblings\t: 4\ncore id\t\t: 1\ncpu cores\t: 2\napicid\t\t: 3\ninitial apicid\t: 3\nfpu\t\t: yes\nfpu_exception\t: yes\ncpuid level\t: 13\nwp\t\t: yes\nflags\t\t: fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush mmx fxsr sse sse2 ht syscall nx mmxext fxsr_opt pdpe1gb rdtscp lm constant_tsc rep_good nopl tsc_reliable nonstop_tsc cpuid extd_apicid aperfmperf tsc_known_freq pni pclmulqdq ssse3 fma cx16 pcid sse4_1 sse4_2 movbe popcnt aes xsave avx f16c rdrand hypervisor lahf_lm cmp_legacy svm cr8_legacy abm sse4a misalignsse 3dnowprefetch osvw topoext vmmcall fsgsbase bmi1 avx2 smep bmi2 erms invpcid rdseed adx smap clflushopt clwb sha_ni xsaveopt xsavec xgetbv1 xsaves user_shstk clzero xsaveerptr rdpru arat npt nrip_save tsc_scale vmcb_clean flushbyasid decodeassists pausefilter pfthreshold v_vmsave_vmload umip vaes vpclmulqdq rdpid fsrm\nbugs\t\t: sysret_ss_attrs null_seg spectre_v1 spectre_v2 spec_store_bypass srso spectre_v2_user tsa\nbogomips\t: 4890.86\nTLB size\t: 2560 4K pages\nclflush size\t: 64\ncache_alignment\t: 64\naddress sizes\t: 48 bits physical, 48 bits virtual\npower management:\n\n",
+          "meminfo": "MemTotal:       16377684 kB\nMemFree:         9321264 kB\nMemAvailable:   14350180 kB\nBuffers:          114968 kB\nCached:          5077288 kB\nSwapCached:            0 kB\nActive:          1496284 kB\nInactive:        4714364 kB\nActive(anon):    1076420 kB\nInactive(anon):        0 kB\nActive(file):     419864 kB\nInactive(file):  4714364 kB\nUnevictable:       46760 kB\nMlocked:           43688 kB\nSwapTotal:       3145724 kB\nSwapFree:        3145724 kB\nZswap:                 0 kB\nZswapped:              0 kB\nDirty:               628 kB\nWriteback:             0 kB\nAnonPages:       1063744 kB\nMapped:           418604 kB\nShmem:             49296 kB\nKReclaimable:     240652 kB\nSlab:             335804 kB\nSReclaimable:     240652 kB\nSUnreclaim:        95152 kB\nKernelStack:        4128 kB\nPageTables:         8704 kB\nSecPageTables:         0 kB\nNFS_Unstable:          0 kB\nBounce:                0 kB\nWritebackTmp:          0 kB\nCommitLimit:    11334564 kB\nCommitted_AS:    2945140 kB\nVmallocTotal:   34359738367 kB\nVmallocUsed:       39440 kB\nVmallocChunk:          0 kB\nPercpu:             2288 kB\nHardwareCorrupted:     0 kB\nAnonHugePages:    468992 kB\nShmemHugePages:        0 kB\nShmemPmdMapped:        0 kB\nFileHugePages:   1083392 kB\nFilePmdMapped:         0 kB\nCmaTotal:              0 kB\nCmaFree:               0 kB\nUnaccepted:            0 kB\nBalloon:               0 kB\nHugePages_Total:       0\nHugePages_Free:        0\nHugePages_Rsvd:        0\nHugePages_Surp:        0\nHugepagesize:       2048 kB\nHugetlb:               0 kB\nDirectMap4k:      136456 kB\nDirectMap2M:     5105664 kB\nDirectMap1G:    13631488 kB\n",
+          "versions": {
+            "tqdm": "4.70.1",
+            "sympy": "1.14.0",
+            "truststore": "0.10.5",
+            "shellingham": "1.5.4",
+            "annotated-doc": "0.0.5",
+            "torch": "2.14.1+cpu",
+            "Jinja2": "3.1.6",
+            "safetensors": "0.8.0",
+            "tokenizers": "0.23.3",
+            "markdown-it-py": "4.2.0",
+            "transformers": "5.20.1",
+            "idna": "3.20",
+            "h11": "0.16.0",
+            "httpx2": "2.14.0",
+            "fsspec": "2026.7.0",
+            "numpy": "2.4.6",
+            "typing_extensions": "4.16.0",
+            "mdurl": "0.1.2",
+            "Pygments": "2.21.0",
+            "setuptools": "79.0.1",
+            "typer": "0.27.3",
+            "hf-xet": "1.7.0",
+            "rich": "15.0.0",
+            "MarkupSafe": "3.0.3",
+            "sentencepiece": "0.2.2",
+            "huggingface_hub": "2.2.0",
+            "mpmath": "1.3.0",
+            "click": "8.5.0",
+            "pip": "26.2.1",
+            "httpcore2": "2.14.0",
+            "regex": "2026.9.29",
+            "filelock": "3.32.3",
+            "PyYAML": "6.0.3",
+            "packaging": "26.3",
+            "anyio": "4.15.1",
+            "networkx": "3.6.1"
+          },
+          "commit": "34a82a565f2e7cc84648f4d85b35826b558cd2e8",
+          "run_url": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39177834081",
+          "bundle_sha256": "e0b13c693a058dfd66ed24a52fc14e9c70964e95885358e7b99cc1f328ad6892",
+          "feature_cache": "action-specific; benchmarks do not supply a feature cache"
+        }
+      }
+    },
+    {
+      "id": "ai-share-hf",
+      "status": "измерено, не доказательство калибровки",
+      "receipt": "reports/acceptance/run39177834081/p6-product-hf/ai-share.json",
+      "run_url": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39177834081",
+      "fact": {
+        "rows": [
+          {
+            "train_pair_id": "corpus-a3-00119",
+            "fraction": 0.0,
+            "machine_chars": 0,
+            "total_chars": 800,
+            "ai_share": 0.08652692920264567,
+            "ai_participation": 0.959933128072006
+          },
+          {
+            "train_pair_id": "corpus-a3-00119",
+            "fraction": 0.25,
+            "machine_chars": 200,
+            "total_chars": 800,
+            "ai_share": 0.1877357643450858,
+            "ai_participation": 0.9471860951279282
+          },
+          {
+            "train_pair_id": "corpus-a3-00119",
+            "fraction": 0.5,
+            "machine_chars": 400,
+            "total_chars": 800,
+            "ai_share": 0.1519265532557309,
+            "ai_participation": 0.9736385859004903
+          },
+          {
+            "train_pair_id": "corpus-a3-00119",
+            "fraction": 0.75,
+            "machine_chars": 600,
+            "total_chars": 800,
+            "ai_share": 0.1977550530510346,
+            "ai_participation": 0.9344703731977188
+          },
+          {
+            "train_pair_id": "corpus-a3-00119",
+            "fraction": 1.0,
+            "machine_chars": 800,
+            "total_chars": 800,
+            "ai_share": 0.0809411450820834,
+            "ai_participation": 0.9998082244595955
+          },
+          {
+            "train_pair_id": "corpus-a3-00188",
+            "fraction": 0.0,
+            "machine_chars": 0,
+            "total_chars": 800,
+            "ai_share": 0.07614022498205994,
+            "ai_participation": 0.9867576457130097
+          },
+          {
+            "train_pair_id": "corpus-a3-00188",
+            "fraction": 0.25,
+            "machine_chars": 200,
+            "total_chars": 800,
+            "ai_share": 0.16828738880186533,
+            "ai_participation": 0.9717658487380579
+          },
+          {
+            "train_pair_id": "corpus-a3-00188",
+            "fraction": 0.5,
+            "machine_chars": 400,
+            "total_chars": 800,
+            "ai_share": 0.15159674142454188,
+            "ai_participation": 0.9873393187911924
+          },
+          {
+            "train_pair_id": "corpus-a3-00188",
+            "fraction": 0.75,
+            "machine_chars": 600,
+            "total_chars": 800,
+            "ai_share": 0.19207941298301676,
+            "ai_participation": 0.9479903003812402
+          },
+          {
+            "train_pair_id": "corpus-a3-00188",
+            "fraction": 1.0,
+            "machine_chars": 800,
+            "total_chars": 800,
+            "ai_share": 0.0809411450820834,
+            "ai_participation": 0.9997987405074011
+          },
+          {
+            "train_pair_id": "corpus-a3-00836",
+            "fraction": 0.0,
+            "machine_chars": 0,
+            "total_chars": 800,
+            "ai_share": 0.046875,
+            "ai_participation": 0.9999994068441271
+          },
+          {
+            "train_pair_id": "corpus-a3-00836",
+            "fraction": 0.25,
+            "machine_chars": 200,
+            "total_chars": 800,
+            "ai_share": 0.13344279610158916,
+            "ai_participation": 0.9851096137311217
+          },
+          {
+            "train_pair_id": "corpus-a3-00836",
+            "fraction": 0.5,
+            "machine_chars": 400,
+            "total_chars": 800,
+            "ai_share": 0.12880896189471705,
+            "ai_participation": 0.99999998375667
+          },
+          {
+            "train_pair_id": "corpus-a3-00836",
+            "fraction": 0.75,
+            "machine_chars": 600,
+            "total_chars": 800,
+            "ai_share": 0.15714285714285714,
+            "ai_participation": 0.9571511820326307
+          },
+          {
+            "train_pair_id": "corpus-a3-00836",
+            "fraction": 1.0,
+            "machine_chars": 800,
+            "total_chars": 800,
+            "ai_share": 0.0809411450820834,
+            "ai_participation": 0.9998154851919643
+          }
+        ],
+        "mae": 0.3998628793292011,
+        "mean_curve": [
+          0.0698473847282352,
+          0.16315531641618009,
+          0.14411075219166328,
+          0.18232577439230283,
+          0.0809411450820834
+        ],
+        "monotone_mean": false,
+        "synthetic_generator_only": true,
+        "calibration_fitted": false,
+        "mode": "hf"
+      }
+    },
+    {
+      "id": "frozen-public-parity",
+      "status": "подтверждено",
+      "fact": {
+        "pairs": 181,
+        "full_token_risks": 13150,
+        "mismatches": [],
+        "p1_max_abs_delta": 0.0,
+        "cache_misses": 0,
+        "bundle_sha256": "e0b13c693a058dfd66ed24a52fc14e9c70964e95885358e7b99cc1f328ad6892",
+        "passed": true,
+        "environment": {
+          "python": "3.11.17 (main, Oct  1 2026, 14:32:31) [GCC 13.3.0]",
+          "platform": "Linux-6.17.0-1022-azure-x86_64-with-glibc2.39",
+          "cpu_count": 4,
+          "cpuinfo": "processor\t: 0\nvendor_id\t: AuthenticAMD\ncpu family\t: 26\nmodel\t\t: 2\nmodel name\t: AMD EPYC 9V45 96-Core Processor\nstepping\t: 1\nmicrocode\t: 0xffffffff\ncpu MHz\t\t: 2596.122\ncache size\t: 1024 KB\nphysical id\t: 0\nsiblings\t: 4\ncore id\t\t: 0\ncpu cores\t: 2\napicid\t\t: 0\ninitial apicid\t: 0\nfpu\t\t: yes\nfpu_exception\t: yes\ncpuid level\t: 28\nwp\t\t: yes\nflags\t\t: fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush mmx fxsr sse sse2 ht syscall nx mmxext fxsr_opt pdpe1gb rdtscp lm constant_tsc rep_good nopl xtopology tsc_reliable nonstop_tsc cpuid extd_apicid aperfmperf tsc_known_freq pni pclmulqdq ssse3 fma cx16 pcid sse4_1 sse4_2 x2apic movbe popcnt aes xsave avx f16c rdrand hypervisor lahf_lm cmp_legacy svm cr8_legacy abm sse4a misalignsse 3dnowprefetch osvw topoext vmmcall fsgsbase bmi1 avx2 smep bmi2 erms invpcid avx512f avx512dq rdseed adx smap avx512ifma clflushopt clwb avx512cd sha_ni avx512bw avx512vl xsaveopt xsavec xgetbv1 xsaves user_shstk avx_vnni avx512_bf16 clzero xsaveerptr rdpru arat npt nrip_save tsc_scale vmcb_clean flushbyasid decodeassists pausefilter pfthreshold v_vmsave_vmload avx512vbmi umip avx512_vbmi2 gfni vaes vpclmulqdq avx512_vnni avx512_bitalg avx512_vpopcntdq rdpid fsrm avx512_vp2intersect\nbugs\t\t: sysret_ss_attrs null_seg spectre_v1 spectre_v2 spec_store_bypass srso spectre_v2_user\nbogomips\t: 5192.24\nTLB size\t: 192 4K pages\nclflush size\t: 64\ncache_alignment\t: 64\naddress sizes\t: 48 bits physical, 48 bits virtual\npower management:\n\nprocessor\t: 1\nvendor_id\t: AuthenticAMD\ncpu family\t: 26\nmodel\t\t: 2\nmodel name\t: AMD EPYC 9V45 96-Core Processor\nstepping\t: 1\nmicrocode\t: 0xffffffff\ncpu MHz\t\t: 4352.341\ncache size\t: 1024 KB\nphysical id\t: 0\nsiblings\t: 4\ncore id\t\t: 0\ncpu cores\t: 2\napicid\t\t: 1\ninitial apicid\t: 1\nfpu\t\t: yes\nfpu_exception\t: yes\ncpuid level\t: 28\nwp\t\t: yes\nflags\t\t: fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush mmx fxsr sse sse2 ht syscall nx mmxext fxsr_opt pdpe1gb rdtscp lm constant_tsc rep_good nopl xtopology tsc_reliable nonstop_tsc cpuid extd_apicid aperfmperf tsc_known_freq pni pclmulqdq ssse3 fma cx16 pcid sse4_1 sse4_2 x2apic movbe popcnt aes xsave avx f16c rdrand hypervisor lahf_lm cmp_legacy svm cr8_legacy abm sse4a misalignsse 3dnowprefetch osvw topoext vmmcall fsgsbase bmi1 avx2 smep bmi2 erms invpcid avx512f avx512dq rdseed adx smap avx512ifma clflushopt clwb avx512cd sha_ni avx512bw avx512vl xsaveopt xsavec xgetbv1 xsaves user_shstk avx_vnni avx512_bf16 clzero xsaveerptr rdpru arat npt nrip_save tsc_scale vmcb_clean flushbyasid decodeassists pausefilter pfthreshold v_vmsave_vmload avx512vbmi umip avx512_vbmi2 gfni vaes vpclmulqdq avx512_vnni avx512_bitalg avx512_vpopcntdq rdpid fsrm avx512_vp2intersect\nbugs\t\t: sysret_ss_attrs null_seg spectre_v1 spectre_v2 spec_store_bypass srso spectre_v2_user\nbogomips\t: 5192.24\nTLB size\t: 192 4K pages\nclflush size\t: 64\ncache_alignment\t: 64\naddress sizes\t: 48 bits physical, 48 bits virtual\npower management:\n\nprocessor\t: 2\nvendor_id\t: AuthenticAMD\ncpu family\t: 26\nmodel\t\t: 2\nmodel name\t: AMD EPYC 9V45 96-Core Processor\nstepping\t: 1\nmicrocode\t: 0xffffffff\ncpu MHz\t\t: 2596.122\ncache size\t: 1024 KB\nphysical id\t: 0\nsiblings\t: 4\ncore id\t\t: 1\ncpu cores\t: 2\napicid\t\t: 2\ninitial apicid\t: 2\nfpu\t\t: yes\nfpu_exception\t: yes\ncpuid level\t: 28\nwp\t\t: yes\nflags\t\t: fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush mmx fxsr sse sse2 ht syscall nx mmxext fxsr_opt pdpe1gb rdtscp lm constant_tsc rep_good nopl xtopology tsc_reliable nonstop_tsc cpuid extd_apicid aperfmperf tsc_known_freq pni pclmulqdq ssse3 fma cx16 pcid sse4_1 sse4_2 x2apic movbe popcnt aes xsave avx f16c rdrand hypervisor lahf_lm cmp_legacy svm cr8_legacy abm sse4a misalignsse 3dnowprefetch osvw topoext vmmcall fsgsbase bmi1 avx2 smep bmi2 erms invpcid avx512f avx512dq rdseed adx smap avx512ifma clflushopt clwb avx512cd sha_ni avx512bw avx512vl xsaveopt xsavec xgetbv1 xsaves user_shstk avx_vnni avx512_bf16 clzero xsaveerptr rdpru arat npt nrip_save tsc_scale vmcb_clean flushbyasid decodeassists pausefilter pfthreshold v_vmsave_vmload avx512vbmi umip avx512_vbmi2 gfni vaes vpclmulqdq avx512_vnni avx512_bitalg avx512_vpopcntdq rdpid fsrm avx512_vp2intersect\nbugs\t\t: sysret_ss_attrs null_seg spectre_v1 spectre_v2 spec_store_bypass srso spectre_v2_user\nbogomips\t: 5192.24\nTLB size\t: 192 4K pages\nclflush size\t: 64\ncache_alignment\t: 64\naddress sizes\t: 48 bits physical, 48 bits virtual\npower management:\n\nprocessor\t: 3\nvendor_id\t: AuthenticAMD\ncpu family\t: 26\nmodel\t\t: 2\nmodel name\t: AMD EPYC 9V45 96-Core Processor\nstepping\t: 1\nmicrocode\t: 0xffffffff\ncpu MHz\t\t: 4396.897\ncache size\t: 1024 KB\nphysical id\t: 0\nsiblings\t: 4\ncore id\t\t: 1\ncpu cores\t: 2\napicid\t\t: 3\ninitial apicid\t: 3\nfpu\t\t: yes\nfpu_exception\t: yes\ncpuid level\t: 28\nwp\t\t: yes\nflags\t\t: fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush mmx fxsr sse sse2 ht syscall nx mmxext fxsr_opt pdpe1gb rdtscp lm constant_tsc rep_good nopl xtopology tsc_reliable nonstop_tsc cpuid extd_apicid aperfmperf tsc_known_freq pni pclmulqdq ssse3 fma cx16 pcid sse4_1 sse4_2 x2apic movbe popcnt aes xsave avx f16c rdrand hypervisor lahf_lm cmp_legacy svm cr8_legacy abm sse4a misalignsse 3dnowprefetch osvw topoext vmmcall fsgsbase bmi1 avx2 smep bmi2 erms invpcid avx512f avx512dq rdseed adx smap avx512ifma clflushopt clwb avx512cd sha_ni avx512bw avx512vl xsaveopt xsavec xgetbv1 xsaves user_shstk avx_vnni avx512_bf16 clzero xsaveerptr rdpru arat npt nrip_save tsc_scale vmcb_clean flushbyasid decodeassists pausefilter pfthreshold v_vmsave_vmload avx512vbmi umip avx512_vbmi2 gfni vaes vpclmulqdq avx512_vnni avx512_bitalg avx512_vpopcntdq rdpid fsrm avx512_vp2intersect\nbugs\t\t: sysret_ss_attrs null_seg spectre_v1 spectre_v2 spec_store_bypass srso spectre_v2_user\nbogomips\t: 5192.24\nTLB size\t: 192 4K pages\nclflush size\t: 64\ncache_alignment\t: 64\naddress sizes\t: 48 bits physical, 48 bits virtual\npower management:\n\n",
+          "meminfo": "MemTotal:       16373448 kB\nMemFree:        12427664 kB\nMemAvailable:   15210516 kB\nBuffers:           92064 kB\nCached:          2938332 kB\nSwapCached:            0 kB\nActive:           787192 kB\nInactive:        2555412 kB\nActive(anon):     368292 kB\nInactive(anon):        0 kB\nActive(file):     418900 kB\nInactive(file):  2555412 kB\nUnevictable:       46728 kB\nMlocked:           43656 kB\nSwapTotal:       3145724 kB\nSwapFree:        3145724 kB\nZswap:                 0 kB\nZswapped:              0 kB\nDirty:            392020 kB\nWriteback:             0 kB\nAnonPages:        344468 kB\nMapped:           324992 kB\nShmem:             47352 kB\nKReclaimable:     139796 kB\nSlab:             220372 kB\nSReclaimable:     139796 kB\nSUnreclaim:        80576 kB\nKernelStack:        3936 kB\nPageTables:         6140 kB\nSecPageTables:         0 kB\nNFS_Unstable:          0 kB\nBounce:                0 kB\nWritebackTmp:          0 kB\nCommitLimit:    11332448 kB\nCommitted_AS:    2023888 kB\nVmallocTotal:   34359738367 kB\nVmallocUsed:       37636 kB\nVmallocChunk:          0 kB\nPercpu:             2208 kB\nHardwareCorrupted:     0 kB\nAnonHugePages:     90112 kB\nShmemHugePages:        0 kB\nShmemPmdMapped:        0 kB\nFileHugePages:      6144 kB\nFilePmdMapped:         0 kB\nCmaTotal:              0 kB\nCmaFree:               0 kB\nUnaccepted:            0 kB\nBalloon:               0 kB\nHugePages_Total:       0\nHugePages_Free:        0\nHugePages_Rsvd:        0\nHugePages_Surp:        0\nHugepagesize:       2048 kB\nHugetlb:               0 kB\nDirectMap4k:      115840 kB\nDirectMap2M:     4073472 kB\nDirectMap1G:    14680064 kB\n",
+          "versions": {
+            "threadpoolctl": "3.7.0",
+            "scikit-learn": "1.5.2",
+            "scipy": "1.13.1",
+            "numpy": "1.26.4",
+            "cloudpickle": "3.1.2",
+            "setuptools": "79.0.1",
+            "pip": "26.2.1",
+            "joblib": "1.6.0"
+          },
+          "commit": "34a82a565f2e7cc84648f4d85b35826b558cd2e8",
+          "run_url": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39177834081",
+          "bundle_sha256": "e0b13c693a058dfd66ed24a52fc14e9c70964e95885358e7b99cc1f328ad6892",
+          "feature_cache": "action-specific; benchmarks do not supply a feature cache"
+        }
+      },
+      "receipt": "reports/acceptance/run39177834081/p6-parity/parity.json",
+      "run_url": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39177834081"
+    },
+    {
+      "id": "local-suite",
+      "status": "подтверждено",
+      "fact": {
+        "tests": 871,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 2
+      },
+      "tests_excluded": false,
+      "receipt": "reports/acceptance/full-suite.xml"
+    },
+    {
+      "id": "ordinary-ci",
+      "status": "подтверждено",
+      "fact": {
+        "conclusion": "success",
+        "headSha": "34a82a565f2e7cc84648f4d85b35826b558cd2e8",
+        "jobs": [
+          {
+            "completedAt": "2026-10-19T00:11:24Z",
+            "conclusion": "success",
+            "databaseId": 117824333908,
+            "name": "Тесты (Python 3.11, ubuntu-latest)",
+            "startedAt": "2026-10-18T23:46:42Z",
+            "status": "completed",
+            "steps": [
+              {
+                "conclusion": "success",
+                "name": "Set up job",
+                "number": 1,
+                "status": "completed"
+              },
+              {
+                "conclusion": "success",
+                "name": "Run actions/checkout@v4",
+                "number": 2,
+                "status": "completed"
+              },
+              {
+                "conclusion": "success",
+                "name": "Run actions/setup-python@v5",
+                "number": 3,
+                "status": "completed"
+              },
+              {
+                "conclusion": "success",
+                "name": "Зависимости тестов",
+                "number": 4,
+                "status": "completed"
+              },
+              {
+                "conclusion": "success",
+                "name": "Тесты",
+                "number": 5,
+                "status": "completed"
+              },
+              {
+                "conclusion": "success",
+                "name": "Само-проверка конвейера",
+                "number": 6,
+                "status": "completed"
+              },
+              {
+                "conclusion": "success",
+                "name": "Проверка HTTP-контракта (реальный запрос к сервису)",
+                "number": 7,
+                "status": "completed"
+              },
+              {
+                "conclusion": "success",
+                "name": "Post Run actions/setup-python@v5",
+                "number": 13,
+                "status": "completed"
+              },
+              {
+                "conclusion": "success",
+                "name": "Post Run actions/checkout@v4",
+                "number": 14,
+                "status": "completed"
+              },
+              {
+                "conclusion": "success",
+                "name": "Complete job",
+                "number": 15,
+                "status": "completed"
+              }
+            ],
+            "url": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39177834071/job/117824333908"
+          },
+          {
+            "completedAt": "2026-10-19T00:11:24Z",
+            "conclusion": "success",
+            "databaseId": 117824333922,
+            "name": "Тесты (Python 3.12, windows-latest)",
+            "startedAt": "2026-10-18T23:46:43Z",
+            "status": "completed",
+            "steps": [
+              {
+                "conclusion": "success",
+                "name": "Set up job",
+                "number": 1,
+                "status": "completed"
+              },
+              {
+                "conclusion": "success",
+                "name": "Run actions/checkout@v4",
+                "number": 2,
+                "status": "completed"
+              },
+              {
+                "conclusion": "success",
+                "name": "Run actions/setup-python@v5",
+                "number": 3,
+                "status": "completed"
+              },
+              {
+                "conclusion": "success",
+                "name": "Зависимости тестов",
+                "number": 4,
+                "status": "completed"
+              },
+              {
+                "conclusion": "success",
+                "name": "Тесты",
+                "number": 5,
+                "status": "completed"
+              },
+              {
+                "conclusion": "success",
+                "name": "Само-проверка конвейера",
+                "number": 6,
+                "status": "completed"
+              },
+              {
+                "conclusion": "success",
+                "name": "Проверка HTTP-контракта (реальный запрос к сервису)",
+                "number": 7,
+                "status": "completed"
+              },
+              {
+                "conclusion": "success",
+                "name": "Post Run actions/setup-python@v5",
+                "number": 13,
+                "status": "completed"
+              },
+              {
+                "conclusion": "success",
+                "name": "Post Run actions/checkout@v4",
+                "number": 14,
+                "status": "completed"
+              },
+              {
+                "conclusion": "success",
+                "name": "Complete job",
+                "number": 15,
+                "status": "completed"
+              }
+            ],
+            "url": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39177834071/job/117824333922"
+          },
+          {
+            "completedAt": "2026-10-19T00:11:24Z",
+            "conclusion": "success",
+            "databaseId": 117824334038,
+            "name": "Линтер, форматирование, покрытие",
+            "startedAt": "2026-10-18T23:46:42Z",
+            "status": "completed",
+            "steps": [
+              {
+                "conclusion": "success",
+                "name": "Set up job",
+                "number": 1,
+                "status": "completed"
+              },
+              {
+                "conclusion": "success",
+                "name": "Run actions/checkout@v4",
+                "number": 2,
+                "status": "completed"
+              },
+              {
+                "conclusion": "success",
+                "name": "Run actions/setup-python@v5",
+                "number": 3,
+                "status": "completed"
+              },
+              {
+                "conclusion": "success",
+                "name": "Зависимости проверки",
+                "number": 4,
+                "status": "completed"
+              },
+              {
+                "conclusion": "success",
+                "name": "Линтер (ruff)",
+                "number": 5,
+                "status": "completed"
+              },
+              {
+                "conclusion": "success",
+                "name": "Форматирование (black --check)",
+                "number": 6,
+                "status": "completed"
+              },
+              {
+                "conclusion": "success",
+                "name": "Тесты с порогом покрытия 85 %",
+                "number": 7,
+                "status": "completed"
+              },
+              {
+                "conclusion": "success",
+                "name": "Воспроизводимость обучения (один seed → один результат)",
+                "number": 8,
+                "status": "completed"
+              },
+              {
+                "conclusion": "success",
+                "name": "Метрики на отложенной части (числа в лог)",
+                "number": 9,
+                "status": "completed"
+              },
+              {
+                "conclusion": "success",
+                "name": "Чистая установка в отдельном venv (пины из requirements.txt)",
+                "number": 10,
+                "status": "completed"
+              },
+              {
+                "conclusion": "success",
+                "name": "Отчёт покрытия для единого файла чисел",
+                "number": 11,
+                "status": "completed"
+              },
+              {
+                "conclusion": "success",
+                "name": "Сохранить отчёт обучения",
+                "number": 12,
+                "status": "completed"
+              },
+              {
+                "conclusion": "success",
+                "name": "Post Run actions/setup-python@v5",
+                "number": 23,
+                "status": "completed"
+              },
+              {
+                "conclusion": "success",
+                "name": "Post Run actions/checkout@v4",
+                "number": 24,
+                "status": "completed"
+              },
+              {
+                "conclusion": "success",
+                "name": "Complete job",
+                "number": 25,
+                "status": "completed"
+              }
+            ],
+            "url": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39177834071/job/117824334038"
+          },
+          {
+            "completedAt": "2026-10-19T00:11:24Z",
+            "conclusion": "skipped",
+            "databaseId": 117824334664,
+            "name": "Разведка официальных источников (не блокирует CI)",
+            "startedAt": "2026-10-18T23:46:41Z",
+            "status": "completed",
+            "steps": [],
+            "url": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39177834071/job/117824334664"
+          },
+          {
+            "completedAt": "2026-10-19T00:11:24Z",
+            "conclusion": "success",
+            "databaseId": 117829465959,
+            "name": "Соответствие договору (проект 117812)",
+            "startedAt": "2026-10-19T00:11:26Z",
+            "status": "completed",
+            "steps": [
+              {
+                "conclusion": "success",
+                "name": "Set up job",
+                "number": 1,
+                "status": "completed"
+              },
+              {
+                "conclusion": "success",
+                "name": "Run actions/checkout@v4",
+                "number": 2,
+                "status": "completed"
+              },
+              {
+                "conclusion": "success",
+                "name": "Отчёт покрытия из job «Качество» (если он есть)",
+                "number": 3,
+                "status": "completed"
+              },
+              {
+                "conclusion": "success",
+                "name": "Run actions/setup-python@v5",
+                "number": 4,
+                "status": "completed"
+              },
+              {
+                "conclusion": "success",
+                "name": "Зависимости",
+                "number": 5,
+                "status": "completed"
+              },
+              {
+                "conclusion": "success",
+                "name": "Контрактные тесты",
+                "number": 6,
+                "status": "completed"
+              },
+              {
+                "conclusion": "success",
+                "name": "Реестр чисел и его сверка с артефактами",
+                "number": 7,
+                "status": "completed"
+              },
+              {
+                "conclusion": "success",
+                "name": "Контрактные проверки (requirement → fact → status)",
+                "number": 8,
+                "status": "completed"
+              },
+              {
+                "conclusion": "success",
+                "name": "Сверка чисел в документах с реестром",
+                "number": 9,
+                "status": "completed"
+              },
+              {
+                "conclusion": "success",
+                "name": "Артефакты контрактной проверки",
+                "number": 10,
+                "status": "completed"
+              },
+              {
+                "conclusion": "success",
+                "name": "Post Run actions/setup-python@v5",
+                "number": 19,
+                "status": "completed"
+              },
+              {
+                "conclusion": "success",
+                "name": "Post Run actions/checkout@v4",
+                "number": 20,
+                "status": "completed"
+              },
+              {
+                "conclusion": "success",
+                "name": "Complete job",
+                "number": 21,
+                "status": "completed"
+              }
+            ],
+            "url": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39177834071/job/117829465959"
+          },
+          {
+            "completedAt": "2026-10-19T00:11:24Z",
+            "conclusion": "success",
+            "databaseId": 117829466263,
+            "name": "Единый файл чисел (METRICS.json) и сверка документов",
+            "startedAt": "2026-10-19T00:11:26Z",
+            "status": "completed",
+            "steps": [
+              {
+                "conclusion": "success",
+                "name": "Set up job",
+                "number": 1,
+                "status": "completed"
+              },
+              {
+                "conclusion": "success",
+                "name": "Run actions/checkout@v4",
+                "number": 2,
+                "status": "completed"
+              },
+              {
+                "conclusion": "success",
+                "name": "Run actions/setup-python@v5",
+                "number": 3,
+                "status": "completed"
+              },
+              {
+                "conclusion": "success",
+                "name": "Зависимости",
+                "number": 4,
+                "status": "completed"
+              },
+              {
+                "conclusion": "success",
+                "name": "Скачать отчёт покрытия",
+                "number": 5,
+                "status": "completed"
+              },
+              {
+                "conclusion": "success",
+                "name": "Скачать отчёт пилота (JSON + PNG)",
+                "number": 6,
+                "status": "completed"
+              },
+              {
+                "conclusion": "success",
+                "name": "Скачать результаты внешних наборов",
+                "number": 7,
+                "status": "completed"
+              },
+              {
+                "conclusion": "success",
+                "name": "Кросс-корпусный тест (обучение на A, оценка на B)",
+                "number": 8,
+                "status": "completed"
+              },
+              {
+                "conclusion": "success",
+                "name": "Собрать единый файл чисел",
+                "number": 9,
+                "status": "completed"
+              },
+              {
+                "conclusion": "success",
+                "name": "Ключевые числа в аннотации (чтобы их можно было прочитать без скачивания)",
+                "number": 10,
+                "status": "completed"
+              },
+              {
+                "conclusion": "success",
+                "name": "Сверить числа в документах с METRICS.json",
+                "number": 11,
+                "status": "completed"
+              },
+              {
+                "conclusion": "success",
+                "name": "Артефакт чисел",
+                "number": 12,
+                "status": "completed"
+              },
+              {
+                "conclusion": "success",
+                "name": "Post Run actions/setup-python@v5",
+                "number": 23,
+                "status": "completed"
+              },
+              {
+                "conclusion": "success",
+                "name": "Post Run actions/checkout@v4",
+                "number": 24,
+                "status": "completed"
+              },
+              {
+                "conclusion": "success",
+                "name": "Complete job",
+                "number": 25,
+                "status": "completed"
+              }
+            ],
+            "url": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39177834071/job/117829466263"
+          },
+          {
+            "completedAt": "2026-10-19T00:11:24Z",
+            "conclusion": "skipped",
+            "databaseId": 117829467100,
+            "name": "Пилот на реальной модели (rugpt3small, CPU)",
+            "startedAt": "2026-10-19T00:11:24Z",
+            "status": "completed",
+            "steps": [],
+            "url": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39177834071/job/117829467100"
+          },
+          {
+            "completedAt": "2026-10-19T00:11:24Z",
+            "conclusion": "skipped",
+            "databaseId": 117829467655,
+            "name": "Внешние размеченные наборы (скачивание, контрольные ...",
+            "startedAt": "2026-10-19T00:11:24Z",
+            "status": "completed",
+            "steps": [],
+            "url": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39177834071/job/117829467655"
+          }
+        ],
+        "url": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39177834071"
+      },
+      "run_url": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39177834071"
+    },
+    {
+      "id": "windows-rc",
+      "status": "не измерено"
+    },
+    {
+      "id": "full-2M-demo-answer",
+      "status": "подтверждено функционально; скорость не достигнута",
+      "fact": {
+        "mode": "demo",
+        "functional_passed": true,
+        "answer_chars": 2000000,
+        "answer_utf8_bytes": 3660605,
+        "answer_sha256": "4c01a95caa3557617572f8e9660fc21c3c352c8ad778e844c7386b7acf496538",
+        "context_chars": 494,
+        "token_count": 282830,
+        "last_token_end": 2000000,
+        "all_full_token_risks_finite_and_bounded": true,
+        "all_spans_schema_and_slices_valid": true,
+        "full_token_records_sha256": "5e68bd503774557c878ffcbb25a182f3c829dff42b2fe711615f64a73a2fcfda",
+        "seconds": 349.8407191619999,
+        "speed_limit_60s_met": false,
+        "score": 0.0,
+        "verdict": "grounded",
+        "note": "Real sandbox CPU product request; separate environment from GitHub benchmarks. No HF full-answer coverage claim."
+      },
+      "receipt": "reports/acceptance/functional-2M-demo.json"
+    },
+    {
+      "id": "native-HF-long-answer-without-truncation",
+      "status": "не достигнут",
+      "receipt": "reports/acceptance/long-answer-limitation.json"
+    },
+    {
+      "id": "robustness",
+      "status": "измерено на saved OOF/dev, не новая независимая проверка",
+      "receipt": "reports/acceptance/robustness.json"
+    },
+    {
+      "id": "official-test177",
+      "status": "не запускался",
+      "incident": "Initial old chunking test parsed unsplit corpus; see protocol incident. No model evaluation or selection on test177."
+    },
+    {
+      "id": "whole-contract",
+      "status": "не принят",
+      "reason": "Dev success and interface smoke are not full contract acceptance; speed failures, censored full-text requests and external Windows HF runtime need explicit accounting."
+    }
+  ],
+  "benchmarks": [
+    {
+      "mode": "demo",
+      "scenario": "document-context",
+      "chars": 1000,
+      "thermal": "cold-process",
+      "median_seconds": 0.007070377000005124,
+      "max_seconds": 0.01361029800000324,
+      "status": "достигнут",
+      "receipt": "reports/acceptance/run39177834081/p6-product-demo/benchmark.json",
+      "run_url": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39177834081"
+    },
+    {
+      "mode": "demo",
+      "scenario": "document-context",
+      "chars": 1000,
+      "thermal": "warm-model",
+      "median_seconds": 0.0020004269999986946,
+      "max_seconds": 0.0020111529999979894,
+      "status": "достигнут",
+      "receipt": "reports/acceptance/run39177834081/p6-product-demo/benchmark.json",
+      "run_url": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39177834081"
+    },
+    {
+      "mode": "demo",
+      "scenario": "document-context",
+      "chars": 50000,
+      "thermal": "cold-process",
+      "median_seconds": 0.04681097200000295,
+      "max_seconds": 0.04691091099999767,
+      "status": "достигнут",
+      "receipt": "reports/acceptance/run39177834081/p6-product-demo/benchmark.json",
+      "run_url": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39177834081"
+    },
+    {
+      "mode": "demo",
+      "scenario": "document-context",
+      "chars": 50000,
+      "thermal": "warm-model",
+      "median_seconds": 0.042196130999997195,
+      "max_seconds": 0.042376238000002786,
+      "status": "достигнут",
+      "receipt": "reports/acceptance/run39177834081/p6-product-demo/benchmark.json",
+      "run_url": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39177834081"
+    },
+    {
+      "mode": "demo",
+      "scenario": "document-context",
+      "chars": 2000000,
+      "thermal": "cold-process",
+      "median_seconds": 2.3095699399999887,
+      "max_seconds": 2.316568701999998,
+      "status": "достигнут",
+      "receipt": "reports/acceptance/run39177834081/p6-product-demo/benchmark.json",
+      "run_url": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39177834081"
+    },
+    {
+      "mode": "demo",
+      "scenario": "document-context",
+      "chars": 2000000,
+      "thermal": "warm-model",
+      "median_seconds": 2.3123810719999938,
+      "max_seconds": 2.3253580020000015,
+      "status": "достигнут",
+      "receipt": "reports/acceptance/run39177834081/p6-product-demo/benchmark.json",
+      "run_url": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39177834081"
+    },
+    {
+      "mode": "demo",
+      "scenario": "answer-text",
+      "chars": 1000,
+      "thermal": "cold-process",
+      "median_seconds": 0.013407542999999578,
+      "max_seconds": 0.013634439999989922,
+      "status": "достигнут",
+      "receipt": "reports/acceptance/run39177834081/p6-product-demo/benchmark.json",
+      "run_url": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39177834081"
+    },
+    {
+      "mode": "demo",
+      "scenario": "answer-text",
+      "chars": 1000,
+      "thermal": "warm-model",
+      "median_seconds": 0.00858227000000511,
+      "max_seconds": 0.008736450000000673,
+      "status": "достигнут",
+      "receipt": "reports/acceptance/run39177834081/p6-product-demo/benchmark.json",
+      "run_url": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39177834081"
+    },
+    {
+      "mode": "demo",
+      "scenario": "answer-text",
+      "chars": 50000,
+      "thermal": "cold-process",
+      "median_seconds": 0.5451400299999989,
+      "max_seconds": 0.5452188559999911,
+      "status": "достигнут",
+      "receipt": "reports/acceptance/run39177834081/p6-product-demo/benchmark.json",
+      "run_url": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39177834081"
+    },
+    {
+      "mode": "demo",
+      "scenario": "answer-text",
+      "chars": 50000,
+      "thermal": "warm-model",
+      "median_seconds": 0.5357318509999942,
+      "max_seconds": 0.5742777539999935,
+      "status": "достигнут",
+      "receipt": "reports/acceptance/run39177834081/p6-product-demo/benchmark.json",
+      "run_url": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39177834081"
+    },
+    {
+      "mode": "demo",
+      "scenario": "answer-text",
+      "chars": 2000000,
+      "thermal": "cold-process",
+      "median_seconds": null,
+      "max_seconds": null,
+      "status": "не достигнут",
+      "receipt": "reports/acceptance/run39177834081/p6-product-demo/benchmark.json",
+      "run_url": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39177834081"
+    },
+    {
+      "mode": "demo",
+      "scenario": "answer-text",
+      "chars": 2000000,
+      "thermal": "warm-model",
+      "median_seconds": null,
+      "max_seconds": null,
+      "status": "не достигнут",
+      "receipt": "reports/acceptance/run39177834081/p6-product-demo/benchmark.json",
+      "run_url": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39177834081"
+    },
+    {
+      "mode": "hf",
+      "scenario": "document-context",
+      "chars": 1000,
+      "thermal": "cold-process",
+      "median_seconds": 5.759504465000006,
+      "max_seconds": 5.766685546000005,
+      "status": "не достигнут",
+      "receipt": "reports/acceptance/run39177834081/p6-product-hf/benchmark.json",
+      "run_url": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39177834081"
+    },
+    {
+      "mode": "hf",
+      "scenario": "document-context",
+      "chars": 1000,
+      "thermal": "warm-model",
+      "median_seconds": 1.4694539609999993,
+      "max_seconds": 1.4819093520000024,
+      "status": "не достигнут",
+      "receipt": "reports/acceptance/run39177834081/p6-product-hf/benchmark.json",
+      "run_url": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39177834081"
+    },
+    {
+      "mode": "hf",
+      "scenario": "document-context",
+      "chars": 50000,
+      "thermal": "cold-process",
+      "median_seconds": 8.605325195999995,
+      "max_seconds": 8.725292445999997,
+      "status": "не достигнут",
+      "receipt": "reports/acceptance/run39177834081/p6-product-hf/benchmark.json",
+      "run_url": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39177834081"
+    },
+    {
+      "mode": "hf",
+      "scenario": "document-context",
+      "chars": 50000,
+      "thermal": "warm-model",
+      "median_seconds": 4.220389256000004,
+      "max_seconds": 4.262031673000024,
+      "status": "не достигнут",
+      "receipt": "reports/acceptance/run39177834081/p6-product-hf/benchmark.json",
+      "run_url": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39177834081"
+    },
+    {
+      "mode": "hf",
+      "scenario": "document-context",
+      "chars": 2000000,
+      "thermal": "cold-process",
+      "median_seconds": 9.524675689999981,
+      "max_seconds": 9.649384985000012,
+      "status": "достигнут",
+      "receipt": "reports/acceptance/run39177834081/p6-product-hf/benchmark.json",
+      "run_url": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39177834081"
+    },
+    {
+      "mode": "hf",
+      "scenario": "document-context",
+      "chars": 2000000,
+      "thermal": "warm-model",
+      "median_seconds": 5.344215689000009,
+      "max_seconds": 5.349798615999987,
+      "status": "достигнут",
+      "receipt": "reports/acceptance/run39177834081/p6-product-hf/benchmark.json",
+      "run_url": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39177834081"
+    },
+    {
+      "mode": "hf",
+      "scenario": "answer-text",
+      "chars": 1000,
+      "thermal": "cold-process",
+      "median_seconds": 7.681687864999958,
+      "max_seconds": 17.582006344999968,
+      "status": "не достигнут",
+      "receipt": "reports/acceptance/run39177834081/p6-product-hf/benchmark.json",
+      "run_url": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39177834081"
+    },
+    {
+      "mode": "hf",
+      "scenario": "answer-text",
+      "chars": 1000,
+      "thermal": "warm-model",
+      "median_seconds": 3.3287632779999967,
+      "max_seconds": 3.3453974079999966,
+      "status": "не достигнут",
+      "receipt": "reports/acceptance/run39177834081/p6-product-hf/benchmark.json",
+      "run_url": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39177834081"
+    },
+    {
+      "mode": "hf",
+      "scenario": "answer-text",
+      "chars": 50000,
+      "thermal": "cold-process",
+      "median_seconds": 8.131707099000039,
+      "max_seconds": 8.16342842299997,
+      "status": "не достигнут",
+      "receipt": "reports/acceptance/run39177834081/p6-product-hf/benchmark.json",
+      "run_url": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39177834081"
+    },
+    {
+      "mode": "hf",
+      "scenario": "answer-text",
+      "chars": 50000,
+      "thermal": "warm-model",
+      "median_seconds": 3.664374754999983,
+      "max_seconds": 3.680787724999959,
+      "status": "не достигнут",
+      "receipt": "reports/acceptance/run39177834081/p6-product-hf/benchmark.json",
+      "run_url": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39177834081"
+    },
+    {
+      "mode": "hf",
+      "scenario": "answer-text",
+      "chars": 2000000,
+      "thermal": "cold-process",
+      "median_seconds": null,
+      "max_seconds": null,
+      "status": "не достигнут",
+      "receipt": "reports/acceptance/run39177834081/p6-product-hf/benchmark.json",
+      "run_url": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39177834081"
+    },
+    {
+      "mode": "hf",
+      "scenario": "answer-text",
+      "chars": 2000000,
+      "thermal": "warm-model",
+      "median_seconds": null,
+      "max_seconds": null,
+      "status": "не достигнут",
+      "receipt": "reports/acceptance/run39177834081/p6-product-hf/benchmark.json",
+      "run_url": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39177834081"
+    }
+  ]
+}

@@ -55,7 +55,7 @@ MODEL_DEFAULT = HF_MODEL_DEFAULT
 PROGRESS_EVERY = 10
 
 
-def dump_matrix(key: str, matrix, pair_id: str, *, max_length: int = 512, chunked: bool = True) -> dict:
+def dump_matrix(key: str, matrix, pair_id: str, *, max_length: int = 512, chunked: bool = False) -> dict:
     """Serialize every feature, including window provenance; no inference or fitting."""
     return {
         "key": key,

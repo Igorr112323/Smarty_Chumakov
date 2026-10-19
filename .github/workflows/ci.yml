@@ -39,6 +39,10 @@ jobs:
     # обучения и чистая установка в отдельный venv: 20 минут не хватило
     # (job снимался на 20-й минуте), сорок — с запасом.
     timeout-minutes: 40
+    # Python 3.12 monitoring observes the same full suite without per-line trace overhead.
+    # No exclusions and the coverage gate remains 85%.
+    env:
+      COVERAGE_CORE: sysmon
     defaults:
       run:
         working-directory: spanverify-module
@@ -47,7 +51,7 @@ jobs:
 
       - uses: actions/setup-python@v5
         with:
-          python-version: "3.11"
+          python-version: "3.12"
           cache: pip
           cache-dependency-path: spanverify-module/requirements.txt
 
@@ -63,7 +67,7 @@ jobs:
         run: python -m black --check .
 
       - name: Тесты с порогом покрытия 85 %
-        run: python -m pytest --cov=spanverify --cov-report=term --cov-report=json:reports/coverage.json --cov-fail-under=85
+        run: python -m pytest --cov=spanverify --cov-report=term --cov-report=json:reports/coverage.json --cov-fail-under=85 --junitxml=reports/quality-junit.xml
 
       - name: Воспроизводимость обучения (один seed → один результат)
         run: |
@@ -95,7 +99,9 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: coverage-json
-          path: spanverify-module/reports/coverage.json
+          path: |
+            spanverify-module/reports/coverage.json
+            spanverify-module/reports/quality-junit.xml
           if-no-files-found: warn
           retention-days: 30
 
@@ -205,7 +211,7 @@ jobs:
           python -m pip install pytest "pyyaml~=6.0" -r requirements-token-head-tests.txt
 
       - name: Тесты
-        run: python -m pytest -q
+        run: python -m pytest -q --junitxml=reports/tests-junit.xml
 
       - name: Само-проверка конвейера
         run: python -m spanverify selftest
@@ -236,6 +242,13 @@ jobs:
           } finally {
             if ($proc -and -not $proc.HasExited) { Stop-Process -Id $proc.Id -Force }
           }
+
+      - name: Full matrix JUnit, including failures
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-junit-${{ matrix.os }}-${{ matrix.python }}
+          path: spanverify-module/reports/tests-junit.xml
 
   pilot:
     name: Пилот на реальной модели (rugpt3small, CPU)
@@ -392,7 +405,17 @@ jobs:
         run: python scripts/print_metrics_annotation.py --metrics reports/METRICS.json
 
       - name: Сверить числа в документах с METRICS.json
-        run: python scripts/check_numbers.py --metrics reports/METRICS.json
+        run: |
+          python - <<'PYCODE'
+          import subprocess, sys
+          result = subprocess.run([sys.executable, "scripts/check_numbers.py", "--metrics", "reports/METRICS.json"], capture_output=True, text=True)
+          print(result.stdout)
+          print(result.stderr, file=sys.stderr)
+          if result.returncode:
+              for line in result.stdout.splitlines():
+                  print("::error title=Document numbers::" + line.replace("%", "%25").replace("\r", "%0D"))
+          raise SystemExit(result.returncode)
+          PYCODE
 
       - name: Артефакт чисел
         if: always()

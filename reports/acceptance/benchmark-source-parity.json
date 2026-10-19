@@ -1,0 +1,11 @@
+{
+  "reference_sha": "34a82a565f2e7cc84648f4d85b35826b558cd2e8",
+  "benchmark_function_AST_unchanged": {
+    "verifier": true,
+    "document": true,
+    "worker": true,
+    "benchmark": true,
+    "shares": true
+  },
+  "interface_fixture_only_change": "existing mandatory number-attribution contract fixture; no runtime/model change"
+}

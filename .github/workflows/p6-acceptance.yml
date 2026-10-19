@@ -61,6 +61,7 @@ jobs:
           mkdir -p ../reports/acceptance/hf
           /usr/bin/time -v python scripts/p6_acceptance.py worker --mode hf --out ../reports/acceptance/hf/download-product-request.json 2> ../reports/acceptance/hf/download.log
       - name: Three cold and warm repeats, both input roles, profiles, 2M UTF-8 evidence
+        if: "!contains(github.event.head_commit.message, '[interfaces-only]')"
         working-directory: spanverify-module
         run: python -u scripts/p6_acceptance.py benchmark --mode ${{ matrix.mode }} --out ../reports/acceptance/${{ matrix.mode }}
       - name: Real CLI, local web 8765, HTTP requests and responses
@@ -77,7 +78,8 @@ jobs:
           retention-days: 90
   publish-evidence:
     needs: [parity, product]
-    if: always()
+    # Final interface-only replay keeps artifacts but must not move the measured HEAD.
+    if: always() && !contains(github.event.head_commit.message, '[interfaces-only]')
     runs-on: ubuntu-latest
     timeout-minutes: 10
     permissions:

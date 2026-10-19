@@ -1,0 +1,11 @@
+{
+  "pairs": 181,
+  "full_token_risks": 13150,
+  "mismatches": [],
+  "p1_max_abs_delta": 0.0,
+  "cache_misses": 0,
+  "bundle_sha256": "e0b13c693a058dfd66ed24a52fc14e9c70964e95885358e7b99cc1f328ad6892",
+  "passed": true,
+  "source_run_url": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39177427357",
+  "source": "GitHub check-run annotation 117822878337; full environment available in p6-parity artifact"
+}

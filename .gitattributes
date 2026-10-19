@@ -1,0 +1,3 @@
+# Frozen experiment evidence must have identical bytes on Linux and Windows.
+# In particular the P5 bundle SHA is a raw-byte integrity requirement.
+spanverify-module/reports/experiments/** -text

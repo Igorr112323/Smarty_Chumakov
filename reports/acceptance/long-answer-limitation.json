@@ -1,0 +1,15 @@
+{
+  "status": "не достигнут: полноценная HF-обработка длинного ответа без усечения не подтверждена",
+  "source_receipt": "reports/acceptance/run39177427357/p6-product-hf/hf-answer-text-50000-cold-process-0.json",
+  "run_url": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39177427357",
+  "observed": {"answer_chars": 50000, "product_token_count": 7073, "hf_seq_len": 512, "hf_chunked": false, "hf_context_tokens": 0},
+  "source_inspection": {
+    "file": "spanverify-module/spanverify/features.py",
+    "hf_features": "tokenizer(prompt, truncation=True, max_length=max_length); map_token_positions maps all answer tokens to the retained model offsets",
+    "hf_features_chunked": "chunks the context, not the answer; short context falls through to hf_features even for a long answer",
+    "consequence": "Output token_count/schema do not prove full model coverage. Unmapped long-answer positions cannot be treated as fully inferred risks. Exact unmapped-position count was not measured; no invented count is reported."
+  },
+  "frozen_model_policy": "No change to frozen feature extraction/window512/chunking or feature substitution was introduced to conceal this limitation. Cached P5 dev parity remains zero, but does not certify native long-input feature coverage.",
+  "context_2M_distinction": "The 2M-context request indexes the full generated document into 2022 chunks and evaluates 3 retrieved chunks under the frozen policy, with a short answer. It is NOT evidence that a 2M-character answer or every fact in a 2M document receives a full HF forward pass.",
+  "acceptance_effect": "Recorded latency is timing of the existing product path only. Even a fast completed long-answer request must not be upgraded to valid full-text throughput or full long-input functional acceptance."
+}
