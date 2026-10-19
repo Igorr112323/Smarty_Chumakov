@@ -1,7 +1,7 @@
 {
   "kind": "ci_workflows",
   "runs_considered": 100,
-  "generated_at": "2026-10-19T07:14:58Z",
+  "generated_at": "2026-10-19T07:25:24Z",
   "command": "python scripts/collect_ci_workflows.py",
   "source": ".github/workflows/*.yml + reports/CI_RUNS.json",
   "registry": {
@@ -707,6 +707,13 @@
           "name": "parity",
           "timeout_minutes": 40,
           "steps": 7,
+          "uploads_artifacts": true,
+          "runs_python": "ubuntu-latest"
+        },
+        {
+          "name": "hf-contract",
+          "timeout_minutes": 40,
+          "steps": 5,
           "uploads_artifacts": true,
           "runs_python": "ubuntu-latest"
         }

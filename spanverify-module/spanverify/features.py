@@ -1157,6 +1157,25 @@ def map_token_positions(
     return mapping
 
 
+def _load_hf_runtime(model_name, device):
+    # Lazy cache is model identity/device only, never answer text or predictions.
+    return _cached_hf_runtime(model_name, device)
+
+
+@lru_cache(maxsize=2)
+def _cached_hf_runtime(model_name, device):
+    import torch
+    from transformers import AutoModelForCausalLM, AutoTokenizer
+
+    tokenizer = AutoTokenizer.from_pretrained(model_name)
+    model = AutoModelForCausalLM.from_pretrained(model_name, attn_implementation="eager", output_attentions=True)
+    model.eval()
+    model.config.output_attentions = True
+    model.config.output_hidden_states = True
+    model.to(device or ("cuda" if torch.cuda.is_available() else "cpu"))
+    return tokenizer, model
+
+
 def hf_features(
     answer: str,
     context: str | Sequence[str] | None,
@@ -1166,6 +1185,8 @@ def hf_features(
     max_length: int = 512,
     answer_tokens: Sequence[Token] | None = None,
     layer: int | str = "last",
+    _runtime=None,
+    _windowed: bool = False,
 ) -> FeatureMatrix:
     """Реальные признаки модели: энтропия внимания, масса на контекст, плотность.
 
@@ -1190,7 +1211,6 @@ def hf_features(
         raise BackendUnavailable(reason)
 
     import torch  # noqa: PLC0415
-    from transformers import AutoModelForCausalLM, AutoTokenizer  # noqa: PLC0415
 
     tokens = list(answer_tokens) if answer_tokens is not None else tokenize_with_offsets(answer)
     if not tokens:
@@ -1202,24 +1222,30 @@ def hf_features(
     answer_start = len(prompt) - len(answer)
 
     try:
-        tokenizer = AutoTokenizer.from_pretrained(model_name)
-        model = AutoModelForCausalLM.from_pretrained(model_name, attn_implementation="eager", output_attentions=True)
+        tokenizer, model = _runtime or _load_hf_runtime(model_name, device)
     except Exception as exc:  # pragma: no cover - зависит от окружения
         raise BackendUnavailable(
             f"не удалось загрузить модель {model_name}: {type(exc).__name__}: {exc}. "
             "Проверьте доступ к весам или укажите другую модель."
         ) from exc
 
-    model.eval()
-    # Скрытые состояния нужны третьему признаку (плотность представлений), а
-    # карты внимания — первым двум. Флаги ставим в конфиге: так одинаково
-    # работают и старые, и новые версии transformers.
-    model.config.output_attentions = True
-    model.config.output_hidden_states = True
-    torch_device = device or ("cuda" if torch.cuda.is_available() else "cpu")
-    model.to(torch_device)
+    if not _windowed:
+        answer_ids = tokenizer(answer, add_special_tokens=False)["input_ids"]
+        if len(answer_ids) > max_length:
+            from .hf_windows import full_answer_features
 
-    encoded = tokenizer(prompt, return_tensors="pt", truncation=True, max_length=max_length)
+            return full_answer_features(
+                answer,
+                context_text,
+                tokens,
+                tokenizer,
+                (tokenizer, model),
+                hf_features,
+                dict(model_name=model_name, k=k, device=device, max_length=max_length, layer=layer),
+            )
+    encoded = tokenizer(prompt, return_tensors="pt", truncation=not _windowed, max_length=max_length)
+    if _windowed and encoded["input_ids"].shape[-1] > max_length:
+        raise BackendUnavailable("HF internal window exceeds model limit; no truncation allowed")
     attention_mask = encoded["attention_mask"]
     with torch.no_grad():
         outputs = model(**encoded)
@@ -1234,7 +1260,7 @@ def hf_features(
     # Разные версии transformers отдают смещения то как тензор/`BatchEncoding`
     # (с методом ``tolist``), то как обычный список списков — приводим к списку
     # кортежей, иначе на свежих версиях падало бы AttributeError.
-    raw_offsets = tokenizer(prompt, return_offsets_mapping=True, truncation=True, max_length=max_length)[
+    raw_offsets = tokenizer(prompt, return_offsets_mapping=True, truncation=not _windowed, max_length=max_length)[
         "offset_mapping"
     ]
     if hasattr(raw_offsets, "tolist"):
@@ -1285,6 +1311,13 @@ def hf_features(
         for position in context_positions:
             context_token_embeddings.append(hidden_cpu[position].tolist())
 
+    context_norms = [sum(x * x for x in v) ** 0.5 for v in context_token_embeddings]
+    try:
+        import numpy as np
+
+        context_array = np.asarray(context_token_embeddings, dtype=np.float64)
+    except ImportError:
+        context_array = context_token_embeddings
     for positions in token_positions:
         if not positions:
             entropy_values.append(0.5)
@@ -1324,10 +1357,9 @@ def hf_features(
                 # Считаем похожесть вместе с позицией источника: для признаков
                 # итерации 2 важно не только значение максимума, но и где именно
                 # в документе лежит подтверждающий фрагмент.
-                scored = [
-                    (_cosine_dense(vector, other), source_position)
-                    for other, source_position in zip(context_token_embeddings, context_positions, strict=False)
-                ]
+                norm = sum(x * x for x in vector) ** 0.5
+                similarities_exact = _dense_cosine_scores_exact(vector, context_array, norm, context_norms)
+                scored = list(zip(similarities_exact, context_positions, strict=True))
                 best_similarity, best_position = max(scored, key=lambda pair: pair[0])
                 distance = int(abs(position - best_position))
                 # Масштаб затухания — 10 % длины: устойчив к размеру документа.
@@ -1390,6 +1422,7 @@ def hf_features(
             "seq_len": seq_len,
             "context_tokens": len(context_positions),
             "k": k,
+            **({"all_answer_tokens_mapped": all(token_positions)} if _windowed else {}),
         },
     )
 
@@ -1574,6 +1607,28 @@ def resolve_layer(layer: int | str, total: int) -> int:
     except ValueError:
         return total - 1
     return max(0, min(total - 1, index if index >= 0 else total + index))
+
+
+def _dense_cosine_scores_exact(vector, others, norm, other_norms):
+    """Vectorized products, sequential float64 accumulation (NOT BLAS/tree sum)."""
+    if len(others) == 0:
+        return []
+    try:
+        import numpy as np
+    except ImportError:
+        return [_cosine_dense_normed(vector, other, norm, n) for other, n in zip(others, other_norms, strict=True)]
+    products = np.multiply(others, vector, dtype=np.float64)
+    numerators = np.cumsum(products, axis=1, dtype=np.float64)[:, -1].tolist()
+    return [
+        max(0.0, v / (norm * n)) if norm > 0 and n > 0 else 0.0 for v, n in zip(numerators, other_norms, strict=True)
+    ]
+
+
+def _cosine_dense_normed(a, b, norm_a, norm_b):
+    numerator = sum(x * y for x, y in zip(a, b, strict=False))
+    if norm_a <= 0 or norm_b <= 0:
+        return 0.0
+    return max(0.0, numerator / (norm_a * norm_b))
 
 
 def _cosine_dense(a: Sequence[float], b: Sequence[float]) -> float:
