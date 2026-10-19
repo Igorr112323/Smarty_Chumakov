@@ -67,5 +67,13 @@
     }
   },
   "note": "диагностика: demo-режим (лексические суррогаты); договорная строка качества — 4.1.6-hf; внутренний ориентир проекта (F1 ≥ 0.90 при FPR ≤ 0.10) остаётся не достигнут",
-  "gate": null
+  "gate": null,
+  "evidence_context": {
+    "run_id": "historical-local-unrecorded:c6bb87a8a39a99d51b4e6d91fa68c338a57155e6",
+    "date": "2026-10-18",
+    "status": "NON_AUTHORITATIVE historical/reference; consult current indices",
+    "successor": "reports/EXPERIMENTS_INDEX.md",
+    "source_commit": "c6bb87a8a39a99d51b4e6d91fa68c338a57155e6",
+    "limitation": "Original remote run not recorded; do not misrepresent as current independent measurement"
+  }
 }

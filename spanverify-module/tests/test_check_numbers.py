@@ -52,7 +52,7 @@ def test_coverage_pattern_no_false_positives():
 
 def _load_real_metrics():
     """Загружает реальный METRICS.json для тестов."""
-    metrics_path = Path(__file__).parent.parent / "reports" / "METRICS.json"
+    metrics_path = Path(__file__).parent.parent / "reports" / "CURRENT_METRICS.json"
     with open(metrics_path, encoding="utf-8") as f:
         return json.load(f)
 

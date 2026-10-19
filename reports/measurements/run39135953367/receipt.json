@@ -1,0 +1,13 @@
+{
+  "run_id": "39135953367",
+  "date": "2026-10-18T14:25:55Z",
+  "commit": "d3c0e5949ef35b1468b77680fb7ed6933c002877",
+  "family": "P1",
+  "workflow": "p1-public-replay.yml",
+  "record_kind": "measurement/delivery",
+  "status": "completed",
+  "outcome": "failure",
+  "url": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39135953367",
+  "canonical_directories": [],
+  "receipt": "reports/measurements/run39135953367/receipt.json"
+}

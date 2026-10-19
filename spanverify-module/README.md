@@ -23,7 +23,7 @@ python -m spanverify verify --answer "..." --context "..."
 
 | Что | Состояние |
 |---|---|
-| Конвейер (признаки → риск → фрагменты → калибровка → вердикт) | реализован, 895 тестов, покрытие [текущий отчёт покрытия CI](https://github.com/Igorr112323/Smarty_Chumakov/actions/workflows/ci.yml) |
+| Конвейер (признаки → риск → фрагменты → калибровка → вердикт) | реализован, 909 тестов, покрытие [текущий отчёт покрытия CI](https://github.com/Igorr112323/Smarty_Chumakov/actions/workflows/ci.yml) |
 | Режим `demo` (без зависимостей) | работает; признаки — лексические суррогаты, годится для проверки конвейера, интерфейса и обучения на своих данных |
 | Режим `hf` (реальная модель: внимание + скрытые состояния) | реализован; путь проверен на локально собранной модели, пилот на `rugpt3small` выполняется в CI |
 | Числа качества | получены на **синтетическом** корпусе: переносить их на реальные документы нельзя |
@@ -164,7 +164,7 @@ curl -s localhost:8835/v1/verify -H 'Content-Type: application/json' \
 корпуса**. Кросс-корпусный тест (обучение здесь, оценка на корпусе другого
 генератора, 240 пар) даёт token F1 0.675 при FPR 0.148 — критерий не выполняется;
 это ограничение метода, а не ошибка измерения. Единый файл чисел:
-`reports/METRICS.json` (сверяется с документами в CI, `scripts/check_numbers.py`).
+`reports/CURRENT_METRICS.json` (сверяется с документами в CI, `scripts/check_numbers.py`).
 
 Строгий F1 фрагментов с *узкой* разметкой равен 0.283 — это следствие расширения
 до границ предложений (ширина ×24 относительно размеченного числа), поэтому рядом
@@ -245,7 +245,7 @@ spanverify-module/
 │   └── detector.py, backends/, vectors.py, training.py, text.py   исторический детектор «текст написан ИИ»
 ├── scripts/             exe_launcher.py, make_demo_dataset.py, make_markup_template.py,
 │                        run_experiments.py, pilot_rugpt3small.py, make_zipapp.py, make_exe.ps1
-├── tests/               895 тестов (pytest), у каждого теста — docstring о смысле проверки
+├── tests/               909 тестов (pytest), у каждого теста — docstring о смысле проверки
 ├── config/              weights.json (веса, порог, изотоника, голова), head.json, config.json
 ├── data/                demo_pairs.jsonl (демонстрационный корпус), demo_dataset.jsonl (исторический)
 ├── reports/             отчёты экспериментов и демо-прогонов

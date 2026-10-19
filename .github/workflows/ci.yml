@@ -193,7 +193,7 @@ jobs:
 
       - name: Сверка чисел в документах с реестром
         working-directory: spanverify-module
-        run: python scripts/check_numbers.py --metrics reports/METRICS.json --numbers ../reports/NUMBERS.json
+        run: python scripts/check_numbers.py --metrics reports/CURRENT_METRICS.json --numbers ../reports/NUMBERS.json
 
       - name: Артефакты контрактной проверки
         if: always()
@@ -424,16 +424,16 @@ jobs:
         run: python scripts/cross_corpus.py --out reports/cross_corpus.json
 
       - name: Собрать единый файл чисел
-        run: python scripts/collect_metrics.py --out reports/METRICS.json --coverage-json reports/coverage.json
+        run: python scripts/collect_metrics.py --out reports/CURRENT_METRICS.json --coverage-json reports/coverage.json
 
       - name: Ключевые числа в аннотации (чтобы их можно было прочитать без скачивания)
-        run: python scripts/print_metrics_annotation.py --metrics reports/METRICS.json
+        run: python scripts/print_metrics_annotation.py --metrics reports/CURRENT_METRICS.json
 
       - name: Сверить числа в документах с METRICS.json
         run: |
           python - <<'PYCODE'
           import subprocess, sys
-          result = subprocess.run([sys.executable, "scripts/check_numbers.py", "--metrics", "reports/METRICS.json"], capture_output=True, text=True)
+          result = subprocess.run([sys.executable, "scripts/check_numbers.py", "--metrics", "reports/CURRENT_METRICS.json"], capture_output=True, text=True)
           print(result.stdout)
           print(result.stderr, file=sys.stderr)
           if result.returncode:
@@ -448,7 +448,7 @@ jobs:
         with:
           name: metrics
           path: |
-            spanverify-module/reports/METRICS.json
+            spanverify-module/reports/CURRENT_METRICS.json
             spanverify-module/reports/cross_corpus.json
             spanverify-module/reports/CORPUS_REPORT.md
           retention-days: 90

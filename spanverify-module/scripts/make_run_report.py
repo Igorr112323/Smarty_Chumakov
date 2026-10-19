@@ -10,7 +10,7 @@
 
 1. ``pytest --collect-only -q`` — количество собранных тестов;
 2. ``spanverify evaluate`` на демонстрационном корпусе и на корпусе A;
-3. чтение ``reports/METRICS.json`` при его наличии;
+3. чтение ``reports/CURRENT_METRICS.json`` при его наличии;
 4. проверка наличия ``data/corpus_a3/sources`` и ``manifest.json``;
 5. проверка доступности режима ``hf`` (torch установлен или нет).
 
@@ -161,7 +161,7 @@ def build(skip_evaluate: bool) -> str:
             "корпусу A3 в отчёте отсутствуют.\n"
         )
 
-    metrics_path = ROOT / "reports" / "METRICS.json"
+    metrics_path = ROOT / "reports" / "CURRENT_METRICS.json"
     lines.append("## 4. Метрики из METRICS.json\n")
     if metrics_path.is_file():
         try:
@@ -191,7 +191,7 @@ def build(skip_evaluate: bool) -> str:
                 "веса обучены на обучающей части, разбиение по документам без общих групп.\n"
             )
     else:
-        lines.append("Файл `reports/METRICS.json` отсутствует: **не измерено**.\n")
+        lines.append("Файл `reports/CURRENT_METRICS.json` отсутствует: **не измерено**.\n")
 
     lines.append("## 5. Прогоны evaluate\n")
     if skip_evaluate:

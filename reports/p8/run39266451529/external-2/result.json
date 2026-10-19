@@ -1,0 +1,140 @@
+{
+  "metrics": {
+    "tokens": {
+      "precision": 0.14285714285714285,
+      "recall": 0.008028904054596548,
+      "f1": 0.015203344735841885,
+      "fpr": 0.027887520334650244,
+      "tp": 20,
+      "fp": 120,
+      "fn": 2471,
+      "tn": 4183,
+      "auc": 0.4236207819682346
+    },
+    "spans": {
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1": 0.0,
+      "tp": 0,
+      "fp": 43,
+      "fn": 109,
+      "iou_threshold": 0.5,
+      "recall_containment": 0.0,
+      "mean_width_ratio": 0.0
+    },
+    "answers": {
+      "tp": 55,
+      "fp": 66,
+      "fn": 33,
+      "tn": 96,
+      "precision": 0.45454545454545453,
+      "recall": 0.625,
+      "f1": 0.5263157894736842,
+      "fpr": 0.4074074074074074,
+      "raw_auc": 0.643658810325477,
+      "calibrated_auc": 0.6339436026936027,
+      "positive_predictions": 121,
+      "auc": 0.6339436026936027
+    },
+    "verdicts": {
+      "tp": 59,
+      "fp": 74,
+      "fn": 29,
+      "tn": 88,
+      "precision": 0.4436,
+      "recall": 0.6705,
+      "f1": 0.5339,
+      "fpr": 0.4568,
+      "flagged_share": 0.532
+    }
+  },
+  "gates": {
+    "tokens": {
+      "family": "tokens",
+      "contract": {
+        "gate": {
+          "f1_min": 0.5,
+          "fpr_max": 0.4
+        },
+        "source": "договор № 20478ГУ/2026, проект 117812, ТЗ п. 4.1 треб. 6",
+        "f1": 0.015203344735841885,
+        "fpr": 0.027887520334650244,
+        "status": "НЕ достигнут"
+      },
+      "internal": {
+        "gate": {
+          "f1_min": 0.9,
+          "fpr_max": 0.1
+        },
+        "source": "мастер-промт проекта (внутренний ориентир, не приёмка)",
+        "f1": 0.015203344735841885,
+        "fpr": 0.027887520334650244,
+        "status": "НЕ достигнут"
+      }
+    },
+    "spans": {
+      "family": "spans",
+      "contract": {
+        "gate": {
+          "f1_min": 0.5,
+          "fpr_max": 0.4
+        },
+        "source": "договор № 20478ГУ/2026, проект 117812, ТЗ п. 4.1 треб. 6",
+        "f1": 0.0,
+        "fpr": 0.027887520334650244,
+        "status": "НЕ достигнут"
+      },
+      "internal": {
+        "gate": {
+          "f1_min": 0.9,
+          "fpr_max": 0.1
+        },
+        "source": "мастер-промт проекта (внутренний ориентир, не приёмка)",
+        "f1": 0.0,
+        "fpr": 0.027887520334650244,
+        "status": "НЕ достигнут"
+      }
+    },
+    "answers": {
+      "family": "answers",
+      "contract": {
+        "gate": {
+          "f1_min": 0.5,
+          "fpr_max": 0.4
+        },
+        "source": "договор № 20478ГУ/2026, проект 117812, ТЗ п. 4.1 треб. 6",
+        "f1": 0.5263157894736842,
+        "fpr": 0.4074074074074074,
+        "status": "НЕ достигнут"
+      },
+      "internal": {
+        "gate": {
+          "f1_min": 0.9,
+          "fpr_max": 0.1
+        },
+        "source": "мастер-промт проекта (внутренний ориентир, не приёмка)",
+        "f1": 0.5263157894736842,
+        "fpr": 0.4074074074074074,
+        "status": "НЕ достигнут"
+      }
+    }
+  },
+  "joint_gate": false,
+  "span_fpr_convention": "unchanged P5 token-FPR proxy, no invented span TN",
+  "kind": "external",
+  "pairs": 250,
+  "shard": 2,
+  "cache_hits": 0,
+  "cache_misses": 250,
+  "cache_policy": "empty P8 feature cache; all product fresh inference, no stale legacy512 cache",
+  "fit_calls": [],
+  "seconds": 509.410390134,
+  "bundle_bytes": 122874,
+  "bundle_sha256": "e0b13c693a058dfd66ed24a52fc14e9c70964e95885358e7b99cc1f328ad6892",
+  "dataset_sha256": "a520f5fcab3cd9d3988e6b0039efe733153f40a0808dc2b7c5ff5ad7613c70d3",
+  "evidence_sha256": "81fd2f3580db95ee94e6b28073cee83b03e134dc0c2093fb3a169c95e3da2bcf",
+  "long_over512": 0,
+  "run_id": "39266451529",
+  "commit": "dd4454b05867495018abe5a2f657fc4d6d0fd9a6",
+  "product_source": "b9cf9acdab1ca7bf082d03629ea7e599597f3fa8"
+}

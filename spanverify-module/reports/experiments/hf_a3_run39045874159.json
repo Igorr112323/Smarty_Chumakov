@@ -12,19 +12,59 @@
   "cache_misses": 0,
   "duration_s": 570.6,
   "test_official": {
-    "tokens": {"f1": 0.2304, "fpr": 0.073, "auc": 0.8594, "precision": 0.1568, "recall": 0.4342},
-    "spans": {"strict_f1_iou_0_5": 0.1609, "coverage": 0.4639, "mean_width_ratio": 9.13},
-    "answers": {"f1": 0.0, "auc": 0.509, "threshold": 0.5951},
-    "verdicts": {"f1": 0.6103, "fpr": 0.6375, "recall": 0.6701}
+    "tokens": {
+      "f1": 0.2304,
+      "fpr": 0.073,
+      "auc": 0.8594,
+      "precision": 0.1568,
+      "recall": 0.4342
+    },
+    "spans": {
+      "strict_f1_iou_0_5": 0.1609,
+      "coverage": 0.4639,
+      "mean_width_ratio": 9.13
+    },
+    "answers": {
+      "f1": 0.0,
+      "auc": 0.509,
+      "threshold": 0.5951
+    },
+    "verdicts": {
+      "f1": 0.6103,
+      "fpr": 0.6375,
+      "recall": 0.6701
+    }
   },
   "gates": {
-    "tokens": {"f1_min": 0.5, "achieved": 0.2304, "met": false},
-    "spans": {"f1_min": 0.5, "achieved": 0.1609, "met": false},
-    "answers": {"f1_min": 0.5, "achieved": 0.0, "met": false},
-    "verdicts": {"fpr_max": 0.4, "achieved": 0.6375, "met": false}
+    "tokens": {
+      "f1_min": 0.5,
+      "achieved": 0.2304,
+      "met": false
+    },
+    "spans": {
+      "f1_min": 0.5,
+      "achieved": 0.1609,
+      "met": false
+    },
+    "answers": {
+      "f1_min": 0.5,
+      "achieved": 0.0,
+      "met": false
+    },
+    "verdicts": {
+      "fpr_max": 0.4,
+      "achieved": 0.6375,
+      "met": false
+    }
   },
   "bundle": {
-    "weights": {"attention_entropy": 0.1, "ctx_attention_mass": 0.0, "ctx_attention_mass_norm": 0.1, "ctx_max_similarity": 0.8, "embedding_density": 0.0},
+    "weights": {
+      "attention_entropy": 0.1,
+      "ctx_attention_mass": 0.0,
+      "ctx_attention_mass_norm": 0.1,
+      "ctx_max_similarity": 0.8,
+      "embedding_density": 0.0
+    },
     "threshold": 0.595122,
     "span_z": 1.5,
     "span_floor": 0.05,
@@ -34,5 +74,13 @@
     "verdict: min_flagged_share=0.0, any 2 masked tokens → verdict",
     "answers: aggregation dilutes signal (AUC tokens 0.859, answers 0.509)",
     "spans: _shrink_to_clause inflates width to 9.1x, strict F1 collapses"
-  ]
+  ],
+  "evidence_context": {
+    "run_id": "39045874159",
+    "date": "2026-10-18",
+    "status": "NON_AUTHORITATIVE historical/reference; consult current indices",
+    "successor": "reports/EXPERIMENTS_INDEX.md",
+    "source_commit": "c6bb87a8a39a99d51b4e6d91fa68c338a57155e6",
+    "limitation": null
+  }
 }

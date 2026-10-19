@@ -17,3 +17,4 @@ P7 preserve workflow limits and validate actual complete HF runtime
 P7 current test inventory888, all existing guards retained
 P7 matching full-history acceptance source; parallel independent checks
 P7 portable abi3 Python DLL search and lossless archive compression
+P8 acceptance build: official joint PASS, external1000 published, frozen P7 product

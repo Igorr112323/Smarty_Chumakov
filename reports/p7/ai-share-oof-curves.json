@@ -29,7 +29,15 @@
     "status": "частично",
     "limitation": "Synthetic train-only diagnostic, NOT real-LLM authorship calibration; no quality fitting.",
     "source_job": 118007480024,
-    "source_run": 39236657451
+    "source_run": 39236657451,
+    "evidence_context": {
+      "run_id": "39236657451",
+      "date": "2026-10-19",
+      "status": "NON_AUTHORITATIVE historical/reference; consult current indices",
+      "successor": "reports/EXPERIMENTS_INDEX.md",
+      "source_commit": "b5eb133a55c1d1b8062851919f5978676497dbfc",
+      "limitation": null
+    }
   },
   {
     "mode": "hf",
@@ -61,6 +69,14 @@
     "status": "частично",
     "limitation": "Synthetic train-only diagnostic, NOT real-LLM authorship calibration; no quality fitting.",
     "source_job": 118007480002,
-    "source_run": 39236657451
+    "source_run": 39236657451,
+    "evidence_context": {
+      "run_id": "39236657451",
+      "date": "2026-10-19",
+      "status": "NON_AUTHORITATIVE historical/reference; consult current indices",
+      "successor": "reports/EXPERIMENTS_INDEX.md",
+      "source_commit": "b5eb133a55c1d1b8062851919f5978676497dbfc",
+      "limitation": null
+    }
   }
 ]

@@ -334,5 +334,13 @@
   },
   "rule": "внешние наборы — только тест; калибровка на корпусе A",
   "generated_at": "2026-10-07T10:54:50Z",
-  "disclaimer": "Числа режима demo получены лексическими признаками и научным результатом не являются. Колонка label_origin указывает происхождение разметки: human / llm / auto."
+  "disclaimer": "Числа режима demo получены лексическими признаками и научным результатом не являются. Колонка label_origin указывает происхождение разметки: human / llm / auto.",
+  "evidence_context": {
+    "run_id": "historical-local-unrecorded:fc438ea7069b4a3c8ad78097f4c29df1767937ec",
+    "date": "2026-10-14",
+    "status": "NON_AUTHORITATIVE historical/reference; consult current indices",
+    "successor": "reports/EXPERIMENTS_INDEX.md",
+    "source_commit": "fc438ea7069b4a3c8ad78097f4c29df1767937ec",
+    "limitation": "Original remote run not recorded; do not misrepresent as current independent measurement"
+  }
 }

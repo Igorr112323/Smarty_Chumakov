@@ -346,7 +346,7 @@ workflow не лежит в ветке по умолчанию. Поэтому �
 
 ## Шаг 10 (аудит, команда «исправляй»): P0/P1/P2 — что было, что стало, чем доказано
 
-Актуальные числа всех документов — в едином файле `spanverify-module/reports/METRICS.json`
+Актуальные числа всех документов — в едином файле `spanverify-module/reports/CURRENT_METRICS.json`
 (собирается `scripts/collect_metrics.py`, сверяется `scripts/check_numbers.py` в CI).
 Ниже — исторические числа этапа исправлений; они намеренно не совпадают с текущими,
 потому что сплит, признаки и артефакты изменились.
@@ -395,7 +395,7 @@ workflow не лежит в ветке по умолчанию. Поэтому �
 
 * **Было**: «AUC 0.996» против 0.9963 в прогоне, «72 пары / 690 токенов» против 594
   оцениваемых токенов, «207 тестов» против 226, «покрытие 87 %» против 86 %.
-* **Стало**: `scripts/collect_metrics.py` собирает `reports/METRICS.json` (версия,
+* **Стало**: `scripts/collect_metrics.py` собирает `reports/CURRENT_METRICS.json` (версия,
   коммит, seed, тесты, покрытие, метрики отложенной части и всего корпуса,
   кросс-корпус, пилот, артефакты релиза); `scripts/check_numbers.py` сверяет
   документы с этим файлом и падает при расхождении; оба шага в CI.
@@ -450,7 +450,7 @@ $ python scripts/check_numbers.py
 * Прогон `37118455503`: **9 заданий из 9 зелёные** — линтер/покрытие, тесты на
   Python 3.10/3.11/3.12 (Linux и Windows), пилот, новый job «Единый файл чисел
   (METRICS.json) и сверка документов».
-* Числа из аннотаций CI (то же, что в `reports/METRICS.json` внутри прогона):
+* Числа из аннотаций CI (то же, что в `reports/CURRENT_METRICS.json` внутри прогона):
   `версия=1.2.0 коммит=05fbe820b549 тестов=234 покрытие=86.09% демо: F1=0.9532
   FPR=0.0021 AUC=0.9963 фрагменты: строгий=0.2826 мягкий=1.0 участие_ИИ_AUC=1.0`;
   `внутри=0.9532 кросс=0.7173 падение=0.2226 FPR_кросс=0.1571`.
@@ -514,7 +514,7 @@ $ python scripts/check_numbers.py
 * **Чем доказано**: `tests/test_number_attribution.py` (8 тестов; на коде 1.2.0 падали
   6 из них): подмена → `doubtful` с фрагментом, своё число → строго `grounded`,
   три факта — находится верный субъект; ложных срабатываний на чистых парах 0 из 116
-  (число в `reports/METRICS.json` → `defects.number_attribution.false_positives`).
+  (число в `reports/CURRENT_METRICS.json` → `defects.number_attribution.false_positives`).
   Метрики демо-корпуса не изменились: token F1 0.953 / FPR 0.002 (было столько же).
 
 ### Дефект E — «чужой формат принимается молча»
@@ -528,7 +528,7 @@ $ python scripts/check_numbers.py
   возврата 2. Пустой файл и битая JSON-строка — тоже ошибка с номером строки.
   Вывод `--json` больше не содержит `NaN` (`allow_nan=False`, `NaN → null`).
 * **Чем доказано**: `tests/test_dataset_validation.py` (9 тестов; на коде 1.2.0
-  падали 6, включая `assert 0 == 2`). В `reports/METRICS.json` →
+  падали 6, включая `assert 0 == 2`). В `reports/CURRENT_METRICS.json` →
   `defects.dataset_validation.checks`: чужой/пустой/битый → `rejected: true`, код 2;
   корректный → код 0.
 
@@ -585,7 +585,7 @@ $ python scripts/check_numbers.py
   Инструкция для машины с GPU — `docs/GPU_ИНСТРУКЦИЯ.md`.
 
 Пересборка чисел: `python scripts/collect_metrics.py` → блоки `corpus_a`, `corpus_b`;
-`reports/METRICS.json` содержит 304 теста, покрытие 87.13 %, версия 1.3.0.
+`reports/CURRENT_METRICS.json` содержит 304 теста, покрытие 87.13 %, версия 1.3.0.
 
 ## Шаг 14 (v1.3.0): чистка истории и релиз 1.2.1
 
@@ -689,7 +689,7 @@ RusHallu-RAG — нет: оно проверяется в CI скачивани�
 ## Шаг 20. Продолжение работ по реестру `spanverify-module/reports/TODO_AUDIT.md`
 
 Журнал ведётся по требованию промта: каждое решение записывается здесь, числа —
-только из выполненных команд, источник чисел — `spanverify-module/reports/METRICS.json`.
+только из выполненных команд, источник чисел — `spanverify-module/reports/CURRENT_METRICS.json`.
 
 ### 20-1. Починка красного CI и реестр аудита (commit `b678197`)
 
@@ -1168,7 +1168,7 @@ token **F1 0,7351**, FPR 0,0085, вердикт F1 0,7628. Кросс-корпу
 пересчитал **всю** секцию `demo` на корпусе A3: числа демо-корпуса поехали
 (F1 0,953 → 0,698, FPR 0,002 → 0,0095), после чего `check_numbers.py` и три
 теста `test_metrics_files.py` стали красными. CI считает METRICS **без**
-`--dataset` (`python scripts/collect_metrics.py --out reports/METRICS.json
+`--dataset` (`python scripts/collect_metrics.py --out reports/CURRENT_METRICS.json
 --coverage-json reports/coverage.json`) — тогда `demo` считается на
 `data/demo_pairs.jsonl`, а корпус A3 читается скриптом сам. METRICS.json
 восстановлен из HEAD и пересчитан правильной командой; прежние числа демо
@@ -1761,7 +1761,7 @@ PDF в этом заходе не скачивался.
 между частями 0 (поэтому seed 43 не понадобился). Режимы: faithful 540,
 contradiction 144, number_attribution 132, partial 108, unconfirmed 84,
 missing 72, oversight 60, excess 60. `fetch_npa_corpus.py --verify`: 409 файлов,
-расхождений хеша 0. Актуальные числа метрик по-прежнему в `reports/METRICS.json`;
+расхождений хеша 0. Актуальные числа метрик по-прежнему в `reports/CURRENT_METRICS.json`;
 этот шаг корпус пересобрал, режим hf на нём ещё не измерен.
 
 ## Шаг 20-28. Запущен тяжёлый прогон hf, числа ещё не измерены
@@ -1778,7 +1778,7 @@ missing 72, oversight 60, excess 60. `fetch_npa_corpus.py --verify`: 409 фай�
 Пока `experiment.json` этого прогона не лежит в ветке, писать его числа нельзя.
 
 Актуальные числа demo после пересборки корпуса A3 записаны в
-`reports/METRICS.json` (test token F1 0,7432, FPR 0,0071, 1200 пар, 409
+`reports/CURRENT_METRICS.json` (test token F1 0,7432, FPR 0,0071, 1200 пар, 409
 документов). Это не режим hf.
 
 ## Шаг 20-29. Прогон hf 37532050295 посчитан, в METRICS.json не записан
@@ -1787,7 +1787,7 @@ missing 72, oversight 60, excess 60. `fetch_npa_corpus.py --verify`: 409 фай�
 `arena/c9346971-smarty-chumakov`. Модель `ai-forever/rugpt3small_based_on_gpt2`,
 seed 42, CPU, `torch 2.14.1+cpu`, `cuda=False`, 4 ядра, `transformers 5.19.0`,
 Python 3.11.16. Объём памяти раннер в артефакт не записал, поэтому RAM здесь
-нет. Числа ниже взяты из файлов артефакта, не из `reports/METRICS.json`:
+нет. Числа ниже взяты из файлов артефакта, не из `reports/CURRENT_METRICS.json`:
 сверка документов на этом прогоне упала, и `METRICS.json` не обновился.
 
 | Job | Статус | Длительность |
@@ -1856,7 +1856,7 @@ FPR 0,0, AUC 0,798. Размеченных фрагментов в срезе 4.
 пишется в `cross_corpus_hf.json` и не затирает demo-файл, от которого
 зависит сверка. Полный пересчёт из-за этой правки не запускается:
 сообщение коммита содержит `[skip ci]`, а путь workflow убран из триггера.
-Актуальные demo-числа по-прежнему только в `reports/METRICS.json`.
+Актуальные demo-числа по-прежнему только в `reports/CURRENT_METRICS.json`.
 
 ## Шаг 30. Прогон hf 37593829810: официальный тест, кривая маски, правило вердикта
 
@@ -1927,17 +1927,17 @@ FPR 0,4167.
 раскладывал артефакт корпуса A до сборки чисел). Для A3 и пилота файлы
 сведены; исправление шага — в `.github/workflows/hf-runs.yml` следующего
 коммита, пересчёт повторяется тем же триггером.
-Актуальные числа всех документов — в `reports/METRICS.json`.
+Актуальные числа всех документов — в `reports/CURRENT_METRICS.json`.
 
 Прогон `37609202780` повторил измерение тем же триггером после исправления
 метрика-джоба (артефакт корпуса A раскладывается до сборки чисел). Числа
 сошлись с прогоном 37593829810 до последнего знака: официальный тест A3
 token F1 0,2029 при FPR 0,0653, корпус A 0,6083 при 0,0237, выводы кривой
-маски и сравнение правила вердикта — те же. `reports/METRICS.json` теперь
+маски и сравнение правила вердикта — те же. `reports/CURRENT_METRICS.json` теперь
 собран из файлов этого прогона: блоки `hf_experiments.a`, `hf_experiments.a3`
 и `pilot` с номером прогона 37609202780, файлы
 `reports/experiments/*/experiment.json` — от него же. Дефект рассинхронизации
-закрыт. Актуальные числа всех документов — в `reports/METRICS.json`.
+закрыт. Актуальные числа всех документов — в `reports/CURRENT_METRICS.json`.
 
 ## Шаг 31. Разбор ложных пометок на чистых парах официального теста (без подбора порога)
 
@@ -2028,7 +2028,7 @@ METRICS.json» в job'е «Единый файл чисел»; остальны�
 линтер и покрытие, пилот, внешние наборы). Механика: job пересчитывает
 `tests.collected` заново (`pytest --collect-only`) и берёт покрытие из свежего
 `coverage.json` — на `main` это 515 и 87,35 %, — а документы и закоммиченный
-`reports/METRICS.json` остались на 510 и `null`. При `coverage_percent: null`
+`reports/CURRENT_METRICS.json` остались на 510 и `null`. При `coverage_percent: null`
 сверка заявления о покрытии не проверяет вовсе (множество допустимых значений
 пустое), поэтому локально и в PR расхождение не видно. На пуш job чисел не
 запускается: у него `needs: [quality, pilot, external]`, а `pilot` и `external`
@@ -2044,7 +2044,7 @@ METRICS.json» в job'е «Единый файл чисел»; остальны�
   **покрытие 88 %** (87,51 %; 537 непокрытых строк из 4298). Правки:
   `README.md`, `ИТОГ.md` (три места), `docs/ОТЧЁТ_о_НИР_шаблон.md` (два места),
   `spanverify-module/README.md` (два места).
-* В `reports/METRICS.json` блок `tests` записан измеренным (532 / 87.51), а не
+* В `reports/CURRENT_METRICS.json` блок `tests` записан измеренным (532 / 87.51), а не
   `null`; `meta.commit` и `meta.generated_at` указывают состояние кода, для
   которого сделано измерение. Остальные блоки не тронуты намеренно: локальный
   пересчёт `collect_metrics.py` обнуляет `pilot` (каталог `reports/pilot/` в
@@ -2092,7 +2092,7 @@ python -m ruff check .                    # All checks passed!
 python -m black --check .                 # 121 files would be left unchanged
 python -m pytest --collect-only -q        # 532 (scripts/collect_metrics.py::_test_count)
 python -m pytest --cov=spanverify --cov-report=json:reports/coverage.json
-python scripts/check_numbers.py --metrics reports/METRICS.json
+python scripts/check_numbers.py --metrics reports/CURRENT_METRICS.json
 python scripts/collect_metrics.py --out /tmp/METRICS.sim.json --coverage-json reports/coverage.json
 python scripts/check_numbers.py --metrics /tmp/METRICS.sim.json
 ```
@@ -2184,7 +2184,7 @@ python scripts/check_numbers.py --metrics /tmp/METRICS.sim.json
   означает «не измерено» и обязан иметь причину.
 * `scripts/verify_checksum.py` — сверка контрольной суммы поставки перед
   запуском (с самопроверкой: подменённый файл отвергается).
-* `scripts/refresh_metrics.py` — пересборка `reports/METRICS.json` из артефактов
+* `scripts/refresh_metrics.py` — пересборка `reports/CURRENT_METRICS.json` из артефактов
   прогонов **без потери** чужих прогонов: блоки, артефактов которых нет на этой
   машине (пилот на реальной модели), сохраняются из прежнего файла и
   перечисляются в `meta.refresh.preserved`.
@@ -2199,7 +2199,7 @@ python scripts/check_numbers.py --metrics /tmp/METRICS.sim.json
   (0,63 МиБ / 0,66 МБ) и требование ТЗ п. 4.2 («пакет не больше 0,6 МБ») не
   выполняется; со сжатием — 167 250 байт (0,16 МиБ / 0,17 МБ).
 * `spanverify-module/scripts/check_numbers.py` — сводит числа не только с
-  `reports/METRICS.json`, но и с `reports/NUMBERS.json`; оговорки о порогах
+  `reports/CURRENT_METRICS.json`, но и с `reports/NUMBERS.json`; оговорки о порогах
   («не меньше», «не ниже», «не выше») больше не принимаются за измерения.
 * CI: добавлена обязательная job `contract` (контрактные тесты, реестр чисел,
   `contract_check.py`, сверка чисел документов, артефакты прогона).
@@ -2213,10 +2213,10 @@ python scripts/check_numbers.py --metrics /tmp/METRICS.sim.json
 50 000 знаках (три повтора, медиана); договорный ориентир на отложенной части
 корпуса A — удалённая по документам часть, общих групп 0 — достигнут.
 
-Актуальные числа всех документов — в `reports/METRICS.json` и
+Актуальные числа всех документов — в `reports/CURRENT_METRICS.json` и
 `reports/NUMBERS.json`.
 
-Честные ограничения этого шага: `reports/METRICS.json` пересобран на локальной
+Честные ограничения этого шага: `reports/CURRENT_METRICS.json` пересобран на локальной
 машине (`meta.refresh.worktree = dirty`), блок пилота сохранён из прогона
 `39a0ad48`; сверка контрольной суммы **опубликованного** файла релиза не
 выполнена — файлы релиза отдаются хранилищем, недоступным из сети прогона;
@@ -2252,7 +2252,7 @@ python scripts/check_numbers.py --metrics /tmp/METRICS.sim.json
   `_attribute_tokens`, а не в каждой паре «число ответа × измерение документа».
 
 Проверка, что качество не изменилось (это главное условие правки): пересборка
-`reports/METRICS.json` из артефактов прогонов (`python
+`reports/CURRENT_METRICS.json` из артефактов прогонов (`python
 scripts/refresh_metrics.py --dry-run`) показала изменения **только** в блоках
 `duration_s` и `tests` — все метрики корпусов побайтово те же: корпус A test
 token F1 0.7338 при FPR 0.0, корпус A3 test 0.7442 при 0.0078, демо-корпус
@@ -2276,7 +2276,7 @@ seed 42, режим demo, набор данных — синтетический
 `reports/NUMBERS.json`. Пороговые значения договора не менялись: ускорена
 программа, а не критерий.
 
-Актуальные числа всех документов — в `reports/METRICS.json` и
+Актуальные числа всех документов — в `reports/CURRENT_METRICS.json` и
 `reports/NUMBERS.json`.
 
 ## Шаг 36. CI зелёный, включая обязательную job соответствия договору
@@ -2309,7 +2309,7 @@ seed 42, режим demo, набор данных — синтетический
 измерено»; сам контрактный прогон стал двухфазным, поэтому проверка «числа
 документов сверены с реестром» относится к итоговому документу соответствия.
 
-Актуальные числа всех документов — в `reports/METRICS.json` и
+Актуальные числа всех документов — в `reports/CURRENT_METRICS.json` и
 `reports/NUMBERS.json`.
 
 ## Шаг 37. Договорный контур замкнут: 32 из 33 проверок, сборка .exe зелёная
@@ -2345,7 +2345,7 @@ seed 42, режим demo, набор данных — синтетический
 | Размер упакованного .exe | в поставку попадали корпуса на 40 МБ, релиз v1.3.0 дал 9 134 317 байт | в сборке только `config/` и демонстрационные пары, добавлен гейт 9 МБ / 0,6 МБ: сборка 8 967 236 байт (8,97 МБ) и пакет 172 242 байта |
 | Объём режима hf | библиотеки считались как весь прирост `site-packages`, веса — как весь кеш (там лежали и буфер загрузки, и другая ревизия) | меряются загруженные пакеты (проба `sys.modules`), веса — файлы снимка ревизии `refs/main`: библиотеки 813,8 МБ, веса 554,3 МБ, хранение 1368,2 МБ ≤ 1,5 ГБ |
 
-Актуальные числа всех документов — в `reports/METRICS.json` и `reports/NUMBERS.json`.
+Актуальные числа всех документов — в `reports/CURRENT_METRICS.json` и `reports/NUMBERS.json`.
 
 ## Шаг 38. Вердикт на реальных актах с запасом: F1 0.8315 при FPR 0.0875 (код 637a562)
 
@@ -2382,7 +2382,7 @@ seed 42, режим demo, набор данных — синтетический
 «неатрибутированное число» (по 10–16 ложных отрицаний на тип в тесте),
 расширение корпуса A3 до 800+ документов / 2000 пар, покрытие тестами до 90 %.
 
-Актуальные числа всех документов — в `reports/METRICS.json` и `reports/NUMBERS.json`.
+Актуальные числа всех документов — в `reports/CURRENT_METRICS.json` и `reports/NUMBERS.json`.
 
 ## Шаг 39. PR #8 слит, релиз v1.3.1 собран; реестр больше не отстаёт от сборки тега
 
@@ -2402,4 +2402,4 @@ seed 42, режим demo, набор данных — синтетический
 (`reports/release_sizes.json`, `spanverify-module/reports/release_sizes.json`,
 `reports/NUMBERS.json`), реестр пересобран, сверка с артефактами проходит.
 
-Актуальные числа всех документов — в `reports/METRICS.json` и `reports/NUMBERS.json`.
+Актуальные числа всех документов — в `reports/CURRENT_METRICS.json` и `reports/NUMBERS.json`.

@@ -1,0 +1,13 @@
+{
+  "run_id": "37635117291",
+  "date": "2026-10-07T14:15:03Z",
+  "commit": "dc29f136ef64dec7acc6a9487a7e8a41ad468a33",
+  "family": "P0",
+  "workflow": "hf-analysis.yml",
+  "record_kind": "measurement/delivery",
+  "status": "completed",
+  "outcome": "success",
+  "url": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/37635117291",
+  "canonical_directories": [],
+  "receipt": "reports/measurements/run37635117291/receipt.json"
+}

@@ -1525,5 +1525,13 @@
       "run_url": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39177834081"
     }
   ],
-  "validated_code_head": "14a018a1b90b51cc47cd8baf628147ac22e1d8b1"
+  "validated_code_head": "14a018a1b90b51cc47cd8baf628147ac22e1d8b1",
+  "evidence_context": {
+    "run_id": "historical-local-unrecorded:cd335b2d554a7edb22ad59f8286b47c75bb985bc",
+    "date": "2026-10-19",
+    "status": "NON_AUTHORITATIVE historical/reference; consult current indices",
+    "successor": "reports/EXPERIMENTS_INDEX.md",
+    "source_commit": "cd335b2d554a7edb22ad59f8286b47c75bb985bc",
+    "limitation": "Original remote run not recorded; do not misrepresent as current independent measurement"
+  }
 }

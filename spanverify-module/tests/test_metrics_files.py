@@ -1,7 +1,7 @@
 """Единый файл чисел и его сверка с документами (исправление P0-3 аудита).
 
 Смысл набора: числа в документах больше не берутся из памяти. Есть один файл
-``reports/METRICS.json``, собранный прогоном кода, и есть проверка, которая
+``reports/CURRENT_METRICS.json``, собранный прогоном кода, и есть проверка, которая
 падает, если документ разошёлся с ним. Тесты ниже защищают это правило и
 честные оговорки, которые нельзя потерять при правках.
 """
@@ -17,7 +17,7 @@ import pytest
 
 MODULE_ROOT = Path(__file__).resolve().parents[1]
 REPO_ROOT = MODULE_ROOT.parent
-METRICS_PATH = MODULE_ROOT / "reports" / "METRICS.json"
+METRICS_PATH = MODULE_ROOT / "reports" / "CURRENT_METRICS.json"
 
 
 def _load_script(name: str):
@@ -33,7 +33,7 @@ def _load_script(name: str):
 def _metrics() -> dict:
     """Прочитать единый файл чисел; без него проверки бессмысленны — пропуск."""
     if not METRICS_PATH.is_file():
-        pytest.skip("reports/METRICS.json отсутствует: сначала scripts/collect_metrics.py")
+        pytest.skip("reports/CURRENT_METRICS.json отсутствует: сначала scripts/collect_metrics.py")
     return json.loads(METRICS_PATH.read_text(encoding="utf-8"))
 
 
@@ -101,7 +101,7 @@ def test_check_numbers_requires_itog_sections(tmp_path: Path) -> None:
 
 
 def test_documents_match_metrics_file() -> None:
-    """Сквозная проверка: README, ИТОГ и docs/ сходятся с reports/METRICS.json."""
+    """Сквозная проверка: README, ИТОГ и docs/ сходятся с reports/CURRENT_METRICS.json."""
     checker = _load_script("check_numbers")
     metrics = _metrics()
     docs = [REPO_ROOT / name for name in checker.DEFAULT_DOCS if (REPO_ROOT / name).is_file()]
@@ -185,12 +185,12 @@ def test_metrics_file_is_not_behind_the_suite(request: pytest.FixtureRequest) ->
     metrics = _metrics()
     tests_block = metrics.get("tests") or {}
     assert tests_block.get("collected") == collected, (
-        f"reports/METRICS.json отстал от состава тестов: в файле {tests_block.get('collected')}, "
+        f"reports/CURRENT_METRICS.json отстал от состава тестов: в файле {tests_block.get('collected')}, "
         f"собрано {collected}; пересоберите файл (scripts/collect_metrics.py) и обновите документы"
     )
     coverage = tests_block.get("coverage_percent")
     assert isinstance(coverage, (int, float)) and not isinstance(coverage, bool), (
-        "в reports/METRICS.json нет измеренного покрытия (null): локальная сверка документов "
+        "в reports/CURRENT_METRICS.json нет измеренного покрытия (null): локальная сверка документов "
         "пропускает заявления о покрытии, а ночной CI, где покрытие измеряется, — нет"
     )
 

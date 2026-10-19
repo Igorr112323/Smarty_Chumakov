@@ -1,0 +1,4009 @@
+{
+  "pairs": 1000,
+  "over512": 0,
+  "max_positions": 306,
+  "labels_inspected": false,
+  "contract": "window512_full_answer_v1",
+  "rows": [
+    {
+      "id": "rushallu-sberquad-50488",
+      "model_positions": 47
+    },
+    {
+      "id": "rushallu-sberquad-51273",
+      "model_positions": 32
+    },
+    {
+      "id": "rushallu-sberquad-51600",
+      "model_positions": 20
+    },
+    {
+      "id": "rushallu-sberquad-51905",
+      "model_positions": 25
+    },
+    {
+      "id": "rushallu-sberquad-52505",
+      "model_positions": 99
+    },
+    {
+      "id": "rushallu-sberquad-53427",
+      "model_positions": 71
+    },
+    {
+      "id": "rushallu-sberquad-53885",
+      "model_positions": 29
+    },
+    {
+      "id": "rushallu-sberquad-54172",
+      "model_positions": 243
+    },
+    {
+      "id": "rushallu-sberquad-55126",
+      "model_positions": 182
+    },
+    {
+      "id": "rushallu-sberquad-55276",
+      "model_positions": 108
+    },
+    {
+      "id": "rushallu-sberquad-55768",
+      "model_positions": 19
+    },
+    {
+      "id": "rushallu-sberquad-56461",
+      "model_positions": 14
+    },
+    {
+      "id": "rushallu-sberquad-57792",
+      "model_positions": 52
+    },
+    {
+      "id": "rushallu-sberquad-58554",
+      "model_positions": 22
+    },
+    {
+      "id": "rushallu-sberquad-58747",
+      "model_positions": 167
+    },
+    {
+      "id": "rushallu-sberquad-58995",
+      "model_positions": 18
+    },
+    {
+      "id": "rushallu-sberquad-59798",
+      "model_positions": 57
+    },
+    {
+      "id": "rushallu-sberquad-60361",
+      "model_positions": 95
+    },
+    {
+      "id": "rushallu-sberquad-61298",
+      "model_positions": 27
+    },
+    {
+      "id": "rushallu-sberquad-62254",
+      "model_positions": 21
+    },
+    {
+      "id": "rushallu-sberquad-62922",
+      "model_positions": 49
+    },
+    {
+      "id": "rushallu-sberquad-63090",
+      "model_positions": 12
+    },
+    {
+      "id": "rushallu-sberquad-64936",
+      "model_positions": 17
+    },
+    {
+      "id": "rushallu-sberquad-65363",
+      "model_positions": 90
+    },
+    {
+      "id": "rushallu-sberquad-65512",
+      "model_positions": 154
+    },
+    {
+      "id": "rushallu-sberquad-65547",
+      "model_positions": 126
+    },
+    {
+      "id": "rushallu-sberquad-66365",
+      "model_positions": 200
+    },
+    {
+      "id": "rushallu-sberquad-66465",
+      "model_positions": 44
+    },
+    {
+      "id": "rushallu-sberquad-66729",
+      "model_positions": 80
+    },
+    {
+      "id": "rushallu-sberquad-67431",
+      "model_positions": 53
+    },
+    {
+      "id": "rushallu-sberquad-68460",
+      "model_positions": 28
+    },
+    {
+      "id": "rushallu-sberquad-68564",
+      "model_positions": 125
+    },
+    {
+      "id": "rushallu-sberquad-69060",
+      "model_positions": 88
+    },
+    {
+      "id": "rushallu-sberquad-69376",
+      "model_positions": 17
+    },
+    {
+      "id": "rushallu-sberquad-70436",
+      "model_positions": 123
+    },
+    {
+      "id": "rushallu-sberquad-72219",
+      "model_positions": 54
+    },
+    {
+      "id": "rushallu-sberquad-72774",
+      "model_positions": 138
+    },
+    {
+      "id": "rushallu-sberquad-73382",
+      "model_positions": 15
+    },
+    {
+      "id": "rushallu-sberquad-73744",
+      "model_positions": 39
+    },
+    {
+      "id": "rushallu-sberquad-54348",
+      "model_positions": 15
+    },
+    {
+      "id": "rushallu-sberquad-51131",
+      "model_positions": 18
+    },
+    {
+      "id": "rushallu-sberquad-69281",
+      "model_positions": 28
+    },
+    {
+      "id": "rushallu-sberquad-63399",
+      "model_positions": 30
+    },
+    {
+      "id": "rushallu-sberquad-58618",
+      "model_positions": 17
+    },
+    {
+      "id": "rushallu-sberquad-51199",
+      "model_positions": 17
+    },
+    {
+      "id": "rushallu-sberquad-72232",
+      "model_positions": 60
+    },
+    {
+      "id": "rushallu-sberquad-56154",
+      "model_positions": 18
+    },
+    {
+      "id": "rushallu-sberquad-67510",
+      "model_positions": 17
+    },
+    {
+      "id": "rushallu-sberquad-65887",
+      "model_positions": 26
+    },
+    {
+      "id": "rushallu-sberquad-72993",
+      "model_positions": 18
+    },
+    {
+      "id": "rushallu-sberquad-50518",
+      "model_positions": 31
+    },
+    {
+      "id": "rushallu-sberquad-57856",
+      "model_positions": 14
+    },
+    {
+      "id": "rushallu-sberquad-71235",
+      "model_positions": 19
+    },
+    {
+      "id": "rushallu-sberquad-60346",
+      "model_positions": 20
+    },
+    {
+      "id": "rushallu-sberquad-57628",
+      "model_positions": 15
+    },
+    {
+      "id": "rushallu-sberquad-50753",
+      "model_positions": 16
+    },
+    {
+      "id": "rushallu-sberquad-72667",
+      "model_positions": 17
+    },
+    {
+      "id": "rushallu-sberquad-69002",
+      "model_positions": 29
+    },
+    {
+      "id": "rushallu-sberquad-63170",
+      "model_positions": 34
+    },
+    {
+      "id": "rushallu-sberquad-57000",
+      "model_positions": 17
+    },
+    {
+      "id": "rushallu-sberquad-51621",
+      "model_positions": 38
+    },
+    {
+      "id": "rushallu-sberquad-65137",
+      "model_positions": 18
+    },
+    {
+      "id": "rushallu-sberquad-74236",
+      "model_positions": 20
+    },
+    {
+      "id": "rushallu-sberquad-72290",
+      "model_positions": 48
+    },
+    {
+      "id": "rushallu-sberquad-61522",
+      "model_positions": 20
+    },
+    {
+      "id": "rushallu-sberquad-70431",
+      "model_positions": 33
+    },
+    {
+      "id": "rushallu-sberquad-70015",
+      "model_positions": 130
+    },
+    {
+      "id": "rushallu-sberquad-63256",
+      "model_positions": 23
+    },
+    {
+      "id": "rushallu-sberquad-72263",
+      "model_positions": 19
+    },
+    {
+      "id": "rushallu-sberquad-51615",
+      "model_positions": 14
+    },
+    {
+      "id": "rushallu-sberquad-60528",
+      "model_positions": 12
+    },
+    {
+      "id": "rushallu-sberquad-59958",
+      "model_positions": 66
+    },
+    {
+      "id": "rushallu-sberquad-51620",
+      "model_positions": 136
+    },
+    {
+      "id": "rushallu-sberquad-69310",
+      "model_positions": 22
+    },
+    {
+      "id": "rushallu-sberquad-63817",
+      "model_positions": 25
+    },
+    {
+      "id": "rushallu-sberquad-57233",
+      "model_positions": 19
+    },
+    {
+      "id": "rushallu-sberquad-58642",
+      "model_positions": 41
+    },
+    {
+      "id": "rushallu-sberquad-64670",
+      "model_positions": 31
+    },
+    {
+      "id": "rushallu-sberquad-60063",
+      "model_positions": 38
+    },
+    {
+      "id": "rushallu-sberquad-69859",
+      "model_positions": 6
+    },
+    {
+      "id": "rushallu-sberquad-57272",
+      "model_positions": 25
+    },
+    {
+      "id": "rushallu-sberquad-57540",
+      "model_positions": 11
+    },
+    {
+      "id": "rushallu-sberquad-72455",
+      "model_positions": 10
+    },
+    {
+      "id": "rushallu-sberquad-53493",
+      "model_positions": 27
+    },
+    {
+      "id": "rushallu-sberquad-67370",
+      "model_positions": 33
+    },
+    {
+      "id": "rushallu-sberquad-67790",
+      "model_positions": 19
+    },
+    {
+      "id": "rushallu-sberquad-63996",
+      "model_positions": 23
+    },
+    {
+      "id": "rushallu-sberquad-58812",
+      "model_positions": 22
+    },
+    {
+      "id": "rushallu-sberquad-68198",
+      "model_positions": 19
+    },
+    {
+      "id": "rushallu-sberquad-59272",
+      "model_positions": 80
+    },
+    {
+      "id": "rushallu-sberquad-60912",
+      "model_positions": 19
+    },
+    {
+      "id": "rushallu-sberquad-60532",
+      "model_positions": 101
+    },
+    {
+      "id": "rushallu-sberquad-69005",
+      "model_positions": 30
+    },
+    {
+      "id": "rushallu-sberquad-67934",
+      "model_positions": 56
+    },
+    {
+      "id": "rushallu-sberquad-60015",
+      "model_positions": 20
+    },
+    {
+      "id": "rushallu-sberquad-59049",
+      "model_positions": 54
+    },
+    {
+      "id": "rushallu-sberquad-68512",
+      "model_positions": 20
+    },
+    {
+      "id": "rushallu-sberquad-63941",
+      "model_positions": 29
+    },
+    {
+      "id": "rushallu-sberquad-73779",
+      "model_positions": 66
+    },
+    {
+      "id": "rushallu-sberquad-52107",
+      "model_positions": 23
+    },
+    {
+      "id": "rushallu-sberquad-52831",
+      "model_positions": 66
+    },
+    {
+      "id": "rushallu-sberquad-69871",
+      "model_positions": 16
+    },
+    {
+      "id": "rushallu-sberquad-52754",
+      "model_positions": 32
+    },
+    {
+      "id": "rushallu-sberquad-70067",
+      "model_positions": 49
+    },
+    {
+      "id": "rushallu-sberquad-71325",
+      "model_positions": 31
+    },
+    {
+      "id": "rushallu-sberquad-68232",
+      "model_positions": 70
+    },
+    {
+      "id": "rushallu-sberquad-66546",
+      "model_positions": 32
+    },
+    {
+      "id": "rushallu-sberquad-51516",
+      "model_positions": 53
+    },
+    {
+      "id": "rushallu-sberquad-55623",
+      "model_positions": 23
+    },
+    {
+      "id": "rushallu-sberquad-56160",
+      "model_positions": 52
+    },
+    {
+      "id": "rushallu-sberquad-68265",
+      "model_positions": 13
+    },
+    {
+      "id": "rushallu-sberquad-55535",
+      "model_positions": 27
+    },
+    {
+      "id": "rushallu-sberquad-53676",
+      "model_positions": 5
+    },
+    {
+      "id": "rushallu-sberquad-64904",
+      "model_positions": 21
+    },
+    {
+      "id": "rushallu-sberquad-62370",
+      "model_positions": 53
+    },
+    {
+      "id": "rushallu-sberquad-60956",
+      "model_positions": 35
+    },
+    {
+      "id": "rushallu-sberquad-70514",
+      "model_positions": 75
+    },
+    {
+      "id": "rushallu-sberquad-70992",
+      "model_positions": 5
+    },
+    {
+      "id": "rushallu-sberquad-64190",
+      "model_positions": 24
+    },
+    {
+      "id": "rushallu-sberquad-54202",
+      "model_positions": 14
+    },
+    {
+      "id": "rushallu-sberquad-51588",
+      "model_positions": 19
+    },
+    {
+      "id": "rushallu-sberquad-68010",
+      "model_positions": 31
+    },
+    {
+      "id": "rushallu-sberquad-59610",
+      "model_positions": 53
+    },
+    {
+      "id": "rushallu-sberquad-62044",
+      "model_positions": 23
+    },
+    {
+      "id": "rushallu-sberquad-59215",
+      "model_positions": 44
+    },
+    {
+      "id": "rushallu-sberquad-51004",
+      "model_positions": 83
+    },
+    {
+      "id": "rushallu-sberquad-67038",
+      "model_positions": 7
+    },
+    {
+      "id": "rushallu-sberquad-53220",
+      "model_positions": 48
+    },
+    {
+      "id": "rushallu-sberquad-58175",
+      "model_positions": 46
+    },
+    {
+      "id": "rushallu-sberquad-74025",
+      "model_positions": 21
+    },
+    {
+      "id": "rushallu-sberquad-60344",
+      "model_positions": 48
+    },
+    {
+      "id": "rushallu-sberquad-52467",
+      "model_positions": 30
+    },
+    {
+      "id": "rushallu-sberquad-55586",
+      "model_positions": 37
+    },
+    {
+      "id": "rushallu-sberquad-51767",
+      "model_positions": 57
+    },
+    {
+      "id": "rushallu-sberquad-73792",
+      "model_positions": 24
+    },
+    {
+      "id": "rushallu-sberquad-63779",
+      "model_positions": 28
+    },
+    {
+      "id": "rushallu-sberquad-60854",
+      "model_positions": 32
+    },
+    {
+      "id": "rushallu-sberquad-59761",
+      "model_positions": 55
+    },
+    {
+      "id": "rushallu-sberquad-52879",
+      "model_positions": 53
+    },
+    {
+      "id": "rushallu-sberquad-63083",
+      "model_positions": 50
+    },
+    {
+      "id": "rushallu-sberquad-52025",
+      "model_positions": 22
+    },
+    {
+      "id": "rushallu-sberquad-64036",
+      "model_positions": 24
+    },
+    {
+      "id": "rushallu-sberquad-52695",
+      "model_positions": 18
+    },
+    {
+      "id": "rushallu-sberquad-56745",
+      "model_positions": 27
+    },
+    {
+      "id": "rushallu-sberquad-57953",
+      "model_positions": 14
+    },
+    {
+      "id": "rushallu-sberquad-72642",
+      "model_positions": 47
+    },
+    {
+      "id": "rushallu-sberquad-64387",
+      "model_positions": 64
+    },
+    {
+      "id": "rushallu-sberquad-69153",
+      "model_positions": 17
+    },
+    {
+      "id": "rushallu-sberquad-60455",
+      "model_positions": 24
+    },
+    {
+      "id": "rushallu-sberquad-56239",
+      "model_positions": 59
+    },
+    {
+      "id": "rushallu-sberquad-53384",
+      "model_positions": 4
+    },
+    {
+      "id": "rushallu-sberquad-56567",
+      "model_positions": 15
+    },
+    {
+      "id": "rushallu-sberquad-50566",
+      "model_positions": 18
+    },
+    {
+      "id": "rushallu-sberquad-65544",
+      "model_positions": 37
+    },
+    {
+      "id": "rushallu-sberquad-62011",
+      "model_positions": 25
+    },
+    {
+      "id": "rushallu-sberquad-71665",
+      "model_positions": 44
+    },
+    {
+      "id": "rushallu-sberquad-69976",
+      "model_positions": 70
+    },
+    {
+      "id": "rushallu-sberquad-67288",
+      "model_positions": 12
+    },
+    {
+      "id": "rushallu-sberquad-63333",
+      "model_positions": 43
+    },
+    {
+      "id": "rushallu-sberquad-60371",
+      "model_positions": 60
+    },
+    {
+      "id": "rushallu-sberquad-52523",
+      "model_positions": 105
+    },
+    {
+      "id": "rushallu-sberquad-71631",
+      "model_positions": 30
+    },
+    {
+      "id": "rushallu-sberquad-58015",
+      "model_positions": 6
+    },
+    {
+      "id": "rushallu-sberquad-60416",
+      "model_positions": 48
+    },
+    {
+      "id": "rushallu-sberquad-57228",
+      "model_positions": 17
+    },
+    {
+      "id": "rushallu-sberquad-62365",
+      "model_positions": 31
+    },
+    {
+      "id": "rushallu-sberquad-55658",
+      "model_positions": 41
+    },
+    {
+      "id": "rushallu-sberquad-58873",
+      "model_positions": 24
+    },
+    {
+      "id": "rushallu-sberquad-67605",
+      "model_positions": 73
+    },
+    {
+      "id": "rushallu-sberquad-73066",
+      "model_positions": 31
+    },
+    {
+      "id": "rushallu-sberquad-66195",
+      "model_positions": 16
+    },
+    {
+      "id": "rushallu-sberquad-69937",
+      "model_positions": 26
+    },
+    {
+      "id": "rushallu-sberquad-73908",
+      "model_positions": 28
+    },
+    {
+      "id": "rushallu-sberquad-67714",
+      "model_positions": 22
+    },
+    {
+      "id": "rushallu-sberquad-65643",
+      "model_positions": 15
+    },
+    {
+      "id": "rushallu-sberquad-53316",
+      "model_positions": 45
+    },
+    {
+      "id": "rushallu-sberquad-61059",
+      "model_positions": 80
+    },
+    {
+      "id": "rushallu-sberquad-70826",
+      "model_positions": 35
+    },
+    {
+      "id": "rushallu-sberquad-52066",
+      "model_positions": 16
+    },
+    {
+      "id": "rushallu-sberquad-56378",
+      "model_positions": 24
+    },
+    {
+      "id": "rushallu-sberquad-62159",
+      "model_positions": 31
+    },
+    {
+      "id": "rushallu-sberquad-66784",
+      "model_positions": 12
+    },
+    {
+      "id": "rushallu-sberquad-64322",
+      "model_positions": 49
+    },
+    {
+      "id": "rushallu-sberquad-67774",
+      "model_positions": 33
+    },
+    {
+      "id": "rushallu-sberquad-54245",
+      "model_positions": 12
+    },
+    {
+      "id": "rushallu-sberquad-60648",
+      "model_positions": 75
+    },
+    {
+      "id": "rushallu-sberquad-51308",
+      "model_positions": 24
+    },
+    {
+      "id": "rushallu-sberquad-53940",
+      "model_positions": 19
+    },
+    {
+      "id": "rushallu-sberquad-51123",
+      "model_positions": 7
+    },
+    {
+      "id": "rushallu-sberquad-64203",
+      "model_positions": 4
+    },
+    {
+      "id": "rushallu-sberquad-57835",
+      "model_positions": 14
+    },
+    {
+      "id": "rushallu-sberquad-55971",
+      "model_positions": 78
+    },
+    {
+      "id": "rushallu-sberquad-73739",
+      "model_positions": 94
+    },
+    {
+      "id": "rushallu-sberquad-56957",
+      "model_positions": 16
+    },
+    {
+      "id": "rushallu-sberquad-72513",
+      "model_positions": 21
+    },
+    {
+      "id": "rushallu-sberquad-64496",
+      "model_positions": 14
+    },
+    {
+      "id": "rushallu-sberquad-66177",
+      "model_positions": 32
+    },
+    {
+      "id": "rushallu-sberquad-66773",
+      "model_positions": 7
+    },
+    {
+      "id": "rushallu-sberquad-65143",
+      "model_positions": 31
+    },
+    {
+      "id": "rushallu-sberquad-51724",
+      "model_positions": 14
+    },
+    {
+      "id": "rushallu-sberquad-73697",
+      "model_positions": 5
+    },
+    {
+      "id": "rushallu-sberquad-59726",
+      "model_positions": 56
+    },
+    {
+      "id": "rushallu-sberquad-64776",
+      "model_positions": 32
+    },
+    {
+      "id": "rushallu-sberquad-71037",
+      "model_positions": 13
+    },
+    {
+      "id": "rushallu-sberquad-59692",
+      "model_positions": 15
+    },
+    {
+      "id": "rushallu-sberquad-67269",
+      "model_positions": 46
+    },
+    {
+      "id": "rushallu-sberquad-57950",
+      "model_positions": 18
+    },
+    {
+      "id": "rushallu-sberquad-73234",
+      "model_positions": 19
+    },
+    {
+      "id": "rushallu-sberquad-53632",
+      "model_positions": 17
+    },
+    {
+      "id": "rushallu-sberquad-54930",
+      "model_positions": 5
+    },
+    {
+      "id": "rushallu-sberquad-59697",
+      "model_positions": 29
+    },
+    {
+      "id": "rushallu-sberquad-66925",
+      "model_positions": 108
+    },
+    {
+      "id": "rushallu-sberquad-54994",
+      "model_positions": 26
+    },
+    {
+      "id": "rushallu-sberquad-68939",
+      "model_positions": 30
+    },
+    {
+      "id": "rushallu-sberquad-59212",
+      "model_positions": 14
+    },
+    {
+      "id": "rushallu-sberquad-69848",
+      "model_positions": 32
+    },
+    {
+      "id": "rushallu-sberquad-62675",
+      "model_positions": 16
+    },
+    {
+      "id": "rushallu-sberquad-66697",
+      "model_positions": 42
+    },
+    {
+      "id": "rushallu-sberquad-57872",
+      "model_positions": 39
+    },
+    {
+      "id": "rushallu-sberquad-61367",
+      "model_positions": 20
+    },
+    {
+      "id": "rushallu-sberquad-69573",
+      "model_positions": 19
+    },
+    {
+      "id": "rushallu-sberquad-66601",
+      "model_positions": 14
+    },
+    {
+      "id": "rushallu-sberquad-70707",
+      "model_positions": 59
+    },
+    {
+      "id": "rushallu-sberquad-57206",
+      "model_positions": 5
+    },
+    {
+      "id": "rushallu-sberquad-74203",
+      "model_positions": 30
+    },
+    {
+      "id": "rushallu-sberquad-58632",
+      "model_positions": 14
+    },
+    {
+      "id": "rushallu-sberquad-51191",
+      "model_positions": 23
+    },
+    {
+      "id": "rushallu-sberquad-50922",
+      "model_positions": 23
+    },
+    {
+      "id": "rushallu-sberquad-67157",
+      "model_positions": 13
+    },
+    {
+      "id": "rushallu-sberquad-59605",
+      "model_positions": 55
+    },
+    {
+      "id": "rushallu-sberquad-55287",
+      "model_positions": 78
+    },
+    {
+      "id": "rushallu-sberquad-62817",
+      "model_positions": 49
+    },
+    {
+      "id": "rushallu-sberquad-64004",
+      "model_positions": 46
+    },
+    {
+      "id": "rushallu-sberquad-68161",
+      "model_positions": 21
+    },
+    {
+      "id": "rushallu-sberquad-53266",
+      "model_positions": 26
+    },
+    {
+      "id": "rushallu-sberquad-56627",
+      "model_positions": 11
+    },
+    {
+      "id": "rushallu-sberquad-57139",
+      "model_positions": 18
+    },
+    {
+      "id": "rushallu-sberquad-70226",
+      "model_positions": 10
+    },
+    {
+      "id": "rushallu-sberquad-61388",
+      "model_positions": 18
+    },
+    {
+      "id": "rushallu-sberquad-66922",
+      "model_positions": 21
+    },
+    {
+      "id": "rushallu-sberquad-70260",
+      "model_positions": 6
+    },
+    {
+      "id": "rushallu-sberquad-59376",
+      "model_positions": 25
+    },
+    {
+      "id": "rushallu-sberquad-73042",
+      "model_positions": 18
+    },
+    {
+      "id": "rushallu-sberquad-57202",
+      "model_positions": 39
+    },
+    {
+      "id": "rushallu-sberquad-70661",
+      "model_positions": 26
+    },
+    {
+      "id": "rushallu-sberquad-51129",
+      "model_positions": 30
+    },
+    {
+      "id": "rushallu-sberquad-53518",
+      "model_positions": 68
+    },
+    {
+      "id": "rushallu-sberquad-55725",
+      "model_positions": 17
+    },
+    {
+      "id": "rushallu-sberquad-63270",
+      "model_positions": 53
+    },
+    {
+      "id": "rushallu-sberquad-51042",
+      "model_positions": 29
+    },
+    {
+      "id": "rushallu-sberquad-55330",
+      "model_positions": 16
+    },
+    {
+      "id": "rushallu-sberquad-53823",
+      "model_positions": 43
+    },
+    {
+      "id": "rushallu-sberquad-52749",
+      "model_positions": 17
+    },
+    {
+      "id": "rushallu-sberquad-70192",
+      "model_positions": 23
+    },
+    {
+      "id": "rushallu-sberquad-72314",
+      "model_positions": 54
+    },
+    {
+      "id": "rushallu-sberquad-66402",
+      "model_positions": 16
+    },
+    {
+      "id": "rushallu-sberquad-60281",
+      "model_positions": 27
+    },
+    {
+      "id": "rushallu-sberquad-59566",
+      "model_positions": 11
+    },
+    {
+      "id": "rushallu-sberquad-64827",
+      "model_positions": 20
+    },
+    {
+      "id": "rushallu-sberquad-67426",
+      "model_positions": 14
+    },
+    {
+      "id": "rushallu-sberquad-57411",
+      "model_positions": 31
+    },
+    {
+      "id": "rushallu-sberquad-58804",
+      "model_positions": 59
+    },
+    {
+      "id": "rushallu-sberquad-65735",
+      "model_positions": 22
+    },
+    {
+      "id": "rushallu-sberquad-65097",
+      "model_positions": 80
+    },
+    {
+      "id": "rushallu-sberquad-64098",
+      "model_positions": 52
+    },
+    {
+      "id": "rushallu-sberquad-69257",
+      "model_positions": 22
+    },
+    {
+      "id": "rushallu-sberquad-60149",
+      "model_positions": 42
+    },
+    {
+      "id": "rushallu-sberquad-72978",
+      "model_positions": 100
+    },
+    {
+      "id": "rushallu-sberquad-60448",
+      "model_positions": 20
+    },
+    {
+      "id": "rushallu-sberquad-74076",
+      "model_positions": 24
+    },
+    {
+      "id": "rushallu-sberquad-56897",
+      "model_positions": 42
+    },
+    {
+      "id": "rushallu-sberquad-54269",
+      "model_positions": 123
+    },
+    {
+      "id": "rushallu-sberquad-52426",
+      "model_positions": 36
+    },
+    {
+      "id": "rushallu-sberquad-61492",
+      "model_positions": 12
+    },
+    {
+      "id": "rushallu-sberquad-54176",
+      "model_positions": 49
+    },
+    {
+      "id": "rushallu-sberquad-58763",
+      "model_positions": 22
+    },
+    {
+      "id": "rushallu-sberquad-57721",
+      "model_positions": 18
+    },
+    {
+      "id": "rushallu-sberquad-64551",
+      "model_positions": 22
+    },
+    {
+      "id": "rushallu-sberquad-61316",
+      "model_positions": 33
+    },
+    {
+      "id": "rushallu-sberquad-51549",
+      "model_positions": 75
+    },
+    {
+      "id": "rushallu-sberquad-54214",
+      "model_positions": 44
+    },
+    {
+      "id": "rushallu-sberquad-58051",
+      "model_positions": 27
+    },
+    {
+      "id": "rushallu-sberquad-54518",
+      "model_positions": 12
+    },
+    {
+      "id": "rushallu-sberquad-53945",
+      "model_positions": 19
+    },
+    {
+      "id": "rushallu-sberquad-67538",
+      "model_positions": 15
+    },
+    {
+      "id": "rushallu-sberquad-68747",
+      "model_positions": 28
+    },
+    {
+      "id": "rushallu-sberquad-66680",
+      "model_positions": 20
+    },
+    {
+      "id": "rushallu-sberquad-73077",
+      "model_positions": 12
+    },
+    {
+      "id": "rushallu-sberquad-60366",
+      "model_positions": 66
+    },
+    {
+      "id": "rushallu-sberquad-53267",
+      "model_positions": 23
+    },
+    {
+      "id": "rushallu-sberquad-70281",
+      "model_positions": 36
+    },
+    {
+      "id": "rushallu-sberquad-73179",
+      "model_positions": 30
+    },
+    {
+      "id": "rushallu-sberquad-65797",
+      "model_positions": 70
+    },
+    {
+      "id": "rushallu-sberquad-73817",
+      "model_positions": 15
+    },
+    {
+      "id": "rushallu-sberquad-55448",
+      "model_positions": 61
+    },
+    {
+      "id": "rushallu-sberquad-56450",
+      "model_positions": 20
+    },
+    {
+      "id": "rushallu-sberquad-70433",
+      "model_positions": 130
+    },
+    {
+      "id": "rushallu-sberquad-67751",
+      "model_positions": 20
+    },
+    {
+      "id": "rushallu-sberquad-67844",
+      "model_positions": 10
+    },
+    {
+      "id": "rushallu-sberquad-53736",
+      "model_positions": 104
+    },
+    {
+      "id": "rushallu-sberquad-69730",
+      "model_positions": 84
+    },
+    {
+      "id": "rushallu-sberquad-66839",
+      "model_positions": 19
+    },
+    {
+      "id": "rushallu-sberquad-61516",
+      "model_positions": 98
+    },
+    {
+      "id": "rushallu-sberquad-59477",
+      "model_positions": 24
+    },
+    {
+      "id": "rushallu-sberquad-51207",
+      "model_positions": 45
+    },
+    {
+      "id": "rushallu-sberquad-50794",
+      "model_positions": 25
+    },
+    {
+      "id": "rushallu-sberquad-67465",
+      "model_positions": 18
+    },
+    {
+      "id": "rushallu-sberquad-57952",
+      "model_positions": 14
+    },
+    {
+      "id": "rushallu-sberquad-68275",
+      "model_positions": 27
+    },
+    {
+      "id": "rushallu-sberquad-72565",
+      "model_positions": 39
+    },
+    {
+      "id": "rushallu-sberquad-52692",
+      "model_positions": 18
+    },
+    {
+      "id": "rushallu-sberquad-69696",
+      "model_positions": 104
+    },
+    {
+      "id": "rushallu-sberquad-72599",
+      "model_positions": 59
+    },
+    {
+      "id": "rushallu-sberquad-70785",
+      "model_positions": 16
+    },
+    {
+      "id": "rushallu-sberquad-71755",
+      "model_positions": 15
+    },
+    {
+      "id": "rushallu-sberquad-66338",
+      "model_positions": 13
+    },
+    {
+      "id": "rushallu-sberquad-52411",
+      "model_positions": 19
+    },
+    {
+      "id": "rushallu-sberquad-67500",
+      "model_positions": 11
+    },
+    {
+      "id": "rushallu-sberquad-52650",
+      "model_positions": 24
+    },
+    {
+      "id": "rushallu-sberquad-69757",
+      "model_positions": 88
+    },
+    {
+      "id": "rushallu-sberquad-60730",
+      "model_positions": 26
+    },
+    {
+      "id": "rushallu-sberquad-65923",
+      "model_positions": 87
+    },
+    {
+      "id": "rushallu-sberquad-63248",
+      "model_positions": 113
+    },
+    {
+      "id": "rushallu-sberquad-73353",
+      "model_positions": 22
+    },
+    {
+      "id": "rushallu-sberquad-72644",
+      "model_positions": 49
+    },
+    {
+      "id": "rushallu-sberquad-64024",
+      "model_positions": 26
+    },
+    {
+      "id": "rushallu-sberquad-53139",
+      "model_positions": 13
+    },
+    {
+      "id": "rushallu-sberquad-50573",
+      "model_positions": 47
+    },
+    {
+      "id": "rushallu-sberquad-50748",
+      "model_positions": 15
+    },
+    {
+      "id": "rushallu-sberquad-53169",
+      "model_positions": 68
+    },
+    {
+      "id": "rushallu-sberquad-57003",
+      "model_positions": 6
+    },
+    {
+      "id": "rushallu-sberquad-67129",
+      "model_positions": 52
+    },
+    {
+      "id": "rushallu-sberquad-67281",
+      "model_positions": 41
+    },
+    {
+      "id": "rushallu-sberquad-69489",
+      "model_positions": 11
+    },
+    {
+      "id": "rushallu-sberquad-69958",
+      "model_positions": 16
+    },
+    {
+      "id": "rushallu-sberquad-71824",
+      "model_positions": 45
+    },
+    {
+      "id": "rushallu-sberquad-74211",
+      "model_positions": 69
+    },
+    {
+      "id": "rushallu-sberquad-54760",
+      "model_positions": 43
+    },
+    {
+      "id": "rushallu-sberquad-59438",
+      "model_positions": 30
+    },
+    {
+      "id": "rushallu-sberquad-54349",
+      "model_positions": 19
+    },
+    {
+      "id": "rushallu-sberquad-67897",
+      "model_positions": 22
+    },
+    {
+      "id": "rushallu-sberquad-69847",
+      "model_positions": 30
+    },
+    {
+      "id": "rushallu-sberquad-70398",
+      "model_positions": 71
+    },
+    {
+      "id": "rushallu-sberquad-60642",
+      "model_positions": 22
+    },
+    {
+      "id": "rushallu-sberquad-57795",
+      "model_positions": 11
+    },
+    {
+      "id": "rushallu-sberquad-60796",
+      "model_positions": 31
+    },
+    {
+      "id": "rushallu-sberquad-70259",
+      "model_positions": 13
+    },
+    {
+      "id": "rushallu-sberquad-53575",
+      "model_positions": 9
+    },
+    {
+      "id": "rushallu-sberquad-71733",
+      "model_positions": 49
+    },
+    {
+      "id": "rushallu-sberquad-62981",
+      "model_positions": 50
+    },
+    {
+      "id": "rushallu-sberquad-66568",
+      "model_positions": 8
+    },
+    {
+      "id": "rushallu-sberquad-73210",
+      "model_positions": 25
+    },
+    {
+      "id": "rushallu-sberquad-66971",
+      "model_positions": 84
+    },
+    {
+      "id": "rushallu-sberquad-73642",
+      "model_positions": 15
+    },
+    {
+      "id": "rushallu-sberquad-74074",
+      "model_positions": 66
+    },
+    {
+      "id": "rushallu-sberquad-64293",
+      "model_positions": 23
+    },
+    {
+      "id": "rushallu-sberquad-51918",
+      "model_positions": 82
+    },
+    {
+      "id": "rushallu-sberquad-63677",
+      "model_positions": 27
+    },
+    {
+      "id": "rushallu-sberquad-53348",
+      "model_positions": 33
+    },
+    {
+      "id": "rushallu-sberquad-68719",
+      "model_positions": 25
+    },
+    {
+      "id": "rushallu-sberquad-62209",
+      "model_positions": 18
+    },
+    {
+      "id": "rushallu-sberquad-63759",
+      "model_positions": 41
+    },
+    {
+      "id": "rushallu-sberquad-68962",
+      "model_positions": 12
+    },
+    {
+      "id": "rushallu-sberquad-68598",
+      "model_positions": 83
+    },
+    {
+      "id": "rushallu-sberquad-68968",
+      "model_positions": 17
+    },
+    {
+      "id": "rushallu-sberquad-70899",
+      "model_positions": 15
+    },
+    {
+      "id": "rushallu-sberquad-58063",
+      "model_positions": 27
+    },
+    {
+      "id": "rushallu-sberquad-59400",
+      "model_positions": 45
+    },
+    {
+      "id": "rushallu-sberquad-66828",
+      "model_positions": 46
+    },
+    {
+      "id": "rushallu-sberquad-58034",
+      "model_positions": 7
+    },
+    {
+      "id": "rushallu-sberquad-69716",
+      "model_positions": 5
+    },
+    {
+      "id": "rushallu-sberquad-64011",
+      "model_positions": 29
+    },
+    {
+      "id": "rushallu-sberquad-67345",
+      "model_positions": 47
+    },
+    {
+      "id": "rushallu-sberquad-71282",
+      "model_positions": 13
+    },
+    {
+      "id": "rushallu-sberquad-64067",
+      "model_positions": 34
+    },
+    {
+      "id": "rushallu-sberquad-69361",
+      "model_positions": 37
+    },
+    {
+      "id": "rushallu-sberquad-61287",
+      "model_positions": 46
+    },
+    {
+      "id": "rushallu-sberquad-68775",
+      "model_positions": 37
+    },
+    {
+      "id": "rushallu-sberquad-55420",
+      "model_positions": 9
+    },
+    {
+      "id": "rushallu-sberquad-64687",
+      "model_positions": 42
+    },
+    {
+      "id": "rushallu-sberquad-58623",
+      "model_positions": 23
+    },
+    {
+      "id": "rushallu-sberquad-60622",
+      "model_positions": 17
+    },
+    {
+      "id": "rushallu-sberquad-62927",
+      "model_positions": 33
+    },
+    {
+      "id": "rushallu-sberquad-72338",
+      "model_positions": 20
+    },
+    {
+      "id": "rushallu-sberquad-56690",
+      "model_positions": 21
+    },
+    {
+      "id": "rushallu-sberquad-68568",
+      "model_positions": 80
+    },
+    {
+      "id": "rushallu-sberquad-64673",
+      "model_positions": 12
+    },
+    {
+      "id": "rushallu-sberquad-59429",
+      "model_positions": 17
+    },
+    {
+      "id": "rushallu-sberquad-69389",
+      "model_positions": 47
+    },
+    {
+      "id": "rushallu-sberquad-50599",
+      "model_positions": 35
+    },
+    {
+      "id": "rushallu-sberquad-62608",
+      "model_positions": 21
+    },
+    {
+      "id": "rushallu-sberquad-73401",
+      "model_positions": 17
+    },
+    {
+      "id": "rushallu-sberquad-59401",
+      "model_positions": 25
+    },
+    {
+      "id": "rushallu-sberquad-57999",
+      "model_positions": 22
+    },
+    {
+      "id": "rushallu-sberquad-63131",
+      "model_positions": 63
+    },
+    {
+      "id": "rushallu-sberquad-63904",
+      "model_positions": 31
+    },
+    {
+      "id": "rushallu-sberquad-67268",
+      "model_positions": 89
+    },
+    {
+      "id": "rushallu-sberquad-70366",
+      "model_positions": 41
+    },
+    {
+      "id": "rushallu-sberquad-72860",
+      "model_positions": 62
+    },
+    {
+      "id": "rushallu-sberquad-63255",
+      "model_positions": 69
+    },
+    {
+      "id": "rushallu-sberquad-51382",
+      "model_positions": 21
+    },
+    {
+      "id": "rushallu-sberquad-50824",
+      "model_positions": 35
+    },
+    {
+      "id": "rushallu-sberquad-58542",
+      "model_positions": 11
+    },
+    {
+      "id": "rushallu-sberquad-73785",
+      "model_positions": 13
+    },
+    {
+      "id": "rushallu-sberquad-55961",
+      "model_positions": 30
+    },
+    {
+      "id": "rushallu-sberquad-72102",
+      "model_positions": 11
+    },
+    {
+      "id": "rushallu-sberquad-67910",
+      "model_positions": 5
+    },
+    {
+      "id": "rushallu-sberquad-68400",
+      "model_positions": 61
+    },
+    {
+      "id": "rushallu-sberquad-63501",
+      "model_positions": 68
+    },
+    {
+      "id": "rushallu-sberquad-51485",
+      "model_positions": 48
+    },
+    {
+      "id": "rushallu-sberquad-54771",
+      "model_positions": 40
+    },
+    {
+      "id": "rushallu-sberquad-68997",
+      "model_positions": 33
+    },
+    {
+      "id": "rushallu-sberquad-67640",
+      "model_positions": 25
+    },
+    {
+      "id": "rushallu-sberquad-66430",
+      "model_positions": 112
+    },
+    {
+      "id": "rushallu-sberquad-51838",
+      "model_positions": 21
+    },
+    {
+      "id": "rushallu-sberquad-67470",
+      "model_positions": 11
+    },
+    {
+      "id": "rushallu-sberquad-61154",
+      "model_positions": 39
+    },
+    {
+      "id": "rushallu-sberquad-73426",
+      "model_positions": 24
+    },
+    {
+      "id": "rushallu-sberquad-73289",
+      "model_positions": 27
+    },
+    {
+      "id": "rushallu-sberquad-69725",
+      "model_positions": 15
+    },
+    {
+      "id": "rushallu-sberquad-55857",
+      "model_positions": 65
+    },
+    {
+      "id": "rushallu-sberquad-51551",
+      "model_positions": 17
+    },
+    {
+      "id": "rushallu-sberquad-56847",
+      "model_positions": 59
+    },
+    {
+      "id": "rushallu-sberquad-65741",
+      "model_positions": 64
+    },
+    {
+      "id": "rushallu-sberquad-63922",
+      "model_positions": 101
+    },
+    {
+      "id": "rushallu-sberquad-57343",
+      "model_positions": 185
+    },
+    {
+      "id": "rushallu-sberquad-69355",
+      "model_positions": 14
+    },
+    {
+      "id": "rushallu-sberquad-72187",
+      "model_positions": 25
+    },
+    {
+      "id": "rushallu-sberquad-64934",
+      "model_positions": 126
+    },
+    {
+      "id": "rushallu-sberquad-59953",
+      "model_positions": 13
+    },
+    {
+      "id": "rushallu-sberquad-73039",
+      "model_positions": 24
+    },
+    {
+      "id": "rushallu-sberquad-50501",
+      "model_positions": 49
+    },
+    {
+      "id": "rushallu-sberquad-70722",
+      "model_positions": 36
+    },
+    {
+      "id": "rushallu-sberquad-70956",
+      "model_positions": 27
+    },
+    {
+      "id": "rushallu-sberquad-62617",
+      "model_positions": 135
+    },
+    {
+      "id": "rushallu-sberquad-63415",
+      "model_positions": 61
+    },
+    {
+      "id": "rushallu-sberquad-50971",
+      "model_positions": 33
+    },
+    {
+      "id": "rushallu-sberquad-53144",
+      "model_positions": 82
+    },
+    {
+      "id": "rushallu-sberquad-54300",
+      "model_positions": 46
+    },
+    {
+      "id": "rushallu-sberquad-55404",
+      "model_positions": 97
+    },
+    {
+      "id": "rushallu-sberquad-57592",
+      "model_positions": 39
+    },
+    {
+      "id": "rushallu-sberquad-61689",
+      "model_positions": 53
+    },
+    {
+      "id": "rushallu-sberquad-61907",
+      "model_positions": 78
+    },
+    {
+      "id": "rushallu-sberquad-62258",
+      "model_positions": 26
+    },
+    {
+      "id": "rushallu-sberquad-67906",
+      "model_positions": 38
+    },
+    {
+      "id": "rushallu-sberquad-68034",
+      "model_positions": 39
+    },
+    {
+      "id": "rushallu-sberquad-68896",
+      "model_positions": 73
+    },
+    {
+      "id": "rushallu-sberquad-70043",
+      "model_positions": 30
+    },
+    {
+      "id": "rushallu-sberquad-71603",
+      "model_positions": 19
+    },
+    {
+      "id": "rushallu-sberquad-73727",
+      "model_positions": 27
+    },
+    {
+      "id": "rushallu-sberquad-53133",
+      "model_positions": 18
+    },
+    {
+      "id": "rushallu-sberquad-64081",
+      "model_positions": 14
+    },
+    {
+      "id": "rushallu-sberquad-55926",
+      "model_positions": 4
+    },
+    {
+      "id": "rushallu-sberquad-67111",
+      "model_positions": 46
+    },
+    {
+      "id": "rushallu-sberquad-63823",
+      "model_positions": 20
+    },
+    {
+      "id": "rushallu-sberquad-52465",
+      "model_positions": 56
+    },
+    {
+      "id": "rushallu-sberquad-72151",
+      "model_positions": 64
+    },
+    {
+      "id": "rushallu-sberquad-62554",
+      "model_positions": 95
+    },
+    {
+      "id": "rushallu-sberquad-66257",
+      "model_positions": 61
+    },
+    {
+      "id": "rushallu-sberquad-69156",
+      "model_positions": 10
+    },
+    {
+      "id": "rushallu-sberquad-67845",
+      "model_positions": 5
+    },
+    {
+      "id": "rushallu-sberquad-68741",
+      "model_positions": 16
+    },
+    {
+      "id": "rushallu-sberquad-70887",
+      "model_positions": 13
+    },
+    {
+      "id": "rushallu-sberquad-52412",
+      "model_positions": 19
+    },
+    {
+      "id": "rushallu-sberquad-51852",
+      "model_positions": 15
+    },
+    {
+      "id": "rushallu-sberquad-66390",
+      "model_positions": 62
+    },
+    {
+      "id": "rushallu-sberquad-56944",
+      "model_positions": 22
+    },
+    {
+      "id": "rushallu-sberquad-54066",
+      "model_positions": 6
+    },
+    {
+      "id": "rushallu-sberquad-68795",
+      "model_positions": 15
+    },
+    {
+      "id": "rushallu-sberquad-51526",
+      "model_positions": 58
+    },
+    {
+      "id": "rushallu-sberquad-70695",
+      "model_positions": 65
+    },
+    {
+      "id": "rushallu-sberquad-61030",
+      "model_positions": 88
+    },
+    {
+      "id": "rushallu-sberquad-61031",
+      "model_positions": 14
+    },
+    {
+      "id": "rushallu-sberquad-55718",
+      "model_positions": 23
+    },
+    {
+      "id": "rushallu-sberquad-50647",
+      "model_positions": 18
+    },
+    {
+      "id": "rushallu-sberquad-65195",
+      "model_positions": 22
+    },
+    {
+      "id": "rushallu-sberquad-52356",
+      "model_positions": 29
+    },
+    {
+      "id": "rushallu-sberquad-62756",
+      "model_positions": 26
+    },
+    {
+      "id": "rushallu-sberquad-62481",
+      "model_positions": 20
+    },
+    {
+      "id": "rushallu-sberquad-59651",
+      "model_positions": 4
+    },
+    {
+      "id": "rushallu-sberquad-68453",
+      "model_positions": 45
+    },
+    {
+      "id": "rushallu-sberquad-54058",
+      "model_positions": 18
+    },
+    {
+      "id": "rushallu-sberquad-67026",
+      "model_positions": 24
+    },
+    {
+      "id": "rushallu-sberquad-67334",
+      "model_positions": 41
+    },
+    {
+      "id": "rushallu-sberquad-61374",
+      "model_positions": 37
+    },
+    {
+      "id": "rushallu-sberquad-57444",
+      "model_positions": 21
+    },
+    {
+      "id": "rushallu-sberquad-62379",
+      "model_positions": 15
+    },
+    {
+      "id": "rushallu-sberquad-68867",
+      "model_positions": 31
+    },
+    {
+      "id": "rushallu-sberquad-73048",
+      "model_positions": 41
+    },
+    {
+      "id": "rushallu-sberquad-57200",
+      "model_positions": 59
+    },
+    {
+      "id": "rushallu-sberquad-74207",
+      "model_positions": 58
+    },
+    {
+      "id": "rushallu-sberquad-62478",
+      "model_positions": 25
+    },
+    {
+      "id": "rushallu-sberquad-53544",
+      "model_positions": 29
+    },
+    {
+      "id": "rushallu-sberquad-58896",
+      "model_positions": 11
+    },
+    {
+      "id": "rushallu-sberquad-63660",
+      "model_positions": 47
+    },
+    {
+      "id": "rushallu-sberquad-58511",
+      "model_positions": 89
+    },
+    {
+      "id": "rushallu-sberquad-56711",
+      "model_positions": 25
+    },
+    {
+      "id": "rushallu-sberquad-64534",
+      "model_positions": 46
+    },
+    {
+      "id": "rushallu-sberquad-60383",
+      "model_positions": 45
+    },
+    {
+      "id": "rushallu-sberquad-72144",
+      "model_positions": 22
+    },
+    {
+      "id": "rushallu-sberquad-69650",
+      "model_positions": 105
+    },
+    {
+      "id": "rushallu-sberquad-68816",
+      "model_positions": 53
+    },
+    {
+      "id": "rushallu-sberquad-72831",
+      "model_positions": 29
+    },
+    {
+      "id": "rushallu-sberquad-50965",
+      "model_positions": 52
+    },
+    {
+      "id": "rushallu-sberquad-66841",
+      "model_positions": 79
+    },
+    {
+      "id": "rushallu-sberquad-63201",
+      "model_positions": 30
+    },
+    {
+      "id": "rushallu-sberquad-70363",
+      "model_positions": 15
+    },
+    {
+      "id": "rushallu-sberquad-66817",
+      "model_positions": 47
+    },
+    {
+      "id": "rushallu-sberquad-55121",
+      "model_positions": 61
+    },
+    {
+      "id": "rushallu-sberquad-60582",
+      "model_positions": 48
+    },
+    {
+      "id": "rushallu-sberquad-64170",
+      "model_positions": 21
+    },
+    {
+      "id": "rushallu-sberquad-51911",
+      "model_positions": 52
+    },
+    {
+      "id": "rushallu-sberquad-50714",
+      "model_positions": 6
+    },
+    {
+      "id": "rushallu-sberquad-66756",
+      "model_positions": 6
+    },
+    {
+      "id": "rushallu-sberquad-59260",
+      "model_positions": 62
+    },
+    {
+      "id": "rushallu-sberquad-59531",
+      "model_positions": 21
+    },
+    {
+      "id": "rushallu-sberquad-70648",
+      "model_positions": 27
+    },
+    {
+      "id": "rushallu-sberquad-62697",
+      "model_positions": 106
+    },
+    {
+      "id": "rushallu-sberquad-55218",
+      "model_positions": 80
+    },
+    {
+      "id": "rushallu-sberquad-51925",
+      "model_positions": 13
+    },
+    {
+      "id": "rushallu-sberquad-58394",
+      "model_positions": 83
+    },
+    {
+      "id": "rushallu-sberquad-67238",
+      "model_positions": 23
+    },
+    {
+      "id": "rushallu-sberquad-60921",
+      "model_positions": 33
+    },
+    {
+      "id": "rushallu-sberquad-69627",
+      "model_positions": 64
+    },
+    {
+      "id": "rushallu-sberquad-52593",
+      "model_positions": 15
+    },
+    {
+      "id": "rushallu-sberquad-67570",
+      "model_positions": 26
+    },
+    {
+      "id": "rushallu-sberquad-56186",
+      "model_positions": 34
+    },
+    {
+      "id": "rushallu-sberquad-57141",
+      "model_positions": 17
+    },
+    {
+      "id": "rushallu-sberquad-73986",
+      "model_positions": 54
+    },
+    {
+      "id": "rushallu-sberquad-62382",
+      "model_positions": 56
+    },
+    {
+      "id": "rushallu-sberquad-60348",
+      "model_positions": 27
+    },
+    {
+      "id": "rushallu-sberquad-57414",
+      "model_positions": 90
+    },
+    {
+      "id": "rushallu-sberquad-56886",
+      "model_positions": 108
+    },
+    {
+      "id": "rushallu-sberquad-73535",
+      "model_positions": 3
+    },
+    {
+      "id": "rushallu-sberquad-56719",
+      "model_positions": 18
+    },
+    {
+      "id": "rushallu-sberquad-58093",
+      "model_positions": 16
+    },
+    {
+      "id": "rushallu-sberquad-50982",
+      "model_positions": 201
+    },
+    {
+      "id": "rushallu-sberquad-56268",
+      "model_positions": 17
+    },
+    {
+      "id": "rushallu-sberquad-71254",
+      "model_positions": 63
+    },
+    {
+      "id": "rushallu-sberquad-67231",
+      "model_positions": 156
+    },
+    {
+      "id": "rushallu-sberquad-69000",
+      "model_positions": 45
+    },
+    {
+      "id": "rushallu-sberquad-59584",
+      "model_positions": 20
+    },
+    {
+      "id": "rushallu-sberquad-53398",
+      "model_positions": 54
+    },
+    {
+      "id": "rushallu-sberquad-71242",
+      "model_positions": 30
+    },
+    {
+      "id": "rushallu-sberquad-55050",
+      "model_positions": 91
+    },
+    {
+      "id": "rushallu-sberquad-50634",
+      "model_positions": 32
+    },
+    {
+      "id": "rushallu-sberquad-50702",
+      "model_positions": 20
+    },
+    {
+      "id": "rushallu-sberquad-50750",
+      "model_positions": 44
+    },
+    {
+      "id": "rushallu-sberquad-50876",
+      "model_positions": 19
+    },
+    {
+      "id": "rushallu-sberquad-51238",
+      "model_positions": 52
+    },
+    {
+      "id": "rushallu-sberquad-51259",
+      "model_positions": 21
+    },
+    {
+      "id": "rushallu-sberquad-51298",
+      "model_positions": 52
+    },
+    {
+      "id": "rushallu-sberquad-51340",
+      "model_positions": 18
+    },
+    {
+      "id": "rushallu-sberquad-51354",
+      "model_positions": 43
+    },
+    {
+      "id": "rushallu-sberquad-51413",
+      "model_positions": 57
+    },
+    {
+      "id": "rushallu-sberquad-51556",
+      "model_positions": 28
+    },
+    {
+      "id": "rushallu-sberquad-51727",
+      "model_positions": 16
+    },
+    {
+      "id": "rushallu-sberquad-51913",
+      "model_positions": 19
+    },
+    {
+      "id": "rushallu-sberquad-52102",
+      "model_positions": 10
+    },
+    {
+      "id": "rushallu-sberquad-52203",
+      "model_positions": 21
+    },
+    {
+      "id": "rushallu-sberquad-53192",
+      "model_positions": 32
+    },
+    {
+      "id": "rushallu-sberquad-53296",
+      "model_positions": 10
+    },
+    {
+      "id": "rushallu-sberquad-53367",
+      "model_positions": 19
+    },
+    {
+      "id": "rushallu-sberquad-53433",
+      "model_positions": 40
+    },
+    {
+      "id": "rushallu-sberquad-53774",
+      "model_positions": 16
+    },
+    {
+      "id": "rushallu-sberquad-54678",
+      "model_positions": 63
+    },
+    {
+      "id": "rushallu-sberquad-54733",
+      "model_positions": 66
+    },
+    {
+      "id": "rushallu-sberquad-54769",
+      "model_positions": 34
+    },
+    {
+      "id": "rushallu-sberquad-54969",
+      "model_positions": 57
+    },
+    {
+      "id": "rushallu-sberquad-54973",
+      "model_positions": 38
+    },
+    {
+      "id": "rushallu-sberquad-54982",
+      "model_positions": 18
+    },
+    {
+      "id": "rushallu-sberquad-54993",
+      "model_positions": 21
+    },
+    {
+      "id": "rushallu-sberquad-55313",
+      "model_positions": 124
+    },
+    {
+      "id": "rushallu-sberquad-55412",
+      "model_positions": 44
+    },
+    {
+      "id": "rushallu-sberquad-55596",
+      "model_positions": 22
+    },
+    {
+      "id": "rushallu-sberquad-55767",
+      "model_positions": 30
+    },
+    {
+      "id": "rushallu-sberquad-55805",
+      "model_positions": 22
+    },
+    {
+      "id": "rushallu-sberquad-55832",
+      "model_positions": 90
+    },
+    {
+      "id": "rushallu-sberquad-55912",
+      "model_positions": 17
+    },
+    {
+      "id": "rushallu-sberquad-56172",
+      "model_positions": 19
+    },
+    {
+      "id": "rushallu-sberquad-56418",
+      "model_positions": 55
+    },
+    {
+      "id": "rushallu-sberquad-56466",
+      "model_positions": 93
+    },
+    {
+      "id": "rushallu-sberquad-56565",
+      "model_positions": 5
+    },
+    {
+      "id": "rushallu-sberquad-56981",
+      "model_positions": 17
+    },
+    {
+      "id": "rushallu-sberquad-56983",
+      "model_positions": 39
+    },
+    {
+      "id": "rushallu-sberquad-57868",
+      "model_positions": 22
+    },
+    {
+      "id": "rushallu-sberquad-58078",
+      "model_positions": 73
+    },
+    {
+      "id": "rushallu-sberquad-58158",
+      "model_positions": 22
+    },
+    {
+      "id": "rushallu-sberquad-58192",
+      "model_positions": 30
+    },
+    {
+      "id": "rushallu-sberquad-58740",
+      "model_positions": 13
+    },
+    {
+      "id": "rushallu-sberquad-59385",
+      "model_positions": 5
+    },
+    {
+      "id": "rushallu-sberquad-59599",
+      "model_positions": 45
+    },
+    {
+      "id": "rushallu-sberquad-59832",
+      "model_positions": 45
+    },
+    {
+      "id": "rushallu-sberquad-60166",
+      "model_positions": 24
+    },
+    {
+      "id": "rushallu-sberquad-60195",
+      "model_positions": 20
+    },
+    {
+      "id": "rushallu-sberquad-60290",
+      "model_positions": 69
+    },
+    {
+      "id": "rushallu-sberquad-60547",
+      "model_positions": 49
+    },
+    {
+      "id": "rushallu-sberquad-60603",
+      "model_positions": 24
+    },
+    {
+      "id": "rushallu-sberquad-61376",
+      "model_positions": 25
+    },
+    {
+      "id": "rushallu-sberquad-61634",
+      "model_positions": 99
+    },
+    {
+      "id": "rushallu-sberquad-62042",
+      "model_positions": 55
+    },
+    {
+      "id": "rushallu-sberquad-62067",
+      "model_positions": 32
+    },
+    {
+      "id": "rushallu-sberquad-62308",
+      "model_positions": 38
+    },
+    {
+      "id": "rushallu-sberquad-62387",
+      "model_positions": 20
+    },
+    {
+      "id": "rushallu-sberquad-62527",
+      "model_positions": 146
+    },
+    {
+      "id": "rushallu-sberquad-62743",
+      "model_positions": 136
+    },
+    {
+      "id": "rushallu-sberquad-63069",
+      "model_positions": 26
+    },
+    {
+      "id": "rushallu-sberquad-63082",
+      "model_positions": 27
+    },
+    {
+      "id": "rushallu-sberquad-63157",
+      "model_positions": 69
+    },
+    {
+      "id": "rushallu-sberquad-63218",
+      "model_positions": 82
+    },
+    {
+      "id": "rushallu-sberquad-63345",
+      "model_positions": 48
+    },
+    {
+      "id": "rushallu-sberquad-63489",
+      "model_positions": 27
+    },
+    {
+      "id": "rushallu-sberquad-64542",
+      "model_positions": 21
+    },
+    {
+      "id": "rushallu-sberquad-64655",
+      "model_positions": 17
+    },
+    {
+      "id": "rushallu-sberquad-64957",
+      "model_positions": 34
+    },
+    {
+      "id": "rushallu-sberquad-65783",
+      "model_positions": 19
+    },
+    {
+      "id": "rushallu-sberquad-65902",
+      "model_positions": 20
+    },
+    {
+      "id": "rushallu-sberquad-66246",
+      "model_positions": 16
+    },
+    {
+      "id": "rushallu-sberquad-66605",
+      "model_positions": 56
+    },
+    {
+      "id": "rushallu-sberquad-66899",
+      "model_positions": 23
+    },
+    {
+      "id": "rushallu-sberquad-66901",
+      "model_positions": 11
+    },
+    {
+      "id": "rushallu-sberquad-67342",
+      "model_positions": 30
+    },
+    {
+      "id": "rushallu-sberquad-67381",
+      "model_positions": 37
+    },
+    {
+      "id": "rushallu-sberquad-67792",
+      "model_positions": 86
+    },
+    {
+      "id": "rushallu-sberquad-67951",
+      "model_positions": 20
+    },
+    {
+      "id": "rushallu-sberquad-68077",
+      "model_positions": 40
+    },
+    {
+      "id": "rushallu-sberquad-68335",
+      "model_positions": 18
+    },
+    {
+      "id": "rushallu-sberquad-68714",
+      "model_positions": 48
+    },
+    {
+      "id": "rushallu-sberquad-68752",
+      "model_positions": 13
+    },
+    {
+      "id": "rushallu-sberquad-68912",
+      "model_positions": 25
+    },
+    {
+      "id": "rushallu-sberquad-68957",
+      "model_positions": 18
+    },
+    {
+      "id": "rushallu-sberquad-68991",
+      "model_positions": 33
+    },
+    {
+      "id": "rushallu-sberquad-69041",
+      "model_positions": 62
+    },
+    {
+      "id": "rushallu-sberquad-69328",
+      "model_positions": 71
+    },
+    {
+      "id": "rushallu-sberquad-69925",
+      "model_positions": 9
+    },
+    {
+      "id": "rushallu-sberquad-70051",
+      "model_positions": 27
+    },
+    {
+      "id": "rushallu-sberquad-70203",
+      "model_positions": 33
+    },
+    {
+      "id": "rushallu-sberquad-70219",
+      "model_positions": 106
+    },
+    {
+      "id": "rushallu-sberquad-70670",
+      "model_positions": 14
+    },
+    {
+      "id": "rushallu-sberquad-70873",
+      "model_positions": 12
+    },
+    {
+      "id": "rushallu-sberquad-70984",
+      "model_positions": 22
+    },
+    {
+      "id": "rushallu-sberquad-71120",
+      "model_positions": 38
+    },
+    {
+      "id": "rushallu-sberquad-71146",
+      "model_positions": 15
+    },
+    {
+      "id": "rushallu-sberquad-71373",
+      "model_positions": 32
+    },
+    {
+      "id": "rushallu-sberquad-71450",
+      "model_positions": 15
+    },
+    {
+      "id": "rushallu-sberquad-71998",
+      "model_positions": 109
+    },
+    {
+      "id": "rushallu-sberquad-72004",
+      "model_positions": 10
+    },
+    {
+      "id": "rushallu-sberquad-72201",
+      "model_positions": 50
+    },
+    {
+      "id": "rushallu-sberquad-72590",
+      "model_positions": 44
+    },
+    {
+      "id": "rushallu-sberquad-72633",
+      "model_positions": 18
+    },
+    {
+      "id": "rushallu-sberquad-72806",
+      "model_positions": 19
+    },
+    {
+      "id": "rushallu-sberquad-73569",
+      "model_positions": 21
+    },
+    {
+      "id": "rushallu-sberquad-73581",
+      "model_positions": 24
+    },
+    {
+      "id": "rushallu-sberquad-73810",
+      "model_positions": 117
+    },
+    {
+      "id": "rushallu-sberquad-74068",
+      "model_positions": 33
+    },
+    {
+      "id": "rushallu-ruscibench-q-1136",
+      "model_positions": 72
+    },
+    {
+      "id": "rushallu-ruscibench-q-1309",
+      "model_positions": 26
+    },
+    {
+      "id": "rushallu-ruscibench-q-1470",
+      "model_positions": 18
+    },
+    {
+      "id": "rushallu-ruscibench-q-17",
+      "model_positions": 103
+    },
+    {
+      "id": "rushallu-ruscibench-q-1721",
+      "model_positions": 153
+    },
+    {
+      "id": "rushallu-ruscibench-q-227",
+      "model_positions": 97
+    },
+    {
+      "id": "rushallu-ruscibench-q-265",
+      "model_positions": 27
+    },
+    {
+      "id": "rushallu-ruscibench-q-276",
+      "model_positions": 96
+    },
+    {
+      "id": "rushallu-ruscibench-q-278",
+      "model_positions": 20
+    },
+    {
+      "id": "rushallu-ruscibench-q-346",
+      "model_positions": 35
+    },
+    {
+      "id": "rushallu-ruscibench-q-459",
+      "model_positions": 107
+    },
+    {
+      "id": "rushallu-ruscibench-q-473",
+      "model_positions": 114
+    },
+    {
+      "id": "rushallu-ruscibench-q-508",
+      "model_positions": 19
+    },
+    {
+      "id": "rushallu-ruscibench-q-865",
+      "model_positions": 43
+    },
+    {
+      "id": "rushallu-ruscibench-q-226",
+      "model_positions": 141
+    },
+    {
+      "id": "rushallu-ruscibench-q-196",
+      "model_positions": 149
+    },
+    {
+      "id": "rushallu-ruscibench-q-233",
+      "model_positions": 67
+    },
+    {
+      "id": "rushallu-ruscibench-q-598",
+      "model_positions": 137
+    },
+    {
+      "id": "rushallu-ruscibench-q-988",
+      "model_positions": 89
+    },
+    {
+      "id": "rushallu-ruscibench-q-1619",
+      "model_positions": 102
+    },
+    {
+      "id": "rushallu-ruscibench-q-1372",
+      "model_positions": 71
+    },
+    {
+      "id": "rushallu-ruscibench-q-1593",
+      "model_positions": 156
+    },
+    {
+      "id": "rushallu-ruscibench-q-128",
+      "model_positions": 67
+    },
+    {
+      "id": "rushallu-ruscibench-q-535",
+      "model_positions": 89
+    },
+    {
+      "id": "rushallu-ruscibench-q-1265",
+      "model_positions": 16
+    },
+    {
+      "id": "rushallu-ruscibench-q-586",
+      "model_positions": 100
+    },
+    {
+      "id": "rushallu-ruscibench-q-1165",
+      "model_positions": 87
+    },
+    {
+      "id": "rushallu-ruscibench-q-1633",
+      "model_positions": 119
+    },
+    {
+      "id": "rushallu-ruscibench-q-231",
+      "model_positions": 70
+    },
+    {
+      "id": "rushallu-ruscibench-q-1676",
+      "model_positions": 24
+    },
+    {
+      "id": "rushallu-ruscibench-q-753",
+      "model_positions": 88
+    },
+    {
+      "id": "rushallu-ruscibench-q-602",
+      "model_positions": 71
+    },
+    {
+      "id": "rushallu-ruscibench-q-1018",
+      "model_positions": 51
+    },
+    {
+      "id": "rushallu-ruscibench-q-665",
+      "model_positions": 170
+    },
+    {
+      "id": "rushallu-ruscibench-q-1429",
+      "model_positions": 75
+    },
+    {
+      "id": "rushallu-ruscibench-q-692",
+      "model_positions": 76
+    },
+    {
+      "id": "rushallu-ruscibench-q-860",
+      "model_positions": 36
+    },
+    {
+      "id": "rushallu-ruscibench-q-1150",
+      "model_positions": 94
+    },
+    {
+      "id": "rushallu-ruscibench-q-891",
+      "model_positions": 116
+    },
+    {
+      "id": "rushallu-ruscibench-q-1592",
+      "model_positions": 43
+    },
+    {
+      "id": "rushallu-ruscibench-q-137",
+      "model_positions": 181
+    },
+    {
+      "id": "rushallu-ruscibench-q-87",
+      "model_positions": 85
+    },
+    {
+      "id": "rushallu-ruscibench-q-1229",
+      "model_positions": 130
+    },
+    {
+      "id": "rushallu-ruscibench-q-787",
+      "model_positions": 22
+    },
+    {
+      "id": "rushallu-ruscibench-q-764",
+      "model_positions": 44
+    },
+    {
+      "id": "rushallu-ruscibench-q-1615",
+      "model_positions": 136
+    },
+    {
+      "id": "rushallu-ruscibench-q-1199",
+      "model_positions": 23
+    },
+    {
+      "id": "rushallu-ruscibench-q-1475",
+      "model_positions": 20
+    },
+    {
+      "id": "rushallu-ruscibench-q-88",
+      "model_positions": 62
+    },
+    {
+      "id": "rushallu-ruscibench-q-491",
+      "model_positions": 141
+    },
+    {
+      "id": "rushallu-ruscibench-q-1196",
+      "model_positions": 127
+    },
+    {
+      "id": "rushallu-ruscibench-q-1317",
+      "model_positions": 118
+    },
+    {
+      "id": "rushallu-ruscibench-q-268",
+      "model_positions": 87
+    },
+    {
+      "id": "rushallu-ruscibench-q-982",
+      "model_positions": 40
+    },
+    {
+      "id": "rushallu-ruscibench-q-1395",
+      "model_positions": 178
+    },
+    {
+      "id": "rushallu-ruscibench-q-494",
+      "model_positions": 71
+    },
+    {
+      "id": "rushallu-ruscibench-q-1109",
+      "model_positions": 24
+    },
+    {
+      "id": "rushallu-ruscibench-q-714",
+      "model_positions": 117
+    },
+    {
+      "id": "rushallu-ruscibench-q-184",
+      "model_positions": 27
+    },
+    {
+      "id": "rushallu-ruscibench-q-1211",
+      "model_positions": 126
+    },
+    {
+      "id": "rushallu-ruscibench-q-377",
+      "model_positions": 19
+    },
+    {
+      "id": "rushallu-ruscibench-q-510",
+      "model_positions": 110
+    },
+    {
+      "id": "rushallu-ruscibench-q-1052",
+      "model_positions": 94
+    },
+    {
+      "id": "rushallu-ruscibench-q-601",
+      "model_positions": 40
+    },
+    {
+      "id": "rushallu-ruscibench-q-916",
+      "model_positions": 30
+    },
+    {
+      "id": "rushallu-ruscibench-q-200",
+      "model_positions": 102
+    },
+    {
+      "id": "rushallu-ruscibench-q-97",
+      "model_positions": 69
+    },
+    {
+      "id": "rushallu-ruscibench-q-547",
+      "model_positions": 83
+    },
+    {
+      "id": "rushallu-ruscibench-q-255",
+      "model_positions": 92
+    },
+    {
+      "id": "rushallu-ruscibench-q-1175",
+      "model_positions": 122
+    },
+    {
+      "id": "rushallu-ruscibench-q-287",
+      "model_positions": 98
+    },
+    {
+      "id": "rushallu-ruscibench-q-1462",
+      "model_positions": 132
+    },
+    {
+      "id": "rushallu-ruscibench-q-741",
+      "model_positions": 183
+    },
+    {
+      "id": "rushallu-ruscibench-q-606",
+      "model_positions": 89
+    },
+    {
+      "id": "rushallu-ruscibench-q-280",
+      "model_positions": 108
+    },
+    {
+      "id": "rushallu-ruscibench-q-1446",
+      "model_positions": 137
+    },
+    {
+      "id": "rushallu-ruscibench-q-1273",
+      "model_positions": 46
+    },
+    {
+      "id": "rushallu-ruscibench-q-330",
+      "model_positions": 29
+    },
+    {
+      "id": "rushallu-ruscibench-q-1503",
+      "model_positions": 46
+    },
+    {
+      "id": "rushallu-ruscibench-q-48",
+      "model_positions": 111
+    },
+    {
+      "id": "rushallu-ruscibench-q-94",
+      "model_positions": 91
+    },
+    {
+      "id": "rushallu-ruscibench-q-1581",
+      "model_positions": 97
+    },
+    {
+      "id": "rushallu-ruscibench-q-1315",
+      "model_positions": 50
+    },
+    {
+      "id": "rushallu-ruscibench-q-1135",
+      "model_positions": 83
+    },
+    {
+      "id": "rushallu-ruscibench-q-1039",
+      "model_positions": 139
+    },
+    {
+      "id": "rushallu-ruscibench-q-922",
+      "model_positions": 51
+    },
+    {
+      "id": "rushallu-ruscibench-q-1376",
+      "model_positions": 133
+    },
+    {
+      "id": "rushallu-ruscibench-q-318",
+      "model_positions": 98
+    },
+    {
+      "id": "rushallu-ruscibench-q-1310",
+      "model_positions": 29
+    },
+    {
+      "id": "rushallu-ruscibench-q-1178",
+      "model_positions": 274
+    },
+    {
+      "id": "rushallu-ruscibench-q-914",
+      "model_positions": 96
+    },
+    {
+      "id": "rushallu-ruscibench-q-640",
+      "model_positions": 114
+    },
+    {
+      "id": "rushallu-ruscibench-q-1162",
+      "model_positions": 70
+    },
+    {
+      "id": "rushallu-ruscibench-q-1422",
+      "model_positions": 56
+    },
+    {
+      "id": "rushallu-ruscibench-q-1646",
+      "model_positions": 78
+    },
+    {
+      "id": "rushallu-ruscibench-q-923",
+      "model_positions": 65
+    },
+    {
+      "id": "rushallu-ruscibench-q-34",
+      "model_positions": 96
+    },
+    {
+      "id": "rushallu-ruscibench-q-1641",
+      "model_positions": 122
+    },
+    {
+      "id": "rushallu-ruscibench-q-800",
+      "model_positions": 75
+    },
+    {
+      "id": "rushallu-ruscibench-q-723",
+      "model_positions": 138
+    },
+    {
+      "id": "rushallu-ruscibench-q-645",
+      "model_positions": 115
+    },
+    {
+      "id": "rushallu-ruscibench-q-1449",
+      "model_positions": 25
+    },
+    {
+      "id": "rushallu-ruscibench-q-1556",
+      "model_positions": 166
+    },
+    {
+      "id": "rushallu-ruscibench-q-1212",
+      "model_positions": 73
+    },
+    {
+      "id": "rushallu-ruscibench-q-352",
+      "model_positions": 39
+    },
+    {
+      "id": "rushallu-ruscibench-q-194",
+      "model_positions": 175
+    },
+    {
+      "id": "rushallu-ruscibench-q-1341",
+      "model_positions": 109
+    },
+    {
+      "id": "rushallu-ruscibench-q-1632",
+      "model_positions": 151
+    },
+    {
+      "id": "rushallu-ruscibench-q-1442",
+      "model_positions": 153
+    },
+    {
+      "id": "rushallu-ruscibench-q-678",
+      "model_positions": 151
+    },
+    {
+      "id": "rushallu-ruscibench-q-329",
+      "model_positions": 58
+    },
+    {
+      "id": "rushallu-ruscibench-q-992",
+      "model_positions": 100
+    },
+    {
+      "id": "rushallu-ruscibench-q-369",
+      "model_positions": 180
+    },
+    {
+      "id": "rushallu-ruscibench-q-1664",
+      "model_positions": 146
+    },
+    {
+      "id": "rushallu-ruscibench-q-1047",
+      "model_positions": 97
+    },
+    {
+      "id": "rushallu-ruscibench-q-152",
+      "model_positions": 67
+    },
+    {
+      "id": "rushallu-ruscibench-q-839",
+      "model_positions": 47
+    },
+    {
+      "id": "rushallu-ruscibench-q-553",
+      "model_positions": 162
+    },
+    {
+      "id": "rushallu-ruscibench-q-1127",
+      "model_positions": 66
+    },
+    {
+      "id": "rushallu-ruscibench-q-138",
+      "model_positions": 198
+    },
+    {
+      "id": "rushallu-ruscibench-q-203",
+      "model_positions": 94
+    },
+    {
+      "id": "rushallu-ruscibench-q-1400",
+      "model_positions": 176
+    },
+    {
+      "id": "rushallu-ruscibench-q-1678",
+      "model_positions": 86
+    },
+    {
+      "id": "rushallu-ruscibench-q-1485",
+      "model_positions": 57
+    },
+    {
+      "id": "rushallu-ruscibench-q-1544",
+      "model_positions": 91
+    },
+    {
+      "id": "rushallu-ruscibench-q-868",
+      "model_positions": 70
+    },
+    {
+      "id": "rushallu-ruscibench-q-1070",
+      "model_positions": 165
+    },
+    {
+      "id": "rushallu-ruscibench-q-752",
+      "model_positions": 65
+    },
+    {
+      "id": "rushallu-ruscibench-q-1627",
+      "model_positions": 33
+    },
+    {
+      "id": "rushallu-ruscibench-q-1261",
+      "model_positions": 24
+    },
+    {
+      "id": "rushallu-ruscibench-q-260",
+      "model_positions": 86
+    },
+    {
+      "id": "rushallu-ruscibench-q-1024",
+      "model_positions": 103
+    },
+    {
+      "id": "rushallu-ruscibench-q-1424",
+      "model_positions": 98
+    },
+    {
+      "id": "rushallu-ruscibench-q-1714",
+      "model_positions": 118
+    },
+    {
+      "id": "rushallu-ruscibench-q-571",
+      "model_positions": 65
+    },
+    {
+      "id": "rushallu-ruscibench-q-721",
+      "model_positions": 75
+    },
+    {
+      "id": "rushallu-ruscibench-q-972",
+      "model_positions": 107
+    },
+    {
+      "id": "rushallu-ruscibench-q-364",
+      "model_positions": 56
+    },
+    {
+      "id": "rushallu-ruscibench-q-218",
+      "model_positions": 186
+    },
+    {
+      "id": "rushallu-ruscibench-q-1549",
+      "model_positions": 274
+    },
+    {
+      "id": "rushallu-ruscibench-q-533",
+      "model_positions": 105
+    },
+    {
+      "id": "rushallu-ruscibench-q-1236",
+      "model_positions": 76
+    },
+    {
+      "id": "rushallu-ruscibench-q-143",
+      "model_positions": 55
+    },
+    {
+      "id": "rushallu-ruscibench-q-802",
+      "model_positions": 86
+    },
+    {
+      "id": "rushallu-ruscibench-q-424",
+      "model_positions": 170
+    },
+    {
+      "id": "rushallu-ruscibench-q-1401",
+      "model_positions": 46
+    },
+    {
+      "id": "rushallu-ruscibench-q-429",
+      "model_positions": 78
+    },
+    {
+      "id": "rushallu-ruscibench-q-237",
+      "model_positions": 87
+    },
+    {
+      "id": "rushallu-ruscibench-q-89",
+      "model_positions": 173
+    },
+    {
+      "id": "rushallu-ruscibench-q-1689",
+      "model_positions": 65
+    },
+    {
+      "id": "rushallu-ruscibench-q-321",
+      "model_positions": 54
+    },
+    {
+      "id": "rushallu-ruscibench-q-1038",
+      "model_positions": 44
+    },
+    {
+      "id": "rushallu-ruscibench-q-103",
+      "model_positions": 25
+    },
+    {
+      "id": "rushallu-ruscibench-q-772",
+      "model_positions": 69
+    },
+    {
+      "id": "rushallu-ruscibench-q-526",
+      "model_positions": 188
+    },
+    {
+      "id": "rushallu-ruscibench-q-730",
+      "model_positions": 181
+    },
+    {
+      "id": "rushallu-ruscibench-q-1692",
+      "model_positions": 28
+    },
+    {
+      "id": "rushallu-ruscibench-q-471",
+      "model_positions": 59
+    },
+    {
+      "id": "rushallu-ruscibench-q-497",
+      "model_positions": 115
+    },
+    {
+      "id": "rushallu-ruscibench-q-1484",
+      "model_positions": 82
+    },
+    {
+      "id": "rushallu-ruscibench-q-1335",
+      "model_positions": 50
+    },
+    {
+      "id": "rushallu-ruscibench-q-1232",
+      "model_positions": 177
+    },
+    {
+      "id": "rushallu-ruscibench-q-1651",
+      "model_positions": 12
+    },
+    {
+      "id": "rushallu-ruscibench-q-460",
+      "model_positions": 74
+    },
+    {
+      "id": "rushallu-ruscibench-q-740",
+      "model_positions": 91
+    },
+    {
+      "id": "rushallu-ruscibench-q-854",
+      "model_positions": 79
+    },
+    {
+      "id": "rushallu-ruscibench-q-1490",
+      "model_positions": 34
+    },
+    {
+      "id": "rushallu-ruscibench-q-724",
+      "model_positions": 24
+    },
+    {
+      "id": "rushallu-ruscibench-q-350",
+      "model_positions": 69
+    },
+    {
+      "id": "rushallu-ruscibench-q-1617",
+      "model_positions": 103
+    },
+    {
+      "id": "rushallu-ruscibench-q-360",
+      "model_positions": 77
+    },
+    {
+      "id": "rushallu-ruscibench-q-1488",
+      "model_positions": 20
+    },
+    {
+      "id": "rushallu-ruscibench-q-1467",
+      "model_positions": 118
+    },
+    {
+      "id": "rushallu-ruscibench-q-35",
+      "model_positions": 109
+    },
+    {
+      "id": "rushallu-ruscibench-q-531",
+      "model_positions": 189
+    },
+    {
+      "id": "rushallu-ruscibench-q-587",
+      "model_positions": 99
+    },
+    {
+      "id": "rushallu-ruscibench-q-73",
+      "model_positions": 68
+    },
+    {
+      "id": "rushallu-ruscibench-q-27",
+      "model_positions": 39
+    },
+    {
+      "id": "rushallu-ruscibench-q-1622",
+      "model_positions": 81
+    },
+    {
+      "id": "rushallu-ruscibench-q-696",
+      "model_positions": 121
+    },
+    {
+      "id": "rushallu-ruscibench-q-105",
+      "model_positions": 148
+    },
+    {
+      "id": "rushallu-ruscibench-q-1694",
+      "model_positions": 46
+    },
+    {
+      "id": "rushallu-ruscibench-q-1307",
+      "model_positions": 136
+    },
+    {
+      "id": "rushallu-ruscibench-q-890",
+      "model_positions": 117
+    },
+    {
+      "id": "rushallu-ruscibench-q-1334",
+      "model_positions": 201
+    },
+    {
+      "id": "rushallu-ruscibench-q-524",
+      "model_positions": 96
+    },
+    {
+      "id": "rushallu-ruscibench-q-1287",
+      "model_positions": 51
+    },
+    {
+      "id": "rushallu-ruscibench-q-1192",
+      "model_positions": 54
+    },
+    {
+      "id": "rushallu-ruscibench-q-1016",
+      "model_positions": 107
+    },
+    {
+      "id": "rushallu-ruscibench-q-195",
+      "model_positions": 68
+    },
+    {
+      "id": "rushallu-ruscibench-q-1346",
+      "model_positions": 203
+    },
+    {
+      "id": "rushallu-ruscibench-q-1652",
+      "model_positions": 65
+    },
+    {
+      "id": "rushallu-ruscibench-q-876",
+      "model_positions": 175
+    },
+    {
+      "id": "rushallu-ruscibench-q-1011",
+      "model_positions": 114
+    },
+    {
+      "id": "rushallu-ruscibench-q-365",
+      "model_positions": 90
+    },
+    {
+      "id": "rushallu-ruscibench-q-887",
+      "model_positions": 261
+    },
+    {
+      "id": "rushallu-ruscibench-q-1264",
+      "model_positions": 71
+    },
+    {
+      "id": "rushallu-ruscibench-q-213",
+      "model_positions": 65
+    },
+    {
+      "id": "rushallu-ruscibench-q-845",
+      "model_positions": 132
+    },
+    {
+      "id": "rushallu-ruscibench-q-561",
+      "model_positions": 52
+    },
+    {
+      "id": "rushallu-ruscibench-q-1339",
+      "model_positions": 100
+    },
+    {
+      "id": "rushallu-ruscibench-q-475",
+      "model_positions": 19
+    },
+    {
+      "id": "rushallu-ruscibench-q-779",
+      "model_positions": 116
+    },
+    {
+      "id": "rushallu-ruscibench-q-1296",
+      "model_positions": 133
+    },
+    {
+      "id": "rushallu-ruscibench-q-4",
+      "model_positions": 27
+    },
+    {
+      "id": "rushallu-ruscibench-q-284",
+      "model_positions": 129
+    },
+    {
+      "id": "rushallu-ruscibench-q-1661",
+      "model_positions": 71
+    },
+    {
+      "id": "rushallu-ruscibench-q-1415",
+      "model_positions": 61
+    },
+    {
+      "id": "rushallu-ruscibench-q-731",
+      "model_positions": 72
+    },
+    {
+      "id": "rushallu-ruscibench-q-1013",
+      "model_positions": 146
+    },
+    {
+      "id": "rushallu-ruscibench-q-1660",
+      "model_positions": 48
+    },
+    {
+      "id": "rushallu-ruscibench-q-432",
+      "model_positions": 145
+    },
+    {
+      "id": "rushallu-ruscibench-q-1217",
+      "model_positions": 110
+    },
+    {
+      "id": "rushallu-ruscibench-q-806",
+      "model_positions": 96
+    },
+    {
+      "id": "rushallu-ruscibench-q-266",
+      "model_positions": 84
+    },
+    {
+      "id": "rushallu-ruscibench-q-59",
+      "model_positions": 72
+    },
+    {
+      "id": "rushallu-ruscibench-q-1613",
+      "model_positions": 86
+    },
+    {
+      "id": "rushallu-ruscibench-q-955",
+      "model_positions": 161
+    },
+    {
+      "id": "rushallu-ruscibench-q-1612",
+      "model_positions": 69
+    },
+    {
+      "id": "rushallu-ruscibench-q-1106",
+      "model_positions": 91
+    },
+    {
+      "id": "rushallu-ruscibench-q-286",
+      "model_positions": 131
+    },
+    {
+      "id": "rushallu-ruscibench-q-791",
+      "model_positions": 44
+    },
+    {
+      "id": "rushallu-ruscibench-q-581",
+      "model_positions": 49
+    },
+    {
+      "id": "rushallu-ruscibench-q-1311",
+      "model_positions": 58
+    },
+    {
+      "id": "rushallu-ruscibench-q-488",
+      "model_positions": 54
+    },
+    {
+      "id": "rushallu-ruscibench-q-520",
+      "model_positions": 55
+    },
+    {
+      "id": "rushallu-ruscibench-q-1508",
+      "model_positions": 111
+    },
+    {
+      "id": "rushallu-ruscibench-q-172",
+      "model_positions": 65
+    },
+    {
+      "id": "rushallu-ruscibench-q-1326",
+      "model_positions": 72
+    },
+    {
+      "id": "rushallu-ruscibench-q-417",
+      "model_positions": 141
+    },
+    {
+      "id": "rushallu-ruscibench-q-119",
+      "model_positions": 76
+    },
+    {
+      "id": "rushallu-ruscibench-q-1435",
+      "model_positions": 70
+    },
+    {
+      "id": "rushallu-ruscibench-q-773",
+      "model_positions": 84
+    },
+    {
+      "id": "rushallu-ruscibench-q-160",
+      "model_positions": 251
+    },
+    {
+      "id": "rushallu-ruscibench-q-604",
+      "model_positions": 44
+    },
+    {
+      "id": "rushallu-ruscibench-q-1708",
+      "model_positions": 56
+    },
+    {
+      "id": "rushallu-ruscibench-q-683",
+      "model_positions": 53
+    },
+    {
+      "id": "rushallu-ruscibench-q-1656",
+      "model_positions": 259
+    },
+    {
+      "id": "rushallu-ruscibench-q-676",
+      "model_positions": 68
+    },
+    {
+      "id": "rushallu-ruscibench-q-1648",
+      "model_positions": 128
+    },
+    {
+      "id": "rushallu-ruscibench-q-204",
+      "model_positions": 81
+    },
+    {
+      "id": "rushallu-ruscibench-q-900",
+      "model_positions": 306
+    },
+    {
+      "id": "rushallu-ruscibench-q-1037",
+      "model_positions": 74
+    },
+    {
+      "id": "rushallu-ruscibench-q-412",
+      "model_positions": 30
+    },
+    {
+      "id": "rushallu-ruscibench-q-771",
+      "model_positions": 155
+    },
+    {
+      "id": "rushallu-ruscibench-q-300",
+      "model_positions": 119
+    },
+    {
+      "id": "rushallu-ruscibench-q-1189",
+      "model_positions": 41
+    },
+    {
+      "id": "rushallu-ruscibench-q-1369",
+      "model_positions": 190
+    },
+    {
+      "id": "rushallu-ruscibench-q-485",
+      "model_positions": 146
+    },
+    {
+      "id": "rushallu-ruscibench-q-375",
+      "model_positions": 123
+    },
+    {
+      "id": "rushallu-ruscibench-q-661",
+      "model_positions": 27
+    },
+    {
+      "id": "rushallu-ruscibench-q-861",
+      "model_positions": 123
+    },
+    {
+      "id": "rushallu-ruscibench-q-1545",
+      "model_positions": 72
+    },
+    {
+      "id": "rushallu-ruscibench-q-434",
+      "model_positions": 116
+    },
+    {
+      "id": "rushallu-ruscibench-q-1568",
+      "model_positions": 57
+    },
+    {
+      "id": "rushallu-ruscibench-q-701",
+      "model_positions": 85
+    },
+    {
+      "id": "rushallu-ruscibench-q-1130",
+      "model_positions": 21
+    },
+    {
+      "id": "rushallu-ruscibench-q-1507",
+      "model_positions": 89
+    },
+    {
+      "id": "rushallu-ruscibench-q-1629",
+      "model_positions": 33
+    },
+    {
+      "id": "rushallu-ruscibench-q-1677",
+      "model_positions": 76
+    },
+    {
+      "id": "rushallu-ruscibench-q-500",
+      "model_positions": 203
+    },
+    {
+      "id": "rushallu-ruscibench-q-190",
+      "model_positions": 51
+    },
+    {
+      "id": "rushallu-ruscibench-q-465",
+      "model_positions": 85
+    },
+    {
+      "id": "rushallu-ruscibench-q-1086",
+      "model_positions": 172
+    },
+    {
+      "id": "rushallu-ruscibench-q-1675",
+      "model_positions": 23
+    },
+    {
+      "id": "rushallu-ruscibench-q-80",
+      "model_positions": 89
+    },
+    {
+      "id": "rushallu-ruscibench-q-506",
+      "model_positions": 29
+    },
+    {
+      "id": "rushallu-ruscibench-q-1096",
+      "model_positions": 108
+    },
+    {
+      "id": "rushallu-ruscibench-q-911",
+      "model_positions": 139
+    },
+    {
+      "id": "rushallu-ruscibench-q-1206",
+      "model_positions": 105
+    },
+    {
+      "id": "rushallu-ruscibench-q-819",
+      "model_positions": 101
+    },
+    {
+      "id": "rushallu-ruscibench-q-1195",
+      "model_positions": 148
+    },
+    {
+      "id": "rushallu-ruscibench-q-1076",
+      "model_positions": 41
+    },
+    {
+      "id": "rushallu-ruscibench-q-700",
+      "model_positions": 54
+    },
+    {
+      "id": "rushallu-ruscibench-q-1224",
+      "model_positions": 25
+    },
+    {
+      "id": "rushallu-ruscibench-q-1298",
+      "model_positions": 81
+    },
+    {
+      "id": "rushallu-ruscibench-q-1453",
+      "model_positions": 132
+    },
+    {
+      "id": "rushallu-ruscibench-q-1543",
+      "model_positions": 66
+    },
+    {
+      "id": "rushallu-ruscibench-q-141",
+      "model_positions": 70
+    },
+    {
+      "id": "rushallu-ruscibench-q-584",
+      "model_positions": 123
+    },
+    {
+      "id": "rushallu-ruscibench-q-793",
+      "model_positions": 108
+    },
+    {
+      "id": "rushallu-ruscibench-q-249",
+      "model_positions": 138
+    },
+    {
+      "id": "rushallu-ruscibench-q-379",
+      "model_positions": 88
+    },
+    {
+      "id": "rushallu-ruscibench-q-1216",
+      "model_positions": 110
+    },
+    {
+      "id": "rushallu-ruscibench-q-669",
+      "model_positions": 51
+    },
+    {
+      "id": "rushallu-ruscibench-q-1650",
+      "model_positions": 105
+    },
+    {
+      "id": "rushallu-ruscibench-q-1705",
+      "model_positions": 79
+    },
+    {
+      "id": "rushallu-ruscibench-q-443",
+      "model_positions": 42
+    },
+    {
+      "id": "rushallu-ruscibench-q-583",
+      "model_positions": 137
+    },
+    {
+      "id": "rushallu-ruscibench-q-623",
+      "model_positions": 81
+    },
+    {
+      "id": "rushallu-ruscibench-q-685",
+      "model_positions": 128
+    },
+    {
+      "id": "rushallu-ruscibench-q-704",
+      "model_positions": 74
+    },
+    {
+      "id": "rushallu-ruscibench-q-722",
+      "model_positions": 95
+    },
+    {
+      "id": "rushallu-ruscibench-q-745",
+      "model_positions": 102
+    },
+    {
+      "id": "rushallu-ruscibench-q-857",
+      "model_positions": 20
+    },
+    {
+      "id": "rushallu-ruscibench-q-867",
+      "model_positions": 91
+    },
+    {
+      "id": "rushallu-ruscibench-q-905",
+      "model_positions": 56
+    },
+    {
+      "id": "rushallu-ruscibench-q-98",
+      "model_positions": 67
+    },
+    {
+      "id": "rushallu-ruscibench-q-522",
+      "model_positions": 64
+    },
+    {
+      "id": "rushallu-ruscibench-q-912",
+      "model_positions": 120
+    },
+    {
+      "id": "rushallu-ruscibench-q-1257",
+      "model_positions": 211
+    },
+    {
+      "id": "rushallu-ruscibench-q-1451",
+      "model_positions": 104
+    },
+    {
+      "id": "rushallu-ruscibench-q-188",
+      "model_positions": 22
+    },
+    {
+      "id": "rushallu-ruscibench-q-555",
+      "model_positions": 43
+    },
+    {
+      "id": "rushallu-ruscibench-q-617",
+      "model_positions": 36
+    },
+    {
+      "id": "rushallu-ruscibench-q-920",
+      "model_positions": 216
+    },
+    {
+      "id": "rushallu-ruscibench-q-1377",
+      "model_positions": 176
+    },
+    {
+      "id": "rushallu-ruscibench-q-338",
+      "model_positions": 71
+    },
+    {
+      "id": "rushallu-ruscibench-q-933",
+      "model_positions": 152
+    },
+    {
+      "id": "rushallu-ruscibench-q-1359",
+      "model_positions": 90
+    },
+    {
+      "id": "rushallu-ruscibench-q-1407",
+      "model_positions": 24
+    },
+    {
+      "id": "rushallu-ruscibench-q-234",
+      "model_positions": 149
+    },
+    {
+      "id": "rushallu-ruscibench-q-1440",
+      "model_positions": 106
+    },
+    {
+      "id": "rushallu-ruscibench-q-427",
+      "model_positions": 189
+    },
+    {
+      "id": "rushallu-ruscibench-q-1494",
+      "model_positions": 69
+    },
+    {
+      "id": "rushallu-ruscibench-q-397",
+      "model_positions": 104
+    },
+    {
+      "id": "rushallu-ruscibench-q-1218",
+      "model_positions": 83
+    },
+    {
+      "id": "rushallu-ruscibench-q-608",
+      "model_positions": 150
+    },
+    {
+      "id": "rushallu-ruscibench-q-838",
+      "model_positions": 164
+    },
+    {
+      "id": "rushallu-ruscibench-q-1518",
+      "model_positions": 35
+    },
+    {
+      "id": "rushallu-ruscibench-q-1281",
+      "model_positions": 95
+    },
+    {
+      "id": "rushallu-ruscibench-q-1529",
+      "model_positions": 32
+    },
+    {
+      "id": "rushallu-ruscibench-q-288",
+      "model_positions": 127
+    },
+    {
+      "id": "rushallu-ruscibench-q-376",
+      "model_positions": 111
+    },
+    {
+      "id": "rushallu-ruscibench-q-407",
+      "model_positions": 114
+    },
+    {
+      "id": "rushallu-ruscibench-q-436",
+      "model_positions": 88
+    },
+    {
+      "id": "rushallu-ruscibench-q-479",
+      "model_positions": 54
+    },
+    {
+      "id": "rushallu-ruscibench-q-68",
+      "model_positions": 125
+    },
+    {
+      "id": "rushallu-ruscibench-q-1389",
+      "model_positions": 68
+    },
+    {
+      "id": "rushallu-ruscibench-q-333",
+      "model_positions": 146
+    },
+    {
+      "id": "rushallu-ruscibench-q-654",
+      "model_positions": 117
+    },
+    {
+      "id": "rushallu-ruscibench-q-466",
+      "model_positions": 55
+    },
+    {
+      "id": "rushallu-ruscibench-q-419",
+      "model_positions": 68
+    },
+    {
+      "id": "rushallu-ruscibench-q-556",
+      "model_positions": 77
+    },
+    {
+      "id": "rushallu-ruscibench-q-92",
+      "model_positions": 238
+    },
+    {
+      "id": "rushallu-ruscibench-q-1542",
+      "model_positions": 140
+    },
+    {
+      "id": "rushallu-ruscibench-q-712",
+      "model_positions": 49
+    },
+    {
+      "id": "rushallu-ruscibench-q-682",
+      "model_positions": 102
+    },
+    {
+      "id": "rushallu-ruscibench-q-1045",
+      "model_positions": 92
+    },
+    {
+      "id": "rushallu-ruscibench-q-115",
+      "model_positions": 58
+    },
+    {
+      "id": "rushallu-ruscibench-q-1482",
+      "model_positions": 60
+    },
+    {
+      "id": "rushallu-ruscibench-q-1559",
+      "model_positions": 38
+    },
+    {
+      "id": "rushallu-ruscibench-q-950",
+      "model_positions": 100
+    },
+    {
+      "id": "rushallu-ruscibench-q-769",
+      "model_positions": 47
+    },
+    {
+      "id": "rushallu-ruscibench-q-359",
+      "model_positions": 73
+    }
+  ]
+}

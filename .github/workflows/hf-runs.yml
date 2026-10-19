@@ -304,18 +304,18 @@ jobs:
         working-directory: spanverify-module
         timeout-minutes: 15
         run: |
-          python scripts/collect_metrics.py --seed "$SEED" --out reports/METRICS.json
+          python scripts/collect_metrics.py --seed "$SEED" --out reports/CURRENT_METRICS.json
           if ! python scripts/check_numbers.py; then
             echo "::error::сверка чисел не сошлась, METRICS.json всё равно сохраняется артефактом"
             exit 1
           fi
-          python -c "import json; d=json.load(open('reports/METRICS.json')); ext=d.get('external_tests') or {}; print('hf_runs', ext.get('hf_runs'))"
+          python -c "import json; d=json.load(open('reports/CURRENT_METRICS.json')); ext=d.get('external_tests') or {}; print('hf_runs', ext.get('hf_runs'))"
       - uses: actions/upload-artifact@v4
         if: always()
         with:
           name: hf-runs-metrics
           path: |
-            spanverify-module/reports/METRICS.json
+            spanverify-module/reports/CURRENT_METRICS.json
             spanverify-module/reports/cross_corpus_hf.json
             spanverify-module/reports/external_tests.json
           retention-days: 14
@@ -404,7 +404,7 @@ jobs:
             mkdir -p spanverify-module/reports/experiments/pilot
             cp spanverify-module/reports/pilot/pilot.json spanverify-module/reports/pilot/pilot.md spanverify-module/reports/experiments/pilot/
           fi
-          for path in spanverify-module/reports/experiments spanverify-module/reports/METRICS.json spanverify-module/reports/cross_corpus_hf.json spanverify-module/reports/external_tests.json spanverify-module/reports/ext_ragtruth_qa_hf.json; do
+          for path in spanverify-module/reports/experiments spanverify-module/reports/CURRENT_METRICS.json spanverify-module/reports/cross_corpus_hf.json spanverify-module/reports/external_tests.json spanverify-module/reports/ext_ragtruth_qa_hf.json; do
             if [ -e "$path" ]; then
               git add -- "$path"
             fi

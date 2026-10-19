@@ -1,0 +1,103 @@
+{
+  "run_id": "P8-hygiene",
+  "date": "2026-10-19",
+  "source_commit": "b9cf9acdab1ca7bf082d03629ea7e599597f3fa8",
+  "files": {
+    "spanverify-module/reports/METRICS.json": {
+      "original_keys": [
+        "commands",
+        "meta",
+        "disclaimer",
+        "tests",
+        "demo",
+        "defects",
+        "corpus_a",
+        "corpus_a3_real",
+        "corpus_b",
+        "external_tests",
+        "hf_experiments",
+        "hf_external_slices",
+        "cross_corpus",
+        "pilot",
+        "release",
+        "duration_s"
+      ],
+      "semantic_sha256": "aa02c274c636d64e0515cea6378051d536c5c6dbc6788a7863279f55432f8621"
+    },
+    "reports/METRICS.json": {
+      "original_keys": [
+        "commands",
+        "meta",
+        "disclaimer",
+        "tests",
+        "demo",
+        "defects",
+        "corpus_a",
+        "corpus_a3_real",
+        "corpus_b",
+        "external_tests",
+        "hf_experiments",
+        "hf_external_slices",
+        "cross_corpus",
+        "pilot",
+        "release",
+        "duration_s"
+      ],
+      "semantic_sha256": "aa02c274c636d64e0515cea6378051d536c5c6dbc6788a7863279f55432f8621"
+    },
+    "spanverify-module/reports/experiments/a3/experiment.json": {
+      "original_keys": [
+        "dataset",
+        "mode",
+        "model",
+        "seed",
+        "run_id",
+        "git_commit",
+        "duration_s",
+        "corpus",
+        "splits",
+        "metrics",
+        "test_official",
+        "dev_official",
+        "by_type_test",
+        "clean_pairs",
+        "mask_scan",
+        "verdict_rule_comparison",
+        "bundle",
+        "folds",
+        "gate",
+        "gate_test_official",
+        "head_inline",
+        "artifacts"
+      ],
+      "semantic_sha256": "5ef983a5ace49ea878ea26dd8b681b4412d01c5f4d16d0210ec1d7229b52361d"
+    },
+    "reports/experiments/a3/experiment.json": {
+      "original_keys": [
+        "dataset",
+        "mode",
+        "model",
+        "seed",
+        "run_id",
+        "git_commit",
+        "duration_s",
+        "corpus",
+        "splits",
+        "metrics",
+        "test_official",
+        "dev_official",
+        "by_type_test",
+        "clean_pairs",
+        "mask_scan",
+        "verdict_rule_comparison",
+        "bundle",
+        "folds",
+        "gate",
+        "gate_test_official",
+        "head_inline",
+        "artifacts"
+      ],
+      "semantic_sha256": "5ef983a5ace49ea878ea26dd8b681b4412d01c5f4d16d0210ec1d7229b52361d"
+    }
+  }
+}

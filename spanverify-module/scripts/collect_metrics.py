@@ -1,4 +1,4 @@
-"""Единый источник чисел проекта: ``reports/METRICS.json``.
+"""Единый источник чисел проекта: ``reports/CURRENT_METRICS.json``.
 
 Правило проекта (после аудита): любое число в документах берётся отсюда, а не из
 памяти. Скрипт собирает:
@@ -22,7 +22,7 @@
 
 Запуск::
 
-    python scripts/collect_metrics.py --out reports/METRICS.json
+    python scripts/collect_metrics.py --out reports/CURRENT_METRICS.json
 """
 
 from __future__ import annotations
@@ -559,7 +559,7 @@ def _hf_experiments_block() -> dict | None:
         "hf_runs": sum(1 for run in runs.values() if run.get("mode") == "hf"),
         "note": (
             "числа взяты из файлов прогонов reports/experiments/*/; в документы "
-            "попадают только через reports/METRICS.json"
+            "попадают только через reports/CURRENT_METRICS.json"
         ),
     }
 
@@ -730,10 +730,10 @@ def collect(dataset: str, seed: int, release_dir: Path, coverage_json: Path) -> 
 
 
 def main() -> int:
-    parser = argparse.ArgumentParser(description="Собрать reports/METRICS.json")
+    parser = argparse.ArgumentParser(description="Собрать reports/CURRENT_METRICS.json")
     parser.add_argument("--dataset", default="data/demo_pairs.jsonl")
     parser.add_argument("--seed", type=int, default=42)
-    parser.add_argument("--out", default="reports/METRICS.json")
+    parser.add_argument("--out", default="reports/CURRENT_METRICS.json")
     parser.add_argument("--release-dir", default="release")
     parser.add_argument("--coverage-json", default="reports/coverage.json")
     args = parser.parse_args()

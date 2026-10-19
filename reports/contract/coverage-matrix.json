@@ -1,10 +1,10 @@
 {
   "as_of": "2026-10-19",
   "source": "User-specified Appendix3 requirements; evidence only, no invented acceptance",
-  "current_measurement_run": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39236657451",
+  "current_measurement_run": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39266451529",
   "official_test_read": true,
-  "official_test_evaluated": false,
-  "official_test_read_scope": "legacy P6 chunking-test unsplit read, not new P7 evaluation",
+  "official_test_evaluated": true,
+  "official_test_read_scope": "P8 authorized final evaluation177; prior legacy read and zero-output infrastructure abort explicitly retained",
   "incident_evidence": "reports/p7/freeze-and-incident.json",
   "overall": "не достигнут",
   "no_artifact_rule": "No current proof => not achieved; historical/demo proof cannot establish P5 speed/delivery/official quality",
@@ -48,20 +48,20 @@
     {
       "id": "spans",
       "requirement": "Fragments with coordinates, label and confidence",
-      "status": "частично",
-      "scope": "current P5 candidate; historical evidence is explicitly qualified",
-      "note": "Real dev spans and exact text slices; existing API exposes confidence. Current P5 packaged API is not separately measured.",
+      "status": "достигнут",
+      "scope": "P8 official held-out measurement; frozen P7 product",
+      "note": "Official strict kept-spans+rules:47TP38FP50FN, IoU>=.5 unchanged, containment .2886597938, mean contained width1.33926249.",
       "evidence": [
         {
-          "path": "spanverify-module/reports/experiments/p5_span_filter/run39170981235/dev_evidence.jsonl.gz",
-          "url": "https://github.com/Igorr112323/Smarty_Chumakov/blob/arena/c5f69767-smarty-chumakov/spanverify-module/reports/experiments/p5_span_filter/run39170981235/dev_evidence.jsonl.gz"
+          "path": "reports/p8/run39266451529/official/result.json",
+          "url": "https://github.com/Igorr112323/Smarty_Chumakov/blob/arena/c5f69767-smarty-chumakov/reports/p8/run39266451529/official/result.json"
         },
         {
-          "path": "reports/contract/4.1.2-api-schema.json",
-          "url": "https://github.com/Igorr112323/Smarty_Chumakov/blob/arena/c5f69767-smarty-chumakov/reports/contract/4.1.2-api-schema.json"
+          "path": "reports/FINAL_REPORT.md",
+          "url": "https://github.com/Igorr112323/Smarty_Chumakov/blob/arena/c5f69767-smarty-chumakov/reports/FINAL_REPORT.md"
         }
       ],
-      "current_run": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39170981235"
+      "current_run": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39266451529"
     },
     {
       "id": "features",
@@ -128,20 +128,20 @@
     {
       "id": "quality_gate",
       "requirement": "F1 >= .50 jointly with FPR <= .40 on document-held-out part of 1200 pairs",
-      "status": "частично",
-      "scope": "historical frozen P5 legacy512; not re-evaluated P7 long-v1 quality",
-      "note": "A successful dev gate would still be partial contractual evidence: official test177 remains CLOSED. No status based on FPR alone. Historical P5 metric, not a new P7 long-path quality evaluation.",
+      "status": "достигнут",
+      "scope": "P8 official held-out measurement; frozen P7 product",
+      "note": "P8 official177 joint PASS: tokensF1 .6252045826513911, strict spansF1 .5164835164835164, token-FPR proxy .015466785356626237; internal .90/.10 NOT achieved.",
       "evidence": [
         {
-          "path": "spanverify-module/reports/experiments/p5_span_filter/run39170981235/all_family_metrics.json",
-          "url": "https://github.com/Igorr112323/Smarty_Chumakov/blob/arena/c5f69767-smarty-chumakov/spanverify-module/reports/experiments/p5_span_filter/run39170981235/all_family_metrics.json"
+          "path": "reports/p8/run39266451529/official/result.json",
+          "url": "https://github.com/Igorr112323/Smarty_Chumakov/blob/arena/c5f69767-smarty-chumakov/reports/p8/run39266451529/official/result.json"
         },
         {
-          "path": "spanverify-module/reports/experiments/p5_span_filter/run39170981235/oof_validation.json",
-          "url": "https://github.com/Igorr112323/Smarty_Chumakov/blob/arena/c5f69767-smarty-chumakov/spanverify-module/reports/experiments/p5_span_filter/run39170981235/oof_validation.json"
+          "path": "reports/FINAL_REPORT.md",
+          "url": "https://github.com/Igorr112323/Smarty_Chumakov/blob/arena/c5f69767-smarty-chumakov/reports/FINAL_REPORT.md"
         }
       ],
-      "current_run": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39170981235"
+      "current_run": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39266451529"
     },
     {
       "id": "dev_tokens_gate",
@@ -182,16 +182,20 @@
     {
       "id": "official_test",
       "requirement": "Official test177 acceptance",
-      "status": "не достигнут",
-      "scope": "current P5 candidate; historical evidence is explicitly qualified",
-      "note": "Official test177 remains CLOSED; no metric or result is asserted for it.",
+      "status": "достигнут",
+      "scope": "P8 official held-out measurement; frozen P7 product",
+      "note": "177/177 once through public Verifier; 7 over512/max1266, full long-v1; empty cache0hits177misses,381.292202784s, no fits. Zero-output infrastructure abort preserved, not a second quality chance.",
       "evidence": [
         {
-          "path": "spanverify-module/reports/experiments/p5_span_filter/run39170981235/manifest.json",
-          "url": "https://github.com/Igorr112323/Smarty_Chumakov/blob/arena/c5f69767-smarty-chumakov/spanverify-module/reports/experiments/p5_span_filter/run39170981235/manifest.json"
+          "path": "reports/p8/run39266451529/official/result.json",
+          "url": "https://github.com/Igorr112323/Smarty_Chumakov/blob/arena/c5f69767-smarty-chumakov/reports/p8/run39266451529/official/result.json"
+        },
+        {
+          "path": "reports/FINAL_REPORT.md",
+          "url": "https://github.com/Igorr112323/Smarty_Chumakov/blob/arena/c5f69767-smarty-chumakov/reports/FINAL_REPORT.md"
         }
       ],
-      "current_run": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39170981235"
+      "current_run": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39266451529"
     },
     {
       "id": "speed_per_1000",
@@ -532,25 +536,139 @@
     {
       "id": "control_sample",
       "requirement": "Control sample / corpus1200 / held-out document split",
-      "status": "частично",
-      "scope": "current P5 candidate; historical evidence is explicitly qualified",
-      "note": "Frozen A3 manifest1200, train842/dev181. Original folds unchanged; official177 not evaluated. Legacy unsplit read disclosed in reports/p7/freeze-and-incident.json; no new P7 reads.",
+      "status": "достигнут",
+      "scope": "P8 official held-out measurement; frozen P7 product",
+      "note": "A3 1200 pairs: immutable train842/dev181/test177 document split; official177 now evaluated. Historical unsplit fixture-read incident and train-only guard retained; no claim test was never exposed.",
       "evidence": [
         {
-          "path": "spanverify-module/data/corpus_a3/manifest.json",
-          "url": "https://github.com/Igorr112323/Smarty_Chumakov/blob/arena/c5f69767-smarty-chumakov/spanverify-module/data/corpus_a3/manifest.json"
+          "path": "reports/p8/run39266451529/official/result.json",
+          "url": "https://github.com/Igorr112323/Smarty_Chumakov/blob/arena/c5f69767-smarty-chumakov/reports/p8/run39266451529/official/result.json"
         },
         {
-          "path": "spanverify-module/reports/experiments/p5_span_filter/run39170981235/manifest.json",
-          "url": "https://github.com/Igorr112323/Smarty_Chumakov/blob/arena/c5f69767-smarty-chumakov/spanverify-module/reports/experiments/p5_span_filter/run39170981235/manifest.json"
-        },
-        {
-          "path": "spanverify-module/reports/experiments/p5_span_filter/run39170981235/oof_validation.json",
-          "url": "https://github.com/Igorr112323/Smarty_Chumakov/blob/arena/c5f69767-smarty-chumakov/spanverify-module/reports/experiments/p5_span_filter/run39170981235/oof_validation.json"
+          "path": "reports/FINAL_REPORT.md",
+          "url": "https://github.com/Igorr112323/Smarty_Chumakov/blob/arena/c5f69767-smarty-chumakov/reports/FINAL_REPORT.md"
         }
       ],
-      "current_run": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39170981235"
+      "current_run": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39266451529"
     }
   ],
-  "p7_evidence_overlay": "reports/p7/contract-overlay.json"
+  "p7_evidence_overlay": "reports/p7/contract-overlay.json",
+  "run_id": "39266451529",
+  "date": "2026-10-19",
+  "tests_excluded": false,
+  "p8_official_metrics": {
+    "tokens": {
+      "precision": 0.5787878787878787,
+      "recall": 0.6797153024911032,
+      "f1": 0.6252045826513911,
+      "fpr": 0.015466785356626237,
+      "tp": 191,
+      "fp": 139,
+      "fn": 90,
+      "tn": 8848,
+      "auc": 0.971716560140052
+    },
+    "spans": {
+      "precision": 0.5529411764705883,
+      "recall": 0.4845360824742268,
+      "f1": 0.5164835164835164,
+      "tp": 47,
+      "fp": 38,
+      "fn": 50,
+      "iou_threshold": 0.5,
+      "recall_containment": 0.28865979381443296,
+      "mean_width_ratio": 1.3392624902023396
+    },
+    "answers": {
+      "tp": 51,
+      "fp": 15,
+      "fn": 46,
+      "tn": 65,
+      "precision": 0.7727272727272727,
+      "recall": 0.5257731958762887,
+      "f1": 0.6257668711656442,
+      "fpr": 0.1875,
+      "raw_auc": 0.6974226804123711,
+      "calibrated_auc": 0.6844072164948454,
+      "positive_predictions": 66,
+      "auc": 0.6844072164948454
+    },
+    "verdicts": {
+      "tp": 62,
+      "fp": 19,
+      "fn": 35,
+      "tn": 61,
+      "precision": 0.7654,
+      "recall": 0.6392,
+      "f1": 0.6966,
+      "fpr": 0.2375,
+      "flagged_share": 0.4576
+    }
+  },
+  "p8_joint_gate": true,
+  "current_indices": [
+    "reports/EXPERIMENTS_INDEX.md",
+    "reports/contract/coverage-matrix.json"
+  ],
+  "external_validation": {
+    "pairs": 1000,
+    "contract_gate": false,
+    "metrics": {
+      "tokens": {
+        "precision": 0.229607250755287,
+        "recall": 0.016853309679565363,
+        "f1": 0.031401714698894745,
+        "fpr": 0.026744978761340396,
+        "tp": 152,
+        "fp": 510,
+        "fn": 8867,
+        "tn": 18559,
+        "auc": 0.43746190000958873
+      },
+      "spans": {
+        "precision": 0.031914893617021274,
+        "recall": 0.014184397163120567,
+        "f1": 0.019639934533551555,
+        "tp": 6,
+        "fp": 182,
+        "fn": 417,
+        "iou_threshold": 0.5,
+        "recall_containment": 0.0,
+        "mean_width_ratio": 0.0
+      },
+      "answers": {
+        "tp": 203,
+        "fp": 271,
+        "fn": 130,
+        "tn": 396,
+        "precision": 0.4282700421940928,
+        "recall": 0.6096096096096096,
+        "f1": 0.5030978934324659,
+        "fpr": 0.4062968515742129,
+        "raw_auc": 0.6215045630337984,
+        "calibrated_auc": 0.616484550517534,
+        "positive_predictions": 474,
+        "auc": 0.616484550517534
+      },
+      "verdicts": {
+        "tp": 221,
+        "fp": 319,
+        "fn": 112,
+        "tn": 348,
+        "precision": 0.4093,
+        "recall": 0.6637,
+        "f1": 0.5063,
+        "fpr": 0.4783,
+        "flagged_share": 0.54
+      }
+    },
+    "evidence": "reports/p8/run39266451529/external/result.json",
+    "limitation": "423 human exact spans/333positive answers; one first-match ambiguity; raw license unconfirmed; severe transfer drop published"
+  },
+  "evidence_context": {
+    "run_id": "39266451529",
+    "date": "2026-10-19",
+    "status": "CURRENT authoritative requirements index",
+    "successor": "reports/EXPERIMENTS_INDEX.md"
+  }
 }

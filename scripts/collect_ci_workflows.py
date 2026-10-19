@@ -216,7 +216,7 @@ def main() -> int:
         "command": "python scripts/collect_ci_workflows.py",
         "source": ".github/workflows/*.yml + reports/CI_RUNS.json",
         "registry": {
-            "ci": "reports/METRICS.json, reports/contract/*.json",
+            "ci": "reports/CURRENT_METRICS.json, reports/contract/*.json",
             "build-and-release-exe": "reports/release_sizes.json (spanverify.exe, spanverify.pyz)",
             "hf-footprint": "reports/contract/4.2.5-hf-footprint.json, reports/contract/4.2.6-storage.json",
             "hf-pilot": "spanverify-module/reports/pilot/pilot.json",

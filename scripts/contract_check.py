@@ -2265,7 +2265,7 @@ def check_numbers_script(runner: Runner) -> tuple[str, dict[str, Any], str]:
             sys.executable,
             str(MODULE / "scripts" / "check_numbers.py"),
             "--metrics",
-            "reports/METRICS.json",
+            "reports/CURRENT_METRICS.json",
             "--numbers",
             str(ROOT / "reports" / "NUMBERS.json"),
         ],
@@ -2816,9 +2816,9 @@ PROJECT_TARGET_ROWS: tuple[dict[str, Any], ...] = (
         "norm": 600.0,
         "direction": "min",
         "unit": "",
-        "source": "spanverify-module/reports/METRICS.json (tests.collected)",
+        "source": "spanverify-module/reports/CURRENT_METRICS.json (tests.collected)",
         "value": lambda payload: (
-            _json_artifact("spanverify-module", "reports", "METRICS.json").get("tests")
+            _json_artifact("spanverify-module", "reports", "CURRENT_METRICS.json").get("tests")
             or {}
         ).get("collected"),
     },
@@ -2827,9 +2827,9 @@ PROJECT_TARGET_ROWS: tuple[dict[str, Any], ...] = (
         "norm": 90.0,
         "direction": "min",
         "unit": "%",
-        "source": "spanverify-module/reports/METRICS.json (tests.coverage_percent)",
+        "source": "spanverify-module/reports/CURRENT_METRICS.json (tests.coverage_percent)",
         "value": lambda payload: (
-            _json_artifact("spanverify-module", "reports", "METRICS.json").get("tests")
+            _json_artifact("spanverify-module", "reports", "CURRENT_METRICS.json").get("tests")
             or {}
         ).get("coverage_percent"),
     },
@@ -2993,7 +2993,7 @@ def _reproduction_block() -> list[str]:
         "",
         "# 3а. То же напрямую из модуля (если запускать из spanverify-module)",
         "python spanverify-module/scripts/check_numbers.py \\",
-        "    --metrics spanverify-module/reports/METRICS.json --reports-root .",
+        "    --metrics spanverify-module/reports/CURRENT_METRICS.json --reports-root .",
         "",
         "# 4. Тесты модуля, включая контрактные",
         "cd spanverify-module && python -m pytest -q",
@@ -3122,7 +3122,7 @@ def render_closing_doc(payload: dict[str, Any]) -> str:
     lines += [
         "",
         "Числа и материалы для этих пунктов готовит кодовая часть: метрики —",
-        "`spanverify-module/reports/METRICS.json`, таблица соответствия — этот документ",
+        "`spanverify-module/reports/CURRENT_METRICS.json`, таблица соответствия — этот документ",
         "и `docs/СООТВЕТСТВИЕ_ДОГОВОРУ.md`, приложение к отчёту —",
         "`docs/ОТЧЁТ_ПРИЛОЖЕНИЕ_СООТВЕТСТВИЕ.md`, инструкция по оригинальности —",
         "`docs/ПРОВЕРКА_ОРИГИНАЛЬНОСТИ.md`.",

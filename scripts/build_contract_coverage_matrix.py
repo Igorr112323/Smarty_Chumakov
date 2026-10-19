@@ -255,11 +255,32 @@ def main():
             known[update["id"]].update(update)
         payload["current_measurement_run"] = overlay["current_measurement_run"]
         payload["p7_evidence_overlay"] = str(overlay_path.relative_to(ROOT))
+    p8 = ROOT / "reports/p8/run39266451529/official/result.json"
+    if p8.exists():
+        official = json.loads(p8.read_text())
+        evidence_path = str(p8.relative_to(ROOT))
+        run_url = f"{URL}/actions/runs/39266451529"
+        known = {r["id"]: r for r in rows}
+        for id_, note in {
+            "quality_gate": "P8 official177 joint PASS: tokensF1 .6252045826513911, strict spansF1 .5164835164835164, token-FPR proxy .015466785356626237; internal .90/.10 NOT achieved.",
+            "official_test": "177/177 once through public Verifier; 7 over512/max1266, full long-v1; empty cache0hits177misses,381.292202784s, no fits. Zero-output infrastructure abort preserved, not a second quality chance.",
+            "control_sample": "A3 1200 pairs: immutable train842/dev181/test177 document split; official177 now evaluated. Historical unsplit fixture-read incident and train-only guard retained; no claim test was never exposed.",
+            "spans": "Official strict kept-spans+rules:47TP38FP50FN, IoU>=.5 unchanged, containment .2886597938, mean contained width1.33926249.",
+        }.items():
+            known[id_].update(status="достигнут" if official["joint_gate"] else "не достигнут",scope="P8 official held-out measurement; frozen P7 product",note=note,evidence=[dict(path=evidence_path,url=f"{URL}/blob/arena/c5f69767-smarty-chumakov/{evidence_path}"),dict(path="reports/FINAL_REPORT.md",url=f"{URL}/blob/arena/c5f69767-smarty-chumakov/reports/FINAL_REPORT.md")],current_run=run_url)
+        payload.update(run_id="39266451529",date="2026-10-19",current_measurement_run=run_url,official_test_evaluated=True,official_test_read_scope="P8 authorized final evaluation177; prior legacy read and zero-output infrastructure abort explicitly retained",tests_excluded=False,p8_official_metrics=official["metrics"],p8_joint_gate=official["joint_gate"],current_indices=["reports/EXPERIMENTS_INDEX.md","reports/contract/coverage-matrix.json"])
+        external = ROOT / "reports/p8/run39266451529/external/result.json"
+        if external.exists():
+            payload["external_validation"] = dict(pairs=1000,contract_gate=False,metrics=json.loads(external.read_text())["metrics"],evidence=str(external.relative_to(ROOT)),limitation="423 human exact spans/333positive answers; one first-match ambiguity; raw license unconfirmed; severe transfer drop published")
+        delivery = ROOT / "reports/p8/DELIVERY.json"
+        if delivery.exists():
+            payload["delivery"] = json.loads(delivery.read_text())
+        payload["evidence_context"] = dict(run_id="39266451529",date="2026-10-19",status="CURRENT authoritative requirements index",successor="reports/EXPERIMENTS_INDEX.md")
     out = ROOT / "reports/contract"
     (out / "coverage-matrix.json").write_text(
         json.dumps(payload, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
     )
-    text = "# Appendix3: evidence coverage matrix\n\nAs of 2026-10-19. **Overall: НЕ ДОСТИГНУТ.** Official test177 not evaluated; legacy read incident is disclosed.\n\nHistorical/demo artifacts are not current P5 HF acceptance. A dev gate cannot establish speed, delivery or the whole contract.\n\n| Requirement | Status | Scope / limitation | Real evidence |\n|---|---|---|---|\n"
+    text = "# Appendix3: evidence coverage matrix\n\nAs of 2026-10-19. **Overall: НЕ ДОСТИГНУТ.** Official test177 evaluated once in P8; joint quality gate PASS, overall contract remains NOT achieved; legacy read and infrastructure incident disclosed.\n\nHistorical/demo artifacts are not current P5 HF acceptance. A dev gate cannot establish speed, delivery or the whole contract.\n\n| Requirement | Status | Scope / limitation | Real evidence |\n|---|---|---|---|\n"
     for r in rows:
         links = "; ".join(f"[{e['path'].split('/')[-1]}]({e['url']})" for e in r["evidence"])
         text += f"| {r['requirement']} | {r['status']} | {r['note']} | {links} |\n"

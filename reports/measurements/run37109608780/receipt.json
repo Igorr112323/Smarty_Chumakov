@@ -1,0 +1,13 @@
+{
+  "run_id": "37109608780",
+  "date": "2026-10-03T08:24:45Z",
+  "commit": "dd21e39ca01c8109f43da081693148a301256ca0",
+  "family": "P0",
+  "workflow": "build-and-release-exe.yml",
+  "record_kind": "measurement/delivery",
+  "status": "completed",
+  "outcome": "failure",
+  "url": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/37109608780",
+  "canonical_directories": [],
+  "receipt": "reports/measurements/run37109608780/receipt.json"
+}

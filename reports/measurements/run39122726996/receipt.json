@@ -1,0 +1,13 @@
+{
+  "run_id": "39122726996",
+  "date": "2026-10-18T11:18:51Z",
+  "commit": "375e3a5d693be2340ea7116c44c892470f6a181f",
+  "family": "P1",
+  "workflow": "recover-p1-results.yml",
+  "record_kind": "publication/recovery",
+  "status": "completed",
+  "outcome": "failure",
+  "url": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39122726996",
+  "canonical_directories": [],
+  "receipt": "reports/measurements/run39122726996/receipt.json"
+}

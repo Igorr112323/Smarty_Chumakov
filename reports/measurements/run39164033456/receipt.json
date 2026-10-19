@@ -1,0 +1,15 @@
+{
+  "run_id": "39164033456",
+  "date": "2026-10-18T20:35:54Z",
+  "commit": "5c80e39e5d1915913dda231846ab26cccf8370b0",
+  "family": "P4",
+  "workflow": "p4-context-head.yml",
+  "record_kind": "measurement/delivery",
+  "status": "completed",
+  "outcome": "failure",
+  "url": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39164033456",
+  "canonical_directories": [
+    "spanverify-module/reports/experiments/p4_context_head/run39164033456"
+  ],
+  "receipt": "reports/measurements/run39164033456/receipt.json"
+}

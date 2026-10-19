@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Обновить ``reports/METRICS.json``, не потеряв чужих прогонов.
+"""Обновить ``reports/CURRENT_METRICS.json``, не потеряв чужих прогонов.
 
 Зачем отдельный шаг. ``scripts/collect_metrics.py`` собирает единый файл чисел из
 артефактов прогонов. После изменения кода (признаки, знаки, нормировка) числа
@@ -21,7 +21,7 @@
 Запуск::
 
     python scripts/refresh_metrics.py --dry-run     # показать, что изменится
-    python scripts/refresh_metrics.py               # обновить reports/METRICS.json
+    python scripts/refresh_metrics.py               # обновить reports/CURRENT_METRICS.json
 """
 
 from __future__ import annotations
@@ -36,7 +36,7 @@ from typing import Any
 
 ROOT = Path(__file__).resolve().parents[1]
 REPO = ROOT.parent
-METRICS = ROOT / "reports" / "METRICS.json"
+METRICS = ROOT / "reports" / "CURRENT_METRICS.json"
 
 #: Блоки, которые на локальной машине без весов модели и без артефактов CI
 #: пересобрать нельзя. Для них сохраняется прежнее значение.
@@ -123,7 +123,7 @@ def merge(old: dict, fresh: dict) -> tuple[dict, list[str], list[str]]:
 
 
 def main() -> int:
-    parser = argparse.ArgumentParser(description="Обновить reports/METRICS.json без потери чужих прогонов")
+    parser = argparse.ArgumentParser(description="Обновить reports/CURRENT_METRICS.json без потери чужих прогонов")
     parser.add_argument("--dry-run", action="store_true", help="показать различия и выйти")
     parser.add_argument("--out", default=str(METRICS))
     args = parser.parse_args()

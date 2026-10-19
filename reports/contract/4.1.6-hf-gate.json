@@ -62,5 +62,13 @@
     }
   },
   "note": "шлюз качества в режиме hf на корпусе A (шаблонные документы, 1200 пар); окно модели 512 (совпадает с config.hf_max_tokens в продукте); требуется прогон через CI с обновлённым извлечением признаков (чанкинг + BM25 отбор)",
-  "gate": null
+  "gate": null,
+  "evidence_context": {
+    "run_id": "37609202780",
+    "date": "2026-10-18",
+    "status": "NON_AUTHORITATIVE historical/reference; consult current indices",
+    "successor": "reports/EXPERIMENTS_INDEX.md",
+    "source_commit": "c6bb87a8a39a99d51b4e6d91fa68c338a57155e6",
+    "limitation": null
+  }
 }

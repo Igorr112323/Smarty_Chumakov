@@ -2,12 +2,13 @@ name: P7 final acceptance artifact publication
 on:
   push:
     branches: [arena/c5f69767-smarty-chumakov]
-    paths: [.github/p7-publication.trigger]
+    paths: [.github/p7-publication.trigger, .github/p8-publication.trigger]
 permissions:
   contents: read
   actions: read
 jobs:
   publish:
+    if: "!startsWith(github.event.head_commit.message, 'P8:')"
     runs-on: ubuntu-24.04
     timeout-minutes: 15
     env:
@@ -36,4 +37,39 @@ jobs:
           path: |
             .arena/p7-publication/p7-final-acceptance.zip
             .arena/p7-publication/p7-final-acceptance.zip.sha256
+          retention-days: 90
+  p8-final:
+    if: startsWith(github.event.head_commit.message, 'P8:')
+    runs-on: ubuntu-24.04
+    timeout-minutes: 40
+    permissions:
+      contents: write
+      actions: read
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: All final evidence and ordinary CI SUCCESS; product unchanged
+        id: validate
+        run: python scripts/p8_publish_acceptance.py --prepare
+      - uses: actions/download-artifact@v4
+        with:
+          name: spanverify-windows-x64
+          run-id: ${{ steps.validate.outputs.windows_run }}
+          github-token: ${{ github.token }}
+          path: .arena/p8-publication/windows
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: p8-*
+          run-id: 39266451529
+          github-token: ${{ github.token }}
+          path: .arena/p8-publication/evidence
+      - name: Package source, binary and original per-pair streams; upload final stable release asset
+        run: python scripts/p8_publish_acceptance.py
+      - uses: actions/upload-artifact@v4
+        with:
+          name: p8-final-acceptance-archive
+          path: .arena/p8-publication/p8-final-acceptance.zip*
           retention-days: 90

@@ -7,7 +7,7 @@
 
     python scripts/check_numbers.py
 
-Пути по умолчанию: ``spanverify-module/reports/METRICS.json`` и
+Пути по умолчанию: ``spanverify-module/reports/CURRENT_METRICS.json`` и
 ``reports/NUMBERS.json``. Любые дополнительные аргументы передаются модулю как
 есть (например ``--docs README.md``).
 """
@@ -31,7 +31,7 @@ def main() -> int:
         sys.executable,
         str(script),
         "--metrics",
-        str(MODULE / "reports" / "METRICS.json"),
+        str(MODULE / "reports" / "CURRENT_METRICS.json"),
         "--numbers",
         str(ROOT / "reports" / "NUMBERS.json"),
         *sys.argv[1:],

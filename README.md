@@ -4,13 +4,19 @@
 [![build-and-release-exe](https://github.com/Igorr112323/Smarty_Chumakov/actions/workflows/build-and-release-exe.yml/badge.svg)](https://github.com/Igorr112323/Smarty_Chumakov/actions/workflows/build-and-release-exe.yml)
 [![release](https://img.shields.io/github/v/release/Igorr112323/Smarty_Chumakov)](https://github.com/Igorr112323/Smarty_Chumakov/releases/latest)
 [![python](https://img.shields.io/badge/python-3.10%20%7C%203.11%20%7C%203.12-blue)](spanverify-module/pyproject.toml)
-[![tests](https://img.shields.io/badge/tests-606%20passed-brightgreen)](spanverify-module/tests)
-[![coverage](https://img.shields.io/badge/coverage-88%25-brightgreen)](spanverify-module/pyproject.toml)
+[![tests](https://img.shields.io/badge/tests-909%20collected-blue)](spanverify-module/tests)
+[![coverage](https://img.shields.io/badge/coverage-see_CI-blue)](spanverify-module/pyproject.toml)
 
 Программа берёт **документ-источник** и **ответ** (языковой модели или
 сотрудника) и показывает, какие места ответа документ не подтверждает: подмену
 числа, выдуманное утверждение, расхождение со сроком. Никаких внешних сервисов —
 всё считается локально.
+
+## P8 — финальное измерение
+
+[Итоговый отчёт](reports/FINAL_REPORT.md), [единственный индекс измерений](reports/EXPERIMENTS_INDEX.md), [текущая матрица требований](reports/contract/coverage-matrix.json).
+Официальные177: token F1 **0.6252**, strict span F1 **0.5165**, FPR proxy **0.0155** — совместный gate PASS. B1000: answers F1 **0.5031**, FPR **0.4063**, strict span F1 **0.0196** — перенос слабый, B не контрактный gate.
+HF50k ≤1с **НЕ достигнуто** (8.168с), AI-share частично/nonmonotone; весь договор НЕ объявлен выполненным. Small exe по умолчанию demo, подтверждённый frozen HF bundle/runtime поставляются отдельно, требуют model551.3MB + libraries870.6MB плюс Python. После test ни модель, ни tau не изменялись.
 
 ## Скачать и запустить (Windows)
 
@@ -36,7 +42,7 @@ python -m spanverify train --dataset data/demo_pairs.jsonl --out config/weights.
 python -m spanverify evaluate --dataset data/demo_pairs.jsonl   # метрики и критерий качества
 python -m spanverify selftest                                   # само-проверка конвейера
 python -m spanverify server --port 8835                         # API + веб-интерфейс
-python -m pytest -q                                             # 895 тестов
+python -m pytest -q                                             # 909 тестов
 ```
 
 Коды возврата `verify`: `0` — ответ подтверждён, `1` — найдены спорные
@@ -68,7 +74,7 @@ curl -X POST http://localhost:8835/v1/verify -H "Content-Type: application/json"
 * **Качество фрагментов показано с двух сторон**: строгий F1 по узкой разметке
   0.283 (весь корпус — 0.315; конвейер расширяет найденный токен до границы
   предложения, ширина ×24) и полнота накрытия 1.000. Актуальные числа — в
-  `spanverify-module/reports/METRICS.json` (единый файл чисел, сверяется в CI).
+  `spanverify-module/reports/CURRENT_METRICS.json` (единый файл чисел, сверяется в CI).
 * Пилот на малой модели `ruGPT3-small` (CPU, 24 контрастные пары на синтетических промтах) показал
   **отрицательный результат**: признаки внимания не отличают подставленное число
   от правильного. Числа из аннотаций CI прогона `37118455503` (job «Пилот», после

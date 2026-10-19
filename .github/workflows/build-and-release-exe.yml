@@ -503,10 +503,13 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         working-directory: spanverify-module/release
         run: |
-          $tag = "v1.3.1-rc.p7.${{ github.run_id }}"
-          $notes = "P7 RC only; code ${{ github.sha }}. No stable acceptance or official test177 claim. Default executable is demo; frozen P5 HF bundle/runtime supplied separately. HF requires external model weights (~530 MB) and compatible libraries (~500 MB); not part of the small executable. See reports/acceptance."
+          $quality = Get-Content ../../reports/p8/run39266451529/official/result.json -Raw | ConvertFrom-Json
+          $pass = ($quality.joint_gate -eq $true) -and ($quality.metrics.tokens.f1 -ge 0.5) -and ($quality.metrics.spans.f1 -ge 0.5) -and ($quality.metrics.tokens.fpr -le 0.4)
+          $tag = if ($pass) { "p8-final-20261019" } else { "v1.3.1-rc.p8.${{ github.run_id }}" }
+          $flags = if ($pass) { @("--latest=true") } else { @("--prerelease", "--latest=false") }
           gh release create $tag spanverify.exe spanverify-win.zip spanverify.pyz frozen-p5.json p5-runtime.json SHA256SUMS.txt `
-            --repo "${{ github.repository }}" --target "${{ github.sha }}" --title "SpanVerify P7 RC" `
-            --notes $notes --prerelease --latest=false
-          if ($LASTEXITCODE -ne 0) { throw "RC publication failed" }
+            --repo "${{ github.repository }}" --target "${{ github.sha }}" --title "SpanVerify 1.3.1 — P8 final evaluation" `
+            --notes-file ../../reports/p8/RELEASE_NOTES.md @flags
+          if ($LASTEXITCODE -ne 0) { throw "P8 conditional publication failed" }
+          python ../../scripts/p8_emit_receipt.py . p8-windows ${{ github.run_id }}
           gh release view $tag --repo "${{ github.repository }}" --json url,assets

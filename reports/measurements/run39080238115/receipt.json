@@ -1,0 +1,15 @@
+{
+  "run_id": "39080238115",
+  "date": "2026-10-17T23:45:34Z",
+  "commit": "c2a958d25c8767edd380f7149912346a357f2f32",
+  "family": "P0",
+  "workflow": "postprocess-p0-answer.yml",
+  "record_kind": "measurement/delivery",
+  "status": "completed",
+  "outcome": "success",
+  "url": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39080238115",
+  "canonical_directories": [
+    "spanverify-module/reports/experiments/p0_answer/run39080238115"
+  ],
+  "receipt": "reports/measurements/run39080238115/receipt.json"
+}

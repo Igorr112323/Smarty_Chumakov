@@ -1,0 +1,13 @@
+{
+  "run_id": "39217828002",
+  "date": "2026-10-19T07:43:30Z",
+  "commit": "36cfac92ecf0ce2a5afae44f0d00d47a8cfabc47",
+  "family": "P7",
+  "workflow": "p7-acceptance.yml",
+  "record_kind": "measurement/delivery",
+  "status": "completed",
+  "outcome": "failure",
+  "url": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39217828002",
+  "canonical_directories": [],
+  "receipt": "reports/measurements/run39217828002/receipt.json"
+}

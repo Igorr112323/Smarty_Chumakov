@@ -1,11 +1,11 @@
 {
   "kind": "ci_workflows",
   "runs_considered": 100,
-  "generated_at": "2026-10-19T10:43:20Z",
+  "generated_at": "2026-10-19T14:38:07Z",
   "command": "python scripts/collect_ci_workflows.py",
   "source": ".github/workflows/*.yml + reports/CI_RUNS.json",
   "registry": {
-    "ci": "reports/METRICS.json, reports/contract/*.json",
+    "ci": "reports/CURRENT_METRICS.json, reports/contract/*.json",
     "build-and-release-exe": "reports/release_sizes.json (spanverify.exe, spanverify.pyz)",
     "hf-footprint": "reports/contract/4.2.5-hf-footprint.json, reports/contract/4.2.6-storage.json",
     "hf-pilot": "spanverify-module/reports/pilot/pilot.json",
@@ -68,6 +68,13 @@
       ],
       "push_tags": [],
       "jobs": [
+        {
+          "name": "P8 no-fit barrier until official177 is sealed",
+          "timeout_minutes": 40,
+          "steps": 1,
+          "uploads_artifacts": false,
+          "runs_python": "ubuntu-latest"
+        },
         {
           "name": "Линтер, форматирование, покрытие",
           "timeout_minutes": 40,
@@ -783,7 +790,8 @@
       ],
       "schedule": [],
       "push_paths": [
-        ".github/p7-publication.trigger"
+        ".github/p7-publication.trigger",
+        ".github/p8-publication.trigger"
       ],
       "push_branches": [
         "arena/c5f69767-smarty-chumakov"
@@ -795,6 +803,80 @@
           "timeout_minutes": 15,
           "steps": 6,
           "uploads_artifacts": true,
+          "runs_python": "ubuntu-24.04"
+        },
+        {
+          "name": "p8-final",
+          "timeout_minutes": 40,
+          "steps": 6,
+          "uploads_artifacts": true,
+          "runs_python": "ubuntu-24.04"
+        }
+      ],
+      "manual_only": false,
+      "never_runs_by_itself": false
+    },
+    {
+      "file": ".github/workflows/p8-final-evaluation.yml",
+      "name": "P8 single official test and external validation",
+      "triggers": [
+        "workflow_dispatch",
+        "push"
+      ],
+      "schedule": [],
+      "push_paths": [
+        ".github/p8-evaluation.trigger"
+      ],
+      "push_branches": [
+        "arena/c5f69767-smarty-chumakov"
+      ],
+      "push_tags": [],
+      "jobs": [
+        {
+          "name": "official",
+          "timeout_minutes": 40,
+          "steps": 9,
+          "uploads_artifacts": true,
+          "runs_python": "ubuntu-24.04"
+        },
+        {
+          "name": "external",
+          "timeout_minutes": 40,
+          "steps": 6,
+          "uploads_artifacts": true,
+          "runs_python": "ubuntu-24.04"
+        },
+        {
+          "name": "external-aggregate",
+          "timeout_minutes": 20,
+          "steps": 5,
+          "uploads_artifacts": true,
+          "runs_python": "ubuntu-24.04"
+        }
+      ],
+      "manual_only": true,
+      "never_runs_by_itself": false
+    },
+    {
+      "file": ".github/workflows/p8-receipts.yml",
+      "name": "P8 evidence receipts only, no inference",
+      "triggers": [
+        "push"
+      ],
+      "schedule": [],
+      "push_paths": [
+        ".github/p8-receipts.trigger"
+      ],
+      "push_branches": [
+        "arena/c5f69767-smarty-chumakov"
+      ],
+      "push_tags": [],
+      "jobs": [
+        {
+          "name": "receipt",
+          "timeout_minutes": 40,
+          "steps": 4,
+          "uploads_artifacts": false,
           "runs_python": "ubuntu-24.04"
         }
       ],

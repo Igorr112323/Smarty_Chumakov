@@ -1,0 +1,13 @@
+{
+  "run_id": "37649798240",
+  "date": "2026-10-07T16:09:12Z",
+  "commit": "b4ffdc05a4508b3ab47b52ba03d3f5a54edf4dd5",
+  "family": "P0",
+  "workflow": "hf-span-filter.yml",
+  "record_kind": "measurement/delivery",
+  "status": "completed",
+  "outcome": "success",
+  "url": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/37649798240",
+  "canonical_directories": [],
+  "receipt": "reports/measurements/run37649798240/receipt.json"
+}

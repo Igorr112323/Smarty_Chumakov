@@ -1,0 +1,13 @@
+{
+  "run_id": "39090910326",
+  "date": "2026-10-18T02:40:10Z",
+  "commit": "d083e43b614fc0d53fbbd68ea72230608572c9cd",
+  "family": "P0",
+  "workflow": "postprocess-p0-answer.yml",
+  "record_kind": "measurement/delivery",
+  "status": "completed",
+  "outcome": "failure",
+  "url": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39090910326",
+  "canonical_directories": [],
+  "receipt": "reports/measurements/run39090910326/receipt.json"
+}

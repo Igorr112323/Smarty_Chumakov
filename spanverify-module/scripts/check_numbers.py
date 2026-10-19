@@ -1,4 +1,4 @@
-"""Проверка: числа в документах совпадают с ``reports/METRICS.json``.
+"""Проверка: числа в документах совпадают с ``reports/CURRENT_METRICS.json``.
 
 Причина появления скрипта: в аудите нашлись расхождения (AUC 0.996 против 0.9978,
 «690 токенов» против фактических 546, «207 тестов» против 210, «покрытие 87 %»
@@ -16,7 +16,7 @@
 
 Запуск (CI и локально)::
 
-    python scripts/check_numbers.py --metrics reports/METRICS.json
+    python scripts/check_numbers.py --metrics reports/CURRENT_METRICS.json
 """
 
 from __future__ import annotations
@@ -29,7 +29,7 @@ from pathlib import Path
 
 # Журналы: хранят исторические числа своих прогонов (333 теста, версии 1.2.0/1.2.1,
 # AUC прошлых замеров) — сверять их с текущим METRICS.json нельзя. Требование к
-# ним одно: явная ссылка на reports/METRICS.json как источник актуальных чисел.
+# ним одно: явная ссылка на reports/CURRENT_METRICS.json как источник актуальных чисел.
 HISTORY_DOCS = {
     "PROGRESS.md",
     "AUDIT.md",
@@ -68,7 +68,7 @@ DEFAULT_DOCS = (
     "docs/ОТЧЁТ_ПРИЛОЖЕНИЕ_СООТВЕТСТВИЕ.md",
     "docs/ПРОВЕРКА_ОРИГИНАЛЬНОСТИ.md",
     # Отчёты прогонов: текущие числа проверяются (CORPUS_A3), журналы прошлых
-    # прогонов обязаны ссылаться на reports/METRICS.json (см. HISTORY_DOCS).
+    # прогонов обязаны ссылаться на reports/CURRENT_METRICS.json (см. HISTORY_DOCS).
     "spanverify-module/reports/CORPUS_A3.md",
     "spanverify-module/reports/README.md",
     "spanverify-module/reports/TODO_AUDIT.md",
@@ -84,7 +84,7 @@ REQUIRED_IN_ITOG = (
 )
 REQUIRED_IN_README = (
     ("синтетическ", "оговорка о синтетическом корпусе"),
-    ("METRICS.json", "ссылка на единый файл чисел"),
+    ("CURRENT_METRICS.json", "ссылка на единый файл чисел"),
 )
 
 NUMBER_PATTERNS = (
@@ -452,10 +452,10 @@ def check_docs(
             continue
         if path.name in HISTORY_DOCS:
             # Это журналы: они хранят исторические числа и обязательно указывают,
-            # что актуальные значения — в reports/METRICS.json.
+            # что актуальные значения — в reports/CURRENT_METRICS.json.
             text = path.read_text(encoding="utf-8")
-            if "METRICS.json" not in text:
-                problems.append(f"{path}: нет ссылки на reports/METRICS.json (актуальные числа)")
+            if "CURRENT_METRICS.json" not in text:
+                problems.append(f"{path}: нет ссылки на reports/CURRENT_METRICS.json (актуальные числа)")
             continue
         for number, line in enumerate(path.read_text(encoding="utf-8").splitlines(), start=1):
             for pattern, kind in NUMBER_PATTERNS:
@@ -497,7 +497,7 @@ def check_docs(
 
 def main() -> int:
     parser = argparse.ArgumentParser(description="Сверить числа в документах с METRICS.json")
-    parser.add_argument("--metrics", default="reports/METRICS.json")
+    parser.add_argument("--metrics", default="reports/CURRENT_METRICS.json")
     parser.add_argument("--numbers", default=NUMBERS_PATH, help="реестр чисел reports/NUMBERS.json")
     parser.add_argument("--docs", nargs="*", default=None, help="переопределить список документов")
     args = parser.parse_args()

@@ -1,0 +1,16 @@
+{
+  "run_id": "39060670054",
+  "date": "2026-10-17T19:01:48Z",
+  "commit": "14ea3a0792e0ca9502d9b78870dd2caf874f1163",
+  "family": "P0",
+  "workflow": "hf-experiments.yml",
+  "record_kind": "measurement/delivery",
+  "status": "completed",
+  "outcome": "failure",
+  "url": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39060670054",
+  "canonical_directories": [
+    "spanverify-module/reports/experiments/p0_answer/run39060670054",
+    "spanverify-module/reports/experiments/p0_span/run39060670054"
+  ],
+  "receipt": "reports/measurements/run39060670054/receipt.json"
+}

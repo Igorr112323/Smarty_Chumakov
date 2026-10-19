@@ -1,9 +1,13 @@
 {
+  "_status": "SUPERSEDED / historical baseline before P1–P5",
+  "run_id": "37609202780",
+  "date": "2026-10-14",
+  "successor": "reports/EXPERIMENTS_INDEX.md",
+  "canonical_current_matrix": "reports/contract/coverage-matrix.json",
   "dataset": "data/corpus_a3/pairs.jsonl",
   "mode": "hf",
   "model": "ai-forever/rugpt3small_based_on_gpt2",
   "seed": 42,
-  "run_id": "37609202780",
   "git_commit": "39a0ad4858f7278335b9f0ef94bc405485a78b4a",
   "duration_s": 463.68,
   "corpus": {
@@ -556,5 +560,14 @@
   "artifacts": {
     "weights": "reports/experiments/a3/weights.json",
     "head": "reports/experiments/a3/config/head.json"
-  }
+  },
+  "evidence_context": {
+    "run_id": "37609202780",
+    "date": "2026-10-14",
+    "status": "NON_AUTHORITATIVE historical/reference; consult current indices",
+    "successor": "reports/EXPERIMENTS_INDEX.md",
+    "source_commit": "fc438ea7069b4a3c8ad78097f4c29df1767937ec",
+    "limitation": null
+  },
+  "source_date": "2026-10-07T10:42:44Z"
 }

@@ -1,0 +1,2552 @@
+{
+  "_status": "SUPERSEDED / historical baseline before P1–P5",
+  "run_id": "historical-2026-10-14",
+  "date": "2026-10-14",
+  "successor": "reports/EXPERIMENTS_INDEX.md",
+  "canonical_current_matrix": "reports/contract/coverage-matrix.json",
+  "commands": {
+    "train": "python -m spanverify train --dataset data/demo_pairs.jsonl --out config/weights.json --seed 42",
+    "evaluate": "python -m spanverify evaluate --dataset data/demo_pairs.jsonl",
+    "cross_corpus": "python scripts/cross_corpus.py --out reports/cross_corpus.json",
+    "tests": "python -m pytest -q",
+    "coverage": "python -m pytest --cov=spanverify --cov-fail-under=85"
+  },
+  "meta": {
+    "version": "1.3.1",
+    "commit": "50c6d586611fb7257b810d5f33627c02ac004632",
+    "generated_at": "2026-10-14T14:02:18Z",
+    "seed": 42,
+    "dataset": "data/demo_pairs.jsonl",
+    "refresh": {
+      "at": "2026-10-14T14:02:21Z",
+      "head_commit": "50c6d586611fb7257b810d5f33627c02ac004632",
+      "worktree": "clean",
+      "preserved_from_commit": "76bc22f3c5ae9cb1653d5c67b7b6d4c1597d3ccc",
+      "preserved_blocks": [
+        "pilot"
+      ],
+      "refreshed_blocks": [
+        "duration_s"
+      ],
+      "rule": "блоки пересобраны из артефактов прогонов; блоки, артефактов которых нет на этой машине, сохранены из прежнего файла и перечислены в preserved_blocks"
+    }
+  },
+  "disclaimer": "Демонстрационные метрики получены на синтетическом корпусе и научным результатом не являются. Для подтверждения требуются 1200 пар «вопрос–ответ» с экспертной разметкой на реальных регламентах организации.",
+  "tests": {
+    "collected": 895,
+    "coverage_percent": 87.82,
+    "coverage_gate_percent": 85,
+    "inventory_note": "P7 collection; actual pass/fail/coverage require current JUnit and CI."
+  },
+  "demo": {
+    "split": {
+      "grouped": true,
+      "train_pairs": 168,
+      "test_pairs": 72,
+      "shared_groups": 0
+    },
+    "in_corpus": {
+      "tokens": {
+        "precision": 0.9912,
+        "recall": 0.9262,
+        "f1": 0.9576,
+        "fpr": 0.0021,
+        "auc": 0.9979,
+        "n": 594
+      },
+      "spans": {
+        "strict_f1": 0.2796,
+        "coverage": 0.9783,
+        "soft_f1": 0.7957,
+        "width_ratio": 17.43
+      },
+      "answers": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "fpr": 0.0,
+        "auc": 1.0,
+        "threshold": 1.0
+      },
+      "verdicts": {
+        "tp": 46,
+        "fp": 0,
+        "fn": 0,
+        "tn": 26,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "fpr": 0.0
+      }
+    },
+    "validation": {
+      "precision": 0.9912,
+      "recall": 0.9262,
+      "f1": 0.9576,
+      "fpr": 0.0021,
+      "auc": 0.9962,
+      "signal": "logreg"
+    },
+    "bundle": {
+      "threshold": 1.0,
+      "weights": {
+        "attention_entropy": 0.2,
+        "ctx_attention_mass": 0.0,
+        "ctx_attention_mass_norm": 0.4,
+        "ctx_max_similarity": 0.1,
+        "embedding_density": 0.30000000000000004
+      },
+      "span_z": 0.0,
+      "span_floor": 0.3,
+      "span_cap": 0.5
+    },
+    "participation": {
+      "auc_out_of_fold": 1.0,
+      "calibrated_on": "synthetic-participation-corpus 1.0 (два стиля, доля смеси известна)",
+      "rows": 8179,
+      "features": [
+        "attention_entropy",
+        "ctx_attention_mass",
+        "embedding_density",
+        "cliche_rate",
+        "len_norm"
+      ]
+    },
+    "whole_corpus": {
+      "tokens": {
+        "precision": 0.976,
+        "recall": 0.9339,
+        "f1": 0.9545,
+        "fpr": 0.0048,
+        "auc": 0.9973,
+        "n": 2001
+      },
+      "spans": {
+        "strict_f1": 0.3071,
+        "coverage": 0.9516,
+        "soft_f1": 0.8031,
+        "width_ratio": 18.84
+      },
+      "answers": {
+        "precision": 1.0,
+        "recall": 0.9919,
+        "f1": 0.996,
+        "fpr": 0.0,
+        "auc": 0.996,
+        "threshold": 1.0
+      },
+      "verdicts": {
+        "tp": 123,
+        "fp": 0,
+        "fn": 1,
+        "tn": 116,
+        "precision": 1.0,
+        "recall": 0.9919,
+        "f1": 0.996,
+        "fpr": 0.0
+      }
+    },
+    "demo_answer_example": {
+      "answer": "Срок хранения первичных документов составляет 5 лет.",
+      "context": "Регламент: срок хранения первичных документов составляет 10 лет.",
+      "verdict": "likely_hallucination"
+    }
+  },
+  "defects": {
+    "number_attribution": {
+      "borrowed_number_verdict": "doubtful",
+      "borrowed_number_spans": [
+        "Срок хранения первичных документов составляет десять лет."
+      ],
+      "own_number_verdict": "grounded",
+      "clean_pairs": 116,
+      "false_positives": 0,
+      "false_positive_ids": [],
+      "rule": "число ответа сверяется с измерениями того же объекта документа; если оно взято у другого объекта — фрагмент doubtful независимо от головы"
+    },
+    "dataset_validation": {
+      "schema_required": [
+        "context",
+        "answer"
+      ],
+      "schema_optional": [
+        "id",
+        "labels",
+        "meta"
+      ],
+      "checks": {
+        "foreign": {
+          "rejected": true,
+          "returncode": 2
+        },
+        "empty": {
+          "rejected": true,
+          "returncode": 2
+        },
+        "broken_json": {
+          "rejected": true,
+          "returncode": 2
+        },
+        "valid": {
+          "rejected": false,
+          "returncode": 0
+        }
+      }
+    }
+  },
+  "corpus_a": {
+    "available": true,
+    "label": "corpus_a1_synthetic",
+    "note": "синтетические шаблоны для отладки; числа не складывать с corpus_a3_real",
+    "dataset_version": "corpus-a1.0",
+    "pairs": 1200,
+    "balance": {
+      "counts": {
+        "faithful": 566,
+        "contradiction": 148,
+        "partial": 129,
+        "number_attribution": 93,
+        "unconfirmed": 83,
+        "missing": 57,
+        "oversight": 59,
+        "excess": 65
+      },
+      "clean": 566,
+      "clean_share": 0.4717,
+      "min_per_mode": 40,
+      "problems": []
+    },
+    "splits": {
+      "train": 840,
+      "dev": 180,
+      "test": 180
+    },
+    "shared_groups": 0,
+    "spans_checked": 634,
+    "sha256_pairs": "734c89159f4a828d63e2d99a27fcac830bf435f8a5bf822ff5f6819cf09e6c6e",
+    "documents": {
+      "count": 60,
+      "synthetic": true
+    },
+    "by_split": {
+      "dev": {
+        "tokens": {
+          "precision": 1.0,
+          "recall": 0.5465,
+          "f1": 0.7068,
+          "fpr": 0.0,
+          "auc": 0.9238,
+          "n": 1900
+        },
+        "spans": {
+          "strict_f1": 0.6763,
+          "coverage": 0.5109,
+          "soft_f1": 0.2014,
+          "width_ratio": 1.06
+        },
+        "answers": {
+          "precision": 1.0,
+          "recall": 0.4022,
+          "f1": 0.5736,
+          "fpr": 0.0,
+          "auc": 0.7011,
+          "threshold": 1.0
+        },
+        "verdicts": {
+          "tp": 45,
+          "fp": 0,
+          "fn": 47,
+          "tn": 88,
+          "precision": 1.0,
+          "recall": 0.4891,
+          "f1": 0.6569,
+          "fpr": 0.0
+        }
+      },
+      "test": {
+        "tokens": {
+          "precision": 1.0,
+          "recall": 0.5795,
+          "f1": 0.7338,
+          "fpr": 0.0,
+          "auc": 0.935,
+          "n": 1868
+        },
+        "spans": {
+          "strict_f1": 0.7778,
+          "coverage": 0.6364,
+          "soft_f1": 0.1235,
+          "width_ratio": 1.09
+        },
+        "answers": {
+          "precision": 1.0,
+          "recall": 0.4343,
+          "f1": 0.6056,
+          "fpr": 0.0,
+          "auc": 0.7172,
+          "threshold": 1.0
+        },
+        "verdicts": {
+          "tp": 57,
+          "fp": 0,
+          "fn": 42,
+          "tn": 81,
+          "precision": 1.0,
+          "recall": 0.5758,
+          "f1": 0.7308,
+          "fpr": 0.0
+        }
+      }
+    },
+    "by_mode": {
+      "contradiction": {
+        "pairs": 26,
+        "verdict_recall": 0.5769,
+        "verdict_fpr": 0.0,
+        "token_f1": 0.6269,
+        "span_coverage": 0.8077
+      },
+      "excess": {
+        "pairs": 14,
+        "verdict_recall": 1.0,
+        "verdict_fpr": 0.0,
+        "token_f1": 0.979,
+        "span_coverage": 1.0
+      },
+      "faithful": {
+        "pairs": 81,
+        "verdict_recall": 0.0,
+        "verdict_fpr": 0.0,
+        "token_f1": 0.0,
+        "span_coverage": 0.0
+      },
+      "missing": {
+        "pairs": 10,
+        "verdict_recall": 0.0,
+        "verdict_fpr": 0.0,
+        "token_f1": 0.0,
+        "span_coverage": 0.0
+      },
+      "number_attribution": {
+        "pairs": 13,
+        "verdict_recall": 0.5385,
+        "verdict_fpr": 0.0,
+        "token_f1": 0.0,
+        "span_coverage": 0.5385
+      },
+      "oversight": {
+        "pairs": 11,
+        "verdict_recall": 1.0,
+        "verdict_fpr": 0.0,
+        "token_f1": 0.8,
+        "span_coverage": 1.0
+      },
+      "partial": {
+        "pairs": 15,
+        "verdict_recall": 0.0,
+        "verdict_fpr": 0.0,
+        "token_f1": 0.0,
+        "span_coverage": 0.0
+      },
+      "unconfirmed": {
+        "pairs": 10,
+        "verdict_recall": 1.0,
+        "verdict_fpr": 0.0,
+        "token_f1": 0.9302,
+        "span_coverage": 1.0
+      }
+    }
+  },
+  "corpus_a3_real": {
+    "available": true,
+    "dataset_version": "corpus-a3.0",
+    "real_documents": true,
+    "pairs": 1200,
+    "target": 1200,
+    "balance": {
+      "counts": {
+        "faithful": 540,
+        "contradiction": 144,
+        "partial": 108,
+        "number_attribution": 132,
+        "unconfirmed": 84,
+        "missing": 72,
+        "oversight": 60,
+        "excess": 60
+      },
+      "clean": 540,
+      "clean_share": 0.45,
+      "min_per_mode": 40,
+      "problems": []
+    },
+    "splits": {
+      "train": 842,
+      "dev": 181,
+      "test": 177
+    },
+    "shared_groups": 0,
+    "documents": {
+      "count": 409,
+      "synthetic": false,
+      "by_type": {
+        "Положение": 7,
+        "Федеральный закон": 26,
+        "Указ": 24,
+        "Распоряжение": 21,
+        "Приказ": 77,
+        "Постановление": 110,
+        "Закон": 7,
+        "метаданные не перенесены": 137
+      },
+      "by_theme": {
+        "прочее": 149,
+        "сроки хранения документов": 101,
+        "защита информации": 3,
+        "персональные данные": 5,
+        "кадровый учёт": 11,
+        "охрана труда": 3,
+        "не указано": 137
+      },
+      "extraction": "publication.pravo.gov.ru: отбор по /api/Documents (по видам актов и по региональным разделам block=region<код>), текст — распознавание скана (pdftoppm + tesseract -l rus)"
+    },
+    "sources": [
+      {
+        "host": "publication.pravo.gov.ru",
+        "documents_downloaded": 272,
+        "documents_with_text": 272,
+        "robots_status": null,
+        "robots_error": null,
+        "robots_disallow": []
+      },
+      {
+        "host": "локальный корпус рабочей ветки (АктыРеальны)",
+        "documents_downloaded": 0,
+        "documents_with_text": 137,
+        "note": "тексты уже были в рабочей ветке, в этом заходе не скачивались; дубли по SHA256 отброшены"
+      }
+    ],
+    "checks": {
+      "spans_checked": 660,
+      "spans_problems": 0,
+      "contexts_checked": 1200,
+      "contexts_problems": 0,
+      "number_attribution_checked": 132,
+      "number_attribution_problems": 0,
+      "plan_problems": 0
+    },
+    "sha256_pairs": "b9a4cf05a9078644dd539470481a1b8079aed2d9201e195c3ecd901276ff7c8e",
+    "by_split": {
+      "dev": {
+        "tokens": {
+          "precision": 0.8644,
+          "recall": 0.7108,
+          "f1": 0.7801,
+          "fpr": 0.0042,
+          "auc": 0.8933,
+          "n": 7969
+        },
+        "spans": {
+          "strict_f1": 0.5213,
+          "coverage": 0.6979,
+          "soft_f1": 0.266,
+          "width_ratio": 9.18
+        },
+        "answers": {
+          "precision": 0.9756,
+          "recall": 0.4167,
+          "f1": 0.5839,
+          "fpr": 0.0118,
+          "auc": 0.7025,
+          "threshold": 1.0
+        },
+        "verdicts": {
+          "tp": 62,
+          "fp": 6,
+          "fn": 34,
+          "tn": 79,
+          "precision": 0.9118,
+          "recall": 0.6458,
+          "f1": 0.7561,
+          "fpr": 0.0706
+        }
+      },
+      "test": {
+        "tokens": {
+          "precision": 0.8619,
+          "recall": 0.7331,
+          "f1": 0.7923,
+          "fpr": 0.0037,
+          "auc": 0.9049,
+          "n": 9268
+        },
+        "spans": {
+          "strict_f1": 0.4422,
+          "coverage": 0.701,
+          "soft_f1": 0.201,
+          "width_ratio": 14.56
+        },
+        "answers": {
+          "precision": 0.973,
+          "recall": 0.3711,
+          "f1": 0.5373,
+          "fpr": 0.0125,
+          "auc": 0.6793,
+          "threshold": 1.0
+        },
+        "verdicts": {
+          "tp": 58,
+          "fp": 6,
+          "fn": 39,
+          "tn": 74,
+          "precision": 0.9062,
+          "recall": 0.5979,
+          "f1": 0.7205,
+          "fpr": 0.075
+        }
+      }
+    },
+    "by_mode": {
+      "contradiction": {
+        "pairs": 18,
+        "verdict_recall": 0.7222,
+        "verdict_fpr": 0.0,
+        "token_f1": 0.9,
+        "span_coverage": 0.9444
+      },
+      "excess": {
+        "pairs": 9,
+        "verdict_recall": 1.0,
+        "verdict_fpr": 0.0,
+        "token_f1": 0.9167,
+        "span_coverage": 0.0
+      },
+      "faithful": {
+        "pairs": 80,
+        "verdict_recall": 0.0,
+        "verdict_fpr": 0.075,
+        "token_f1": 0.0,
+        "span_coverage": 0.0
+      },
+      "missing": {
+        "pairs": 10,
+        "verdict_recall": 0.4,
+        "verdict_fpr": 0.0,
+        "token_f1": 0.6667,
+        "span_coverage": 1.0
+      },
+      "number_attribution": {
+        "pairs": 27,
+        "verdict_recall": 0.3333,
+        "verdict_fpr": 0.0,
+        "token_f1": 0.6667,
+        "span_coverage": 0.6667
+      },
+      "oversight": {
+        "pairs": 13,
+        "verdict_recall": 1.0,
+        "verdict_fpr": 0.0,
+        "token_f1": 0.9278,
+        "span_coverage": 1.0
+      },
+      "partial": {
+        "pairs": 10,
+        "verdict_recall": 0.0,
+        "verdict_fpr": 0.0,
+        "token_f1": 0.0,
+        "span_coverage": 0.0
+      },
+      "unconfirmed": {
+        "pairs": 10,
+        "verdict_recall": 1.0,
+        "verdict_fpr": 0.0,
+        "token_f1": 1.0,
+        "span_coverage": 1.0
+      }
+    }
+  },
+  "corpus_b": {
+    "available": true,
+    "dataset": "RusHallu-RAG (SberQuAD-RAG + ruSciBench-RAG)",
+    "citation": "Sadkovskii F., Nasyrova R., Sorokin A. RusHallu-RAG: бенчмарк обнаружения галлюцинаций RAG (Диалог-2026, DOI 10.29003/2075-7182-2026-24-516-534)",
+    "mode": "demo",
+    "pairs": 1000,
+    "our_metrics": {
+      "tokens": {
+        "precision": 0.3611,
+        "recall": 0.0769,
+        "f1": 0.1269,
+        "fpr": 0.0644,
+        "auc": 0.5293
+      },
+      "spans": {
+        "strict_f1_iou_0_5": 0.0902,
+        "coverage": 0.0993,
+        "soft_f1_expanded": 0.0676,
+        "mean_width_ratio": 2.29
+      },
+      "answers": {
+        "precision": 0.3977,
+        "recall": 0.2042,
+        "f1": 0.2698,
+        "fpr": 0.1544,
+        "auc": 0.5249
+      }
+    },
+    "their_metrics": {
+      "rouge1": 0.4861,
+      "rouge2": 0.4609,
+      "rougeL": 0.4679,
+      "accuracy": 0.372,
+      "jaccard_score": 0.373,
+      "hamming_loss": 0.3205,
+      "empty_reference": 667,
+      "pairs": 1000
+    },
+    "baseline_comparison": {
+      "article_url": "https://dialogue-conf.org/wp-content/uploads/2026/06/SadkovskiiFNasyrovaRSorokinA.087.pdf",
+      "article_bytes": 944040,
+      "tables": {
+        "2": {
+          "source_note": "данные из статьи, таблица 2",
+          "rows": [
+            {
+              "metric": "precision",
+              "line": "Table 2: Total benchmark binary metrics. P=Precision, R=Recall, SR=Success Rate",
+              "numbers": [
+                "2"
+              ]
+            },
+            {
+              "metric": "accuracy",
+              "line": "multi-label type classification, and span identification. Results are sorted by the accuracy metric. All",
+              "numbers": []
+            },
+            {
+              "metric": "precision",
+              "line": "precision, recall, F1-score and Jaccard metrics are macro-averaged 22.",
+              "numbers": [
+                "1",
+                "22"
+              ]
+            },
+            {
+              "metric": "f1",
+              "line": "acy 81.3, F1 78.5) with perfect format compliance, followed by Gemini-2.5-Flash (accuracy 75.2, F1",
+              "numbers": [
+                "81.3",
+                "1",
+                "78.5",
+                "2.5",
+                "75.2",
+                "1"
+              ]
+            },
+            {
+              "metric": "accuracy",
+              "line": "72.2). The proprietary GPT5.1-Pro achieves near-perfect format adherence (99.4% SR) with accuracy of",
+              "numbers": [
+                "72.2",
+                "5.1",
+                "99.4"
+              ]
+            },
+            {
+              "metric": "accuracy",
+              "line": "69.5. Y andexGPT-5.1 shows moderate performance (accuracy 54.3) with acceptable format compliance",
+              "numbers": [
+                "69.5",
+                "5.1",
+                "54.3"
+              ]
+            },
+            {
+              "metric": "accuracy",
+              "line": "detection (accuracy 65.0 and 63.0, respectively) but lower success rates (81.9 for both). GLM-4.6v",
+              "numbers": [
+                "65.0",
+                "63.0",
+                "81.9",
+                "4.6"
+              ]
+            },
+            {
+              "metric": "accuracy",
+              "line": "demonstrates competitive detection capability (accuracy 70.1) despite moderate success rate (89.5). The",
+              "numbers": [
+                "70.1",
+                "89.5"
+              ]
+            },
+            {
+              "metric": "precision",
+              "line": "reasoning-focused Kimi-k2-thinking achieves 56.4% accuracy with notably high precision (57.6) but low",
+              "numbers": [
+                "2",
+                "56.4",
+                "57.6"
+              ]
+            },
+            {
+              "metric": "recall",
+              "line": "recall (31.8) and reduced format compliance (63.9% SR).",
+              "numbers": [
+                "31.8",
+                "63.9"
+              ]
+            },
+            {
+              "metric": "accuracy",
+              "line": "herence but substantially weaker detection accuracy (41.6 and 35.5, respectively), though both maintain",
+              "numbers": [
+                "41.6",
+                "35.5"
+              ]
+            },
+            {
+              "metric": "recall",
+              "line": "high recall (54.6 and 50.9). DeepSeek-chat-v3-0324 underperforms on accuracy (37.0) with moder-",
+              "numbers": [
+                "54.6",
+                "50.9",
+                "3",
+                "0324",
+                "37.0"
+              ]
+            }
+          ]
+        },
+        "3": {
+          "source_note": "данные из статьи, таблица 3",
+          "rows": [
+            {
+              "metric": "precision",
+              "line": "Table 3: Total benchmark multi-label metrics. P=Precision, R=Recall, HL=Hamming Loss.",
+              "numbers": [
+                "3"
+              ]
+            },
+            {
+              "metric": "f1",
+              "line": "curacy 71.6, macro F1 47.0, Jaccard 34.1) with minimal Hamming Loss (7.0), confirming superior per-",
+              "numbers": [
+                "71.6",
+                "1",
+                "47.0",
+                "34.1",
+                "7.0"
+              ]
+            },
+            {
+              "metric": "f1",
+              "line": "label prediction quality. Gemini-2.5-Flash follows at a distance (accuracy 63.1, F1 31.7, Jaccard 21.9).",
+              "numbers": [
+                "2.5",
+                "63.1",
+                "1",
+                "31.7",
+                "21.9"
+              ]
+            },
+            {
+              "metric": "precision",
+              "line": "GLM-4.6v model achieves competitive accuracy (61.7) with strong precision (40.7), closely match-",
+              "numbers": [
+                "4.6",
+                "61.7",
+                "40.7"
+              ]
+            },
+            {
+              "metric": "accuracy",
+              "line": "Y andexGPT-5.1, and Kimi-k2-thinking cluster in the 51.9–58.1% accuracy range, though with varying",
+              "numbers": [
+                "5.1",
+                "2",
+                "51.9",
+                "58.1"
+              ]
+            },
+            {
+              "metric": "precision",
+              "line": "precision-recall trade-offs: T-pro-it-2.0 and gpt-oss-20b favor precision (38.8 and 41.9), while Kimi",
+              "numbers": [
+                "2.0",
+                "20",
+                "38.8",
+                "41.9"
+              ]
+            },
+            {
+              "metric": "precision",
+              "line": "shows the highest precision (48.7) but lowest recall (21.2) in this group.",
+              "numbers": [
+                "48.7",
+                "21.2"
+              ]
+            },
+            {
+              "metric": "accuracy",
+              "line": "A performance gap emerges below 20% accuracy: DeepSeek-chat-v3-0324, Llama-3.3-70B, and",
+              "numbers": [
+                "20",
+                "3",
+                "0324",
+                "3.3",
+                "70"
+              ]
+            },
+            {
+              "metric": "recall",
+              "line": "showing relatively higher recall (33.7 and 34.8). Smaller models (Gemma-3-27b-it, Y andexGPT-5-8B-",
+              "numbers": [
+                "33.7",
+                "34.8",
+                "3",
+                "27",
+                "5",
+                "8"
+              ]
+            },
+            {
+              "metric": "accuracy",
+              "line": "Span identification. Gemini-2.5-Pro achieves the highest span accuracy (71.7), Jaccard (73.6), and",
+              "numbers": [
+                "2.5",
+                "71.7",
+                "73.6"
+              ]
+            },
+            {
+              "metric": "accuracy",
+              "line": "Gemini-2.5-Flash drops to seventh place (accuracy 61.9, ROUGE-L 70.7), suggesting that span extrac-",
+              "numbers": [
+                "2.5",
+                "61.9",
+                "70.7"
+              ]
+            }
+          ]
+        },
+        "4": {
+          "source_note": "данные из статьи, таблица 4",
+          "rows": [
+            {
+              "metric": "accuracy",
+              "line": "tection, Gemini-2.5-Pro’s accuracy drops from 84.6% (SberQuAD) to 75.1% (ruSciBench), with similar",
+              "numbers": [
+                "2.5",
+                "84.6",
+                "75.1"
+              ]
+            },
+            {
+              "metric": "accuracy",
+              "line": "both datasets (below 30% accuracy).",
+              "numbers": [
+                "30"
+              ]
+            }
+          ]
+        }
+      },
+      "note": "числа взяты из текста статьи без пересчёта; источник — таблицы 2-4"
+    },
+    "baseline_note": "Сравнение с baseline статьи приведено по извлечённым из PDF числам (таблицы 2-4).",
+    "disclaimer": "RusHallu-RAG — внешний тест с человеческой разметкой спанов. Числа режима demo получены лексическими суррогатами признаков и научным результатом не являются: научный вывод требует режима hf на GPU, который в этой среде не запускался.",
+    "role": "только тест: обучение и калибровка на корпусе B запрещены"
+  },
+  "external_tests": {
+    "available": true,
+    "runs": {
+      "ragtruth_qa_test_demo": {
+        "dataset": "ragtruth",
+        "task": "qa",
+        "split": "test",
+        "mode": "demo",
+        "label_origin": {
+          "human": 875
+        },
+        "pairs": 875,
+        "limit": null,
+        "tokens": {
+          "precision": 0.1322,
+          "recall": 0.4512,
+          "f1": 0.2045,
+          "fpr": 0.1685,
+          "auc": 0.7167
+        },
+        "answers": {
+          "tp": 160,
+          "fp": 706,
+          "fn": 0,
+          "tn": 9,
+          "precision": 0.1848,
+          "recall": 1.0,
+          "f1": 0.3119,
+          "fpr": 0.9874
+        },
+        "spans": {
+          "strict_f1_iou_0_5": 0.0357,
+          "coverage": 0.383,
+          "soft_f1_expanded": 0.0266,
+          "mean_width_ratio": 3.35
+        },
+        "their": {
+          "accuracy": 0.0103,
+          "jaccard_score": 0.0106,
+          "hamming_loss": 0.1817,
+          "rouge1": 0.104,
+          "rouge2": 0.0715,
+          "rougeL": 0.0797
+        },
+        "baseline_extracted": false
+      },
+      "ragtruth_summary_test_demo": {
+        "dataset": "ragtruth",
+        "task": "summary",
+        "split": "test",
+        "mode": "demo",
+        "label_origin": {
+          "human": 900
+        },
+        "pairs": 900,
+        "limit": null,
+        "tokens": {
+          "precision": 0.0724,
+          "recall": 0.2596,
+          "f1": 0.1133,
+          "fpr": 0.1023,
+          "auc": 0.644
+        },
+        "answers": {
+          "tp": 204,
+          "fp": 683,
+          "fn": 0,
+          "tn": 13,
+          "precision": 0.23,
+          "recall": 1.0,
+          "f1": 0.374,
+          "fpr": 0.9813
+        },
+        "spans": {
+          "strict_f1_iou_0_5": 0.021,
+          "coverage": 0.873,
+          "soft_f1_expanded": 0.0605,
+          "mean_width_ratio": 14.24
+        },
+        "their": {
+          "accuracy": 0.0167,
+          "jaccard_score": 0.0167,
+          "hamming_loss": 0.2244,
+          "rouge1": 0.0869,
+          "rouge2": 0.076,
+          "rougeL": 0.0786
+        },
+        "baseline_extracted": false
+      },
+      "ragtruth_data2txt_test_demo": {
+        "dataset": "ragtruth",
+        "task": "data2txt",
+        "split": "test",
+        "mode": "demo",
+        "label_origin": {
+          "human": 900
+        },
+        "pairs": 900,
+        "limit": null,
+        "tokens": {
+          "precision": 0.0571,
+          "recall": 0.4454,
+          "f1": 0.1013,
+          "fpr": 0.3293,
+          "auc": 0.591
+        },
+        "answers": {
+          "tp": 579,
+          "fp": 321,
+          "fn": 0,
+          "tn": 0,
+          "precision": 0.6433,
+          "recall": 1.0,
+          "f1": 0.783,
+          "fpr": 1.0
+        },
+        "spans": {
+          "strict_f1_iou_0_5": 0.0,
+          "coverage": 0.9829,
+          "soft_f1_expanded": 0.0106,
+          "mean_width_ratio": 56.78
+        },
+        "their": {
+          "accuracy": 0.0,
+          "jaccard_score": 0.0,
+          "hamming_loss": 0.6433,
+          "rouge1": 0.0657,
+          "rouge2": 0.06,
+          "rougeL": 0.063
+        },
+        "baseline_extracted": false
+      },
+      "rushallu_all_test_demo": {
+        "dataset": "rushallu",
+        "task": "all",
+        "split": "test",
+        "mode": "demo",
+        "label_origin": {
+          "human": 1000
+        },
+        "pairs": 1000,
+        "limit": null,
+        "tokens": {
+          "precision": 0.3611,
+          "recall": 0.0769,
+          "f1": 0.1269,
+          "fpr": 0.0644,
+          "auc": 0.5293
+        },
+        "answers": {
+          "tp": 259,
+          "fp": 305,
+          "fn": 74,
+          "tn": 362,
+          "precision": 0.4592,
+          "recall": 0.7778,
+          "f1": 0.5775,
+          "fpr": 0.4573
+        },
+        "spans": {
+          "strict_f1_iou_0_5": 0.0902,
+          "coverage": 0.0993,
+          "soft_f1_expanded": 0.0676,
+          "mean_width_ratio": 2.29
+        },
+        "their": {
+          "accuracy": 0.372,
+          "jaccard_score": 0.373,
+          "hamming_loss": 0.3205,
+          "rouge1": 0.4861,
+          "rouge2": 0.4609,
+          "rougeL": 0.4679
+        },
+        "baseline_extracted": false
+      },
+      "ragtruth_qa_test_hf": {
+        "dataset": "ragtruth",
+        "task": "qa",
+        "split": "test",
+        "mode": "hf",
+        "label_origin": {
+          "human": 40
+        },
+        "pairs": 40,
+        "limit": 40,
+        "tokens": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "fpr": 0.0,
+          "auc": 0.7975
+        },
+        "answers": {
+          "tp": 3,
+          "fp": 15,
+          "fn": 1,
+          "tn": 21,
+          "precision": 0.1667,
+          "recall": 0.75,
+          "f1": 0.2727,
+          "fpr": 0.4167
+        },
+        "spans": {
+          "strict_f1_iou_0_5": 0.0,
+          "coverage": 0.0,
+          "soft_f1_expanded": 0.0,
+          "mean_width_ratio": 0.0
+        },
+        "their": {
+          "accuracy": 0.525,
+          "jaccard_score": 0.525,
+          "hamming_loss": 0.1,
+          "rouge1": 0.5442,
+          "rouge2": 0.5372,
+          "rougeL": 0.5415
+        },
+        "baseline_extracted": false
+      }
+    },
+    "total_pairs": 3715,
+    "demo_runs": 4,
+    "hf_runs": 1
+  },
+  "hf_experiments": {
+    "available": true,
+    "runs": {
+      "a": {
+        "dataset": "data/corpus_a/pairs.jsonl",
+        "mode": "hf",
+        "model": "ai-forever/rugpt3small_based_on_gpt2",
+        "seed": 42,
+        "run_id": "37609202780",
+        "git_commit": "39a0ad4858f7278335b9f0ef94bc405485a78b4a",
+        "duration_s": 84.68,
+        "pairs": 1200,
+        "gate": "НЕ достигнут",
+        "tokens": {
+          "precision": 0.7444,
+          "recall": 0.5167,
+          "f1": 0.61,
+          "fpr": 0.0268,
+          "auc": 0.9073
+        },
+        "spans": {
+          "strict_f1": 0.5937,
+          "coverage": 0.5221,
+          "width_ratio": 1.14
+        },
+        "answers": {
+          "precision": 1.0,
+          "recall": 0.1483,
+          "f1": 0.2582,
+          "fpr": 0.0,
+          "auc": 0.6758,
+          "threshold": 1.0
+        },
+        "verdicts": {
+          "tp": 317,
+          "fp": 65,
+          "fn": 317,
+          "tn": 501,
+          "precision": 0.8298,
+          "recall": 0.5,
+          "f1": 0.624,
+          "fpr": 0.1148,
+          "flagged_share": 0.3183
+        },
+        "bundle": {
+          "threshold": 1.0,
+          "span_z": 0.0,
+          "span_floor": 0.35,
+          "span_cap": 0.5,
+          "weights": {
+            "attention_entropy": 0.0,
+            "ctx_attention_mass": 1.0,
+            "embedding_density": 0.0
+          },
+          "signal": "logreg"
+        },
+        "splits": {
+          "sizes": {
+            "train": 840,
+            "dev": 180,
+            "test": 180
+          },
+          "rule": "порог и маска выбраны только на официальной обучающей части; тест в выборе не участвовал"
+        },
+        "test_official": {
+          "pairs": 180,
+          "tokens": {
+            "precision": 0.7765,
+            "recall": 0.5,
+            "f1": 0.6083,
+            "fpr": 0.0237,
+            "auc": 0.9095,
+            "tp": 132,
+            "fp": 38,
+            "fn": 132,
+            "tn": 1566
+          },
+          "spans": {
+            "strict_f1_iou_0_5": 0.5896,
+            "coverage": 0.5152,
+            "soft_f1_expanded": 0.1156,
+            "mean_width_ratio": 1.08
+          },
+          "answers": {
+            "threshold": 1.0,
+            "precision": 1.0,
+            "recall": 0.1212,
+            "f1": 0.2162,
+            "fpr": 0.0,
+            "auc": 0.6699
+          },
+          "verdicts": {
+            "tp": 49,
+            "fp": 6,
+            "fn": 50,
+            "tn": 75,
+            "precision": 0.8909,
+            "recall": 0.4949,
+            "f1": 0.6364,
+            "fpr": 0.0741,
+            "flagged_share": 0.3056
+          }
+        },
+        "gate_test_official": "НЕ достигнут",
+        "dev_official": {
+          "pairs": 180,
+          "tokens": {
+            "precision": 0.7676,
+            "recall": 0.5504,
+            "f1": 0.6411,
+            "fpr": 0.0262,
+            "auc": 0.9092,
+            "tp": 142,
+            "fp": 43,
+            "fn": 116,
+            "tn": 1599
+          },
+          "spans": {
+            "strict_f1_iou_0_5": 0.5714,
+            "coverage": 0.4891,
+            "soft_f1_expanded": 0.1948,
+            "mean_width_ratio": 1.22
+          },
+          "answers": {
+            "threshold": 1.0,
+            "precision": 1.0,
+            "recall": 0.1848,
+            "f1": 0.3119,
+            "fpr": 0.0,
+            "auc": 0.6716
+          },
+          "verdicts": {
+            "tp": 41,
+            "fp": 10,
+            "fn": 51,
+            "tn": 78,
+            "precision": 0.8039,
+            "recall": 0.4457,
+            "f1": 0.5734,
+            "fpr": 0.1136,
+            "flagged_share": 0.2833
+          }
+        },
+        "by_type_test": {
+          "contradiction": {
+            "pairs": 26,
+            "token_precision": 0.1429,
+            "token_recall": 0.0217,
+            "token_f1": 0.0377,
+            "span_coverage": 0.3077,
+            "verdict_recall": 0.2692,
+            "verdict_fpr": 0.0
+          },
+          "excess": {
+            "pairs": 14,
+            "token_precision": 1.0,
+            "token_recall": 0.7671,
+            "token_f1": 0.8682,
+            "span_coverage": 1.0,
+            "verdict_recall": 1.0,
+            "verdict_fpr": 0.0
+          },
+          "faithful": {
+            "pairs": 81,
+            "token_precision": 0.0,
+            "token_recall": 0.0,
+            "token_f1": 0.0,
+            "span_coverage": 0.0,
+            "verdict_recall": 0.0,
+            "verdict_fpr": 0.0741
+          },
+          "missing": {
+            "pairs": 10,
+            "token_precision": 0.0,
+            "token_recall": 0.0,
+            "token_f1": 0.0,
+            "span_coverage": 0.0,
+            "verdict_recall": 0.0,
+            "verdict_fpr": 0.0
+          },
+          "number_attribution": {
+            "pairs": 13,
+            "token_precision": 0.0,
+            "token_recall": 0.0,
+            "token_f1": 0.0,
+            "span_coverage": 0.5385,
+            "verdict_recall": 0.5385,
+            "verdict_fpr": 0.0
+          },
+          "oversight": {
+            "pairs": 11,
+            "token_precision": 1.0,
+            "token_recall": 0.9091,
+            "token_f1": 0.9524,
+            "span_coverage": 1.0,
+            "verdict_recall": 1.0,
+            "verdict_fpr": 0.0
+          },
+          "partial": {
+            "pairs": 15,
+            "token_precision": 1.0,
+            "token_recall": 0.0345,
+            "token_f1": 0.0667,
+            "span_coverage": 0.0667,
+            "verdict_recall": 0.0,
+            "verdict_fpr": 0.0
+          },
+          "unconfirmed": {
+            "pairs": 10,
+            "token_precision": 1.0,
+            "token_recall": 0.9565,
+            "token_f1": 0.9778,
+            "span_coverage": 1.0,
+            "verdict_recall": 1.0,
+            "verdict_fpr": 0.0
+          }
+        },
+        "clean_pairs": {
+          "pairs": 566,
+          "token_fpr": 0.0391,
+          "verdict_fpr": 0.1148,
+          "flagged_pairs": 65,
+          "flagged_share": 0.1148,
+          "note": "чистые пары всего корпуса (без фрагментов недостоверности в разметке); числа — измерение фиксированным бандлом, не подбор"
+        },
+        "mask_scan": {
+          "signal": "logreg",
+          "target_fpr": 0.1,
+          "points_total": 343,
+          "points_within_target": 203,
+          "selected": {
+            "span_z": 0.0,
+            "span_floor": 0.35,
+            "span_cap": 0.5,
+            "token_f1": 0.6234,
+            "token_precision": 0.6741,
+            "token_recall": 0.5799,
+            "token_fpr": 0.0411,
+            "within_target": true
+          },
+          "best_within_target": {
+            "span_z": 0.0,
+            "span_floor": 0.35,
+            "span_cap": 0.5,
+            "token_f1": 0.6234,
+            "token_precision": 0.6741,
+            "token_recall": 0.5799,
+            "token_fpr": 0.0411,
+            "within_target": true
+          },
+          "adopted": false,
+          "statement": "Точка лучше текущей при FPR ≤ 0.1 на обучающей части не найдена: выбранная точка остаётся."
+        },
+        "verdict_rule_comparison": {
+          "test_pairs": 180,
+          "rule_any_span": {
+            "tp": 51,
+            "fp": 21,
+            "fn": 48,
+            "tn": 60,
+            "precision": 0.7083,
+            "recall": 0.5152,
+            "f1": 0.5965,
+            "fpr": 0.2593,
+            "flagged_share": 0.4
+          },
+          "rule_min_two_tokens": {
+            "tp": 49,
+            "fp": 6,
+            "fn": 50,
+            "tn": 75,
+            "precision": 0.8909,
+            "recall": 0.4949,
+            "f1": 0.6364,
+            "fpr": 0.0741,
+            "flagged_share": 0.3056
+          },
+          "flagged_answers": {
+            "any_span": 72,
+            "min_two_tokens": 55
+          },
+          "tokens_identical": true
+        },
+        "kind": "experiment"
+      },
+      "a3": {
+        "dataset": "data/corpus_a3/pairs.jsonl",
+        "mode": "hf",
+        "model": "ai-forever/rugpt3small_based_on_gpt2",
+        "seed": 42,
+        "run_id": "37609202780",
+        "git_commit": "39a0ad4858f7278335b9f0ef94bc405485a78b4a",
+        "duration_s": 463.68,
+        "pairs": 1200,
+        "gate": "НЕ достигнут",
+        "tokens": {
+          "precision": 0.1363,
+          "recall": 0.3519,
+          "f1": 0.1965,
+          "fpr": 0.0703,
+          "auc": 0.8421
+        },
+        "spans": {
+          "strict_f1": 0.0888,
+          "coverage": 0.4591,
+          "width_ratio": 15.28
+        },
+        "answers": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "fpr": 0.0,
+          "auc": 0.4983,
+          "threshold": 0.5847
+        },
+        "verdicts": {
+          "tp": 493,
+          "fp": 433,
+          "fn": 167,
+          "tn": 107,
+          "precision": 0.5324,
+          "recall": 0.747,
+          "f1": 0.6217,
+          "fpr": 0.8019,
+          "flagged_share": 0.7717
+        },
+        "bundle": {
+          "threshold": 0.584677,
+          "span_z": 2.0,
+          "span_floor": 0.05,
+          "span_cap": 0.5,
+          "weights": {
+            "attention_entropy": 1.0,
+            "ctx_attention_mass": 0.0,
+            "embedding_density": 0.0
+          },
+          "signal": "logreg"
+        },
+        "splits": {
+          "sizes": {
+            "train": 842,
+            "dev": 181,
+            "test": 177
+          },
+          "rule": "порог и маска выбраны только на официальной обучающей части; тест в выборе не участвовал"
+        },
+        "test_official": {
+          "pairs": 177,
+          "tokens": {
+            "precision": 0.1431,
+            "recall": 0.3488,
+            "f1": 0.2029,
+            "fpr": 0.0653,
+            "auc": 0.8507,
+            "tp": 98,
+            "fp": 587,
+            "fn": 183,
+            "tn": 8400
+          },
+          "spans": {
+            "strict_f1_iou_0_5": 0.1193,
+            "coverage": 0.4227,
+            "soft_f1_expanded": 0.0398,
+            "mean_width_ratio": 9.12
+          },
+          "answers": {
+            "threshold": 0.5847,
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "fpr": 0.0,
+            "auc": 0.4469
+          },
+          "verdicts": {
+            "tp": 69,
+            "fp": 62,
+            "fn": 28,
+            "tn": 18,
+            "precision": 0.5267,
+            "recall": 0.7113,
+            "f1": 0.6053,
+            "fpr": 0.775,
+            "flagged_share": 0.7401
+          }
+        },
+        "gate_test_official": "НЕ достигнут",
+        "dev_official": {
+          "pairs": 181,
+          "tokens": {
+            "precision": 0.1433,
+            "recall": 0.3415,
+            "f1": 0.2019,
+            "fpr": 0.0763,
+            "auc": 0.821,
+            "tp": 98,
+            "fp": 586,
+            "fn": 189,
+            "tn": 7096
+          },
+          "spans": {
+            "strict_f1_iou_0_5": 0.0998,
+            "coverage": 0.4688,
+            "soft_f1_expanded": 0.0555,
+            "mean_width_ratio": 16.1
+          },
+          "answers": {
+            "threshold": 0.5847,
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "fpr": 0.0,
+            "auc": 0.4547
+          },
+          "verdicts": {
+            "tp": 73,
+            "fp": 64,
+            "fn": 23,
+            "tn": 21,
+            "precision": 0.5328,
+            "recall": 0.7604,
+            "f1": 0.6266,
+            "fpr": 0.7529,
+            "flagged_share": 0.7569
+          }
+        },
+        "by_type_test": {
+          "contradiction": {
+            "pairs": 18,
+            "token_precision": 0.1163,
+            "token_recall": 0.3125,
+            "token_f1": 0.1695,
+            "span_coverage": 0.3333,
+            "verdict_recall": 0.7222,
+            "verdict_fpr": 0.0
+          },
+          "excess": {
+            "pairs": 9,
+            "token_precision": 0.4429,
+            "token_recall": 0.6327,
+            "token_f1": 0.521,
+            "span_coverage": 0.0,
+            "verdict_recall": 0.7778,
+            "verdict_fpr": 0.0
+          },
+          "faithful": {
+            "pairs": 80,
+            "token_precision": 0.0,
+            "token_recall": 0.0,
+            "token_f1": 0.0,
+            "span_coverage": 0.0,
+            "verdict_recall": 0.0,
+            "verdict_fpr": 0.775
+          },
+          "missing": {
+            "pairs": 10,
+            "token_precision": 0.6154,
+            "token_recall": 0.4,
+            "token_f1": 0.4848,
+            "span_coverage": 0.8,
+            "verdict_recall": 0.3,
+            "verdict_fpr": 0.0
+          },
+          "number_attribution": {
+            "pairs": 27,
+            "token_precision": 0.0977,
+            "token_recall": 0.2889,
+            "token_f1": 0.1461,
+            "span_coverage": 0.3704,
+            "verdict_recall": 0.8519,
+            "verdict_fpr": 0.0
+          },
+          "oversight": {
+            "pairs": 13,
+            "token_precision": 0.9444,
+            "token_recall": 0.3269,
+            "token_f1": 0.4857,
+            "span_coverage": 0.5385,
+            "verdict_recall": 0.5385,
+            "verdict_fpr": 0.0
+          },
+          "partial": {
+            "pairs": 10,
+            "token_precision": 0.0645,
+            "token_recall": 0.0769,
+            "token_f1": 0.0702,
+            "span_coverage": 0.4,
+            "verdict_recall": 0.8,
+            "verdict_fpr": 0.0
+          },
+          "unconfirmed": {
+            "pairs": 10,
+            "token_precision": 0.85,
+            "token_recall": 0.2982,
+            "token_f1": 0.4416,
+            "span_coverage": 0.6,
+            "verdict_recall": 0.8,
+            "verdict_fpr": 0.0
+          }
+        },
+        "clean_pairs": {
+          "pairs": 540,
+          "token_fpr": 0.0739,
+          "verdict_fpr": 0.8019,
+          "flagged_pairs": 433,
+          "flagged_share": 0.8019,
+          "note": "чистые пары всего корпуса (без фрагментов недостоверности в разметке); числа — измерение фиксированным бандлом, не подбор"
+        },
+        "mask_scan": {
+          "signal": "logreg",
+          "target_fpr": 0.1,
+          "points_total": 343,
+          "points_within_target": 323,
+          "selected": {
+            "span_z": 2.0,
+            "span_floor": 0.05,
+            "span_cap": 0.5,
+            "token_f1": 0.212,
+            "token_precision": 0.1356,
+            "token_recall": 0.4848,
+            "token_fpr": 0.0946,
+            "within_target": true
+          },
+          "best_within_target": {
+            "span_z": 2.0,
+            "span_floor": 0.05,
+            "span_cap": 0.5,
+            "token_f1": 0.212,
+            "token_precision": 0.1356,
+            "token_recall": 0.4848,
+            "token_fpr": 0.0946,
+            "within_target": true
+          },
+          "adopted": false,
+          "statement": "Точка лучше текущей при FPR ≤ 0.1 на обучающей части не найдена: выбранная точка остаётся."
+        },
+        "verdict_rule_comparison": {
+          "test_pairs": 177,
+          "rule_any_span": {
+            "tp": 80,
+            "fp": 69,
+            "fn": 17,
+            "tn": 11,
+            "precision": 0.5369,
+            "recall": 0.8247,
+            "f1": 0.6504,
+            "fpr": 0.8625,
+            "flagged_share": 0.8418
+          },
+          "rule_min_two_tokens": {
+            "tp": 69,
+            "fp": 62,
+            "fn": 28,
+            "tn": 18,
+            "precision": 0.5267,
+            "recall": 0.7113,
+            "f1": 0.6053,
+            "fpr": 0.775,
+            "flagged_share": 0.7401
+          },
+          "flagged_answers": {
+            "any_span": 149,
+            "min_two_tokens": 131
+          },
+          "tokens_identical": true
+        },
+        "kind": "experiment"
+      },
+      "experiment": {
+        "dataset": "data/demo_pairs.jsonl",
+        "mode": "demo",
+        "model": null,
+        "seed": 42,
+        "run_id": null,
+        "git_commit": null,
+        "duration_s": 35.1,
+        "pairs": 240,
+        "gate": "ДОСТИГНУТ",
+        "tokens": {
+          "precision": 0.9758,
+          "recall": 0.9282,
+          "f1": 0.9514,
+          "fpr": 0.0048,
+          "auc": 0.9974
+        },
+        "spans": {
+          "strict_f1": 0.3145,
+          "coverage": 1.0,
+          "width_ratio": 24.17
+        },
+        "answers": {
+          "precision": 1.0,
+          "recall": 0.9919,
+          "f1": 0.996,
+          "fpr": 0.0,
+          "auc": 0.996,
+          "threshold": 1.0
+        },
+        "verdicts": {
+          "tp": null,
+          "fp": null,
+          "fn": null,
+          "tn": null,
+          "precision": null,
+          "recall": null,
+          "f1": null,
+          "fpr": null,
+          "flagged_share": null
+        },
+        "bundle": {
+          "threshold": 1.0,
+          "span_z": 0.0,
+          "span_floor": 0.3,
+          "span_cap": 0.5,
+          "weights": {
+            "attention_entropy": 0.1,
+            "ctx_attention_mass": 0.9,
+            "embedding_density": 0.0
+          },
+          "signal": "logreg"
+        },
+        "kind": "experiment"
+      },
+      "pilot": {
+        "kind": "pilot",
+        "status": "ok",
+        "published": true,
+        "wording": "пилот на малой модели (ruGPT3-small) на синтетических промтах: модель реальная, корпус промтов синтетический",
+        "pairs": 96,
+        "tokens": 2408,
+        "bootstrap_iterations": 5000,
+        "seed": 42,
+        "contrast": {
+          "grounded_pairs": 48,
+          "unsupported_pairs": 48,
+          "grounded_value_copy_rate": 1.0,
+          "unsupported_value_copy_rate": 0.0,
+          "grounded_overlap_mean": 0.8544890873015873,
+          "unsupported_overlap_mean": 0.6473875661375661,
+          "contrast_ok": true
+        }
+      }
+    },
+    "hf_runs": 2,
+    "note": "числа взяты из файлов прогонов reports/experiments/*/; в документы попадают только через reports/METRICS.json"
+  },
+  "hf_external_slices": {
+    "available": true,
+    "slices": {
+      "ext_ragtruth_qa_hf.json": {
+        "dataset": "ragtruth",
+        "task": "qa",
+        "split": "test",
+        "mode": "hf",
+        "model": "ai-forever/rugpt3small_based_on_gpt2",
+        "pairs": 40,
+        "pairs_total_in_file": 875,
+        "limit": 40,
+        "note": "ЭТО СРЕЗ: 40 пар из 875. Числа относятся только к срезу, не ко всему набору.",
+        "duration_s": 1059.9,
+        "tokens": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "fpr": 0.0,
+          "auc": 0.7975
+        },
+        "spans": {
+          "strict_f1_iou_0_5": 0.0,
+          "coverage": 0.0,
+          "soft_f1_expanded": 0.0,
+          "mean_width_ratio": 0.0
+        },
+        "answers": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "fpr": 0.0,
+          "auc": 0.5
+        },
+        "verdicts": {
+          "tp": 3,
+          "fp": 15,
+          "fn": 1,
+          "tn": 21,
+          "precision": 0.1667,
+          "recall": 0.75,
+          "f1": 0.2727,
+          "fpr": 0.4167
+        },
+        "their": {
+          "rouge1": 0.5442,
+          "rouge2": 0.5372,
+          "rougeL": 0.5415,
+          "accuracy": 0.525,
+          "jaccard_score": 0.525,
+          "hamming_loss": 0.1,
+          "empty_reference": 36,
+          "pairs": 40
+        }
+      }
+    },
+    "rule": "срез не равен всему набору: лимит и оговорка обязательны"
+  },
+  "cross_corpus": {
+    "in_corpus_f1": 0.9576,
+    "cross_corpus_f1": 0.6752,
+    "drop": 0.2824,
+    "cross_fpr": 0.1478,
+    "alt_generator": {
+      "name": "alt-generator 1.0 (числа словами, другие шаблоны)",
+      "pairs": 240,
+      "seed": 4242
+    }
+  },
+  "pilot": {
+    "status": "ok",
+    "published": true,
+    "wording": "пилот на малой модели (ruGPT3-small) на синтетических промтах: модель реальная, корпус промтов синтетический",
+    "control": {
+      "grounded_copy_min": 0.8,
+      "unsupported_copy_max": 0.3,
+      "grounded_copy_rate": 1.0,
+      "unsupported_copy_rate": 0.0,
+      "grounded_ok": true,
+      "unsupported_ok": true,
+      "contrast_ok": true
+    },
+    "pairs": 96,
+    "tokens": 2408,
+    "bootstrap_iterations": 5000,
+    "auc": {
+      "first": {
+        "attention_entropy": {
+          "auc_oriented": 0.49229037207094845,
+          "ci": [
+            0.4473643307576161,
+            0.5385022960084775
+          ],
+          "auc_fact_oriented": 0.4361979166666667,
+          "fact_ci": [
+            0.3208695652173913,
+            0.5552173913043478
+          ],
+          "delta_mean": -0.0014533928285042446,
+          "delta_ci": [
+            -0.003383596117297808,
+            0.0004042734702428182
+          ],
+          "delta_significant": false
+        },
+        "ctx_attention_mass": {
+          "auc_oriented": 0.50104303484509,
+          "ci": [
+            0.45195070733863835,
+            0.544648672517525
+          ],
+          "auc_fact_oriented": -0.5026041666666666,
+          "fact_ci": [
+            0.3862847222222222,
+            0.6161220043572985
+          ],
+          "delta_mean": 4.808511584997177e-05,
+          "delta_ci": [
+            -0.003116259972254435,
+            0.0032270122319459915
+          ],
+          "delta_significant": false
+        },
+        "embedding_density": {
+          "auc_oriented": 0.4524342998421651,
+          "ci": [
+            0.4080849889624724,
+            0.49879559341885726
+          ],
+          "auc_fact_oriented": 0.2009548611111111,
+          "fact_ci": [
+            0.11713286713286714,
+            0.296875
+          ],
+          "delta_mean": -0.014262074525163633,
+          "delta_ci": [
+            -0.01779825693178575,
+            -0.011007930138789803
+          ],
+          "delta_significant": true
+        },
+        "ctx_attention_mass_norm": {
+          "auc_oriented": 0.503272590810256,
+          "ci": [
+            0.44928360120098904,
+            0.5435778550532648
+          ],
+          "auc_fact_oriented": -0.4978298611111111,
+          "fact_ci": [
+            0.3825708061002179,
+            0.6130434782608696
+          ],
+          "delta_mean": -6.011990896939481e-05,
+          "delta_ci": [
+            -0.004955359225900099,
+            0.004857009921657371
+          ],
+          "delta_significant": false
+        },
+        "ctx_attention_mass_lift": {
+          "auc_oriented": 0.5034050396794737,
+          "ci": [
+            0.4498534373098833,
+            0.5434451471903043
+          ],
+          "auc_fact_oriented": -0.5030381944444444,
+          "fact_ci": [
+            0.3900134952766532,
+            0.6185185185185185
+          ],
+          "delta_mean": 4.808511584997177e-05,
+          "delta_ci": [
+            -0.003116259972254435,
+            0.0032270122319459915
+          ],
+          "delta_significant": false
+        },
+        "ctx_max_similarity": {
+          "auc_oriented": 0.6063398858732244,
+          "ci": [
+            0.3491697774626981,
+            0.43916755013693787
+          ],
+          "auc_fact_oriented": -0.0,
+          "fact_ci": [
+            0.0,
+            0.0
+          ],
+          "delta_mean": -0.058378111157726766,
+          "delta_ci": [
+            -0.06365730595365965,
+            -0.053387955443659395
+          ],
+          "delta_significant": true
+        },
+        "ctx_support_distance": {
+          "auc_oriented": 0.5084325780068653,
+          "ci": [
+            0.46253974562798095,
+            0.5527681183418889
+          ],
+          "auc_fact_oriented": 0.5594618055555556,
+          "fact_ci": [
+            0.4429193899782135,
+            0.669675925925926
+          ],
+          "delta_mean": 0.018218790736906677,
+          "delta_ci": [
+            0.003858024691358023,
+            0.03397937274748868
+          ],
+          "delta_significant": true
+        },
+        "ctx_similarity_decay": {
+          "auc_oriented": 0.5196962505932605,
+          "ci": [
+            0.435943808417676,
+            0.5266942604856513
+          ],
+          "auc_fact_oriented": -0.3806423611111111,
+          "fact_ci": [
+            0.2724879333040807,
+            0.4943576388888889
+          ],
+          "delta_mean": -0.0016276224052402218,
+          "delta_ci": [
+            -0.002337569895562677,
+            -0.0010708943053281167
+          ],
+          "delta_significant": true
+        },
+        "ctx_sim_contrast": {
+          "auc_oriented": 0.5574441783203276,
+          "ci": [
+            0.3957597173144876,
+            0.48859128628412946
+          ],
+          "auc_fact_oriented": -0.03602430555555555,
+          "fact_ci": [
+            0.007982261640798226,
+            0.07410714285714286
+          ],
+          "delta_mean": -0.05188941395055449,
+          "delta_ci": [
+            -0.055601355170108814,
+            -0.04836105241510744
+          ],
+          "delta_significant": true
+        },
+        "ctx_sim_margin": {
+          "auc_oriented": 0.5394200947009415,
+          "ci": [
+            0.4147495495097118,
+            0.5067402570137347
+          ],
+          "auc_fact_oriented": -0.07074652777777778,
+          "fact_ci": [
+            0.027789839339991317,
+            0.1246119733924612
+          ],
+          "delta_mean": -0.052104023464595715,
+          "delta_ci": [
+            -0.05775696118385576,
+            -0.04656546347296436
+          ],
+          "delta_significant": true
+        }
+      },
+      "middle": {
+        "attention_entropy": {
+          "auc_oriented": 0.5089678921866204,
+          "ci": [
+            0.4633873086305286,
+            0.5555684326710817
+          ],
+          "auc_fact_oriented": 0.6341145833333334,
+          "fact_ci": [
+            0.5241071428571429,
+            0.7438271604938271
+          ],
+          "delta_mean": 0.011774444331725439,
+          "delta_ci": [
+            0.00914915930479765,
+            0.01424147499104341
+          ],
+          "delta_significant": true
+        },
+        "ctx_attention_mass": {
+          "auc_oriented": 0.4994426110087085,
+          "ci": [
+            0.4540948275862069,
+            0.5456692826473283
+          ],
+          "auc_fact_oriented": -0.48828125,
+          "fact_ci": [
+            0.3723214285714286,
+            0.6052287581699346
+          ],
+          "delta_mean": -0.0011513431866963704,
+          "delta_ci": [
+            -0.005122539276878039,
+            0.002771737053990364
+          ],
+          "delta_significant": false
+        },
+        "embedding_density": {
+          "auc_oriented": 0.4707563934172912,
+          "ci": [
+            0.4249335106382979,
+            0.5171012473460722
+          ],
+          "auc_fact_oriented": 0.2378472222222222,
+          "fact_ci": [
+            0.14553376906318083,
+            0.3420479302832244
+          ],
+          "delta_mean": -0.00567940115678493,
+          "delta_ci": [
+            -0.007051236708264137,
+            -0.00437291907796198
+          ],
+          "delta_significant": true
+        },
+        "ctx_attention_mass_norm": {
+          "auc_oriented": 0.49958609728369446,
+          "ci": [
+            0.45394184916990465,
+            0.5460433244916003
+          ],
+          "auc_fact_oriented": -0.4926215277777778,
+          "fact_ci": [
+            0.3736979166666667,
+            0.612679114198871
+          ],
+          "delta_mean": -0.0018978563191724234,
+          "delta_ci": [
+            -0.008255760149212693,
+            0.004374292649228832
+          ],
+          "delta_significant": false
+        },
+        "ctx_attention_mass_lift": {
+          "auc_oriented": 0.4992770499221863,
+          "ci": [
+            0.45425354924578526,
+            0.54684740374426
+          ],
+          "auc_fact_oriented": -0.4908854166666667,
+          "fact_ci": [
+            0.3734259661311333,
+            0.6097883597883598
+          ],
+          "delta_mean": -0.0011513431866963704,
+          "delta_ci": [
+            -0.005122539276878039,
+            0.002771737053990364
+          ],
+          "delta_significant": false
+        },
+        "ctx_max_similarity": {
+          "auc_oriented": 0.5885475877749694,
+          "ci": [
+            0.36775874249381846,
+            0.45714016995662565
+          ],
+          "auc_fact_oriented": -0.04600694444444445,
+          "fact_ci": [
+            0.01652173913043478,
+            0.08468626590609916
+          ],
+          "delta_mean": -0.026742891735526658,
+          "delta_ci": [
+            -0.029691190139158524,
+            -0.023919308895709385
+          ],
+          "delta_significant": true
+        },
+        "ctx_support_distance": {
+          "auc_oriented": 0.5,
+          "ci": [
+            0.45452888947786907,
+            0.5452309902740937
+          ],
+          "auc_fact_oriented": 0.5,
+          "fact_ci": [
+            0.3847155883630048,
+            0.6167178587099605
+          ],
+          "delta_mean": 0.0,
+          "delta_ci": [
+            0.0,
+            0.0
+          ],
+          "delta_significant": false
+        },
+        "ctx_similarity_decay": {
+          "auc_oriented": 0.5088133685058663,
+          "ci": [
+            0.44539839338791837,
+            0.53732406027488
+          ],
+          "auc_fact_oriented": -0.44921875,
+          "fact_ci": [
+            0.33507625272331154,
+            0.5668402777777778
+          ],
+          "delta_mean": -0.00044831834839857357,
+          "delta_ci": [
+            -0.0005479864740105463,
+            -0.00036115424985803035
+          ],
+          "delta_significant": true
+        },
+        "ctx_sim_contrast": {
+          "auc_oriented": 0.5460315007560623,
+          "ci": [
+            0.4092585435874786,
+            0.5010548173674851
+          ],
+          "auc_fact_oriented": -0.1332465277777778,
+          "fact_ci": [
+            0.07006651884700665,
+            0.20872694556905083
+          ],
+          "delta_mean": -0.02232751364742049,
+          "delta_ci": [
+            -0.025141793800313398,
+            -0.019650594744442345
+          ],
+          "delta_significant": true
+        },
+        "ctx_sim_margin": {
+          "auc_oriented": 0.5410757055661637,
+          "ci": [
+            0.4140641386543026,
+            0.5051503709591945
+          ],
+          "auc_fact_oriented": -0.1970486111111111,
+          "fact_ci": [
+            0.11582167832167832,
+            0.2902097902097902
+          ],
+          "delta_mean": -0.029058050356785724,
+          "delta_ci": [
+            -0.0343850103120168,
+            -0.02403648343214591
+          ],
+          "delta_significant": true
+        }
+      },
+      "-4": {
+        "attention_entropy": {
+          "auc_oriented": 0.4927539431132107,
+          "ci": [
+            0.44660103089369874,
+            0.5391620222929936
+          ],
+          "auc_fact_oriented": 0.4696180555555556,
+          "fact_ci": [
+            0.355188884064264,
+            0.5849748053137883
+          ],
+          "delta_mean": -0.0006340515489379565,
+          "delta_ci": [
+            -0.003792216069996357,
+            0.0027565291772286096
+          ],
+          "delta_significant": false
+        },
+        "ctx_attention_mass": {
+          "auc_oriented": 0.49036986346729067,
+          "ci": [
+            0.46203831502235965,
+            0.5547938400397416
+          ],
+          "auc_fact_oriented": -0.5850694444444444,
+          "fact_ci": [
+            0.46830357142857143,
+            0.6971153846153846
+          ],
+          "delta_mean": 0.012298745413621267,
+          "delta_ci": [
+            0.008621168012420336,
+            0.016016590719421703
+          ],
+          "delta_significant": true
+        },
+        "embedding_density": {
+          "auc_oriented": 0.49866999260493816,
+          "ci": [
+            0.452900273057917,
+            0.5440801457194899
+          ],
+          "auc_fact_oriented": 0.4618055555555556,
+          "fact_ci": [
+            0.3459201388888889,
+            0.5818497611810681
+          ],
+          "delta_mean": -0.0012056464768059906,
+          "delta_ci": [
+            -0.0025208196197817174,
+            0.00011730334371986655
+          ],
+          "delta_significant": false
+        },
+        "ctx_attention_mass_norm": {
+          "auc_oriented": 0.4652597653447534,
+          "ci": [
+            0.4884197695035461,
+            0.5811490542467692
+          ],
+          "auc_fact_oriented": -0.64453125,
+          "fact_ci": [
+            0.5289760348583878,
+            0.7533651758575771
+          ],
+          "delta_mean": 0.019562353253745095,
+          "delta_ci": [
+            0.013841911460523985,
+            0.02550265270729164
+          ],
+          "delta_significant": true
+        },
+        "ctx_attention_mass_lift": {
+          "auc_oriented": 0.46726857319455634,
+          "ci": [
+            0.48715102924286596,
+            0.5796308576480991
+          ],
+          "auc_fact_oriented": -0.65625,
+          "fact_ci": [
+            0.5419043440105309,
+            0.762962962962963
+          ],
+          "delta_mean": 0.012298745413621267,
+          "delta_ci": [
+            0.008621168012420336,
+            0.016016590719421703
+          ],
+          "delta_significant": true
+        },
+        "ctx_max_similarity": {
+          "auc_oriented": 0.5208993278219887,
+          "ci": [
+            0.43445436584585156,
+            0.5250409690849499
+          ],
+          "auc_fact_oriented": -0.2877604166666667,
+          "fact_ci": [
+            0.19130434782608696,
+            0.3975694444444444
+          ],
+          "delta_mean": -0.013675601003386828,
+          "delta_ci": [
+            -0.017123360234308094,
+            -0.010353746852739954
+          ],
+          "delta_significant": true
+        },
+        "ctx_support_distance": {
+          "auc_oriented": 0.5025220472180219,
+          "ci": [
+            0.45795626567662234,
+            0.5475401872460696
+          ],
+          "auc_fact_oriented": 0.5171440972222222,
+          "fact_ci": [
+            0.39956427015250545,
+            0.6325954861111112
+          ],
+          "delta_mean": 0.003968253968253968,
+          "delta_ci": [
+            0.0,
+            0.011904761904761904
+          ],
+          "delta_significant": false
+        },
+        "ctx_similarity_decay": {
+          "auc_oriented": 0.5033608900564012,
+          "ci": [
+            0.4520606944076332,
+            0.5415562328827634
+          ],
+          "auc_fact_oriented": -0.4565972222222222,
+          "fact_ci": [
+            0.3409390083369899,
+            0.5739130434782609
+          ],
+          "delta_mean": -0.00047902850431145023,
+          "delta_ci": [
+            -0.001005512329978925,
+            -0.00017981039867143484
+          ],
+          "delta_significant": true
+        },
+        "ctx_sim_contrast": {
+          "auc_oriented": 0.5113409344267723,
+          "ci": [
+            0.44326710816777043,
+            0.5352574016791869
+          ],
+          "auc_fact_oriented": -0.4036458333333333,
+          "fact_ci": [
+            0.29196428571428573,
+            0.5204036858271172
+          ],
+          "delta_mean": -0.011095246901702197,
+          "delta_ci": [
+            -0.01465380142903431,
+            -0.0075991653141516706
+          ],
+          "delta_significant": true
+        },
+        "ctx_sim_margin": {
+          "auc_oriented": 0.5157779715455679,
+          "ci": [
+            0.439023178807947,
+            0.5309554590557011
+          ],
+          "auc_fact_oriented": -0.3472222222222222,
+          "fact_ci": [
+            0.24088541666666666,
+            0.4597902097902098
+          ],
+          "delta_mean": -0.017444992617332584,
+          "delta_ci": [
+            -0.022839664258784528,
+            -0.012423576004480172
+          ],
+          "delta_significant": true
+        }
+      },
+      "last": {
+        "attention_entropy": {
+          "auc_oriented": 0.4957119678590744,
+          "ci": [
+            0.4505603710042511,
+            0.5407615894039736
+          ],
+          "auc_fact_oriented": 0.4752604166666667,
+          "fact_ci": [
+            0.35692574902301344,
+            0.5973392461197339
+          ],
+          "delta_mean": -0.0041297972202301025,
+          "delta_ci": [
+            -0.007684963755309582,
+            -0.0007270968829592069
+          ],
+          "delta_significant": true
+        },
+        "ctx_attention_mass": {
+          "auc_oriented": 0.4976987008973411,
+          "ci": [
+            0.4559239610963749,
+            0.5483596785588132
+          ],
+          "auc_fact_oriented": -0.5186631944444444,
+          "fact_ci": [
+            0.3986105080330004,
+            0.6357142857142857
+          ],
+          "delta_mean": 0.0018441521873076756,
+          "delta_ci": [
+            -0.001454088216026624,
+            0.00499889999628067
+          ],
+          "delta_significant": false
+        },
+        "embedding_density": {
+          "auc_oriented": 0.4965287358859174,
+          "ci": [
+            0.4507433398742808,
+            0.5412433451641526
+          ],
+          "auc_fact_oriented": 0.46484375,
+          "fact_ci": [
+            0.3498910675381264,
+            0.5807622504537205
+          ],
+          "delta_mean": -0.0012416741161041384,
+          "delta_ci": [
+            -0.003385070065818091,
+            0.0011779741294449114
+          ],
+          "delta_significant": false
+        },
+        "ctx_attention_mass_norm": {
+          "auc_oriented": 0.4992108254875774,
+          "ci": [
+            0.45497519890808613,
+            0.5470821329624601
+          ],
+          "auc_fact_oriented": -0.5208333333333334,
+          "fact_ci": [
+            0.40515734265734266,
+            0.6378636561007381
+          ],
+          "delta_mean": 0.0032640981935306962,
+          "delta_ci": [
+            -0.0017465717660033718,
+            0.00819566588697065
+          ],
+          "delta_significant": false
+        },
+        "ctx_attention_mass_lift": {
+          "auc_oriented": 0.4983167956203574,
+          "ci": [
+            0.4556521449507061,
+            0.5481099656357389
+          ],
+          "auc_fact_oriented": -0.5121527777777778,
+          "fact_ci": [
+            0.3951219512195122,
+            0.6279379157427938
+          ],
+          "delta_mean": 0.0018441521873076756,
+          "delta_ci": [
+            -0.001454088216026624,
+            0.00499889999628067
+          ],
+          "delta_significant": false
+        },
+        "ctx_max_similarity": {
+          "auc_oriented": 0.5087250692597212,
+          "ci": [
+            0.44535525166653767,
+            0.5376003099230726
+          ],
+          "auc_fact_oriented": -0.41796875,
+          "fact_ci": [
+            0.30589293747188484,
+            0.5352173913043479
+          ],
+          "delta_mean": -0.014515416974359293,
+          "delta_ci": [
+            -0.022090089010285002,
+            -0.0071607211933917185
+          ],
+          "delta_significant": true
+        },
+        "ctx_support_distance": {
+          "auc_oriented": 0.5,
+          "ci": [
+            0.4553358373840035,
+            0.5455524469313439
+          ],
+          "auc_fact_oriented": 0.5,
+          "fact_ci": [
+            0.3847155883630048,
+            0.6167178587099605
+          ],
+          "delta_mean": 0.0,
+          "delta_ci": [
+            0.0,
+            0.0
+          ],
+          "delta_significant": false
+        },
+        "ctx_similarity_decay": {
+          "auc_oriented": 0.5011423714970034,
+          "ci": [
+            0.4532490476453376,
+            0.5440215471564818
+          ],
+          "auc_fact_oriented": -0.4835069444444444,
+          "fact_ci": [
+            0.3686495874945723,
+            0.5987841945288754
+          ],
+          "delta_mean": -0.000303302562513561,
+          "delta_ci": [
+            -0.00047598869842581447,
+            -0.00014461993463360312
+          ],
+          "delta_significant": true
+        },
+        "ctx_sim_contrast": {
+          "auc_oriented": 0.5093542013885056,
+          "ci": [
+            0.4438936781609195,
+            0.5383039579468151
+          ],
+          "auc_fact_oriented": -0.4227430555555556,
+          "fact_ci": [
+            0.30959617889709073,
+            0.5382608695652173
+          ],
+          "delta_mean": -0.013484151543503362,
+          "delta_ci": [
+            -0.02116534315351982,
+            -0.006120432763244983
+          ],
+          "delta_significant": true
+        },
+        "ctx_sim_margin": {
+          "auc_oriented": 0.5117051688171212,
+          "ci": [
+            0.4422255340288127,
+            0.5343476867658921
+          ],
+          "auc_fact_oriented": -0.3862847222222222,
+          "fact_ci": [
+            0.27572731220147634,
+            0.5030381944444444
+          ],
+          "delta_mean": -0.022243472453568475,
+          "delta_ci": [
+            -0.03213585771793035,
+            -0.013057559517246983
+          ],
+          "delta_significant": true
+        }
+      }
+    }
+  },
+  "release": null,
+  "duration_s": 27.5,
+  "evidence_context": {
+    "run_id": "37609202780",
+    "date": "2026-10-19",
+    "status": "NON_AUTHORITATIVE historical/reference; consult current indices",
+    "successor": "reports/EXPERIMENTS_INDEX.md",
+    "source_commit": null,
+    "limitation": null
+  }
+}
