@@ -101,7 +101,10 @@ def test_windows_rc_keeps_strict_size_and_frozen_packaging_contract() -> None:
     assert "spanverify train" not in build and "git push" not in build
     assert "--prerelease" in build and "--latest=false" in build
     assert "spanverify-module/reports/experiments/** -text" in (REPO_ROOT / ".gitattributes").read_text()
-    tree = ast.parse((MODULE_ROOT / "spanverify.spec").read_text(encoding="utf-8"))
+    spec = (MODULE_ROOT / "spanverify.spec").read_text(encoding="utf-8")
+    assert 'ROOT / "data"' not in spec  # Server never needs embedded training corpora.
+    assert '--add-data "data/' not in build
+    tree = ast.parse(spec)
     excluded = next(
         ast.literal_eval(n.value)
         for n in tree.body

@@ -171,7 +171,7 @@ jobs:
       - name: Сборка onedir (вариант для строгих антивирусов)
         run: >
           python -m PyInstaller --noconfirm --clean --onedir --name spanverify_onedir
-          --add-data "config;config" --add-data "data/demo_pairs.jsonl;data" --add-data "data/demo_dataset.jsonl;data"
+          --add-data "config;config"
           --hidden-import spanverify.server --hidden-import spanverify.cli
           --exclude-module torch --exclude-module transformers --exclude-module streamlit
           --exclude-module numpy --exclude-module sklearn --exclude-module scipy --exclude-module pandas --exclude-module matplotlib

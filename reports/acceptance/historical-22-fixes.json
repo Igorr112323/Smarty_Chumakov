@@ -1,0 +1,139 @@
+{
+  "head_sha": "ef39a09d0840d3227c853bcff1e3f0311b5001ac",
+  "source_junit": "spanverify-module/reports/experiments/p5_span_filter/run39170981235/full_suite_junit.xml",
+  "current_junit": "reports/acceptance/full-suite.xml",
+  "failures_fixed": [
+    {
+      "node": "tests.test_calibration::test_cross_validate_reports_folds_and_mean",
+      "cause_and_fix": "PAVA compression сохраняла неверные концы ступеней: сохранены последние точки для upper-bound transform, исходное требование F1 > .8 оставлено. Frozen таблицы не менялись.",
+      "result": "passed",
+      "diff": "https://github.com/Igorr112323/Smarty_Chumakov/commit/81ed5bd#diff-0a7190d85bdd5a0ca5c3d31c83d8041527d01b3e2d62886d78c38405f4f07cc2"
+    },
+    {
+      "node": "tests.test_check_numbers::test_coverage_pattern_decimal",
+      "cause_and_fix": "Парсер coverage не принимал десятичную часть/регистр. Добавлены fractional percent и IGNORECASE, отрицательные ловушки сохранены.",
+      "result": "passed",
+      "diff": "https://github.com/Igorr112323/Smarty_Chumakov/commit/5ff79f9#diff-006b47444817bf93960dc22b4ce1b03a7ba5db2a6d150e11a51525c543ba55a8"
+    },
+    {
+      "node": "tests.test_check_numbers::test_trap_wrong_coverage",
+      "cause_and_fix": "Парсер coverage не принимал десятичную часть/регистр. Добавлены fractional percent и IGNORECASE, отрицательные ловушки сохранены.",
+      "result": "passed",
+      "diff": "https://github.com/Igorr112323/Smarty_Chumakov/commit/5ff79f9#diff-006b47444817bf93960dc22b4ce1b03a7ba5db2a6d150e11a51525c543ba55a8"
+    },
+    {
+      "node": "tests.test_ci_workflows::test_document_lists_every_workflow",
+      "cause_and_fix": "Устаревший реестр workflow пересобран из действующих файлов, не выдумывая статусы.",
+      "result": "passed",
+      "diff": "https://github.com/Igorr112323/Smarty_Chumakov/commit/5ff79f9#diff-24048e38b26084932f144a2b9805cd1551f1daa403f18c7f5daf18557b0d0767"
+    },
+    {
+      "node": "tests.test_context_stack::test_train_produces_valid_bundle",
+      "cause_and_fix": "Устаревшее ожидание probability <= 1 противоречило documented all-negative sentinel max(prob)+1e-9. Допущен только предусмотренный sentinel, модельный порог не менялся.",
+      "result": "passed",
+      "diff": "https://github.com/Igorr112323/Smarty_Chumakov/commit/5ff79f9#diff-e2b4f539b9379608b9521c05e8647b499ef9a23db08bfcff014b04e43bb54cb1"
+    },
+    {
+      "node": "tests.test_contract_provenance::test_contract_provenance_local_or_ci",
+      "cause_and_fix": "Локальному отчёту присвоен честный provenance=local, генератор также пишет local без фиктивной CI-ссылки.",
+      "result": "passed",
+      "diff": "https://github.com/Igorr112323/Smarty_Chumakov/commit/5ff79f9#diff-88ea2d6f349cd91f8c012e3cfdfcdbe8227d56fbcf6e4e51291ae3aba598fb43"
+    },
+    {
+      "node": "tests.test_feature_cache_roundtrip::test_dump_load_roundtrip_preserves_all_features",
+      "cause_and_fix": "Serializer сохранял 3 из 5 признаков и не принимал max_length/chunked: сохраняется полный FEATURE_NAMES и реальные параметры окна.",
+      "result": "passed",
+      "diff": "https://github.com/Igorr112323/Smarty_Chumakov/commit/5ff79f9#diff-f3f0c568c3b80ddec6dc83002ee897f109fe2b904c1f7ef35605660a6f62f4b7"
+    },
+    {
+      "node": "tests.test_feature_cache_roundtrip::test_collect_samples_works_with_cached_matrix",
+      "cause_and_fix": "Serializer сохранял 3 из 5 признаков и не принимал max_length/chunked: сохраняется полный FEATURE_NAMES и реальные параметры окна.",
+      "result": "passed",
+      "diff": "https://github.com/Igorr112323/Smarty_Chumakov/commit/5ff79f9#diff-f3f0c568c3b80ddec6dc83002ee897f109fe2b904c1f7ef35605660a6f62f4b7"
+    },
+    {
+      "node": "tests.test_metrics_files::test_metrics_file_is_not_behind_the_suite",
+      "cause_and_fix": "Устаревшая inventory 606 заменена фактической текущей collection 872; pass/skip/coverage взяты отдельно из JUnit/CI, не выдуманы.",
+      "result": "passed",
+      "diff": "https://github.com/Igorr112323/Smarty_Chumakov/commit/5ff79f9#diff-0e3eb06f48b8c13cc77bfd21311cd6695ef28ece16a255daa5afe676154628dd"
+    },
+    {
+      "node": "tests.test_metrics_files::test_document_test_claims_match_this_session",
+      "cause_and_fix": "Устаревшая inventory 606 заменена фактической текущей collection 872; pass/skip/coverage взяты отдельно из JUnit/CI, не выдуманы.",
+      "result": "passed",
+      "diff": "https://github.com/Igorr112323/Smarty_Chumakov/commit/5ff79f9#diff-0e3eb06f48b8c13cc77bfd21311cd6695ef28ece16a255daa5afe676154628dd"
+    },
+    {
+      "node": "tests.test_metrics_files::test_evaluate_reports_verdict_metrics",
+      "cause_and_fix": "Demo использовал старую семантику нижних границ PAVA. Совместимость включена только явным lower_bounds_legacy_v1; положительные grounded/CLI/verdict assertions сохранены; P5 не входит в эту ветку.",
+      "result": "passed",
+      "diff": "https://github.com/Igorr112323/Smarty_Chumakov/commit/5ff79f9#diff-3524bcbd9c692a8d52008ad610f8a39faf76347f25f86dde6275d7b269e9832d"
+    },
+    {
+      "node": "tests.test_no_test_isolation::test_no_test_without_splits_errors",
+      "cause_and_fix": "Реализован --no-test: без splits код 3, со splits открываются только train/dev, не test и не общий unsplit corpus.",
+      "result": "passed",
+      "diff": "https://github.com/Igorr112323/Smarty_Chumakov/commit/5ff79f9#diff-242e5277437c2447a276ce1ce08f6a0211c2d2bd5f4c72480179b518810f09cb"
+    },
+    {
+      "node": "tests.test_no_test_isolation::test_no_test_with_splits_excludes_test",
+      "cause_and_fix": "Реализован --no-test: без splits код 3, со splits открываются только train/dev, не test и не общий unsplit corpus.",
+      "result": "passed",
+      "diff": "https://github.com/Igorr112323/Smarty_Chumakov/commit/5ff79f9#diff-242e5277437c2447a276ce1ce08f6a0211c2d2bd5f4c72480179b518810f09cb"
+    },
+    {
+      "node": "tests.test_number_attribution::test_attribution_requires_two_measurements",
+      "cause_and_fix": "Demo использовал старую семантику нижних границ PAVA. Совместимость включена только явным lower_bounds_legacy_v1; положительные grounded/CLI/verdict assertions сохранены; P5 не входит в эту ветку.",
+      "result": "passed",
+      "diff": "https://github.com/Igorr112323/Smarty_Chumakov/commit/5ff79f9#diff-3524bcbd9c692a8d52008ad610f8a39faf76347f25f86dde6275d7b269e9832d"
+    },
+    {
+      "node": "tests.test_number_words_in_answer::test_answer_with_number_in_words_is_grounded",
+      "cause_and_fix": "Demo использовал старую семантику нижних границ PAVA. Совместимость включена только явным lower_bounds_legacy_v1; положительные grounded/CLI/verdict assertions сохранены; P5 не входит в эту ветку.",
+      "result": "passed",
+      "diff": "https://github.com/Igorr112323/Smarty_Chumakov/commit/5ff79f9#diff-3524bcbd9c692a8d52008ad610f8a39faf76347f25f86dde6275d7b269e9832d"
+    },
+    {
+      "node": "tests.test_server_cli::test_service_verify_accepts_context_list",
+      "cause_and_fix": "Demo использовал старую семантику нижних границ PAVA. Совместимость включена только явным lower_bounds_legacy_v1; положительные grounded/CLI/verdict assertions сохранены; P5 не входит в эту ветку.",
+      "result": "passed",
+      "diff": "https://github.com/Igorr112323/Smarty_Chumakov/commit/5ff79f9#diff-3524bcbd9c692a8d52008ad610f8a39faf76347f25f86dde6275d7b269e9832d"
+    },
+    {
+      "node": "tests.test_server_cli::test_cli_verify_confirmed_answer",
+      "cause_and_fix": "Demo использовал старую семантику нижних границ PAVA. Совместимость включена только явным lower_bounds_legacy_v1; положительные grounded/CLI/verdict assertions сохранены; P5 не входит в эту ветку.",
+      "result": "passed",
+      "diff": "https://github.com/Igorr112323/Smarty_Chumakov/commit/5ff79f9#diff-3524bcbd9c692a8d52008ad610f8a39faf76347f25f86dde6275d7b269e9832d"
+    },
+    {
+      "node": "tests.test_server_cli::test_cli_selftest_passes",
+      "cause_and_fix": "Demo использовал старую семантику нижних границ PAVA. Совместимость включена только явным lower_bounds_legacy_v1; положительные grounded/CLI/verdict assertions сохранены; P5 не входит в эту ветку.",
+      "result": "passed",
+      "diff": "https://github.com/Igorr112323/Smarty_Chumakov/commit/5ff79f9#diff-3524bcbd9c692a8d52008ad610f8a39faf76347f25f86dde6275d7b269e9832d"
+    },
+    {
+      "node": "tests.test_verdict_rule::test_demo_pair_single_token_verdict_before_after",
+      "cause_and_fix": "Demo использовал старую семантику нижних границ PAVA. Совместимость включена только явным lower_bounds_legacy_v1; положительные grounded/CLI/verdict assertions сохранены; P5 не входит в эту ветку.",
+      "result": "passed",
+      "diff": "https://github.com/Igorr112323/Smarty_Chumakov/commit/5ff79f9#diff-3524bcbd9c692a8d52008ad610f8a39faf76347f25f86dde6275d7b269e9832d"
+    },
+    {
+      "node": "tests.test_verdict_rule::test_evaluate_tokens_identical_under_both_rules",
+      "cause_and_fix": "Demo использовал старую семантику нижних границ PAVA. Совместимость включена только явным lower_bounds_legacy_v1; положительные grounded/CLI/verdict assertions сохранены; P5 не входит в эту ветку.",
+      "result": "passed",
+      "diff": "https://github.com/Igorr112323/Smarty_Chumakov/commit/5ff79f9#diff-3524bcbd9c692a8d52008ad610f8a39faf76347f25f86dde6275d7b269e9832d"
+    },
+    {
+      "node": "tests.test_workflow_limits::test_no_job_is_longer_than_the_limit[postprocess-p0-answer-p1.yml]",
+      "cause_and_fix": "Job timeout 60 противоречил сохранённому лимиту 40 min. Workflow и проверка сохранены, timeout исправлен на 40.",
+      "result": "passed",
+      "diff": "https://github.com/Igorr112323/Smarty_Chumakov/commit/5ff79f9#diff-709de731f9a52256f179530b7edc4f5d28904d410accc7858d9a2d90b12b2f42"
+    },
+    {
+      "node": "tests.test_workflow_limits::test_no_job_is_longer_than_the_limit[postprocess-p0-answer.yml]",
+      "cause_and_fix": "Job timeout 60 противоречил сохранённому лимиту 40 min. Workflow и проверка сохранены, timeout исправлен на 40.",
+      "result": "passed",
+      "diff": "https://github.com/Igorr112323/Smarty_Chumakov/commit/5ff79f9#diff-73c5b1beb66a80292e73e6f8ca4ef09b9bea5042b474e3b0c0407db672b8f7e8"
+    }
+  ]
+}
