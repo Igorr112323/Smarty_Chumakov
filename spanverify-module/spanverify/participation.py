@@ -188,6 +188,10 @@ def token_rows(text: str, matrix: FeatureMatrix) -> tuple[list[list[float]], lis
     """
     tokens = tokenize_with_offsets(text)
     bounds = _sentence_bounds(text)
+    from bisect import bisect_right
+
+    sentence_starts = [a for a, _ in bounds]
+    fragment_stats = {}
     rows: list[list[float]] = []
     kept: list[Token] = []
     for index, token in enumerate(tokens):
@@ -195,15 +199,21 @@ def token_rows(text: str, matrix: FeatureMatrix) -> tuple[list[list[float]], lis
             continue
         if index >= len(matrix):
             break
-        start, end = _sentence_of(token.start, bounds)
-        fragment = text[start:end]
+        candidate = max(0, bisect_right(sentence_starts, token.start) - 1)
+        start, end = bounds[candidate]
+        if not start <= token.start < end:
+            start, end = bounds[0]
+        if (start, end) not in fragment_stats:
+            fragment = text[start:end]
+            fragment_stats[start, end] = (_cliche_rate(fragment), _len_norm(fragment))
+        cliche, length = fragment_stats[start, end]
         rows.append(
             [
                 matrix.attention_entropy[index],
                 matrix.ctx_attention_mass[index],
                 matrix.embedding_density[index],
-                _cliche_rate(fragment),
-                _len_norm(fragment),
+                cliche,
+                length,
             ]
         )
         kept.append(token)

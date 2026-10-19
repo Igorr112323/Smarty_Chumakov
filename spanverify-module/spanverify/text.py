@@ -100,8 +100,15 @@ def sentences(text: str) -> list[tuple[int, int]]:
     """Список (start, end) предложений с учётом частых сокращений."""
     bounds: list[int] = []
     for match in _SENT_BOUNDARY.finditer(text):
-        prefix = text[: match.start()].rstrip()
-        last_word = re.split(r"[\s«\"(]", prefix)[-1]
+        # Same last split field as re.split on the entire prefix, but O(word)
+        # instead of rescanning/copying all previous sentences for every stop.
+        end = match.start()
+        while end > 0 and text[end - 1].isspace():
+            end -= 1
+        start = end
+        while start > 0 and not text[start - 1].isspace() and text[start - 1] not in '«"(':
+            start -= 1
+        last_word = text[start:end]
         last_word = last_word.strip(".,!?…").lower()
         if last_word and len(last_word) <= 4 and last_word in ABBREV:
             continue
