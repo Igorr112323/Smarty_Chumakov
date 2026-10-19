@@ -87,12 +87,13 @@ def main(out):
                     patch("transformers.AutoModelForCausalLM.from_pretrained", return_value=_model),
                 ):
                     if split == "dev":
-                        before = legacy.verify(pair["answer"], pair["context"], with_tokens=True).to_dict(
-                            with_tokens=True
-                        )
-                        after = current.verify(pair["answer"], pair["context"], with_tokens=True).to_dict(
-                            with_tokens=True
-                        )
+                        before_result = legacy.verify(pair["answer"], pair["context"], with_tokens=True)
+                        after_result = current.verify(pair["answer"], pair["context"], with_tokens=True)
+                        if length <= 512:
+                            assert before_result.score == after_result.score
+                            assert before_result.threshold == after_result.threshold
+                        before = before_result.to_dict(with_tokens=True)
+                        after = after_result.to_dict(with_tokens=True)
                         before.pop("latency_ms", None)
                         after.pop("latency_ms", None)
                         a = json.dumps(before, ensure_ascii=False, sort_keys=True, separators=(",", ":")).encode()
@@ -154,6 +155,47 @@ def main(out):
                 )
             )
         )
+
+    # Cache optimization golden against the previously accepted uncached P7
+    # window contract, full public tokens/risks/texts/offsets included.
+    previous_source = subprocess.check_output(
+        ["git", "show", "2502a62:spanverify-module/spanverify/hf_windows.py"], text=True
+    )
+    previous = types.ModuleType("spanverify._p7_uncached_windows")
+    previous.__package__ = "spanverify"
+    sys.modules[previous.__name__] = previous
+    exec(compile(previous_source, "<accepted-uncached-P7-window-contract>", "exec"), previous.__dict__)
+    from spanverify import hf_windows
+
+    long_text = "Срок хранения первичных документов десять лет. " * 120
+    context = "Срок хранения первичных документов составляет 10 лет."
+    with patch.object(hf_windows, "full_answer_features", previous.full_answer_features):
+        baseline = verifier("hf").verify(long_text, context, with_tokens=True).to_dict(with_tokens=True)
+    optimized = verifier("hf").verify(long_text, context, with_tokens=True).to_dict(with_tokens=True)
+    for result in (baseline, optimized):
+        result.pop("latency_ms", None)
+        for key in ("model_calls", "identical_window_cache_hits", "logical_window_scores"):
+            result["stats"]["features"].pop(key, None)
+    left = json.dumps(baseline, ensure_ascii=False, sort_keys=True, separators=(",", ":")).encode()
+    right = json.dumps(optimized, ensure_ascii=False, sort_keys=True, separators=(",", ":")).encode()
+    assert left == right, "Identical-window cache changed predictive output"
+    save(
+        out / "long-cache-golden.json",
+        dict(
+            passed=True,
+            bytes=len(left),
+            sha256=hashlib.sha256(left).hexdigest(),
+            excluded_nonpredictive_fields=[
+                "latency_ms",
+                "model_calls",
+                "identical_window_cache_hits",
+                "logical_window_scores",
+            ],
+        ),
+    )
+    print(
+        "::notice title=P7 exact long cache::" + json.dumps(dict(passed=True, sha256=hashlib.sha256(left).hexdigest()))
+    )
 
     # Actual >512 model positions: every native token must map, no surrogate fallback.
     text = "Срок хранения первичных документов десять лет. " * 120

@@ -1,7 +1,7 @@
 {
   "kind": "ci_workflows",
   "runs_considered": 100,
-  "generated_at": "2026-10-19T08:12:52Z",
+  "generated_at": "2026-10-19T08:39:30Z",
   "command": "python scripts/collect_ci_workflows.py",
   "source": ".github/workflows/*.yml + reports/CI_RUNS.json",
   "registry": {
@@ -740,8 +740,8 @@
         },
         {
           "name": "acceptance-archive",
-          "timeout_minutes": 10,
-          "steps": 4,
+          "timeout_minutes": 40,
+          "steps": 6,
           "uploads_artifacts": true,
           "runs_python": "ubuntu-24.04"
         }

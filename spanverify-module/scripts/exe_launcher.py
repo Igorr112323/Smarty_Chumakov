@@ -54,7 +54,13 @@ def main(argv: list[str] | None = None) -> int:
     args = parser.parse_args(argv)
 
     if args.runtime_dir:
-        sys.path.insert(0, str(Path(args.runtime_dir).resolve()))
+        libraries = Path(args.runtime_dir).resolve()
+        # HF's external runtime includes optional stdlib modules deliberately
+        # absent from the small frozen demo executable (e.g. unittest/pydoc).
+        # These come from the portable matching Python, never host registry.
+        for path in (libraries.parent / "python" / "DLLs", libraries.parent / "python" / "Lib", libraries):
+            if path.is_dir():
+                sys.path.insert(0, str(path))
     port = free_port(args.port)
     if not args.quiet or args.port_file:
         print(f"[spanverify] сервис будет запущен на http://127.0.0.1:{port}", flush=True)

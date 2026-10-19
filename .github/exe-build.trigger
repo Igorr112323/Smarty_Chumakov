@@ -9,3 +9,4 @@ P6 final measured receipts publication; runtime unchanged
 P7 external HF offline autonomy RC
 P7 external HF layout, corrected generic schema bounds
 P7 offline HF generic span bounds
+P7 complete portable external stdlib and diagnostic HF smoke

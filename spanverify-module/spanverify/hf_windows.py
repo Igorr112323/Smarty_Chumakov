@@ -3,9 +3,14 @@
 from __future__ import annotations
 
 from bisect import bisect_right
+from collections import OrderedDict
 from dataclasses import fields
 
 from .core import Token
+
+
+class FullAnswerCoverageError(ValueError):
+    """Do not turn a failed long context window into partial scoring."""
 
 
 def character_windows(text, offsets, budget):
@@ -44,7 +49,7 @@ def full_answer_features(answer, context, tokens, tokenizer, runtime, scorer, op
 
     limit = options["max_length"]
     if limit < 16:
-        raise ValueError("HF full-answer windows require max_length >= 16")
+        raise FullAnswerCoverageError("HF full-answer windows require max_length >= 16")
     budget = max(1, limit // 4)
     offsets = tokenizer(answer, return_offsets_mapping=True, add_special_tokens=False)["offset_mapping"]
     windows = character_windows(answer, offsets, budget)
@@ -55,6 +60,8 @@ def full_answer_features(answer, context, tokens, tokenizer, runtime, scorer, op
     weights = [0] * len(tokens)
     ends = [t.end for t in tokens]
     calls = 0
+    hits = 0
+    cache = OrderedDict()
     for start, end in windows:
         indices = []
         local = []
@@ -70,23 +77,44 @@ def full_answer_features(answer, context, tokens, tokenizer, runtime, scorer, op
             continue
         maxima = None
         for a, b in contexts:
-            part = scorer(
-                answer[start:end], context[a:b], answer_tokens=local, _runtime=runtime, _windowed=True, **options
+            # Same immutable eval runtime, exact strings AND exact relative token
+            # slices: reuse identical feature computations, never skip a token.
+            # Per-request bounded LRU prevents cross-model/context contamination.
+            key = (
+                answer[start:end],
+                context[a:b],
+                tuple((t.text, t.start, t.end) for t in local),
             )
+            if key in cache:
+                part = cache.pop(key)
+                cache[key] = part
+                hits += 1
+            else:
+                part = scorer(
+                    answer[start:end],
+                    context[a:b],
+                    answer_tokens=local,
+                    _runtime=runtime,
+                    _windowed=True,
+                    **options,
+                )
+                cache[key] = part
+                if len(cache) > 256:
+                    cache.popitem(last=False)
+                calls += 1
             if not part.meta.get("all_answer_tokens_mapped"):
-                raise ValueError("HF window has unscored answer tokens; refusing zero fill")
+                raise FullAnswerCoverageError("HF window has unscored answer tokens; refusing zero fill")
             if maxima is None:
                 maxima = {name: list(getattr(part, name)) for name in names}
             else:
                 for name in names:
                     maxima[name] = [max(x, y) for x, y in zip(maxima[name], getattr(part, name), strict=True)]
-            calls += 1
         for j, (index, weight) in enumerate(indices):
             weights[index] += weight
             for name in names:
                 sums[name][index] += maxima[name][j] * weight
     if any(w == 0 for w in weights):
-        raise ValueError("HF answer coverage gap; refusing synthetic defaults")
+        raise FullAnswerCoverageError("HF answer coverage gap; refusing synthetic defaults")
     return FeatureMatrix(
         **{name: [v / w for v, w in zip(values, weights, strict=True)] for name, values in sums.items()},
         meta=dict(
@@ -97,6 +125,8 @@ def full_answer_features(answer, context, tokens, tokenizer, runtime, scorer, op
             answer_windows=len(windows),
             context_subwindows=len(contexts),
             model_calls=calls,
+            identical_window_cache_hits=hits,
+            logical_window_scores=calls + hits,
             all_answer_tokens_mapped=True,
             scored_answer_tokens=len(tokens),
             answer_last_end=tokens[-1].end,

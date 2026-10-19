@@ -3,6 +3,18 @@ $ErrorActionPreference = 'Stop'
 $release = (Resolve-Path $ReleaseDir).Path
 New-Item -ItemType Directory -Force $OutputDir | Out-Null
 $out = (Resolve-Path $OutputDir).Path
+trap {
+  $message = $_.Exception.Message + ' | ' + $_.InvocationInfo.PositionMessage
+  if ($out -and (Test-Path $out)) {
+    foreach ($log in (Get-ChildItem $out -Filter '*stderr.log' -ErrorAction SilentlyContinue)) {
+      $message += ' | ' + (Get-Content $log.FullName -Tail 12 -ErrorAction SilentlyContinue | Out-String)
+    }
+  }
+  $message = $message -replace '(https?://[^\s?]+)\?[^\s]+', '${1}?[redacted]'
+  if ($message.Length -gt 2400) { $message = $message.Substring($message.Length-2400) }
+  Write-Host ('::error title=P7 Windows HF failure::'+$message.Replace('%','%25').Replace("`r",'%0D').Replace("`n",'%0A'))
+  exit 1
+}
 $layout = Join-Path $env:RUNNER_TEMP 'p7-hf-isolated'
 New-Item -ItemType Directory -Force $layout | Out-Null
 $pythonRoot = Split-Path (Get-Command python).Source
@@ -26,6 +38,10 @@ Copy-Item (Join-Path $release 'p5-runtime.json') $layout
 $exe = Join-Path $layout 'spanverify.exe'
 $weights = Join-Path $layout 'frozen-p5.json'
 $pyz = Join-Path $layout 'spanverify.pyz'
+# The portable interpreter uses only stdlib plus the declared external libs;
+# never inherit development packages or host .pth files.
+$site = Join-Path $layout 'python/Lib/site-packages'
+if (Test-Path $site) { Remove-Item $site -Recurse -Force }
 $env:HF_HUB_OFFLINE = '1'
 $env:TRANSFORMERS_OFFLINE = '1'
 $env:HF_HOME = Join-Path $layout 'offline-cache'

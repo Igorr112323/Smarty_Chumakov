@@ -35,6 +35,7 @@ import statistics
 from collections.abc import Mapping, Sequence
 from dataclasses import dataclass, field
 from functools import lru_cache
+from threading import RLock
 from typing import Any
 
 from .core import Token, number_value, numbers_in, split_chunks
@@ -1157,9 +1158,28 @@ def map_token_positions(
     return mapping
 
 
+_HF_RUNTIME_LOCK = RLock()
+
+
+class _LockedTokenizer:
+    """Fast tokenizers mutate truncation state; serialize only tokenizer calls."""
+
+    def __init__(self, tokenizer):
+        self.tokenizer = tokenizer
+        self.lock = RLock()
+
+    def __call__(self, *args, **kwargs):
+        with self.lock:
+            return self.tokenizer(*args, **kwargs)
+
+    def __getattr__(self, key):
+        return getattr(self.tokenizer, key)
+
+
 def _load_hf_runtime(model_name, device):
     # Lazy cache is model identity/device only, never answer text or predictions.
-    return _cached_hf_runtime(model_name, device)
+    with _HF_RUNTIME_LOCK:
+        return _cached_hf_runtime(model_name, device)
 
 
 @lru_cache(maxsize=2)
@@ -1173,7 +1193,7 @@ def _cached_hf_runtime(model_name, device):
     model.config.output_attentions = True
     model.config.output_hidden_states = True
     model.to(device or ("cuda" if torch.cuda.is_available() else "cpu"))
-    return tokenizer, model
+    return _LockedTokenizer(tokenizer), model
 
 
 def hf_features(
@@ -1525,8 +1545,11 @@ def hf_features_chunked(
                 layer=layer,
             )
             chunk_matrices.append(fm)
-        except Exception:
-            # Если проход по чанку не удался — пропускаем
+        except Exception as exc:
+            from .hf_windows import FullAnswerCoverageError
+
+            if isinstance(exc, FullAnswerCoverageError):
+                raise
             continue
 
     if not chunk_matrices:
@@ -1558,6 +1581,10 @@ def hf_features_chunked(
     )
 
     if any(m.meta.get("full_answer") for m in chunk_matrices):
+        from .hf_windows import FullAnswerCoverageError
+
+        if len(chunk_matrices) != len(relevant_indices):
+            raise FullAnswerCoverageError("A selected long-answer context failed; partial scoring forbidden")
         if not all(m.meta.get("all_answer_tokens_mapped") for m in chunk_matrices):
             raise ValueError("Incomplete HF answer coverage; refusing mixed/truncated matrices")
         merged.meta.update(
@@ -1566,6 +1593,8 @@ def hf_features_chunked(
             all_answer_tokens_mapped=True,
             scored_answer_tokens=n_tokens,
             answer_last_end=tokens[-1].end,
+            model_calls=sum(m.meta.get("model_calls", 0) for m in chunk_matrices),
+            identical_window_cache_hits=sum(m.meta.get("identical_window_cache_hits", 0) for m in chunk_matrices),
             answer_windows=[m.meta["answer_windows"] for m in chunk_matrices],
         )
 

@@ -53,7 +53,7 @@ def test_window_partition_preserves_unicode_boundaries_and_all_characters():
     assert all(spans[i][1] == spans[i + 1][0] for i in range(len(spans) - 1))
 
 
-def test_full_answer_stitches_every_token_once_without_zero_fill():
+def test_full_answer_stitches_every_token_once_without_zero_fill(monkeypatch):
     from dataclasses import fields
 
     from spanverify.features import FeatureMatrix
@@ -80,6 +80,38 @@ def test_full_answer_stitches_every_token_once_without_zero_fill():
         assert result.meta["answer_last_end"] == tokens[-1].end
         assert result.attention_entropy == [0.75] * len(tokens)
         assert result.meta["answer_windows"] > 1
+
+    # Cover lazy runtime identity and long-dispatch control flow without fitting
+    # a model or silently replacing a requested real HF production backend.
+    import sys
+    import types
+
+    from spanverify import features, hf_windows
+    from spanverify.backends.hf import HFBackend
+
+    fake_model = types.SimpleNamespace(config=types.SimpleNamespace())
+    fake_model.eval = lambda: None
+    fake_model.to = lambda device: None
+
+    def fake_tokenizer(text, **kwargs):
+        return {"input_ids": [0] * 513}
+
+    torch = types.ModuleType("torch")
+    torch.cuda = types.SimpleNamespace(is_available=lambda: False)
+    transformers = types.ModuleType("transformers")
+    transformers.AutoTokenizer = types.SimpleNamespace(from_pretrained=lambda name: fake_tokenizer)
+    transformers.AutoModelForCausalLM = types.SimpleNamespace(from_pretrained=lambda *a, **kw: fake_model)
+    features._cached_hf_runtime.cache_clear()
+    with monkeypatch.context() as m:
+        m.setitem(sys.modules, "torch", torch)
+        m.setitem(sys.modules, "transformers", transformers)
+        m.setattr(HFBackend, "dependencies", staticmethod(lambda: (True, "")))
+        runtime = features._load_hf_runtime("fixture", None)
+        assert runtime == features._load_hf_runtime("fixture", None)
+        sentinel = FeatureMatrix(attention_entropy=[0.75], meta={"full_answer": True})
+        m.setattr(hf_windows, "full_answer_features", lambda *a, **kw: sentinel)
+        assert features.hf_features("слово", "", model_name="fixture") is sentinel
+    features._cached_hf_runtime.cache_clear()
 
 
 def test_cached_cosine_norms_are_float_exact():

@@ -154,9 +154,25 @@ jobs:
     needs: [parity, hf-contract, benchmark, calibration, full-hf-input]
     if: always()
     runs-on: ubuntu-24.04
-    timeout-minutes: 10
+    timeout-minutes: 40
     steps:
       - uses: actions/checkout@v4
+      - name: Matching Windows workflow receipt
+        id: windows
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          run_id=$(gh run list --workflow build-and-release-exe.yml --commit "$GITHUB_SHA" --json databaseId --jq '.[0].databaseId')
+          test -n "$run_id" && test "$run_id" != null
+          gh run watch "$run_id" --exit-status
+          gh run view "$run_id" --json headSha,url,conclusion,jobs > reports/p7/windows-workflow.json
+          echo "run_id=$run_id" >> "$GITHUB_OUTPUT"
+      - uses: actions/download-artifact@v4
+        with:
+          name: p7-windows-hf-autonomy
+          path: reports/p7/windows-hf-autonomy
+          run-id: ${{ steps.windows.outputs.run_id }}
+          github-token: ${{ github.token }}
       - uses: actions/download-artifact@v4
         with:
           pattern: p7-*

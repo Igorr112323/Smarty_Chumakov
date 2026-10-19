@@ -15,6 +15,32 @@ from p6_acceptance import check_schema, document, environment, save, verifier
 
 
 def rates(out):
+    env = json.loads((out / "environment.json").read_text())
+    cpu = next(
+        (
+            line.split(":", 1)[1].strip()
+            for line in env.get("cpuinfo", "").splitlines()
+            if line.startswith("model name")
+        ),
+        "unknown",
+    )
+    ram = next(
+        (line for line in (env.get("meminfo") or "").splitlines() if line.startswith("MemTotal:")),
+        "unknown",
+    )
+    summary = dict(
+        cpu=cpu,
+        logical_cpu=env["cpu_count"],
+        ram=ram,
+        python=env["python"],
+        platform=env["platform"],
+        versions={
+            k: v for k, v in env["versions"].items() if k.lower() in ("torch", "transformers", "numpy", "sentencepiece")
+        },
+        commit=env["commit"],
+        run_url=env["run_url"],
+    )
+    print("::notice title=P7 benchmark environment::" + json.dumps(summary), flush=True)
     path = out / "benchmark.json"
     rows = json.loads(path.read_text())
     for row in rows:
@@ -22,8 +48,18 @@ def rates(out):
         row["seconds_per_1000_chars"] = (
             row["median_seconds"] * 1000 / n if row.get("median_seconds") is not None else None
         )
+        if row.get("diagnostic_profile"):
+            profile = (out / row["diagnostic_profile"]).with_suffix(".summary.json")
+            if profile.exists():
+                row["profile_top"] = [
+                    {k: v for k, v in r.items() if k in ("function", "calls", "self_seconds", "cumulative_seconds")}
+                    for r in json.loads(profile.read_text())[:5]
+                ]
         brief = {k: v for k, v in row.items() if k not in ("samples", "repeats")}
-        print("::notice title=P7 speed::" + json.dumps(brief, ensure_ascii=False), flush=True)
+        print(
+            "::notice title=P7 speed::" + json.dumps(brief, ensure_ascii=False),
+            flush=True,
+        )
     save(path, rows)
 
 

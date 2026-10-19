@@ -1,0 +1,477 @@
+{
+  "mapping": "reports/acceptance/protocol.json (published before these numbers)",
+  "train_oof": {
+    "contradiction": {
+      "pairs": 104,
+      "tokens": {
+        "tp": 58,
+        "fp": 27,
+        "fn": 156,
+        "tn": 4400,
+        "f1": 0.3879598662207358,
+        "fpr": 0.006098938332956856
+      },
+      "spans": {
+        "precision": 0.5185185185185185,
+        "recall": 0.1346153846153846,
+        "f1": 0.2137404580152672,
+        "tp": 14,
+        "fp": 13,
+        "fn": 90,
+        "iou_threshold": 0.5
+      },
+      "answers": {
+        "status": "not measured",
+        "reason": "P5 does not store complete OOF answer predictions; no replacement or new inference"
+      }
+    },
+    "ALL": {
+      "pairs": 842,
+      "tokens": {
+        "tp": 919,
+        "fp": 422,
+        "fn": 465,
+        "tn": 44801,
+        "f1": 0.6744954128440367,
+        "fpr": 0.009331534838467152
+      },
+      "spans": {
+        "precision": 0.670846394984326,
+        "recall": 0.4582441113490364,
+        "f1": 0.544529262086514,
+        "tp": 214,
+        "fp": 105,
+        "fn": 253,
+        "iou_threshold": 0.5
+      },
+      "answers": {
+        "status": "not measured",
+        "reason": "P5 does not store complete OOF answer predictions; no replacement or new inference"
+      }
+    },
+    "unconfirmed": {
+      "pairs": 59,
+      "tokens": {
+        "tp": 314,
+        "fp": 71,
+        "fn": 5,
+        "tn": 2545,
+        "f1": 0.8920454545454546,
+        "fpr": 0.027140672782874617
+      },
+      "spans": {
+        "precision": 0.8529411764705882,
+        "recall": 0.9830508474576272,
+        "f1": 0.9133858267716536,
+        "tp": 58,
+        "fp": 10,
+        "fn": 1,
+        "iou_threshold": 0.5
+      },
+      "answers": {
+        "status": "not measured",
+        "reason": "P5 does not store complete OOF answer predictions; no replacement or new inference"
+      }
+    },
+    "number_attribution": {
+      "pairs": 92,
+      "tokens": {
+        "tp": 72,
+        "fp": 33,
+        "fn": 123,
+        "tn": 3886,
+        "f1": 0.48,
+        "fpr": 0.008420515437611636
+      },
+      "spans": {
+        "precision": 0.6216216216216216,
+        "recall": 0.25,
+        "f1": 0.35658914728682173,
+        "tp": 23,
+        "fp": 14,
+        "fn": 69,
+        "iou_threshold": 0.5
+      },
+      "answers": {
+        "status": "not measured",
+        "reason": "P5 does not store complete OOF answer predictions; no replacement or new inference"
+      }
+    },
+    "faithful": {
+      "pairs": 375,
+      "tokens": {
+        "tp": 0,
+        "fp": 188,
+        "fn": 0,
+        "tn": 21840,
+        "f1": 0.0,
+        "fpr": 0.008534592337025604
+      },
+      "spans": {
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0,
+        "tp": 0,
+        "fp": 49,
+        "fn": 0,
+        "iou_threshold": 0.5
+      },
+      "answers": {
+        "status": "not measured",
+        "reason": "P5 does not store complete OOF answer predictions; no replacement or new inference"
+      }
+    },
+    "excess": {
+      "pairs": 44,
+      "tokens": {
+        "tp": 233,
+        "fp": 26,
+        "fn": 11,
+        "tn": 2691,
+        "f1": 0.9264413518886679,
+        "fpr": 0.009569377990430622
+      },
+      "spans": {
+        "precision": 0.8571428571428571,
+        "recall": 0.9545454545454546,
+        "f1": 0.9032258064516128,
+        "tp": 42,
+        "fp": 7,
+        "fn": 2,
+        "iou_threshold": 0.5
+      },
+      "answers": {
+        "status": "not measured",
+        "reason": "P5 does not store complete OOF answer predictions; no replacement or new inference"
+      }
+    },
+    "missing": {
+      "pairs": 48,
+      "tokens": {
+        "tp": 74,
+        "fp": 35,
+        "fn": 22,
+        "tn": 1163,
+        "f1": 0.7219512195121951,
+        "fpr": 0.02921535893155259
+      },
+      "spans": {
+        "precision": 0.868421052631579,
+        "recall": 0.6875,
+        "f1": 0.7674418604651162,
+        "tp": 33,
+        "fp": 5,
+        "fn": 15,
+        "iou_threshold": 0.5
+      },
+      "answers": {
+        "status": "not measured",
+        "reason": "P5 does not store complete OOF answer predictions; no replacement or new inference"
+      }
+    },
+    "oversight": {
+      "pairs": 38,
+      "tokens": {
+        "tp": 143,
+        "fp": 7,
+        "fn": 9,
+        "tn": 690,
+        "f1": 0.9470198675496688,
+        "fpr": 0.010043041606886656
+      },
+      "spans": {
+        "precision": 1.0,
+        "recall": 0.9473684210526315,
+        "f1": 0.972972972972973,
+        "tp": 36,
+        "fp": 0,
+        "fn": 2,
+        "iou_threshold": 0.5
+      },
+      "answers": {
+        "status": "not measured",
+        "reason": "P5 does not store complete OOF answer predictions; no replacement or new inference"
+      }
+    },
+    "partial": {
+      "pairs": 82,
+      "tokens": {
+        "tp": 25,
+        "fp": 35,
+        "fn": 139,
+        "tn": 7586,
+        "f1": 0.22321428571428573,
+        "fpr": 0.004592573153129511
+      },
+      "spans": {
+        "precision": 0.5333333333333333,
+        "recall": 0.0975609756097561,
+        "f1": 0.16494845360824742,
+        "tp": 8,
+        "fp": 7,
+        "fn": 74,
+        "iou_threshold": 0.5
+      },
+      "answers": {
+        "status": "not measured",
+        "reason": "P5 does not store complete OOF answer predictions; no replacement or new inference"
+      }
+    }
+  },
+  "saved_dev": {
+    "partial": {
+      "pairs": 16,
+      "tokens": {
+        "tp": 1,
+        "fp": 5,
+        "fn": 24,
+        "tn": 1709,
+        "f1": 0.06451612903225806,
+        "fpr": 0.0029171528588098016
+      },
+      "spans": {
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0,
+        "tp": 0,
+        "fp": 2,
+        "fn": 16,
+        "iou_threshold": 0.5
+      },
+      "answers": {
+        "tp": 4,
+        "fp": 0,
+        "fn": 12,
+        "tn": 0,
+        "f1": 0.4,
+        "fpr": 0
+      }
+    },
+    "ALL": {
+      "pairs": 181,
+      "tokens": {
+        "tp": 192,
+        "fp": 134,
+        "fn": 95,
+        "tn": 7548,
+        "f1": 0.6264274061990212,
+        "fpr": 0.01744337412132257
+      },
+      "spans": {
+        "precision": 0.5897435897435898,
+        "recall": 0.4791666666666667,
+        "f1": 0.5287356321839081,
+        "tp": 46,
+        "fp": 32,
+        "fn": 50,
+        "iou_threshold": 0.5
+      },
+      "answers": {
+        "tp": 49,
+        "fp": 14,
+        "fn": 47,
+        "tn": 71,
+        "f1": 0.6163522012578616,
+        "fpr": 0.16470588235294117
+      }
+    },
+    "faithful": {
+      "pairs": 85,
+      "tokens": {
+        "tp": 0,
+        "fp": 92,
+        "fn": 0,
+        "tn": 3094,
+        "f1": 0.0,
+        "fpr": 0.028876333961079723
+      },
+      "spans": {
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0,
+        "tp": 0,
+        "fp": 22,
+        "fn": 0,
+        "iou_threshold": 0.5
+      },
+      "answers": {
+        "tp": 0,
+        "fp": 14,
+        "fn": 0,
+        "tn": 71,
+        "f1": 0.0,
+        "fpr": 0.16470588235294117
+      }
+    },
+    "contradiction": {
+      "pairs": 22,
+      "tokens": {
+        "tp": 8,
+        "fp": 3,
+        "fn": 42,
+        "tn": 1161,
+        "f1": 0.26229508196721313,
+        "fpr": 0.002577319587628866
+      },
+      "spans": {
+        "precision": 0.5,
+        "recall": 0.09090909090909091,
+        "f1": 0.15384615384615385,
+        "tp": 2,
+        "fp": 2,
+        "fn": 20,
+        "iou_threshold": 0.5
+      },
+      "answers": {
+        "tp": 4,
+        "fp": 0,
+        "fn": 18,
+        "tn": 0,
+        "f1": 0.3076923076923077,
+        "fpr": 0
+      }
+    },
+    "missing": {
+      "pairs": 14,
+      "tokens": {
+        "tp": 22,
+        "fp": 3,
+        "fn": 6,
+        "tn": 172,
+        "f1": 0.8301886792452831,
+        "fpr": 0.017142857142857144
+      },
+      "spans": {
+        "precision": 1.0,
+        "recall": 0.7857142857142857,
+        "f1": 0.88,
+        "tp": 11,
+        "fp": 0,
+        "fn": 3,
+        "iou_threshold": 0.5
+      },
+      "answers": {
+        "tp": 12,
+        "fp": 0,
+        "fn": 2,
+        "tn": 0,
+        "f1": 0.9230769230769231,
+        "fpr": 0
+      }
+    },
+    "excess": {
+      "pairs": 7,
+      "tokens": {
+        "tp": 38,
+        "fp": 7,
+        "fn": 0,
+        "tn": 139,
+        "f1": 0.9156626506024096,
+        "fpr": 0.04794520547945205
+      },
+      "spans": {
+        "precision": 0.7777777777777778,
+        "recall": 1.0,
+        "f1": 0.8750000000000001,
+        "tp": 7,
+        "fp": 2,
+        "fn": 0,
+        "iou_threshold": 0.5
+      },
+      "answers": {
+        "tp": 5,
+        "fp": 0,
+        "fn": 2,
+        "tn": 0,
+        "f1": 0.8333333333333334,
+        "fpr": 0
+      }
+    },
+    "unconfirmed": {
+      "pairs": 15,
+      "tokens": {
+        "tp": 79,
+        "fp": 12,
+        "fn": 6,
+        "tn": 614,
+        "f1": 0.8977272727272727,
+        "fpr": 0.019169329073482427
+      },
+      "spans": {
+        "precision": 0.875,
+        "recall": 0.9333333333333333,
+        "f1": 0.9032258064516129,
+        "tp": 14,
+        "fp": 2,
+        "fn": 1,
+        "iou_threshold": 0.5
+      },
+      "answers": {
+        "tp": 13,
+        "fp": 0,
+        "fn": 2,
+        "tn": 0,
+        "f1": 0.9285714285714286,
+        "fpr": 0
+      }
+    },
+    "oversight": {
+      "pairs": 9,
+      "tokens": {
+        "tp": 36,
+        "fp": 5,
+        "fn": 0,
+        "tn": 196,
+        "f1": 0.935064935064935,
+        "fpr": 0.024875621890547265
+      },
+      "spans": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "tp": 9,
+        "fp": 0,
+        "fn": 0,
+        "iou_threshold": 0.5
+      },
+      "answers": {
+        "tp": 8,
+        "fp": 0,
+        "fn": 1,
+        "tn": 0,
+        "f1": 0.9411764705882353,
+        "fpr": 0
+      }
+    },
+    "number_attribution": {
+      "pairs": 13,
+      "tokens": {
+        "tp": 8,
+        "fp": 7,
+        "fn": 17,
+        "tn": 463,
+        "f1": 0.4,
+        "fpr": 0.014893617021276596
+      },
+      "spans": {
+        "precision": 0.6,
+        "recall": 0.23076923076923078,
+        "f1": 0.33333333333333337,
+        "tp": 3,
+        "fp": 2,
+        "fn": 10,
+        "iou_threshold": 0.5
+      },
+      "answers": {
+        "tp": 3,
+        "fp": 0,
+        "fn": 10,
+        "tn": 0,
+        "f1": 0.375,
+        "fpr": 0
+      }
+    }
+  },
+  "no_fitting": true,
+  "caution": "Mode proxies, not new perturbation tests; OOF answer unavailable is not replaced by P1 or in-sample predictions."
+}
