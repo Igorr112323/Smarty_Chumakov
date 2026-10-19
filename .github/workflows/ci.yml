@@ -19,7 +19,7 @@ on:
 # Новый пуш отменяет предыдущий прогон той же ветки. Без этого каждый коммит
 # плодил полный прогон, старые продолжали работать, и очередь не рассасывалась.
 concurrency:
-  group: ci-${{ github.workflow }}-${{ github.ref }}
+  group: ci-p8-acceptance-${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
 # CI ничего не пишет обратно в ветку: коммиты бота были источником
@@ -35,7 +35,7 @@ env:
 jobs:
   p8-freeze-barrier:
     name: P8 no-fit barrier until official177 is sealed
-    runs-on: ubuntu-24.04-arm
+    runs-on: ubuntu-24.04
     timeout-minutes: 40
     env:
       GH_TOKEN: ${{ github.token }}
@@ -58,7 +58,7 @@ jobs:
   quality:
     needs: p8-freeze-barrier
     name: Линтер, форматирование, покрытие
-    runs-on: ubuntu-24.04-arm
+    runs-on: ubuntu-24.04
     # В job'е не только линтер, но и прогон с покрытием, воспроизводимость
     # обучения и чистая установка в отдельный venv: 20 минут не хватило
     # (job снимался на 20-й минуте), сорок — с запасом.
@@ -146,7 +146,7 @@ jobs:
   # кодом или с документами, и это должно быть видно на каждом push.
   contract:
     name: Соответствие договору (проект 117812)
-    runs-on: ubuntu-24.04-arm
+    runs-on: ubuntu-24.04
     timeout-minutes: 40
     # GH_TOKEN нужен проверке поставки: состав и размеры релиза читаются через
     # API GitHub. Без токена эта проверка честно пишет «не измерено», а не падает.
@@ -217,7 +217,7 @@ jobs:
       matrix:
         # На каждый push — две контрольные комбинации. Полная матрица
         # (3 версии Python x 2 системы) идёт по расписанию и при ручном запуске.
-        include: ${{ github.event_name == 'push' && fromJSON('[{"os":"ubuntu-24.04-arm","python":"3.11"},{"os":"windows-latest","python":"3.12"}]') || fromJSON('[{"os":"ubuntu-24.04-arm","python":"3.10"},{"os":"ubuntu-24.04-arm","python":"3.11"},{"os":"ubuntu-24.04-arm","python":"3.12"},{"os":"windows-latest","python":"3.10"},{"os":"windows-latest","python":"3.11"},{"os":"windows-latest","python":"3.12"}]') }}
+        include: ${{ github.event_name == 'push' && fromJSON('[{"os":"ubuntu-24.04","python":"3.11"},{"os":"windows-latest","python":"3.12"}]') || fromJSON('[{"os":"ubuntu-24.04","python":"3.10"},{"os":"ubuntu-24.04","python":"3.11"},{"os":"ubuntu-24.04","python":"3.12"},{"os":"windows-latest","python":"3.10"},{"os":"windows-latest","python":"3.11"},{"os":"windows-latest","python":"3.12"}]') }}
     defaults:
       run:
         working-directory: spanverify-module
@@ -277,7 +277,7 @@ jobs:
 
   pilot:
     name: Пилот на реальной модели (rugpt3small, CPU)
-    runs-on: ubuntu-24.04-arm
+    runs-on: ubuntu-24.04
     # Качает веса модели и считает на CPU — 22-32 минуты. На каждый push
     # это незачем: только вручную или по ночному расписанию.
     if: github.event_name == 'workflow_dispatch' || github.event_name == 'schedule'
@@ -365,7 +365,7 @@ jobs:
 
   metrics:
     name: Единый файл чисел (METRICS.json) и сверка документов
-    runs-on: ubuntu-24.04-arm
+    runs-on: ubuntu-24.04
     timeout-minutes: 30
     needs: [quality, pilot, external, p8-freeze-barrier]
     # На пуш job'ы pilot и external пропускаются (они работают по расписанию и
@@ -455,7 +455,7 @@ jobs:
 
   external:
     name: Внешние размеченные наборы (скачивание, контрольные числа, оценка)
-    runs-on: ubuntu-24.04-arm
+    runs-on: ubuntu-24.04
     # Скачивание внешних наборов занимает десятки минут: только вручную
     # или по ночному расписанию.
     if: github.event_name == 'workflow_dispatch' || github.event_name == 'schedule'
@@ -532,7 +532,7 @@ jobs:
   probe-sources:
     needs: p8-freeze-barrier
     name: Разведка официальных источников (не блокирует CI)
-    runs-on: ubuntu-24.04-arm
+    runs-on: ubuntu-24.04
     timeout-minutes: 40
     # Отключено по той же причине, что и corpus-a3: акты загружены вручную,
     # разведка доступности источников больше не нужна, а job без таймаута
