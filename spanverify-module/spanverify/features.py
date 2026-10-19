@@ -535,8 +535,9 @@ def _normalised_support(mass: Sequence[float], tokens: Sequence[Token], eps: flo
         return [0.0] * len(mass)
     background = sum(mass[index] for index in content) / len(content)
     out = [0.0] * len(mass)
+    content_set = set(content)  # Preserve summation order, index membership only.
     for index in range(len(mass)):
-        if index not in content:
+        if index not in content_set:
             out[index] = min(1.0, max(0.0, mass[index]))
             continue
         out[index] = min(1.0, max(0.0, mass[index] / (background if background > eps else eps)))
@@ -1127,14 +1128,26 @@ def map_token_positions(
     наш токен получает все позиции модели, которые с ним существенно
     перекрываются, — признаки такого токена усредняются по его подсловам.
     """
+    from bisect import bisect_left, bisect_right
+
+    # Sorted starts and prefix-max ends form a conservative interval index.
+    # This supports nested, duplicate and unsorted offsets, not just tokenizer
+    # output. Candidate pruning never changes overlap arithmetic or thresholds.
+    indexed = sorted(model_spans, key=lambda span: span[1])
+    starts = [span[1] for span in indexed]
+    prefix_ends = []
+    for _position, _start, end in indexed:
+        prefix_ends.append(max(prefix_ends[-1], end) if prefix_ends else end)
     mapping: list[list[int]] = []
     for start, end in token_spans:
         absolute = (start + answer_start, end + answer_start)
-        hits = [
-            (position, _span_overlap(absolute, (span_start, span_end)))
-            for position, span_start, span_end in model_spans
-            if _span_overlap(absolute, (span_start, span_end)) > 0
-        ]
+        lo = bisect_right(prefix_ends, absolute[0])
+        hi = bisect_left(starts, absolute[1])
+        hits = []
+        for position, span_start, span_end in indexed[lo:hi]:
+            overlap = _span_overlap(absolute, (span_start, span_end))
+            if overlap > 0:
+                hits.append((position, overlap))
         if not hits:
             mapping.append([])
             continue
