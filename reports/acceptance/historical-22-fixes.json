@@ -1,5 +1,5 @@
 {
-  "head_sha": "ef39a09d0840d3227c853bcff1e3f0311b5001ac",
+  "head_sha": "6926a809a9d85d9786b2f27517a6629899278074",
   "source_junit": "spanverify-module/reports/experiments/p5_span_filter/run39170981235/full_suite_junit.xml",
   "current_junit": "reports/acceptance/full-suite.xml",
   "failures_fixed": [

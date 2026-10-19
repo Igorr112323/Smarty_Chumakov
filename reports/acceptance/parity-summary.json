@@ -6,7 +6,7 @@
   "cache_misses": 0,
   "bundle_sha256": "e0b13c693a058dfd66ed24a52fc14e9c70964e95885358e7b99cc1f328ad6892",
   "passed": true,
-  "source_run_url": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39181817277",
-  "head_sha": "ef39a09d0840d3227c853bcff1e3f0311b5001ac",
-  "source": "Checked JSON prefix before environment in check-run 117835985317 annotation (4096-byte message cap); full environment retained in p6-parity runner artifact"
+  "source_run_url": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39183025109",
+  "head_sha": "6926a809a9d85d9786b2f27517a6629899278074",
+  "source": "check-run 117839626488 checked JSON prefix before environment (4096-byte annotation cap); full environment retained in p6-parity artifact"
 }

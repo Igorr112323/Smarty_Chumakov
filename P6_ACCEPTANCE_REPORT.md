@@ -1,13 +1,13 @@
 # P6 — результаты приёмочного контура
 
-**Приёмка продукта целиком не пройдена.** Модель P5 не переобучалась. Исправлены причины исторических тестовых падений; нормальная CI-проверка на `34a82a5` завершилась SUCCESS. После исправления Windows-поставки требуется заключительный CI на окончательном HEAD; статус будет приложен отдельным receipt.
+**Приёмка продукта целиком не пройдена.** Приёмочный контур выполнен и результаты зафиксированы без изменения замороженной модели. Проверенный код: `6926a809a9d85d9786b2f27517a6629899278074`. Обычный CI **39183025069 SUCCESS**, Windows **39183025124 SUCCESS**, public parity/interfaces **39183025109 SUCCESS**. После этого публикуются только receipts/отчёты; inference/runtime/config не меняются. Официальная оценка test177 не выполнялась (инцидент чтения описан ниже).
 
 ## Контроль модели и регрессии
 
 - Frozen P5: **122874 B**, SHA-256 `e0b13c693a058dfd66ed24a52fc14e9c70964e95885358e7b99cc1f328ad6892`.
 - Public dev replay: 181 пара, 13150 полных token-risk записей, несовпадений 0, P1 raw/calibrated/threshold delta 0, cache misses 0. Все span/token поля сравниваются с сохранённым P5, без переобучения.
-- Полный локальный suite: **869 passed, 2 skipped, 0 failures/errors**, 320.79 s, 871 узел. Tests excluded: false. Пропуски прежние: отсутствуют torch/transformers и rouge_score в unit-test окружении; настоящий product HF измеряется отдельно на runner.
-- Причины всех 22 падений и правки: [acceptance README](reports/acceptance/README.md). Исходные положительные grounded/CLI/числовые проверки сохранены; изменено только устаревшее ограничение sentinel-порога.
+- Полный локальный suite: **870 passed, 2 skipped, 0 failures/errors**, 301.725 s, 872 узла. Tests excluded: false. Пропуски прежние: отсутствуют torch/transformers и rouge_score в unit-test окружении; настоящий product HF измеряется отдельно на runner.
+- Все 22 исходных testcase найдены и PASSED в новом JUnit: [индивидуальные причины и diff](reports/acceptance/historical-22-fixes.md). Исходные положительные grounded/CLI/числовые проверки сохранены; изменено только устаревшее ограничение sentinel-порога.
 - Исторические каталоги P2/P3/P4/P5 побайтно не изменены.
 
 ## Native benchmark на GitHub runner
@@ -53,7 +53,7 @@ HF: CPU wheels, OMP/MKL/OpenBLAS threads=2. У каждого режима от�
 ### Функциональные 2 млн знаков
 
 - Полный context-документ: ровно 2M Unicode chars, 2022 проиндексированных чанка, 3 обработанных retrieved chunks по замороженной политике; короткий ответ. Это не проверка каждого факта документа.
-- Отдельный полный answer-запрос в настоящем sandbox CPU (2 CPU, RAM 4034452 kB, Python 3.11.2): **2000000 chars / 3660605 UTF-8 B**, 282830 token records, последняя координата **2000000**, все full risks конечны и в [0,1], все span slices/schema проверены. **349.840719 s**, норма 60 s не достигнута. Модель та же P5, режим demo; это не HF-результат. Receipt: `reports/acceptance/functional-2M-demo.json`.
+- Отдельный полный answer-запрос в настоящем sandbox CPU (2 CPU, RAM 4034452 kB, Python 3.11.2): **2000000 chars / 3660605 UTF-8 B**, 282830 token records, последняя координата **2000000**, все full risks конечны и в [0,1], все span slices/schema проверены. **363.414889 s**, норма 60 s не достигнута. Модель та же P5, режим demo; это не HF-результат. Receipt: `reports/acceptance/functional-2M-demo-final.json`; первый полный прогон 349.840719 s сохранён отдельно.
 - Native HF full-answer без усечения **не достигнут**: [доказательство и ограничение](reports/acceptance/long-answer-limitation.json). Извлечение признаков/окно/чанкинг не менялись ради красивой скорости.
 
 ### Профиль узких мест (отдельный диагностический прогон)
@@ -97,7 +97,16 @@ MAE: demo **0.471802**, hf **0.399863**. Обе средние кривые **н
 
 ## Windows RC / окончательная CI-проверка
 
-Предыдущая сборка выявила нарушение raw-byte SHA при Windows CRLF checkout frozen JSON. Добавлено `.gitattributes -text` для immutable experiment evidence, проверка SHA не ослабляется. Clean-directory smoke теперь также запускается с настоящим чистым working directory. Готовится fresh RC на окончательном SHA; стабильный latest запрещён. SHA256SUMS, размеры, автономный smoke и окончательный ordinary CI будут приложены после выполнения, не объявляются выполненными заранее.
+Итоговые проверки на одном коде `6926a80`:
+
+- [Обычный ci.yml — **SUCCESS**](https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39183025069): quality Ruff/Black, полный suite и coverage **85.06%** (не demo quality P5), Linux/Windows, contract и numbers jobs SUCCESS. Tests collected **872**, tests_excluded=false; новых unit skips нет. Существующие conditional pilot/external/scout jobs не отключались и не выдаются за запущенные.
+- [Windows workflow — **SUCCESS**](https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39183025124): три тестовые Python-матрицы, onefile/onedir/pyz, HTTP/clean-CWD autonomy smoke, проверка embedded Python DLL SHA и frozen P5 SHA, product registry keys before/after, оба строгих size gate SUCCESS.
+- [Public interfaces/parity — **SUCCESS**](https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39183025109): demo и hf, CLI/web8765/HTTP200; обязательный nonempty span 46..53 «десять », label=doubtful, risk=.5654, confidence=.4346; сохранены реальные HTTP bodies/annotations/artifact links. В `[interfaces-only]` пропущено повторное измерение уже неизменного benchmark, не unit tests. Publisher не создаёт повторные bot-коммиты.
+- [Только prerelease RC, не latest](https://github.com/Igorr112323/Smarty_Chumakov/releases/tag/v1.3.1-rc.p6.39183025124): **exe 8985124 B ≤9000000**, **pyz 227008 B ≤600000**, onedir ZIP **9135445 B**. `.pyz` требует Python ≥3.10, самостоятельный `.exe` содержит Python DLL; ZIP не называется 0.6-MB portable package.
+- SHA256 exe: `526655effe1a30e9e3ae04236e6659ccb3afbc258dc94141fd9e0ee15fa44464`; pyz: `632777edf23dcb680e83e06f0bb92abf623a380b9d1bc1a64d4ae082ac4450ca`; ZIP: `6abe236d14f8d4464d8ae6be9ff3c7ee8e8ae85ab36cf44c119953d976627f67`. Полный SHA256SUMS опубликован с RC и зеркалируется в `RC-SHA256SUMS.txt`; digest взят из GitHub release API, а не придуман из имени файла.
+- Фикс CRLF: `.gitattributes -text` оставляет frozen evidence побайтно исходным. Training fallback запрещён, production auto-train не выполнялся. Неиспользуемые server exe train/evaluate корпуса вынесены из exe; модель/config не удалялись, DLL не стрипились.
+
+Portable copy/update: остановить процесс, проверить SHA256SUMS, заменить полный exe/onedir одним RC целиком; не смешивать config/runtime разных поставок. Frozen `frozen-p5.json` и `p5-runtime.json` включены в RC. Конкретные bytes/hash/runtime/env и JUnit находятся в `reports/acceptance/`; `manifest.json` инвентаризирует артефакты.
 
 HF внешние веса ~530 MB и библиотеки ~500 MB не включены в маленький exe. Маленький default exe — demo; frozen-p5.json/runtime передаются отдельно. Windows HF autonomy с конкретной внешней раскладкой не подтверждена и не выдаётся за измеренный факт. Продуктовые registry keys проверяются до/после; это не глобальный OS registry trace.
 

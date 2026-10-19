@@ -1,0 +1,12 @@
+{
+  "head_sha": "6926a809a9d85d9786b2f27517a6629899278074",
+  "tests": 872,
+  "passed": 870,
+  "skipped": 2,
+  "failures": 0,
+  "errors": 0,
+  "seconds": 301.725,
+  "tests_excluded": false,
+  "command": "python -m pytest tests -q --junitxml=../reports/acceptance/full-suite.xml",
+  "junit_sha256": "1e74a27031f0bd7ad806ee385f36d2bccbf069607b625eac34cd03b57c6bc379"
+}

@@ -1,1 +1,65 @@
-{"total_count":3,"artifacts":[{"id":12156970495,"node_id":"MDg6QXJ0aWZhY3QxMjE1Njk3MDQ5NQ==","name":"p6-parity","size_in_bytes":2126,"url":"https://api.github.com/repos/Igorr112323/Smarty_Chumakov/actions/artifacts/12156970495","archive_download_url":"https://api.github.com/repos/Igorr112323/Smarty_Chumakov/actions/artifacts/12156970495/zip","expired":false,"digest":"sha256:12b06aa45e280f2784ab0f022be0aea5f17fd3af46d6cfbb72c515b02dd4ddba","created_at":"2026-10-19T00:40:38Z","updated_at":"2026-10-19T00:40:38Z","expires_at":"2027-01-17T00:40:15Z","workflow_run":{"id":39181817277,"repository_id":1402768620,"head_repository_id":1402768620,"head_branch":"arena/c5f69767-smarty-chumakov","head_sha":"ef39a09d0840d3227c853bcff1e3f0311b5001ac"}},{"id":12156865575,"node_id":"MDg6QXJ0aWZhY3QxMjE1Njg2NTU3NQ==","name":"p6-product-hf","size_in_bytes":14348,"url":"https://api.github.com/repos/Igorr112323/Smarty_Chumakov/actions/artifacts/12156865575","archive_download_url":"https://api.github.com/repos/Igorr112323/Smarty_Chumakov/actions/artifacts/12156865575/zip","expired":false,"digest":"sha256:5829926ba80839a72b36fe47ec5545c45947118929b73c9f33434c05c144d1a4","created_at":"2026-10-19T00:42:18Z","updated_at":"2026-10-19T00:42:18Z","expires_at":"2027-01-17T00:40:15Z","workflow_run":{"id":39181817277,"repository_id":1402768620,"head_repository_id":1402768620,"head_branch":"arena/c5f69767-smarty-chumakov","head_sha":"ef39a09d0840d3227c853bcff1e3f0311b5001ac"}},{"id":12155863833,"node_id":"MDg6QXJ0aWZhY3QxMjE1NTg2MzgzMw==","name":"p6-product-demo","size_in_bytes":12385,"url":"https://api.github.com/repos/Igorr112323/Smarty_Chumakov/actions/artifacts/12155863833","archive_download_url":"https://api.github.com/repos/Igorr112323/Smarty_Chumakov/actions/artifacts/12155863833/zip","expired":false,"digest":"sha256:34c5ce350284b20fa016e3d4be11c4870156384f597eaa96760e55379a9f10ed","created_at":"2026-10-19T00:40:26Z","updated_at":"2026-10-19T00:40:26Z","expires_at":"2027-01-17T00:40:15Z","workflow_run":{"id":39181817277,"repository_id":1402768620,"head_repository_id":1402768620,"head_branch":"arena/c5f69767-smarty-chumakov","head_sha":"ef39a09d0840d3227c853bcff1e3f0311b5001ac"}}]}
+{
+  "total_count": 3,
+  "artifacts": [
+    {
+      "id": 12157430019,
+      "node_id": "MDg6QXJ0aWZhY3QxMjE1NzQzMDAxOQ==",
+      "name": "p6-parity",
+      "size_in_bytes": 2123,
+      "url": "https://api.github.com/repos/Igorr112323/Smarty_Chumakov/actions/artifacts/12157430019",
+      "archive_download_url": "https://api.github.com/repos/Igorr112323/Smarty_Chumakov/actions/artifacts/12157430019/zip",
+      "expired": false,
+      "digest": "sha256:03be3efcaa5ce450caaac1b830ff0c3d9721b837458d7cd8a7f14896cb07f155",
+      "created_at": "2026-10-19T00:56:50Z",
+      "updated_at": "2026-10-19T00:56:50Z",
+      "expires_at": "2027-01-17T00:56:28Z",
+      "workflow_run": {
+        "id": 39183025109,
+        "repository_id": 1402768620,
+        "head_repository_id": 1402768620,
+        "head_branch": "arena/c5f69767-smarty-chumakov",
+        "head_sha": "6926a809a9d85d9786b2f27517a6629899278074"
+      }
+    },
+    {
+      "id": 12157150666,
+      "node_id": "MDg6QXJ0aWZhY3QxMjE1NzE1MDY2Ng==",
+      "name": "p6-product-demo",
+      "size_in_bytes": 12308,
+      "url": "https://api.github.com/repos/Igorr112323/Smarty_Chumakov/actions/artifacts/12157150666",
+      "archive_download_url": "https://api.github.com/repos/Igorr112323/Smarty_Chumakov/actions/artifacts/12157150666/zip",
+      "expired": false,
+      "digest": "sha256:a69a822bcd17a49a199a3774744f3bc503266d75f96101a1732894945dc47223",
+      "created_at": "2026-10-19T00:56:36Z",
+      "updated_at": "2026-10-19T00:56:36Z",
+      "expires_at": "2027-01-17T00:56:28Z",
+      "workflow_run": {
+        "id": 39183025109,
+        "repository_id": 1402768620,
+        "head_repository_id": 1402768620,
+        "head_branch": "arena/c5f69767-smarty-chumakov",
+        "head_sha": "6926a809a9d85d9786b2f27517a6629899278074"
+      }
+    },
+    {
+      "id": 12156288561,
+      "node_id": "MDg6QXJ0aWZhY3QxMjE1NjI4ODU2MQ==",
+      "name": "p6-product-hf",
+      "size_in_bytes": 14424,
+      "url": "https://api.github.com/repos/Igorr112323/Smarty_Chumakov/actions/artifacts/12156288561",
+      "archive_download_url": "https://api.github.com/repos/Igorr112323/Smarty_Chumakov/actions/artifacts/12156288561/zip",
+      "expired": false,
+      "digest": "sha256:d79ef9acb298454b62f6c787d3ecbeec2b0076d5489d6b28f36fcf2da420320f",
+      "created_at": "2026-10-19T00:58:18Z",
+      "updated_at": "2026-10-19T00:58:18Z",
+      "expires_at": "2027-01-17T00:56:28Z",
+      "workflow_run": {
+        "id": 39183025109,
+        "repository_id": 1402768620,
+        "head_repository_id": 1402768620,
+        "head_branch": "arena/c5f69767-smarty-chumakov",
+        "head_sha": "6926a809a9d85d9786b2f27517a6629899278074"
+      }
+    }
+  ]
+}
