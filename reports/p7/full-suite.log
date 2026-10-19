@@ -3,85 +3,12 @@
 ........................................................................ [ 24%]
 ........................................................................ [ 32%]
 ........................................................................ [ 40%]
-........................................................................ [ 49%]
-.......s.........FF..................................................... [ 57%]
+........................................................................ [ 48%]
+.......s................................................................ [ 57%]
 ........................................................................ [ 65%]
-................................s....................................... [ 73%]
+..................................s..................................... [ 73%]
 ........................................................................ [ 81%]
 ........................................................................ [ 89%]
-........................................................................ [ 98%]
-.................                                                        [100%]
-=================================== FAILURES ===================================
-__________________ test_metrics_file_is_not_behind_the_suite ___________________
-
-request = <FixtureRequest for <Function test_metrics_file_is_not_behind_the_suite>>
-
-    def test_metrics_file_is_not_behind_the_suite(request: pytest.FixtureRequest) -> None:
-        """Файл чисел обязан совпадать с фактическим числом тестов этого прогона.
-    
-        Причина проверки: два ночных прогона ``ci`` на ``main`` подряд
-        (37755784670, 37911250513) падали на шаге «Сверить числа в документах с
-        METRICS.json». Job «Единый файл чисел» пересчитывает ``tests.collected``
-        заново (``pytest --collect-only``), а закоммиченный файл и документы
-        остались с прежним числом после слияния ветки, добавившей тесты. Локально
-        расхождение не ловилось: сверка смотрела в устаревший файл.
-    
-        Здесь число берётся из самой сессии pytest (коллекция завершена до запуска
-        тестов), поэтому проверка ничего не пересчитывает и не запускает второй
-        pytest. Прогон подмножества тестов — не полный состав, он пропускается.
-        """
-        if not _full_suite_requested(request.config):
-            pytest.skip("запрошено подмножество тестов: полный состав не собирался")
-        collected = request.session.testscollected
-        metrics = _metrics()
-        tests_block = metrics.get("tests") or {}
->       assert tests_block.get("collected") == collected, (
-            f"reports/METRICS.json отстал от состава тестов: в файле {tests_block.get('collected')}, "
-            f"собрано {collected}; пересоберите файл (scripts/collect_metrics.py) и обновите документы"
-        )
-E       AssertionError: reports/METRICS.json отстал от состава тестов: в файле 876, собрано 881; пересоберите файл (scripts/collect_metrics.py) и обновите документы
-E       assert 876 == 881
-E        +  where 876 = <built-in method get of dict object at 0x7fc1283acc00>('collected')
-E        +    where <built-in method get of dict object at 0x7fc1283acc00> = {'collected': 876, 'coverage_percent': 87.82, 'coverage_gate_percent': 85, 'inventory_note': 'P6 current collection; pass/fail and coverage require current JUnit, historical coverage retained.'}.get
-
-tests/test_metrics_files.py:187: AssertionError
-_________________ test_document_test_claims_match_this_session _________________
-
-request = <FixtureRequest for <Function test_document_test_claims_match_this_session>>
-
-    def test_document_test_claims_match_this_session(request: pytest.FixtureRequest) -> None:
-        """Заявленное в документах число тестов совпадает с собранным в этом прогоне.
-    
-        Документы (README, ИТОГ, отчёт о НИР, руководство) называют число тестов
-        текстом. Сверка с закоммиченным ``METRICS.json`` этого не ловит, если файл
-        устарел вместе с документами, — поэтому число подставляется из текущей
-        сессии pytest, а правила чтения строк берутся из ``scripts/check_numbers.py``
-        (оговорки «устарело», «аннотации CI», пороги и критерии остаются допустимыми).
-        """
-        if not _full_suite_requested(request.config):
-            pytest.skip("запрошено подмножество тестов: полный состав не собирался")
-        collected = request.session.testscollected
-        checker = _load_script("check_numbers")
-        metrics = json.loads(json.dumps(_metrics()))
-        metrics.setdefault("tests", {})["collected"] = collected
-        docs = [REPO_ROOT / name for name in checker.DEFAULT_DOCS if (REPO_ROOT / name).is_file()]
-        problems = [problem for problem in checker.check_docs(docs, metrics, repo_root=REPO_ROOT) if "tests=" in problem]
->       assert problems == [], "документы заявляют число тестов, которого нет в этом прогоне:\n" + "\n".join(problems)
-E       AssertionError: документы заявляют число тестов, которого нет в этом прогоне:
-E         /home/user/Smarty_Chumakov/README.md:39: tests=876 нет в METRICS.json (допустимо: ['881']) → python -m pytest -q                                             # 876 тестов
-E         /home/user/Smarty_Chumakov/ИТОГ.md:56: tests=876 нет в METRICS.json (допустимо: ['881']) → | 1 | Тесты проходят | `python -m pytest -q` | **876 тестов, все проходят** |
-E         /home/user/Smarty_Chumakov/ИТОГ.md:155: tests=876 нет в METRICS.json (допустимо: ['881']) → 4. **Тесты и покрытие**: 876 тестов проходят, покрытие [текущий отчёт покрытия CI](https:/
-E         /home/user/Smarty_Chumakov/ИТОГ.md:195: tests=876 нет в METRICS.json (допустимо: ['881']) → | 876 тестов, покрытие [текущий отчёт покрытия CI](https://github.com/Igorr112323/Smarty_C
-E         /home/user/Smarty_Chumakov/docs/ОТЧЁТ_о_НИР_шаблон.md:302: tests=876 нет в METRICS.json (допустимо: ['881']) → | Автоматические тесты | 876 тестов, все проходят |
-E         /home/user/Smarty_Chumakov/spanverify-module/README.md:26: tests=876 нет в METRICS.json (допустимо: ['881']) → | Конвейер (признаки → риск → фрагменты → калибровка → вердикт) | реализован, 876 тестов, 
-E         /home/user/Smarty_Chumakov/spanverify-module/README.md:248: tests=876 нет в METRICS.json (допустимо: ['881']) → ├── tests/               876 тестов (pytest), у каждого теста — docstring о смысле проверк
-E       assert ['/home/user/...естов, ', ...] == []
-E         
-E         Left contains 7 more items, first extra item: "/home/user/Smarty_Chumakov/README.md:39: tests=876 нет в METRICS.json (допустимо: ['881']) → python -m pytest -q                                             # 876 тестов"
-E         Use -v to get more diff
-
-tests/test_metrics_files.py:215: AssertionError
-=========================== short test summary info ============================
-FAILED tests/test_metrics_files.py::test_metrics_file_is_not_behind_the_suite
-FAILED tests/test_metrics_files.py::test_document_test_claims_match_this_session
-2 failed, 877 passed, 2 skipped in 302.35s (0:05:02)
+........................................................................ [ 97%]
+...................                                                      [100%]
+881 passed, 2 skipped in 305.51s (0:05:05)

@@ -15,3 +15,10 @@ latency includes no download/import; timeout is censored failure, never a passin
 Robustness is studied/documented, not a quality gate. Official test remains reserved.
 
 First attempt rejected by byte gate because original to_dict includes wall-clock latency_ms. Predictive code reverted before continuing. Original golden retained; stable golden removes ONLY latency_ms, never scores/tokens/offsets/texts. Comparison confirms original predictive fields unchanged.
+
+## Blocking audit finding
+Real tokenizer audit on 36cfac9: train 22/842 >512 (max1923), dev3/181 >512 (max1046).
+The prior short-answer assumption is false. Cached dev replay passes but bypasses
+new feature extraction, so is NOT proof of fresh long-path parity. Automatic long
+dispatch reverted immediately; no test177 reads. An explicit contract decision
+is needed before enabling changed long-answer features on those saved inputs.

@@ -1229,20 +1229,9 @@ def hf_features(
             "Проверьте доступ к весам или укажите другую модель."
         ) from exc
 
-    if not _windowed:
-        answer_ids = tokenizer(answer, add_special_tokens=False)["input_ids"]
-        if len(answer_ids) > max_length:
-            from .hf_windows import full_answer_features
-
-            return full_answer_features(
-                answer,
-                context_text,
-                tokens,
-                tokenizer,
-                (tokenizer, model),
-                hf_features,
-                dict(model_name=model_name, k=k, device=device, max_length=max_length, layer=layer),
-            )
+    # P7 automatic full-answer dispatch is rejected: tokenizer audit found
+    # 22 train / 3 dev answers >512, contrary to the preregistered assumption.
+    # Preserve the frozen public feature contract until explicit authorization.
     encoded = tokenizer(prompt, return_tensors="pt", truncation=not _windowed, max_length=max_length)
     if _windowed and encoded["input_ids"].shape[-1] > max_length:
         raise BackendUnavailable("HF internal window exceeds model limit; no truncation allowed")

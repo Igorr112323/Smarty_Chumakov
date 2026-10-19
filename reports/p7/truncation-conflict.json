@@ -1,0 +1,20 @@
+{
+  "source_run": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39217828002",
+  "audit": {
+    "train": {
+      "answers": 842,
+      "answer_over_512": 22,
+      "max_answer_model_tokens": 1923,
+      "answer_input_sha256": "5b59e375b54a2ef7a11123230566f9c0993606d25ddd19912fc883190ef894f4"
+    },
+    "dev": {
+      "answers": 181,
+      "answer_over_512": 3,
+      "max_answer_model_tokens": 1046,
+      "answer_input_sha256": "c02e34fc96c696af6bf2b20270489a7a007a8adecfa257013a7b37b774dd3c57"
+    }
+  },
+  "cached_parity_is_not_long_path_parity": true,
+  "automatic_long_dispatch_reverted": true,
+  "official_test_read": false
+}

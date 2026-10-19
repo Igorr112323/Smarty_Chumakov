@@ -29,6 +29,15 @@ def main(out):
             .sha256(json.dumps([(p["id"], p["answer"]) for p in pairs], ensure_ascii=False).encode())
             .hexdigest(),
         )
+    save(
+        out / "truncation-audit.json",
+        dict(
+            splits=audit,
+            official_test_read=False,
+            blocked="Saved OOF/dev contain long answers; full-answer semantics need explicit authorization",
+            environment=environment(),
+        ),
+    )
     print("::notice title=P7 truncation audit::" + json.dumps(audit))
     assert (
         audit["train"]["answer_over_512"] == 0 and audit["dev"]["answer_over_512"] == 0
