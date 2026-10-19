@@ -633,5 +633,15 @@
     "All source workflow conclusions SUCCESS does not mean every speed/quality norm achieved.",
     "Frozen P5 historical TP/FP/FN/TN49/14/47/71; authorized long-v1 audit52/14/44/71, no retuning.",
     "Current benchmark host differs from historical P6; paired same-host controls in reports/p7/paired/."
-  ]
+  ],
+  "publication": {
+    "run_url": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39241808393",
+    "documentation_source": "b5eb133a55c1d1b8062851919f5978676497dbfc",
+    "artifact_url": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39241808393/artifacts/12181377477",
+    "artifact_bytes": 4762168,
+    "artifact_container_digest": "sha256:1c76bc15f7cd91956b462614fa473e545abdcf18f81ff9072c57ddbf4328b14d",
+    "inner_zip_sha256": "03eaa6e0379c30a9db4d23da7f0ea0cbd0a66a57ac7952bbeca2064fcbc0f143",
+    "measurement_source": "a85c40a14828141447768d3c78d13aa0ced105eb",
+    "note": "Archive source b5eb133; this post-publication receipt is committed afterwards. No new science/application changes."
+  }
 }

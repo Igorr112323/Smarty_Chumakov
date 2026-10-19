@@ -19,7 +19,7 @@ Baseline `14a018a1b90b51cc47cd8baf628147ac22e1d8b1`.
 - [Новый RC, prerelease/not latest](https://github.com/Igorr112323/Smarty_Chumakov/releases/tag/v1.3.1-rc.p7.39236657579).
 - [Проверенная полная portable HF поставка](https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39236657579/artifacts/12180458356), artifact-container637051335B.
 - [Исходный архив приёмки](https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39236657451/artifacts/12180029914).
-- [Финальный архив с этим отчётом и committed-квитанциями: отдельная публикация](https://github.com/Igorr112323/Smarty_Chumakov/actions/workflows/p7-publish-acceptance.yml).
+- [Финальный архив с отчётом и committed-квитанциями](https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39241808393/artifacts/12181377477), publication39241808393 **SUCCESS**, 4762168B artifact-container.
 - [Полный diff от baseline](https://github.com/Igorr112323/Smarty_Chumakov/compare/14a018a1b90b51cc47cd8baf628147ac22e1d8b1...arena%2Fc5f69767-smarty-chumakov).
 
 Финальная artifact-only публикация проверяет SUCCESS исходных runs, неизменность
@@ -226,3 +226,11 @@ libs~500MB/полный установленный SDK footprint; весь оф�
 Квитанции всех измерений/RC/архивов сохраняются в Git. Финальный documentary HEAD
 проходит обычный полный CI; ссылка на его run проверяется после push и сообщается
 в результате (самоссылочный SHA в собственном коммите не создаётся).
+
+## Квитанция финальной публикации
+
+Архив документации source`b5eb133` опубликован workflow39241808393, SUCCESS.
+SHA256 внутреннего `p7-final-acceptance.zip`: `03eaa6e0379c30a9db4d23da7f0ea0cbd0a66a57ac7952bbeca2064fcbc0f143`.
+Artifact-container digest отличается, указан в `final-receipts/published-archive.json`.
+Эта post-run квитанция добавлена после публикации, не маскируется как часть
+собственного ZIP. Предиктивный код/поставка/измерения не изменены.

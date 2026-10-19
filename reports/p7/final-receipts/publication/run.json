@@ -1,0 +1,82 @@
+{
+  "conclusion": "success",
+  "createdAt": "2026-10-19T11:03:03Z",
+  "headSha": "b5eb133a55c1d1b8062851919f5978676497dbfc",
+  "jobs": [
+    {
+      "completedAt": "2026-10-19T11:03:26Z",
+      "conclusion": "success",
+      "databaseId": 118024168172,
+      "name": "publish",
+      "startedAt": "2026-10-19T11:03:06Z",
+      "status": "completed",
+      "steps": [
+        {
+          "conclusion": "success",
+          "name": "Set up job",
+          "number": 1,
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Run actions/checkout@v4",
+          "number": 2,
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Run actions/setup-python@v5",
+          "number": 3,
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "All source runs SUCCESS and scientific code unchanged",
+          "number": 4,
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Run actions/download-artifact@v4",
+          "number": 5,
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Verify source checksum, include final report and committed receipts",
+          "number": 6,
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Run actions/upload-artifact@v4",
+          "number": 7,
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Post Run actions/setup-python@v5",
+          "number": 13,
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Post Run actions/checkout@v4",
+          "number": 14,
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Complete job",
+          "number": 15,
+          "status": "completed"
+        }
+      ],
+      "url": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39241808393/job/118024168172"
+    }
+  ],
+  "name": "P7 final acceptance artifact publication",
+  "status": "completed",
+  "updatedAt": "2026-10-19T11:03:27Z",
+  "url": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39241808393"
+}
