@@ -10,6 +10,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from p6_acceptance import verifier
+
 from spanverify.core import tokenize_with_offsets
 from spanverify.features import _normalised_support, map_token_positions
 
@@ -31,6 +32,10 @@ def payload():
         products.append(
             v.verify(answer, "Регламент: срок хранения 10 лет.", with_tokens=True).to_dict(with_tokens=True)
         )
+    # Measured wall-clock telemetry cannot be byte-identical across executions.
+    # Every predictive field, offset, text and full token record is retained.
+    for product in products:
+        product.pop("latency_ms", None)
     return dict(mappings=mappings, supports=supports, products=products)
 
 

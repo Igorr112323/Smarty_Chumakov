@@ -13,3 +13,5 @@ PAVA on frozen raw ai_share, separate versioned artifact, no dev/test calibratio
 Performance uses train/synthetic only; 3 warm/cold trials, same P6 definitions,
 latency includes no download/import; timeout is censored failure, never a passing median.
 Robustness is studied/documented, not a quality gate. Official test remains reserved.
+
+First attempt rejected by byte gate because original to_dict includes wall-clock latency_ms. Predictive code reverted before continuing. Original golden retained; stable golden removes ONLY latency_ms, never scores/tokens/offsets/texts. Comparison confirms original predictive fields unchanged.

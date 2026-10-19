@@ -33,4 +33,4 @@ jobs:
           name: p7-parity
           path: reports/acceptance/parity/
       - name: Byte-exact pre-change golden I/O
-        run: python spanverify-module/scripts/p7_golden.py check reports/p7/pre-change-golden.json
+        run: python spanverify-module/scripts/p7_golden.py check reports/p7/pre-change-golden-stable.json
