@@ -99,8 +99,16 @@ The fresh HF7262 audit completed09:31:41→10:02:19UTC (30m38s), within40min.
 Windows409 reached native tokenizers but failed DLL loading. Reference Windows
 abi3 wheel PE imports include python3.dll; sys.path does not configure dependent
 DLL resolution. Register portable python/, DLLs, libs and *.libs via
-os.add_dll_directory, retain handles throughout serve. Portable-import preflight
-is separate from mandatory actual exe/pyz offline requests. Pure archive zlib
+os.add_dll_directory, retain handles throughout serve. Actual exe/pyz offline requests remain mandatory; package import alone
+would not prove autonomy. Pure archive zlib
 compression6→9 provides size headroom without removing bytecode/assertions.
 Current409 sizes before this fix8999498/232874B pass strict9M/600k gates;
 this is not a successful HF autonomy receipt.
+
+Final artifact publication is separate from measurement: it verifies SUCCESS
+of source acceptance/Windows/CI runs and byte-unchanged science/application
+paths, checks original ZIP SHA, preserves raw evidence, overlays committed
+final documentation and uploads a NEW workflow artifact (no release ZIP upload).
+It does not skip/replace measurement jobs. Its extra workflow contributes5existing
+parametrized checks; two ZIP-integrity/path-escape regressions give895current
+collected tests (888+5+2). Historical888JUnit receipts remain identified by SHA.

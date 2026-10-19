@@ -36,7 +36,7 @@ python -m spanverify train --dataset data/demo_pairs.jsonl --out config/weights.
 python -m spanverify evaluate --dataset data/demo_pairs.jsonl   # метрики и критерий качества
 python -m spanverify selftest                                   # само-проверка конвейера
 python -m spanverify server --port 8835                         # API + веб-интерфейс
-python -m pytest -q                                             # 888 тестов
+python -m pytest -q                                             # 895 тестов
 ```
 
 Коды возврата `verify`: `0` — ответ подтверждён, `1` — найдены спорные
@@ -221,3 +221,12 @@ python spanverify-module/scripts/check_numbers.py   # сверка чисел д
 ([`docs/ЗАЯВКА_поля.md`](docs/ЗАЯВКА_поля.md)): их можно копировать в поля
 АС «Фонд-М». Поля про публикации, дипломную работу и письмо поддержки
 заполняет исполнитель — эти данные знает только он.
+
+### P7: инженерные измерения
+
+[Подробный отчёт](reports/p7/REPORT.md),
+[контролируемое сравнение скорости](reports/p7/TIMINGS.md).
+Длинный HF-ответ имеет отдельный `window512_full_answer_v1`; исторические P5
+показатели неизменны. HF50k warm≤1s не достигнут, AI-share PAVA остаётся
+частичной synthetic/train-only диагностикой, не доказательством LLM-авторства.
+Официальный test177 не оценивался; legacy unsplit-чтение раскрыто в отчёте.

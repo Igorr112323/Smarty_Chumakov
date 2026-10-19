@@ -1,0 +1,39 @@
+name: P7 final acceptance artifact publication
+on:
+  push:
+    branches: [arena/c5f69767-smarty-chumakov]
+    paths: [.github/p7-publication.trigger]
+permissions:
+  contents: read
+  actions: read
+jobs:
+  publish:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: All source runs SUCCESS and scientific code unchanged
+        id: validate
+        run: python scripts/p7_publish_acceptance.py --prepare
+      - uses: actions/download-artifact@v4
+        with:
+          name: p7-acceptance-archive
+          run-id: ${{ steps.validate.outputs.acceptance_run }}
+          github-token: ${{ github.token }}
+          path: .arena/p7-publication/original
+      - name: Verify source checksum, include final report and committed receipts
+        run: python scripts/p7_publish_acceptance.py
+      - uses: actions/upload-artifact@v4
+        with:
+          name: p7-final-acceptance-archive
+          path: |
+            .arena/p7-publication/p7-final-acceptance.zip
+            .arena/p7-publication/p7-final-acceptance.zip.sha256
+          retention-days: 90

@@ -1,0 +1,23 @@
+{
+  "wheel": "tokenizers-0.23.3-cp310-abi3-win_amd64.whl",
+  "sha256": "1f0823bb00c5fdc98e487354d54dd55a03848d61a1a0bf29a68c77f24f3b26c3",
+  "extension": "tokenizers/tokenizers.pyd",
+  "pe_imports": [
+    "python3.dll",
+    "kernel32.dll",
+    "bcryptprimitives.dll",
+    "api-ms-win-core-synch-l1-2-0.dll",
+    "KERNEL32.dll",
+    "ntdll.dll",
+    "VCRUNTIME140.dll",
+    "VCRUNTIME140_1.dll",
+    "api-ms-win-crt-string-l1-1-0.dll",
+    "api-ms-win-crt-math-l1-1-0.dll",
+    "api-ms-win-crt-heap-l1-1-0.dll",
+    "api-ms-win-crt-stdio-l1-1-0.dll",
+    "api-ms-win-crt-runtime-l1-1-0.dll"
+  ],
+  "scope": "Reference Windows wheel inspected via pefile, no quality fitting. Actual Windows error: tokenizers DLL load failed. python3.dll is in portable python/, absent from executable search dirs until add_dll_directory fix.",
+  "failed_run": 39232868662,
+  "failed_job": 118003047999
+}
