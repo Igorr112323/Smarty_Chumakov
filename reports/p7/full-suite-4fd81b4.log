@@ -1,0 +1,36 @@
+........................................................................ [  8%]
+...................F.................................................... [ 16%]
+........................................................................ [ 24%]
+........................................................................ [ 32%]
+........................................................................ [ 40%]
+........................................................................ [ 48%]
+.......s................................................................ [ 56%]
+........................................................................ [ 64%]
+....................................s................................... [ 72%]
+........................................................................ [ 80%]
+........................................................................ [ 88%]
+........................................................................ [ 96%]
+...............................                                          [100%]
+=================================== FAILURES ===================================
+______________________ test_document_lists_every_workflow ______________________
+
+    def test_document_lists_every_workflow() -> None:
+        """В документе есть каждое задание из .github/workflows."""
+        assert DOC.is_file(), "нет docs/ЗАДАНИЯ_CI.md (собрать: scripts/collect_ci_workflows.py)"
+        payload = json.loads(PAYLOAD.read_text(encoding="utf-8"))
+        doc = DOC.read_text(encoding="utf-8")
+        names = [item["name"] for item in payload["workflows"]]
+        assert names, "в реестре заданий пусто"
+>       assert len(names) == len(list(WORKFLOWS.glob("*.yml"))), "не все файлы заданий попали в реестр"
+E       AssertionError: не все файлы заданий попали в реестр
+E       assert 25 == 26
+E        +  where 25 = len(['build-and-release-exe', 'ci', 'Корпус A3 (реальные акты, срезы)', 'Разбор ложных пометок по кешу', 'Свести числа экспериментов hf', 'Эксперименты hf (корпуса A3 и A)', ...])
+E        +  and   26 = len([PosixPath('/home/user/Smarty_Chumakov/.github/workflows/build-and-release-exe.yml'), PosixPath('/home/user/Smarty_Chu.../.github/workflows/hf-collect.yml'), PosixPath('/home/user/Smarty_Chumakov/.github/workflows/hf-experiments.yml'), ...])
+E        +    where [PosixPath('/home/user/Smarty_Chumakov/.github/workflows/build-and-release-exe.yml'), PosixPath('/home/user/Smarty_Chu.../.github/workflows/hf-collect.yml'), PosixPath('/home/user/Smarty_Chumakov/.github/workflows/hf-experiments.yml'), ...] = list(<generator object Path.glob at 0x7fcb2fc23340>)
+E        +      where <generator object Path.glob at 0x7fcb2fc23340> = glob('*.yml')
+E        +        where glob = PosixPath('/home/user/Smarty_Chumakov/.github/workflows').glob
+
+tests/test_ci_workflows.py:46: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_ci_workflows.py::test_document_lists_every_workflow - Asser...
+1 failed, 892 passed, 2 skipped in 322.12s (0:05:22)
