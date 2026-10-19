@@ -238,3 +238,5 @@ python spanverify-module/scripts/check_numbers.py   # сверка чисел д
 показатели неизменны. HF50k warm≤1s не достигнут, AI-share PAVA остаётся
 частичной synthetic/train-only диагностикой, не доказательством LLM-авторства.
 Официальный test177 не оценивался; legacy unsplit-чтение раскрыто в отчёте.
+
+P8 published **RC, not latest**: [release](https://github.com/Igorr112323/Smarty_Chumakov/releases/tag/v1.3.1-rc.p8.20261019), publication39290438219 SUCCESS, accepted source879cd14 both ordinary CI SUCCESS. Archive SHA256 `58143baac4a39d86aeaa46879c497d5195f0202f58174c91af746d94dfe2f158`. Numeric official joint gate PASS; pre-seal synthetic CI fit breached strict execution freeze, so NOT clean process acceptance. Frozen product unchanged; latest1.3.1 preserved. Full actual receipts/limitations in [FINAL_REPORT](reports/FINAL_REPORT.md), sole current indices [EXPERIMENTS_INDEX](reports/EXPERIMENTS_INDEX.md) and [coverage matrix](reports/contract/coverage-matrix.json).

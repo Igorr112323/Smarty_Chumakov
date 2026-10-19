@@ -1,0 +1,36 @@
+{
+  "runs": {
+    "evaluation": {
+      "conclusion": "success",
+      "headSha": "dd4454b05867495018abe5a2f657fc4d6d0fd9a6",
+      "status": "completed",
+      "url": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39266451529"
+    },
+    "windows": {
+      "conclusion": "failure",
+      "headSha": "654a48e3f074654d62fb4adb38a6c37555c53681",
+      "status": "completed",
+      "url": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39271014161"
+    },
+    "ci": {
+      "conclusion": "success",
+      "headSha": "879cd14f69b3c63a47fbb29f55cc4e8a55d5acf5",
+      "status": "completed",
+      "url": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39290451085"
+    }
+  },
+  "ci_runs": [
+    39290451085,
+    39290438244
+  ],
+  "windows_run": 39271014161,
+  "tests_excluded": false,
+  "documentation_source": "879cd14f69b3c63a47fbb29f55cc4e8a55d5acf5",
+  "release_tag": "v1.3.1-rc.p8.20261019",
+  "stable_promotion": false,
+  "execution_freeze_status": "NOT ACHIEVED: cancelled early CI always-contract bypass caused pre-seal temporary synthetic ParticipationModel.fit",
+  "windows_source_failure_scope": "Publication only; all build/test/size/offline checks SUCCESS, original failure retained",
+  "publication_run": "39290438219",
+  "sha256": "58143baac4a39d86aeaa46879c497d5195f0202f58174c91af746d94dfe2f158",
+  "bytes": 65248935
+}

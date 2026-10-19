@@ -2327,8 +2327,8 @@
       "family": "P8",
       "workflow": "p7-publish-acceptance.yml",
       "record_kind": "publication/recovery",
-      "status": "in_progress",
-      "outcome": null,
+      "status": "completed",
+      "outcome": "failure",
       "url": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39281691564",
       "canonical_directories": [],
       "receipt": "reports/measurements/run39281691564/receipt.json"
@@ -2340,11 +2340,54 @@
       "family": "P8",
       "workflow": "p7-publish-acceptance.yml",
       "record_kind": "publication/recovery",
-      "status": "in_progress",
-      "outcome": null,
+      "status": "completed",
+      "outcome": "failure",
       "url": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39283457964",
       "canonical_directories": [],
       "receipt": "reports/measurements/run39283457964/receipt.json"
+    },
+    {
+      "run_id": "39286305377",
+      "date": "2026-10-19T16:32:50Z",
+      "commit": "06514608edcea8f5765261e3dbc51c1c48700002",
+      "family": "P8",
+      "workflow": "p7-publish-acceptance.yml",
+      "record_kind": "publication/recovery",
+      "status": "completed",
+      "outcome": "failure",
+      "url": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39286305377",
+      "canonical_directories": [],
+      "receipt": "reports/measurements/run39286305377/receipt.json"
+    },
+    {
+      "run_id": "39287371656",
+      "date": "2026-10-19T16:40:23Z",
+      "commit": "fd1b863c3a04c9db7120c4181854af2007a4a629",
+      "family": "P8",
+      "workflow": "p7-publish-acceptance.yml",
+      "record_kind": "publication/recovery",
+      "status": "completed",
+      "outcome": "failure",
+      "url": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39287371656",
+      "canonical_directories": [
+        "reports/p8/run39287371656"
+      ],
+      "receipt": "reports/measurements/run39287371656/receipt.json"
+    },
+    {
+      "run_id": "39290438219",
+      "date": "2026-10-19T17:00:42Z",
+      "commit": "879cd14f69b3c63a47fbb29f55cc4e8a55d5acf5",
+      "family": "P8",
+      "workflow": "p7-publish-acceptance.yml",
+      "record_kind": "publication/recovery",
+      "status": "completed",
+      "outcome": "success",
+      "url": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39290438219",
+      "canonical_directories": [
+        "reports/p8/run39290438219"
+      ],
+      "receipt": "reports/measurements/run39290438219/receipt.json"
     }
   ]
 }

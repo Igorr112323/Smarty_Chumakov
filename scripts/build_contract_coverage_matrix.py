@@ -263,7 +263,7 @@ def main():
         known = {r["id"]: r for r in rows}
         for id_, note in {
             "quality_gate": "P8 official177 joint PASS: tokensF1 .6252045826513911, strict spansF1 .5164835164835164, token-FPR proxy .015466785356626237; internal .90/.10 NOT achieved.",
-            "official_test": "177/177 once through public Verifier; 7 over512/max1266, full long-v1; empty cache0hits177misses,381.292202784s, no fits. Zero-output infrastructure abort preserved, not a second quality chance.",
+            "official_test": "177/177 once through public Verifier; 7 over512/max1266, full long-v1; empty cache0hits177misses,381.292202784s, inference-worker fit_calls=[] ONLY; separate early-CI temporary fit breached execution freeze. Zero-output infrastructure abort preserved, not a second quality chance.",
             "control_sample": "A3 1200 pairs: immutable train842/dev181/test177 document split; official177 now evaluated. Historical unsplit fixture-read incident and train-only guard retained; no claim test was never exposed.",
             "spans": "Official strict kept-spans+rules:47TP38FP50FN, IoU>=.5 unchanged, containment .2886597938, mean contained width1.33926249.",
         }.items():
@@ -276,6 +276,9 @@ def main():
         if delivery.exists():
             payload["delivery"] = json.loads(delivery.read_text())
             delivery_info = payload["delivery"]
+            if delivery_info.get("publication_conclusion") == "success":
+                payload["publication"] = dict(run=delivery_info["publication_run"],status="success",release=delivery_info["release_url"],prerelease=True,latest=False,archive_sha256=delivery_info["archive_sha256"],archive_bytes=delivery_info["archive_bytes"],evidence=delivery_info["publication_evidence"])
+                known["control_sample"].update(scope="P8 actual official177 and external human B1000, NOT a B quality gate",note="Immutable A3 train842/dev181/test177, official177 measured once. External B1000 unique human pairs,333positive answers/423exact spans, all supported families measured; severe token/span transfer drop published. No B selection/training; one ambiguous first match/license unconfirmed. Historical official-file exposure disclosed.",evidence=[dict(path="reports/p8/run39266451529/external/result.json",url=f"{URL}/blob/arena/c5f69767-smarty-chumakov/reports/p8/run39266451529/external/result.json"),dict(path="reports/p8/run39266451529/external/aggregation-integrity.json",url=f"{URL}/blob/arena/c5f69767-smarty-chumakov/reports/p8/run39266451529/external/aggregation-integrity.json")])
             payload["execution_freeze_status"] = delivery_info.get("execution_freeze_status", "unrecorded")
             payload["stable_promotion"] = delivery_info.get("stable_promotion", False)
             rows.append(dict(id="execution_freeze",requirement="P8 no ANY fit before official seal",status="не достигнут",scope="P8 execution-process violation, separate from numeric official joint PASS",note="Early cancelled CI39266027509 always-contract bypass; artifact14:12:03 before official job14:26:51. Temporary synthetic ParticipationModel.fit, no official/B data or product changes. No official retry; guard corrected; conservative RC/latest unchanged.",evidence=[dict(path="reports/p8/infra-freeze-barrier/incident.json",url=f"{URL}/blob/arena/c5f69767-smarty-chumakov/reports/p8/infra-freeze-barrier/incident.json")],current_run=f"{URL}/actions/runs/39266027509"))

@@ -184,7 +184,7 @@
       "requirement": "Official test177 acceptance",
       "status": "достигнут",
       "scope": "P8 official held-out measurement; frozen P7 product",
-      "note": "177/177 once through public Verifier; 7 over512/max1266, full long-v1; empty cache0hits177misses,381.292202784s, no fits. Zero-output infrastructure abort preserved, not a second quality chance.",
+      "note": "177/177 once through public Verifier; 7 over512/max1266, full long-v1; empty cache0hits177misses,381.292202784s, inference-worker fit_calls=[] ONLY; separate early-CI temporary fit breached execution freeze. Zero-output infrastructure abort preserved, not a second quality chance.",
       "evidence": [
         {
           "path": "reports/p8/run39266451529/official/result.json",
@@ -298,7 +298,7 @@
       "requirement": "Executable <=9 MB",
       "status": "достигнут",
       "scope": "P8 actual Windows build artifacts; publication-only source failure preserved",
-      "note": "P8 build39271014161/source654a48e: exe8981233B, pyz232874B, strict gates PASS; three complete suites and smoke/offline validations PASS. Original workflow publication-only FAIL; recovery reuses exact checksummed artifacts, no rebuild/scoring. Reuse exact existing binary artifacts, no rebuild/re-inference; real argv list replaces PS scalar splat",
+      "note": "P8 build39271014161/source654a48e: exe8981233B, pyz232874B, strict gates PASS; three complete suites and smoke/offline validations PASS. Original workflow publication-only FAIL; recovery reuses exact checksummed artifacts, no rebuild/scoring. SUCCESS39290438219: exact accepted-source tag target fixes older-commit release403; original Windows scalar-splat failure and publication403 preserved; same original bytes, no rebuild/inference",
       "evidence": [
         {
           "path": "reports/p8/DELIVERY.json",
@@ -316,7 +316,7 @@
       "requirement": "Package <=0.6 MB",
       "status": "достигнут",
       "scope": "P8 actual Windows build artifacts; publication-only source failure preserved",
-      "note": "P8 build39271014161/source654a48e: exe8981233B, pyz232874B, strict gates PASS; three complete suites and smoke/offline validations PASS. Original workflow publication-only FAIL; recovery reuses exact checksummed artifacts, no rebuild/scoring. Reuse exact existing binary artifacts, no rebuild/re-inference; real argv list replaces PS scalar splat",
+      "note": "P8 build39271014161/source654a48e: exe8981233B, pyz232874B, strict gates PASS; three complete suites and smoke/offline validations PASS. Original workflow publication-only FAIL; recovery reuses exact checksummed artifacts, no rebuild/scoring. SUCCESS39290438219: exact accepted-source tag target fixes older-commit release403; original Windows scalar-splat failure and publication403 preserved; same original bytes, no rebuild/inference",
       "evidence": [
         {
           "path": "reports/p8/DELIVERY.json",
@@ -334,7 +334,7 @@
       "requirement": "Automatic source build with SHA-256",
       "status": "достигнут",
       "scope": "P8 actual Windows build artifacts; publication-only source failure preserved",
-      "note": "P8 build39271014161/source654a48e: exe8981233B, pyz232874B, strict gates PASS; three complete suites and smoke/offline validations PASS. Original workflow publication-only FAIL; recovery reuses exact checksummed artifacts, no rebuild/scoring. Reuse exact existing binary artifacts, no rebuild/re-inference; real argv list replaces PS scalar splat",
+      "note": "P8 build39271014161/source654a48e: exe8981233B, pyz232874B, strict gates PASS; three complete suites and smoke/offline validations PASS. Original workflow publication-only FAIL; recovery reuses exact checksummed artifacts, no rebuild/scoring. SUCCESS39290438219: exact accepted-source tag target fixes older-commit release403; original Windows scalar-splat failure and publication403 preserved; same original bytes, no rebuild/inference",
       "evidence": [
         {
           "path": "reports/p8/DELIVERY.json",
@@ -352,7 +352,7 @@
       "requirement": "4.2.3 Launch without installation",
       "status": "достигнут",
       "scope": "P8 actual Windows build artifacts; publication-only source failure preserved",
-      "note": "P8 build39271014161/source654a48e: exe8981233B, pyz232874B, strict gates PASS; three complete suites and smoke/offline validations PASS. Original workflow publication-only FAIL; recovery reuses exact checksummed artifacts, no rebuild/scoring. Reuse exact existing binary artifacts, no rebuild/re-inference; real argv list replaces PS scalar splat",
+      "note": "P8 build39271014161/source654a48e: exe8981233B, pyz232874B, strict gates PASS; three complete suites and smoke/offline validations PASS. Original workflow publication-only FAIL; recovery reuses exact checksummed artifacts, no rebuild/scoring. SUCCESS39290438219: exact accepted-source tag target fixes older-commit release403; original Windows scalar-splat failure and publication403 preserved; same original bytes, no rebuild/inference",
       "evidence": [
         {
           "path": "reports/p8/DELIVERY.json",
@@ -398,7 +398,7 @@
       "requirement": "4.2.7 Portable copying and integrity",
       "status": "достигнут",
       "scope": "P8 actual Windows build artifacts; publication-only source failure preserved",
-      "note": "P8 build39271014161/source654a48e: exe8981233B, pyz232874B, strict gates PASS; three complete suites and smoke/offline validations PASS. Original workflow publication-only FAIL; recovery reuses exact checksummed artifacts, no rebuild/scoring. Reuse exact existing binary artifacts, no rebuild/re-inference; real argv list replaces PS scalar splat",
+      "note": "P8 build39271014161/source654a48e: exe8981233B, pyz232874B, strict gates PASS; three complete suites and smoke/offline validations PASS. Original workflow publication-only FAIL; recovery reuses exact checksummed artifacts, no rebuild/scoring. SUCCESS39290438219: exact accepted-source tag target fixes older-commit release403; original Windows scalar-splat failure and publication403 preserved; same original bytes, no rebuild/inference",
       "evidence": [
         {
           "path": "reports/p8/DELIVERY.json",
@@ -529,16 +529,16 @@
       "id": "control_sample",
       "requirement": "Control sample / corpus1200 / held-out document split",
       "status": "достигнут",
-      "scope": "P8 official held-out measurement; frozen P7 product",
-      "note": "A3 1200 pairs: immutable train842/dev181/test177 document split; official177 now evaluated. Historical unsplit fixture-read incident and train-only guard retained; no claim test was never exposed.",
+      "scope": "P8 actual official177 and external human B1000, NOT a B quality gate",
+      "note": "Immutable A3 train842/dev181/test177, official177 measured once. External B1000 unique human pairs,333positive answers/423exact spans, all supported families measured; severe token/span transfer drop published. No B selection/training; one ambiguous first match/license unconfirmed. Historical official-file exposure disclosed.",
       "evidence": [
         {
-          "path": "reports/p8/run39266451529/official/result.json",
-          "url": "https://github.com/Igorr112323/Smarty_Chumakov/blob/arena/c5f69767-smarty-chumakov/reports/p8/run39266451529/official/result.json"
+          "path": "reports/p8/run39266451529/external/result.json",
+          "url": "https://github.com/Igorr112323/Smarty_Chumakov/blob/arena/c5f69767-smarty-chumakov/reports/p8/run39266451529/external/result.json"
         },
         {
-          "path": "reports/FINAL_REPORT.md",
-          "url": "https://github.com/Igorr112323/Smarty_Chumakov/blob/arena/c5f69767-smarty-chumakov/reports/FINAL_REPORT.md"
+          "path": "reports/p8/run39266451529/external/aggregation-integrity.json",
+          "url": "https://github.com/Igorr112323/Smarty_Chumakov/blob/arena/c5f69767-smarty-chumakov/reports/p8/run39266451529/external/aggregation-integrity.json"
         }
       ],
       "current_run": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39266451529"
@@ -672,7 +672,7 @@
     "limitation": "423 human exact spans/333positive answers; one first-match ambiguity; raw license unconfirmed; severe transfer drop published"
   },
   "delivery": {
-    "run_id": "39271014161",
+    "run_id": "39290438219",
     "date": "2026-10-19",
     "windows_run": 39271014161,
     "build_source": "654a48e3f074654d62fb4adb38a6c37555c53681",
@@ -680,8 +680,8 @@
     "official_run": 39266451529,
     "official_commit": "dd4454b05867495018abe5a2f657fc4d6d0fd9a6",
     "official_joint_gate": true,
-    "ci_run": null,
-    "ci_policy": "Publisher must wait for ALL ordinary CI on exact publication HEAD; actual IDs resolved in FINAL-PUBLICATION.json and post-publication receipt",
+    "ci_run": 39290451085,
+    "ci_policy": "ALL ordinary CI on exact publication source879cd14 SUCCESS:39290451085+39290438244; receipt-only successor final checks separately verified on GitHub",
     "tests_excluded": false,
     "windows_workflow_conclusion": "failure: publication-only; preserved, never relabelled",
     "windows_build_validation": "SUCCESS all three full suites, exe/pyz smoke, size gates and real offline HF",
@@ -706,10 +706,37 @@
     "product_registry_keys_unchanged": true,
     "release_tag": "v1.3.1-rc.p8.20261019",
     "release_url": "https://github.com/Igorr112323/Smarty_Chumakov/releases/tag/v1.3.1-rc.p8.20261019",
-    "publication_recovery": "Reuse exact existing binary artifacts, no rebuild/re-inference; real argv list replaces PS scalar splat",
+    "publication_recovery": "SUCCESS39290438219: exact accepted-source tag target fixes older-commit release403; original Windows scalar-splat failure and publication403 preserved; same original bytes, no rebuild/inference",
     "execution_freeze_status": "NOT ACHIEVED: cancelled early CI always-contract bypass caused pre-seal temporary synthetic ParticipationModel.fit",
     "execution_freeze_evidence": "reports/p8/infra-freeze-barrier/",
-    "stable_promotion": false
+    "stable_promotion": false,
+    "ci_runs": [
+      39290451085,
+      39290438244
+    ],
+    "ci_commit": "879cd14f69b3c63a47fbb29f55cc4e8a55d5acf5",
+    "publication_run": 39290438219,
+    "publication_conclusion": "success",
+    "release_id": 417547379,
+    "release_prerelease": true,
+    "latest_tag": "v1.3.1",
+    "archive_asset_id": 656906252,
+    "archive_url": "https://github.com/Igorr112323/Smarty_Chumakov/releases/download/v1.3.1-rc.p8.20261019/p8-final-acceptance.zip",
+    "archive_sha256": "58143baac4a39d86aeaa46879c497d5195f0202f58174c91af746d94dfe2f158",
+    "archive_bytes": 65248935,
+    "publication_source": "879cd14f69b3c63a47fbb29f55cc4e8a55d5acf5",
+    "publication_evidence": "reports/p8/run39290438219/",
+    "ci_scope": "Both ordinary CI SUCCESS on exact publication source; receipt-only successor final checks verified separately by immutable GitHub HEAD checks"
+  },
+  "publication": {
+    "run": 39290438219,
+    "status": "success",
+    "release": "https://github.com/Igorr112323/Smarty_Chumakov/releases/tag/v1.3.1-rc.p8.20261019",
+    "prerelease": true,
+    "latest": false,
+    "archive_sha256": "58143baac4a39d86aeaa46879c497d5195f0202f58174c91af746d94dfe2f158",
+    "archive_bytes": 65248935,
+    "evidence": "reports/p8/run39290438219/"
   },
   "execution_freeze_status": "NOT ACHIEVED: cancelled early CI always-contract bypass caused pre-seal temporary synthetic ParticipationModel.fit",
   "stable_promotion": false,
