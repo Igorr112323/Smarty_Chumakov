@@ -1,6 +1,9 @@
 name: P8 single official test and external validation
 on:
   workflow_dispatch:
+  push:
+    branches: [arena/c5f69767-smarty-chumakov]
+    paths: [.github/p8-evaluation.trigger]
 permissions:
   contents: write
   actions: read

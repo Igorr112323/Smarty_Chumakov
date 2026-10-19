@@ -25,6 +25,7 @@ concurrency:
 # CI ничего не пишет обратно в ветку: коммиты бота были источником
 # rebase-конфликтов и петель. Результаты уходят в артефакты.
 permissions:
+  actions: read
   contents: read
 
 env:
@@ -32,7 +33,30 @@ env:
   PYTHONIOENCODING: "utf-8"
 
 jobs:
+  p8-freeze-barrier:
+    name: P8 no-fit barrier until official177 is sealed
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - name: Wait for authorized official measurement, never execute tests before it
+        run: |
+          for attempt in $(seq 1 450); do
+            runs=$(gh api 'repos/${{ github.repository }}/actions/workflows/p8-final-evaluation.yml/runs?branch=arena%2Fc5f69767-smarty-chumakov&per_page=10' --jq '.workflow_runs[].id')
+            for run in $runs; do
+              state=$(gh api "repos/${{ github.repository }}/actions/runs/$run/jobs?per_page=100" --jq '.jobs[] | select(.name=="official") | .conclusion')
+              if [ "$state" = success ]; then
+                echo "Official177 sealed by run $run; existing CI/tests/fits may now proceed."
+                exit 0
+              fi
+            done
+            sleep 5
+          done
+          echo '::error::No sealed authorized official run; refuse all test fits.'
+          exit 1
   quality:
+    needs: p8-freeze-barrier
     name: Линтер, форматирование, покрытие
     runs-on: ubuntu-latest
     # В job'е не только линтер, но и прогон с покрытием, воспроизводимость
@@ -132,7 +156,7 @@ jobs:
     # тесты с покрытием не запускает (иначе они шли бы дважды). Если job качества
     # упал и артефакта нет, контрактная проверка продолжает работу и пишет по
     # правилу готовности «не измерено» с причиной.
-    needs: quality
+    needs: [quality, p8-freeze-barrier]
     if: always()
     steps:
       - uses: actions/checkout@v4
@@ -184,6 +208,7 @@ jobs:
           retention-days: 90
 
   tests:
+    needs: p8-freeze-barrier
     name: Тесты (Python ${{ matrix.python }}, ${{ matrix.os }})
     runs-on: ${{ matrix.os }}
     timeout-minutes: 30
@@ -257,7 +282,7 @@ jobs:
     # это незачем: только вручную или по ночному расписанию.
     if: github.event_name == 'workflow_dispatch' || github.event_name == 'schedule'
     timeout-minutes: 40
-    needs: quality
+    needs: [quality, p8-freeze-barrier]
     defaults:
       run:
         working-directory: spanverify-module
@@ -342,7 +367,7 @@ jobs:
     name: Единый файл чисел (METRICS.json) и сверка документов
     runs-on: ubuntu-latest
     timeout-minutes: 30
-    needs: [quality, pilot, external]
+    needs: [quality, pilot, external, p8-freeze-barrier]
     # На пуш job'ы pilot и external пропускаются (они работают по расписанию и
     # вручную), а пропущенный needs по умолчанию пропускает и зависимый job.
     # Из-за этого сверка чисел выполнялась раз в сутки и её падение не
@@ -435,7 +460,7 @@ jobs:
     # или по ночному расписанию.
     if: github.event_name == 'workflow_dispatch' || github.event_name == 'schedule'
     timeout-minutes: 40
-    needs: quality
+    needs: [quality, p8-freeze-barrier]
     defaults:
       run:
         working-directory: spanverify-module
@@ -505,6 +530,7 @@ jobs:
   # пары, манифест, отчёт) коммитится в main — иначе его не увидеть из окружения
   # разработки, а проверяющему нужны сами документы для выборочной сверки.
   probe-sources:
+    needs: p8-freeze-barrier
     name: Разведка официальных источников (не блокирует CI)
     runs-on: ubuntu-latest
     timeout-minutes: 40
