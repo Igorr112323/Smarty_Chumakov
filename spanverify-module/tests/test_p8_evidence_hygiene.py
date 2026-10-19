@@ -5,6 +5,7 @@ from __future__ import annotations
 import hashlib
 import importlib.util
 import json
+import re
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -23,6 +24,9 @@ def test_all_non_run_metric_documents_have_provenance():
             found += 1
             assert hygiene.provenance_problems(path, data) == [], path
     assert found >= 20
+    for name in ("reports/FINAL_REPORT.md", "reports/p8/RELEASE_NOTES.md"):
+        # Catch SHA/year concatenation without altering immutable raw snapshots.
+        assert not re.search(r"(?<![0-9a-f])[0-9a-f]{41,63}(?![0-9a-f])", (ROOT / name).read_text()), name
     path = Path("arbitrary-new-name.json")
     assert hygiene.metric_file(path, {"auc": 0.75})
     assert hygiene.metric_file(Path("model_metrics.json"), {"auc": 0.75})

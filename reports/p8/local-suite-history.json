@@ -56,6 +56,18 @@
       "hostname": "e2b.local",
       "source_at_start": "1ef0f780d99d86580c1ce6eba3ded5a019474bf8",
       "scope": "fifth full suite; .gitattributes-only commit during execution did not change tested code"
+    },
+    {
+      "name": "pytest",
+      "errors": "0",
+      "failures": "0",
+      "skipped": "2",
+      "tests": "910",
+      "time": "446.914",
+      "timestamp": "2026-10-19T17:28:31.252681+00:00",
+      "hostname": "e2b.local",
+      "source_at_start": "860a7f65224b540c716101c5da226613674110b8",
+      "scope": "Sixth complete local suite on receipt-only source, no exclusions"
     }
   ]
 }
