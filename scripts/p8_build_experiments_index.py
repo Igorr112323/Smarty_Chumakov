@@ -26,6 +26,9 @@ def main():
                 dest=ROOT/receipt;dest.parent.mkdir(parents=True,exist_ok=True);dest.write_text(json.dumps(record,ensure_ascii=False,indent=2)+'\n');rows.append(record)
             if len(batch)<100:break
             page+=1
+    incident=api('actions/runs/39266027509')
+    record=dict(run_id=str(incident['id']),date=incident['created_at'],commit=incident['head_sha'],family='P8',workflow='ci.yml',record_kind='process incident: incidental synthetic diagnostic',status=incident['status'],outcome=incident['conclusion'],url=incident['html_url'],canonical_directories=['reports/p8/infra-freeze-barrier'],receipt='reports/p8/infra-freeze-barrier/run.json')
+    rows.append(record)
     rows.sort(key=lambda r:(r['date'],r['run_id']))
     latest={f:max((r for r in rows if r['family']==f and r['record_kind']=='measurement/delivery'),key=lambda r:r['date'])['run_id'] for f in sorted({r['family'] for r in rows})}
     dest=ROOT/'reports/p8/measurement-inventory.json';dest.write_text(json.dumps(dict(run_id='P8-index-audit',date='2026-10-19',latest_by_family=latest,runs=rows),ensure_ascii=False,indent=2)+'\n')
@@ -34,5 +37,6 @@ def main():
         links='; '.join(f'`{d}`' for d in r['canonical_directories'])+f"; [{r['receipt']}](../{r['receipt']})"
         text+=f"| {r['date']} | {r['family']} | [{r['run_id']}]({r['url']}) | `{r['commit']}` | {r['outcome'] or r['status']} | {links} |\n"
     text+='\n## P8 final evidence\n\nOfficial and B: `reports/p8/run39266451529/`, original per-pair streams in immutable workflow artifacts (SHA256/row IDs in manifests); final release archive preserves them. Official successful measurement source dd4454b, exact product b9cf9ac. First attempt39266027598 produced ZERO predictions; traceback retained in `reports/p8/infra-first-attempt`. Historical local summaries with no recorded remote run explicitly say `historical-local-unrecorded`, never invented scientific provenance. See [FINAL_REPORT](FINAL_REPORT.md).\n'
+    text+='\n## Critical P8 execution-freeze breach\n\nCI39266027509 was cancelled, but always-contract ran a temporary synthetic ParticipationModel.fit before seal (artifact12192328736 created14:12:03Z). [Immutable original run/artifact metadata](p8/infra-freeze-barrier/). No official/B fit data or product change; nevertheless ANY-fit prohibition was violated. Inference-worker fit_calls=[] is process-scoped. Guard now requires successful barrier; no official retry. Numeric joint gate PASS, process freeze NOT achieved, conservative RC NOTlatest. Ordinary CI synthetic diagnostics are regressions, not candidate comparisons; this exceptional incident is explicitly indexed chronologically above.\n'
     (ROOT/'reports/EXPERIMENTS_INDEX.md').write_text(text)
 if __name__=='__main__':main()

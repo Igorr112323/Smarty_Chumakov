@@ -20,6 +20,42 @@
       "time": "413.251",
       "timestamp": "2026-10-19T14:44:08.862063+00:00",
       "hostname": "e2b.local"
+    },
+    {
+      "name": "pytest",
+      "errors": "0",
+      "failures": "0",
+      "skipped": "2",
+      "tests": "910",
+      "time": "432.398",
+      "timestamp": "2026-10-19T14:57:56.297616+00:00",
+      "hostname": "e2b.local",
+      "receipt_commit": "f2b7f53",
+      "scope": "third full run; receipt committed with preparatory metadata changes"
+    },
+    {
+      "name": "pytest",
+      "errors": "0",
+      "failures": "0",
+      "skipped": "2",
+      "tests": "910",
+      "time": "404.435",
+      "timestamp": "2026-10-19T15:32:44.579404+00:00",
+      "hostname": "e2b.local",
+      "receipt_commit": "f8068bf",
+      "scope": "fourth full run on f2b7f53 source"
+    },
+    {
+      "name": "pytest",
+      "errors": "0",
+      "failures": "0",
+      "skipped": "2",
+      "tests": "910",
+      "time": "407.793",
+      "timestamp": "2026-10-19T16:17:35.859859+00:00",
+      "hostname": "e2b.local",
+      "source_at_start": "1ef0f780d99d86580c1ce6eba3ded5a019474bf8",
+      "scope": "fifth full suite; .gitattributes-only commit during execution did not change tested code"
     }
   ]
 }

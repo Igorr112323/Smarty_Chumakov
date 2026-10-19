@@ -87,7 +87,7 @@ AI-share: train-only original5doc-fold OOF PAVA HF MAE **0.406824→0.2565365102
 
 Проверенные P7 ориентиры до новой сборки: exe8,979,956B /pyz232,874B; отдельно модель **551,290,714B**, библиотеки **870,588,148B** (sum1,421,878,862B **плюс Python/application**, полный installed SDK total не измерен). Это не «всё HF внутри9MB», не прежняя неточная оценка ~500MB libs. Итоговые P8 build/release/CI receipts и контрольные суммы находятся в `reports/p8/DELIVERY.json` и linked artifact manifests; новый архив сохраняет source, binary, исходные per-pair доказательства. Публикационный receipt создаётся позже самого архива, без рекурсивного перепаковывания.
 
-Полный локальный pytest без exclusions и ordinary CI finalHEAD отражаются фактическими JUnit/log/run receipts: [full-suite.log](p8/full-suite.log), [full-suite.xml](p8/full-suite.xml). Локально: **910 collected /908 passed /2 pre-existing skipped,0 failures,404.435с**, JUnit подтверждает. Два старых optional skips сохраняются, новые skips не добавлены. `tests_excluded=false`. Переоценки official177 ради сборки/CI не выполняется.
+Полный локальный pytest без exclusions и ordinary CI finalHEAD отражаются фактическими JUnit/log/run receipts: [full-suite.log](p8/full-suite.log), [full-suite.xml](p8/full-suite.xml). Локально: **910 collected /908 passed /2 pre-existing skipped,0 failures,407.793с**, JUnit подтверждает. Два старых optional skips сохраняются, новые skips не добавлены. `tests_excluded=false`. Переоценки official177 ради сборки/CI не выполняется.
 
 ### P8 actual Windows receipt and publication recovery
 
