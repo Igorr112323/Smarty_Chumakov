@@ -1,0 +1,31 @@
+name: P8 evidence receipts only, no inference
+on:
+  push:
+    branches: [arena/c5f69767-smarty-chumakov]
+    paths: [.github/p8-receipts.trigger]
+permissions:
+  contents: read
+  actions: read
+jobs:
+  receipt:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    strategy:
+      fail-fast: false
+      matrix:
+        artifact: [p8-official177, p8-external-0, p8-external-1, p8-external-2, p8-external-3, p8-external-full]
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Wait for evidence (never repeat inference)
+        if: matrix.artifact != 'p8-official177'
+        run: gh run watch 39266451529 --exit-status --interval 30
+      - uses: actions/download-artifact@v4
+        with:
+          name: ${{ matrix.artifact }}
+          run-id: 39266451529
+          github-token: ${{ github.token }}
+          path: .arena/receipt
+      - name: Lossless compressed metadata receipts and per-pair artifact hashes
+        run: python scripts/p8_emit_receipt.py .arena/receipt '${{ matrix.artifact }}'
