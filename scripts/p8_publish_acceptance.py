@@ -37,5 +37,6 @@ def main():
         z.writestr('FINAL-PUBLICATION.json',json.dumps(dict(meta,files=checks),ensure_ascii=False,indent=2))
     digest=hashlib.sha256(out.read_bytes()).hexdigest();sha=out.with_suffix('.zip.sha256');sha.write_text(f'{digest}  {out.name}\n')
     subprocess.run(['gh','release','upload',meta['release_tag'],str(out),str(sha),'--clobber'],check=True)
+    subprocess.run(['gh','release','edit',meta['release_tag'],'--notes-file',str(ROOT/'reports/p8/RELEASE_NOTES.md')],check=True)
     print('::notice title=P8 final archive::'+json.dumps(dict(meta,sha256=digest,bytes=out.stat().st_size)))
 if __name__=='__main__':main()

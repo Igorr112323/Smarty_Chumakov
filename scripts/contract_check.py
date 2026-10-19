@@ -361,6 +361,7 @@ def artifact_payload(
     """Стандартная схема артефакта: commit, seed, mode, dataset, metrics, note, gate."""
     return {
         "id": check_id,
+        "run_id": os.environ.get("GITHUB_RUN_ID", "local-contract:" + git_commit()),
         "commit": git_commit(),
         "seed": SEED,
         "mode": fact.pop("mode", "demo"),
@@ -3248,6 +3249,8 @@ def main() -> int:
     }
     payload = {
         "kind": "contract_check",
+        "run_id": os.environ.get("GITHUB_RUN_ID", "local-contract:" + git_commit()),
+        "date": time.strftime("%Y-%m-%d", time.gmtime()),
         "provenance": "local",
         "commit": git_commit(),
         "environment": env_info(),

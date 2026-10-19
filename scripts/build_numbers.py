@@ -742,6 +742,7 @@ def main() -> int:
     args = parser.parse_args()
 
     payload = build()
+    payload.update(run_id="numbers-build", date=str(payload.get("generated_at", "2026-10-19"))[:10])
     out = ROOT / args.out
     rendered = json.dumps(payload, ensure_ascii=False, indent=2) + "\n"
     if args.check:

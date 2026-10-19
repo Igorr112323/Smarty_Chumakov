@@ -11,7 +11,17 @@
     "median_lower_bound_seconds": null,
     "seconds_per_1000_chars_lower_bound": null,
     "mode": "demo",
-    "phase": "after"
+    "phase": "after",
+    "evidence_context": {
+      "run_id": "historical-local-unrecorded:b5eb133a55c1d1b8062851919f5978676497dbfc",
+      "date": "2026-10-19",
+      "status": "NON_AUTHORITATIVE historical/reference; consult current indices",
+      "successor": "reports/EXPERIMENTS_INDEX.md",
+      "source_commit": "b5eb133a55c1d1b8062851919f5978676497dbfc",
+      "run_id_scope": "Referenced subrun only for historical aggregates; not all values share one run",
+      "date_scope": "file provenance date, not assertion of every underlying measurement date",
+      "limitation": "Original remote run not recorded; do not misrepresent as current independent measurement"
+    }
   },
   {
     "scenario": "document-context",
@@ -25,7 +35,17 @@
     "median_lower_bound_seconds": null,
     "seconds_per_1000_chars_lower_bound": null,
     "mode": "demo",
-    "phase": "after"
+    "phase": "after",
+    "evidence_context": {
+      "run_id": "historical-local-unrecorded:b5eb133a55c1d1b8062851919f5978676497dbfc",
+      "date": "2026-10-19",
+      "status": "NON_AUTHORITATIVE historical/reference; consult current indices",
+      "successor": "reports/EXPERIMENTS_INDEX.md",
+      "source_commit": "b5eb133a55c1d1b8062851919f5978676497dbfc",
+      "run_id_scope": "Referenced subrun only for historical aggregates; not all values share one run",
+      "date_scope": "file provenance date, not assertion of every underlying measurement date",
+      "limitation": "Original remote run not recorded; do not misrepresent as current independent measurement"
+    }
   },
   {
     "scenario": "document-context",
@@ -39,7 +59,17 @@
     "median_lower_bound_seconds": null,
     "seconds_per_1000_chars_lower_bound": null,
     "mode": "demo",
-    "phase": "after"
+    "phase": "after",
+    "evidence_context": {
+      "run_id": "historical-local-unrecorded:b5eb133a55c1d1b8062851919f5978676497dbfc",
+      "date": "2026-10-19",
+      "status": "NON_AUTHORITATIVE historical/reference; consult current indices",
+      "successor": "reports/EXPERIMENTS_INDEX.md",
+      "source_commit": "b5eb133a55c1d1b8062851919f5978676497dbfc",
+      "run_id_scope": "Referenced subrun only for historical aggregates; not all values share one run",
+      "date_scope": "file provenance date, not assertion of every underlying measurement date",
+      "limitation": "Original remote run not recorded; do not misrepresent as current independent measurement"
+    }
   },
   {
     "scenario": "document-context",
@@ -53,7 +83,17 @@
     "median_lower_bound_seconds": null,
     "seconds_per_1000_chars_lower_bound": null,
     "mode": "demo",
-    "phase": "after"
+    "phase": "after",
+    "evidence_context": {
+      "run_id": "historical-local-unrecorded:b5eb133a55c1d1b8062851919f5978676497dbfc",
+      "date": "2026-10-19",
+      "status": "NON_AUTHORITATIVE historical/reference; consult current indices",
+      "successor": "reports/EXPERIMENTS_INDEX.md",
+      "source_commit": "b5eb133a55c1d1b8062851919f5978676497dbfc",
+      "run_id_scope": "Referenced subrun only for historical aggregates; not all values share one run",
+      "date_scope": "file provenance date, not assertion of every underlying measurement date",
+      "limitation": "Original remote run not recorded; do not misrepresent as current independent measurement"
+    }
   },
   {
     "scenario": "document-context",
@@ -67,7 +107,17 @@
     "median_lower_bound_seconds": null,
     "seconds_per_1000_chars_lower_bound": null,
     "mode": "demo",
-    "phase": "after"
+    "phase": "after",
+    "evidence_context": {
+      "run_id": "historical-local-unrecorded:b5eb133a55c1d1b8062851919f5978676497dbfc",
+      "date": "2026-10-19",
+      "status": "NON_AUTHORITATIVE historical/reference; consult current indices",
+      "successor": "reports/EXPERIMENTS_INDEX.md",
+      "source_commit": "b5eb133a55c1d1b8062851919f5978676497dbfc",
+      "run_id_scope": "Referenced subrun only for historical aggregates; not all values share one run",
+      "date_scope": "file provenance date, not assertion of every underlying measurement date",
+      "limitation": "Original remote run not recorded; do not misrepresent as current independent measurement"
+    }
   },
   {
     "scenario": "document-context",
@@ -81,7 +131,17 @@
     "median_lower_bound_seconds": null,
     "seconds_per_1000_chars_lower_bound": null,
     "mode": "demo",
-    "phase": "after"
+    "phase": "after",
+    "evidence_context": {
+      "run_id": "historical-local-unrecorded:b5eb133a55c1d1b8062851919f5978676497dbfc",
+      "date": "2026-10-19",
+      "status": "NON_AUTHORITATIVE historical/reference; consult current indices",
+      "successor": "reports/EXPERIMENTS_INDEX.md",
+      "source_commit": "b5eb133a55c1d1b8062851919f5978676497dbfc",
+      "run_id_scope": "Referenced subrun only for historical aggregates; not all values share one run",
+      "date_scope": "file provenance date, not assertion of every underlying measurement date",
+      "limitation": "Original remote run not recorded; do not misrepresent as current independent measurement"
+    }
   },
   {
     "scenario": "answer-text",
@@ -95,7 +155,17 @@
     "median_lower_bound_seconds": null,
     "seconds_per_1000_chars_lower_bound": null,
     "mode": "demo",
-    "phase": "after"
+    "phase": "after",
+    "evidence_context": {
+      "run_id": "historical-local-unrecorded:b5eb133a55c1d1b8062851919f5978676497dbfc",
+      "date": "2026-10-19",
+      "status": "NON_AUTHORITATIVE historical/reference; consult current indices",
+      "successor": "reports/EXPERIMENTS_INDEX.md",
+      "source_commit": "b5eb133a55c1d1b8062851919f5978676497dbfc",
+      "run_id_scope": "Referenced subrun only for historical aggregates; not all values share one run",
+      "date_scope": "file provenance date, not assertion of every underlying measurement date",
+      "limitation": "Original remote run not recorded; do not misrepresent as current independent measurement"
+    }
   },
   {
     "scenario": "answer-text",
@@ -109,7 +179,17 @@
     "median_lower_bound_seconds": null,
     "seconds_per_1000_chars_lower_bound": null,
     "mode": "demo",
-    "phase": "after"
+    "phase": "after",
+    "evidence_context": {
+      "run_id": "historical-local-unrecorded:b5eb133a55c1d1b8062851919f5978676497dbfc",
+      "date": "2026-10-19",
+      "status": "NON_AUTHORITATIVE historical/reference; consult current indices",
+      "successor": "reports/EXPERIMENTS_INDEX.md",
+      "source_commit": "b5eb133a55c1d1b8062851919f5978676497dbfc",
+      "run_id_scope": "Referenced subrun only for historical aggregates; not all values share one run",
+      "date_scope": "file provenance date, not assertion of every underlying measurement date",
+      "limitation": "Original remote run not recorded; do not misrepresent as current independent measurement"
+    }
   },
   {
     "scenario": "answer-text",
@@ -123,7 +203,17 @@
     "median_lower_bound_seconds": null,
     "seconds_per_1000_chars_lower_bound": null,
     "mode": "demo",
-    "phase": "after"
+    "phase": "after",
+    "evidence_context": {
+      "run_id": "historical-local-unrecorded:b5eb133a55c1d1b8062851919f5978676497dbfc",
+      "date": "2026-10-19",
+      "status": "NON_AUTHORITATIVE historical/reference; consult current indices",
+      "successor": "reports/EXPERIMENTS_INDEX.md",
+      "source_commit": "b5eb133a55c1d1b8062851919f5978676497dbfc",
+      "run_id_scope": "Referenced subrun only for historical aggregates; not all values share one run",
+      "date_scope": "file provenance date, not assertion of every underlying measurement date",
+      "limitation": "Original remote run not recorded; do not misrepresent as current independent measurement"
+    }
   },
   {
     "scenario": "answer-text",
@@ -137,7 +227,17 @@
     "median_lower_bound_seconds": null,
     "seconds_per_1000_chars_lower_bound": null,
     "mode": "demo",
-    "phase": "after"
+    "phase": "after",
+    "evidence_context": {
+      "run_id": "historical-local-unrecorded:b5eb133a55c1d1b8062851919f5978676497dbfc",
+      "date": "2026-10-19",
+      "status": "NON_AUTHORITATIVE historical/reference; consult current indices",
+      "successor": "reports/EXPERIMENTS_INDEX.md",
+      "source_commit": "b5eb133a55c1d1b8062851919f5978676497dbfc",
+      "run_id_scope": "Referenced subrun only for historical aggregates; not all values share one run",
+      "date_scope": "file provenance date, not assertion of every underlying measurement date",
+      "limitation": "Original remote run not recorded; do not misrepresent as current independent measurement"
+    }
   },
   {
     "scenario": "answer-text",
@@ -151,7 +251,17 @@
     "median_lower_bound_seconds": null,
     "seconds_per_1000_chars_lower_bound": null,
     "mode": "demo",
-    "phase": "after"
+    "phase": "after",
+    "evidence_context": {
+      "run_id": "historical-local-unrecorded:b5eb133a55c1d1b8062851919f5978676497dbfc",
+      "date": "2026-10-19",
+      "status": "NON_AUTHORITATIVE historical/reference; consult current indices",
+      "successor": "reports/EXPERIMENTS_INDEX.md",
+      "source_commit": "b5eb133a55c1d1b8062851919f5978676497dbfc",
+      "run_id_scope": "Referenced subrun only for historical aggregates; not all values share one run",
+      "date_scope": "file provenance date, not assertion of every underlying measurement date",
+      "limitation": "Original remote run not recorded; do not misrepresent as current independent measurement"
+    }
   },
   {
     "scenario": "answer-text",
@@ -165,7 +275,17 @@
     "median_lower_bound_seconds": null,
     "seconds_per_1000_chars_lower_bound": null,
     "mode": "demo",
-    "phase": "after"
+    "phase": "after",
+    "evidence_context": {
+      "run_id": "historical-local-unrecorded:b5eb133a55c1d1b8062851919f5978676497dbfc",
+      "date": "2026-10-19",
+      "status": "NON_AUTHORITATIVE historical/reference; consult current indices",
+      "successor": "reports/EXPERIMENTS_INDEX.md",
+      "source_commit": "b5eb133a55c1d1b8062851919f5978676497dbfc",
+      "run_id_scope": "Referenced subrun only for historical aggregates; not all values share one run",
+      "date_scope": "file provenance date, not assertion of every underlying measurement date",
+      "limitation": "Original remote run not recorded; do not misrepresent as current independent measurement"
+    }
   },
   {
     "scenario": "document-context",
@@ -179,7 +299,17 @@
     "median_lower_bound_seconds": null,
     "seconds_per_1000_chars_lower_bound": null,
     "mode": "hf",
-    "phase": "after"
+    "phase": "after",
+    "evidence_context": {
+      "run_id": "historical-local-unrecorded:b5eb133a55c1d1b8062851919f5978676497dbfc",
+      "date": "2026-10-19",
+      "status": "NON_AUTHORITATIVE historical/reference; consult current indices",
+      "successor": "reports/EXPERIMENTS_INDEX.md",
+      "source_commit": "b5eb133a55c1d1b8062851919f5978676497dbfc",
+      "run_id_scope": "Referenced subrun only for historical aggregates; not all values share one run",
+      "date_scope": "file provenance date, not assertion of every underlying measurement date",
+      "limitation": "Original remote run not recorded; do not misrepresent as current independent measurement"
+    }
   },
   {
     "scenario": "document-context",
@@ -193,7 +323,17 @@
     "median_lower_bound_seconds": null,
     "seconds_per_1000_chars_lower_bound": null,
     "mode": "hf",
-    "phase": "after"
+    "phase": "after",
+    "evidence_context": {
+      "run_id": "historical-local-unrecorded:b5eb133a55c1d1b8062851919f5978676497dbfc",
+      "date": "2026-10-19",
+      "status": "NON_AUTHORITATIVE historical/reference; consult current indices",
+      "successor": "reports/EXPERIMENTS_INDEX.md",
+      "source_commit": "b5eb133a55c1d1b8062851919f5978676497dbfc",
+      "run_id_scope": "Referenced subrun only for historical aggregates; not all values share one run",
+      "date_scope": "file provenance date, not assertion of every underlying measurement date",
+      "limitation": "Original remote run not recorded; do not misrepresent as current independent measurement"
+    }
   },
   {
     "scenario": "document-context",
@@ -207,7 +347,17 @@
     "median_lower_bound_seconds": null,
     "seconds_per_1000_chars_lower_bound": null,
     "mode": "hf",
-    "phase": "after"
+    "phase": "after",
+    "evidence_context": {
+      "run_id": "historical-local-unrecorded:b5eb133a55c1d1b8062851919f5978676497dbfc",
+      "date": "2026-10-19",
+      "status": "NON_AUTHORITATIVE historical/reference; consult current indices",
+      "successor": "reports/EXPERIMENTS_INDEX.md",
+      "source_commit": "b5eb133a55c1d1b8062851919f5978676497dbfc",
+      "run_id_scope": "Referenced subrun only for historical aggregates; not all values share one run",
+      "date_scope": "file provenance date, not assertion of every underlying measurement date",
+      "limitation": "Original remote run not recorded; do not misrepresent as current independent measurement"
+    }
   },
   {
     "scenario": "document-context",
@@ -221,7 +371,17 @@
     "median_lower_bound_seconds": null,
     "seconds_per_1000_chars_lower_bound": null,
     "mode": "hf",
-    "phase": "after"
+    "phase": "after",
+    "evidence_context": {
+      "run_id": "historical-local-unrecorded:b5eb133a55c1d1b8062851919f5978676497dbfc",
+      "date": "2026-10-19",
+      "status": "NON_AUTHORITATIVE historical/reference; consult current indices",
+      "successor": "reports/EXPERIMENTS_INDEX.md",
+      "source_commit": "b5eb133a55c1d1b8062851919f5978676497dbfc",
+      "run_id_scope": "Referenced subrun only for historical aggregates; not all values share one run",
+      "date_scope": "file provenance date, not assertion of every underlying measurement date",
+      "limitation": "Original remote run not recorded; do not misrepresent as current independent measurement"
+    }
   },
   {
     "scenario": "document-context",
@@ -235,7 +395,17 @@
     "median_lower_bound_seconds": null,
     "seconds_per_1000_chars_lower_bound": null,
     "mode": "hf",
-    "phase": "after"
+    "phase": "after",
+    "evidence_context": {
+      "run_id": "historical-local-unrecorded:b5eb133a55c1d1b8062851919f5978676497dbfc",
+      "date": "2026-10-19",
+      "status": "NON_AUTHORITATIVE historical/reference; consult current indices",
+      "successor": "reports/EXPERIMENTS_INDEX.md",
+      "source_commit": "b5eb133a55c1d1b8062851919f5978676497dbfc",
+      "run_id_scope": "Referenced subrun only for historical aggregates; not all values share one run",
+      "date_scope": "file provenance date, not assertion of every underlying measurement date",
+      "limitation": "Original remote run not recorded; do not misrepresent as current independent measurement"
+    }
   },
   {
     "scenario": "document-context",
@@ -249,7 +419,17 @@
     "median_lower_bound_seconds": null,
     "seconds_per_1000_chars_lower_bound": null,
     "mode": "hf",
-    "phase": "after"
+    "phase": "after",
+    "evidence_context": {
+      "run_id": "historical-local-unrecorded:b5eb133a55c1d1b8062851919f5978676497dbfc",
+      "date": "2026-10-19",
+      "status": "NON_AUTHORITATIVE historical/reference; consult current indices",
+      "successor": "reports/EXPERIMENTS_INDEX.md",
+      "source_commit": "b5eb133a55c1d1b8062851919f5978676497dbfc",
+      "run_id_scope": "Referenced subrun only for historical aggregates; not all values share one run",
+      "date_scope": "file provenance date, not assertion of every underlying measurement date",
+      "limitation": "Original remote run not recorded; do not misrepresent as current independent measurement"
+    }
   },
   {
     "scenario": "answer-text",
@@ -263,7 +443,17 @@
     "median_lower_bound_seconds": null,
     "seconds_per_1000_chars_lower_bound": null,
     "mode": "hf",
-    "phase": "after"
+    "phase": "after",
+    "evidence_context": {
+      "run_id": "historical-local-unrecorded:b5eb133a55c1d1b8062851919f5978676497dbfc",
+      "date": "2026-10-19",
+      "status": "NON_AUTHORITATIVE historical/reference; consult current indices",
+      "successor": "reports/EXPERIMENTS_INDEX.md",
+      "source_commit": "b5eb133a55c1d1b8062851919f5978676497dbfc",
+      "run_id_scope": "Referenced subrun only for historical aggregates; not all values share one run",
+      "date_scope": "file provenance date, not assertion of every underlying measurement date",
+      "limitation": "Original remote run not recorded; do not misrepresent as current independent measurement"
+    }
   },
   {
     "scenario": "answer-text",
@@ -277,7 +467,17 @@
     "median_lower_bound_seconds": null,
     "seconds_per_1000_chars_lower_bound": null,
     "mode": "hf",
-    "phase": "after"
+    "phase": "after",
+    "evidence_context": {
+      "run_id": "historical-local-unrecorded:b5eb133a55c1d1b8062851919f5978676497dbfc",
+      "date": "2026-10-19",
+      "status": "NON_AUTHORITATIVE historical/reference; consult current indices",
+      "successor": "reports/EXPERIMENTS_INDEX.md",
+      "source_commit": "b5eb133a55c1d1b8062851919f5978676497dbfc",
+      "run_id_scope": "Referenced subrun only for historical aggregates; not all values share one run",
+      "date_scope": "file provenance date, not assertion of every underlying measurement date",
+      "limitation": "Original remote run not recorded; do not misrepresent as current independent measurement"
+    }
   },
   {
     "scenario": "answer-text",
@@ -291,7 +491,17 @@
     "median_lower_bound_seconds": null,
     "seconds_per_1000_chars_lower_bound": null,
     "mode": "hf",
-    "phase": "after"
+    "phase": "after",
+    "evidence_context": {
+      "run_id": "historical-local-unrecorded:b5eb133a55c1d1b8062851919f5978676497dbfc",
+      "date": "2026-10-19",
+      "status": "NON_AUTHORITATIVE historical/reference; consult current indices",
+      "successor": "reports/EXPERIMENTS_INDEX.md",
+      "source_commit": "b5eb133a55c1d1b8062851919f5978676497dbfc",
+      "run_id_scope": "Referenced subrun only for historical aggregates; not all values share one run",
+      "date_scope": "file provenance date, not assertion of every underlying measurement date",
+      "limitation": "Original remote run not recorded; do not misrepresent as current independent measurement"
+    }
   },
   {
     "scenario": "answer-text",
@@ -305,7 +515,17 @@
     "median_lower_bound_seconds": null,
     "seconds_per_1000_chars_lower_bound": null,
     "mode": "hf",
-    "phase": "after"
+    "phase": "after",
+    "evidence_context": {
+      "run_id": "historical-local-unrecorded:b5eb133a55c1d1b8062851919f5978676497dbfc",
+      "date": "2026-10-19",
+      "status": "NON_AUTHORITATIVE historical/reference; consult current indices",
+      "successor": "reports/EXPERIMENTS_INDEX.md",
+      "source_commit": "b5eb133a55c1d1b8062851919f5978676497dbfc",
+      "run_id_scope": "Referenced subrun only for historical aggregates; not all values share one run",
+      "date_scope": "file provenance date, not assertion of every underlying measurement date",
+      "limitation": "Original remote run not recorded; do not misrepresent as current independent measurement"
+    }
   },
   {
     "scenario": "answer-text",
@@ -319,7 +539,17 @@
     "median_lower_bound_seconds": null,
     "seconds_per_1000_chars_lower_bound": null,
     "mode": "hf",
-    "phase": "after"
+    "phase": "after",
+    "evidence_context": {
+      "run_id": "historical-local-unrecorded:b5eb133a55c1d1b8062851919f5978676497dbfc",
+      "date": "2026-10-19",
+      "status": "NON_AUTHORITATIVE historical/reference; consult current indices",
+      "successor": "reports/EXPERIMENTS_INDEX.md",
+      "source_commit": "b5eb133a55c1d1b8062851919f5978676497dbfc",
+      "run_id_scope": "Referenced subrun only for historical aggregates; not all values share one run",
+      "date_scope": "file provenance date, not assertion of every underlying measurement date",
+      "limitation": "Original remote run not recorded; do not misrepresent as current independent measurement"
+    }
   },
   {
     "scenario": "answer-text",
@@ -333,6 +563,16 @@
     "median_lower_bound_seconds": null,
     "seconds_per_1000_chars_lower_bound": null,
     "mode": "hf",
-    "phase": "after"
+    "phase": "after",
+    "evidence_context": {
+      "run_id": "historical-local-unrecorded:b5eb133a55c1d1b8062851919f5978676497dbfc",
+      "date": "2026-10-19",
+      "status": "NON_AUTHORITATIVE historical/reference; consult current indices",
+      "successor": "reports/EXPERIMENTS_INDEX.md",
+      "source_commit": "b5eb133a55c1d1b8062851919f5978676497dbfc",
+      "run_id_scope": "Referenced subrun only for historical aggregates; not all values share one run",
+      "date_scope": "file provenance date, not assertion of every underlying measurement date",
+      "limitation": "Original remote run not recorded; do not misrepresent as current independent measurement"
+    }
   }
 ]

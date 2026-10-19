@@ -21,14 +21,17 @@ def test_all_non_run_metric_documents_have_provenance():
             if hygiene.is_run(path) or not hygiene.metric_file(path, data):
                 continue
             found += 1
-            for item in hygiene.objects(data):
-                context = item.get("evidence_context", item)
-                assert context.get("run_id") and context.get("date"), path
-                if "unrecorded" in str(context["run_id"]):
-                    assert context.get("limitation"), path
-                if "SUPERSEDED" in str(item.get("_status", context.get("status", ""))):
-                    assert item.get("successor", context.get("successor")), path
+            assert hygiene.provenance_problems(path, data) == [], path
     assert found >= 20
+    path = Path("arbitrary-new-name.json")
+    assert hygiene.metric_file(path, {"auc": 0.75})
+    assert hygiene.provenance_problems(path, {"auc": 0.75})
+    broken = {"f1": 0.5, "run_id": "local-probe", "date": "2026-10-19", "_status": "SUPERSEDED"}
+    assert any("successor" in p for p in hygiene.provenance_problems(path, broken))
+    broken["successor"] = "reports/EXPERIMENTS_INDEX.md"
+    assert hygiene.provenance_problems(path, broken) == []
+    broken["date"] = "not-a-date"
+    assert any("date" in p for p in hygiene.provenance_problems(path, broken))
 
 
 def test_legacy_numbers_immutable_and_superseded():

@@ -9,5 +9,15 @@
   },
   "interface_fixture_only_change": "existing mandatory number-attribution contract fixture; no runtime/model change",
   "last_validated_head": "14a018a1b90b51cc47cd8baf628147ac22e1d8b1",
-  "whole_runtime_config_tree_diff_from_native_benchmark": "empty (git diff 34a82a5 HEAD -- spanverify-module/spanverify spanverify-module/config)"
+  "whole_runtime_config_tree_diff_from_native_benchmark": "empty (git diff 34a82a5 HEAD -- spanverify-module/spanverify spanverify-module/config)",
+  "evidence_context": {
+    "run_id": "historical-local-unrecorded:cd335b2d554a7edb22ad59f8286b47c75bb985bc",
+    "date": "2026-10-19",
+    "status": "NON_AUTHORITATIVE historical/reference; consult current indices",
+    "successor": "reports/EXPERIMENTS_INDEX.md",
+    "source_commit": "cd335b2d554a7edb22ad59f8286b47c75bb985bc",
+    "run_id_scope": "Referenced subrun only for historical aggregates; not all values share one run",
+    "date_scope": "file provenance date, not assertion of every underlying measurement date",
+    "limitation": "Original remote run not recorded; do not misrepresent as current independent measurement"
+  }
 }

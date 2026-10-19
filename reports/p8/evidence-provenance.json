@@ -9,6 +9,11 @@
       "date": "2026-10-19"
     },
     {
+      "path": "reports/NUMBERS.json",
+      "run_id": null,
+      "date": "2026-10-19"
+    },
+    {
       "path": "reports/METRICS.json",
       "run_id": "37609202780",
       "date": "2026-10-19"
@@ -32,6 +37,21 @@
       "path": "reports/contract/4.1.6-gate-corpus-a.json",
       "run_id": null,
       "date": "2026-10-19"
+    },
+    {
+      "path": "reports/contract/4.1.7-performance.json",
+      "run_id": null,
+      "date": "2026-10-14"
+    },
+    {
+      "path": "reports/contract/numbers.check.json",
+      "run_id": null,
+      "date": "2026-10-14"
+    },
+    {
+      "path": "reports/contract/numbers.registry.json",
+      "run_id": null,
+      "date": "2026-10-14"
     },
     {
       "path": "reports/contract/4.1.6-demo.json",
@@ -64,6 +84,11 @@
       "date": "2026-10-19"
     },
     {
+      "path": "reports/acceptance/benchmark-source-parity.json",
+      "run_id": null,
+      "date": "2026-10-19"
+    },
+    {
       "path": "reports/acceptance/coverage-matrix.json",
       "run_id": null,
       "date": "2026-10-19"
@@ -79,7 +104,22 @@
       "date": "2026-10-19"
     },
     {
+      "path": "reports/p7/coverage-matrix.json",
+      "run_id": null,
+      "date": "2026-10-19"
+    },
+    {
       "path": "reports/p7/calibration-demo-local/oof-calibration.json",
+      "run_id": null,
+      "date": "2026-10-19"
+    },
+    {
+      "path": "reports/p7/final-receipts/native-benchmark.json",
+      "run_id": null,
+      "date": "2026-10-19"
+    },
+    {
+      "path": "reports/p7/final-receipts/native-profiles.json",
       "run_id": null,
       "date": "2026-10-19"
     },
@@ -182,6 +222,11 @@
       "path": "spanverify-module/reports/experiments/a3/experiment.json",
       "run_id": "37609202780",
       "date": "2026-10-19"
+    },
+    {
+      "path": "spanverify-module/reports/experiments/pilot/pilot.json",
+      "run_id": null,
+      "date": "2026-10-14"
     }
   ]
 }

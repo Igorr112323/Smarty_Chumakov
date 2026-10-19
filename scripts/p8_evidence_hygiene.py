@@ -8,14 +8,14 @@ ROOT=Path(__file__).resolve().parents[1]
 INDEX='reports/EXPERIMENTS_INDEX.md'
 
 def is_run(path):
-    return any(re.fullmatch(r'run\d+',p) for p in path.parts) or any((p/'run.json').is_file() for p in path.parents if p!=ROOT)
+    return any(re.fullmatch(r'run\d+',p) for p in path.parts) or any((p/'run.json').is_file() for p in path.parents if p!=ROOT and p.is_relative_to(ROOT))
 
 def metric_file(path,data):
-    if path.name in ('weights.json','combined_bundle.json') or 'model' in path.name or 'calibrator_v1' in path.name:return False
+    if path.name in ('weights.json','combined_bundle.json') or 'model' in path.name or 'calibrator_v1' in path.name or 'golden' in path.name:return False
     def contains(x):
-        if isinstance(x,dict):return any(k.lower() in ('f1','mae','strict_f1','token_f1','calibrated_auc') for k in x) or any(contains(v) for v in x.values())
+        if isinstance(x,dict):return any(k.lower() in ('f1','mae','strict_f1','token_f1','calibrated_auc','auc','precision','recall','fpr','accuracy','mse','brier','median_s','median_seconds','elapsed_seconds','wall_seconds','elapsed','mae_before','mae_after') for k in x) or any(contains(v) for v in x.values())
         return isinstance(x,list) and any(contains(v) for v in x)
-    return contains(data)
+    return contains(data) or any(word in path.stem.lower() for word in ("metrics","numbers","benchmark","timings","profile"))
 
 def objects(data):
     return [data] if isinstance(data,dict) else [x for x in data if isinstance(x,dict)]
@@ -33,6 +33,19 @@ def source_id(data):
             found=source_id(v)
             if found:return found
     return None
+
+def provenance_problems(path,data):
+    from datetime import date
+    problems=[]
+    if not objects(data):return [f'{path}: metric document has no provenance object']
+    for obj in objects(data):
+        context=obj.get('evidence_context',obj)
+        if not context.get('run_id'):problems.append(f'{path}: missing run_id')
+        try:date.fromisoformat(str(context.get('date',''))[:10])
+        except ValueError:problems.append(f'{path}: missing/invalid date')
+        if 'SUPERSEDED' in str(obj.get('_status',context.get('status',''))).upper() and not obj.get('successor',context.get('successor')):problems.append(f'{path}: SUPERSEDED missing successor')
+        if 'unrecorded' in str(context.get('run_id','')) and not context.get('limitation'):problems.append(f'{path}: undocumented historical provenance gap')
+    return problems
 
 def migrate():
     records=[]

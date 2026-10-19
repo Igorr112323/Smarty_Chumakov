@@ -57,5 +57,15 @@
     "target_seconds_2m": 60.0
   },
   "note": "быстродействие в пределах договорных значений",
-  "gate": null
+  "gate": null,
+  "evidence_context": {
+    "run_id": "historical-local-unrecorded:fc438ea7069b4a3c8ad78097f4c29df1767937ec",
+    "date": "2026-10-14",
+    "status": "NON_AUTHORITATIVE historical/reference; consult current indices",
+    "successor": "reports/EXPERIMENTS_INDEX.md",
+    "source_commit": "fc438ea7069b4a3c8ad78097f4c29df1767937ec",
+    "run_id_scope": "Referenced subrun only for historical aggregates; not all values share one run",
+    "date_scope": "file provenance date, not assertion of every underlying measurement date",
+    "limitation": "Original remote run not recorded; do not misrepresent as current independent measurement"
+  }
 }
