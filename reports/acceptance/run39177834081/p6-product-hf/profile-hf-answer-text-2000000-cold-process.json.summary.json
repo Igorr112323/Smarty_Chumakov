@@ -1,0 +1,272 @@
+[
+  {
+    "file": "/home/runner/work/Smarty_Chumakov/Smarty_Chumakov/spanverify-module/spanverify/engine.py",
+    "line": 479,
+    "function": "verify",
+    "primitive_calls": 1,
+    "calls": 1,
+    "self_seconds": 2.0229000000000002e-05,
+    "cumulative_seconds": 74.91650186000001
+  },
+  {
+    "file": "/home/runner/work/Smarty_Chumakov/Smarty_Chumakov/spanverify-module/spanverify/engine.py",
+    "line": 761,
+    "function": "_features",
+    "primitive_calls": 1,
+    "calls": 1,
+    "self_seconds": 1.7584e-05,
+    "cumulative_seconds": 73.632810133
+  },
+  {
+    "file": "/home/runner/work/Smarty_Chumakov/Smarty_Chumakov/spanverify-module/spanverify/features.py",
+    "line": 1384,
+    "function": "hf_features_chunked",
+    "primitive_calls": 1,
+    "calls": 1,
+    "self_seconds": 0.0023269510000000003,
+    "cumulative_seconds": 73.632791107
+  },
+  {
+    "file": "/home/runner/work/Smarty_Chumakov/Smarty_Chumakov/spanverify-module/spanverify/features.py",
+    "line": 1147,
+    "function": "hf_features",
+    "primitive_calls": 1,
+    "calls": 1,
+    "self_seconds": 0.031826449,
+    "cumulative_seconds": 70.623231699
+  },
+  {
+    "file": "/home/runner/work/Smarty_Chumakov/Smarty_Chumakov/spanverify-module/spanverify/features.py",
+    "line": 1115,
+    "function": "map_token_positions",
+    "primitive_calls": 1,
+    "calls": 1,
+    "self_seconds": 0.09204100200000001,
+    "cumulative_seconds": 63.163095658
+  },
+  {
+    "file": "/home/runner/work/Smarty_Chumakov/Smarty_Chumakov/spanverify-module/spanverify/features.py",
+    "line": 1133,
+    "function": "<listcomp>",
+    "primitive_calls": 104085,
+    "calls": 104085,
+    "self_seconds": 15.964020097,
+    "cumulative_seconds": 63.06438885000001
+  },
+  {
+    "file": "/home/runner/work/Smarty_Chumakov/Smarty_Chumakov/spanverify-module/spanverify/features.py",
+    "line": 1110,
+    "function": "_span_overlap",
+    "primitive_calls": 53291159,
+    "calls": 53291159,
+    "self_seconds": 24.230004334,
+    "cumulative_seconds": 47.100368753000005
+  },
+  {
+    "file": "~",
+    "line": 0,
+    "function": "<built-in method builtins.max>",
+    "primitive_calls": 106593426,
+    "calls": 106593426,
+    "self_seconds": 14.65671007,
+    "cumulative_seconds": 14.660951903
+  },
+  {
+    "file": "~",
+    "line": 0,
+    "function": "<built-in method builtins.min>",
+    "primitive_calls": 53307209,
+    "calls": 53307209,
+    "self_seconds": 8.223732458,
+    "cumulative_seconds": 8.225875812
+  },
+  {
+    "file": "<frozen importlib._bootstrap>",
+    "line": 1165,
+    "function": "_find_and_load",
+    "primitive_calls": 15,
+    "calls": 5442,
+    "self_seconds": 0.015369925000000001,
+    "cumulative_seconds": 5.855995111
+  },
+  {
+    "file": "<frozen importlib._bootstrap>",
+    "line": 1120,
+    "function": "_find_and_load_unlocked",
+    "primitive_calls": 12,
+    "calls": 2407,
+    "self_seconds": 0.012277151,
+    "cumulative_seconds": 5.855568242
+  },
+  {
+    "file": "<frozen importlib._bootstrap>",
+    "line": 666,
+    "function": "_load_unlocked",
+    "primitive_calls": 14,
+    "calls": 2312,
+    "self_seconds": 0.009534167000000001,
+    "cumulative_seconds": 5.853364031000001
+  },
+  {
+    "file": "<frozen importlib._bootstrap_external>",
+    "line": 934,
+    "function": "exec_module",
+    "primitive_calls": 14,
+    "calls": 2266,
+    "self_seconds": 0.005607185000000001,
+    "cumulative_seconds": 5.852762391000001
+  },
+  {
+    "file": "<frozen importlib._bootstrap>",
+    "line": 233,
+    "function": "_call_with_frames_removed",
+    "primitive_calls": 26,
+    "calls": 5224,
+    "self_seconds": 0.003066174,
+    "cumulative_seconds": 5.848159583
+  },
+  {
+    "file": "~",
+    "line": 0,
+    "function": "<built-in method builtins.exec>",
+    "primitive_calls": 14,
+    "calls": 5744,
+    "self_seconds": 0.401858741,
+    "cumulative_seconds": 5.846708244
+  },
+  {
+    "file": "<frozen importlib._bootstrap>",
+    "line": 1207,
+    "function": "_handle_fromlist",
+    "primitive_calls": 951,
+    "calls": 2983,
+    "self_seconds": 0.004926336,
+    "cumulative_seconds": 4.573909733000001
+  },
+  {
+    "file": "~",
+    "line": 0,
+    "function": "<built-in method builtins.__import__>",
+    "primitive_calls": 119,
+    "calls": 829,
+    "self_seconds": 0.002126949,
+    "cumulative_seconds": 3.1288609070000004
+  },
+  {
+    "file": "~",
+    "line": 0,
+    "function": "<built-in method builtins.hasattr>",
+    "primitive_calls": 22865,
+    "calls": 71682,
+    "self_seconds": 0.027997002000000003,
+    "cumulative_seconds": 3.093352444
+  },
+  {
+    "file": "/opt/hostedtoolcache/Python/3.11.17/x64/lib/python3.11/importlib/__init__.py",
+    "line": 108,
+    "function": "import_module",
+    "primitive_calls": 53,
+    "calls": 3094,
+    "self_seconds": 0.002397661,
+    "cumulative_seconds": 3.082809892
+  },
+  {
+    "file": "<frozen importlib._bootstrap>",
+    "line": 1192,
+    "function": "_gcd_import",
+    "primitive_calls": 53,
+    "calls": 3097,
+    "self_seconds": 0.00198392,
+    "cumulative_seconds": 3.082729903
+  },
+  {
+    "file": "/home/runner/work/Smarty_Chumakov/Smarty_Chumakov/spanverify-module/spanverify/backends/hf.py",
+    "line": 44,
+    "function": "dependencies",
+    "primitive_calls": 2,
+    "calls": 2,
+    "self_seconds": 1.2083000000000001e-05,
+    "cumulative_seconds": 3.003732077
+  },
+  {
+    "file": "/opt/hostedtoolcache/Python/3.11.17/x64/lib/python3.11/site-packages/transformers/utils/import_utils.py",
+    "line": 2547,
+    "function": "__getattr__",
+    "primitive_calls": 5,
+    "calls": 34,
+    "self_seconds": 0.00018130700000000002,
+    "cumulative_seconds": 2.841801115
+  },
+  {
+    "file": "/opt/hostedtoolcache/Python/3.11.17/x64/lib/python3.11/site-packages/transformers/utils/import_utils.py",
+    "line": 2827,
+    "function": "_get_module",
+    "primitive_calls": 5,
+    "calls": 24,
+    "self_seconds": 4.7264e-05,
+    "cumulative_seconds": 2.8417143520000003
+  },
+  {
+    "file": "/opt/hostedtoolcache/Python/3.11.17/x64/lib/python3.11/site-packages/transformers/tokenization_utils_base.py",
+    "line": 2431,
+    "function": "__call__",
+    "primitive_calls": 2,
+    "calls": 2,
+    "self_seconds": 6.5277e-05,
+    "cumulative_seconds": 2.724736907
+  },
+  {
+    "file": "/opt/hostedtoolcache/Python/3.11.17/x64/lib/python3.11/site-packages/transformers/tokenization_utils_tokenizers.py",
+    "line": 970,
+    "function": "_encode_plus",
+    "primitive_calls": 2,
+    "calls": 2,
+    "self_seconds": 0.00013102800000000002,
+    "cumulative_seconds": 2.724627662
+  },
+  {
+    "file": "~",
+    "line": 0,
+    "function": "<method 'encode_batch' of 'tokenizers.Tokenizer' objects>",
+    "primitive_calls": 2,
+    "calls": 2,
+    "self_seconds": 2.71091476,
+    "cumulative_seconds": 2.71091476
+  },
+  {
+    "file": "/opt/hostedtoolcache/Python/3.11.17/x64/lib/python3.11/site-packages/transformers/models/auto/modeling_auto.py",
+    "line": 1,
+    "function": "<module>",
+    "primitive_calls": 1,
+    "calls": 1,
+    "self_seconds": 0.0005738760000000001,
+    "cumulative_seconds": 1.8005282850000002
+  },
+  {
+    "file": "/opt/hostedtoolcache/Python/3.11.17/x64/lib/python3.11/site-packages/transformers/models/auto/auto_factory.py",
+    "line": 1,
+    "function": "<module>",
+    "primitive_calls": 1,
+    "calls": 1,
+    "self_seconds": 5.3721e-05,
+    "cumulative_seconds": 1.7763713900000002
+  },
+  {
+    "file": "/opt/hostedtoolcache/Python/3.11.17/x64/lib/python3.11/site-packages/transformers/generation/utils.py",
+    "line": 1,
+    "function": "<module>",
+    "primitive_calls": 1,
+    "calls": 1,
+    "self_seconds": 0.00015270800000000002,
+    "cumulative_seconds": 1.7243610310000002
+  },
+  {
+    "file": "/opt/hostedtoolcache/Python/3.11.17/x64/lib/python3.11/site-packages/torch/__init__.py",
+    "line": 1,
+    "function": "<module>",
+    "primitive_calls": 1,
+    "calls": 1,
+    "self_seconds": 0.00211779,
+    "cumulative_seconds": 1.666160644
+  }
+]

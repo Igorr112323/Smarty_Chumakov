@@ -1,0 +1,1714 @@
+[
+  {
+    "mode": "demo",
+    "scenario": "document-context",
+    "chars": 1000,
+    "thermal": "cold-process",
+    "repeats": [
+      {
+        "status": "completed",
+        "profile_enabled": false,
+        "seconds": 0.01361029800000324,
+        "warmup_seconds": null,
+        "answer_chars": 79,
+        "context_chars": 1000,
+        "answer_utf8_bytes": 137,
+        "context_utf8_bytes": 1827,
+        "input_sha256": "1658fd2911f1e61ddeeccba6744617b25eef7ae66f899c3f9a34ce91af0eab60",
+        "schema_valid": true,
+        "stats": {
+          "token_count": 16,
+          "scored_tokens": 10,
+          "number_attribution": [],
+          "fact_coverage": [],
+          "mean_risk": 0.3377,
+          "p90_risk": 0.4096,
+          "raw_score": 0.5201,
+          "raw_score_full": 0.5200824561635692,
+          "span_threshold": 0.4186579753072923,
+          "span_z": 1.5,
+          "span_floor": 0.05,
+          "weights": {
+            "attention_entropy": 0.1,
+            "ctx_attention_mass": 0.0,
+            "ctx_attention_mass_norm": 0.1,
+            "ctx_max_similarity": 0.8,
+            "embedding_density": 0.0
+          },
+          "features": {
+            "backend": "demo",
+            "token_count": 16,
+            "context_tokens": 144,
+            "context_numbers": [
+              "1",
+              "12",
+              "2",
+              "2022",
+              "4"
+            ],
+            "k": 5
+          },
+          "ai_participation": 0.6699,
+          "ai_participation_calibrated_on": "synthetic-participation-corpus 1.0 (два стиля, доля смеси известна)",
+          "warning": "ДЕМО-РЕЖИМ: признаки считаются лексическими суррогатами без весов языковой модели. Он проверяет работоспособность конвейера и интерфейса, а не достоверность ответа. Подмена числа ловится, если число есть у другого объекта документа (например, «первичные — пять лет» против «вторичные — десять лет»); перефразирования и таблицы требуют режима 'hf'. Научные выводы возможны только в режиме 'hf'."
+        },
+        "spans": [],
+        "score": 0.46511627906976744,
+        "verdict": "grounded"
+      },
+      {
+        "status": "completed",
+        "profile_enabled": false,
+        "seconds": 0.007070377000005124,
+        "warmup_seconds": null,
+        "answer_chars": 79,
+        "context_chars": 1000,
+        "answer_utf8_bytes": 137,
+        "context_utf8_bytes": 1827,
+        "input_sha256": "1658fd2911f1e61ddeeccba6744617b25eef7ae66f899c3f9a34ce91af0eab60",
+        "schema_valid": true,
+        "stats": {
+          "token_count": 16,
+          "scored_tokens": 10,
+          "number_attribution": [],
+          "fact_coverage": [],
+          "mean_risk": 0.3377,
+          "p90_risk": 0.4096,
+          "raw_score": 0.5201,
+          "raw_score_full": 0.5200824561635692,
+          "span_threshold": 0.4186579753072923,
+          "span_z": 1.5,
+          "span_floor": 0.05,
+          "weights": {
+            "attention_entropy": 0.1,
+            "ctx_attention_mass": 0.0,
+            "ctx_attention_mass_norm": 0.1,
+            "ctx_max_similarity": 0.8,
+            "embedding_density": 0.0
+          },
+          "features": {
+            "backend": "demo",
+            "token_count": 16,
+            "context_tokens": 144,
+            "context_numbers": [
+              "1",
+              "12",
+              "2",
+              "2022",
+              "4"
+            ],
+            "k": 5
+          },
+          "ai_participation": 0.6699,
+          "ai_participation_calibrated_on": "synthetic-participation-corpus 1.0 (два стиля, доля смеси известна)",
+          "warning": "ДЕМО-РЕЖИМ: признаки считаются лексическими суррогатами без весов языковой модели. Он проверяет работоспособность конвейера и интерфейса, а не достоверность ответа. Подмена числа ловится, если число есть у другого объекта документа (например, «первичные — пять лет» против «вторичные — десять лет»); перефразирования и таблицы требуют режима 'hf'. Научные выводы возможны только в режиме 'hf'."
+        },
+        "spans": [],
+        "score": 0.46511627906976744,
+        "verdict": "grounded"
+      },
+      {
+        "status": "completed",
+        "profile_enabled": false,
+        "seconds": 0.007025279999993472,
+        "warmup_seconds": null,
+        "answer_chars": 79,
+        "context_chars": 1000,
+        "answer_utf8_bytes": 137,
+        "context_utf8_bytes": 1827,
+        "input_sha256": "1658fd2911f1e61ddeeccba6744617b25eef7ae66f899c3f9a34ce91af0eab60",
+        "schema_valid": true,
+        "stats": {
+          "token_count": 16,
+          "scored_tokens": 10,
+          "number_attribution": [],
+          "fact_coverage": [],
+          "mean_risk": 0.3377,
+          "p90_risk": 0.4096,
+          "raw_score": 0.5201,
+          "raw_score_full": 0.5200824561635692,
+          "span_threshold": 0.4186579753072923,
+          "span_z": 1.5,
+          "span_floor": 0.05,
+          "weights": {
+            "attention_entropy": 0.1,
+            "ctx_attention_mass": 0.0,
+            "ctx_attention_mass_norm": 0.1,
+            "ctx_max_similarity": 0.8,
+            "embedding_density": 0.0
+          },
+          "features": {
+            "backend": "demo",
+            "token_count": 16,
+            "context_tokens": 144,
+            "context_numbers": [
+              "1",
+              "12",
+              "2",
+              "2022",
+              "4"
+            ],
+            "k": 5
+          },
+          "ai_participation": 0.6699,
+          "ai_participation_calibrated_on": "synthetic-participation-corpus 1.0 (два стиля, доля смеси известна)",
+          "warning": "ДЕМО-РЕЖИМ: признаки считаются лексическими суррогатами без весов языковой модели. Он проверяет работоспособность конвейера и интерфейса, а не достоверность ответа. Подмена числа ловится, если число есть у другого объекта документа (например, «первичные — пять лет» против «вторичные — десять лет»); перефразирования и таблицы требуют режима 'hf'. Научные выводы возможны только в режиме 'hf'."
+        },
+        "spans": [],
+        "score": 0.46511627906976744,
+        "verdict": "grounded"
+      }
+    ],
+    "median_seconds": 0.007070377000005124,
+    "max_seconds": 0.01361029800000324,
+    "limit_seconds": 0.03,
+    "status": "достигнут"
+  },
+  {
+    "mode": "demo",
+    "scenario": "document-context",
+    "chars": 1000,
+    "thermal": "warm-model",
+    "repeats": [
+      {
+        "status": "completed",
+        "profile_enabled": false,
+        "seconds": 0.0020111529999979894,
+        "warmup_seconds": 0.0026581029999874772,
+        "answer_chars": 79,
+        "context_chars": 1000,
+        "answer_utf8_bytes": 137,
+        "context_utf8_bytes": 1827,
+        "input_sha256": "1658fd2911f1e61ddeeccba6744617b25eef7ae66f899c3f9a34ce91af0eab60",
+        "schema_valid": true,
+        "stats": {
+          "token_count": 16,
+          "scored_tokens": 10,
+          "number_attribution": [],
+          "fact_coverage": [],
+          "mean_risk": 0.3377,
+          "p90_risk": 0.4096,
+          "raw_score": 0.5201,
+          "raw_score_full": 0.5200824561635692,
+          "span_threshold": 0.4186579753072923,
+          "span_z": 1.5,
+          "span_floor": 0.05,
+          "weights": {
+            "attention_entropy": 0.1,
+            "ctx_attention_mass": 0.0,
+            "ctx_attention_mass_norm": 0.1,
+            "ctx_max_similarity": 0.8,
+            "embedding_density": 0.0
+          },
+          "features": {
+            "backend": "demo",
+            "token_count": 16,
+            "context_tokens": 144,
+            "context_numbers": [
+              "1",
+              "12",
+              "2",
+              "2022",
+              "4"
+            ],
+            "k": 5
+          },
+          "ai_participation": 0.6699,
+          "ai_participation_calibrated_on": "synthetic-participation-corpus 1.0 (два стиля, доля смеси известна)",
+          "warning": "ДЕМО-РЕЖИМ: признаки считаются лексическими суррогатами без весов языковой модели. Он проверяет работоспособность конвейера и интерфейса, а не достоверность ответа. Подмена числа ловится, если число есть у другого объекта документа (например, «первичные — пять лет» против «вторичные — десять лет»); перефразирования и таблицы требуют режима 'hf'. Научные выводы возможны только в режиме 'hf'."
+        },
+        "spans": [],
+        "score": 0.46511627906976744,
+        "verdict": "grounded"
+      },
+      {
+        "status": "completed",
+        "profile_enabled": false,
+        "seconds": 0.0020004269999986946,
+        "warmup_seconds": 0.0026145980000080726,
+        "answer_chars": 79,
+        "context_chars": 1000,
+        "answer_utf8_bytes": 137,
+        "context_utf8_bytes": 1827,
+        "input_sha256": "1658fd2911f1e61ddeeccba6744617b25eef7ae66f899c3f9a34ce91af0eab60",
+        "schema_valid": true,
+        "stats": {
+          "token_count": 16,
+          "scored_tokens": 10,
+          "number_attribution": [],
+          "fact_coverage": [],
+          "mean_risk": 0.3377,
+          "p90_risk": 0.4096,
+          "raw_score": 0.5201,
+          "raw_score_full": 0.5200824561635692,
+          "span_threshold": 0.4186579753072923,
+          "span_z": 1.5,
+          "span_floor": 0.05,
+          "weights": {
+            "attention_entropy": 0.1,
+            "ctx_attention_mass": 0.0,
+            "ctx_attention_mass_norm": 0.1,
+            "ctx_max_similarity": 0.8,
+            "embedding_density": 0.0
+          },
+          "features": {
+            "backend": "demo",
+            "token_count": 16,
+            "context_tokens": 144,
+            "context_numbers": [
+              "1",
+              "12",
+              "2",
+              "2022",
+              "4"
+            ],
+            "k": 5
+          },
+          "ai_participation": 0.6699,
+          "ai_participation_calibrated_on": "synthetic-participation-corpus 1.0 (два стиля, доля смеси известна)",
+          "warning": "ДЕМО-РЕЖИМ: признаки считаются лексическими суррогатами без весов языковой модели. Он проверяет работоспособность конвейера и интерфейса, а не достоверность ответа. Подмена числа ловится, если число есть у другого объекта документа (например, «первичные — пять лет» против «вторичные — десять лет»); перефразирования и таблицы требуют режима 'hf'. Научные выводы возможны только в режиме 'hf'."
+        },
+        "spans": [],
+        "score": 0.46511627906976744,
+        "verdict": "grounded"
+      },
+      {
+        "status": "completed",
+        "profile_enabled": false,
+        "seconds": 0.0019820189999961713,
+        "warmup_seconds": 0.002652062999999316,
+        "answer_chars": 79,
+        "context_chars": 1000,
+        "answer_utf8_bytes": 137,
+        "context_utf8_bytes": 1827,
+        "input_sha256": "1658fd2911f1e61ddeeccba6744617b25eef7ae66f899c3f9a34ce91af0eab60",
+        "schema_valid": true,
+        "stats": {
+          "token_count": 16,
+          "scored_tokens": 10,
+          "number_attribution": [],
+          "fact_coverage": [],
+          "mean_risk": 0.3377,
+          "p90_risk": 0.4096,
+          "raw_score": 0.5201,
+          "raw_score_full": 0.5200824561635692,
+          "span_threshold": 0.4186579753072923,
+          "span_z": 1.5,
+          "span_floor": 0.05,
+          "weights": {
+            "attention_entropy": 0.1,
+            "ctx_attention_mass": 0.0,
+            "ctx_attention_mass_norm": 0.1,
+            "ctx_max_similarity": 0.8,
+            "embedding_density": 0.0
+          },
+          "features": {
+            "backend": "demo",
+            "token_count": 16,
+            "context_tokens": 144,
+            "context_numbers": [
+              "1",
+              "12",
+              "2",
+              "2022",
+              "4"
+            ],
+            "k": 5
+          },
+          "ai_participation": 0.6699,
+          "ai_participation_calibrated_on": "synthetic-participation-corpus 1.0 (два стиля, доля смеси известна)",
+          "warning": "ДЕМО-РЕЖИМ: признаки считаются лексическими суррогатами без весов языковой модели. Он проверяет работоспособность конвейера и интерфейса, а не достоверность ответа. Подмена числа ловится, если число есть у другого объекта документа (например, «первичные — пять лет» против «вторичные — десять лет»); перефразирования и таблицы требуют режима 'hf'. Научные выводы возможны только в режиме 'hf'."
+        },
+        "spans": [],
+        "score": 0.46511627906976744,
+        "verdict": "grounded"
+      }
+    ],
+    "median_seconds": 0.0020004269999986946,
+    "max_seconds": 0.0020111529999979894,
+    "limit_seconds": 0.03,
+    "status": "достигнут"
+  },
+  {
+    "mode": "demo",
+    "scenario": "document-context",
+    "chars": 50000,
+    "thermal": "cold-process",
+    "repeats": [
+      {
+        "status": "completed",
+        "profile_enabled": false,
+        "seconds": 0.04691091099999767,
+        "warmup_seconds": null,
+        "answer_chars": 79,
+        "context_chars": 50000,
+        "answer_utf8_bytes": 137,
+        "context_utf8_bytes": 91513,
+        "input_sha256": "7ca8caa569bf87dd8151cda6ff36104779fe06f6a2ce7823555d14d332a70f7e",
+        "schema_valid": true,
+        "stats": {
+          "token_count": 16,
+          "scored_tokens": 10,
+          "number_attribution": [],
+          "fact_coverage": [],
+          "mean_risk": 0.3411,
+          "p90_risk": 0.4217,
+          "raw_score": 0.5292,
+          "raw_score_full": 0.5292298205549328,
+          "span_threshold": 0.4186579753072923,
+          "span_z": 1.5,
+          "span_floor": 0.05,
+          "weights": {
+            "attention_entropy": 0.1,
+            "ctx_attention_mass": 0.0,
+            "ctx_attention_mass_norm": 0.1,
+            "ctx_max_similarity": 0.8,
+            "embedding_density": 0.0
+          },
+          "features": {
+            "backend": "demo",
+            "token_count": 16,
+            "context_tokens": 7073,
+            "context_numbers": [
+              "1",
+              "12",
+              "2",
+              "2022",
+              "4"
+            ],
+            "k": 5
+          },
+          "ai_participation": 0.6933,
+          "ai_participation_calibrated_on": "synthetic-participation-corpus 1.0 (два стиля, доля смеси известна)",
+          "warning": "ДЕМО-РЕЖИМ: признаки считаются лексическими суррогатами без весов языковой модели. Он проверяет работоспособность конвейера и интерфейса, а не достоверность ответа. Подмена числа ловится, если число есть у другого объекта документа (например, «первичные — пять лет» против «вторичные — десять лет»); перефразирования и таблицы требуют режима 'hf'. Научные выводы возможны только в режиме 'hf'."
+        },
+        "spans": [],
+        "score": 0.5188679245283019,
+        "verdict": "grounded"
+      },
+      {
+        "status": "completed",
+        "profile_enabled": false,
+        "seconds": 0.04681097200000295,
+        "warmup_seconds": null,
+        "answer_chars": 79,
+        "context_chars": 50000,
+        "answer_utf8_bytes": 137,
+        "context_utf8_bytes": 91513,
+        "input_sha256": "7ca8caa569bf87dd8151cda6ff36104779fe06f6a2ce7823555d14d332a70f7e",
+        "schema_valid": true,
+        "stats": {
+          "token_count": 16,
+          "scored_tokens": 10,
+          "number_attribution": [],
+          "fact_coverage": [],
+          "mean_risk": 0.3411,
+          "p90_risk": 0.4217,
+          "raw_score": 0.5292,
+          "raw_score_full": 0.5292298205549328,
+          "span_threshold": 0.4186579753072923,
+          "span_z": 1.5,
+          "span_floor": 0.05,
+          "weights": {
+            "attention_entropy": 0.1,
+            "ctx_attention_mass": 0.0,
+            "ctx_attention_mass_norm": 0.1,
+            "ctx_max_similarity": 0.8,
+            "embedding_density": 0.0
+          },
+          "features": {
+            "backend": "demo",
+            "token_count": 16,
+            "context_tokens": 7073,
+            "context_numbers": [
+              "1",
+              "12",
+              "2",
+              "2022",
+              "4"
+            ],
+            "k": 5
+          },
+          "ai_participation": 0.6933,
+          "ai_participation_calibrated_on": "synthetic-participation-corpus 1.0 (два стиля, доля смеси известна)",
+          "warning": "ДЕМО-РЕЖИМ: признаки считаются лексическими суррогатами без весов языковой модели. Он проверяет работоспособность конвейера и интерфейса, а не достоверность ответа. Подмена числа ловится, если число есть у другого объекта документа (например, «первичные — пять лет» против «вторичные — десять лет»); перефразирования и таблицы требуют режима 'hf'. Научные выводы возможны только в режиме 'hf'."
+        },
+        "spans": [],
+        "score": 0.5188679245283019,
+        "verdict": "grounded"
+      },
+      {
+        "status": "completed",
+        "profile_enabled": false,
+        "seconds": 0.0464603220000015,
+        "warmup_seconds": null,
+        "answer_chars": 79,
+        "context_chars": 50000,
+        "answer_utf8_bytes": 137,
+        "context_utf8_bytes": 91513,
+        "input_sha256": "7ca8caa569bf87dd8151cda6ff36104779fe06f6a2ce7823555d14d332a70f7e",
+        "schema_valid": true,
+        "stats": {
+          "token_count": 16,
+          "scored_tokens": 10,
+          "number_attribution": [],
+          "fact_coverage": [],
+          "mean_risk": 0.3411,
+          "p90_risk": 0.4217,
+          "raw_score": 0.5292,
+          "raw_score_full": 0.5292298205549328,
+          "span_threshold": 0.4186579753072923,
+          "span_z": 1.5,
+          "span_floor": 0.05,
+          "weights": {
+            "attention_entropy": 0.1,
+            "ctx_attention_mass": 0.0,
+            "ctx_attention_mass_norm": 0.1,
+            "ctx_max_similarity": 0.8,
+            "embedding_density": 0.0
+          },
+          "features": {
+            "backend": "demo",
+            "token_count": 16,
+            "context_tokens": 7073,
+            "context_numbers": [
+              "1",
+              "12",
+              "2",
+              "2022",
+              "4"
+            ],
+            "k": 5
+          },
+          "ai_participation": 0.6933,
+          "ai_participation_calibrated_on": "synthetic-participation-corpus 1.0 (два стиля, доля смеси известна)",
+          "warning": "ДЕМО-РЕЖИМ: признаки считаются лексическими суррогатами без весов языковой модели. Он проверяет работоспособность конвейера и интерфейса, а не достоверность ответа. Подмена числа ловится, если число есть у другого объекта документа (например, «первичные — пять лет» против «вторичные — десять лет»); перефразирования и таблицы требуют режима 'hf'. Научные выводы возможны только в режиме 'hf'."
+        },
+        "spans": [],
+        "score": 0.5188679245283019,
+        "verdict": "grounded"
+      }
+    ],
+    "median_seconds": 0.04681097200000295,
+    "max_seconds": 0.04691091099999767,
+    "limit_seconds": 1.0,
+    "status": "достигнут"
+  },
+  {
+    "mode": "demo",
+    "scenario": "document-context",
+    "chars": 50000,
+    "thermal": "warm-model",
+    "repeats": [
+      {
+        "status": "completed",
+        "profile_enabled": false,
+        "seconds": 0.042196130999997195,
+        "warmup_seconds": 0.0026578340000043,
+        "answer_chars": 79,
+        "context_chars": 50000,
+        "answer_utf8_bytes": 137,
+        "context_utf8_bytes": 91513,
+        "input_sha256": "7ca8caa569bf87dd8151cda6ff36104779fe06f6a2ce7823555d14d332a70f7e",
+        "schema_valid": true,
+        "stats": {
+          "token_count": 16,
+          "scored_tokens": 10,
+          "number_attribution": [],
+          "fact_coverage": [],
+          "mean_risk": 0.3411,
+          "p90_risk": 0.4217,
+          "raw_score": 0.5292,
+          "raw_score_full": 0.5292298205549328,
+          "span_threshold": 0.4186579753072923,
+          "span_z": 1.5,
+          "span_floor": 0.05,
+          "weights": {
+            "attention_entropy": 0.1,
+            "ctx_attention_mass": 0.0,
+            "ctx_attention_mass_norm": 0.1,
+            "ctx_max_similarity": 0.8,
+            "embedding_density": 0.0
+          },
+          "features": {
+            "backend": "demo",
+            "token_count": 16,
+            "context_tokens": 7073,
+            "context_numbers": [
+              "1",
+              "12",
+              "2",
+              "2022",
+              "4"
+            ],
+            "k": 5
+          },
+          "ai_participation": 0.6933,
+          "ai_participation_calibrated_on": "synthetic-participation-corpus 1.0 (два стиля, доля смеси известна)",
+          "warning": "ДЕМО-РЕЖИМ: признаки считаются лексическими суррогатами без весов языковой модели. Он проверяет работоспособность конвейера и интерфейса, а не достоверность ответа. Подмена числа ловится, если число есть у другого объекта документа (например, «первичные — пять лет» против «вторичные — десять лет»); перефразирования и таблицы требуют режима 'hf'. Научные выводы возможны только в режиме 'hf'."
+        },
+        "spans": [],
+        "score": 0.5188679245283019,
+        "verdict": "grounded"
+      },
+      {
+        "status": "completed",
+        "profile_enabled": false,
+        "seconds": 0.042376238000002786,
+        "warmup_seconds": 0.002715159000004519,
+        "answer_chars": 79,
+        "context_chars": 50000,
+        "answer_utf8_bytes": 137,
+        "context_utf8_bytes": 91513,
+        "input_sha256": "7ca8caa569bf87dd8151cda6ff36104779fe06f6a2ce7823555d14d332a70f7e",
+        "schema_valid": true,
+        "stats": {
+          "token_count": 16,
+          "scored_tokens": 10,
+          "number_attribution": [],
+          "fact_coverage": [],
+          "mean_risk": 0.3411,
+          "p90_risk": 0.4217,
+          "raw_score": 0.5292,
+          "raw_score_full": 0.5292298205549328,
+          "span_threshold": 0.4186579753072923,
+          "span_z": 1.5,
+          "span_floor": 0.05,
+          "weights": {
+            "attention_entropy": 0.1,
+            "ctx_attention_mass": 0.0,
+            "ctx_attention_mass_norm": 0.1,
+            "ctx_max_similarity": 0.8,
+            "embedding_density": 0.0
+          },
+          "features": {
+            "backend": "demo",
+            "token_count": 16,
+            "context_tokens": 7073,
+            "context_numbers": [
+              "1",
+              "12",
+              "2",
+              "2022",
+              "4"
+            ],
+            "k": 5
+          },
+          "ai_participation": 0.6933,
+          "ai_participation_calibrated_on": "synthetic-participation-corpus 1.0 (два стиля, доля смеси известна)",
+          "warning": "ДЕМО-РЕЖИМ: признаки считаются лексическими суррогатами без весов языковой модели. Он проверяет работоспособность конвейера и интерфейса, а не достоверность ответа. Подмена числа ловится, если число есть у другого объекта документа (например, «первичные — пять лет» против «вторичные — десять лет»); перефразирования и таблицы требуют режима 'hf'. Научные выводы возможны только в режиме 'hf'."
+        },
+        "spans": [],
+        "score": 0.5188679245283019,
+        "verdict": "grounded"
+      },
+      {
+        "status": "completed",
+        "profile_enabled": false,
+        "seconds": 0.04146042000000705,
+        "warmup_seconds": 0.002603923000009445,
+        "answer_chars": 79,
+        "context_chars": 50000,
+        "answer_utf8_bytes": 137,
+        "context_utf8_bytes": 91513,
+        "input_sha256": "7ca8caa569bf87dd8151cda6ff36104779fe06f6a2ce7823555d14d332a70f7e",
+        "schema_valid": true,
+        "stats": {
+          "token_count": 16,
+          "scored_tokens": 10,
+          "number_attribution": [],
+          "fact_coverage": [],
+          "mean_risk": 0.3411,
+          "p90_risk": 0.4217,
+          "raw_score": 0.5292,
+          "raw_score_full": 0.5292298205549328,
+          "span_threshold": 0.4186579753072923,
+          "span_z": 1.5,
+          "span_floor": 0.05,
+          "weights": {
+            "attention_entropy": 0.1,
+            "ctx_attention_mass": 0.0,
+            "ctx_attention_mass_norm": 0.1,
+            "ctx_max_similarity": 0.8,
+            "embedding_density": 0.0
+          },
+          "features": {
+            "backend": "demo",
+            "token_count": 16,
+            "context_tokens": 7073,
+            "context_numbers": [
+              "1",
+              "12",
+              "2",
+              "2022",
+              "4"
+            ],
+            "k": 5
+          },
+          "ai_participation": 0.6933,
+          "ai_participation_calibrated_on": "synthetic-participation-corpus 1.0 (два стиля, доля смеси известна)",
+          "warning": "ДЕМО-РЕЖИМ: признаки считаются лексическими суррогатами без весов языковой модели. Он проверяет работоспособность конвейера и интерфейса, а не достоверность ответа. Подмена числа ловится, если число есть у другого объекта документа (например, «первичные — пять лет» против «вторичные — десять лет»); перефразирования и таблицы требуют режима 'hf'. Научные выводы возможны только в режиме 'hf'."
+        },
+        "spans": [],
+        "score": 0.5188679245283019,
+        "verdict": "grounded"
+      }
+    ],
+    "median_seconds": 0.042196130999997195,
+    "max_seconds": 0.042376238000002786,
+    "limit_seconds": 1.0,
+    "status": "достигнут"
+  },
+  {
+    "mode": "demo",
+    "scenario": "document-context",
+    "chars": 2000000,
+    "thermal": "cold-process",
+    "repeats": [
+      {
+        "status": "completed",
+        "profile_enabled": false,
+        "seconds": 2.3095699399999887,
+        "warmup_seconds": null,
+        "answer_chars": 79,
+        "context_chars": 2000000,
+        "answer_utf8_bytes": 137,
+        "context_utf8_bytes": 3660605,
+        "input_sha256": "fe5bfdf13122e800580c20b76410bcfd148fe06cebf0c3eb976d31dba0e934c0",
+        "schema_valid": true,
+        "stats": {
+          "token_count": 16,
+          "scored_tokens": 10,
+          "number_attribution": [],
+          "fact_coverage": [],
+          "mean_risk": 0.3411,
+          "p90_risk": 0.4217,
+          "raw_score": 0.5292,
+          "raw_score_full": 0.5292298205549328,
+          "span_threshold": 0.4186579753072923,
+          "span_z": 1.5,
+          "span_floor": 0.05,
+          "weights": {
+            "attention_entropy": 0.1,
+            "ctx_attention_mass": 0.0,
+            "ctx_attention_mass_norm": 0.1,
+            "ctx_max_similarity": 0.8,
+            "embedding_density": 0.0
+          },
+          "features": {
+            "backend": "demo",
+            "token_count": 16,
+            "context_tokens": 282830,
+            "context_numbers": [
+              "1",
+              "12",
+              "2",
+              "2022",
+              "4"
+            ],
+            "k": 5
+          },
+          "ai_participation": 0.6933,
+          "ai_participation_calibrated_on": "synthetic-participation-corpus 1.0 (два стиля, доля смеси известна)",
+          "warning": "ДЕМО-РЕЖИМ: признаки считаются лексическими суррогатами без весов языковой модели. Он проверяет работоспособность конвейера и интерфейса, а не достоверность ответа. Подмена числа ловится, если число есть у другого объекта документа (например, «первичные — пять лет» против «вторичные — десять лет»); перефразирования и таблицы требуют режима 'hf'. Научные выводы возможны только в режиме 'hf'."
+        },
+        "spans": [],
+        "score": 0.5188679245283019,
+        "verdict": "grounded"
+      },
+      {
+        "status": "completed",
+        "profile_enabled": false,
+        "seconds": 2.316568701999998,
+        "warmup_seconds": null,
+        "answer_chars": 79,
+        "context_chars": 2000000,
+        "answer_utf8_bytes": 137,
+        "context_utf8_bytes": 3660605,
+        "input_sha256": "fe5bfdf13122e800580c20b76410bcfd148fe06cebf0c3eb976d31dba0e934c0",
+        "schema_valid": true,
+        "stats": {
+          "token_count": 16,
+          "scored_tokens": 10,
+          "number_attribution": [],
+          "fact_coverage": [],
+          "mean_risk": 0.3411,
+          "p90_risk": 0.4217,
+          "raw_score": 0.5292,
+          "raw_score_full": 0.5292298205549328,
+          "span_threshold": 0.4186579753072923,
+          "span_z": 1.5,
+          "span_floor": 0.05,
+          "weights": {
+            "attention_entropy": 0.1,
+            "ctx_attention_mass": 0.0,
+            "ctx_attention_mass_norm": 0.1,
+            "ctx_max_similarity": 0.8,
+            "embedding_density": 0.0
+          },
+          "features": {
+            "backend": "demo",
+            "token_count": 16,
+            "context_tokens": 282830,
+            "context_numbers": [
+              "1",
+              "12",
+              "2",
+              "2022",
+              "4"
+            ],
+            "k": 5
+          },
+          "ai_participation": 0.6933,
+          "ai_participation_calibrated_on": "synthetic-participation-corpus 1.0 (два стиля, доля смеси известна)",
+          "warning": "ДЕМО-РЕЖИМ: признаки считаются лексическими суррогатами без весов языковой модели. Он проверяет работоспособность конвейера и интерфейса, а не достоверность ответа. Подмена числа ловится, если число есть у другого объекта документа (например, «первичные — пять лет» против «вторичные — десять лет»); перефразирования и таблицы требуют режима 'hf'. Научные выводы возможны только в режиме 'hf'."
+        },
+        "spans": [],
+        "score": 0.5188679245283019,
+        "verdict": "grounded"
+      },
+      {
+        "status": "completed",
+        "profile_enabled": false,
+        "seconds": 2.2871828600000015,
+        "warmup_seconds": null,
+        "answer_chars": 79,
+        "context_chars": 2000000,
+        "answer_utf8_bytes": 137,
+        "context_utf8_bytes": 3660605,
+        "input_sha256": "fe5bfdf13122e800580c20b76410bcfd148fe06cebf0c3eb976d31dba0e934c0",
+        "schema_valid": true,
+        "stats": {
+          "token_count": 16,
+          "scored_tokens": 10,
+          "number_attribution": [],
+          "fact_coverage": [],
+          "mean_risk": 0.3411,
+          "p90_risk": 0.4217,
+          "raw_score": 0.5292,
+          "raw_score_full": 0.5292298205549328,
+          "span_threshold": 0.4186579753072923,
+          "span_z": 1.5,
+          "span_floor": 0.05,
+          "weights": {
+            "attention_entropy": 0.1,
+            "ctx_attention_mass": 0.0,
+            "ctx_attention_mass_norm": 0.1,
+            "ctx_max_similarity": 0.8,
+            "embedding_density": 0.0
+          },
+          "features": {
+            "backend": "demo",
+            "token_count": 16,
+            "context_tokens": 282830,
+            "context_numbers": [
+              "1",
+              "12",
+              "2",
+              "2022",
+              "4"
+            ],
+            "k": 5
+          },
+          "ai_participation": 0.6933,
+          "ai_participation_calibrated_on": "synthetic-participation-corpus 1.0 (два стиля, доля смеси известна)",
+          "warning": "ДЕМО-РЕЖИМ: признаки считаются лексическими суррогатами без весов языковой модели. Он проверяет работоспособность конвейера и интерфейса, а не достоверность ответа. Подмена числа ловится, если число есть у другого объекта документа (например, «первичные — пять лет» против «вторичные — десять лет»); перефразирования и таблицы требуют режима 'hf'. Научные выводы возможны только в режиме 'hf'."
+        },
+        "spans": [],
+        "score": 0.5188679245283019,
+        "verdict": "grounded"
+      }
+    ],
+    "median_seconds": 2.3095699399999887,
+    "max_seconds": 2.316568701999998,
+    "limit_seconds": 60.0,
+    "status": "достигнут"
+  },
+  {
+    "mode": "demo",
+    "scenario": "document-context",
+    "chars": 2000000,
+    "thermal": "warm-model",
+    "repeats": [
+      {
+        "status": "completed",
+        "profile_enabled": false,
+        "seconds": 2.2839461949999986,
+        "warmup_seconds": 0.002856778999998255,
+        "answer_chars": 79,
+        "context_chars": 2000000,
+        "answer_utf8_bytes": 137,
+        "context_utf8_bytes": 3660605,
+        "input_sha256": "fe5bfdf13122e800580c20b76410bcfd148fe06cebf0c3eb976d31dba0e934c0",
+        "schema_valid": true,
+        "stats": {
+          "token_count": 16,
+          "scored_tokens": 10,
+          "number_attribution": [],
+          "fact_coverage": [],
+          "mean_risk": 0.3411,
+          "p90_risk": 0.4217,
+          "raw_score": 0.5292,
+          "raw_score_full": 0.5292298205549328,
+          "span_threshold": 0.4186579753072923,
+          "span_z": 1.5,
+          "span_floor": 0.05,
+          "weights": {
+            "attention_entropy": 0.1,
+            "ctx_attention_mass": 0.0,
+            "ctx_attention_mass_norm": 0.1,
+            "ctx_max_similarity": 0.8,
+            "embedding_density": 0.0
+          },
+          "features": {
+            "backend": "demo",
+            "token_count": 16,
+            "context_tokens": 282830,
+            "context_numbers": [
+              "1",
+              "12",
+              "2",
+              "2022",
+              "4"
+            ],
+            "k": 5
+          },
+          "ai_participation": 0.6933,
+          "ai_participation_calibrated_on": "synthetic-participation-corpus 1.0 (два стиля, доля смеси известна)",
+          "warning": "ДЕМО-РЕЖИМ: признаки считаются лексическими суррогатами без весов языковой модели. Он проверяет работоспособность конвейера и интерфейса, а не достоверность ответа. Подмена числа ловится, если число есть у другого объекта документа (например, «первичные — пять лет» против «вторичные — десять лет»); перефразирования и таблицы требуют режима 'hf'. Научные выводы возможны только в режиме 'hf'."
+        },
+        "spans": [],
+        "score": 0.5188679245283019,
+        "verdict": "grounded"
+      },
+      {
+        "status": "completed",
+        "profile_enabled": false,
+        "seconds": 2.3123810719999938,
+        "warmup_seconds": 0.0026288029999932405,
+        "answer_chars": 79,
+        "context_chars": 2000000,
+        "answer_utf8_bytes": 137,
+        "context_utf8_bytes": 3660605,
+        "input_sha256": "fe5bfdf13122e800580c20b76410bcfd148fe06cebf0c3eb976d31dba0e934c0",
+        "schema_valid": true,
+        "stats": {
+          "token_count": 16,
+          "scored_tokens": 10,
+          "number_attribution": [],
+          "fact_coverage": [],
+          "mean_risk": 0.3411,
+          "p90_risk": 0.4217,
+          "raw_score": 0.5292,
+          "raw_score_full": 0.5292298205549328,
+          "span_threshold": 0.4186579753072923,
+          "span_z": 1.5,
+          "span_floor": 0.05,
+          "weights": {
+            "attention_entropy": 0.1,
+            "ctx_attention_mass": 0.0,
+            "ctx_attention_mass_norm": 0.1,
+            "ctx_max_similarity": 0.8,
+            "embedding_density": 0.0
+          },
+          "features": {
+            "backend": "demo",
+            "token_count": 16,
+            "context_tokens": 282830,
+            "context_numbers": [
+              "1",
+              "12",
+              "2",
+              "2022",
+              "4"
+            ],
+            "k": 5
+          },
+          "ai_participation": 0.6933,
+          "ai_participation_calibrated_on": "synthetic-participation-corpus 1.0 (два стиля, доля смеси известна)",
+          "warning": "ДЕМО-РЕЖИМ: признаки считаются лексическими суррогатами без весов языковой модели. Он проверяет работоспособность конвейера и интерфейса, а не достоверность ответа. Подмена числа ловится, если число есть у другого объекта документа (например, «первичные — пять лет» против «вторичные — десять лет»); перефразирования и таблицы требуют режима 'hf'. Научные выводы возможны только в режиме 'hf'."
+        },
+        "spans": [],
+        "score": 0.5188679245283019,
+        "verdict": "grounded"
+      },
+      {
+        "status": "completed",
+        "profile_enabled": false,
+        "seconds": 2.3253580020000015,
+        "warmup_seconds": 0.002693256000000588,
+        "answer_chars": 79,
+        "context_chars": 2000000,
+        "answer_utf8_bytes": 137,
+        "context_utf8_bytes": 3660605,
+        "input_sha256": "fe5bfdf13122e800580c20b76410bcfd148fe06cebf0c3eb976d31dba0e934c0",
+        "schema_valid": true,
+        "stats": {
+          "token_count": 16,
+          "scored_tokens": 10,
+          "number_attribution": [],
+          "fact_coverage": [],
+          "mean_risk": 0.3411,
+          "p90_risk": 0.4217,
+          "raw_score": 0.5292,
+          "raw_score_full": 0.5292298205549328,
+          "span_threshold": 0.4186579753072923,
+          "span_z": 1.5,
+          "span_floor": 0.05,
+          "weights": {
+            "attention_entropy": 0.1,
+            "ctx_attention_mass": 0.0,
+            "ctx_attention_mass_norm": 0.1,
+            "ctx_max_similarity": 0.8,
+            "embedding_density": 0.0
+          },
+          "features": {
+            "backend": "demo",
+            "token_count": 16,
+            "context_tokens": 282830,
+            "context_numbers": [
+              "1",
+              "12",
+              "2",
+              "2022",
+              "4"
+            ],
+            "k": 5
+          },
+          "ai_participation": 0.6933,
+          "ai_participation_calibrated_on": "synthetic-participation-corpus 1.0 (два стиля, доля смеси известна)",
+          "warning": "ДЕМО-РЕЖИМ: признаки считаются лексическими суррогатами без весов языковой модели. Он проверяет работоспособность конвейера и интерфейса, а не достоверность ответа. Подмена числа ловится, если число есть у другого объекта документа (например, «первичные — пять лет» против «вторичные — десять лет»); перефразирования и таблицы требуют режима 'hf'. Научные выводы возможны только в режиме 'hf'."
+        },
+        "spans": [],
+        "score": 0.5188679245283019,
+        "verdict": "grounded"
+      }
+    ],
+    "median_seconds": 2.3123810719999938,
+    "max_seconds": 2.3253580020000015,
+    "limit_seconds": 60.0,
+    "status": "достигнут"
+  },
+  {
+    "mode": "demo",
+    "scenario": "answer-text",
+    "chars": 1000,
+    "thermal": "cold-process",
+    "repeats": [
+      {
+        "status": "completed",
+        "profile_enabled": false,
+        "seconds": 0.013407542999999578,
+        "warmup_seconds": null,
+        "answer_chars": 1000,
+        "context_chars": 494,
+        "answer_utf8_bytes": 1827,
+        "context_utf8_bytes": 905,
+        "input_sha256": "df5180a689e0ef1fdc5f7623b3c7075e0788acbc69876912d0d79518f3145188",
+        "schema_valid": true,
+        "stats": {
+          "token_count": 144,
+          "scored_tokens": 91,
+          "number_attribution": [],
+          "fact_coverage": [],
+          "mean_risk": 0.1712,
+          "p90_risk": 0.4502,
+          "raw_score": 0.3202,
+          "raw_score_full": 0.320162617294145,
+          "span_threshold": 0.4186579753072923,
+          "span_z": 1.5,
+          "span_floor": 0.05,
+          "weights": {
+            "attention_entropy": 0.1,
+            "ctx_attention_mass": 0.0,
+            "ctx_attention_mass_norm": 0.1,
+            "ctx_max_similarity": 0.8,
+            "embedding_density": 0.0
+          },
+          "features": {
+            "backend": "demo",
+            "token_count": 144,
+            "context_tokens": 70,
+            "context_numbers": [
+              "1",
+              "12",
+              "2",
+              "2022",
+              "4"
+            ],
+            "k": 5
+          },
+          "ai_participation": 0.9065,
+          "ai_participation_calibrated_on": "synthetic-participation-corpus 1.0 (два стиля, доля смеси известна)",
+          "warning": "ДЕМО-РЕЖИМ: признаки считаются лексическими суррогатами без весов языковой модели. Он проверяет работоспособность конвейера и интерфейса, а не достоверность ответа. Подмена числа ловится, если число есть у другого объекта документа (например, «первичные — пять лет» против «вторичные — десять лет»); перефразирования и таблицы требуют режима 'hf'. Научные выводы возможны только в режиме 'hf'."
+        },
+        "spans": [],
+        "score": 0.0,
+        "verdict": "grounded"
+      },
+      {
+        "status": "completed",
+        "profile_enabled": false,
+        "seconds": 0.013634439999989922,
+        "warmup_seconds": null,
+        "answer_chars": 1000,
+        "context_chars": 494,
+        "answer_utf8_bytes": 1827,
+        "context_utf8_bytes": 905,
+        "input_sha256": "df5180a689e0ef1fdc5f7623b3c7075e0788acbc69876912d0d79518f3145188",
+        "schema_valid": true,
+        "stats": {
+          "token_count": 144,
+          "scored_tokens": 91,
+          "number_attribution": [],
+          "fact_coverage": [],
+          "mean_risk": 0.1712,
+          "p90_risk": 0.4502,
+          "raw_score": 0.3202,
+          "raw_score_full": 0.320162617294145,
+          "span_threshold": 0.4186579753072923,
+          "span_z": 1.5,
+          "span_floor": 0.05,
+          "weights": {
+            "attention_entropy": 0.1,
+            "ctx_attention_mass": 0.0,
+            "ctx_attention_mass_norm": 0.1,
+            "ctx_max_similarity": 0.8,
+            "embedding_density": 0.0
+          },
+          "features": {
+            "backend": "demo",
+            "token_count": 144,
+            "context_tokens": 70,
+            "context_numbers": [
+              "1",
+              "12",
+              "2",
+              "2022",
+              "4"
+            ],
+            "k": 5
+          },
+          "ai_participation": 0.9065,
+          "ai_participation_calibrated_on": "synthetic-participation-corpus 1.0 (два стиля, доля смеси известна)",
+          "warning": "ДЕМО-РЕЖИМ: признаки считаются лексическими суррогатами без весов языковой модели. Он проверяет работоспособность конвейера и интерфейса, а не достоверность ответа. Подмена числа ловится, если число есть у другого объекта документа (например, «первичные — пять лет» против «вторичные — десять лет»); перефразирования и таблицы требуют режима 'hf'. Научные выводы возможны только в режиме 'hf'."
+        },
+        "spans": [],
+        "score": 0.0,
+        "verdict": "grounded"
+      },
+      {
+        "status": "completed",
+        "profile_enabled": false,
+        "seconds": 0.013383999000012636,
+        "warmup_seconds": null,
+        "answer_chars": 1000,
+        "context_chars": 494,
+        "answer_utf8_bytes": 1827,
+        "context_utf8_bytes": 905,
+        "input_sha256": "df5180a689e0ef1fdc5f7623b3c7075e0788acbc69876912d0d79518f3145188",
+        "schema_valid": true,
+        "stats": {
+          "token_count": 144,
+          "scored_tokens": 91,
+          "number_attribution": [],
+          "fact_coverage": [],
+          "mean_risk": 0.1712,
+          "p90_risk": 0.4502,
+          "raw_score": 0.3202,
+          "raw_score_full": 0.320162617294145,
+          "span_threshold": 0.4186579753072923,
+          "span_z": 1.5,
+          "span_floor": 0.05,
+          "weights": {
+            "attention_entropy": 0.1,
+            "ctx_attention_mass": 0.0,
+            "ctx_attention_mass_norm": 0.1,
+            "ctx_max_similarity": 0.8,
+            "embedding_density": 0.0
+          },
+          "features": {
+            "backend": "demo",
+            "token_count": 144,
+            "context_tokens": 70,
+            "context_numbers": [
+              "1",
+              "12",
+              "2",
+              "2022",
+              "4"
+            ],
+            "k": 5
+          },
+          "ai_participation": 0.9065,
+          "ai_participation_calibrated_on": "synthetic-participation-corpus 1.0 (два стиля, доля смеси известна)",
+          "warning": "ДЕМО-РЕЖИМ: признаки считаются лексическими суррогатами без весов языковой модели. Он проверяет работоспособность конвейера и интерфейса, а не достоверность ответа. Подмена числа ловится, если число есть у другого объекта документа (например, «первичные — пять лет» против «вторичные — десять лет»); перефразирования и таблицы требуют режима 'hf'. Научные выводы возможны только в режиме 'hf'."
+        },
+        "spans": [],
+        "score": 0.0,
+        "verdict": "grounded"
+      }
+    ],
+    "median_seconds": 0.013407542999999578,
+    "max_seconds": 0.013634439999989922,
+    "limit_seconds": 0.03,
+    "status": "достигнут"
+  },
+  {
+    "mode": "demo",
+    "scenario": "answer-text",
+    "chars": 1000,
+    "thermal": "warm-model",
+    "repeats": [
+      {
+        "status": "completed",
+        "profile_enabled": false,
+        "seconds": 0.008552145999999539,
+        "warmup_seconds": 0.0026341409999872667,
+        "answer_chars": 1000,
+        "context_chars": 494,
+        "answer_utf8_bytes": 1827,
+        "context_utf8_bytes": 905,
+        "input_sha256": "df5180a689e0ef1fdc5f7623b3c7075e0788acbc69876912d0d79518f3145188",
+        "schema_valid": true,
+        "stats": {
+          "token_count": 144,
+          "scored_tokens": 91,
+          "number_attribution": [],
+          "fact_coverage": [],
+          "mean_risk": 0.1712,
+          "p90_risk": 0.4502,
+          "raw_score": 0.3202,
+          "raw_score_full": 0.320162617294145,
+          "span_threshold": 0.4186579753072923,
+          "span_z": 1.5,
+          "span_floor": 0.05,
+          "weights": {
+            "attention_entropy": 0.1,
+            "ctx_attention_mass": 0.0,
+            "ctx_attention_mass_norm": 0.1,
+            "ctx_max_similarity": 0.8,
+            "embedding_density": 0.0
+          },
+          "features": {
+            "backend": "demo",
+            "token_count": 144,
+            "context_tokens": 70,
+            "context_numbers": [
+              "1",
+              "12",
+              "2",
+              "2022",
+              "4"
+            ],
+            "k": 5
+          },
+          "ai_participation": 0.9065,
+          "ai_participation_calibrated_on": "synthetic-participation-corpus 1.0 (два стиля, доля смеси известна)",
+          "warning": "ДЕМО-РЕЖИМ: признаки считаются лексическими суррогатами без весов языковой модели. Он проверяет работоспособность конвейера и интерфейса, а не достоверность ответа. Подмена числа ловится, если число есть у другого объекта документа (например, «первичные — пять лет» против «вторичные — десять лет»); перефразирования и таблицы требуют режима 'hf'. Научные выводы возможны только в режиме 'hf'."
+        },
+        "spans": [],
+        "score": 0.0,
+        "verdict": "grounded"
+      },
+      {
+        "status": "completed",
+        "profile_enabled": false,
+        "seconds": 0.008736450000000673,
+        "warmup_seconds": 0.002707127999997283,
+        "answer_chars": 1000,
+        "context_chars": 494,
+        "answer_utf8_bytes": 1827,
+        "context_utf8_bytes": 905,
+        "input_sha256": "df5180a689e0ef1fdc5f7623b3c7075e0788acbc69876912d0d79518f3145188",
+        "schema_valid": true,
+        "stats": {
+          "token_count": 144,
+          "scored_tokens": 91,
+          "number_attribution": [],
+          "fact_coverage": [],
+          "mean_risk": 0.1712,
+          "p90_risk": 0.4502,
+          "raw_score": 0.3202,
+          "raw_score_full": 0.320162617294145,
+          "span_threshold": 0.4186579753072923,
+          "span_z": 1.5,
+          "span_floor": 0.05,
+          "weights": {
+            "attention_entropy": 0.1,
+            "ctx_attention_mass": 0.0,
+            "ctx_attention_mass_norm": 0.1,
+            "ctx_max_similarity": 0.8,
+            "embedding_density": 0.0
+          },
+          "features": {
+            "backend": "demo",
+            "token_count": 144,
+            "context_tokens": 70,
+            "context_numbers": [
+              "1",
+              "12",
+              "2",
+              "2022",
+              "4"
+            ],
+            "k": 5
+          },
+          "ai_participation": 0.9065,
+          "ai_participation_calibrated_on": "synthetic-participation-corpus 1.0 (два стиля, доля смеси известна)",
+          "warning": "ДЕМО-РЕЖИМ: признаки считаются лексическими суррогатами без весов языковой модели. Он проверяет работоспособность конвейера и интерфейса, а не достоверность ответа. Подмена числа ловится, если число есть у другого объекта документа (например, «первичные — пять лет» против «вторичные — десять лет»); перефразирования и таблицы требуют режима 'hf'. Научные выводы возможны только в режиме 'hf'."
+        },
+        "spans": [],
+        "score": 0.0,
+        "verdict": "grounded"
+      },
+      {
+        "status": "completed",
+        "profile_enabled": false,
+        "seconds": 0.00858227000000511,
+        "warmup_seconds": 0.0026338800000047513,
+        "answer_chars": 1000,
+        "context_chars": 494,
+        "answer_utf8_bytes": 1827,
+        "context_utf8_bytes": 905,
+        "input_sha256": "df5180a689e0ef1fdc5f7623b3c7075e0788acbc69876912d0d79518f3145188",
+        "schema_valid": true,
+        "stats": {
+          "token_count": 144,
+          "scored_tokens": 91,
+          "number_attribution": [],
+          "fact_coverage": [],
+          "mean_risk": 0.1712,
+          "p90_risk": 0.4502,
+          "raw_score": 0.3202,
+          "raw_score_full": 0.320162617294145,
+          "span_threshold": 0.4186579753072923,
+          "span_z": 1.5,
+          "span_floor": 0.05,
+          "weights": {
+            "attention_entropy": 0.1,
+            "ctx_attention_mass": 0.0,
+            "ctx_attention_mass_norm": 0.1,
+            "ctx_max_similarity": 0.8,
+            "embedding_density": 0.0
+          },
+          "features": {
+            "backend": "demo",
+            "token_count": 144,
+            "context_tokens": 70,
+            "context_numbers": [
+              "1",
+              "12",
+              "2",
+              "2022",
+              "4"
+            ],
+            "k": 5
+          },
+          "ai_participation": 0.9065,
+          "ai_participation_calibrated_on": "synthetic-participation-corpus 1.0 (два стиля, доля смеси известна)",
+          "warning": "ДЕМО-РЕЖИМ: признаки считаются лексическими суррогатами без весов языковой модели. Он проверяет работоспособность конвейера и интерфейса, а не достоверность ответа. Подмена числа ловится, если число есть у другого объекта документа (например, «первичные — пять лет» против «вторичные — десять лет»); перефразирования и таблицы требуют режима 'hf'. Научные выводы возможны только в режиме 'hf'."
+        },
+        "spans": [],
+        "score": 0.0,
+        "verdict": "grounded"
+      }
+    ],
+    "median_seconds": 0.00858227000000511,
+    "max_seconds": 0.008736450000000673,
+    "limit_seconds": 0.03,
+    "status": "достигнут"
+  },
+  {
+    "mode": "demo",
+    "scenario": "answer-text",
+    "chars": 50000,
+    "thermal": "cold-process",
+    "repeats": [
+      {
+        "status": "completed",
+        "profile_enabled": false,
+        "seconds": 0.5444110979999977,
+        "warmup_seconds": null,
+        "answer_chars": 50000,
+        "context_chars": 494,
+        "answer_utf8_bytes": 91513,
+        "context_utf8_bytes": 905,
+        "input_sha256": "38264e9c53d32226b44537f153843b4416c7a580538b84d9eb6165a41c2c8033",
+        "schema_valid": true,
+        "stats": {
+          "token_count": 7073,
+          "scored_tokens": 4445,
+          "number_attribution": [],
+          "fact_coverage": [],
+          "mean_risk": 0.1688,
+          "p90_risk": 0.4449,
+          "raw_score": 0.239,
+          "raw_score_full": 0.23899151024444426,
+          "span_threshold": 0.4186579753072923,
+          "span_z": 1.5,
+          "span_floor": 0.05,
+          "weights": {
+            "attention_entropy": 0.1,
+            "ctx_attention_mass": 0.0,
+            "ctx_attention_mass_norm": 0.1,
+            "ctx_max_similarity": 0.8,
+            "embedding_density": 0.0
+          },
+          "features": {
+            "backend": "demo",
+            "token_count": 7073,
+            "context_tokens": 70,
+            "context_numbers": [
+              "1",
+              "12",
+              "2",
+              "2022",
+              "4"
+            ],
+            "k": 5
+          },
+          "ai_participation": 0.9502,
+          "ai_participation_calibrated_on": "synthetic-participation-corpus 1.0 (два стиля, доля смеси известна)",
+          "warning": "ДЕМО-РЕЖИМ: признаки считаются лексическими суррогатами без весов языковой модели. Он проверяет работоспособность конвейера и интерфейса, а не достоверность ответа. Подмена числа ловится, если число есть у другого объекта документа (например, «первичные — пять лет» против «вторичные — десять лет»); перефразирования и таблицы требуют режима 'hf'. Научные выводы возможны только в режиме 'hf'."
+        },
+        "spans": [],
+        "score": 0.0,
+        "verdict": "grounded"
+      },
+      {
+        "status": "completed",
+        "profile_enabled": false,
+        "seconds": 0.5451400299999989,
+        "warmup_seconds": null,
+        "answer_chars": 50000,
+        "context_chars": 494,
+        "answer_utf8_bytes": 91513,
+        "context_utf8_bytes": 905,
+        "input_sha256": "38264e9c53d32226b44537f153843b4416c7a580538b84d9eb6165a41c2c8033",
+        "schema_valid": true,
+        "stats": {
+          "token_count": 7073,
+          "scored_tokens": 4445,
+          "number_attribution": [],
+          "fact_coverage": [],
+          "mean_risk": 0.1688,
+          "p90_risk": 0.4449,
+          "raw_score": 0.239,
+          "raw_score_full": 0.23899151024444426,
+          "span_threshold": 0.4186579753072923,
+          "span_z": 1.5,
+          "span_floor": 0.05,
+          "weights": {
+            "attention_entropy": 0.1,
+            "ctx_attention_mass": 0.0,
+            "ctx_attention_mass_norm": 0.1,
+            "ctx_max_similarity": 0.8,
+            "embedding_density": 0.0
+          },
+          "features": {
+            "backend": "demo",
+            "token_count": 7073,
+            "context_tokens": 70,
+            "context_numbers": [
+              "1",
+              "12",
+              "2",
+              "2022",
+              "4"
+            ],
+            "k": 5
+          },
+          "ai_participation": 0.9502,
+          "ai_participation_calibrated_on": "synthetic-participation-corpus 1.0 (два стиля, доля смеси известна)",
+          "warning": "ДЕМО-РЕЖИМ: признаки считаются лексическими суррогатами без весов языковой модели. Он проверяет работоспособность конвейера и интерфейса, а не достоверность ответа. Подмена числа ловится, если число есть у другого объекта документа (например, «первичные — пять лет» против «вторичные — десять лет»); перефразирования и таблицы требуют режима 'hf'. Научные выводы возможны только в режиме 'hf'."
+        },
+        "spans": [],
+        "score": 0.0,
+        "verdict": "grounded"
+      },
+      {
+        "status": "completed",
+        "profile_enabled": false,
+        "seconds": 0.5452188559999911,
+        "warmup_seconds": null,
+        "answer_chars": 50000,
+        "context_chars": 494,
+        "answer_utf8_bytes": 91513,
+        "context_utf8_bytes": 905,
+        "input_sha256": "38264e9c53d32226b44537f153843b4416c7a580538b84d9eb6165a41c2c8033",
+        "schema_valid": true,
+        "stats": {
+          "token_count": 7073,
+          "scored_tokens": 4445,
+          "number_attribution": [],
+          "fact_coverage": [],
+          "mean_risk": 0.1688,
+          "p90_risk": 0.4449,
+          "raw_score": 0.239,
+          "raw_score_full": 0.23899151024444426,
+          "span_threshold": 0.4186579753072923,
+          "span_z": 1.5,
+          "span_floor": 0.05,
+          "weights": {
+            "attention_entropy": 0.1,
+            "ctx_attention_mass": 0.0,
+            "ctx_attention_mass_norm": 0.1,
+            "ctx_max_similarity": 0.8,
+            "embedding_density": 0.0
+          },
+          "features": {
+            "backend": "demo",
+            "token_count": 7073,
+            "context_tokens": 70,
+            "context_numbers": [
+              "1",
+              "12",
+              "2",
+              "2022",
+              "4"
+            ],
+            "k": 5
+          },
+          "ai_participation": 0.9502,
+          "ai_participation_calibrated_on": "synthetic-participation-corpus 1.0 (два стиля, доля смеси известна)",
+          "warning": "ДЕМО-РЕЖИМ: признаки считаются лексическими суррогатами без весов языковой модели. Он проверяет работоспособность конвейера и интерфейса, а не достоверность ответа. Подмена числа ловится, если число есть у другого объекта документа (например, «первичные — пять лет» против «вторичные — десять лет»); перефразирования и таблицы требуют режима 'hf'. Научные выводы возможны только в режиме 'hf'."
+        },
+        "spans": [],
+        "score": 0.0,
+        "verdict": "grounded"
+      }
+    ],
+    "median_seconds": 0.5451400299999989,
+    "max_seconds": 0.5452188559999911,
+    "limit_seconds": 1.0,
+    "status": "достигнут"
+  },
+  {
+    "mode": "demo",
+    "scenario": "answer-text",
+    "chars": 50000,
+    "thermal": "warm-model",
+    "repeats": [
+      {
+        "status": "completed",
+        "profile_enabled": false,
+        "seconds": 0.5330615990000069,
+        "warmup_seconds": 0.002639508000001456,
+        "answer_chars": 50000,
+        "context_chars": 494,
+        "answer_utf8_bytes": 91513,
+        "context_utf8_bytes": 905,
+        "input_sha256": "38264e9c53d32226b44537f153843b4416c7a580538b84d9eb6165a41c2c8033",
+        "schema_valid": true,
+        "stats": {
+          "token_count": 7073,
+          "scored_tokens": 4445,
+          "number_attribution": [],
+          "fact_coverage": [],
+          "mean_risk": 0.1688,
+          "p90_risk": 0.4449,
+          "raw_score": 0.239,
+          "raw_score_full": 0.23899151024444426,
+          "span_threshold": 0.4186579753072923,
+          "span_z": 1.5,
+          "span_floor": 0.05,
+          "weights": {
+            "attention_entropy": 0.1,
+            "ctx_attention_mass": 0.0,
+            "ctx_attention_mass_norm": 0.1,
+            "ctx_max_similarity": 0.8,
+            "embedding_density": 0.0
+          },
+          "features": {
+            "backend": "demo",
+            "token_count": 7073,
+            "context_tokens": 70,
+            "context_numbers": [
+              "1",
+              "12",
+              "2",
+              "2022",
+              "4"
+            ],
+            "k": 5
+          },
+          "ai_participation": 0.9502,
+          "ai_participation_calibrated_on": "synthetic-participation-corpus 1.0 (два стиля, доля смеси известна)",
+          "warning": "ДЕМО-РЕЖИМ: признаки считаются лексическими суррогатами без весов языковой модели. Он проверяет работоспособность конвейера и интерфейса, а не достоверность ответа. Подмена числа ловится, если число есть у другого объекта документа (например, «первичные — пять лет» против «вторичные — десять лет»); перефразирования и таблицы требуют режима 'hf'. Научные выводы возможны только в режиме 'hf'."
+        },
+        "spans": [],
+        "score": 0.0,
+        "verdict": "grounded"
+      },
+      {
+        "status": "completed",
+        "profile_enabled": false,
+        "seconds": 0.5742777539999935,
+        "warmup_seconds": 0.0027082809999967594,
+        "answer_chars": 50000,
+        "context_chars": 494,
+        "answer_utf8_bytes": 91513,
+        "context_utf8_bytes": 905,
+        "input_sha256": "38264e9c53d32226b44537f153843b4416c7a580538b84d9eb6165a41c2c8033",
+        "schema_valid": true,
+        "stats": {
+          "token_count": 7073,
+          "scored_tokens": 4445,
+          "number_attribution": [],
+          "fact_coverage": [],
+          "mean_risk": 0.1688,
+          "p90_risk": 0.4449,
+          "raw_score": 0.239,
+          "raw_score_full": 0.23899151024444426,
+          "span_threshold": 0.4186579753072923,
+          "span_z": 1.5,
+          "span_floor": 0.05,
+          "weights": {
+            "attention_entropy": 0.1,
+            "ctx_attention_mass": 0.0,
+            "ctx_attention_mass_norm": 0.1,
+            "ctx_max_similarity": 0.8,
+            "embedding_density": 0.0
+          },
+          "features": {
+            "backend": "demo",
+            "token_count": 7073,
+            "context_tokens": 70,
+            "context_numbers": [
+              "1",
+              "12",
+              "2",
+              "2022",
+              "4"
+            ],
+            "k": 5
+          },
+          "ai_participation": 0.9502,
+          "ai_participation_calibrated_on": "synthetic-participation-corpus 1.0 (два стиля, доля смеси известна)",
+          "warning": "ДЕМО-РЕЖИМ: признаки считаются лексическими суррогатами без весов языковой модели. Он проверяет работоспособность конвейера и интерфейса, а не достоверность ответа. Подмена числа ловится, если число есть у другого объекта документа (например, «первичные — пять лет» против «вторичные — десять лет»); перефразирования и таблицы требуют режима 'hf'. Научные выводы возможны только в режиме 'hf'."
+        },
+        "spans": [],
+        "score": 0.0,
+        "verdict": "grounded"
+      },
+      {
+        "status": "completed",
+        "profile_enabled": false,
+        "seconds": 0.5357318509999942,
+        "warmup_seconds": 0.0026109860000076424,
+        "answer_chars": 50000,
+        "context_chars": 494,
+        "answer_utf8_bytes": 91513,
+        "context_utf8_bytes": 905,
+        "input_sha256": "38264e9c53d32226b44537f153843b4416c7a580538b84d9eb6165a41c2c8033",
+        "schema_valid": true,
+        "stats": {
+          "token_count": 7073,
+          "scored_tokens": 4445,
+          "number_attribution": [],
+          "fact_coverage": [],
+          "mean_risk": 0.1688,
+          "p90_risk": 0.4449,
+          "raw_score": 0.239,
+          "raw_score_full": 0.23899151024444426,
+          "span_threshold": 0.4186579753072923,
+          "span_z": 1.5,
+          "span_floor": 0.05,
+          "weights": {
+            "attention_entropy": 0.1,
+            "ctx_attention_mass": 0.0,
+            "ctx_attention_mass_norm": 0.1,
+            "ctx_max_similarity": 0.8,
+            "embedding_density": 0.0
+          },
+          "features": {
+            "backend": "demo",
+            "token_count": 7073,
+            "context_tokens": 70,
+            "context_numbers": [
+              "1",
+              "12",
+              "2",
+              "2022",
+              "4"
+            ],
+            "k": 5
+          },
+          "ai_participation": 0.9502,
+          "ai_participation_calibrated_on": "synthetic-participation-corpus 1.0 (два стиля, доля смеси известна)",
+          "warning": "ДЕМО-РЕЖИМ: признаки считаются лексическими суррогатами без весов языковой модели. Он проверяет работоспособность конвейера и интерфейса, а не достоверность ответа. Подмена числа ловится, если число есть у другого объекта документа (например, «первичные — пять лет» против «вторичные — десять лет»); перефразирования и таблицы требуют режима 'hf'. Научные выводы возможны только в режиме 'hf'."
+        },
+        "spans": [],
+        "score": 0.0,
+        "verdict": "grounded"
+      }
+    ],
+    "median_seconds": 0.5357318509999942,
+    "max_seconds": 0.5742777539999935,
+    "limit_seconds": 1.0,
+    "status": "достигнут"
+  },
+  {
+    "mode": "demo",
+    "scenario": "answer-text",
+    "chars": 2000000,
+    "thermal": "cold-process",
+    "repeats": [
+      {
+        "status": "timeout",
+        "returncode": 124,
+        "seconds": null,
+        "process_lower_bound_seconds": 75
+      },
+      {
+        "status": "timeout",
+        "returncode": 124,
+        "seconds": null,
+        "process_lower_bound_seconds": 75
+      },
+      {
+        "status": "timeout",
+        "returncode": 124,
+        "seconds": null,
+        "process_lower_bound_seconds": 75
+      }
+    ],
+    "median_seconds": null,
+    "max_seconds": null,
+    "limit_seconds": 60.0,
+    "status": "не достигнут",
+    "diagnostic_profile": "profile-demo-answer-text-2000000-cold-process.json.prof"
+  },
+  {
+    "mode": "demo",
+    "scenario": "answer-text",
+    "chars": 2000000,
+    "thermal": "warm-model",
+    "repeats": [
+      {
+        "status": "timeout",
+        "returncode": 124,
+        "seconds": null,
+        "process_lower_bound_seconds": 75
+      },
+      {
+        "status": "timeout",
+        "returncode": 124,
+        "seconds": null,
+        "process_lower_bound_seconds": 75
+      },
+      {
+        "status": "timeout",
+        "returncode": 124,
+        "seconds": null,
+        "process_lower_bound_seconds": 75
+      }
+    ],
+    "median_seconds": null,
+    "max_seconds": null,
+    "limit_seconds": 60.0,
+    "status": "не достигнут",
+    "diagnostic_profile": "profile-demo-answer-text-2000000-warm-model.json.prof"
+  }
+]

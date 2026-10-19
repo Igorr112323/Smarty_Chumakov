@@ -1,0 +1,272 @@
+[
+  {
+    "file": "/home/runner/work/Smarty_Chumakov/Smarty_Chumakov/spanverify-module/spanverify/engine.py",
+    "line": 479,
+    "function": "verify",
+    "primitive_calls": 1,
+    "calls": 1,
+    "self_seconds": 0.00022703300000000002,
+    "cumulative_seconds": 11.321014195
+  },
+  {
+    "file": "/home/runner/work/Smarty_Chumakov/Smarty_Chumakov/spanverify-module/spanverify/engine.py",
+    "line": 761,
+    "function": "_features",
+    "primitive_calls": 1,
+    "calls": 1,
+    "self_seconds": 0.000179075,
+    "cumulative_seconds": 11.246429967000001
+  },
+  {
+    "file": "/home/runner/work/Smarty_Chumakov/Smarty_Chumakov/spanverify-module/spanverify/features.py",
+    "line": 1384,
+    "function": "hf_features_chunked",
+    "primitive_calls": 1,
+    "calls": 1,
+    "self_seconds": 0.029811233000000003,
+    "cumulative_seconds": 11.246249629000001
+  },
+  {
+    "file": "/home/runner/work/Smarty_Chumakov/Smarty_Chumakov/spanverify-module/spanverify/features.py",
+    "line": 1147,
+    "function": "hf_features",
+    "primitive_calls": 3,
+    "calls": 3,
+    "self_seconds": 0.015368579,
+    "cumulative_seconds": 11.197452660000002
+  },
+  {
+    "file": "/home/runner/work/Smarty_Chumakov/Smarty_Chumakov/spanverify-module/spanverify/features.py",
+    "line": 1314,
+    "function": "<listcomp>",
+    "primitive_calls": 90,
+    "calls": 90,
+    "self_seconds": 0.008926794,
+    "cumulative_seconds": 8.271020635000001
+  },
+  {
+    "file": "/home/runner/work/Smarty_Chumakov/Smarty_Chumakov/spanverify-module/spanverify/features.py",
+    "line": 1566,
+    "function": "_cosine_dense",
+    "primitive_calls": 19080,
+    "calls": 19080,
+    "self_seconds": 0.036620597000000005,
+    "cumulative_seconds": 8.262093841
+  },
+  {
+    "file": "~",
+    "line": 0,
+    "function": "<built-in method builtins.sum>",
+    "primitive_calls": 57568,
+    "calls": 57568,
+    "self_seconds": 3.3378363490000003,
+    "cumulative_seconds": 8.222376724
+  },
+  {
+    "file": "/home/runner/work/Smarty_Chumakov/Smarty_Chumakov/spanverify-module/spanverify/features.py",
+    "line": 1567,
+    "function": "<genexpr>",
+    "primitive_calls": 14672520,
+    "calls": 14672520,
+    "self_seconds": 2.206732578,
+    "cumulative_seconds": 2.206732578
+  },
+  {
+    "file": "/home/runner/work/Smarty_Chumakov/Smarty_Chumakov/spanverify-module/spanverify/features.py",
+    "line": 1568,
+    "function": "<genexpr>",
+    "primitive_calls": 14672520,
+    "calls": 14672520,
+    "self_seconds": 1.3404971,
+    "cumulative_seconds": 1.3404971
+  },
+  {
+    "file": "/home/runner/work/Smarty_Chumakov/Smarty_Chumakov/spanverify-module/spanverify/features.py",
+    "line": 1569,
+    "function": "<genexpr>",
+    "primitive_calls": 14672520,
+    "calls": 14672520,
+    "self_seconds": 1.336425451,
+    "cumulative_seconds": 1.336425451
+  },
+  {
+    "file": "/opt/hostedtoolcache/Python/3.11.17/x64/lib/python3.11/site-packages/torch/nn/modules/module.py",
+    "line": 1779,
+    "function": "_wrapped_call_impl",
+    "primitive_calls": 3,
+    "calls": 453,
+    "self_seconds": 0.0012795970000000002,
+    "cumulative_seconds": 1.294183467
+  },
+  {
+    "file": "/opt/hostedtoolcache/Python/3.11.17/x64/lib/python3.11/site-packages/torch/nn/modules/module.py",
+    "line": 1787,
+    "function": "_call_impl",
+    "primitive_calls": 3,
+    "calls": 453,
+    "self_seconds": 0.002273526,
+    "cumulative_seconds": 1.2941634800000001
+  },
+  {
+    "file": "/opt/hostedtoolcache/Python/3.11.17/x64/lib/python3.11/site-packages/transformers/utils/generic.py",
+    "line": 937,
+    "function": "wrapper",
+    "primitive_calls": 3,
+    "calls": 3,
+    "self_seconds": 2.6499e-05,
+    "cumulative_seconds": 1.294118887
+  },
+  {
+    "file": "/opt/hostedtoolcache/Python/3.11.17/x64/lib/python3.11/site-packages/transformers/models/gpt2/modeling_gpt2.py",
+    "line": 647,
+    "function": "forward",
+    "primitive_calls": 3,
+    "calls": 3,
+    "self_seconds": 0.000156992,
+    "cumulative_seconds": 1.2940738920000001
+  },
+  {
+    "file": "/opt/hostedtoolcache/Python/3.11.17/x64/lib/python3.11/site-packages/transformers/models/auto/auto_factory.py",
+    "line": 265,
+    "function": "from_pretrained",
+    "primitive_calls": 3,
+    "calls": 3,
+    "self_seconds": 0.00019802400000000001,
+    "cumulative_seconds": 1.199824672
+  },
+  {
+    "file": "/opt/hostedtoolcache/Python/3.11.17/x64/lib/python3.11/site-packages/transformers/modeling_utils.py",
+    "line": 3822,
+    "function": "from_pretrained",
+    "primitive_calls": 3,
+    "calls": 3,
+    "self_seconds": 0.00448753,
+    "cumulative_seconds": 1.126932631
+  },
+  {
+    "file": "/opt/hostedtoolcache/Python/3.11.17/x64/lib/python3.11/site-packages/transformers/utils/generic.py",
+    "line": 1019,
+    "function": "wrapper",
+    "primitive_calls": 3,
+    "calls": 3,
+    "self_seconds": 6.897400000000001e-05,
+    "cumulative_seconds": 0.937264124
+  },
+  {
+    "file": "/opt/hostedtoolcache/Python/3.11.17/x64/lib/python3.11/site-packages/transformers/utils/output_capturing.py",
+    "line": 250,
+    "function": "wrapper",
+    "primitive_calls": 3,
+    "calls": 3,
+    "self_seconds": 0.00016388,
+    "cumulative_seconds": 0.9371230690000001
+  },
+  {
+    "file": "/opt/hostedtoolcache/Python/3.11.17/x64/lib/python3.11/site-packages/transformers/models/gpt2/modeling_gpt2.py",
+    "line": 511,
+    "function": "forward",
+    "primitive_calls": 3,
+    "calls": 3,
+    "self_seconds": 0.0006891050000000001,
+    "cumulative_seconds": 0.9328457840000001
+  },
+  {
+    "file": "/opt/hostedtoolcache/Python/3.11.17/x64/lib/python3.11/site-packages/transformers/modeling_layers.py",
+    "line": 82,
+    "function": "__call__",
+    "primitive_calls": 36,
+    "calls": 36,
+    "self_seconds": 0.00023644600000000002,
+    "cumulative_seconds": 0.927766437
+  },
+  {
+    "file": "/opt/hostedtoolcache/Python/3.11.17/x64/lib/python3.11/site-packages/torch/nn/modules/module.py",
+    "line": 1799,
+    "function": "inner",
+    "primitive_calls": 36,
+    "calls": 72,
+    "self_seconds": 0.0012868,
+    "cumulative_seconds": 0.926930099
+  },
+  {
+    "file": "/opt/hostedtoolcache/Python/3.11.17/x64/lib/python3.11/site-packages/transformers/models/gpt2/modeling_gpt2.py",
+    "line": 262,
+    "function": "forward",
+    "primitive_calls": 36,
+    "calls": 36,
+    "self_seconds": 0.00462566,
+    "cumulative_seconds": 0.925543749
+  },
+  {
+    "file": "/opt/hostedtoolcache/Python/3.11.17/x64/lib/python3.11/site-packages/transformers/pytorch_utils.py",
+    "line": 117,
+    "function": "forward",
+    "primitive_calls": 144,
+    "calls": 144,
+    "self_seconds": 0.001659218,
+    "cumulative_seconds": 0.7466624580000001
+  },
+  {
+    "file": "~",
+    "line": 0,
+    "function": "<built-in method torch.addmm>",
+    "primitive_calls": 144,
+    "calls": 144,
+    "self_seconds": 0.742065532,
+    "cumulative_seconds": 0.742065532
+  },
+  {
+    "file": "/opt/hostedtoolcache/Python/3.11.17/x64/lib/python3.11/site-packages/transformers/modeling_utils.py",
+    "line": 317,
+    "function": "load_state_dict",
+    "primitive_calls": 6,
+    "calls": 6,
+    "self_seconds": 0.00016578300000000002,
+    "cumulative_seconds": 0.6073451440000001
+  },
+  {
+    "file": "/opt/hostedtoolcache/Python/3.11.17/x64/lib/python3.11/site-packages/torch/serialization.py",
+    "line": 1315,
+    "function": "load",
+    "primitive_calls": 6,
+    "calls": 6,
+    "self_seconds": 0.0009623190000000001,
+    "cumulative_seconds": 0.6015446910000001
+  },
+  {
+    "file": "/opt/hostedtoolcache/Python/3.11.17/x64/lib/python3.11/site-packages/torch/serialization.py",
+    "line": 1667,
+    "function": "_legacy_load",
+    "primitive_calls": 6,
+    "calls": 6,
+    "self_seconds": 0.002976252,
+    "cumulative_seconds": 0.599566255
+  },
+  {
+    "file": "/opt/hostedtoolcache/Python/3.11.17/x64/lib/python3.11/site-packages/transformers/models/gpt2/modeling_gpt2.py",
+    "line": 238,
+    "function": "forward",
+    "primitive_calls": 36,
+    "calls": 36,
+    "self_seconds": 0.0007703030000000001,
+    "cumulative_seconds": 0.577387344
+  },
+  {
+    "file": "/opt/hostedtoolcache/Python/3.11.17/x64/lib/python3.11/site-packages/transformers/modeling_utils.py",
+    "line": 4397,
+    "function": "_load_pretrained_model",
+    "primitive_calls": 3,
+    "calls": 3,
+    "self_seconds": 0.0027654330000000003,
+    "cumulative_seconds": 0.417900847
+  },
+  {
+    "file": "~",
+    "line": 0,
+    "function": "<method '_set_from_file' of 'torch._C.StorageBase' objects>",
+    "primitive_calls": 1032,
+    "calls": 1032,
+    "self_seconds": 0.38588997900000005,
+    "cumulative_seconds": 0.38588997900000005
+  }
+]
