@@ -29,3 +29,11 @@ False-mode transformers evaluation call, never train(True)/fit. Product unchange
 Before recovery, download original artifact and assert empty evidence/no result;
 retain original consumed tag, atomically create separate recovery-1 tag.
 Long metadata audit177/7over512/max1266 already published before labels.
+
+## Retrospective breach: do NOT claim protocol clean
+Early CI39266027509 contract always-job bypassed cancelled barrier and fitted
+a temporary synthetic ParticipationModel; artifact12192328736 created14:12:03Z.
+Official job completed14:26:51Z. Exact fit start unknown; result artifact/code
+retained. No product modification or official/B fit input. This violates user's
+ANY-fit freeze. Inference-worker fit_calls=[] is not a global CI guarantee.
+Corrected success guard/regression; no re-measurement. Conservative RC NOTlatest.

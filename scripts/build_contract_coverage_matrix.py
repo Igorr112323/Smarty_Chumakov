@@ -276,6 +276,9 @@ def main():
         if delivery.exists():
             payload["delivery"] = json.loads(delivery.read_text())
             delivery_info = payload["delivery"]
+            payload["execution_freeze_status"] = delivery_info.get("execution_freeze_status", "unrecorded")
+            payload["stable_promotion"] = delivery_info.get("stable_promotion", False)
+            rows.append(dict(id="execution_freeze",requirement="P8 no ANY fit before official seal",status="не достигнут",scope="P8 execution-process violation, separate from numeric official joint PASS",note="Early cancelled CI39266027509 always-contract bypass; artifact14:12:03 before official job14:26:51. Temporary synthetic ParticipationModel.fit, no official/B data or product changes. No official retry; guard corrected; conservative RC/latest unchanged.",evidence=[dict(path="reports/p8/infra-freeze-barrier/incident.json",url=f"{URL}/blob/arena/c5f69767-smarty-chumakov/reports/p8/infra-freeze-barrier/incident.json")],current_run=f"{URL}/actions/runs/39266027509"))
             for id_ in ("exe", "package", "build", "no_install", "portable_copy"):
                 known[id_].update(scope="P8 actual Windows build artifacts; publication-only source failure preserved",note=f"P8 build39271014161/source654a48e: exe8981233B, pyz232874B, strict gates PASS; three complete suites and smoke/offline validations PASS. Original workflow publication-only FAIL; recovery reuses exact checksummed artifacts, no rebuild/scoring. {delivery_info.get('publication_recovery', '')}",evidence=[dict(path="reports/p8/DELIVERY.json",url=f"{URL}/blob/arena/c5f69767-smarty-chumakov/reports/p8/DELIVERY.json"),dict(path="reports/p8/run39271014161/windows/release/SHA256SUMS.txt",url=f"{URL}/blob/arena/c5f69767-smarty-chumakov/reports/p8/run39271014161/windows/release/SHA256SUMS.txt")],current_run=f"{URL}/actions/runs/39271014161")
             for id_ in ("hf_footprint", "storage"):
@@ -285,7 +288,7 @@ def main():
     (out / "coverage-matrix.json").write_text(
         json.dumps(payload, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
     )
-    text = "# Appendix3: evidence coverage matrix\n\nAs of 2026-10-19. **Overall: НЕ ДОСТИГНУТ.** Official test177 evaluated once in P8; joint quality gate PASS, overall contract remains NOT achieved; legacy read and infrastructure incident disclosed.\n\nHistorical/demo artifacts are not current P5 HF acceptance. A dev gate cannot establish speed, delivery or the whole contract.\n\n| Requirement | Status | Scope / limitation | Real evidence |\n|---|---|---|---|\n"
+    text = "# Appendix3: evidence coverage matrix\n\nAs of 2026-10-19. **Overall: НЕ ДОСТИГНУТ.** Official test177 evaluated once in P8; numeric joint quality gate PASS, execution freeze NOT achieved, conservative RC/not latest; overall contract remains NOT achieved; legacy read and infrastructure incident disclosed.\n\nHistorical/demo artifacts are not current P5 HF acceptance. A dev gate cannot establish speed, delivery or the whole contract.\n\n| Requirement | Status | Scope / limitation | Real evidence |\n|---|---|---|---|\n"
     for r in rows:
         links = "; ".join(f"[{e['path'].split('/')[-1]}]({e['url']})" for e in r["evidence"])
         text += f"| {r['requirement']} | {r['status']} | {r['note']} | {links} |\n"

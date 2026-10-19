@@ -15,6 +15,8 @@
 ## P8 — финальное измерение
 
 [Итоговый отчёт](reports/FINAL_REPORT.md), [единственный индекс измерений](reports/EXPERIMENTS_INDEX.md), [текущая матрица требований](reports/contract/coverage-matrix.json).
+**P8 RC, не latest:** поздний аудит выявил временный synthetic fit в pre-seal cancelled CI; execution freeze НЕ соблюдена, продукт не менялся, численное измерение не повторялось. Подробности/доказательства в итоговом отчёте.
+
 Официальные177: token F1 **0.6252**, strict span F1 **0.5165**, FPR proxy **0.0155** — совместный gate PASS. B1000: answers F1 **0.5031**, FPR **0.4063**, strict span F1 **0.0196** — перенос слабый, B не контрактный gate.
 HF50k ≤1с **НЕ достигнуто** (8.168с), AI-share частично/nonmonotone; весь договор НЕ объявлен выполненным. Small exe по умолчанию demo, подтверждённый frozen HF bundle/runtime поставляются отдельно, требуют model551.3MB + libraries870.6MB плюс Python. После test ни модель, ни tau не изменялись.
 

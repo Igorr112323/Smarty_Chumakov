@@ -542,6 +542,20 @@
         }
       ],
       "current_run": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39266451529"
+    },
+    {
+      "id": "execution_freeze",
+      "requirement": "P8 no ANY fit before official seal",
+      "status": "не достигнут",
+      "scope": "P8 execution-process violation, separate from numeric official joint PASS",
+      "note": "Early cancelled CI39266027509 always-contract bypass; artifact14:12:03 before official job14:26:51. Temporary synthetic ParticipationModel.fit, no official/B data or product changes. No official retry; guard corrected; conservative RC/latest unchanged.",
+      "evidence": [
+        {
+          "path": "reports/p8/infra-freeze-barrier/incident.json",
+          "url": "https://github.com/Igorr112323/Smarty_Chumakov/blob/arena/c5f69767-smarty-chumakov/reports/p8/infra-freeze-barrier/incident.json"
+        }
+      ],
+      "current_run": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39266027509"
     }
   ],
   "p7_evidence_overlay": "reports/p7/contract-overlay.json",
@@ -690,10 +704,15 @@
     "hf_pyz_http": 200,
     "hf_offline": true,
     "product_registry_keys_unchanged": true,
-    "release_tag": "p8-final-20261019",
-    "release_url": "https://github.com/Igorr112323/Smarty_Chumakov/releases/tag/p8-final-20261019",
-    "publication_recovery": "Reuse exact existing binary artifacts, no rebuild/re-inference; real argv list replaces PS scalar splat"
+    "release_tag": "v1.3.1-rc.p8.20261019",
+    "release_url": "https://github.com/Igorr112323/Smarty_Chumakov/releases/tag/v1.3.1-rc.p8.20261019",
+    "publication_recovery": "Reuse exact existing binary artifacts, no rebuild/re-inference; real argv list replaces PS scalar splat",
+    "execution_freeze_status": "NOT ACHIEVED: cancelled early CI always-contract bypass caused pre-seal temporary synthetic ParticipationModel.fit",
+    "execution_freeze_evidence": "reports/p8/infra-freeze-barrier/",
+    "stable_promotion": false
   },
+  "execution_freeze_status": "NOT ACHIEVED: cancelled early CI always-contract bypass caused pre-seal temporary synthetic ParticipationModel.fit",
+  "stable_promotion": false,
   "evidence_context": {
     "run_id": "39266451529",
     "date": "2026-10-19",

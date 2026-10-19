@@ -74,6 +74,10 @@ def test_ci_collector_only_copies_sealed_a3_receipt():
         def evaluate(self, *args, **kwargs):
             raise AssertionError("official177 must never be evaluated by ordinary CI")
 
+    import yaml
+
+    workflow = yaml.safe_load((ROOT / ".github/workflows/ci.yml").read_text())
+    assert workflow["jobs"]["contract"]["if"] == "always() && needs.p8-freeze-barrier.result == 'success'"
     block = module._corpus_a3_block(ForbiddenEvaluation())
     assert "SUPERSEDED" in block["scope"]
     assert block["pairs"] == 1200

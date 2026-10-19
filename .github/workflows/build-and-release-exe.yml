@@ -504,7 +504,8 @@ jobs:
         working-directory: spanverify-module/release
         run: |
           $quality = Get-Content ../../reports/p8/run39266451529/official/result.json -Raw | ConvertFrom-Json
-          $pass = ($quality.joint_gate -eq $true) -and ($quality.metrics.tokens.f1 -ge 0.5) -and ($quality.metrics.spans.f1 -ge 0.5) -and ($quality.metrics.tokens.fpr -le 0.4)
+          $process = Get-Content ../../reports/p8/DELIVERY.json -Raw | ConvertFrom-Json
+          $pass = ($process.stable_promotion -eq $true) -and ($quality.joint_gate -eq $true) -and ($quality.metrics.tokens.f1 -ge 0.5) -and ($quality.metrics.spans.f1 -ge 0.5) -and ($quality.metrics.tokens.fpr -le 0.4)
           $tag = if ($pass) { "p8-final-20261019" } else { "v1.3.1-rc.p8.${{ github.run_id }}" }
           [string[]]$flags = if ($pass) { @("--latest=true") } else { @("--prerelease", "--latest=false") }
           gh release create $tag spanverify.exe spanverify-win.zip spanverify.pyz frozen-p5.json p5-runtime.json SHA256SUMS.txt `

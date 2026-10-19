@@ -2,7 +2,7 @@
 
 ## Вывод
 
-**Официальный quality gate пройден; весь договор целиком НЕ объявлен выполненным.**
+**Численный официальный quality gate PASS; строгая execution freeze НЕ соблюдена (pre-seal synthetic fit в отменённом CI). Поставка — RC, НЕ latest. Весь договор НЕ выполнен.**
 Замороженный продукт P7 (`b9cf9acdab1ca7bf082d03629ea7e599597f3fa8`) один раз успешно измерен на всех 177 test-парах через публичный `Verifier`. Никакого обучения/подбора по test или B. Bundle 122874 B, SHA256 `e0b13c693a058dfd66ed24a52fc14e9c70964e95885358e7b99cc1f328ad6892`, tau 0.5794392523364486, P1/P4/decoder/span_filter/калибраторы неизменны. Побайтовый regression manifest: [frozen-production-sha256](p8/frozen-production-sha256.json).
 
 Только два текущих индекса: [EXPERIMENTS_INDEX](EXPERIMENTS_INDEX.md) и [contract/coverage-matrix.json](contract/coverage-matrix.json). Остальные сводки — evidence или явно исторические, не конкурирующие индексы.
@@ -79,7 +79,7 @@ AI-share: train-only original5doc-fold OOF PAVA HF MAE **0.406824→0.2565365102
 
 [Регрессии](../spanverify-module/tests/test_p8_evidence_hygiene.py): provenance всех aggregate metric documents вне per-run каталогов, successor у SUPERSEDED, последний run каждой семьи в индексе, неизменность legacy payload и всех prediction files. Неизвестные historical local run явно обозначены unrecorded, не выданы за выдуманный GitHub run. Старые canonical per-run P2/P3/P4/P5 сохранены побайтово.
 
-Исторический test-read incident НЕ скрыт: offending `TestSelectRelevantChunks::test_on_corpus_a3_sample` читал unsplit corpus, потом first20; точное время чтения неизвестно. Это был aggregate/fixture read, не прежняя официальная оценка. Guardfix **5ff79f9a7bed33c00c6278f67d68ddff73f8325c2026**,18Oct23:34:59Z, train-only; conftest запрещает reserved177 во всех тестах. Source pairs SHA **b9a4cf05a9078644dd539470481a1b8079aed2d9201e195c3ecd901276ff7c8e**. До успешного official seal ни локальные, ни branch ordinary CI test-fits не запускались; workflow barrier, dispatch403 и инфраструктурное восстановление описаны в [PROTOCOL](p8/PROTOCOL.md).
+Исторический test-read incident НЕ скрыт: offending `TestSelectRelevantChunks::test_on_corpus_a3_sample` читал unsplit corpus, потом first20; точное время чтения неизвестно. Это был aggregate/fixture read, не прежняя официальная оценка. Guardfix **5ff79f9a7bed33c00c6278f67d68ddff73f8325c2026**,18Oct23:34:59Z, train-only; conftest запрещает reserved177 во всех тестах. Source pairs SHA **b9a4cf05a9078644dd539470481a1b8079aed2d9201e195c3ecd901276ff7c8e**. Ранее заявленная гарантия отсутствия всех pre-seal CI fits оказалась НЕВЕРНОЙ: always-contract bypass описан ниже; workflow barrier, dispatch403 и инфраструктурное восстановление описаны в [PROTOCOL](p8/PROTOCOL.md).
 
 ## 6. Поставка и полная проверка
 
@@ -87,7 +87,7 @@ AI-share: train-only original5doc-fold OOF PAVA HF MAE **0.406824→0.2565365102
 
 Проверенные P7 ориентиры до новой сборки: exe8,979,956B /pyz232,874B; отдельно модель **551,290,714B**, библиотеки **870,588,148B** (sum1,421,878,862B **плюс Python/application**, полный installed SDK total не измерен). Это не «всё HF внутри9MB», не прежняя неточная оценка ~500MB libs. Итоговые P8 build/release/CI receipts и контрольные суммы находятся в `reports/p8/DELIVERY.json` и linked artifact manifests; новый архив сохраняет source, binary, исходные per-pair доказательства. Публикационный receipt создаётся позже самого архива, без рекурсивного перепаковывания.
 
-Полный локальный pytest без exclusions и ordinary CI finalHEAD отражаются фактическими JUnit/log/run receipts: [full-suite.log](p8/full-suite.log), [full-suite.xml](p8/full-suite.xml). Локально: **910 collected /908 passed /2 pre-existing skipped,0 failures,432.398с**, JUnit подтверждает. Два старых optional skips сохраняются, новые skips не добавлены. `tests_excluded=false`. Переоценки official177 ради сборки/CI не выполняется.
+Полный локальный pytest без exclusions и ordinary CI finalHEAD отражаются фактическими JUnit/log/run receipts: [full-suite.log](p8/full-suite.log), [full-suite.xml](p8/full-suite.xml). Локально: **910 collected /908 passed /2 pre-existing skipped,0 failures,404.435с**, JUnit подтверждает. Два старых optional skips сохраняются, новые skips не добавлены. `tests_excluded=false`. Переоценки official177 ради сборки/CI не выполняется.
 
 ### P8 actual Windows receipt and publication recovery
 
@@ -100,3 +100,11 @@ Actual P8 weight file551,290,714B; entire six-file model/tokenizer directory **5
 Metadata-only log transfer initially refused ANSI escape output; recovered with explicit `--allow-escape-sequences` (receipt workflow39276221841). This did not run any verifier or fit. Historical CI cancellations track normal successive pushes, not excluded tests or hidden quality reruns. All final source/workflow checks remain enabled.
 
 Infrastructure queue failover: hosted x64 jobs remained queued without steps for >25minutes on19Oct; Linux ordinary CI and metadata-only publisher moved to ubuntu-24.04-arm. ALL suites, Python versions, coverage85%, Windows matrix and existing checks retained, no new skips/exclusions. This does NOT rerun official/B scoring, change the model, rebuild the accepted Windows bytes, or replace P7 AMD speed measurements with ARM timings.
+
+## Final process incident — execution freeze NOT ACHIEVED; conservative RC
+
+Late audit found an EARLY ordinary-CI cancellation bypass: run39266027509/source4b28132, contract job118107779326 used `if: always()` and ran despite cancelled barrier. Its contract artifact12192328736 was created **2026-10-19T14:12:03Z**, before successful official job completed14:26:51Z. `scripts/contract_check.py::Benchmark.participation` invokes a temporary `ParticipationModel.fit` on synthetic240 examples. This violates the requested ban on ANY pre-seal fit, including temporary diagnostics. This is NOT excused as “only a test”. The frozen product/P1/P4/bundle/tau were NOT altered, and official/B data were NOT used for that fit; recorded inference-worker fit_calls=[] does not describe separate CI processes.
+
+[Incident metadata, original run/artifact provenance](p8/infra-freeze-barrier/). Job cancellation timestamps are internally inconsistent (completedAt precedes startedAt); artifact creation timestamp is retained instead of inventing a precise fit start time. The actual fit instant is not independently reconstructed. The executed standard contract code includes the fit; resulting artifact is preserved permanently in final archive.
+
+Fix: even always-contract now REQUIRES barrier success; regression checks exact condition. All existing post-seal checks remain enabled. **No repeat official measurement** and no model tuning. Numeric joint gate remains PASS, but clean execution-freeze compliance is **NOT achieved**. Conservative final release **v1.3.1-rc.p8.20261019**, prerelease/latest=false; stable/latest **v1.3.1 remains unchanged**. Earlier conditional stable-publication descriptions above describe authorization policy, NOT an executed promotion. Full original failures/cancellations remain visible.

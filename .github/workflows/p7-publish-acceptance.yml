@@ -72,7 +72,13 @@ jobs:
           run-id: 39266027598
           github-token: ${{ github.token }}
           path: .arena/p8-publication/evidence/infra-first-attempt
-      - name: Package source, binary and original per-pair streams; upload final stable release asset
+      - uses: actions/download-artifact@v4
+        with:
+          name: contract
+          run-id: 39266027509
+          github-token: ${{ github.token }}
+          path: .arena/p8-publication/evidence/pre-seal-contract-incident
+      - name: Package source, binary and original per-pair streams; upload final RC release asset
         run: python scripts/p8_publish_acceptance.py
       - uses: actions/upload-artifact@v4
         with:

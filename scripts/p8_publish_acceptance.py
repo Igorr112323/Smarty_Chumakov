@@ -67,7 +67,7 @@ def validate():
         subprocess.run(["git", "diff", "--exit-code", info["headSha"], "HEAD", "--", "spanverify-module/spanverify", "spanverify-module/config", "spanverify-module/reports/experiments/p5_span_filter"], check=True)
     quality = json.loads((ROOT / "reports/p8/run39266451529/official/result.json").read_text())
     assert quality["joint_gate"] is True
-    return dict(runs=runs, ci_runs=ci_ids, windows_run=delivery["windows_run"], tests_excluded=False, documentation_source=os.environ["GITHUB_SHA"], release_tag="p8-final-20261019", windows_source_failure_scope="Publication only; all build/test/size/offline checks SUCCESS, original failure retained", publication_run=os.environ["GITHUB_RUN_ID"])
+    return dict(runs=runs, ci_runs=ci_ids, windows_run=delivery["windows_run"], tests_excluded=False, documentation_source=os.environ["GITHUB_SHA"], release_tag=delivery["release_tag"], stable_promotion=delivery["stable_promotion"], execution_freeze_status=delivery["execution_freeze_status"], windows_source_failure_scope="Publication only; all build/test/size/offline checks SUCCESS, original failure retained", publication_run=os.environ["GITHUB_RUN_ID"])
 
 
 def main():
@@ -89,9 +89,11 @@ def main():
         manifest = json.loads((ROOT / f"reports/p8/run39266451529/{role}/artifact-manifest.json").read_text())
         path = ROOT / ".arena/p8-publication/evidence" / folder / "evidence.jsonl"
         assert hashlib.sha256(path.read_bytes()).hexdigest() == manifest["manifest"]["evidence.jsonl"]["sha256"]
+    branch = api("git/ref/heads/arena/c5f69767-smarty-chumakov")
+    assert branch["object"]["sha"] == os.environ["GITHUB_SHA"], "Superseded publication source; refuse publishing"
     assets = [str(binaries / name) for name in ("spanverify.exe", "spanverify-win.zip", "spanverify.pyz", "frozen-p5.json", "p5-runtime.json", "SHA256SUMS.txt")]
     # Real argv list, not PowerShell scalar-string splatting. No rebuild/re-inference.
-    subprocess.run(["gh", "release", "create", meta["release_tag"], *assets, "--repo", REPO, "--target", meta["runs"]["windows"]["headSha"], "--title", "SpanVerify 1.3.1 — P8 final evaluation", "--notes-file", str(ROOT / "reports/p8/RELEASE_NOTES.md"), "--latest=true"], check=True)
+    subprocess.run(["gh", "release", "create", meta["release_tag"], *assets, "--repo", REPO, "--target", meta["runs"]["windows"]["headSha"], "--title", "SpanVerify 1.3.1 — P8 final evaluation", "--notes-file", str(ROOT / "reports/p8/RELEASE_NOTES.md"), *(["--latest=true"] if meta["stable_promotion"] else ["--prerelease", "--latest=false"])], check=True)
     out = ROOT / ".arena/p8-publication/p8-final-acceptance.zip"
     out.parent.mkdir(parents=True, exist_ok=True)
     checks = {}

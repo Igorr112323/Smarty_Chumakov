@@ -157,7 +157,7 @@ jobs:
     # упал и артефакта нет, контрактная проверка продолжает работу и пишет по
     # правилу готовности «не измерено» с причиной.
     needs: [quality, p8-freeze-barrier]
-    if: always()
+    if: always() && needs.p8-freeze-barrier.result == 'success'
     steps:
       - uses: actions/checkout@v4
 

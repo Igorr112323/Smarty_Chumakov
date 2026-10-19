@@ -1,7 +1,7 @@
 {
   "kind": "ci_workflows",
   "runs_considered": 100,
-  "generated_at": "2026-10-19T15:56:25Z",
+  "generated_at": "2026-10-19T16:11:02Z",
   "command": "python scripts/collect_ci_workflows.py",
   "source": ".github/workflows/*.yml + reports/CI_RUNS.json",
   "registry": {
@@ -808,7 +808,7 @@
         {
           "name": "p8-final",
           "timeout_minutes": 40,
-          "steps": 7,
+          "steps": 8,
           "uploads_artifacts": true,
           "runs_python": "ubuntu-24.04-arm"
         }

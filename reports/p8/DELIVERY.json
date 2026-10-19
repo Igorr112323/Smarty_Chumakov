@@ -31,7 +31,10 @@
   "hf_pyz_http": 200,
   "hf_offline": true,
   "product_registry_keys_unchanged": true,
-  "release_tag": "p8-final-20261019",
-  "release_url": "https://github.com/Igorr112323/Smarty_Chumakov/releases/tag/p8-final-20261019",
-  "publication_recovery": "Reuse exact existing binary artifacts, no rebuild/re-inference; real argv list replaces PS scalar splat"
+  "release_tag": "v1.3.1-rc.p8.20261019",
+  "release_url": "https://github.com/Igorr112323/Smarty_Chumakov/releases/tag/v1.3.1-rc.p8.20261019",
+  "publication_recovery": "Reuse exact existing binary artifacts, no rebuild/re-inference; real argv list replaces PS scalar splat",
+  "execution_freeze_status": "NOT ACHIEVED: cancelled early CI always-contract bypass caused pre-seal temporary synthetic ParticipationModel.fit",
+  "execution_freeze_evidence": "reports/p8/infra-freeze-barrier/",
+  "stable_promotion": false
 }
