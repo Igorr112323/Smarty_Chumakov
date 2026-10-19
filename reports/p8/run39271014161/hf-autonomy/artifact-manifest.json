@@ -1,0 +1,43 @@
+{
+  "role": "p7-windows-hf-autonomy",
+  "run_id": "39271014161",
+  "date": "2026-10-19",
+  "manifest": {
+    "exe-request.json": {
+      "bytes": 308,
+      "sha256": "6261a948bdeb8914835db18a175004d8d8aeb5580e7755a481cf7bbd116af5ff"
+    },
+    "exe-response.json": {
+      "bytes": 5149,
+      "sha256": "51251163a819c4b3059d885828948bf92d93b024517e0b79cdd277e7a8d07b6c"
+    },
+    "exe-stderr.log": {
+      "bytes": 699,
+      "sha256": "6bb1c4b95ec8c7319313995be5c481bd998c8894b8fa304143c6c8c287c7a9eb"
+    },
+    "exe-stdout.log": {
+      "bytes": 287,
+      "sha256": "e20bbdd3bb2560a27fff1380cfaf6c551cf9e02e2ab1c7e18b705d907b86d1bd"
+    },
+    "pyz-request.json": {
+      "bytes": 308,
+      "sha256": "6261a948bdeb8914835db18a175004d8d8aeb5580e7755a481cf7bbd116af5ff"
+    },
+    "pyz-response.json": {
+      "bytes": 5053,
+      "sha256": "2f374885b6fbfc54f790f27e8efb993dac198fe125fd07404b9cedc5c8fe7c6d"
+    },
+    "pyz-stderr.log": {
+      "bytes": 698,
+      "sha256": "abf86e9e4fa4eced6387023e4ce4fa61dc287e454a2a077bf4067c0d114a18a5"
+    },
+    "pyz-stdout.log": {
+      "bytes": 96,
+      "sha256": "3107df02b320a4ebceef4301c7f74f93e9975fb7e408e1331a578ab0ea7bf3af"
+    },
+    "windows-hf-autonomy.json": {
+      "bytes": 2323,
+      "sha256": "f7b74005f694619904e5d7f1d7514112063e6527ab18c2c1d0996461668ffc4a"
+    }
+  }
+}

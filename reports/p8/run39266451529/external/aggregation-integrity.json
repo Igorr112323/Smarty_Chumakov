@@ -1,0 +1,23 @@
+{
+  "run_id": "39266451529",
+  "date": "2026-10-19",
+  "unique_ids": 1000,
+  "shards": 4,
+  "rows_each": 250,
+  "disjoint": true,
+  "ids_sha256": "3e18831341aa4378458d82ff64564a1d90c76e898605550336446d7af0abe1a8",
+  "family_count_sums_match": true,
+  "cache_scope": "pair feature cache, not separately instrumented internal window memoization",
+  "cache_hits": 0,
+  "cache_misses": 1000,
+  "fit_calls": [],
+  "shard_seconds": [
+    385.029329003,
+    478.26778070500006,
+    509.410390134,
+    484.199375283
+  ],
+  "sum_shard_seconds": 1856.9068751250002,
+  "model_untuned": true,
+  "not_contract_gate": true
+}

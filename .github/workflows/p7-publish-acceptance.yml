@@ -66,6 +66,12 @@ jobs:
           run-id: 39266451529
           github-token: ${{ github.token }}
           path: .arena/p8-publication/evidence
+      - uses: actions/download-artifact@v4
+        with:
+          name: p8-official177
+          run-id: 39266027598
+          github-token: ${{ github.token }}
+          path: .arena/p8-publication/evidence/infra-first-attempt
       - name: Package source, binary and original per-pair streams; upload final stable release asset
         run: python scripts/p8_publish_acceptance.py
       - uses: actions/upload-artifact@v4

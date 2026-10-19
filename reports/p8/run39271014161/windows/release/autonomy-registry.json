@@ -1,0 +1,15 @@
+{
+  "before": [
+    false,
+    false
+  ],
+  "keys": [
+    "HKCU:\\Software\\SpanVerify",
+    "HKLM:\\Software\\SpanVerify"
+  ],
+  "after": [
+    false,
+    false
+  ],
+  "note": "Product keys only; not a global OS registry trace"
+}

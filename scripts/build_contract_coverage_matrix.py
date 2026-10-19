@@ -275,6 +275,11 @@ def main():
         delivery = ROOT / "reports/p8/DELIVERY.json"
         if delivery.exists():
             payload["delivery"] = json.loads(delivery.read_text())
+            delivery_info = payload["delivery"]
+            for id_ in ("exe", "package", "build", "no_install", "portable_copy"):
+                known[id_].update(scope="P8 actual Windows build artifacts; publication-only source failure preserved",note=f"P8 build39271014161/source654a48e: exe8981233B, pyz232874B, strict gates PASS; three complete suites and smoke/offline validations PASS. Original workflow publication-only FAIL; recovery reuses exact checksummed artifacts, no rebuild/scoring. {delivery_info.get('publication_recovery', '')}",evidence=[dict(path="reports/p8/DELIVERY.json",url=f"{URL}/blob/arena/c5f69767-smarty-chumakov/reports/p8/DELIVERY.json"),dict(path="reports/p8/run39271014161/windows/release/SHA256SUMS.txt",url=f"{URL}/blob/arena/c5f69767-smarty-chumakov/reports/p8/run39271014161/windows/release/SHA256SUMS.txt")],current_run=f"{URL}/actions/runs/39271014161")
+            for id_ in ("hf_footprint", "storage"):
+                known[id_].update(status="частично",scope="P8 measured directory/file footprint, not complete installed SDK",note="Actual weight file551290714B; full model/tokenizer directory554277308B; libs870588148B; directory+libs1424865456B PLUS Python/app/filesystem overhead. Complete installed SDK total unmeasured; compressed portable637048763B is not installed storage.",evidence=[dict(path="reports/p8/run39271014161/hf-autonomy/windows-hf-autonomy.json",url=f"{URL}/blob/arena/c5f69767-smarty-chumakov/reports/p8/run39271014161/hf-autonomy/windows-hf-autonomy.json")],current_run=f"{URL}/actions/runs/39271014161")
         payload["evidence_context"] = dict(run_id="39266451529",date="2026-10-19",status="CURRENT authoritative requirements index",successor="reports/EXPERIMENTS_INDEX.md")
     out = ROOT / "reports/contract"
     (out / "coverage-matrix.json").write_text(

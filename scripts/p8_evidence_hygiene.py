@@ -59,7 +59,7 @@ def migrate():
             commit=subprocess.check_output(['git','log','-1','--format=%H','--',str(p.relative_to(ROOT))],cwd=ROOT,text=True).strip()
             date=subprocess.check_output(['git','log','-1','--format=%cI','--',str(p.relative_to(ROOT))],cwd=ROOT,text=True).strip()[:10] or '2026-10-19'
             for obj in objects(data):
-                if 'evidence_context' not in obj:
+                if 'evidence_context' not in obj and not (obj.get('run_id') and obj.get('date')):
                     obj['evidence_context']=dict(run_id=rid or f'historical-local-unrecorded:{commit or "new"}',date=date,status='NON_AUTHORITATIVE historical/reference; consult current indices',successor=INDEX,source_commit=commit or None,run_id_scope='Referenced subrun only for historical aggregates; not all values share one run',date_scope='file provenance date, not assertion of every underlying measurement date',limitation=None if rid else 'Original remote run not recorded; do not misrepresent as current independent measurement')
             p.write_text(json.dumps(data,ensure_ascii=False,indent=2)+'\n')
             records.append(dict(path=str(p.relative_to(ROOT)),run_id=rid,date=date))

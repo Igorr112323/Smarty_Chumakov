@@ -1,0 +1,57 @@
+{
+  "score": 1.0,
+  "is_hallucination": true,
+  "ai_share": 1.0,
+  "ai_share_soft": 1.0,
+  "ai_share_hard": 1.0,
+  "ai_participation": 0.0069,
+  "threshold": 1.0,
+  "verdict": "likely_hallucination",
+  "spans": [
+    {
+      "start": 0,
+      "end": 53,
+      "text": "Срок хранения первичных документов составляет 3 года.",
+      "risk": 0.7734,
+      "confidence": 0.2266,
+      "label": "likely_hallucination",
+      "n_tokens": 2,
+      "source": "mask"
+    }
+  ],
+  "latency_ms": 0.99,
+  "mode": "demo",
+  "stats": {
+    "token_count": 8,
+    "scored_tokens": 7,
+    "number_attribution": [],
+    "fact_coverage": [],
+    "mean_risk": 0.2511,
+    "p90_risk": 0.7659,
+    "raw_score": 0.5123,
+    "raw_score_full": 0.5122553626624824,
+    "span_threshold": 0.3,
+    "span_z": 0.0,
+    "span_floor": 0.3,
+    "weights": {
+      "attention_entropy": 0.2,
+      "ctx_attention_mass": 0.0,
+      "ctx_attention_mass_norm": 0.4,
+      "ctx_max_similarity": 0.1,
+      "embedding_density": 0.3
+    },
+    "features": {
+      "backend": "demo",
+      "token_count": 8,
+      "context_tokens": 11,
+      "context_numbers": [
+        "10",
+        "343"
+      ],
+      "k": 5
+    },
+    "ai_participation": 0.0069,
+    "ai_participation_calibrated_on": "synthetic-participation-corpus 1.0 (два стиля, доля смеси известна)",
+    "warning": "ДЕМО-РЕЖИМ: признаки считаются лексическими суррогатами без весов языковой модели. Он проверяет работоспособность конвейера и интерфейса, а не достоверность ответа. Подмена числа ловится, если число есть у другого объекта документа (например, «первичные — пять лет» против «вторичные — десять лет»); перефразирования и таблицы требуют режима 'hf'. Научные выводы возможны только в режиме 'hf'."
+  }
+}

@@ -1,0 +1,77 @@
+{
+  "model_files": [
+    {
+      "file": "config.json",
+      "bytes": 720,
+      "sha256": "d8bff97c68d7f789365a2865ec27a7cabf663707d5626afaa4216b165cb83df4"
+    },
+    {
+      "file": "merges.txt",
+      "bytes": 1270925,
+      "sha256": "bd05ba8658a199897510cd84cd98ec1424c812259db6e03319c33a5bfcac2b90"
+    },
+    {
+      "file": "pytorch_model.bin",
+      "bytes": 551290714,
+      "sha256": "0d2a4a387b0430654bb1f6813436bd31f8e10a06e18ea0e5c41b33120b78458e"
+    },
+    {
+      "file": "special_tokens_map.json",
+      "bytes": 574,
+      "sha256": "2aa89d63cf3ddd3e008b626d0c20f09fbd1bc5ba076e4405e18bde586020b011"
+    },
+    {
+      "file": "tokenizer_config.json",
+      "bytes": 1252,
+      "sha256": "82f8564b15d92af6f8dbf1ea45d3777a1b4dc20ffc9d7b2e3f629d2832e986a4"
+    },
+    {
+      "file": "vocab.json",
+      "bytes": 1713123,
+      "sha256": "5c53f37e3f21b1adc676bcb276d76f4bc20d2a58a2b118096072939fc94f4bb8"
+    }
+  ],
+  "registry_product_keys_unchanged": true,
+  "code": "654a48e3f074654d62fb4adb38a6c37555c53681",
+  "run": "39271014161",
+  "receipts": [
+    {
+      "HTTP": 200,
+      "firewall_block": true,
+      "model": "D:\\a\\_temp\\p7-hf-isolated\\model",
+      "libraries": "D:\\a\\_temp\\p7-hf-isolated\\libs",
+      "kind": "exe",
+      "response_file": "exe-response.json",
+      "interpreter": "D:\\a\\_temp\\p7-hf-isolated\\spanverify.exe",
+      "backend": "hf",
+      "mode": "hf",
+      "working_directory": "D:\\a\\_temp\\p7-hf-isolated",
+      "offline": true
+    },
+    {
+      "HTTP": 200,
+      "firewall_block": true,
+      "model": "D:\\a\\_temp\\p7-hf-isolated\\model",
+      "libraries": "D:\\a\\_temp\\p7-hf-isolated\\libs",
+      "kind": "pyz",
+      "response_file": "pyz-response.json",
+      "interpreter": "D:\\a\\_temp\\p7-hf-isolated\\python\\python.exe",
+      "backend": "hf",
+      "mode": "hf",
+      "working_directory": "D:\\a\\_temp\\p7-hf-isolated",
+      "offline": true
+    }
+  ],
+  "layout": {
+    "weights": "model/",
+    "python": "python/python.exe",
+    "libs": "libs/",
+    "runtime": "p5-runtime.json",
+    "quality_bundle": "frozen-p5.json",
+    "pyz": "spanverify.pyz",
+    "exe": "spanverify.exe"
+  },
+  "offline": true,
+  "libs_bytes": 870588148.0,
+  "status": "success"
+}

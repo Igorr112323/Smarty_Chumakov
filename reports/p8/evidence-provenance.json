@@ -41,17 +41,17 @@
     {
       "path": "reports/contract/4.1.7-performance.json",
       "run_id": null,
-      "date": "2026-10-14"
+      "date": "2026-10-19"
     },
     {
       "path": "reports/contract/numbers.check.json",
       "run_id": null,
-      "date": "2026-10-14"
+      "date": "2026-10-19"
     },
     {
       "path": "reports/contract/numbers.registry.json",
       "run_id": null,
-      "date": "2026-10-14"
+      "date": "2026-10-19"
     },
     {
       "path": "reports/contract/4.1.6-demo.json",
@@ -226,7 +226,7 @@
     {
       "path": "spanverify-module/reports/experiments/pilot/pilot.json",
       "run_id": null,
-      "date": "2026-10-14"
+      "date": "2026-10-19"
     }
   ]
 }

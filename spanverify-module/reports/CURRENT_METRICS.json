@@ -34,7 +34,8 @@
     "collected": 910,
     "coverage_percent": 87.82,
     "coverage_gate_percent": 85,
-    "inventory_note": "P8 910 collected; full suite has no exclusions"
+    "inventory_note": "P8 910 collected; full suite has no exclusions",
+    "coverage_scope": "87.82 is historical P7 reference; current coverage and unchanged85% gate are in exact-head ordinary CI quality artifacts"
   },
   "demo": {
     "split": {

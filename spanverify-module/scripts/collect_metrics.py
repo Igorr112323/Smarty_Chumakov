@@ -32,6 +32,7 @@ import contextlib
 import hashlib
 import io
 import json
+import os
 import subprocess
 import sys
 import tempfile
@@ -685,8 +686,8 @@ def main() -> int:
 
     payload = collect(args.dataset, args.seed, Path(args.release_dir), Path(args.coverage_json))
     payload.update(
-        run_id="P8-compatibility-collection",
-        date="2026-10-19",
+        run_id=os.environ.get("GITHUB_RUN_ID", "local-compatibility:" + payload["meta"]["commit"]),
+        date=time.strftime("%Y-%m-%d", time.gmtime()),
         historical_scope="Legacy blocks are saved historical reference, NOT P8 acceptance; only p8_* receipt slices are P8. Authoritative indices: EXPERIMENTS_INDEX.md and contract/coverage-matrix.json",
     )
     for name, role in (("p8_official177", "official"), ("p8_B1000", "external")):

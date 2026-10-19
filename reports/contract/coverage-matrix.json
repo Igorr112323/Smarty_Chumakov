@@ -297,127 +297,119 @@
       "id": "exe",
       "requirement": "Executable <=9 MB",
       "status": "достигнут",
-      "scope": "P7 measured fixtures only; historical P5 quality metrics retained",
-      "note": "Fresh P7 RC exe8979956B≤9000000B; actual offline isolated HF HTTP200, no demo fallback. External runtime separate.",
+      "scope": "P8 actual Windows build artifacts; publication-only source failure preserved",
+      "note": "P8 build39271014161/source654a48e: exe8981233B, pyz232874B, strict gates PASS; three complete suites and smoke/offline validations PASS. Original workflow publication-only FAIL; recovery reuses exact checksummed artifacts, no rebuild/scoring. Reuse exact existing binary artifacts, no rebuild/re-inference; real argv list replaces PS scalar splat",
       "evidence": [
         {
-          "path": "reports/p7/final-receipts/windows/summary.json",
-          "url": "https://github.com/Igorr112323/Smarty_Chumakov/blob/arena/c5f69767-smarty-chumakov/reports/p7/final-receipts/windows/summary.json"
+          "path": "reports/p8/DELIVERY.json",
+          "url": "https://github.com/Igorr112323/Smarty_Chumakov/blob/arena/c5f69767-smarty-chumakov/reports/p8/DELIVERY.json"
         },
         {
-          "path": "reports/p7/final-receipts/rc-release.json",
-          "url": "https://github.com/Igorr112323/Smarty_Chumakov/blob/arena/c5f69767-smarty-chumakov/reports/p7/final-receipts/rc-release.json"
+          "path": "reports/p8/run39271014161/windows/release/SHA256SUMS.txt",
+          "url": "https://github.com/Igorr112323/Smarty_Chumakov/blob/arena/c5f69767-smarty-chumakov/reports/p8/run39271014161/windows/release/SHA256SUMS.txt"
         }
       ],
-      "current_run": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39236657579"
+      "current_run": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39271014161"
     },
     {
       "id": "package",
       "requirement": "Package <=0.6 MB",
       "status": "достигнут",
-      "scope": "P7 measured fixtures only; historical P5 quality metrics retained",
-      "note": "Fresh zipapp232874B≤600000B; actual HF offline HTTP200 using supplied portable Python, no installed development site-packages.",
+      "scope": "P8 actual Windows build artifacts; publication-only source failure preserved",
+      "note": "P8 build39271014161/source654a48e: exe8981233B, pyz232874B, strict gates PASS; three complete suites and smoke/offline validations PASS. Original workflow publication-only FAIL; recovery reuses exact checksummed artifacts, no rebuild/scoring. Reuse exact existing binary artifacts, no rebuild/re-inference; real argv list replaces PS scalar splat",
       "evidence": [
         {
-          "path": "reports/p7/final-receipts/windows/summary.json",
-          "url": "https://github.com/Igorr112323/Smarty_Chumakov/blob/arena/c5f69767-smarty-chumakov/reports/p7/final-receipts/windows/summary.json"
+          "path": "reports/p8/DELIVERY.json",
+          "url": "https://github.com/Igorr112323/Smarty_Chumakov/blob/arena/c5f69767-smarty-chumakov/reports/p8/DELIVERY.json"
         },
         {
-          "path": "reports/p7/final-receipts/rc-release.json",
-          "url": "https://github.com/Igorr112323/Smarty_Chumakov/blob/arena/c5f69767-smarty-chumakov/reports/p7/final-receipts/rc-release.json"
+          "path": "reports/p8/run39271014161/windows/release/SHA256SUMS.txt",
+          "url": "https://github.com/Igorr112323/Smarty_Chumakov/blob/arena/c5f69767-smarty-chumakov/reports/p8/run39271014161/windows/release/SHA256SUMS.txt"
         }
       ],
-      "current_run": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39236657579"
+      "current_run": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39271014161"
     },
     {
       "id": "build",
       "requirement": "Automatic source build with SHA-256",
       "status": "достигнут",
-      "scope": "P7 measured fixtures only; historical P5 quality metrics retained",
-      "note": "Windows sourcea85c40a, all Python jobs/build/HF smoke SUCCESS. RC prerelease/not latest; GitHub asset digests published, frozen JSON digest unchanged e0b13c... No stable promotion.",
+      "scope": "P8 actual Windows build artifacts; publication-only source failure preserved",
+      "note": "P8 build39271014161/source654a48e: exe8981233B, pyz232874B, strict gates PASS; three complete suites and smoke/offline validations PASS. Original workflow publication-only FAIL; recovery reuses exact checksummed artifacts, no rebuild/scoring. Reuse exact existing binary artifacts, no rebuild/re-inference; real argv list replaces PS scalar splat",
       "evidence": [
         {
-          "path": "reports/p7/final-receipts/windows/summary.json",
-          "url": "https://github.com/Igorr112323/Smarty_Chumakov/blob/arena/c5f69767-smarty-chumakov/reports/p7/final-receipts/windows/summary.json"
+          "path": "reports/p8/DELIVERY.json",
+          "url": "https://github.com/Igorr112323/Smarty_Chumakov/blob/arena/c5f69767-smarty-chumakov/reports/p8/DELIVERY.json"
         },
         {
-          "path": "reports/p7/final-receipts/rc-release.json",
-          "url": "https://github.com/Igorr112323/Smarty_Chumakov/blob/arena/c5f69767-smarty-chumakov/reports/p7/final-receipts/rc-release.json"
+          "path": "reports/p8/run39271014161/windows/release/SHA256SUMS.txt",
+          "url": "https://github.com/Igorr112323/Smarty_Chumakov/blob/arena/c5f69767-smarty-chumakov/reports/p8/run39271014161/windows/release/SHA256SUMS.txt"
         }
       ],
-      "current_run": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39236657579"
+      "current_run": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39271014161"
     },
     {
       "id": "no_install",
       "requirement": "4.2.3 Launch without installation",
       "status": "достигнут",
-      "scope": "P7 measured fixtures only; historical P5 quality metrics retained",
-      "note": "Tested isolated portable layout: external weights/libs/Python supplied, no user pip/install/source checkout, exe+pyz HTTP200 with outbound firewall blocks. Application registry-key snapshots unchanged; not global registry tracing.",
+      "scope": "P8 actual Windows build artifacts; publication-only source failure preserved",
+      "note": "P8 build39271014161/source654a48e: exe8981233B, pyz232874B, strict gates PASS; three complete suites and smoke/offline validations PASS. Original workflow publication-only FAIL; recovery reuses exact checksummed artifacts, no rebuild/scoring. Reuse exact existing binary artifacts, no rebuild/re-inference; real argv list replaces PS scalar splat",
       "evidence": [
         {
-          "path": "reports/p7/final-receipts/windows/summary.json",
-          "url": "https://github.com/Igorr112323/Smarty_Chumakov/blob/arena/c5f69767-smarty-chumakov/reports/p7/final-receipts/windows/summary.json"
+          "path": "reports/p8/DELIVERY.json",
+          "url": "https://github.com/Igorr112323/Smarty_Chumakov/blob/arena/c5f69767-smarty-chumakov/reports/p8/DELIVERY.json"
         },
         {
-          "path": "reports/p7/final-receipts/windows/artifacts.json",
-          "url": "https://github.com/Igorr112323/Smarty_Chumakov/blob/arena/c5f69767-smarty-chumakov/reports/p7/final-receipts/windows/artifacts.json"
+          "path": "reports/p8/run39271014161/windows/release/SHA256SUMS.txt",
+          "url": "https://github.com/Igorr112323/Smarty_Chumakov/blob/arena/c5f69767-smarty-chumakov/reports/p8/run39271014161/windows/release/SHA256SUMS.txt"
         }
       ],
-      "current_run": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39236657579"
+      "current_run": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39271014161"
     },
     {
       "id": "hf_footprint",
       "requirement": "4.2.5 HF runtime and separately delivered model footprint",
       "status": "частично",
-      "scope": "P7 measured fixtures only; historical P5 quality metrics retained",
-      "note": "Actual model551290714B and libs870588148B, PLUS portable Python. Libs exceed preliminary~500MB estimate. Complete portable artifact container637051335B; tiny exe/pyz do not include full footprint.",
+      "scope": "P8 measured directory/file footprint, not complete installed SDK",
+      "note": "Actual weight file551290714B; full model/tokenizer directory554277308B; libs870588148B; directory+libs1424865456B PLUS Python/app/filesystem overhead. Complete installed SDK total unmeasured; compressed portable637048763B is not installed storage.",
       "evidence": [
         {
-          "path": "reports/p7/final-receipts/windows/summary.json",
-          "url": "https://github.com/Igorr112323/Smarty_Chumakov/blob/arena/c5f69767-smarty-chumakov/reports/p7/final-receipts/windows/summary.json"
-        },
-        {
-          "path": "reports/p7/final-receipts/windows/artifacts.json",
-          "url": "https://github.com/Igorr112323/Smarty_Chumakov/blob/arena/c5f69767-smarty-chumakov/reports/p7/final-receipts/windows/artifacts.json"
+          "path": "reports/p8/run39271014161/hf-autonomy/windows-hf-autonomy.json",
+          "url": "https://github.com/Igorr112323/Smarty_Chumakov/blob/arena/c5f69767-smarty-chumakov/reports/p8/run39271014161/hf-autonomy/windows-hf-autonomy.json"
         }
       ],
-      "current_run": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39236657579"
+      "current_run": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39271014161"
     },
     {
       "id": "storage",
       "requirement": "4.2.6 Storage requirements",
       "status": "частично",
-      "scope": "P7 measured fixtures only; historical P5 quality metrics retained",
-      "note": "Model+libs alone1421878862B; portable Python and applications additional. Published tested compressed runtime artifact637051335B; no invented whole installed-byte total.",
+      "scope": "P8 measured directory/file footprint, not complete installed SDK",
+      "note": "Actual weight file551290714B; full model/tokenizer directory554277308B; libs870588148B; directory+libs1424865456B PLUS Python/app/filesystem overhead. Complete installed SDK total unmeasured; compressed portable637048763B is not installed storage.",
       "evidence": [
         {
-          "path": "reports/p7/final-receipts/windows/summary.json",
-          "url": "https://github.com/Igorr112323/Smarty_Chumakov/blob/arena/c5f69767-smarty-chumakov/reports/p7/final-receipts/windows/summary.json"
-        },
-        {
-          "path": "reports/p7/final-receipts/windows/artifacts.json",
-          "url": "https://github.com/Igorr112323/Smarty_Chumakov/blob/arena/c5f69767-smarty-chumakov/reports/p7/final-receipts/windows/artifacts.json"
+          "path": "reports/p8/run39271014161/hf-autonomy/windows-hf-autonomy.json",
+          "url": "https://github.com/Igorr112323/Smarty_Chumakov/blob/arena/c5f69767-smarty-chumakov/reports/p8/run39271014161/hf-autonomy/windows-hf-autonomy.json"
         }
       ],
-      "current_run": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39236657579"
+      "current_run": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39271014161"
     },
     {
       "id": "portable_copy",
       "requirement": "4.2.7 Portable copying and integrity",
       "status": "достигнут",
-      "scope": "P7 measured fixtures only; historical P5 quality metrics retained",
-      "note": "Actual copied isolated directory tested for exe+pyz HF. Tested layout published as portable-runtime workflow artifact; inner ZIP SHA c5cd4a93952b9016b8a00748eef8d1b6f2ce2d23f2d6069f7c91185e1dbb5771.",
+      "scope": "P8 actual Windows build artifacts; publication-only source failure preserved",
+      "note": "P8 build39271014161/source654a48e: exe8981233B, pyz232874B, strict gates PASS; three complete suites and smoke/offline validations PASS. Original workflow publication-only FAIL; recovery reuses exact checksummed artifacts, no rebuild/scoring. Reuse exact existing binary artifacts, no rebuild/re-inference; real argv list replaces PS scalar splat",
       "evidence": [
         {
-          "path": "reports/p7/final-receipts/windows/summary.json",
-          "url": "https://github.com/Igorr112323/Smarty_Chumakov/blob/arena/c5f69767-smarty-chumakov/reports/p7/final-receipts/windows/summary.json"
+          "path": "reports/p8/DELIVERY.json",
+          "url": "https://github.com/Igorr112323/Smarty_Chumakov/blob/arena/c5f69767-smarty-chumakov/reports/p8/DELIVERY.json"
         },
         {
-          "path": "reports/p7/final-receipts/windows/artifacts.json",
-          "url": "https://github.com/Igorr112323/Smarty_Chumakov/blob/arena/c5f69767-smarty-chumakov/reports/p7/final-receipts/windows/artifacts.json"
+          "path": "reports/p8/run39271014161/windows/release/SHA256SUMS.txt",
+          "url": "https://github.com/Igorr112323/Smarty_Chumakov/blob/arena/c5f69767-smarty-chumakov/reports/p8/run39271014161/windows/release/SHA256SUMS.txt"
         }
       ],
-      "current_run": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39236657579"
+      "current_run": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39271014161"
     },
     {
       "id": "runtime_config",
@@ -664,6 +656,43 @@
     },
     "evidence": "reports/p8/run39266451529/external/result.json",
     "limitation": "423 human exact spans/333positive answers; one first-match ambiguity; raw license unconfirmed; severe transfer drop published"
+  },
+  "delivery": {
+    "run_id": "39271014161",
+    "date": "2026-10-19",
+    "windows_run": 39271014161,
+    "build_source": "654a48e3f074654d62fb4adb38a6c37555c53681",
+    "frozen_product_source": "b9cf9acdab1ca7bf082d03629ea7e599597f3fa8",
+    "official_run": 39266451529,
+    "official_commit": "dd4454b05867495018abe5a2f657fc4d6d0fd9a6",
+    "official_joint_gate": true,
+    "ci_run": null,
+    "ci_policy": "Publisher must wait for ALL ordinary CI on exact publication HEAD; actual IDs resolved in FINAL-PUBLICATION.json and post-publication receipt",
+    "tests_excluded": false,
+    "windows_workflow_conclusion": "failure: publication-only; preserved, never relabelled",
+    "windows_build_validation": "SUCCESS all three full suites, exe/pyz smoke, size gates and real offline HF",
+    "exe_bytes": 8981233,
+    "pyz_bytes": 232874,
+    "zip_bytes": 9148872,
+    "sha256": {
+      "spanverify.exe": "93f354eeea49633b72df0c8d3548ba912465c3b3309d9e72452fed815f274362",
+      "spanverify-win.zip": "6a565d95c9b96d087764bd48f3169254992acaff4367baf97f0a1d58afb45ac8",
+      "spanverify.pyz": "4006d891adfb9cd0c8554178b0c1d505aaf5b21b8b78bf72e800faddd33ae76f",
+      "frozen-p5.json": "e0b13c693a058dfd66ed24a52fc14e9c70964e95885358e7b99cc1f328ad6892",
+      "p5-runtime.json": "1af8a345655d23d2015c498cd0dfc3cf51a1dddceb31ef7ea42ec05a5eca7749"
+    },
+    "model_weight_file_bytes": 551290714,
+    "model_directory_bytes": 554277308,
+    "libraries_bytes": 870588148,
+    "complete_installed_sdk_bytes": null,
+    "storage_limitation": "Add Python/application/filesystem overhead; full SDK installed total NOT measured",
+    "hf_exe_http": 200,
+    "hf_pyz_http": 200,
+    "hf_offline": true,
+    "product_registry_keys_unchanged": true,
+    "release_tag": "p8-final-20261019",
+    "release_url": "https://github.com/Igorr112323/Smarty_Chumakov/releases/tag/p8-final-20261019",
+    "publication_recovery": "Reuse exact existing binary artifacts, no rebuild/re-inference; real argv list replaces PS scalar splat"
   },
   "evidence_context": {
     "run_id": "39266451529",

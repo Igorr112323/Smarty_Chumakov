@@ -2,7 +2,7 @@
 
 Второй и единственный текущий индекс требований: [contract/coverage-matrix.json](contract/coverage-matrix.json). Все прежние сводки — исторические/неавторитетные. Метаданные всех запусков измерительных/delivery workflow получены из API; failure/cancelled не скрыты. Receipt — канонический каталог provenance; native каталоги содержат собственно измерения. Отсутствие native evidence не превращает успешный workflow в доказанную метрику.
 
-Последний run каждой семьи: P0: **39183025124**, P1: **39177127063**, P2: **39155368906**, P3: **39160817890**, P4: **39164044941**, P5: **39170981235**, P6: **39234887023**, P7: **39236657451**, P8: **39266451529**.
+Последний run каждой семьи: P0: **39183025124**, P1: **39177127063**, P2: **39155368906**, P3: **39160817890**, P4: **39164044941**, P5: **39170981235**, P6: **39234887023**, P7: **39236657451**, P8: **39271014161**.
 
 | UTC дата | Семья | Run | Commit | Результат | Канонические evidence/receipt |
 |---|---|---|---|---|---|
@@ -177,6 +177,7 @@
 | 2026-10-19T11:03:03Z | P7 | [39241808393](https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39241808393) | `b5eb133a55c1d1b8062851919f5978676497dbfc` | success | ; [reports/measurements/run39241808393/receipt.json](../reports/measurements/run39241808393/receipt.json) |
 | 2026-10-19T14:06:56Z | P8 | [39266027598](https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39266027598) | `4b28132e69b829bddfb91839eb810baae2d5dd53` | failure | ; [reports/measurements/run39266027598/receipt.json](../reports/measurements/run39266027598/receipt.json) |
 | 2026-10-19T14:09:45Z | P8 | [39266451529](https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39266451529) | `dd4454b05867495018abe5a2f657fc4d6d0fd9a6` | success | `reports/p8/run39266451529`; [reports/measurements/run39266451529/receipt.json](../reports/measurements/run39266451529/receipt.json) |
+| 2026-10-19T14:40:02Z | P8 | [39271014161](https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39271014161) | `654a48e3f074654d62fb4adb38a6c37555c53681` | failure | `reports/p8/run39271014161`; [reports/measurements/run39271014161/receipt.json](../reports/measurements/run39271014161/receipt.json) |
 
 ## P8 final evidence
 

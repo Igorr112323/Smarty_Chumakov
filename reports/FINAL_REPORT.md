@@ -9,7 +9,7 @@
 
 ## 1. Официальный test177
 
-[Run39266451529](https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39266451529), commit **dd4454b05867495018abe5a2f657fc4d6d0fd9a6** (полный фактический SHA записан в [result.json](p8/run39266451529/official/result.json)); продукт — точно b9cf9ac. Числа ниже — TEST, не dev.
+[Run39266451529](https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39266451529), commit **dd4454b05867495018abe5a2f657fc4d6d0fd9a6** (полный фактический SHA также записан в [result.json](p8/run39266451529/official/result.json)); продукт — точно b9cf9ac. Числа ниже — TEST, не dev.
 
 | Семья | TP / FP / FN / TN | Precision | Recall | F1 | FPR | AUC |
 |---|---|---:|---:|---:|---:|---:|
@@ -22,7 +22,7 @@
 
 Реально исполненный gate: token F1≥0.50, strict span F1≥0.50, token-FPR proxy≤0.40 **одновременно PASS**; внутренний ориентир 0.90/0.10 не достигнут. [Gate code](../spanverify-module/scripts/p8_evaluate.py), полный gate_report в result.json.
 
-Предварительный metadata-only аудит до labels: **177, 7 >512, max1266**; единый `window512_full_answer_v1`, без усечённого legacy cache. [Все позиции по ID](p8/run39266451529/official/pre-label-long-audit.json). Пустой feature cache: **0 hits /177 misses**, свежая extraction+public inference **381.292202784 с**, fit_calls=[]; это не inference из старого dev-cache. Per-pair JSONL SHA256 **7607c513a760b68860e89aa3255d7f44942cc6a678c83bca3c641128067b738f**. Точный исправный hash и размеры — в [artifact-manifest](p8/run39266451529/official/artifact-manifest.json), оригинальный поток — в linked artifact и финальном архиве. Dataset test.jsonl SHA256 **232d2583480f2237fc48d10eb4413043bf35f59be5a10138fbf53235ce83ba88**.
+Предварительный metadata-only аудит до labels: **177, 7 >512, max1266**; единый `window512_full_answer_v1`, без усечённого legacy cache. [Все позиции по ID](p8/run39266451529/official/pre-label-long-audit.json). Пустой feature cache: **0 hits /177 misses**, свежая extraction+public inference **381.292202784 с**, fit_calls=[]; это не inference из старого dev-cache. Счётчики относятся к pair feature cache; внутренний window memoization отдельно не инструментировался. Per-pair JSONL SHA256 **7607c513a760b68860e89aa3255d7f44942cc6a678c83bca3c641128067b738f**. Точный исправный hash и размеры — в [artifact-manifest](p8/run39266451529/official/artifact-manifest.json), оригинальный поток — в linked artifact и финальном архиве. Dataset test.jsonl SHA256 **232d2583480f2237fc48d10eb4413043bf35f59be5a10138fbf53235ce83ba88**.
 
 ### Разрешённое инфраструктурное восстановление, не вторая quality-попытка
 
@@ -87,4 +87,14 @@ AI-share: train-only original5doc-fold OOF PAVA HF MAE **0.406824→0.2565365102
 
 Проверенные P7 ориентиры до новой сборки: exe8,979,956B /pyz232,874B; отдельно модель **551,290,714B**, библиотеки **870,588,148B** (sum1,421,878,862B **плюс Python/application**, полный installed SDK total не измерен). Это не «всё HF внутри9MB», не прежняя неточная оценка ~500MB libs. Итоговые P8 build/release/CI receipts и контрольные суммы находятся в `reports/p8/DELIVERY.json` и linked artifact manifests; новый архив сохраняет source, binary, исходные per-pair доказательства. Публикационный receipt создаётся позже самого архива, без рекурсивного перепаковывания.
 
-Полный локальный pytest без exclusions и ordinary CI finalHEAD отражаются фактическими JUnit/log/run receipts: [full-suite.log](p8/full-suite.log), [full-suite.xml](p8/full-suite.xml). Локально: **909 collected /907 passed /2 pre-existing skipped,0 failures,415.263с**, JUnit подтверждает. Два старых optional skips сохраняются, новые skips не добавлены. `tests_excluded=false`. Переоценки official177 ради сборки/CI не выполняется.
+Полный локальный pytest без exclusions и ordinary CI finalHEAD отражаются фактическими JUnit/log/run receipts: [full-suite.log](p8/full-suite.log), [full-suite.xml](p8/full-suite.xml). Локально: **910 collected /908 passed /2 pre-existing skipped,0 failures,432.398с**, JUnit подтверждает. Два старых optional skips сохраняются, новые skips не добавлены. `tests_excluded=false`. Переоценки official177 ради сборки/CI не выполняется.
+
+### P8 actual Windows receipt and publication recovery
+
+Build-source **654a48e3f074654d62fb4adb38a6c37555c53681**, run **39271014161**: all three full Python suites SUCCESS, all build/smoke/size/offline steps SUCCESS. **exe8,981,233B /pyz232,874B /onedir ZIP9,148,872B**. exe SHA256 `93f354eeea49633b72df0c8d3548ba912465c3b3309d9e72452fed815f274362`; pyz `4006d891adfb9cd0c8554178b0c1d505aaf5b21b8b78bf72e800faddd33ae76f`. [Raw sizes/checksums and manifests](p8/run39271014161/windows/), [actual HF offline receipts](p8/run39271014161/hf-autonomy/windows-hf-autonomy.json). Both exe/pyz HTTP200/backendhf, offline/firewall block true; product registry keys unchanged, not a global OS registry trace.
+
+The SOURCE workflow conclusion remains **FAILURE, publication only**: PS scalar-string flag splat produced `no matches found for '-'` before creating a release. [Failure step log and raw hash](p8/infra-windows-publication/). Do not call that source workflow SUCCESS. Recovery publishes the SAME already-validated bytes from artifact12197265568 (18,159,922B), using a real argv list; no rebuild, no new177/B scoring. Future PS flag is explicitly string-array typed. Final publication waits for all ordinary CI on its exact documentation HEAD; resolved IDs are included in archive FINAL-PUBLICATION.json and the later committed publication receipt.
+
+Actual P8 weight file551,290,714B; entire six-file model/tokenizer directory **554,277,308B**; libraries **870,588,148B**. Model-directory+libs **1,424,865,456B**, PLUS Python/app/filesystem overhead. Complete installed SDK total remains unmeasured/partial. Separate compressed portable artifact12195949376 is **637,048,763B**, not the installed footprint and not the small exe size.
+
+Metadata-only log transfer initially refused ANSI escape output; recovered with explicit `--allow-escape-sequences` (receipt workflow39276221841). This did not run any verifier or fit. Historical CI cancellations track normal successive pushes, not excluded tests or hidden quality reruns. All final source/workflow checks remain enabled.
