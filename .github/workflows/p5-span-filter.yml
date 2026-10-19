@@ -1,0 +1,74 @@
+name: P5 span keep/drop filter
+on:
+  push:
+    branches: [arena/c5f69767-smarty-chumakov]
+    paths: [.github/p5-span.trigger]
+  workflow_dispatch:
+permissions:
+  actions: read
+  contents: write
+jobs:
+  measurement:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    defaults:
+      run:
+        working-directory: spanverify-module
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install pinned test and postprocessing dependencies
+        run: pip install numpy==1.26.4 scipy==1.13.1 scikit-learn==1.5.2 pytest==8.3.5 pyyaml==6.0.2
+      - name: Functional unit preflight (not quality evidence)
+        run: |
+          set -o pipefail
+          mkdir -p reports/p5/run${GITHUB_RUN_ID}
+          python -m pytest tests/test_p5_span_filter.py tests/test_p4_context.py tests/test_p3_localization.py tests/test_p2_tau.py tests/test_p2_public_influence.py tests/test_token_head.py tests/test_p1_replay_contract.py -q 2>&1 | tee reports/p5/run${GITHUB_RUN_ID}/tests.log
+      - name: Download unchanged eight HF feature shards
+        uses: actions/download-artifact@v4
+        with:
+          pattern: hf-cache-a3-v2-*
+          merge-multiple: false
+          path: spanverify-module/reports/hf-cache-v2-raw
+          run-id: 39060670054
+          github-token: ${{ github.token }}
+      - name: OOF diagnostics, span cross-fit, registered grid, freeze then one winner dev replay
+        timeout-minutes: 35
+        run: |
+          set -o pipefail
+          OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 python -u scripts/p5_span_filter.py --cache reports/hf-cache-v2-raw --output reports/p5/run${GITHUB_RUN_ID} 2>&1 | tee reports/p5/run${GITHUB_RUN_ID}/measurement.log
+      - name: Upload complete evidence also on failure
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: p5-span-${{ github.run_id }}
+          path: spanverify-module/reports/p5/run${{ github.run_id }}/
+          retention-days: 30
+      - name: Publish evidence including source gzip in branch, also on failure
+        if: always()
+        working-directory: .
+        run: |
+          set -euo pipefail
+          BRANCH=arena/c5f69767-smarty-chumakov
+          OUT="spanverify-module/reports/p5/run${GITHUB_RUN_ID}"
+          mkdir -p "$OUT"
+          printf '{"run_id":"%s","code_sha":"%s","job_status":"%s"}\n' "$GITHUB_RUN_ID" "$GITHUB_SHA" '${{ job.status }}' > "$OUT/workflow_status.json"
+          git fetch origin "$BRANCH"
+          PUB="$RUNNER_TEMP/p5-publish-${GITHUB_RUN_ID}"
+          git worktree add --detach "$PUB" FETCH_HEAD
+          DEST="spanverify-module/reports/experiments/p5_span_filter/run${GITHUB_RUN_ID}"
+          mkdir -p "$PUB/$DEST"
+          cp -R "$OUT/." "$PUB/$DEST/"
+          git -C "$PUB" config user.name 'github-actions[bot]'
+          git -C "$PUB" config user.email 'github-actions[bot]@users.noreply.github.com'
+          git -C "$PUB" add -f "$DEST"
+          git -C "$PUB" commit -m "reports: P5 span filter run ${GITHUB_RUN_ID}"
+          pushed=0
+          for attempt in 1 2 3; do
+            if git -C "$PUB" push origin "HEAD:refs/heads/$BRANCH"; then pushed=1; break; fi
+            git -C "$PUB" fetch origin "$BRANCH"
+            if ! git -C "$PUB" rebase FETCH_HEAD; then git -C "$PUB" rebase --abort; exit 1; fi
+          done
+          test "$pushed" -eq 1

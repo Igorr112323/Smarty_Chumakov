@@ -1,0 +1,4 @@
+Run 39164048308: FAILED. Check annotations retained in ci_status.json.
+Direct Azure log download was unavailable (EOF), so no traceback is fabricated.
+New P4 test module imported numpy unconditionally; ordinary development requirements previously omitted numpy/sklearn. Fixed by explicitly installing requirements-token-head-tests.txt in test/quality/contract/numbers jobs (unchanged default requirements/runtime/build dependencies), without skipping tests or changing runtime dependencies.
+Full local suite in that stack: same 22 baseline failures.

@@ -1,0 +1,75 @@
+{
+  "id": "4.1.6-hf-gate-a3",
+  "commit": null,
+  "seed": 42,
+  "mode": "hf",
+  "dataset": "corpus_a3_real",
+  "date": null,
+  "command": "python -m spanverify evaluate --dataset data/corpus_a3/splits/test.jsonl --mode hf",
+  "run_id": null,
+  "window_tokens": 512,
+  "metrics": {
+    "pairs_total": 1200,
+    "pairs_scored": null,
+    "splits": {
+      "train": 842,
+      "dev": 181,
+      "test": 177
+    },
+    "shared_groups": 0,
+    "tokens": {
+      "f1": null,
+      "fpr": null,
+      "auc": null,
+      "precision": null,
+      "recall": null
+    },
+    "verdicts": {
+      "f1": null,
+      "fpr": null
+    },
+    "spans": {
+      "mean_width_ratio": null
+    },
+    "gate": "не измерено",
+    "gate_numbers": {
+      "f1_min": 0.5,
+      "fpr_max": 0.4
+    },
+    "internal": {
+      "gate": {
+        "f1_min": 0.6,
+        "fpr_max": 0.25
+      },
+      "status": "не измерено"
+    },
+    "chunking": {
+      "version": "v2-chunked-bm25-top3",
+      "max_tokens_per_chunk": 380,
+      "top_k": 3,
+      "window_tokens": 512
+    },
+    "previous_hf_without_chunking": {
+      "run_id": "37609202780",
+      "window_tokens": 1024,
+      "tokens_f1": 0.1965,
+      "tokens_fpr": 0.0703,
+      "tokens_auc": 0.8421,
+      "verdicts_f1": 0.6217,
+      "verdicts_fpr": 0.8019,
+      "width_ratio": 9.12,
+      "date": "2026-10-14",
+      "note": "предыдущий прогон hf без чанкинга, окно 1024 — НЕ соответствует поставляемому продукту (512); сохранено для истории"
+    }
+  },
+  "note": "шлюз качества в режиме hf на корпусе A3 (реальные акты, 1200 пар, 409 документов); окно модели 512 (совпадает с config.hf_max_tokens в продукте); требуется прогон через CI с обновлённым извлечением признаков (чанкинг + BM25 отбор)",
+  "gate": null,
+  "evidence_context": {
+    "run_id": "37609202780",
+    "date": "2026-10-18",
+    "status": "NON_AUTHORITATIVE historical/reference; consult current indices",
+    "successor": "reports/EXPERIMENTS_INDEX.md",
+    "source_commit": "c6bb87a8a39a99d51b4e6d91fa68c338a57155e6",
+    "limitation": null
+  }
+}

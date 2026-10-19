@@ -1,0 +1,205 @@
+{
+  "total_count": 10,
+  "artifacts": [
+    {
+      "id": 12182170444,
+      "node_id": "MDg6QXJ0aWZhY3QxMjE4MjE3MDQ0NA==",
+      "name": "metrics",
+      "size_in_bytes": 21797,
+      "url": "https://api.github.com/repos/Igorr112323/Smarty_Chumakov/actions/artifacts/12182170444",
+      "archive_download_url": "https://api.github.com/repos/Igorr112323/Smarty_Chumakov/actions/artifacts/12182170444/zip",
+      "expired": false,
+      "digest": "sha256:cef333b15a9af6fd6545144c78283112ae6ae94c619d0749f078a75dd3a9f4b3",
+      "created_at": "2026-10-19T10:59:56Z",
+      "updated_at": "2026-10-19T10:59:56Z",
+      "expires_at": "2027-01-17T10:43:27Z",
+      "workflow_run": {
+        "id": 39239481352,
+        "repository_id": 1402768620,
+        "head_repository_id": 1402768620,
+        "head_branch": "arena/c5f69767-smarty-chumakov",
+        "head_sha": "b8aa671a6b9256d5bc813cf11412420b60e87fdc"
+      }
+    },
+    {
+      "id": 12181940084,
+      "node_id": "MDg6QXJ0aWZhY3QxMjE4MTk0MDA4NA==",
+      "name": "test-junit-windows-latest-3.10",
+      "size_in_bytes": 14150,
+      "url": "https://api.github.com/repos/Igorr112323/Smarty_Chumakov/actions/artifacts/12181940084",
+      "archive_download_url": "https://api.github.com/repos/Igorr112323/Smarty_Chumakov/actions/artifacts/12181940084/zip",
+      "expired": false,
+      "digest": "sha256:5fe7939a6ff790426c43477b41db09e4eb1c7842461ff4116bd0e8a534090f91",
+      "created_at": "2026-10-19T10:55:47Z",
+      "updated_at": "2026-10-19T10:55:47Z",
+      "expires_at": "2027-01-17T10:43:27Z",
+      "workflow_run": {
+        "id": 39239481352,
+        "repository_id": 1402768620,
+        "head_repository_id": 1402768620,
+        "head_branch": "arena/c5f69767-smarty-chumakov",
+        "head_sha": "b8aa671a6b9256d5bc813cf11412420b60e87fdc"
+      }
+    },
+    {
+      "id": 12181870141,
+      "node_id": "MDg6QXJ0aWZhY3QxMjE4MTg3MDE0MQ==",
+      "name": "test-junit-windows-latest-3.12",
+      "size_in_bytes": 14134,
+      "url": "https://api.github.com/repos/Igorr112323/Smarty_Chumakov/actions/artifacts/12181870141",
+      "archive_download_url": "https://api.github.com/repos/Igorr112323/Smarty_Chumakov/actions/artifacts/12181870141/zip",
+      "expired": false,
+      "digest": "sha256:ce49413051abbbdb910b213e9d18c1636bd6d1b1366135e6525439f6c4c948ca",
+      "created_at": "2026-10-19T10:55:21Z",
+      "updated_at": "2026-10-19T10:55:21Z",
+      "expires_at": "2027-01-17T10:43:27Z",
+      "workflow_run": {
+        "id": 39239481352,
+        "repository_id": 1402768620,
+        "head_repository_id": 1402768620,
+        "head_branch": "arena/c5f69767-smarty-chumakov",
+        "head_sha": "b8aa671a6b9256d5bc813cf11412420b60e87fdc"
+      }
+    },
+    {
+      "id": 12181631025,
+      "node_id": "MDg6QXJ0aWZhY3QxMjE4MTYzMTAyNQ==",
+      "name": "test-junit-windows-latest-3.11",
+      "size_in_bytes": 14136,
+      "url": "https://api.github.com/repos/Igorr112323/Smarty_Chumakov/actions/artifacts/12181631025",
+      "archive_download_url": "https://api.github.com/repos/Igorr112323/Smarty_Chumakov/actions/artifacts/12181631025/zip",
+      "expired": false,
+      "digest": "sha256:a589f67685710fa70deee6c0cb16fbbd66ab4d310f25da5ce211a25b36e67620",
+      "created_at": "2026-10-19T10:54:57Z",
+      "updated_at": "2026-10-19T10:54:57Z",
+      "expires_at": "2027-01-17T10:43:27Z",
+      "workflow_run": {
+        "id": 39239481352,
+        "repository_id": 1402768620,
+        "head_repository_id": 1402768620,
+        "head_branch": "arena/c5f69767-smarty-chumakov",
+        "head_sha": "b8aa671a6b9256d5bc813cf11412420b60e87fdc"
+      }
+    },
+    {
+      "id": 12181551571,
+      "node_id": "MDg6QXJ0aWZhY3QxMjE4MTU1MTU3MQ==",
+      "name": "coverage-json",
+      "size_in_bytes": 42812,
+      "url": "https://api.github.com/repos/Igorr112323/Smarty_Chumakov/actions/artifacts/12181551571",
+      "archive_download_url": "https://api.github.com/repos/Igorr112323/Smarty_Chumakov/actions/artifacts/12181551571/zip",
+      "expired": false,
+      "digest": "sha256:181eb090c050b25c7f6ef7d6c7ff8622769d2eae9b806f5b9a7d0b226ef32810",
+      "created_at": "2026-10-19T10:57:48Z",
+      "updated_at": "2026-10-19T10:57:48Z",
+      "expires_at": "2026-11-18T10:57:47Z",
+      "workflow_run": {
+        "id": 39239481352,
+        "repository_id": 1402768620,
+        "head_repository_id": 1402768620,
+        "head_branch": "arena/c5f69767-smarty-chumakov",
+        "head_sha": "b8aa671a6b9256d5bc813cf11412420b60e87fdc"
+      }
+    },
+    {
+      "id": 12181302004,
+      "node_id": "MDg6QXJ0aWZhY3QxMjE4MTMwMjAwNA==",
+      "name": "training-report",
+      "size_in_bytes": 3406,
+      "url": "https://api.github.com/repos/Igorr112323/Smarty_Chumakov/actions/artifacts/12181302004",
+      "archive_download_url": "https://api.github.com/repos/Igorr112323/Smarty_Chumakov/actions/artifacts/12181302004/zip",
+      "expired": false,
+      "digest": "sha256:397e4f6c506d13ba57094a69b5b3aa436805d26c2c77c37be54d5d87c858e790",
+      "created_at": "2026-10-19T10:57:49Z",
+      "updated_at": "2026-10-19T10:57:49Z",
+      "expires_at": "2026-11-18T10:57:48Z",
+      "workflow_run": {
+        "id": 39239481352,
+        "repository_id": 1402768620,
+        "head_repository_id": 1402768620,
+        "head_branch": "arena/c5f69767-smarty-chumakov",
+        "head_sha": "b8aa671a6b9256d5bc813cf11412420b60e87fdc"
+      }
+    },
+    {
+      "id": 12181087626,
+      "node_id": "MDg6QXJ0aWZhY3QxMjE4MTA4NzYyNg==",
+      "name": "test-junit-ubuntu-latest-3.12",
+      "size_in_bytes": 13819,
+      "url": "https://api.github.com/repos/Igorr112323/Smarty_Chumakov/actions/artifacts/12181087626",
+      "archive_download_url": "https://api.github.com/repos/Igorr112323/Smarty_Chumakov/actions/artifacts/12181087626/zip",
+      "expired": false,
+      "digest": "sha256:30dd3de8632909c69980b8735c9564262ab9f8e9d6756b9079857eb8e42ebb28",
+      "created_at": "2026-10-19T10:55:46Z",
+      "updated_at": "2026-10-19T10:55:46Z",
+      "expires_at": "2027-01-17T10:43:27Z",
+      "workflow_run": {
+        "id": 39239481352,
+        "repository_id": 1402768620,
+        "head_repository_id": 1402768620,
+        "head_branch": "arena/c5f69767-smarty-chumakov",
+        "head_sha": "b8aa671a6b9256d5bc813cf11412420b60e87fdc"
+      }
+    },
+    {
+      "id": 12181057133,
+      "node_id": "MDg6QXJ0aWZhY3QxMjE4MTA1NzEzMw==",
+      "name": "test-junit-ubuntu-latest-3.10",
+      "size_in_bytes": 13752,
+      "url": "https://api.github.com/repos/Igorr112323/Smarty_Chumakov/actions/artifacts/12181057133",
+      "archive_download_url": "https://api.github.com/repos/Igorr112323/Smarty_Chumakov/actions/artifacts/12181057133/zip",
+      "expired": false,
+      "digest": "sha256:514cc797517f2595ef7e2656cec45d5ecd80ff2c9445d59c2c400b36f2755a72",
+      "created_at": "2026-10-19T10:51:38Z",
+      "updated_at": "2026-10-19T10:51:38Z",
+      "expires_at": "2027-01-17T10:43:27Z",
+      "workflow_run": {
+        "id": 39239481352,
+        "repository_id": 1402768620,
+        "head_repository_id": 1402768620,
+        "head_branch": "arena/c5f69767-smarty-chumakov",
+        "head_sha": "b8aa671a6b9256d5bc813cf11412420b60e87fdc"
+      }
+    },
+    {
+      "id": 12181033366,
+      "node_id": "MDg6QXJ0aWZhY3QxMjE4MTAzMzM2Ng==",
+      "name": "contract",
+      "size_in_bytes": 62589,
+      "url": "https://api.github.com/repos/Igorr112323/Smarty_Chumakov/actions/artifacts/12181033366",
+      "archive_download_url": "https://api.github.com/repos/Igorr112323/Smarty_Chumakov/actions/artifacts/12181033366/zip",
+      "expired": false,
+      "digest": "sha256:7c77f4d6f362117f6550e33be8ca7c9fa3a9261c567ad6eb15305a580133e44b",
+      "created_at": "2026-10-19T10:58:59Z",
+      "updated_at": "2026-10-19T10:58:59Z",
+      "expires_at": "2027-01-17T10:43:27Z",
+      "workflow_run": {
+        "id": 39239481352,
+        "repository_id": 1402768620,
+        "head_repository_id": 1402768620,
+        "head_branch": "arena/c5f69767-smarty-chumakov",
+        "head_sha": "b8aa671a6b9256d5bc813cf11412420b60e87fdc"
+      }
+    },
+    {
+      "id": 12180254600,
+      "node_id": "MDg6QXJ0aWZhY3QxMjE4MDI1NDYwMA==",
+      "name": "test-junit-ubuntu-latest-3.11",
+      "size_in_bytes": 13730,
+      "url": "https://api.github.com/repos/Igorr112323/Smarty_Chumakov/actions/artifacts/12180254600",
+      "archive_download_url": "https://api.github.com/repos/Igorr112323/Smarty_Chumakov/actions/artifacts/12180254600/zip",
+      "expired": false,
+      "digest": "sha256:52aea61444aa9bd2a3722164a553fdf73aa7a7046a4776dde18bea95626248d4",
+      "created_at": "2026-10-19T10:51:56Z",
+      "updated_at": "2026-10-19T10:51:56Z",
+      "expires_at": "2027-01-17T10:43:27Z",
+      "workflow_run": {
+        "id": 39239481352,
+        "repository_id": 1402768620,
+        "head_repository_id": 1402768620,
+        "head_branch": "arena/c5f69767-smarty-chumakov",
+        "head_sha": "b8aa671a6b9256d5bc813cf11412420b60e87fdc"
+      }
+    }
+  ]
+}

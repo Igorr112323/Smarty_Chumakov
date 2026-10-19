@@ -1,0 +1,13 @@
+{
+  "run_id": "37386399060",
+  "date": "2026-10-05T23:04:52Z",
+  "commit": "112d81785801c34b0dd6948e3e28f34cfed0fda8",
+  "family": "P0",
+  "workflow": "hf-runs.yml",
+  "record_kind": "publication/recovery",
+  "status": "completed",
+  "outcome": "success",
+  "url": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/37386399060",
+  "canonical_directories": [],
+  "receipt": "reports/measurements/run37386399060/receipt.json"
+}

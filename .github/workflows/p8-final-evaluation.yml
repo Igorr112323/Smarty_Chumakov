@@ -1,0 +1,123 @@
+name: P8 single official test and external validation
+on:
+  workflow_dispatch:
+  push:
+    branches: [arena/c5f69767-smarty-chumakov]
+    paths: [.github/p8-evaluation.trigger]
+permissions:
+  contents: write
+  actions: read
+concurrency:
+  group: p8-single-official-test177
+  cancel-in-progress: false
+jobs:
+  official:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 40
+    env:
+      OMP_NUM_THREADS: '2'
+      MKL_NUM_THREADS: '2'
+      OPENBLAS_NUM_THREADS: '2'
+      GH_TOKEN: ${{ github.token }}
+    defaults:
+      run:
+        working-directory: spanverify-module
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Product identity, no prediction changes
+        run: |
+          git diff --exit-code b9cf9acdab1ca7bf082d03629ea7e599597f3fa8 HEAD -- spanverify scripts/p4_context_head.py scripts/replay_p1_dev.py config reports/experiments/p5_span_filter
+          test "${{ github.run_attempt }}" = 1
+      - name: Inference dependencies only, NO tests or fits
+        run: |
+          pip install 'torch==2.14.1+cpu' --index-url https://download.pytorch.org/whl/cpu
+          pip install 'transformers==5.20.1' 'numpy==2.4.6' 'sentencepiece==0.2.2' ijson
+      - uses: actions/download-artifact@v4
+        with:
+          name: p8-official177
+          run-id: 39266027598
+          github-token: ${{ github.token }}
+          path: .arena/p8-first-failure
+      - name: Infrastructure recovery permitted only before first completed prediction
+        run: |
+          python -c "from pathlib import Path; p=Path('../.arena/p8-first-failure'); assert (p/'evidence.jsonl').stat().st_size==0; assert not (p/'result.json').exists(); t=(p/'INFRASTRUCTURE-TRACEBACK.txt').read_text(); assert 'P8 forbidden fit/train call' in t and 'return self.train(False)' in t"
+      - name: Atomically consume the one official authorization
+        run: |
+          gh api --method POST repos/${{ github.repository }}/git/refs -f ref=refs/tags/p8-official-test177-recovery-1-consumed -f sha=${{ github.sha }}
+          mkdir -p ../reports/p8/official
+          printf '{"run_id":"%s","commit":"%s","attempt":1,"authorization":"P8 user one official177, no quality retries"}\n' '${{ github.run_id }}' '${{ github.sha }}' > ../reports/p8/official/CONSUMED.json
+      - name: ONE official inference, metadata-only long audit before labels
+        run: python -u scripts/p8_evaluate.py --kind official --out ../reports/p8/official
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: p8-official177
+          path: reports/p8/official/
+          retention-days: 90
+  external:
+    needs: official
+    runs-on: ubuntu-24.04
+    timeout-minutes: 40
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [0, 1, 2, 3]
+    env:
+      OMP_NUM_THREADS: '2'
+      MKL_NUM_THREADS: '2'
+      OPENBLAS_NUM_THREADS: '2'
+    defaults:
+      run:
+        working-directory: spanverify-module
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: |
+          pip install 'torch==2.14.1+cpu' --index-url https://download.pytorch.org/whl/cpu
+          pip install 'transformers==5.20.1' 'numpy==2.4.6' 'sentencepiece==0.2.2' ijson
+      - name: Recover saved corpus B from pinned SHA-verified source, no relabelling
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python scripts/fetch_rushallu.py --out data/external/rushallu --transport gh --verify
+      - name: Frozen product, disjoint quarter of B, no fit
+        run: python -u scripts/p8_evaluate.py --kind external --shard ${{ matrix.shard }} --out ../reports/p8/external-${{ matrix.shard }}
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: p8-external-${{ matrix.shard }}
+          path: reports/p8/external-${{ matrix.shard }}/
+          retention-days: 90
+  external-aggregate:
+    needs: external
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    defaults:
+      run:
+        working-directory: spanverify-module
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: p8-external-*
+          path: reports/p8/external-shards
+      - name: Metadata and metrics only, NO second inference
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          python scripts/fetch_rushallu.py --out data/external/rushallu --transport gh --verify
+          python scripts/p8_evaluate.py --kind aggregate --inputs ../reports/p8/external-shards --out ../reports/p8/external
+      - uses: actions/upload-artifact@v4
+        with:
+          name: p8-external-full
+          path: reports/p8/external/
+          retention-days: 90

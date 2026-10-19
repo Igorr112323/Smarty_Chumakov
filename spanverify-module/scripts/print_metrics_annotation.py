@@ -14,7 +14,7 @@ from pathlib import Path
 
 def main() -> int:
     parser = argparse.ArgumentParser(description="Аннотации с числами METRICS.json")
-    parser.add_argument("--metrics", default="reports/METRICS.json")
+    parser.add_argument("--metrics", default="reports/CURRENT_METRICS.json")
     args = parser.parse_args()
     metrics = json.loads(Path(args.metrics).read_text(encoding="utf-8"))
 

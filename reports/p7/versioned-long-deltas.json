@@ -1,0 +1,80 @@
+{
+  "source": "1c3aa13; actual fresh dev replay39226917427/117975317127",
+  "audit": {
+    "train": {
+      "answers": 842,
+      "answer_over_512": 22,
+      "max_answer_model_tokens": 1923,
+      "legacy_rows_with_unmapped_native_tokens": 22,
+      "legacy_short_rows_with_unmapped_native_tokens": 0,
+      "legacy_unmapped_native_tokens": 7250,
+      "answer_input_sha256": "5b59e375b54a2ef7a11123230566f9c0993606d25ddd19912fc883190ef894f4"
+    },
+    "dev": {
+      "answers": 181,
+      "answer_over_512": 3,
+      "max_answer_model_tokens": 1046,
+      "legacy_rows_with_unmapped_native_tokens": 3,
+      "legacy_short_rows_with_unmapped_native_tokens": 0,
+      "legacy_unmapped_native_tokens": 479,
+      "answer_input_sha256": "c02e34fc96c696af6bf2b20270489a7a007a8adecfa257013a7b37b774dd3c57"
+    }
+  },
+  "long_dev_rows": [
+    {
+      "split": "dev",
+      "id": "corpus-a3-00265",
+      "model_tokens": 529,
+      "before_sha256": "242a90d95f33b4c1cbb33bc5eca70b5bc606d64b358ce49286d93c1acdfbb268",
+      "after_sha256": "9edb662ecd675648651a8b7bf91a87fc0cfd0b05a768a210eca272e1e9e9f5f0",
+      "legacy_score": 0.5188679245283019,
+      "new_score": 0.5794392523364486,
+      "saved_P5_score": 0.5188679245283019,
+      "changed_token_records": 418,
+      "gold_answer_positive": true,
+      "old_answer_flag": false,
+      "new_answer_flag": true
+    },
+    {
+      "split": "dev",
+      "id": "corpus-a3-00114",
+      "model_tokens": 1046,
+      "before_sha256": "5f230e7154067b06775f31babcd95a13b89c7bc28cbd95186717cdad741474c6",
+      "after_sha256": "cff75f4f76694c1ff6f9fe9d2e269a251e60dbadafa0178fdcebad7130285938",
+      "legacy_score": 0.3969465648854962,
+      "new_score": 0.5794392523364486,
+      "saved_P5_score": 0.3969465648854962,
+      "changed_token_records": 623,
+      "gold_answer_positive": true,
+      "old_answer_flag": false,
+      "new_answer_flag": true
+    },
+    {
+      "split": "dev",
+      "id": "corpus-a3-01041",
+      "model_tokens": 641,
+      "before_sha256": "d057680eedf468440e5ed31b29fd13616f4911705c2461f9fa182254b08222b6",
+      "after_sha256": "0b8647ef91d2289e19cbb96c809e7701d280297f14c7c0437c56113c395fdf9c",
+      "legacy_score": 0.5188679245283019,
+      "new_score": 0.5794392523364486,
+      "saved_P5_score": 0.5188679245283019,
+      "changed_token_records": 531,
+      "gold_answer_positive": true,
+      "old_answer_flag": false,
+      "new_answer_flag": true
+    }
+  ],
+  "historical_P5_answer_counts": {
+    "TP": 49,
+    "FP": 14,
+    "FN": 47,
+    "TN": 71
+  },
+  "versioned_long_answer_counts": {
+    "TP": 52,
+    "FP": 14,
+    "FN": 44,
+    "TN": 71
+  },
+  "notice": "Audit only, no fitting/selection; historical P5 metrics remain unchanged; short178byte-identical."
+}

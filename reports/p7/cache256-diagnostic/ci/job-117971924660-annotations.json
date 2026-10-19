@@ -1,0 +1,86 @@
+[
+  {
+    "path": ".github",
+    "blob_href": "https://github.com/Igorr112323/Smarty_Chumakov/blob/22ae68c2a8a309adcdd7194eac5b5870f2128bd3/.github",
+    "start_line": 1,
+    "start_column": null,
+    "end_line": 1,
+    "end_column": null,
+    "annotation_level": "failure",
+    "title": "",
+    "message": "Canceling since a higher priority waiting request for ci-ci-refs/heads/arena/c5f69767-smarty-chumakov exists",
+    "raw_details": ""
+  },
+  {
+    "path": ".github",
+    "blob_href": "https://github.com/Igorr112323/Smarty_Chumakov/blob/22ae68c2a8a309adcdd7194eac5b5870f2128bd3/.github",
+    "start_line": 2,
+    "start_column": null,
+    "end_line": 2,
+    "end_column": null,
+    "annotation_level": "warning",
+    "title": "",
+    "message": "Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@v4, actions/download-artifact@v4, actions/setup-python@v5, actions/upload-artifact@v4. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/",
+    "raw_details": ""
+  },
+  {
+    "path": ".github",
+    "blob_href": "https://github.com/Igorr112323/Smarty_Chumakov/blob/22ae68c2a8a309adcdd7194eac5b5870f2128bd3/.github",
+    "start_line": 15,
+    "start_column": null,
+    "end_line": 15,
+    "end_column": null,
+    "annotation_level": "notice",
+    "title": "кросс-корпус",
+    "message": "внутри=0.9576 кросс=0.6752 падение=0.2824 FPR_кросс=0.1478",
+    "raw_details": ""
+  },
+  {
+    "path": ".github",
+    "blob_href": "https://github.com/Igorr112323/Smarty_Chumakov/blob/22ae68c2a8a309adcdd7194eac5b5870f2128bd3/.github",
+    "start_line": 14,
+    "start_column": null,
+    "end_line": 14,
+    "end_column": null,
+    "annotation_level": "notice",
+    "title": "метрики",
+    "message": "версия=1.3.1 коммит=22ae68c2a8a3 тестов=883 покрытие=85.41% демо: F1=0.9576 FPR=0.0021 AUC=0.9962 фрагменты: строгий=0.2796 мягкий=0.7957 участие_ИИ_AUC=1.0",
+    "raw_details": ""
+  },
+  {
+    "path": ".github",
+    "blob_href": "https://github.com/Igorr112323/Smarty_Chumakov/blob/22ae68c2a8a309adcdd7194eac5b5870f2128bd3/.github",
+    "start_line": 21,
+    "start_column": null,
+    "end_line": 21,
+    "end_column": null,
+    "annotation_level": "failure",
+    "title": "",
+    "message": "Unable to download artifact(s): Artifact not found for name: external-tests\n        Please ensure that your artifact is not expired and the artifact was uploaded using a compatible version of toolkit/upload-artifact.\n        For more information, visit the GitHub Artifacts FAQ: https://github.com/actions/toolkit/blob/main/packages/artifact/docs/faq.md",
+    "raw_details": ""
+  },
+  {
+    "path": ".github",
+    "blob_href": "https://github.com/Igorr112323/Smarty_Chumakov/blob/22ae68c2a8a309adcdd7194eac5b5870f2128bd3/.github",
+    "start_line": 21,
+    "start_column": null,
+    "end_line": 21,
+    "end_column": null,
+    "annotation_level": "failure",
+    "title": "",
+    "message": "Unable to download artifact(s): Artifact not found for name: pilot-report\n        Please ensure that your artifact is not expired and the artifact was uploaded using a compatible version of toolkit/upload-artifact.\n        For more information, visit the GitHub Artifacts FAQ: https://github.com/actions/toolkit/blob/main/packages/artifact/docs/faq.md",
+    "raw_details": ""
+  },
+  {
+    "path": ".github",
+    "blob_href": "https://github.com/Igorr112323/Smarty_Chumakov/blob/22ae68c2a8a309adcdd7194eac5b5870f2128bd3/.github",
+    "start_line": 1,
+    "start_column": null,
+    "end_line": 1,
+    "end_column": null,
+    "annotation_level": "notice",
+    "title": "",
+    "message": "\"The ubuntu-latest label will migrate to Ubuntu 26 beginning October 19, 2026. For more information, see https://github.com/actions/runner-images/issues/14748\"",
+    "raw_details": ""
+  }
+]

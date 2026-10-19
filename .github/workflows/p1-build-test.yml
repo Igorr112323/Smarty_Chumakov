@@ -1,0 +1,42 @@
+name: P1 Build Test
+on:
+  push:
+    branches:
+      - arena/c5f69767-smarty-chumakov
+    paths:
+      - '.github/workflows/p1-build-test.yml'
+      - 'spanverify-module/scripts/build_p1_candidate.py'
+      - 'test_p1_build.py'
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
+    
+    - name: Install dependencies
+      working-directory: spanverify-module
+      run: |
+        pip install -q --upgrade pip
+        pip install -q -r requirements.txt
+    
+    - name: Test P1 build
+      run: |
+        python3 test_p1_build.py
+    
+    - name: Build P1 candidate
+      working-directory: spanverify-module
+      run: |
+        python3 scripts/build_p1_candidate.py reports/experiments/p1_raw/run39116955685
+        
+        echo ""
+        echo "P1 candidate bundle:"
+        ls -lh reports/experiments/p1_raw/run39116955685/p1_candidate_bundle.json
+        sha256sum reports/experiments/p1_raw/run39116955685/p1_candidate_bundle.json

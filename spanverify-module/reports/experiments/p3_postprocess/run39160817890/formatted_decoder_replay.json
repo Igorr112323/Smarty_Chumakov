@@ -1,0 +1,6 @@
+{
+  "pairs": 181,
+  "mismatches": [],
+  "input_risks_unchanged": true,
+  "note": "same selected config; no search/model inference/fit; parity after formatting-only changes"
+}

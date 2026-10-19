@@ -1,0 +1,1884 @@
+{
+  "run": {
+    "conclusion": "success",
+    "createdAt": "2026-10-19T09:45:22Z",
+    "headSha": "f7bb7181f950e55a67c04003c570093b3e186b7e",
+    "jobs": [
+      {
+        "completedAt": "2026-10-19T09:59:49Z",
+        "conclusion": "success",
+        "databaseId": 117993367143,
+        "name": "paired (hf)",
+        "startedAt": "2026-10-19T09:45:24Z",
+        "status": "completed",
+        "steps": [
+          {
+            "conclusion": "success",
+            "name": "Set up job",
+            "number": 1,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Run actions/checkout@v4",
+            "number": 2,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Run actions/setup-python@v5",
+            "number": 3,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Same pinned P6/P7 HF dependencies and prepared weights",
+            "number": 4,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Immutable P6 program snapshot, never old tests or fitting",
+            "number": 5,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Before, original P6 application; three cold/warm repeats",
+            "number": 6,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Complete before table and hardware receipt",
+            "number": 7,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "After, current program; three cold/warm repeats on SAME runner",
+            "number": 8,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Complete after table and hardware receipt",
+            "number": 9,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Run actions/upload-artifact@v4",
+            "number": 10,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Post Run actions/setup-python@v5",
+            "number": 19,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Post Run actions/checkout@v4",
+            "number": 20,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Complete job",
+            "number": 21,
+            "status": "completed"
+          }
+        ],
+        "url": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39232439363/job/117993367143"
+      },
+      {
+        "completedAt": "2026-10-19T09:59:49Z",
+        "conclusion": "success",
+        "databaseId": 117993367707,
+        "name": "paired (demo)",
+        "startedAt": "2026-10-19T09:45:24Z",
+        "status": "completed",
+        "steps": [
+          {
+            "conclusion": "success",
+            "name": "Set up job",
+            "number": 1,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Run actions/checkout@v4",
+            "number": 2,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Run actions/setup-python@v5",
+            "number": 3,
+            "status": "completed"
+          },
+          {
+            "conclusion": "skipped",
+            "name": "Same pinned P6/P7 HF dependencies and prepared weights",
+            "number": 4,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Immutable P6 program snapshot, never old tests or fitting",
+            "number": 5,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Before, original P6 application; three cold/warm repeats",
+            "number": 6,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Complete before table and hardware receipt",
+            "number": 7,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "After, current program; three cold/warm repeats on SAME runner",
+            "number": 8,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Complete after table and hardware receipt",
+            "number": 9,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Run actions/upload-artifact@v4",
+            "number": 10,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Post Run actions/setup-python@v5",
+            "number": 19,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Post Run actions/checkout@v4",
+            "number": 20,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Complete job",
+            "number": 21,
+            "status": "completed"
+          }
+        ],
+        "url": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39232439363/job/117993367707"
+      }
+    ],
+    "name": "P7 paired same-host benchmark",
+    "status": "completed",
+    "updatedAt": "2026-10-19T10:15:04Z",
+    "url": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39232439363"
+  },
+  "artifacts": {
+    "total_count": 2,
+    "artifacts": [
+      {
+        "id": 12178567349,
+        "node_id": "MDg6QXJ0aWZhY3QxMjE3ODU2NzM0OQ==",
+        "name": "p7-paired-hf",
+        "size_in_bytes": 8154947,
+        "url": "https://api.github.com/repos/Igorr112323/Smarty_Chumakov/actions/artifacts/12178567349",
+        "archive_download_url": "https://api.github.com/repos/Igorr112323/Smarty_Chumakov/actions/artifacts/12178567349/zip",
+        "expired": false,
+        "digest": "sha256:d8d4805493ee90072efaaabc9f98306c7819d6ff7503f3ae9e36640eb2049b01",
+        "created_at": "2026-10-19T10:15:00Z",
+        "updated_at": "2026-10-19T10:15:00Z",
+        "expires_at": "2027-01-17T09:45:22Z",
+        "workflow_run": {
+          "id": 39232439363,
+          "repository_id": 1402768620,
+          "head_repository_id": 1402768620,
+          "head_branch": "arena/c5f69767-smarty-chumakov",
+          "head_sha": "f7bb7181f950e55a67c04003c570093b3e186b7e"
+        }
+      },
+      {
+        "id": 12178009312,
+        "node_id": "MDg6QXJ0aWZhY3QxMjE3ODAwOTMxMg==",
+        "name": "p7-paired-demo",
+        "size_in_bytes": 190015,
+        "url": "https://api.github.com/repos/Igorr112323/Smarty_Chumakov/actions/artifacts/12178009312",
+        "archive_download_url": "https://api.github.com/repos/Igorr112323/Smarty_Chumakov/actions/artifacts/12178009312/zip",
+        "expired": false,
+        "digest": "sha256:4ae99e04a6e4fdebfa97aab2e2bca6b8f0dabc09a5a33cc62d74aeaf623ce7f3",
+        "created_at": "2026-10-19T09:59:47Z",
+        "updated_at": "2026-10-19T09:59:47Z",
+        "expires_at": "2027-01-17T09:45:22Z",
+        "workflow_run": {
+          "id": 39232439363,
+          "repository_id": 1402768620,
+          "head_repository_id": 1402768620,
+          "head_branch": "arena/c5f69767-smarty-chumakov",
+          "head_sha": "f7bb7181f950e55a67c04003c570093b3e186b7e"
+        }
+      }
+    ]
+  },
+  "notices": [
+    {
+      "job": "paired (hf)",
+      "job_id": 117993367143,
+      "title": "P7 benchmark profiles",
+      "data": {
+        "mode": "hf",
+        "cases": [
+          {
+            "scenario": "answer-text",
+            "chars": 50000,
+            "thermal": "cold-process",
+            "top": [
+              {
+                "function": "<built-in method torch.addmm>",
+                "calls": 672,
+                "self_seconds": 3.3096891320000004,
+                "cumulative_seconds": 3.3096891320000004
+              },
+              {
+                "function": "<built-in method builtins.exec>",
+                "calls": 5745,
+                "self_seconds": 0.338284623,
+                "cumulative_seconds": 6.034494455000001
+              },
+              {
+                "function": "hf_features",
+                "calls": 15,
+                "self_seconds": 0.155021699,
+                "cumulative_seconds": 11.678807423
+              },
+              {
+                "function": "full_answer_features",
+                "calls": 1,
+                "self_seconds": 0.045539022000000005,
+                "cumulative_seconds": 7.708073337
+              },
+              {
+                "function": "<built-in method builtins.hasattr>",
+                "calls": 72306,
+                "self_seconds": 0.031127046000000002,
+                "cumulative_seconds": 3.126575529
+              }
+            ]
+          },
+          {
+            "scenario": "answer-text",
+            "chars": 50000,
+            "thermal": "warm-model",
+            "top": [
+              {
+                "function": "<built-in method torch.addmm>",
+                "calls": 672,
+                "self_seconds": 3.282462616,
+                "cumulative_seconds": 3.282462616
+              },
+              {
+                "function": "<built-in method torch._C._nn.linear>",
+                "calls": 14,
+                "self_seconds": 1.611283129,
+                "cumulative_seconds": 1.611283129
+              },
+              {
+                "function": "predict_one",
+                "calls": 2263360,
+                "self_seconds": 0.7466313680000001,
+                "cumulative_seconds": 0.7466313680000001
+              },
+              {
+                "function": "<method 'cumsum' of 'numpy.ndarray' objects>",
+                "calls": 1927,
+                "self_seconds": 0.59630023,
+                "cumulative_seconds": 0.59630023
+              },
+              {
+                "function": "predict_one",
+                "calls": 7073,
+                "self_seconds": 0.229088479,
+                "cumulative_seconds": 1.3192120740000002
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "job": "paired (hf)",
+      "job_id": 117993367143,
+      "title": "P7 benchmark profiles",
+      "data": {
+        "mode": "hf",
+        "cases": [
+          {
+            "scenario": "document-context",
+            "chars": 50000,
+            "thermal": "warm-model",
+            "top": [
+              {
+                "function": "<built-in method torch.addmm>",
+                "calls": 144,
+                "self_seconds": 0.725402041,
+                "cumulative_seconds": 0.725402041
+              },
+              {
+                "function": "<built-in method torch._C._nn.linear>",
+                "calls": 3,
+                "self_seconds": 0.362959001,
+                "cumulative_seconds": 0.362959001
+              },
+              {
+                "function": "<built-in method builtins.sum>",
+                "calls": 1009,
+                "self_seconds": 0.043054712,
+                "cumulative_seconds": 0.092938344
+              },
+              {
+                "function": "forward",
+                "calls": 36,
+                "self_seconds": 0.028499769,
+                "cumulative_seconds": 0.07537487600000001
+              },
+              {
+                "function": "_dense_cosine_scores_exact",
+                "calls": 90,
+                "self_seconds": 0.021069141000000003,
+                "cumulative_seconds": 0.086720129
+              }
+            ]
+          },
+          {
+            "scenario": "answer-text",
+            "chars": 1000,
+            "thermal": "cold-process",
+            "top": [
+              {
+                "function": "<built-in method builtins.exec>",
+                "calls": 5744,
+                "self_seconds": 0.340927605,
+                "cumulative_seconds": 6.046396252
+              },
+              {
+                "function": "create_import_structure_from_path",
+                "calls": 1075,
+                "self_seconds": 0.15776116,
+                "cumulative_seconds": 1.213918354
+              },
+              {
+                "function": "<built-in method builtins.hasattr>",
+                "calls": 71692,
+                "self_seconds": 0.030934982000000003,
+                "cumulative_seconds": 3.221652363
+              },
+              {
+                "function": "hf_features",
+                "calls": 1,
+                "self_seconds": 0.020570565000000002,
+                "cumulative_seconds": 4.818593289000001
+              },
+              {
+                "function": "_find_and_load",
+                "calls": 5442,
+                "self_seconds": 0.016043855000000003,
+                "cumulative_seconds": 6.055546570000001
+              }
+            ]
+          },
+          {
+            "scenario": "answer-text",
+            "chars": 1000,
+            "thermal": "warm-model",
+            "top": [
+              {
+                "function": "<built-in method torch.addmm>",
+                "calls": 48,
+                "self_seconds": 0.32304429100000004,
+                "cumulative_seconds": 0.32304429100000004
+              },
+              {
+                "function": "<built-in method torch._C._nn.linear>",
+                "calls": 1,
+                "self_seconds": 0.15614893500000002,
+                "cumulative_seconds": 0.15614893500000002
+              },
+              {
+                "function": "<method 'cumsum' of 'numpy.ndarray' objects>",
+                "calls": 246,
+                "self_seconds": 0.07616592200000001,
+                "cumulative_seconds": 0.07616592200000001
+              },
+              {
+                "function": "_dense_cosine_scores_exact",
+                "calls": 246,
+                "self_seconds": 0.0309927,
+                "cumulative_seconds": 0.121158575
+              },
+              {
+                "function": "<built-in method torch.matmul>",
+                "calls": 24,
+                "self_seconds": 0.028622613,
+                "cumulative_seconds": 0.028622613
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "job": "paired (hf)",
+      "job_id": 117993367143,
+      "title": "P7 benchmark profiles",
+      "data": {
+        "mode": "hf",
+        "cases": [
+          {
+            "scenario": "document-context",
+            "chars": 1000,
+            "thermal": "cold-process",
+            "top": [
+              {
+                "function": "<built-in method builtins.exec>",
+                "calls": 5744,
+                "self_seconds": 0.33743121600000003,
+                "cumulative_seconds": 6.02899048
+              },
+              {
+                "function": "create_import_structure_from_path",
+                "calls": 1075,
+                "self_seconds": 0.157678958,
+                "cumulative_seconds": 1.212264123
+              },
+              {
+                "function": "<built-in method builtins.hasattr>",
+                "calls": 71691,
+                "self_seconds": 0.031195209,
+                "cumulative_seconds": 3.2072907030000004
+              },
+              {
+                "function": "_find_and_load",
+                "calls": 5442,
+                "self_seconds": 0.015674925,
+                "cumulative_seconds": 6.038023614
+              },
+              {
+                "function": "_find_and_load_unlocked",
+                "calls": 2407,
+                "self_seconds": 0.013096817,
+                "cumulative_seconds": 6.037612958
+              }
+            ]
+          },
+          {
+            "scenario": "document-context",
+            "chars": 1000,
+            "thermal": "warm-model",
+            "top": [
+              {
+                "function": "<built-in method torch.addmm>",
+                "calls": 48,
+                "self_seconds": 0.25241430000000004,
+                "cumulative_seconds": 0.25241430000000004
+              },
+              {
+                "function": "<built-in method torch._C._nn.linear>",
+                "calls": 1,
+                "self_seconds": 0.122401834,
+                "cumulative_seconds": 0.122401834
+              },
+              {
+                "function": "<method 'cumsum' of 'numpy.ndarray' objects>",
+                "calls": 30,
+                "self_seconds": 0.018967711,
+                "cumulative_seconds": 0.018967711
+              },
+              {
+                "function": "<built-in method torch.matmul>",
+                "calls": 24,
+                "self_seconds": 0.016475345000000002,
+                "cumulative_seconds": 0.016475345000000002
+              },
+              {
+                "function": "<genexpr>",
+                "calls": 165335,
+                "self_seconds": 0.014665225,
+                "cumulative_seconds": 0.014665225
+              }
+            ]
+          },
+          {
+            "scenario": "document-context",
+            "chars": 50000,
+            "thermal": "cold-process",
+            "top": [
+              {
+                "function": "<built-in method builtins.exec>",
+                "calls": 5744,
+                "self_seconds": 0.332883058,
+                "cumulative_seconds": 5.920256323
+              },
+              {
+                "function": "create_import_structure_from_path",
+                "calls": 1075,
+                "self_seconds": 0.15656508600000002,
+                "cumulative_seconds": 1.2062656580000002
+              },
+              {
+                "function": "<built-in method builtins.hasattr>",
+                "calls": 71765,
+                "self_seconds": 0.029579746,
+                "cumulative_seconds": 3.1389910920000004
+              },
+              {
+                "function": "_find_and_load",
+                "calls": 5442,
+                "self_seconds": 0.015674264,
+                "cumulative_seconds": 5.928843134
+              },
+              {
+                "function": "_find_and_load_unlocked",
+                "calls": 2407,
+                "self_seconds": 0.012729242,
+                "cumulative_seconds": 5.928470843
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "job": "paired (hf)",
+      "job_id": 117993367143,
+      "title": "P7 benchmark table",
+      "data": {
+        "mode": "hf",
+        "phase": "after",
+        "columns": [
+          "scenario",
+          "chars",
+          "thermal",
+          "median_seconds",
+          "max_seconds",
+          "limit_seconds",
+          "status",
+          "seconds_per_1000_chars",
+          "median_lower_bound_seconds",
+          "seconds_per_1000_chars_lower_bound"
+        ],
+        "rows": [
+          [
+            "document-context",
+            1000,
+            "cold-process",
+            5.381663305999837,
+            5.40366781900002,
+            0.03,
+            "не достигнут",
+            5.381663305999837,
+            null,
+            null
+          ],
+          [
+            "document-context",
+            1000,
+            "warm-model",
+            0.4902333509999153,
+            0.4909863029999997,
+            0.03,
+            "не достигнут",
+            0.4902333509999153,
+            null,
+            null
+          ],
+          [
+            "document-context",
+            50000,
+            "cold-process",
+            6.371048722000069,
+            6.3862028670000655,
+            1.0,
+            "не достигнут",
+            0.12742097444000136,
+            null,
+            null
+          ],
+          [
+            "document-context",
+            50000,
+            "warm-model",
+            1.4586735200000476,
+            1.4593878480000058,
+            1.0,
+            "не достигнут",
+            0.029173470400000952,
+            null,
+            null
+          ],
+          [
+            "document-context",
+            2000000,
+            "cold-process",
+            7.82320984099988,
+            7.8608872140000585,
+            60.0,
+            "достигнут",
+            0.00391160492049994,
+            null,
+            null
+          ],
+          [
+            "document-context",
+            2000000,
+            "warm-model",
+            3.004060834000029,
+            3.01134647899994,
+            60.0,
+            "достигнут",
+            0.0015020304170000145,
+            null,
+            null
+          ],
+          [
+            "answer-text",
+            1000,
+            "cold-process",
+            5.6489328729999215,
+            5.6982773360000465,
+            0.03,
+            "не достигнут",
+            5.6489328729999215,
+            null,
+            null
+          ],
+          [
+            "answer-text",
+            1000,
+            "warm-model",
+            0.7633174879999842,
+            0.7663142480000715,
+            0.03,
+            "не достигнут",
+            0.7633174879999842,
+            null,
+            null
+          ],
+          [
+            "answer-text",
+            50000,
+            "cold-process",
+            12.711859619000052,
+            12.723409575000005,
+            1.0,
+            "не достигнут",
+            0.25423719238000103,
+            null,
+            null
+          ],
+          [
+            "answer-text",
+            50000,
+            "warm-model",
+            7.676519127999882,
+            7.686873110999841,
+            1.0,
+            "не достигнут",
+            0.15353038255999762,
+            null,
+            null
+          ],
+          [
+            "answer-text",
+            2000000,
+            "cold-process",
+            44.26817944499999,
+            44.33380522599987,
+            60.0,
+            "достигнут",
+            0.022134089722499993,
+            null,
+            null
+          ],
+          [
+            "answer-text",
+            2000000,
+            "warm-model",
+            39.82454933199983,
+            39.927221746999976,
+            60.0,
+            "достигнут",
+            0.01991227466599992,
+            null,
+            null
+          ]
+        ]
+      }
+    },
+    {
+      "job": "paired (hf)",
+      "job_id": 117993367143,
+      "title": "P7 benchmark environment",
+      "data": {
+        "phase": "after",
+        "cpu": "AMD EPYC 7763 64-Core Processor",
+        "logical_cpu": 4,
+        "ram": "MemTotal:       16373452 kB",
+        "python": "3.11.17 (main, Oct  1 2026, 14:32:31) [GCC 13.3.0]",
+        "platform": "Linux-6.17.0-1022-azure-x86_64-with-glibc2.39",
+        "versions": {
+          "torch": "2.14.1+cpu",
+          "transformers": "5.20.1",
+          "numpy": "2.4.6",
+          "sentencepiece": "0.2.2"
+        },
+        "commit": "f7bb7181f950e55a67c04003c570093b3e186b7e",
+        "run_url": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39232439363"
+      }
+    },
+    {
+      "job": "paired (hf)",
+      "job_id": 117993367143,
+      "title": "P7 benchmark profiles",
+      "data": {
+        "mode": "hf",
+        "cases": [
+          {
+            "scenario": "answer-text",
+            "chars": 2000000,
+            "thermal": "warm-model",
+            "top": [
+              {
+                "function": "_span_overlap",
+                "calls": 52807413,
+                "self_seconds": 23.619702846000003,
+                "cumulative_seconds": 46.584844944000004
+              },
+              {
+                "function": "<listcomp>",
+                "calls": 103140,
+                "self_seconds": 16.033357153,
+                "cumulative_seconds": 62.618202097
+              },
+              {
+                "function": "<built-in method builtins.max>",
+                "calls": 105615192,
+                "self_seconds": 14.534768502,
+                "cumulative_seconds": 14.534783110000001
+              },
+              {
+                "function": "<built-in method builtins.min>",
+                "calls": 52807557,
+                "self_seconds": 8.43052331,
+                "cumulative_seconds": 8.43052331
+              },
+              {
+                "function": "<method 'encode_batch' of 'tokenizers.Tokenizer' objects>",
+                "calls": 2,
+                "self_seconds": 2.729966499,
+                "cumulative_seconds": 2.729966499
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "job": "paired (hf)",
+      "job_id": 117993367143,
+      "title": "P7 benchmark profiles",
+      "data": {
+        "mode": "hf",
+        "cases": [
+          {
+            "scenario": "answer-text",
+            "chars": 50000,
+            "thermal": "cold-process",
+            "top": [
+              {
+                "function": "_span_overlap",
+                "calls": 3622157,
+                "self_seconds": 1.712936744,
+                "cumulative_seconds": 3.2864347670000003
+              },
+              {
+                "function": "<listcomp>",
+                "calls": 7073,
+                "self_seconds": 1.132489848,
+                "cumulative_seconds": 4.418924615
+              },
+              {
+                "function": "<built-in method builtins.exec>",
+                "calls": 5744,
+                "self_seconds": 0.33106714000000004,
+                "cumulative_seconds": 5.989612779000001
+              },
+              {
+                "function": "predict_one",
+                "calls": 7073,
+                "self_seconds": 0.224108304,
+                "cumulative_seconds": 1.307036055
+              },
+              {
+                "function": "create_import_structure_from_path",
+                "calls": 1075,
+                "self_seconds": 0.157440674,
+                "cumulative_seconds": 1.2061236160000002
+              }
+            ]
+          },
+          {
+            "scenario": "answer-text",
+            "chars": 50000,
+            "thermal": "warm-model",
+            "top": [
+              {
+                "function": "_span_overlap",
+                "calls": 3622157,
+                "self_seconds": 1.654433969,
+                "cumulative_seconds": 3.225121805
+              },
+              {
+                "function": "<listcomp>",
+                "calls": 7073,
+                "self_seconds": 1.1286793050000001,
+                "cumulative_seconds": 4.35380111
+              },
+              {
+                "function": "<built-in method builtins.max>",
+                "calls": 7498245,
+                "self_seconds": 1.0541640250000002,
+                "cumulative_seconds": 1.054351136
+              },
+              {
+                "function": "predict_one",
+                "calls": 2263360,
+                "self_seconds": 0.7383419440000001,
+                "cumulative_seconds": 0.7383419440000001
+              },
+              {
+                "function": "<built-in method builtins.min>",
+                "calls": 3769613,
+                "self_seconds": 0.5912592720000001,
+                "cumulative_seconds": 0.5912592720000001
+              }
+            ]
+          },
+          {
+            "scenario": "answer-text",
+            "chars": 2000000,
+            "thermal": "cold-process",
+            "top": [
+              {
+                "function": "_span_overlap",
+                "calls": 52864295,
+                "self_seconds": 23.589128644000002,
+                "cumulative_seconds": 46.181088535
+              },
+              {
+                "function": "<listcomp>",
+                "calls": 103251,
+                "self_seconds": 16.380540240000002,
+                "cumulative_seconds": 62.561628775
+              },
+              {
+                "function": "<built-in method builtins.max>",
+                "calls": 105739700,
+                "self_seconds": 14.451287529,
+                "cumulative_seconds": 14.455565052
+              },
+              {
+                "function": "<built-in method builtins.min>",
+                "calls": 52880345,
+                "self_seconds": 8.150848,
+                "cumulative_seconds": 8.153004244
+              },
+              {
+                "function": "<method 'encode_batch' of 'tokenizers.Tokenizer' objects>",
+                "calls": 2,
+                "self_seconds": 2.8851646050000004,
+                "cumulative_seconds": 2.8851646050000004
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "job": "paired (hf)",
+      "job_id": 117993367143,
+      "title": "P7 benchmark profiles",
+      "data": {
+        "mode": "hf",
+        "cases": [
+          {
+            "scenario": "document-context",
+            "chars": 50000,
+            "thermal": "warm-model",
+            "top": [
+              {
+                "function": "<built-in method builtins.sum>",
+                "calls": 57568,
+                "self_seconds": 3.301729082,
+                "cumulative_seconds": 8.16326384
+              },
+              {
+                "function": "<genexpr>",
+                "calls": 14672520,
+                "self_seconds": 2.217785048,
+                "cumulative_seconds": 2.217785048
+              },
+              {
+                "function": "<genexpr>",
+                "calls": 14672520,
+                "self_seconds": 1.3233041520000002,
+                "cumulative_seconds": 1.3233041520000002
+              },
+              {
+                "function": "<genexpr>",
+                "calls": 14672520,
+                "self_seconds": 1.3195373970000002,
+                "cumulative_seconds": 1.3195373970000002
+              },
+              {
+                "function": "<method 'read' of '_ssl._SSLSocket' objects>",
+                "calls": 30,
+                "self_seconds": 1.2881429240000002,
+                "cumulative_seconds": 1.2881429240000002
+              }
+            ]
+          },
+          {
+            "scenario": "answer-text",
+            "chars": 1000,
+            "thermal": "cold-process",
+            "top": [
+              {
+                "function": "<built-in method builtins.sum>",
+                "calls": 81397,
+                "self_seconds": 4.419449136,
+                "cumulative_seconds": 10.885257354
+              },
+              {
+                "function": "<genexpr>",
+                "calls": 19674096,
+                "self_seconds": 2.9119771130000003,
+                "cumulative_seconds": 2.9119771130000003
+              },
+              {
+                "function": "<genexpr>",
+                "calls": 19674096,
+                "self_seconds": 1.778542451,
+                "cumulative_seconds": 1.778542451
+              },
+              {
+                "function": "<genexpr>",
+                "calls": 19674096,
+                "self_seconds": 1.7694642880000002,
+                "cumulative_seconds": 1.7694642880000002
+              },
+              {
+                "function": "<built-in method builtins.exec>",
+                "calls": 5744,
+                "self_seconds": 0.33802814200000003,
+                "cumulative_seconds": 6.05806862
+              }
+            ]
+          },
+          {
+            "scenario": "answer-text",
+            "chars": 1000,
+            "thermal": "warm-model",
+            "top": [
+              {
+                "function": "<built-in method builtins.sum>",
+                "calls": 78556,
+                "self_seconds": 4.444861444000001,
+                "cumulative_seconds": 10.879119622000001
+              },
+              {
+                "function": "<genexpr>",
+                "calls": 19674096,
+                "self_seconds": 2.923099139,
+                "cumulative_seconds": 2.923099139
+              },
+              {
+                "function": "<genexpr>",
+                "calls": 19674096,
+                "self_seconds": 1.7581708070000002,
+                "cumulative_seconds": 1.7581708070000002
+              },
+              {
+                "function": "<genexpr>",
+                "calls": 19674096,
+                "self_seconds": 1.751400225,
+                "cumulative_seconds": 1.751400225
+              },
+              {
+                "function": "_cosine_dense",
+                "calls": 25584,
+                "self_seconds": 0.055593441,
+                "cumulative_seconds": 10.938285576
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "job": "paired (hf)",
+      "job_id": 117993367143,
+      "title": "P7 benchmark profiles",
+      "data": {
+        "mode": "hf",
+        "cases": [
+          {
+            "scenario": "document-context",
+            "chars": 1000,
+            "thermal": "cold-process",
+            "top": [
+              {
+                "function": "<built-in method builtins.sum>",
+                "calls": 22434,
+                "self_seconds": 1.1087838840000002,
+                "cumulative_seconds": 2.7458701690000002
+              },
+              {
+                "function": "<built-in method builtins.exec>",
+                "calls": 5744,
+                "self_seconds": 0.32910408500000005,
+                "cumulative_seconds": 6.043082246
+              },
+              {
+                "function": "create_import_structure_from_path",
+                "calls": 1075,
+                "self_seconds": 0.15807389300000002,
+                "cumulative_seconds": 1.2138851240000001
+              },
+              {
+                "function": "<built-in method builtins.hasattr>",
+                "calls": 71682,
+                "self_seconds": 0.029568006,
+                "cumulative_seconds": 3.267612149
+              },
+              {
+                "function": "_find_and_load",
+                "calls": 5442,
+                "self_seconds": 0.016665120000000002,
+                "cumulative_seconds": 6.052195483
+              }
+            ]
+          },
+          {
+            "scenario": "document-context",
+            "chars": 1000,
+            "thermal": "warm-model",
+            "top": [
+              {
+                "function": "<built-in method builtins.sum>",
+                "calls": 19593,
+                "self_seconds": 1.23968214,
+                "cumulative_seconds": 3.027254119
+              },
+              {
+                "function": "<genexpr>",
+                "calls": 4960050,
+                "self_seconds": 0.788839226,
+                "cumulative_seconds": 0.788839226
+              },
+              {
+                "function": "<genexpr>",
+                "calls": 4960050,
+                "self_seconds": 0.49977355700000003,
+                "cumulative_seconds": 0.49977355700000003
+              },
+              {
+                "function": "<genexpr>",
+                "calls": 4960050,
+                "self_seconds": 0.49826642600000004,
+                "cumulative_seconds": 0.49826642600000004
+              },
+              {
+                "function": "_cosine_dense",
+                "calls": 6450,
+                "self_seconds": 0.014272171,
+                "cumulative_seconds": 3.0421311220000002
+              }
+            ]
+          },
+          {
+            "scenario": "document-context",
+            "chars": 50000,
+            "thermal": "cold-process",
+            "top": [
+              {
+                "function": "<built-in method builtins.sum>",
+                "calls": 60409,
+                "self_seconds": 3.391559586,
+                "cumulative_seconds": 8.183040153
+              },
+              {
+                "function": "<genexpr>",
+                "calls": 14672520,
+                "self_seconds": 2.177045084,
+                "cumulative_seconds": 2.177045084
+              },
+              {
+                "function": "<built-in method builtins.exec>",
+                "calls": 5744,
+                "self_seconds": 0.33038554400000003,
+                "cumulative_seconds": 5.972338234
+              },
+              {
+                "function": "_cosine_dense",
+                "calls": 19080,
+                "self_seconds": 0.040985017000000006,
+                "cumulative_seconds": 8.118121272
+              },
+              {
+                "function": "hf_features_chunked",
+                "calls": 1,
+                "self_seconds": 0.033141639,
+                "cumulative_seconds": 18.250940481
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "job": "paired (hf)",
+      "job_id": 117993367143,
+      "title": "P7 benchmark table",
+      "data": {
+        "mode": "hf",
+        "phase": "before",
+        "columns": [
+          "scenario",
+          "chars",
+          "thermal",
+          "median_seconds",
+          "max_seconds",
+          "limit_seconds",
+          "status",
+          "seconds_per_1000_chars",
+          "median_lower_bound_seconds",
+          "seconds_per_1000_chars_lower_bound"
+        ],
+        "rows": [
+          [
+            "document-context",
+            1000,
+            "cold-process",
+            5.957086275999984,
+            5.98564466900001,
+            0.03,
+            "не достигнут",
+            5.957086275999983,
+            null,
+            null
+          ],
+          [
+            "document-context",
+            1000,
+            "warm-model",
+            1.7153905729999792,
+            1.7160756130000152,
+            0.03,
+            "не достигнут",
+            1.7153905729999792,
+            null,
+            null
+          ],
+          [
+            "document-context",
+            50000,
+            "cold-process",
+            9.310338292000012,
+            9.325184132999993,
+            1.0,
+            "не достигнут",
+            0.18620676584000023,
+            null,
+            null
+          ],
+          [
+            "document-context",
+            50000,
+            "warm-model",
+            5.133044227000028,
+            5.178034578999984,
+            1.0,
+            "не достигнут",
+            0.10266088454000055,
+            null,
+            null
+          ],
+          [
+            "document-context",
+            2000000,
+            "cold-process",
+            10.451747195999985,
+            10.45530160100003,
+            60.0,
+            "достигнут",
+            0.005225873597999993,
+            null,
+            null
+          ],
+          [
+            "document-context",
+            2000000,
+            "warm-model",
+            6.155506800000012,
+            6.238260685,
+            60.0,
+            "достигнут",
+            0.003077753400000006,
+            null,
+            null
+          ],
+          [
+            "answer-text",
+            1000,
+            "cold-process",
+            7.7595477760000335,
+            7.7998616579999975,
+            0.03,
+            "не достигнут",
+            7.759547776000034,
+            null,
+            null
+          ],
+          [
+            "answer-text",
+            1000,
+            "warm-model",
+            3.5706020270000067,
+            3.6237690709999697,
+            0.03,
+            "не достигнут",
+            3.5706020270000067,
+            null,
+            null
+          ],
+          [
+            "answer-text",
+            50000,
+            "cold-process",
+            8.108591776000026,
+            8.132264666000083,
+            1.0,
+            "не достигнут",
+            0.1621718355200005,
+            null,
+            null
+          ],
+          [
+            "answer-text",
+            50000,
+            "warm-model",
+            3.893606472999977,
+            3.8999556019999773,
+            1.0,
+            "не достигнут",
+            0.07787212945999954,
+            null,
+            null
+          ],
+          [
+            "answer-text",
+            2000000,
+            "cold-process",
+            null,
+            null,
+            60.0,
+            "не достигнут",
+            null,
+            74.92119524500004,
+            0.03746059762250002
+          ],
+          [
+            "answer-text",
+            2000000,
+            "warm-model",
+            null,
+            null,
+            60.0,
+            "не достигнут",
+            null,
+            68.96545913699993,
+            0.034482729568499966
+          ]
+        ]
+      }
+    },
+    {
+      "job": "paired (hf)",
+      "job_id": 117993367143,
+      "title": "P7 benchmark environment",
+      "data": {
+        "phase": "before",
+        "cpu": "AMD EPYC 7763 64-Core Processor",
+        "logical_cpu": 4,
+        "ram": "MemTotal:       16373452 kB",
+        "python": "3.11.17 (main, Oct  1 2026, 14:32:31) [GCC 13.3.0]",
+        "platform": "Linux-6.17.0-1022-azure-x86_64-with-glibc2.39",
+        "versions": {
+          "torch": "2.14.1+cpu",
+          "transformers": "5.20.1",
+          "numpy": "2.4.6",
+          "sentencepiece": "0.2.2"
+        },
+        "commit": "14a018a1b90b51cc47cd8baf628147ac22e1d8b1",
+        "run_url": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39232439363"
+      }
+    },
+    {
+      "job": "paired (demo)",
+      "job_id": 117993367707,
+      "title": "P7 benchmark table",
+      "data": {
+        "mode": "demo",
+        "phase": "after",
+        "columns": [
+          "scenario",
+          "chars",
+          "thermal",
+          "median_seconds",
+          "max_seconds",
+          "limit_seconds",
+          "status",
+          "seconds_per_1000_chars",
+          "median_lower_bound_seconds",
+          "seconds_per_1000_chars_lower_bound"
+        ],
+        "rows": [
+          [
+            "document-context",
+            1000,
+            "cold-process",
+            0.013302737999993042,
+            0.02560429599998315,
+            0.03,
+            "достигнут",
+            0.013302737999993042,
+            null,
+            null
+          ],
+          [
+            "document-context",
+            1000,
+            "warm-model",
+            0.0036294889999908264,
+            0.0036523919999353893,
+            0.03,
+            "достигнут",
+            0.0036294889999908264,
+            null,
+            null
+          ],
+          [
+            "document-context",
+            50000,
+            "cold-process",
+            0.0845679309999241,
+            0.08488835000002837,
+            1.0,
+            "достигнут",
+            0.001691358619998482,
+            null,
+            null
+          ],
+          [
+            "document-context",
+            50000,
+            "warm-model",
+            0.07510980500001097,
+            0.07519851100005326,
+            1.0,
+            "достигнут",
+            0.0015021961000002194,
+            null,
+            null
+          ],
+          [
+            "document-context",
+            2000000,
+            "cold-process",
+            3.54420457599997,
+            3.5639562489999435,
+            60.0,
+            "достигнут",
+            0.001772102287999985,
+            null,
+            null
+          ],
+          [
+            "document-context",
+            2000000,
+            "warm-model",
+            3.540803935999975,
+            3.586330907000047,
+            60.0,
+            "достигнут",
+            0.0017704019679999875,
+            null,
+            null
+          ],
+          [
+            "answer-text",
+            1000,
+            "cold-process",
+            0.02542606400004388,
+            0.02558727500002078,
+            0.03,
+            "достигнут",
+            0.02542606400004388,
+            null,
+            null
+          ],
+          [
+            "answer-text",
+            1000,
+            "warm-model",
+            0.016516769000077147,
+            0.016601487000002635,
+            0.03,
+            "достигнут",
+            0.016516769000077147,
+            null,
+            null
+          ],
+          [
+            "answer-text",
+            50000,
+            "cold-process",
+            0.7224533570000631,
+            0.7237123290000227,
+            1.0,
+            "достигнут",
+            0.014449067140001262,
+            null,
+            null
+          ],
+          [
+            "answer-text",
+            50000,
+            "warm-model",
+            0.7145627289999084,
+            0.7724238219999506,
+            1.0,
+            "достигнут",
+            0.014291254579998167,
+            null,
+            null
+          ],
+          [
+            "answer-text",
+            2000000,
+            "cold-process",
+            30.243664030000105,
+            30.330629864000002,
+            60.0,
+            "достигнут",
+            0.015121832015000053,
+            null,
+            null
+          ],
+          [
+            "answer-text",
+            2000000,
+            "warm-model",
+            30.09000698,
+            30.202026483000054,
+            60.0,
+            "достигнут",
+            0.015045003489999998,
+            null,
+            null
+          ]
+        ]
+      }
+    },
+    {
+      "job": "paired (demo)",
+      "job_id": 117993367707,
+      "title": "P7 benchmark environment",
+      "data": {
+        "phase": "after",
+        "cpu": "AMD EPYC 7763 64-Core Processor",
+        "logical_cpu": 4,
+        "ram": "MemTotal:       16373448 kB",
+        "python": "3.11.17 (main, Oct  1 2026, 14:32:31) [GCC 13.3.0]",
+        "platform": "Linux-6.17.0-1022-azure-x86_64-with-glibc2.39",
+        "versions": {},
+        "commit": "f7bb7181f950e55a67c04003c570093b3e186b7e",
+        "run_url": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39232439363"
+      }
+    },
+    {
+      "job": "paired (demo)",
+      "job_id": 117993367707,
+      "title": "P7 benchmark profiles",
+      "data": {
+        "mode": "demo",
+        "cases": [
+          {
+            "scenario": "answer-text",
+            "chars": 2000000,
+            "thermal": "warm-model",
+            "top": [
+              {
+                "function": "_normalised_support",
+                "calls": 1,
+                "self_seconds": 61.69853563,
+                "cumulative_seconds": 62.26619071100001
+              },
+              {
+                "function": "demo_features",
+                "calls": 1,
+                "self_seconds": 1.4710757790000002,
+                "cumulative_seconds": 73.600272219
+              },
+              {
+                "function": "number_value",
+                "calls": 1252680,
+                "self_seconds": 1.293209029,
+                "cumulative_seconds": 2.546290034
+              },
+              {
+                "function": "word",
+                "calls": 2606411,
+                "self_seconds": 1.093368197,
+                "cumulative_seconds": 1.6462739620000002
+              },
+              {
+                "function": "similarities",
+                "calls": 181821,
+                "self_seconds": 1.052932811,
+                "cumulative_seconds": 3.715499593
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "job": "paired (demo)",
+      "job_id": 117993367707,
+      "title": "P7 benchmark profiles",
+      "data": {
+        "mode": "demo",
+        "cases": [
+          {
+            "scenario": "answer-text",
+            "chars": 50000,
+            "thermal": "cold-process",
+            "top": [
+              {
+                "function": "predict_one",
+                "calls": 2263360,
+                "self_seconds": 0.731819575,
+                "cumulative_seconds": 0.731819575
+              },
+              {
+                "function": "predict_one",
+                "calls": 7073,
+                "self_seconds": 0.22453186900000002,
+                "cumulative_seconds": 1.286741074
+              },
+              {
+                "function": "_normalised_support",
+                "calls": 1,
+                "self_seconds": 0.193889464,
+                "cumulative_seconds": 0.208997222
+              },
+              {
+                "function": "_to_float32",
+                "calls": 396088,
+                "self_seconds": 0.157310159,
+                "cumulative_seconds": 0.228141532
+              },
+              {
+                "function": "<method 'split' of 're.Pattern' objects>",
+                "calls": 203,
+                "self_seconds": 0.11170848400000001,
+                "cumulative_seconds": 0.11170848400000001
+              }
+            ]
+          },
+          {
+            "scenario": "answer-text",
+            "chars": 50000,
+            "thermal": "warm-model",
+            "top": [
+              {
+                "function": "predict_one",
+                "calls": 2263360,
+                "self_seconds": 0.736501811,
+                "cumulative_seconds": 0.736501811
+              },
+              {
+                "function": "predict_one",
+                "calls": 7073,
+                "self_seconds": 0.22450471300000002,
+                "cumulative_seconds": 1.294119365
+              },
+              {
+                "function": "_normalised_support",
+                "calls": 1,
+                "self_seconds": 0.194293757,
+                "cumulative_seconds": 0.20919257600000002
+              },
+              {
+                "function": "_to_float32",
+                "calls": 396088,
+                "self_seconds": 0.159154292,
+                "cumulative_seconds": 0.23140585100000002
+              },
+              {
+                "function": "<method 'split' of 're.Pattern' objects>",
+                "calls": 203,
+                "self_seconds": 0.11950957400000001,
+                "cumulative_seconds": 0.11950957400000001
+              }
+            ]
+          },
+          {
+            "scenario": "answer-text",
+            "chars": 2000000,
+            "thermal": "cold-process",
+            "top": [
+              {
+                "function": "_normalised_support",
+                "calls": 1,
+                "self_seconds": 60.389142977000006,
+                "cumulative_seconds": 60.991377797000006
+              },
+              {
+                "function": "demo_features",
+                "calls": 1,
+                "self_seconds": 1.5189756630000002,
+                "cumulative_seconds": 73.636027935
+              },
+              {
+                "function": "_candidates",
+                "calls": 181821,
+                "self_seconds": 1.462326107,
+                "cumulative_seconds": 1.779485103
+              },
+              {
+                "function": "number_value",
+                "calls": 1252680,
+                "self_seconds": 1.418017821,
+                "cumulative_seconds": 2.7370468480000003
+              },
+              {
+                "function": "similarities",
+                "calls": 181821,
+                "self_seconds": 1.191542447,
+                "cumulative_seconds": 4.480292185000001
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "job": "paired (demo)",
+      "job_id": 117993367707,
+      "title": "P7 benchmark table",
+      "data": {
+        "mode": "demo",
+        "phase": "before",
+        "columns": [
+          "scenario",
+          "chars",
+          "thermal",
+          "median_seconds",
+          "max_seconds",
+          "limit_seconds",
+          "status",
+          "seconds_per_1000_chars",
+          "median_lower_bound_seconds",
+          "seconds_per_1000_chars_lower_bound"
+        ],
+        "rows": [
+          [
+            "document-context",
+            1000,
+            "cold-process",
+            0.012390155999995045,
+            0.023766793999996594,
+            0.03,
+            "достигнут",
+            0.012390155999995045,
+            null,
+            null
+          ],
+          [
+            "document-context",
+            1000,
+            "warm-model",
+            0.0037134559999998373,
+            0.0037545929999964756,
+            0.03,
+            "достигнут",
+            0.0037134559999998373,
+            null,
+            null
+          ],
+          [
+            "document-context",
+            50000,
+            "cold-process",
+            0.08332885999999462,
+            0.08334773500000381,
+            1.0,
+            "достигнут",
+            0.0016665771999998923,
+            null,
+            null
+          ],
+          [
+            "document-context",
+            50000,
+            "warm-model",
+            0.07452505600001302,
+            0.07518283400000314,
+            1.0,
+            "достигнут",
+            0.0014905011200002606,
+            null,
+            null
+          ],
+          [
+            "document-context",
+            2000000,
+            "cold-process",
+            3.555033703999996,
+            3.558833409000002,
+            60.0,
+            "достигнут",
+            0.001777516851999998,
+            null,
+            null
+          ],
+          [
+            "document-context",
+            2000000,
+            "warm-model",
+            3.5261568880000027,
+            3.546402115999996,
+            60.0,
+            "достигнут",
+            0.0017630784440000014,
+            null,
+            null
+          ],
+          [
+            "answer-text",
+            1000,
+            "cold-process",
+            0.024932492999994338,
+            0.025492038000010098,
+            0.03,
+            "достигнут",
+            0.024932492999994338,
+            null,
+            null
+          ],
+          [
+            "answer-text",
+            1000,
+            "warm-model",
+            0.016736730000005196,
+            0.016954217000005656,
+            0.03,
+            "достигнут",
+            0.016736730000005196,
+            null,
+            null
+          ],
+          [
+            "answer-text",
+            50000,
+            "cold-process",
+            1.0564212829999917,
+            1.0625867370000037,
+            1.0,
+            "не достигнут",
+            0.021128425659999835,
+            null,
+            null
+          ],
+          [
+            "answer-text",
+            50000,
+            "warm-model",
+            1.0418336970000155,
+            1.0482958670000073,
+            1.0,
+            "не достигнут",
+            0.02083667394000031,
+            null,
+            null
+          ],
+          [
+            "answer-text",
+            2000000,
+            "cold-process",
+            null,
+            null,
+            60.0,
+            "не достигнут",
+            null,
+            74.92502029999997,
+            0.03746251014999999
+          ],
+          [
+            "answer-text",
+            2000000,
+            "warm-model",
+            null,
+            null,
+            60.0,
+            "не достигнут",
+            null,
+            74.90774364599997,
+            0.03745387182299999
+          ]
+        ]
+      }
+    },
+    {
+      "job": "paired (demo)",
+      "job_id": 117993367707,
+      "title": "P7 benchmark environment",
+      "data": {
+        "phase": "before",
+        "cpu": "AMD EPYC 7763 64-Core Processor",
+        "logical_cpu": 4,
+        "ram": "MemTotal:       16373448 kB",
+        "python": "3.11.17 (main, Oct  1 2026, 14:32:31) [GCC 13.3.0]",
+        "platform": "Linux-6.17.0-1022-azure-x86_64-with-glibc2.39",
+        "versions": {},
+        "commit": "14a018a1b90b51cc47cd8baf628147ac22e1d8b1",
+        "run_url": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39232439363"
+      }
+    }
+  ]
+}

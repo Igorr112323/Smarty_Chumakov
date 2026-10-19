@@ -1,0 +1,26 @@
+[
+  {
+    "path": ".github",
+    "blob_href": "https://github.com/Igorr112323/Smarty_Chumakov/blob/a85c40a14828141447768d3c78d13aa0ced105eb/.github",
+    "start_line": 2,
+    "start_column": null,
+    "end_line": 2,
+    "end_column": null,
+    "annotation_level": "warning",
+    "title": "",
+    "message": "Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@v4, actions/download-artifact@v4, actions/upload-artifact@v4. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/",
+    "raw_details": ""
+  },
+  {
+    "path": ".github",
+    "blob_href": "https://github.com/Igorr112323/Smarty_Chumakov/blob/a85c40a14828141447768d3c78d13aa0ced105eb/.github",
+    "start_line": 7,
+    "start_column": null,
+    "end_line": 7,
+    "end_column": null,
+    "annotation_level": "notice",
+    "title": "P7 archive",
+    "message": "e74820ed5ac5438023a1403fd638ead6c0056ec247a8490515a7a31f7c3fb1a6  p7-acceptance.zip",
+    "raw_details": ""
+  }
+]

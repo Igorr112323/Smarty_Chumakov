@@ -1,0 +1,123 @@
+============================================================
+P1: Измерение обучаемой answer-головы (cross-fitting OOF)
+============================================================
+
+[1/9] Загрузка бандла...
+✓ Бандл загружен
+
+[2/9] Загрузка данных...
+✓ Train: 842 pairs
+✓ Dev: 181 pairs
+
+[3/9] Загрузка кеша...
+✓ Кеш: 1195 ключей
+
+[4/9] Создание верификатора...
+✓ Verifier создан
+
+[5/9] Сбор samples и извлечение answer-признаков...
+  Train samples...
+  ✓ Train: 46607 scored tokens, 842 пар
+  Dev samples...
+  ✓ Dev: 7969 scored tokens, 181 пар
+  Извлечение answer-признаков...
+  ✓ Answer-признаки: train=842, dev=181
+  Train positive: 467/842
+  Dev positive: 96/181
+
+[6/9] P1 cross-fitting OOF (5 фолдов)...
+  Фолд 0: fit=659, held_out=183, pos=93, neg=90
+  Фолд 1: fit=683, held_out=159, pos=87, neg=72
+  Фолд 2: fit=687, held_out=155, pos=97, neg=58
+  Фолд 3: fit=672, held_out=170, pos=88, neg=82
+  Фолд 4: fit=667, held_out=175, pos=102, neg=73
+  ✓ P1 OOF: 842 предсказаний, покрытие 100%
+
+  Baseline OOF (mean_top3)...
+    Фолд 1/5...
+      Обучение модели на 37952 samples...
+      Вычисление рисков на 8655 test samples...
+      ✓ Фолд 1 завершен, обработано 170 пар
+    Фолд 2/5...
+      Обучение модели на 38467 samples...
+      Вычисление рисков на 8140 test samples...
+      ✓ Фолд 2 завершен, обработано 153 пар
+    Фолд 3/5...
+      Обучение модели на 36387 samples...
+      Вычисление рисков на 10220 test samples...
+      ✓ Фолд 3 завершен, обработано 171 пар
+    Фолд 4/5...
+      Обучение модели на 38837 samples...
+      Вычисление рисков на 7770 test samples...
+      ✓ Фолд 4 завершен, обработано 156 пар
+    Фолд 5/5...
+      Обучение модели на 34785 samples...
+      Вычисление рисков на 11822 test samples...
+      ✓ Фолд 5 завершен, обработано 192 пар
+  ✓ Baseline OOF: 842 предсказаний
+
+[7/9] Обучение финальных моделей...
+  ✓ Финальная P1 модель: 37 признаков
+  ✓ Финальная token-head модель
+  Dev scores...
+  ✓ Dev scores: P1=181, baseline=181
+
+[8/9] Калибровка и выбор порогов...
+  Baseline threshold: 0.562254
+  P1 threshold: 0.579439
+
+[9/9] Вычисление метрик на dev...
+
+============================================================
+Результаты сравнения baseline vs P1
+============================================================
+
+Baseline (mean_top3):
+  Dev Raw AUC: 0.5083
+  Dev Cal AUC: 0.4838
+  Dev F1: 0.0000
+  Dev FPR: 0.0000
+  Dev Precision: 0.0000
+  Dev Recall: 0.0000
+  TP/FP/FN/TN: 0/0/96/85
+  Threshold: 0.562254
+  Positive predictions: 0
+
+P1 (answer-head):
+  Dev Raw AUC: 0.7321
+  Dev Cal AUC: 0.7338
+  Dev F1: 0.6164
+  Dev FPR: 0.1647
+  Dev Precision: 0.7778
+  Dev Recall: 0.5104
+  TP/FP/FN/TN: 49/14/47/71
+  Threshold: 0.579439
+  Positive predictions: 63
+
+Improvement:
+  F1 delta: +0.6164
+  FPR delta: +0.1647
+
+Сохранение артефактов...
+
+Проверка комплектности артефактов...
+  ✓ p1_model.json (3145 bytes)
+  ✓ baseline_bundle.json (3644 bytes)
+  ✓ calibrator_baseline.json (201 bytes)
+  ✓ calibrator_p1.json (1003 bytes)
+  ✓ thresholds.json (82 bytes)
+  ✓ fold_receipts.json (1478 bytes)
+  ✓ oof_predictions.jsonl (233697 bytes)
+  ✓ dev_predictions.jsonl (42295 bytes)
+  ✓ runtime_manifest.json (451 bytes)
+  ✓ p1_comparison.json (1176 bytes)
+  ✓ p1_comparison.md (1224 bytes)
+  ✓ evidence.json (2448 bytes)
+  ✓ OOF JSONL: 842 строк
+  ✓ Dev JSONL: 181 строк
+
+✓ Все артефакты сохранены в reports/p0_answer_comparison
+
+============================================================
+✓ Завершено за 858.6s
+============================================================

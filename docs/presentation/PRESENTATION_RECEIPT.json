@@ -1,0 +1,168 @@
+{
+  "date": "2026-10-19",
+  "scope": "Final repository presentation ONLY; not a new science stage. Merge into main authorized by user addendum.",
+  "baseline": "725824030f24862830c277d9e537c5f05727d8b0",
+  "branch": "arena/c5f69767-smarty-chumakov",
+  "prompt_removal_commit": "ce68caf72c0294630039e6874fd24ef6e53e4c49",
+  "presentation_changes": [
+    "README.md rewritten in Russian",
+    "docs/TESTS.md: 74 real file rows, 910 collected nodes; exact inventory JSON",
+    "docs/presentation/HF_RUNTIME.md: external HF dependencies and existing layout",
+    "docs/presentation/README_TOP_GITHUB.png + renderer provenance",
+    "Existing test_document_lists_every_workflow extended only: prior assertions retained, download/evidence/internal links and full-session inventory added; no new test nodes"
+  ],
+  "preflight": {
+    "targeted_document_contract_provenance_suite": {
+      "passed": 38,
+      "failed": 0
+    },
+    "ruff_touched_test": "PASS",
+    "black_touched_test": "PASS",
+    "git_diff_check": "PASS",
+    "actual_collection": {
+      "source_head": "ce68caf72c0294630039e6874fd24ef6e53e4c49",
+      "files": 74,
+      "nodes": 910,
+      "inventory": "docs/presentation/TESTS_INVENTORY.json"
+    },
+    "baseline_full_suite": {
+      "source": "reports/p8/closure/local-suite.xml",
+      "total": 910,
+      "passed": 908,
+      "skipped": 2,
+      "failed": 0,
+      "errors": 0,
+      "not_a_claim_about_presentation_head": true
+    }
+  },
+  "immutable": {
+    "frozen_manifest": "reports/p8/frozen-production-sha256.json",
+    "all_manifest_file_hashes_match": true,
+    "manifest_entries_verified": 83,
+    "bundle_sha256": "e0b13c693a058dfd66ed24a52fc14e9c70964e95885358e7b99cc1f328ad6892",
+    "tau": 0.5794392523364486,
+    "no_production_logic_model_number_run_catalog_asset_or_tag_changes": true,
+    "no_history_rewrite": true
+  },
+  "downloads": [
+    {
+      "url": "https://github.com/Igorr112323/Smarty_Chumakov/releases/latest/download/spanverify.exe",
+      "status": 302,
+      "location": "https://github.com/Igorr112323/Smarty_Chumakov/releases/download/p8-stable-20261019/spanverify.exe"
+    },
+    {
+      "url": "https://github.com/Igorr112323/Smarty_Chumakov/releases/latest/download/spanverify.pyz",
+      "status": 302,
+      "location": "https://github.com/Igorr112323/Smarty_Chumakov/releases/download/p8-stable-20261019/spanverify.pyz"
+    },
+    {
+      "url": "https://github.com/Igorr112323/Smarty_Chumakov/releases/latest/download/spanverify-win.zip",
+      "status": 302,
+      "location": "https://github.com/Igorr112323/Smarty_Chumakov/releases/download/p8-stable-20261019/spanverify-win.zip"
+    },
+    {
+      "url": "https://github.com/Igorr112323/Smarty_Chumakov/releases/latest/download/SHA256SUMS.txt",
+      "status": 302,
+      "location": "https://github.com/Igorr112323/Smarty_Chumakov/releases/download/p8-stable-20261019/SHA256SUMS.txt"
+    }
+  ],
+  "stable_release_snapshot": {
+    "assets": [
+      {
+        "browser_download_url": "https://github.com/Igorr112323/Smarty_Chumakov/releases/download/p8-stable-20261019/frozen-p5.json",
+        "digest": "sha256:e0b13c693a058dfd66ed24a52fc14e9c70964e95885358e7b99cc1f328ad6892",
+        "id": 657085653,
+        "name": "frozen-p5.json",
+        "size": 122874
+      },
+      {
+        "browser_download_url": "https://github.com/Igorr112323/Smarty_Chumakov/releases/download/p8-stable-20261019/p5-runtime.json",
+        "digest": "sha256:1af8a345655d23d2015c498cd0dfc3cf51a1dddceb31ef7ea42ec05a5eca7749",
+        "id": 657085651,
+        "name": "p5-runtime.json",
+        "size": 2969
+      },
+      {
+        "browser_download_url": "https://github.com/Igorr112323/Smarty_Chumakov/releases/download/p8-stable-20261019/p8-final-acceptance.zip",
+        "digest": "sha256:58143baac4a39d86aeaa46879c497d5195f0202f58174c91af746d94dfe2f158",
+        "id": 657085641,
+        "name": "p8-final-acceptance.zip",
+        "size": 65248935
+      },
+      {
+        "browser_download_url": "https://github.com/Igorr112323/Smarty_Chumakov/releases/download/p8-stable-20261019/p8-final-acceptance.zip.sha256",
+        "digest": "sha256:c069b886f2ef7ba62a541dce534da7fecbc62734f1379fd8369d85bc253f3d5b",
+        "id": 657085652,
+        "name": "p8-final-acceptance.zip.sha256",
+        "size": 90
+      },
+      {
+        "browser_download_url": "https://github.com/Igorr112323/Smarty_Chumakov/releases/download/p8-stable-20261019/SHA256SUMS.txt",
+        "digest": "sha256:e043808d106871c80b92b383059940eaa88aa5acd2d09882b4f3377e87bcbb35",
+        "id": 657085645,
+        "name": "SHA256SUMS.txt",
+        "size": 415
+      },
+      {
+        "browser_download_url": "https://github.com/Igorr112323/Smarty_Chumakov/releases/download/p8-stable-20261019/spanverify-win.zip",
+        "digest": "sha256:6a565d95c9b96d087764bd48f3169254992acaff4367baf97f0a1d58afb45ac8",
+        "id": 657085677,
+        "name": "spanverify-win.zip",
+        "size": 9148872
+      },
+      {
+        "browser_download_url": "https://github.com/Igorr112323/Smarty_Chumakov/releases/download/p8-stable-20261019/spanverify.exe",
+        "digest": "sha256:93f354eeea49633b72df0c8d3548ba912465c3b3309d9e72452fed815f274362",
+        "id": 657085678,
+        "name": "spanverify.exe",
+        "size": 8981233
+      },
+      {
+        "browser_download_url": "https://github.com/Igorr112323/Smarty_Chumakov/releases/download/p8-stable-20261019/spanverify.pyz",
+        "digest": "sha256:4006d891adfb9cd0c8554178b0c1d505aaf5b21b8b78bf72e800faddd33ae76f",
+        "id": 657085682,
+        "name": "spanverify.pyz",
+        "size": 232874
+      }
+    ],
+    "draft": false,
+    "id": 417608189,
+    "prerelease": false,
+    "tag_name": "p8-stable-20261019"
+  },
+  "merge_preflight": {
+    "base": "4d155e48c441e00e2f43af7aedb13ec2301846ee",
+    "work_branch_ahead_at_remote_baseline": 106,
+    "main_ahead": 1,
+    "merge_base": "fc438ea7069b4a3c8ad78097f4c29df1767937ec",
+    "merge_tree_conflicts": false,
+    "main_only_file": {
+      "path": "ПРАВКА_ПУБЛИЧНОГО_REPLAY_P1.zip",
+      "git_blob": "cbc1753caa8f450d24ef39f6a8845fadb6676132",
+      "bytes": 24339,
+      "sha256": "466f5092c4b7f3f77bf756e918c6c1c8ac3caf243239655a9e924e009d685306"
+    },
+    "method_required": "PR #11, merge commit with two parents, no squash/rebase/force, no local branch switch",
+    "main_ci_push_trigger": true
+  },
+  "final_proof_policy": {
+    "tests_excluded": false,
+    "required_before_merge": "Full local suite and ordinary push/PR CI SUCCESS at the final presentation commit; actual Final CI read-only seal job SUCCESS, not skipped",
+    "required_after_merge": "Fetch main without switching branches; verify two parents, exact tree delta of only preserved ZIP, every baseline branch commit ancestor, branch HEAD unchanged, main push CI SUCCESS and latest asset digests unchanged",
+    "immutable_external_proof_location": "Final response lists exact commit SHA and GitHub Actions run/job IDs. Those results are intentionally not fabricated before the commit exists."
+  },
+  "documentation_wording_correction": {
+    "parent": "7fbc42280ca93ee09cb0502678f85253f522c538",
+    "finding": "Existing numeric checker interprets the digit 1 in Russian wording F1 токенов as a token count. Full preflight exposed this; two README phrases corrected to токенный F1. No numbers or checker assertions changed.",
+    "history_policy": "Extra small documentation correction commit instead of amend/force; both initial commits already pushed.",
+    "full_exact_head_qa_required_again": true
+  },
+  "documentation_guard_windows_portability": {
+    "parent": "bf0af208469dea407e0a31e61664892d6216915c",
+    "finding": "Full local suite passed 908+2, but Windows CI failed. Inspection found new documentation guard comparing native Windows backslash paths against canonical POSIX inventory paths. Normalize the filesystem-relative representation with as_posix; retain full set equality and every prior assertion.",
+    "failed_windows_job": 118287245440,
+    "production_changes": false,
+    "history_policy": "Normal additional documentation-test fix commit; no amend/rebase/force.",
+    "full_exact_head_qa_required_again": true
+  }
+}

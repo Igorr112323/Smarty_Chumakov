@@ -1,0 +1,57 @@
+name: P7 paired same-host benchmark
+on:
+  push:
+    branches: [arena/c5f69767-smarty-chumakov]
+    paths: [.github/p7-paired.trigger]
+permissions:
+  contents: read
+jobs:
+  paired:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 40
+    strategy:
+      fail-fast: false
+      matrix:
+        mode: [demo, hf]
+    env:
+      OMP_NUM_THREADS: '2'
+      MKL_NUM_THREADS: '2'
+      OPENBLAS_NUM_THREADS: '2'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Same pinned P6/P7 HF dependencies and prepared weights
+        if: matrix.mode == 'hf'
+        run: |
+          pip install 'torch==2.14.1+cpu' --index-url https://download.pytorch.org/whl/cpu
+          pip install 'transformers==5.20.1' 'sentencepiece==0.2.2' 'numpy==2.4.6'
+          python spanverify-module/scripts/p6_acceptance.py worker --mode hf --out reports/p7/paired-hf/download.json
+      - name: Immutable P6 program snapshot, never old tests or fitting
+        run: |
+          python spanverify-module/scripts/p7_paired_baseline.py
+          mkdir -p reports/p7/paired-${{ matrix.mode }}
+          cp .arena/p7/paired-before/snapshot-receipt.json reports/p7/paired-${{ matrix.mode }}/
+      - name: Before, original P6 application; three cold/warm repeats
+        env:
+          P7_PROGRAM_SOURCE_SHA: '14a018a1b90b51cc47cd8baf628147ac22e1d8b1'
+        run: python -u .arena/p7/paired-before/spanverify-module/scripts/p6_acceptance.py benchmark --mode ${{ matrix.mode }} --out reports/p7/paired-${{ matrix.mode }}/before
+      - name: Complete before table and hardware receipt
+        env:
+          P7_MEASUREMENT_PHASE: before
+        run: python spanverify-module/scripts/p7_measurements.py rates --out reports/p7/paired-${{ matrix.mode }}/before
+      - name: After, current program; three cold/warm repeats on SAME runner
+        run: python -u spanverify-module/scripts/p6_acceptance.py benchmark --mode ${{ matrix.mode }} --out reports/p7/paired-${{ matrix.mode }}/after
+      - name: Complete after table and hardware receipt
+        env:
+          P7_MEASUREMENT_PHASE: after
+        run: python spanverify-module/scripts/p7_measurements.py rates --out reports/p7/paired-${{ matrix.mode }}/after
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: p7-paired-${{ matrix.mode }}
+          path: reports/p7/paired-${{ matrix.mode }}/
+          retention-days: 90

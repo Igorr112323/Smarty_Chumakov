@@ -1,0 +1,876 @@
+{
+  "as_of": "2026-10-19",
+  "source": "User-specified Appendix3 requirements; evidence only, no invented acceptance",
+  "current_measurement_run": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39266451529",
+  "official_test_read": true,
+  "official_test_evaluated": true,
+  "official_test_read_scope": "P8 authorized final evaluation177; prior legacy read and zero-output infrastructure abort explicitly retained",
+  "incident_evidence": "reports/p7/freeze-and-incident.json",
+  "overall": "не достигнут",
+  "no_artifact_rule": "No current proof => not achieved; historical/demo proof cannot establish P5 speed/delivery/official quality",
+  "requirements": [
+    {
+      "id": "input",
+      "requirement": "UTF-8 input up to 2,000,000 characters",
+      "status": "достигнут",
+      "scope": "P7 measured fixtures only; historical P5 quality metrics retained",
+      "note": "Real HF2M:282830native records, last end2000000, all finite/bounded and exact slices; version window512_full_answer_v1, unchanged top3context policy. Arbitrary text latency not guaranteed.",
+      "evidence": [
+        {
+          "path": "reports/p7/final-receipts/acceptance/summary.json",
+          "url": "https://github.com/Igorr112323/Smarty_Chumakov/blob/arena/c5f69767-smarty-chumakov/reports/p7/final-receipts/acceptance/summary.json"
+        },
+        {
+          "path": "reports/p7/full-hf-2M-indexed-public-exact.json",
+          "url": "https://github.com/Igorr112323/Smarty_Chumakov/blob/arena/c5f69767-smarty-chumakov/reports/p7/full-hf-2M-indexed-public-exact.json"
+        }
+      ],
+      "current_run": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39236657451"
+    },
+    {
+      "id": "risk",
+      "requirement": "Output risk in [0,1]",
+      "status": "частично",
+      "scope": "current P5 candidate; historical evidence is explicitly qualified",
+      "note": "Real public dev evidence and finite-risk checks; no all-input/packaged API acceptance.",
+      "evidence": [
+        {
+          "path": "spanverify-module/reports/experiments/p5_span_filter/run39170981235/dev_evidence.jsonl.gz",
+          "url": "https://github.com/Igorr112323/Smarty_Chumakov/blob/arena/c5f69767-smarty-chumakov/spanverify-module/reports/experiments/p5_span_filter/run39170981235/dev_evidence.jsonl.gz"
+        },
+        {
+          "path": "spanverify-module/reports/experiments/p5_span_filter/run39170981235/parity.json",
+          "url": "https://github.com/Igorr112323/Smarty_Chumakov/blob/arena/c5f69767-smarty-chumakov/spanverify-module/reports/experiments/p5_span_filter/run39170981235/parity.json"
+        }
+      ],
+      "current_run": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39170981235"
+    },
+    {
+      "id": "spans",
+      "requirement": "Fragments with coordinates, label and confidence",
+      "status": "достигнут",
+      "scope": "P8 official held-out measurement; frozen P7 product",
+      "note": "Official strict kept-spans+rules:47TP38FP50FN, IoU>=.5 unchanged, containment .2886597938, mean contained width1.33926249.",
+      "evidence": [
+        {
+          "path": "reports/p8/run39266451529/official/result.json",
+          "url": "https://github.com/Igorr112323/Smarty_Chumakov/blob/arena/c5f69767-smarty-chumakov/reports/p8/run39266451529/official/result.json"
+        },
+        {
+          "path": "reports/FINAL_REPORT.md",
+          "url": "https://github.com/Igorr112323/Smarty_Chumakov/blob/arena/c5f69767-smarty-chumakov/reports/FINAL_REPORT.md"
+        }
+      ],
+      "current_run": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39266451529"
+    },
+    {
+      "id": "features",
+      "requirement": "Five features per token",
+      "status": "достигнут",
+      "scope": "current P5 candidate; historical evidence is explicitly qualified",
+      "note": "Frozen P4 retains the original five HF columns and 56 derived token inputs. P5 adds only 19 span-level derivatives; neither token risks nor HF measurements are retrained.",
+      "evidence": [
+        {
+          "path": "spanverify-module/reports/experiments/p4_context_head/run39164044941/feature_specs.json",
+          "url": "https://github.com/Igorr112323/Smarty_Chumakov/blob/arena/c5f69767-smarty-chumakov/spanverify-module/reports/experiments/p4_context_head/run39164044941/feature_specs.json"
+        },
+        {
+          "path": "spanverify-module/reports/experiments/p5_span_filter/run39170981235/span_feature_spec.json",
+          "url": "https://github.com/Igorr112323/Smarty_Chumakov/blob/arena/c5f69767-smarty-chumakov/spanverify-module/reports/experiments/p5_span_filter/run39170981235/span_feature_spec.json"
+        },
+        {
+          "path": "spanverify-module/reports/experiments/p5_span_filter/run39170981235/manifest.json",
+          "url": "https://github.com/Igorr112323/Smarty_Chumakov/blob/arena/c5f69767-smarty-chumakov/spanverify-module/reports/experiments/p5_span_filter/run39170981235/manifest.json"
+        }
+      ],
+      "current_run": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39170981235"
+    },
+    {
+      "id": "participation",
+      "requirement": "AI participation [0,1], calibrated at step 0.25",
+      "status": "частично",
+      "scope": "P7 measured fixtures only; historical P5 quality metrics retained",
+      "note": "Original5document-fold train-only PAVA: demo OOF MAE.449732→.298901,HF.406824→.256537; pooled curves remain nonmonotone. Separate artifact, raw/P1 frozen. Synthetic diagnostic NOT real-LLM authorship.",
+      "evidence": [
+        {
+          "path": "reports/p7/CALIBRATION.md",
+          "url": "https://github.com/Igorr112323/Smarty_Chumakov/blob/arena/c5f69767-smarty-chumakov/reports/p7/CALIBRATION.md"
+        },
+        {
+          "path": "reports/p7/final-receipts/ai_share_calibrator_v1.hf.json",
+          "url": "https://github.com/Igorr112323/Smarty_Chumakov/blob/arena/c5f69767-smarty-chumakov/reports/p7/final-receipts/ai_share_calibrator_v1.hf.json"
+        },
+        {
+          "path": "reports/p7/final-receipts/ai_share_calibrator_v1.demo.json",
+          "url": "https://github.com/Igorr112323/Smarty_Chumakov/blob/arena/c5f69767-smarty-chumakov/reports/p7/final-receipts/ai_share_calibrator_v1.demo.json"
+        }
+      ],
+      "current_run": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39236657451"
+    },
+    {
+      "id": "metric_groups",
+      "requirement": "Token/answer/span metrics, strict IoU >= 0.5",
+      "status": "достигнут",
+      "scope": "historical frozen P5 legacy512; not re-evaluated P7 long-v1 quality",
+      "note": "Real frozen public dev, all families; span FPR remains declared token proxy, not invented TN. Historical P5 metric, not a new P7 long-path quality evaluation.",
+      "evidence": [
+        {
+          "path": "spanverify-module/reports/experiments/p5_span_filter/run39170981235/all_family_metrics.json",
+          "url": "https://github.com/Igorr112323/Smarty_Chumakov/blob/arena/c5f69767-smarty-chumakov/spanverify-module/reports/experiments/p5_span_filter/run39170981235/all_family_metrics.json"
+        },
+        {
+          "path": "spanverify-module/reports/experiments/p5_span_filter/run39170981235/baseline_parity.json",
+          "url": "https://github.com/Igorr112323/Smarty_Chumakov/blob/arena/c5f69767-smarty-chumakov/spanverify-module/reports/experiments/p5_span_filter/run39170981235/baseline_parity.json"
+        }
+      ],
+      "current_run": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39170981235"
+    },
+    {
+      "id": "quality_gate",
+      "requirement": "F1 >= .50 jointly with FPR <= .40 on document-held-out part of 1200 pairs",
+      "status": "достигнут",
+      "scope": "P8 official held-out measurement; frozen P7 product",
+      "note": "P8 official177 joint PASS: tokensF1 .6252045826513911, strict spansF1 .5164835164835164, token-FPR proxy .015466785356626237; internal .90/.10 NOT achieved.",
+      "evidence": [
+        {
+          "path": "reports/p8/run39266451529/official/result.json",
+          "url": "https://github.com/Igorr112323/Smarty_Chumakov/blob/arena/c5f69767-smarty-chumakov/reports/p8/run39266451529/official/result.json"
+        },
+        {
+          "path": "reports/FINAL_REPORT.md",
+          "url": "https://github.com/Igorr112323/Smarty_Chumakov/blob/arena/c5f69767-smarty-chumakov/reports/FINAL_REPORT.md"
+        }
+      ],
+      "current_run": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39266451529"
+    },
+    {
+      "id": "dev_tokens_gate",
+      "requirement": "P5 independent public dev tokens quality gate",
+      "status": "достигнут",
+      "scope": "historical frozen P5 legacy512; not re-evaluated P7 long-v1 quality",
+      "note": "Dev only: F1=0.6264274061990214, FPR=0.01744337412132257; strict spans use existing token proxy. This is not official test or whole-contract acceptance. Historical P5 metric, not a new P7 long-path quality evaluation.",
+      "evidence": [
+        {
+          "path": "spanverify-module/reports/experiments/p5_span_filter/run39170981235/all_family_metrics.json",
+          "url": "https://github.com/Igorr112323/Smarty_Chumakov/blob/arena/c5f69767-smarty-chumakov/spanverify-module/reports/experiments/p5_span_filter/run39170981235/all_family_metrics.json"
+        },
+        {
+          "path": "spanverify-module/reports/experiments/p5_span_filter/run39170981235/parity.json",
+          "url": "https://github.com/Igorr112323/Smarty_Chumakov/blob/arena/c5f69767-smarty-chumakov/spanverify-module/reports/experiments/p5_span_filter/run39170981235/parity.json"
+        }
+      ],
+      "current_run": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39170981235"
+    },
+    {
+      "id": "dev_spans_gate",
+      "requirement": "P5 independent public dev spans quality gate",
+      "status": "достигнут",
+      "scope": "historical frozen P5 legacy512; not re-evaluated P7 long-v1 quality",
+      "note": "Dev only: F1=0.5287356321839081, FPR=0.01744337412132257; strict spans use existing token proxy. This is not official test or whole-contract acceptance. Historical P5 metric, not a new P7 long-path quality evaluation.",
+      "evidence": [
+        {
+          "path": "spanverify-module/reports/experiments/p5_span_filter/run39170981235/all_family_metrics.json",
+          "url": "https://github.com/Igorr112323/Smarty_Chumakov/blob/arena/c5f69767-smarty-chumakov/spanverify-module/reports/experiments/p5_span_filter/run39170981235/all_family_metrics.json"
+        },
+        {
+          "path": "spanverify-module/reports/experiments/p5_span_filter/run39170981235/parity.json",
+          "url": "https://github.com/Igorr112323/Smarty_Chumakov/blob/arena/c5f69767-smarty-chumakov/spanverify-module/reports/experiments/p5_span_filter/run39170981235/parity.json"
+        }
+      ],
+      "current_run": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39170981235"
+    },
+    {
+      "id": "official_test",
+      "requirement": "Official test177 acceptance",
+      "status": "достигнут",
+      "scope": "P8 official held-out measurement; frozen P7 product",
+      "note": "177/177 once through public Verifier; 7 over512/max1266, full long-v1; empty cache0hits177misses,381.292202784s, inference-worker fit_calls=[] ONLY; separate early-CI temporary fit breached execution freeze. Zero-output infrastructure abort preserved, not a second quality chance.",
+      "evidence": [
+        {
+          "path": "reports/p8/run39266451529/official/result.json",
+          "url": "https://github.com/Igorr112323/Smarty_Chumakov/blob/arena/c5f69767-smarty-chumakov/reports/p8/run39266451529/official/result.json"
+        },
+        {
+          "path": "reports/FINAL_REPORT.md",
+          "url": "https://github.com/Igorr112323/Smarty_Chumakov/blob/arena/c5f69767-smarty-chumakov/reports/FINAL_REPORT.md"
+        }
+      ],
+      "current_run": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39266451529"
+    },
+    {
+      "id": "speed_per_1000",
+      "requirement": "<= .03 seconds per 1000 characters",
+      "status": "не достигнут",
+      "scope": "P7 measured fixtures only; historical P5 quality metrics retained",
+      "note": "Demo1k cold/warm≤.03s achieved; HF1k exceeds.03s. All sizes/roles sec1000 and censored timeout bounds published; original limits retained.",
+      "evidence": [
+        {
+          "path": "reports/p7/final-receipts/native-benchmark.json",
+          "url": "https://github.com/Igorr112323/Smarty_Chumakov/blob/arena/c5f69767-smarty-chumakov/reports/p7/final-receipts/native-benchmark.json"
+        },
+        {
+          "path": "reports/p7/TIMINGS.md",
+          "url": "https://github.com/Igorr112323/Smarty_Chumakov/blob/arena/c5f69767-smarty-chumakov/reports/p7/TIMINGS.md"
+        }
+      ],
+      "current_run": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39236657451"
+    },
+    {
+      "id": "speed_50k",
+      "requirement": "50,000 characters <= 1 second",
+      "status": "не достигнут",
+      "scope": "P7 measured fixtures only; historical P5 quality metrics retained",
+      "note": "Demo50k≤1s achieved; HF answer50k warm median8.168092/max8.213496s>1s. Fresh profile: dense frozen-model inference dominates; no quality/threshold changes.",
+      "evidence": [
+        {
+          "path": "reports/p7/final-receipts/native-benchmark.json",
+          "url": "https://github.com/Igorr112323/Smarty_Chumakov/blob/arena/c5f69767-smarty-chumakov/reports/p7/final-receipts/native-benchmark.json"
+        },
+        {
+          "path": "reports/p7/final-receipts/native-profiles.json",
+          "url": "https://github.com/Igorr112323/Smarty_Chumakov/blob/arena/c5f69767-smarty-chumakov/reports/p7/final-receipts/native-profiles.json"
+        }
+      ],
+      "current_run": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39236657451"
+    },
+    {
+      "id": "speed_2m",
+      "requirement": "2,000,000 characters <= 60 seconds",
+      "status": "достигнут",
+      "scope": "P7 measured fixtures only; historical P5 quality metrics retained",
+      "note": "Three cold/warm repeats, all2M answer/context demo/HF≤60s, no timeout. HF answer cold median42.878149/warm38.769417s; demo29.950421/29.876726s. Repeat-train fixture, not arbitrary unique-text guarantee.",
+      "evidence": [
+        {
+          "path": "reports/p7/final-receipts/native-benchmark.json",
+          "url": "https://github.com/Igorr112323/Smarty_Chumakov/blob/arena/c5f69767-smarty-chumakov/reports/p7/final-receipts/native-benchmark.json"
+        },
+        {
+          "path": "reports/p7/TIMINGS.md",
+          "url": "https://github.com/Igorr112323/Smarty_Chumakov/blob/arena/c5f69767-smarty-chumakov/reports/p7/TIMINGS.md"
+        }
+      ],
+      "current_run": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39236657451"
+    },
+    {
+      "id": "cli",
+      "requirement": "CLI interface",
+      "status": "частично",
+      "scope": "current P5 candidate; historical evidence is explicitly qualified",
+      "note": "Historical demo health/index/verify HTTP200 at port8765; CLI exit1 in old smoke. Current P5 interfaces not separately accepted.",
+      "evidence": [
+        {
+          "path": "reports/contract/4.1.8-interfaces.json",
+          "url": "https://github.com/Igorr112323/Smarty_Chumakov/blob/arena/c5f69767-smarty-chumakov/reports/contract/4.1.8-interfaces.json"
+        }
+      ],
+      "current_run": null
+    },
+    {
+      "id": "web",
+      "requirement": "Web interface on port8765",
+      "status": "частично",
+      "scope": "current P5 candidate; historical evidence is explicitly qualified",
+      "note": "Historical demo health/index/verify HTTP200 at port8765; CLI exit1 in old smoke. Current P5 interfaces not separately accepted.",
+      "evidence": [
+        {
+          "path": "reports/contract/4.1.8-interfaces.json",
+          "url": "https://github.com/Igorr112323/Smarty_Chumakov/blob/arena/c5f69767-smarty-chumakov/reports/contract/4.1.8-interfaces.json"
+        }
+      ],
+      "current_run": null
+    },
+    {
+      "id": "http",
+      "requirement": "HTTP API",
+      "status": "частично",
+      "scope": "current P5 candidate; historical evidence is explicitly qualified",
+      "note": "Historical demo health/index/verify HTTP200 at port8765; CLI exit1 in old smoke. Current P5 interfaces not separately accepted.",
+      "evidence": [
+        {
+          "path": "reports/contract/4.1.8-interfaces.json",
+          "url": "https://github.com/Igorr112323/Smarty_Chumakov/blob/arena/c5f69767-smarty-chumakov/reports/contract/4.1.8-interfaces.json"
+        }
+      ],
+      "current_run": null
+    },
+    {
+      "id": "exe",
+      "requirement": "Executable <=9 MB",
+      "status": "достигнут",
+      "scope": "P8 actual Windows build artifacts; publication-only source failure preserved",
+      "note": "P8 build39271014161/source654a48e: exe8981233B, pyz232874B, strict gates PASS; three complete suites and smoke/offline validations PASS. Original workflow publication-only FAIL; recovery reuses exact checksummed artifacts, no rebuild/scoring. P8 closing39303110624 SUCCESS: curator-authorized identical8-asset transfer from original RC, no rebuild/inference; original publication failures retained in historical receipts",
+      "evidence": [
+        {
+          "path": "reports/p8/DELIVERY.json",
+          "url": "https://github.com/Igorr112323/Smarty_Chumakov/blob/arena/c5f69767-smarty-chumakov/reports/p8/DELIVERY.json"
+        },
+        {
+          "path": "reports/p8/run39271014161/windows/release/SHA256SUMS.txt",
+          "url": "https://github.com/Igorr112323/Smarty_Chumakov/blob/arena/c5f69767-smarty-chumakov/reports/p8/run39271014161/windows/release/SHA256SUMS.txt"
+        }
+      ],
+      "current_run": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39271014161"
+    },
+    {
+      "id": "package",
+      "requirement": "Package <=0.6 MB",
+      "status": "достигнут",
+      "scope": "P8 actual Windows build artifacts; publication-only source failure preserved",
+      "note": "P8 build39271014161/source654a48e: exe8981233B, pyz232874B, strict gates PASS; three complete suites and smoke/offline validations PASS. Original workflow publication-only FAIL; recovery reuses exact checksummed artifacts, no rebuild/scoring. P8 closing39303110624 SUCCESS: curator-authorized identical8-asset transfer from original RC, no rebuild/inference; original publication failures retained in historical receipts",
+      "evidence": [
+        {
+          "path": "reports/p8/DELIVERY.json",
+          "url": "https://github.com/Igorr112323/Smarty_Chumakov/blob/arena/c5f69767-smarty-chumakov/reports/p8/DELIVERY.json"
+        },
+        {
+          "path": "reports/p8/run39271014161/windows/release/SHA256SUMS.txt",
+          "url": "https://github.com/Igorr112323/Smarty_Chumakov/blob/arena/c5f69767-smarty-chumakov/reports/p8/run39271014161/windows/release/SHA256SUMS.txt"
+        }
+      ],
+      "current_run": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39271014161"
+    },
+    {
+      "id": "build",
+      "requirement": "Automatic source build with SHA-256",
+      "status": "достигнут",
+      "scope": "P8 actual Windows build artifacts; publication-only source failure preserved",
+      "note": "P8 build39271014161/source654a48e: exe8981233B, pyz232874B, strict gates PASS; three complete suites and smoke/offline validations PASS. Original workflow publication-only FAIL; recovery reuses exact checksummed artifacts, no rebuild/scoring. P8 closing39303110624 SUCCESS: curator-authorized identical8-asset transfer from original RC, no rebuild/inference; original publication failures retained in historical receipts",
+      "evidence": [
+        {
+          "path": "reports/p8/DELIVERY.json",
+          "url": "https://github.com/Igorr112323/Smarty_Chumakov/blob/arena/c5f69767-smarty-chumakov/reports/p8/DELIVERY.json"
+        },
+        {
+          "path": "reports/p8/run39271014161/windows/release/SHA256SUMS.txt",
+          "url": "https://github.com/Igorr112323/Smarty_Chumakov/blob/arena/c5f69767-smarty-chumakov/reports/p8/run39271014161/windows/release/SHA256SUMS.txt"
+        }
+      ],
+      "current_run": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39271014161"
+    },
+    {
+      "id": "no_install",
+      "requirement": "4.2.3 Launch without installation",
+      "status": "достигнут",
+      "scope": "P8 actual Windows build artifacts; publication-only source failure preserved",
+      "note": "P8 build39271014161/source654a48e: exe8981233B, pyz232874B, strict gates PASS; three complete suites and smoke/offline validations PASS. Original workflow publication-only FAIL; recovery reuses exact checksummed artifacts, no rebuild/scoring. P8 closing39303110624 SUCCESS: curator-authorized identical8-asset transfer from original RC, no rebuild/inference; original publication failures retained in historical receipts",
+      "evidence": [
+        {
+          "path": "reports/p8/DELIVERY.json",
+          "url": "https://github.com/Igorr112323/Smarty_Chumakov/blob/arena/c5f69767-smarty-chumakov/reports/p8/DELIVERY.json"
+        },
+        {
+          "path": "reports/p8/run39271014161/windows/release/SHA256SUMS.txt",
+          "url": "https://github.com/Igorr112323/Smarty_Chumakov/blob/arena/c5f69767-smarty-chumakov/reports/p8/run39271014161/windows/release/SHA256SUMS.txt"
+        }
+      ],
+      "current_run": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39271014161"
+    },
+    {
+      "id": "hf_footprint",
+      "requirement": "4.2.5 HF runtime and separately delivered model footprint",
+      "status": "частично",
+      "scope": "P8 measured directory/file footprint, not complete installed SDK",
+      "note": "Actual weight file551290714B; full model/tokenizer directory554277308B; libs870588148B; directory+libs1424865456B PLUS Python/app/filesystem overhead. Complete installed SDK total unmeasured; compressed portable637048763B is not installed storage.",
+      "evidence": [
+        {
+          "path": "reports/p8/run39271014161/hf-autonomy/windows-hf-autonomy.json",
+          "url": "https://github.com/Igorr112323/Smarty_Chumakov/blob/arena/c5f69767-smarty-chumakov/reports/p8/run39271014161/hf-autonomy/windows-hf-autonomy.json"
+        }
+      ],
+      "current_run": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39271014161"
+    },
+    {
+      "id": "storage",
+      "requirement": "4.2.6 Storage requirements",
+      "status": "частично",
+      "scope": "P8 measured directory/file footprint, not complete installed SDK",
+      "note": "Actual weight file551290714B; full model/tokenizer directory554277308B; libs870588148B; directory+libs1424865456B PLUS Python/app/filesystem overhead. Complete installed SDK total unmeasured; compressed portable637048763B is not installed storage.",
+      "evidence": [
+        {
+          "path": "reports/p8/run39271014161/hf-autonomy/windows-hf-autonomy.json",
+          "url": "https://github.com/Igorr112323/Smarty_Chumakov/blob/arena/c5f69767-smarty-chumakov/reports/p8/run39271014161/hf-autonomy/windows-hf-autonomy.json"
+        }
+      ],
+      "current_run": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39271014161"
+    },
+    {
+      "id": "portable_copy",
+      "requirement": "4.2.7 Portable copying and integrity",
+      "status": "достигнут",
+      "scope": "P8 actual Windows build artifacts; publication-only source failure preserved",
+      "note": "P8 build39271014161/source654a48e: exe8981233B, pyz232874B, strict gates PASS; three complete suites and smoke/offline validations PASS. Original workflow publication-only FAIL; recovery reuses exact checksummed artifacts, no rebuild/scoring. P8 closing39303110624 SUCCESS: curator-authorized identical8-asset transfer from original RC, no rebuild/inference; original publication failures retained in historical receipts",
+      "evidence": [
+        {
+          "path": "reports/p8/DELIVERY.json",
+          "url": "https://github.com/Igorr112323/Smarty_Chumakov/blob/arena/c5f69767-smarty-chumakov/reports/p8/DELIVERY.json"
+        },
+        {
+          "path": "reports/p8/run39271014161/windows/release/SHA256SUMS.txt",
+          "url": "https://github.com/Igorr112323/Smarty_Chumakov/blob/arena/c5f69767-smarty-chumakov/reports/p8/run39271014161/windows/release/SHA256SUMS.txt"
+        }
+      ],
+      "current_run": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39271014161"
+    },
+    {
+      "id": "runtime_config",
+      "requirement": "4.2.8 Reference machine / RAM / CPU / offline runtime",
+      "status": "частично",
+      "scope": "current P5 candidate; historical evidence is explicitly qualified",
+      "note": "Historical demo peak261MB on3.85GB host; specified reference machine not tested. P5 cache-only CPU replay is not a memory/offline-delivery benchmark.",
+      "evidence": [
+        {
+          "path": "reports/contract/4.2.8-runtime-config.json",
+          "url": "https://github.com/Igorr112323/Smarty_Chumakov/blob/arena/c5f69767-smarty-chumakov/reports/contract/4.2.8-runtime-config.json"
+        }
+      ],
+      "current_run": null
+    },
+    {
+      "id": "updates",
+      "requirement": "4.2.9 Whole-package replacement / update procedure",
+      "status": "частично",
+      "scope": "current P5 candidate; historical evidence is explicitly qualified",
+      "note": "Historical operating guide contains replacement/previous-version procedure; no measured P5 packaged upgrade.",
+      "evidence": [
+        {
+          "path": "reports/contract/4.2.9-update-procedure.json",
+          "url": "https://github.com/Igorr112323/Smarty_Chumakov/blob/arena/c5f69767-smarty-chumakov/reports/contract/4.2.9-update-procedure.json"
+        }
+      ],
+      "current_run": null
+    },
+    {
+      "id": "qualification",
+      "requirement": "4.2.10 Operation without specialist preparation",
+      "status": "частично",
+      "scope": "current P5 candidate; historical evidence is explicitly qualified",
+      "note": "Historical guide sections checked; no P5 end-user usability acceptance artifact.",
+      "evidence": [
+        {
+          "path": "reports/contract/4.2.10-qualification.json",
+          "url": "https://github.com/Igorr112323/Smarty_Chumakov/blob/arena/c5f69767-smarty-chumakov/reports/contract/4.2.10-qualification.json"
+        }
+      ],
+      "current_run": null
+    },
+    {
+      "id": "number",
+      "requirement": "Robustness: numeric substitutions",
+      "status": "исследовано и задокументировано",
+      "scope": "P7 measured fixtures only; historical P5 quality metrics retained",
+      "note": "Not quality achieved. P6 saved OOF/dev mode proxies only, not new perturbation tests: dev strict span F1 contradiction.1538/number_attribution.3333/partial0; paraphrase not separately labelled. No retraining or selection.",
+      "evidence": [
+        {
+          "path": "reports/acceptance/robustness.json",
+          "url": "https://github.com/Igorr112323/Smarty_Chumakov/blob/arena/c5f69767-smarty-chumakov/reports/acceptance/robustness.json"
+        },
+        {
+          "path": "reports/p7/REPORT.md",
+          "url": "https://github.com/Igorr112323/Smarty_Chumakov/blob/arena/c5f69767-smarty-chumakov/reports/p7/REPORT.md"
+        }
+      ],
+      "current_run": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39236657451"
+    },
+    {
+      "id": "contradiction",
+      "requirement": "Robustness: contradiction",
+      "status": "исследовано и задокументировано",
+      "scope": "P7 measured fixtures only; historical P5 quality metrics retained",
+      "note": "Not quality achieved. P6 saved OOF/dev mode proxies only, not new perturbation tests: dev strict span F1 contradiction.1538/number_attribution.3333/partial0; paraphrase not separately labelled. No retraining or selection.",
+      "evidence": [
+        {
+          "path": "reports/acceptance/robustness.json",
+          "url": "https://github.com/Igorr112323/Smarty_Chumakov/blob/arena/c5f69767-smarty-chumakov/reports/acceptance/robustness.json"
+        },
+        {
+          "path": "reports/p7/REPORT.md",
+          "url": "https://github.com/Igorr112323/Smarty_Chumakov/blob/arena/c5f69767-smarty-chumakov/reports/p7/REPORT.md"
+        }
+      ],
+      "current_run": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39236657451"
+    },
+    {
+      "id": "paraphrase",
+      "requirement": "Robustness: paraphrase",
+      "status": "исследовано и задокументировано",
+      "scope": "P7 measured fixtures only; historical P5 quality metrics retained",
+      "note": "Not quality achieved. P6 saved OOF/dev mode proxies only, not new perturbation tests: dev strict span F1 contradiction.1538/number_attribution.3333/partial0; paraphrase not separately labelled. No retraining or selection.",
+      "evidence": [
+        {
+          "path": "reports/acceptance/robustness.json",
+          "url": "https://github.com/Igorr112323/Smarty_Chumakov/blob/arena/c5f69767-smarty-chumakov/reports/acceptance/robustness.json"
+        },
+        {
+          "path": "reports/p7/REPORT.md",
+          "url": "https://github.com/Igorr112323/Smarty_Chumakov/blob/arena/c5f69767-smarty-chumakov/reports/p7/REPORT.md"
+        }
+      ],
+      "current_run": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39236657451"
+    },
+    {
+      "id": "omission",
+      "requirement": "Robustness: omission",
+      "status": "исследовано и задокументировано",
+      "scope": "P7 measured fixtures only; historical P5 quality metrics retained",
+      "note": "Not quality achieved. P6 saved OOF/dev mode proxies only, not new perturbation tests: dev strict span F1 contradiction.1538/number_attribution.3333/partial0; paraphrase not separately labelled. No retraining or selection.",
+      "evidence": [
+        {
+          "path": "reports/acceptance/robustness.json",
+          "url": "https://github.com/Igorr112323/Smarty_Chumakov/blob/arena/c5f69767-smarty-chumakov/reports/acceptance/robustness.json"
+        },
+        {
+          "path": "reports/p7/REPORT.md",
+          "url": "https://github.com/Igorr112323/Smarty_Chumakov/blob/arena/c5f69767-smarty-chumakov/reports/p7/REPORT.md"
+        }
+      ],
+      "current_run": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39236657451"
+    },
+    {
+      "id": "control_sample",
+      "requirement": "Control sample / corpus1200 / held-out document split",
+      "status": "достигнут",
+      "scope": "P8 actual official177 and external human B1000, NOT a B quality gate",
+      "note": "Immutable A3 train842/dev181/test177, official177 measured once. External B1000 unique human pairs,333positive answers/423exact spans, all supported families measured; severe token/span transfer drop published. No B selection/training; one ambiguous first match/license unconfirmed. Historical official-file exposure disclosed.",
+      "evidence": [
+        {
+          "path": "reports/p8/run39266451529/external/result.json",
+          "url": "https://github.com/Igorr112323/Smarty_Chumakov/blob/arena/c5f69767-smarty-chumakov/reports/p8/run39266451529/external/result.json"
+        },
+        {
+          "path": "reports/p8/run39266451529/external/aggregation-integrity.json",
+          "url": "https://github.com/Igorr112323/Smarty_Chumakov/blob/arena/c5f69767-smarty-chumakov/reports/p8/run39266451529/external/aggregation-integrity.json"
+        },
+        {
+          "path": "reports/p8/run39266451529/official/result.json",
+          "url": "https://github.com/Igorr112323/Smarty_Chumakov/blob/arena/c5f69767-smarty-chumakov/reports/p8/run39266451529/official/result.json"
+        }
+      ],
+      "current_run": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39266451529"
+    },
+    {
+      "id": "execution_freeze",
+      "requirement": "P8 no ANY fit before official seal",
+      "status": "не достигнут",
+      "scope": "P8 execution-process violation, separate from numeric official joint PASS",
+      "note": "Early cancelled CI39266027509 always-contract bypass; artifact14:12:03 before official job14:26:51. Temporary synthetic ParticipationModel.fit, no official/B data or product changes. No official retry; guard corrected; conservative RC/latest unchanged. Curator accepts numerical validity: separate synthetic job/process/machine, test/B unused, frozen bytes unchanged; historical violation NOT erased, does not block authorized stable.",
+      "evidence": [
+        {
+          "path": "reports/p8/infra-freeze-barrier/incident.json",
+          "url": "https://github.com/Igorr112323/Smarty_Chumakov/blob/arena/c5f69767-smarty-chumakov/reports/p8/infra-freeze-barrier/incident.json"
+        },
+        {
+          "path": "reports/p8/closure/CURATOR_DECISION.json",
+          "url": "https://github.com/Igorr112323/Smarty_Chumakov/blob/arena/c5f69767-smarty-chumakov/reports/p8/closure/CURATOR_DECISION.json"
+        }
+      ],
+      "current_run": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39266027509",
+      "disposition": "задокументировано/принято как процессное исключение куратором"
+    }
+  ],
+  "p7_evidence_overlay": "reports/p7/contract-overlay.json",
+  "run_id": "39266451529",
+  "date": "2026-10-19",
+  "tests_excluded": false,
+  "p8_official_metrics": {
+    "tokens": {
+      "precision": 0.5787878787878787,
+      "recall": 0.6797153024911032,
+      "f1": 0.6252045826513911,
+      "fpr": 0.015466785356626237,
+      "tp": 191,
+      "fp": 139,
+      "fn": 90,
+      "tn": 8848,
+      "auc": 0.971716560140052
+    },
+    "spans": {
+      "precision": 0.5529411764705883,
+      "recall": 0.4845360824742268,
+      "f1": 0.5164835164835164,
+      "tp": 47,
+      "fp": 38,
+      "fn": 50,
+      "iou_threshold": 0.5,
+      "recall_containment": 0.28865979381443296,
+      "mean_width_ratio": 1.3392624902023396
+    },
+    "answers": {
+      "tp": 51,
+      "fp": 15,
+      "fn": 46,
+      "tn": 65,
+      "precision": 0.7727272727272727,
+      "recall": 0.5257731958762887,
+      "f1": 0.6257668711656442,
+      "fpr": 0.1875,
+      "raw_auc": 0.6974226804123711,
+      "calibrated_auc": 0.6844072164948454,
+      "positive_predictions": 66,
+      "auc": 0.6844072164948454
+    },
+    "verdicts": {
+      "tp": 62,
+      "fp": 19,
+      "fn": 35,
+      "tn": 61,
+      "precision": 0.7654,
+      "recall": 0.6392,
+      "f1": 0.6966,
+      "fpr": 0.2375,
+      "flagged_share": 0.4576
+    }
+  },
+  "p8_joint_gate": true,
+  "current_indices": [
+    "reports/EXPERIMENTS_INDEX.md",
+    "reports/contract/coverage-matrix.json"
+  ],
+  "external_validation": {
+    "pairs": 1000,
+    "contract_gate": false,
+    "metrics": {
+      "tokens": {
+        "precision": 0.229607250755287,
+        "recall": 0.016853309679565363,
+        "f1": 0.031401714698894745,
+        "fpr": 0.026744978761340396,
+        "tp": 152,
+        "fp": 510,
+        "fn": 8867,
+        "tn": 18559,
+        "auc": 0.43746190000958873
+      },
+      "spans": {
+        "precision": 0.031914893617021274,
+        "recall": 0.014184397163120567,
+        "f1": 0.019639934533551555,
+        "tp": 6,
+        "fp": 182,
+        "fn": 417,
+        "iou_threshold": 0.5,
+        "recall_containment": 0.0,
+        "mean_width_ratio": 0.0
+      },
+      "answers": {
+        "tp": 203,
+        "fp": 271,
+        "fn": 130,
+        "tn": 396,
+        "precision": 0.4282700421940928,
+        "recall": 0.6096096096096096,
+        "f1": 0.5030978934324659,
+        "fpr": 0.4062968515742129,
+        "raw_auc": 0.6215045630337984,
+        "calibrated_auc": 0.616484550517534,
+        "positive_predictions": 474,
+        "auc": 0.616484550517534
+      },
+      "verdicts": {
+        "tp": 221,
+        "fp": 319,
+        "fn": 112,
+        "tn": 348,
+        "precision": 0.4093,
+        "recall": 0.6637,
+        "f1": 0.5063,
+        "fpr": 0.4783,
+        "flagged_share": 0.54
+      }
+    },
+    "evidence": "reports/p8/run39266451529/external/result.json",
+    "limitation": "423 human exact spans/333positive answers; one first-match ambiguity; raw license unconfirmed; severe transfer drop published"
+  },
+  "delivery": {
+    "run_id": "39303110624",
+    "date": "2026-10-19",
+    "windows_run": 39271014161,
+    "build_source": "654a48e3f074654d62fb4adb38a6c37555c53681",
+    "frozen_product_source": "b9cf9acdab1ca7bf082d03629ea7e599597f3fa8",
+    "official_run": 39266451529,
+    "official_commit": "dd4454b05867495018abe5a2f657fc4d6d0fd9a6",
+    "official_joint_gate": true,
+    "ci_run": 39296146689,
+    "ci_policy": "Acceptance9be both full ordinary CI SUCCESS; final receipt-only head separately verified by full ordinary CI plus read-only Final CI job",
+    "tests_excluded": false,
+    "windows_workflow_conclusion": "failure: publication-only; preserved, never relabelled",
+    "windows_build_validation": "SUCCESS all three full suites, exe/pyz smoke, size gates and real offline HF",
+    "exe_bytes": 8981233,
+    "pyz_bytes": 232874,
+    "zip_bytes": 9148872,
+    "sha256": {
+      "spanverify.exe": "93f354eeea49633b72df0c8d3548ba912465c3b3309d9e72452fed815f274362",
+      "spanverify-win.zip": "6a565d95c9b96d087764bd48f3169254992acaff4367baf97f0a1d58afb45ac8",
+      "spanverify.pyz": "4006d891adfb9cd0c8554178b0c1d505aaf5b21b8b78bf72e800faddd33ae76f",
+      "frozen-p5.json": "e0b13c693a058dfd66ed24a52fc14e9c70964e95885358e7b99cc1f328ad6892",
+      "p5-runtime.json": "1af8a345655d23d2015c498cd0dfc3cf51a1dddceb31ef7ea42ec05a5eca7749"
+    },
+    "model_weight_file_bytes": 551290714,
+    "model_directory_bytes": 554277308,
+    "libraries_bytes": 870588148,
+    "complete_installed_sdk_bytes": null,
+    "storage_limitation": "Add Python/application/filesystem overhead; full SDK installed total NOT measured",
+    "hf_exe_http": 200,
+    "hf_pyz_http": 200,
+    "hf_offline": true,
+    "product_registry_keys_unchanged": true,
+    "release_tag": "p8-stable-20261019",
+    "release_url": "https://github.com/Igorr112323/Smarty_Chumakov/releases/tag/p8-stable-20261019",
+    "publication_recovery": "P8 closing39303110624 SUCCESS: curator-authorized identical8-asset transfer from original RC, no rebuild/inference; original publication failures retained in historical receipts",
+    "execution_freeze_status": "NOT ACHIEVED: cancelled early CI always-contract bypass caused pre-seal temporary synthetic ParticipationModel.fit",
+    "execution_freeze_evidence": "reports/p8/infra-freeze-barrier/",
+    "stable_promotion": true,
+    "ci_runs": [
+      39296139298,
+      39296146689
+    ],
+    "ci_commit": "9be619031a6cd0d47e826e7ea63208d87f42315e",
+    "publication_run": 39303110624,
+    "publication_conclusion": "success",
+    "release_id": 417608189,
+    "release_prerelease": false,
+    "latest_tag": "p8-stable-20261019",
+    "archive_asset_id": 657085641,
+    "archive_url": "https://github.com/Igorr112323/Smarty_Chumakov/releases/download/p8-stable-20261019/p8-final-acceptance.zip",
+    "archive_sha256": "58143baac4a39d86aeaa46879c497d5195f0202f58174c91af746d94dfe2f158",
+    "archive_bytes": 65248935,
+    "publication_source": "39ab73e630379f57c20bf53df01b5cca94310bc3",
+    "publication_evidence": "reports/p8/closure/",
+    "ci_scope": "Acceptance9be verified before closure; final receipt-only HEAD full checks and read-only Final CI verify independently tracked on GitHub",
+    "original_rc": {
+      "release_tag": "v1.3.1-rc.p8.20261019",
+      "release_url": "https://github.com/Igorr112323/Smarty_Chumakov/releases/tag/v1.3.1-rc.p8.20261019",
+      "release_id": 417547379,
+      "publication_run": 39290438219,
+      "publication_source": "879cd14f69b3c63a47fbb29f55cc4e8a55d5acf5",
+      "archive_asset_id": 656906252
+    },
+    "acceptance_head": "9be619031a6cd0d47e826e7ea63208d87f42315e",
+    "numerical_acceptance": "VALID with curator-accepted process exception",
+    "execution_freeze_disposition": "Historical violation retained; accepted by curator, does not invalidate numerical result"
+  },
+  "publication": {
+    "run": 39303110624,
+    "status": "success",
+    "release": "https://github.com/Igorr112323/Smarty_Chumakov/releases/tag/p8-stable-20261019",
+    "prerelease": true,
+    "latest": false,
+    "archive_sha256": "58143baac4a39d86aeaa46879c497d5195f0202f58174c91af746d94dfe2f158",
+    "archive_bytes": 65248935,
+    "evidence": "reports/p8/closure/"
+  },
+  "execution_freeze_status": "NOT ACHIEVED: cancelled early CI always-contract bypass caused pre-seal temporary synthetic ParticipationModel.fit",
+  "stable_promotion": true,
+  "evidence_context": {
+    "run_id": "39266451529",
+    "date": "2026-10-19",
+    "status": "CURRENT authoritative requirements index",
+    "successor": "reports/EXPERIMENTS_INDEX.md"
+  },
+  "curator_decision": {
+    "run_id": "P8-closing-curator-decision",
+    "date": "2026-10-19",
+    "acceptance_head": "9be619031a6cd0d47e826e7ea63208d87f42315e",
+    "authority": "Explicit curator decision in closing request, recorded verbatim in substance; not a claim of an external signature",
+    "numerical_acceptance": "VALID with documented P8 process exception",
+    "exception": "Early cancelled CI39266027509 fitted synthetic diagnostics in separate job/process/machine. Test/B unused; frozen product bytes unchanged, bundle hash verified, inference workers fit_calls=[]; could not affect measured product. Full disclosure, barrier fixed with regression.",
+    "incident_evidence": "reports/p8/infra-freeze-barrier/incident.json",
+    "stable_promotion_authorized": true,
+    "limits": "No predictive changes, retraining, recalibration, rescoring or rebuilding; transfer identical existing RC files by digest. Does not declare unmet speed, AI-share or storage norms achieved.",
+    "scope": "Closing P8 code contour only, not a new experimental stage"
+  },
+  "numerical_acceptance_valid_with_exception": true,
+  "stable_promotion_authorized": true,
+  "deviations_register": "reports/DEVIATIONS.md",
+  "stable_publication": {
+    "run_id": "39303110624",
+    "date": "2026-10-19",
+    "scope": "P8 closing publication ONLY, no build/train/calibration/scoring",
+    "conclusion": "success",
+    "acceptance_head": "9be619031a6cd0d47e826e7ea63208d87f42315e",
+    "publication_source": "39ab73e630379f57c20bf53df01b5cca94310bc3",
+    "release_tag": "p8-stable-20261019",
+    "release_id": 417608189,
+    "release_url": "https://github.com/Igorr112323/Smarty_Chumakov/releases/tag/p8-stable-20261019",
+    "latest": true,
+    "prerelease": false,
+    "all_8_original_RC_assets_identical": true,
+    "assets": [
+      {
+        "name": "frozen-p5.json",
+        "bytes": 122874,
+        "sha256": "e0b13c693a058dfd66ed24a52fc14e9c70964e95885358e7b99cc1f328ad6892",
+        "rc_asset_id": 656906011,
+        "stable_asset_id": 657085653,
+        "url": "https://github.com/Igorr112323/Smarty_Chumakov/releases/download/p8-stable-20261019/frozen-p5.json",
+        "identical": true
+      },
+      {
+        "name": "p5-runtime.json",
+        "bytes": 2969,
+        "sha256": "1af8a345655d23d2015c498cd0dfc3cf51a1dddceb31ef7ea42ec05a5eca7749",
+        "rc_asset_id": 656906017,
+        "stable_asset_id": 657085651,
+        "url": "https://github.com/Igorr112323/Smarty_Chumakov/releases/download/p8-stable-20261019/p5-runtime.json",
+        "identical": true
+      },
+      {
+        "name": "p8-final-acceptance.zip",
+        "bytes": 65248935,
+        "sha256": "58143baac4a39d86aeaa46879c497d5195f0202f58174c91af746d94dfe2f158",
+        "rc_asset_id": 656906252,
+        "stable_asset_id": 657085641,
+        "url": "https://github.com/Igorr112323/Smarty_Chumakov/releases/download/p8-stable-20261019/p8-final-acceptance.zip",
+        "identical": true
+      },
+      {
+        "name": "p8-final-acceptance.zip.sha256",
+        "bytes": 90,
+        "sha256": "c069b886f2ef7ba62a541dce534da7fecbc62734f1379fd8369d85bc253f3d5b",
+        "rc_asset_id": 656906256,
+        "stable_asset_id": 657085652,
+        "url": "https://github.com/Igorr112323/Smarty_Chumakov/releases/download/p8-stable-20261019/p8-final-acceptance.zip.sha256",
+        "identical": true
+      },
+      {
+        "name": "SHA256SUMS.txt",
+        "bytes": 415,
+        "sha256": "e043808d106871c80b92b383059940eaa88aa5acd2d09882b4f3377e87bcbb35",
+        "rc_asset_id": 656906054,
+        "stable_asset_id": 657085645,
+        "url": "https://github.com/Igorr112323/Smarty_Chumakov/releases/download/p8-stable-20261019/SHA256SUMS.txt",
+        "identical": true
+      },
+      {
+        "name": "spanverify-win.zip",
+        "bytes": 9148872,
+        "sha256": "6a565d95c9b96d087764bd48f3169254992acaff4367baf97f0a1d58afb45ac8",
+        "rc_asset_id": 656906012,
+        "stable_asset_id": 657085677,
+        "url": "https://github.com/Igorr112323/Smarty_Chumakov/releases/download/p8-stable-20261019/spanverify-win.zip",
+        "identical": true
+      },
+      {
+        "name": "spanverify.exe",
+        "bytes": 8981233,
+        "sha256": "93f354eeea49633b72df0c8d3548ba912465c3b3309d9e72452fed815f274362",
+        "rc_asset_id": 656906015,
+        "stable_asset_id": 657085678,
+        "url": "https://github.com/Igorr112323/Smarty_Chumakov/releases/download/p8-stable-20261019/spanverify.exe",
+        "identical": true
+      },
+      {
+        "name": "spanverify.pyz",
+        "bytes": 232874,
+        "sha256": "4006d891adfb9cd0c8554178b0c1d505aaf5b21b8b78bf72e800faddd33ae76f",
+        "rc_asset_id": 656906016,
+        "stable_asset_id": 657085682,
+        "url": "https://github.com/Igorr112323/Smarty_Chumakov/releases/download/p8-stable-20261019/spanverify.pyz",
+        "identical": true
+      }
+    ],
+    "verification": "reports/p8/VERIFICATION.json",
+    "numerical_acceptance": "VALID with curator-accepted process exception"
+  },
+  "verification_receipt": "reports/p8/VERIFICATION.json",
+  "code_contour": "closed; numerical acceptance valid with curator-accepted exception; deviations closed as accepted limitations, not factual compliance uplift"
+}

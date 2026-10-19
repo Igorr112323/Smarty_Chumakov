@@ -1,0 +1,15 @@
+{
+  "run_id": "39154517984",
+  "date": "2026-10-18T18:31:09Z",
+  "commit": "89bdb7f10501ec05ad7492afbc82c1f4c1f92fd6",
+  "family": "P2",
+  "workflow": "p2-experiment.yml",
+  "record_kind": "measurement/delivery",
+  "status": "completed",
+  "outcome": "success",
+  "url": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39154517984",
+  "canonical_directories": [
+    "spanverify-module/reports/experiments/p2_hf/run39154517984"
+  ],
+  "receipt": "reports/measurements/run39154517984/receipt.json"
+}

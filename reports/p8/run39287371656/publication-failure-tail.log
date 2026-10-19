@@ -1,0 +1,195 @@
+)]
+2026-10-19T16:44:57.2819161Z Await exact-head full ordinary CI: [(39287382275, 'queued'), (39287371393, 'in_progress')]
+2026-10-19T16:45:29.7055591Z Await exact-head full ordinary CI: [(39287382275, 'queued'), (39287371393, 'in_progress')]
+2026-10-19T16:46:02.2176264Z Await exact-head full ordinary CI: [(39287382275, 'queued'), (39287371393, 'in_progress')]
+2026-10-19T16:46:34.2622528Z Await exact-head full ordinary CI: [(39287382275, 'queued'), (39287371393, 'in_progress')]
+2026-10-19T16:47:06.9882002Z Await exact-head full ordinary CI: [(39287382275, 'in_progress'), (39287371393, 'in_progress')]
+2026-10-19T16:47:39.2396613Z Await exact-head full ordinary CI: [(39287382275, 'in_progress'), (39287371393, 'in_progress')]
+2026-10-19T16:48:12.5567503Z Await exact-head full ordinary CI: [(39287382275, 'in_progress'), (39287371393, 'in_progress')]
+2026-10-19T16:48:44.7928729Z Await exact-head full ordinary CI: [(39287382275, 'in_progress'), (39287371393, 'in_progress')]
+2026-10-19T16:49:16.9103582Z Await exact-head full ordinary CI: [(39287382275, 'in_progress'), (39287371393, 'in_progress')]
+2026-10-19T16:49:49.4354948Z Await exact-head full ordinary CI: [(39287382275, 'in_progress'), (39287371393, 'in_progress')]
+2026-10-19T16:50:21.9832669Z Await exact-head full ordinary CI: [(39287382275, 'in_progress'), (39287371393, 'in_progress')]
+2026-10-19T16:50:54.5333434Z Await exact-head full ordinary CI: [(39287382275, 'in_progress'), (39287371393, 'in_progress')]
+2026-10-19T16:51:27.1535256Z Await exact-head full ordinary CI: [(39287382275, 'in_progress'), (39287371393, 'in_progress')]
+2026-10-19T16:52:00.8688524Z Await exact-head full ordinary CI: [(39287382275, 'in_progress'), (39287371393, 'in_progress')]
+2026-10-19T16:52:33.0601924Z Await exact-head full ordinary CI: [(39287382275, 'in_progress'), (39287371393, 'in_progress')]
+2026-10-19T16:53:05.1410322Z Await exact-head full ordinary CI: [(39287382275, 'in_progress'), (39287371393, 'in_progress')]
+2026-10-19T16:53:37.6296845Z Await exact-head full ordinary CI: [(39287382275, 'in_progress'), (39287371393, 'in_progress')]
+2026-10-19T16:54:10.5013658Z Await exact-head full ordinary CI: [(39287382275, 'in_progress'), (39287371393, 'in_progress')]
+2026-10-19T16:54:44.1694304Z Await exact-head full ordinary CI: [(39287382275, 'in_progress'), (39287371393, 'in_progress')]
+2026-10-19T16:55:18.3560274Z Await exact-head full ordinary CI: [(39287382275, 'in_progress'), (39287371393, 'in_progress')]
+2026-10-19T16:55:50.8671106Z Await exact-head full ordinary CI: [(39287382275, 'in_progress'), (39287371393, 'in_progress')]
+2026-10-19T16:56:25.0893474Z ##[group]Run actions/download-artifact@v4
+2026-10-19T16:56:25.0893777Z with:
+2026-10-19T16:56:25.0893981Z   name: spanverify-windows-x64
+2026-10-19T16:56:25.0894230Z   run-id: 39271014161
+2026-10-19T16:56:25.0896864Z   github-token: ***
+2026-10-19T16:56:25.0897102Z   path: .arena/p8-publication/windows
+2026-10-19T16:56:25.0897371Z   merge-multiple: false
+2026-10-19T16:56:25.0897620Z   repository: Igorr112323/Smarty_Chumakov
+2026-10-19T16:56:25.0897883Z env:
+2026-10-19T16:56:25.0900680Z   GH_TOKEN: ***
+2026-10-19T16:56:25.0900883Z ##[endgroup]
+2026-10-19T16:56:25.2401575Z Downloading single artifact
+2026-10-19T16:56:25.2508024Z (node:2683) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+2026-10-19T16:56:25.2509398Z (Use `node --trace-deprecation ...` to show where the warning was created)
+2026-10-19T16:56:25.2736732Z (node:2683) [DEP0169] DeprecationWarning: `url.parse()` behavior is not standardized and prone to errors that have security implications. Use the WHATWG URL API instead. CVEs are not issued for `url.parse()` vulnerabilities.
+2026-10-19T16:56:25.4043609Z Preparing to download the following artifacts:
+2026-10-19T16:56:25.4045067Z - spanverify-windows-x64 (ID: 12197265568, Size: 18159922, Expected Digest: sha256:f198f16050acdba10a5d85257fe09800adaefc924b4aaed2c05b003a08e7950a)
+2026-10-19T16:56:25.4090416Z Downloading artifact '12197265568' from 'Igorr112323/Smarty_Chumakov'
+2026-10-19T16:56:25.6225706Z Redirecting to blob download url: https://productionresultssa9.blob.core.windows.net/actions-results/d6983f33-f0fa-85de-9836-f4653cb87e8f/workflow-job-run-c1a35fbe-0c0f-5e52-8bc7-1a17c358cac1/artifacts/8a8d9266734ac4fdccac651e1052ae2490d46f0bed43a5d4a68502779b41e697.zip
+2026-10-19T16:56:25.6227584Z Starting download of artifact to: /home/runner/work/Smarty_Chumakov/Smarty_Chumakov/.arena/p8-publication/windows
+2026-10-19T16:56:25.7301921Z (node:2683) [DEP0005] DeprecationWarning: Buffer() is deprecated due to security and usability issues. Please use the Buffer.alloc(), Buffer.allocUnsafe(), or Buffer.from() methods instead.
+2026-10-19T16:56:26.0262951Z SHA256 digest of downloaded artifact is f198f16050acdba10a5d85257fe09800adaefc924b4aaed2c05b003a08e7950a
+2026-10-19T16:56:26.0264200Z Artifact download completed successfully.
+2026-10-19T16:56:26.0264857Z Total of 1 artifact(s) downloaded
+2026-10-19T16:56:26.0290055Z Download artifact has finished successfully
+2026-10-19T16:56:26.0484439Z ##[group]Run actions/download-artifact@v4
+2026-10-19T16:56:26.0484733Z with:
+2026-10-19T16:56:26.0484923Z   pattern: p8-*
+2026-10-19T16:56:26.0485123Z   run-id: 39266451529
+2026-10-19T16:56:26.0487739Z   github-token: ***
+2026-10-19T16:56:26.0487989Z   path: .arena/p8-publication/evidence
+2026-10-19T16:56:26.0488263Z   merge-multiple: false
+2026-10-19T16:56:26.0488504Z   repository: Igorr112323/Smarty_Chumakov
+2026-10-19T16:56:26.0488761Z env:
+2026-10-19T16:56:26.0491525Z   GH_TOKEN: ***
+2026-10-19T16:56:26.0491727Z ##[endgroup]
+2026-10-19T16:56:26.1958185Z Fetching artifact list for workflow run 39266451529 in repository Igorr112323/Smarty_Chumakov
+2026-10-19T16:56:26.2057299Z (node:2695) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+2026-10-19T16:56:26.2058180Z (Use `node --trace-deprecation ...` to show where the warning was created)
+2026-10-19T16:56:26.2265413Z (node:2695) [DEP0169] DeprecationWarning: `url.parse()` behavior is not standardized and prone to errors that have security implications. Use the WHATWG URL API instead. CVEs are not issued for `url.parse()` vulnerabilities.
+2026-10-19T16:56:26.3575764Z Found 6 artifact(s)
+2026-10-19T16:56:26.3577350Z Filtering artifacts by pattern 'p8-*'
+2026-10-19T16:56:26.3597705Z Preparing to download the following artifacts:
+2026-10-19T16:56:26.3598927Z - p8-external-full (ID: 12195185508, Size: 1234, Expected Digest: sha256:8e38ed45e462abcc8c5f7e091313f56f844727aa659350e378165357d51ccbb5)
+2026-10-19T16:56:26.3601094Z - p8-external-1 (ID: 12194475762, Size: 707546, Expected Digest: sha256:e36be447159e43d297d81657c1595e0b3d50dd55f39b9c02fe3d69fe3fb0e749)
+2026-10-19T16:56:26.3602811Z - p8-external-2 (ID: 12194401119, Size: 695842, Expected Digest: sha256:8d9d6e4a1e4e12140558e5449113778b640b33508a1b97b35a74b7d129ad4bf4)
+2026-10-19T16:56:26.3604634Z - p8-external-0 (ID: 12193978436, Size: 862234, Expected Digest: sha256:9f69b12b3dbdf2150d195b01a8c9df5e1cca460958a0efd8846a366005b9ad63)
+2026-10-19T16:56:26.3606405Z - p8-official177 (ID: 12193224062, Size: 1302049, Expected Digest: sha256:62b37fe6056fc4ecf9cb804063ce47bd326e53ed19c204c9873e86f9db31f047)
+2026-10-19T16:56:26.3608229Z - p8-external-3 (ID: 12193194748, Size: 734421, Expected Digest: sha256:e2111778856258b960a78d697b33ed5b12e8e9e2faa3ef7f6954397baedc049d)
+2026-10-19T16:56:26.3648980Z Downloading artifact '12194475762' from 'Igorr112323/Smarty_Chumakov'
+2026-10-19T16:56:26.3689632Z Downloading artifact '12194401119' from 'Igorr112323/Smarty_Chumakov'
+2026-10-19T16:56:26.3754336Z Downloading artifact '12195185508' from 'Igorr112323/Smarty_Chumakov'
+2026-10-19T16:56:26.3805602Z Downloading artifact '12193978436' from 'Igorr112323/Smarty_Chumakov'
+2026-10-19T16:56:26.3855665Z Downloading artifact '12193194748' from 'Igorr112323/Smarty_Chumakov'
+2026-10-19T16:56:26.3905899Z Downloading artifact '12193224062' from 'Igorr112323/Smarty_Chumakov'
+2026-10-19T16:56:26.5474558Z Redirecting to blob download url: https://productionresultssa18.blob.core.windows.net/actions-results/4bb9f779-2424-87e3-8177-22ec7570c07e/workflow-job-run-839285c9-b66a-5ecd-b289-59fdeb1634e8/artifacts/decd5085937eff457a1dab4bf9973228fe840a07ae7536dcc3313d364ccb778f.zip
+2026-10-19T16:56:26.5477028Z Starting download of artifact to: /home/runner/work/Smarty_Chumakov/Smarty_Chumakov/.arena/p8-publication/evidence/p8-external-3
+2026-10-19T16:56:26.5582042Z Redirecting to blob download url: https://productionresultssa18.blob.core.windows.net/actions-results/4bb9f779-2424-87e3-8177-22ec7570c07e/workflow-job-run-815ff5be-3d72-5acc-b7d3-29b587b0d26f/artifacts/a16bd61c862d83980bab5a49e50b7cb0f65a8e2028e37d3c2811618997584978.zip
+2026-10-19T16:56:26.5584132Z Starting download of artifact to: /home/runner/work/Smarty_Chumakov/Smarty_Chumakov/.arena/p8-publication/evidence/p8-external-2
+2026-10-19T16:56:26.5628295Z Redirecting to blob download url: https://productionresultssa18.blob.core.windows.net/actions-results/4bb9f779-2424-87e3-8177-22ec7570c07e/workflow-job-run-4193c15d-a175-5177-bd4a-e07685a9c0e3/artifacts/8d4db09261ff9dcd3361a938bc96853026b8337c5b07cc84a88e49f3dd6da18c.zip
+2026-10-19T16:56:26.5630118Z Starting download of artifact to: /home/runner/work/Smarty_Chumakov/Smarty_Chumakov/.arena/p8-publication/evidence/p8-official177
+2026-10-19T16:56:26.5684122Z Redirecting to blob download url: https://productionresultssa18.blob.core.windows.net/actions-results/4bb9f779-2424-87e3-8177-22ec7570c07e/workflow-job-run-9616ac4a-3f57-54f7-9092-3b89c7b770ac/artifacts/313bb3eb950195d8b4b9124d08625e8ab8b306b75eb66340af7b730205b6d848.zip
+2026-10-19T16:56:26.5685730Z Starting download of artifact to: /home/runner/work/Smarty_Chumakov/Smarty_Chumakov/.arena/p8-publication/evidence/p8-external-0
+2026-10-19T16:56:26.5702571Z Redirecting to blob download url: https://productionresultssa18.blob.core.windows.net/actions-results/4bb9f779-2424-87e3-8177-22ec7570c07e/workflow-job-run-bc1908a1-9f97-555d-9c7f-53d63fd6a31e/artifacts/8c47e01ce59a552d53cbffe0c4e2d1c8ebea7125376342e3146a2512201c3978.zip
+2026-10-19T16:56:26.5704184Z Starting download of artifact to: /home/runner/work/Smarty_Chumakov/Smarty_Chumakov/.arena/p8-publication/evidence/p8-external-full
+2026-10-19T16:56:26.5778652Z Redirecting to blob download url: https://productionresultssa18.blob.core.windows.net/actions-results/4bb9f779-2424-87e3-8177-22ec7570c07e/workflow-job-run-d03b51d9-816f-5e37-a596-d867c2449e31/artifacts/c931eeb7d38799dea0085de28339a34a0b0839cb32ff91f0cabf62e50ec972d9.zip
+2026-10-19T16:56:26.5781146Z Starting download of artifact to: /home/runner/work/Smarty_Chumakov/Smarty_Chumakov/.arena/p8-publication/evidence/p8-external-1
+2026-10-19T16:56:26.6127675Z (node:2695) [DEP0005] DeprecationWarning: Buffer() is deprecated due to security and usability issues. Please use the Buffer.alloc(), Buffer.allocUnsafe(), or Buffer.from() methods instead.
+2026-10-19T16:56:26.6157788Z SHA256 digest of downloaded artifact is 8e38ed45e462abcc8c5f7e091313f56f844727aa659350e378165357d51ccbb5
+2026-10-19T16:56:26.6158553Z Artifact download completed successfully.
+2026-10-19T16:56:26.7610225Z SHA256 digest of downloaded artifact is e2111778856258b960a78d697b33ed5b12e8e9e2faa3ef7f6954397baedc049d
+2026-10-19T16:56:26.7611222Z Artifact download completed successfully.
+2026-10-19T16:56:26.7668933Z SHA256 digest of downloaded artifact is 8d9d6e4a1e4e12140558e5449113778b640b33508a1b97b35a74b7d129ad4bf4
+2026-10-19T16:56:26.7669946Z Artifact download completed successfully.
+2026-10-19T16:56:26.7726213Z SHA256 digest of downloaded artifact is e36be447159e43d297d81657c1595e0b3d50dd55f39b9c02fe3d69fe3fb0e749
+2026-10-19T16:56:26.7727280Z Artifact download completed successfully.
+2026-10-19T16:56:26.7762713Z SHA256 digest of downloaded artifact is 9f69b12b3dbdf2150d195b01a8c9df5e1cca460958a0efd8846a366005b9ad63
+2026-10-19T16:56:26.7763293Z Artifact download completed successfully.
+2026-10-19T16:56:26.7925205Z SHA256 digest of downloaded artifact is 62b37fe6056fc4ecf9cb804063ce47bd326e53ed19c204c9873e86f9db31f047
+2026-10-19T16:56:26.7926444Z Artifact download completed successfully.
+2026-10-19T16:56:26.7927476Z Total of 6 artifact(s) downloaded
+2026-10-19T16:56:26.7933936Z Download artifact has finished successfully
+2026-10-19T16:56:26.8115039Z ##[group]Run actions/download-artifact@v4
+2026-10-19T16:56:26.8115355Z with:
+2026-10-19T16:56:26.8115558Z   name: p8-official177
+2026-10-19T16:56:26.8115772Z   run-id: 39266027598
+2026-10-19T16:56:26.8118383Z   github-token: ***
+2026-10-19T16:56:26.8118681Z   path: .arena/p8-publication/evidence/infra-first-attempt
+2026-10-19T16:56:26.8119039Z   merge-multiple: false
+2026-10-19T16:56:26.8119557Z   repository: Igorr112323/Smarty_Chumakov
+2026-10-19T16:56:26.8119827Z env:
+2026-10-19T16:56:26.8122317Z   GH_TOKEN: ***
+2026-10-19T16:56:26.8122517Z ##[endgroup]
+2026-10-19T16:56:26.9664976Z Downloading single artifact
+2026-10-19T16:56:26.9743699Z (node:2708) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+2026-10-19T16:56:26.9745010Z (Use `node --trace-deprecation ...` to show where the warning was created)
+2026-10-19T16:56:26.9971256Z (node:2708) [DEP0169] DeprecationWarning: `url.parse()` behavior is not standardized and prone to errors that have security implications. Use the WHATWG URL API instead. CVEs are not issued for `url.parse()` vulnerabilities.
+2026-10-19T16:56:27.1324662Z Preparing to download the following artifacts:
+2026-10-19T16:56:27.1325706Z - p8-official177 (ID: 12193626366, Size: 2853, Expected Digest: sha256:41330402d092adbb50abfbf4b5dd9e9c236ea0f710d78c5d248242b59367734d)
+2026-10-19T16:56:27.1365050Z Downloading artifact '12193626366' from 'Igorr112323/Smarty_Chumakov'
+2026-10-19T16:56:27.3458904Z Redirecting to blob download url: https://productionresultssa0.blob.core.windows.net/actions-results/b5bf7fd4-639b-87c7-a026-bd017c08a2b7/workflow-job-run-f7efd608-35fa-5413-919e-990eb8163290/artifacts/8d4db09261ff9dcd3361a938bc96853026b8337c5b07cc84a88e49f3dd6da18c.zip
+2026-10-19T16:56:27.3461847Z Starting download of artifact to: /home/runner/work/Smarty_Chumakov/Smarty_Chumakov/.arena/p8-publication/evidence/infra-first-attempt
+2026-10-19T16:56:27.3818836Z (node:2708) [DEP0005] DeprecationWarning: Buffer() is deprecated due to security and usability issues. Please use the Buffer.alloc(), Buffer.allocUnsafe(), or Buffer.from() methods instead.
+2026-10-19T16:56:27.3874630Z SHA256 digest of downloaded artifact is 41330402d092adbb50abfbf4b5dd9e9c236ea0f710d78c5d248242b59367734d
+2026-10-19T16:56:27.3875772Z Artifact download completed successfully.
+2026-10-19T16:56:27.3876206Z Total of 1 artifact(s) downloaded
+2026-10-19T16:56:27.3880926Z Download artifact has finished successfully
+2026-10-19T16:56:27.4014787Z ##[group]Run actions/download-artifact@v4
+2026-10-19T16:56:27.4015079Z with:
+2026-10-19T16:56:27.4015264Z   name: contract
+2026-10-19T16:56:27.4015459Z   run-id: 39266027509
+2026-10-19T16:56:27.4018329Z   github-token: ***
+2026-10-19T16:56:27.4018659Z   path: .arena/p8-publication/evidence/pre-seal-contract-incident
+2026-10-19T16:56:27.4019023Z   merge-multiple: false
+2026-10-19T16:56:27.4019600Z   repository: Igorr112323/Smarty_Chumakov
+2026-10-19T16:56:27.4019873Z env:
+2026-10-19T16:56:27.4022391Z   GH_TOKEN: ***
+2026-10-19T16:56:27.4022591Z ##[endgroup]
+2026-10-19T16:56:27.5701320Z Downloading single artifact
+2026-10-19T16:56:27.5780915Z (node:2721) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+2026-10-19T16:56:27.5781667Z (Use `node --trace-deprecation ...` to show where the warning was created)
+2026-10-19T16:56:27.6021884Z (node:2721) [DEP0169] DeprecationWarning: `url.parse()` behavior is not standardized and prone to errors that have security implications. Use the WHATWG URL API instead. CVEs are not issued for `url.parse()` vulnerabilities.
+2026-10-19T16:56:27.7604154Z Preparing to download the following artifacts:
+2026-10-19T16:56:27.7605598Z - contract (ID: 12192328736, Size: 64634, Expected Digest: sha256:d498db5b86b314eab2d9773f8a6b1568dd37cd274e9d3ae515d2f4292704acbe)
+2026-10-19T16:56:27.7641901Z Downloading artifact '12192328736' from 'Igorr112323/Smarty_Chumakov'
+2026-10-19T16:56:27.9105077Z Redirecting to blob download url: https://productionresultssa17.blob.core.windows.net/actions-results/0a000a8f-f4a1-81e5-bd94-a3129b470698/workflow-job-run-d34c8e36-b8a1-5743-aaed-c66dfa6ba121/artifacts/cc8321d6375c494d043fdd0260f21bc0ec51dacc9f6abb7f909cdcd3041b78bf.zip
+2026-10-19T16:56:27.9109167Z Starting download of artifact to: /home/runner/work/Smarty_Chumakov/Smarty_Chumakov/.arena/p8-publication/evidence/pre-seal-contract-incident
+2026-10-19T16:56:27.9658149Z (node:2721) [DEP0005] DeprecationWarning: Buffer() is deprecated due to security and usability issues. Please use the Buffer.alloc(), Buffer.allocUnsafe(), or Buffer.from() methods instead.
+2026-10-19T16:56:27.9978757Z SHA256 digest of downloaded artifact is d498db5b86b314eab2d9773f8a6b1568dd37cd274e9d3ae515d2f4292704acbe
+2026-10-19T16:56:27.9979947Z Artifact download completed successfully.
+2026-10-19T16:56:27.9980452Z Total of 1 artifact(s) downloaded
+2026-10-19T16:56:27.9984807Z Download artifact has finished successfully
+2026-10-19T16:56:28.0098244Z ##[group]Run python scripts/p8_publish_acceptance.py
+2026-10-19T16:56:28.0098664Z python scripts/p8_publish_acceptance.py
+2026-10-19T16:56:28.0160435Z shell: /usr/bin/bash -e {0}
+2026-10-19T16:56:28.0160681Z env:
+2026-10-19T16:56:28.0163468Z   GH_TOKEN: ***
+2026-10-19T16:56:28.0163682Z ##[endgroup]
+2026-10-19T16:56:35.5807230Z HTTP 403: Resource not accessible by integration (https://api.github.com/repos/Igorr112323/Smarty_Chumakov/releases)
+2026-10-19T16:56:35.5985246Z ##[error]Traceback (most recent call last):
+  File "/home/runner/work/Smarty_Chumakov/Smarty_Chumakov/scripts/p8_publish_acceptance.py", line 121, in <module>
+    main()
+  File "/home/runner/work/Smarty_Chumakov/Smarty_Chumakov/scripts/p8_publish_acceptance.py", line 96, in main
+    subprocess.run(["gh", "release", "create", meta["release_tag"], *assets, "--repo", REPO, "--target", meta["runs"]["windows"]["headSha"], "--title", "SpanVerify 1.3.1 — P8 final evaluation", "--notes-file", str(ROOT / "reports/p8/RELEASE_NOTES.md"), *(["--latest=true"] if meta["stable_promotion"] else ["--prerelease", "--latest=false"])], check=True)
+  File "/usr/lib/python3.12/subprocess.py", line 571, in run
+    raise CalledProcessError(retcode, process.args,
+subprocess.CalledProcessError: Command '['gh', 'release', 'create', 'v1.3.1-rc.p8.20261019', '/home/runner/work/Smarty_Chumakov/Smarty_Chumakov/.arena/p8-publication/windows/release/spanverify.exe', '/home/runner/work/Smarty_Chumakov/Smarty_Chumakov/.arena/p8-publication/windows/release/spanverify-win.zip', '/home/runner/work/Smarty_Chumakov/Smarty_Chumakov/.arena/p8-publication/windows/release/spanverify.pyz', '/home/runner/work/Smarty_Chumakov/Smarty_Chumakov/.arena/p8-publication/windows/release/frozen-p5.json', '/home/runner/work/Smarty_Chumakov/Smarty_Chumakov/.arena/p8-publication/windows/release/p5-runtime.json', '/home/runner/work/Smarty_Chumakov/Smarty_Chumakov/.arena/p8-publication/windows/release/SHA256SUMS.txt', '--repo', 'Igorr112323/Smarty_Chumakov', '--target', '654a48e3f074654d62fb4adb38a6c37555c53681', '--title', 'SpanVerify 1.3.1 — P8 final evaluation', '--notes-file', '/home/runner/work/Smarty_Chumakov/Smarty_Chumakov/reports/p8/RELEASE_NOTES.md', '--prerelease', '--latest=false']' returned non-zero exit status 1.
+
+2026-10-19T16:56:35.6700455Z Traceback (most recent call last):
+2026-10-19T16:56:35.6701555Z   File "/home/runner/work/Smarty_Chumakov/Smarty_Chumakov/scripts/p8_publish_acceptance.py", line 121, in <module>
+2026-10-19T16:56:35.6702916Z     main()
+2026-10-19T16:56:35.6703480Z   File "/home/runner/work/Smarty_Chumakov/Smarty_Chumakov/scripts/p8_publish_acceptance.py", line 96, in main
+2026-10-19T16:56:35.6705993Z     subprocess.run(["gh", "release", "create", meta["release_tag"], *assets, "--repo", REPO, "--target", meta["runs"]["windows"]["headSha"], "--title", "SpanVerify 1.3.1 — P8 final evaluation", "--notes-file", str(ROOT / "reports/p8/RELEASE_NOTES.md"), *(["--latest=true"] if meta["stable_promotion"] else ["--prerelease", "--latest=false"])], check=True)
+2026-10-19T16:56:35.6707551Z   File "/usr/lib/python3.12/subprocess.py", line 571, in run
+2026-10-19T16:56:35.6707968Z     raise CalledProcessError(retcode, process.args,
+2026-10-19T16:56:35.6713554Z subprocess.CalledProcessError: Command '['gh', 'release', 'create', 'v1.3.1-rc.p8.20261019', '/home/runner/work/Smarty_Chumakov/Smarty_Chumakov/.arena/p8-publication/windows/release/spanverify.exe', '/home/runner/work/Smarty_Chumakov/Smarty_Chumakov/.arena/p8-publication/windows/release/spanverify-win.zip', '/home/runner/work/Smarty_Chumakov/Smarty_Chumakov/.arena/p8-publication/windows/release/spanverify.pyz', '/home/runner/work/Smarty_Chumakov/Smarty_Chumakov/.arena/p8-publication/windows/release/frozen-p5.json', '/home/runner/work/Smarty_Chumakov/Smarty_Chumakov/.arena/p8-publication/windows/release/p5-runtime.json', '/home/runner/work/Smarty_Chumakov/Smarty_Chumakov/.arena/p8-publication/windows/release/SHA256SUMS.txt', '--repo', 'Igorr112323/Smarty_Chumakov', '--target', '654a48e3f074654d62fb4adb38a6c37555c53681', '--title', 'SpanVerify 1.3.1 — P8 final evaluation', '--notes-file', '/home/runner/work/Smarty_Chumakov/Smarty_Chumakov/reports/p8/RELEASE_NOTES.md', '--prerelease', '--latest=false']' returned non-zero exit status 1.
+2026-10-19T16:56:35.6853707Z ##[error]Process completed with exit code 1.
+2026-10-19T16:56:35.6964476Z Post job cleanup.
+2026-10-19T16:56:35.7855855Z [command]/usr/bin/git version
+2026-10-19T16:56:35.7898977Z git version 2.55.0
+2026-10-19T16:56:35.7939043Z Temporarily overriding HOME='/home/runner/work/_temp/10785b57-16db-46b0-aa15-d1af9ec29d9d' before making global git config changes
+2026-10-19T16:56:35.7940928Z Adding repository directory to the temporary git global config as a safe directory
+2026-10-19T16:56:35.7945389Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/Smarty_Chumakov/Smarty_Chumakov
+2026-10-19T16:56:35.7984517Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+2026-10-19T16:56:35.8018738Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2026-10-19T16:56:35.8275951Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-10-19T16:56:35.8304474Z http.https://github.com/.extraheader
+2026-10-19T16:56:35.8315515Z [command]/usr/bin/git config --local --unset-all http.https://github.com/.extraheader
+2026-10-19T16:56:35.8350529Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2026-10-19T16:56:35.8612000Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+2026-10-19T16:56:35.8657598Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+2026-10-19T16:56:35.9086056Z Cleaning up orphan processes
+2026-10-19T16:56:35.9377294Z ##[warning]Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@v4, actions/download-artifact@v4. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/

@@ -7,7 +7,7 @@
 
 Источники:
 
-* ``spanverify-module/reports/METRICS.json`` — реестр модуля (числа прогонов CI
+* ``spanverify-module/reports/CURRENT_METRICS.json`` — реестр модуля (числа прогонов CI
   и локальных прогонов корпусов);
 * ``reports/contract/*.json`` — артефакты контрактных проверок
   (``scripts/contract_check.py``);
@@ -341,7 +341,7 @@ MEASURED_SOURCES: list[dict] = [
     # --- прогон на отложенной части корпуса A (договорный ориентир) ---
     {
         "id": "corpus_a.test.tokens.f1",
-        "source": "spanverify-module/reports/METRICS.json",
+        "source": "spanverify-module/reports/CURRENT_METRICS.json",
         "path": ["corpus_a", "by_split", "test", "tokens", "f1"],
         "unit": "F1",
         "dataset": "corpus_a1_synthetic",
@@ -350,7 +350,7 @@ MEASURED_SOURCES: list[dict] = [
     },
     {
         "id": "corpus_a.test.tokens.fpr",
-        "source": "spanverify-module/reports/METRICS.json",
+        "source": "spanverify-module/reports/CURRENT_METRICS.json",
         "path": ["corpus_a", "by_split", "test", "tokens", "fpr"],
         "unit": "FPR",
         "dataset": "corpus_a1_synthetic",
@@ -359,7 +359,7 @@ MEASURED_SOURCES: list[dict] = [
     },
     {
         "id": "corpus_a.test.tokens.auc",
-        "source": "spanverify-module/reports/METRICS.json",
+        "source": "spanverify-module/reports/CURRENT_METRICS.json",
         "path": ["corpus_a", "by_split", "test", "tokens", "auc"],
         "unit": "AUC",
         "dataset": "corpus_a1_synthetic",
@@ -367,7 +367,7 @@ MEASURED_SOURCES: list[dict] = [
     },
     {
         "id": "corpus_a.test.spans.strict_f1",
-        "source": "spanverify-module/reports/METRICS.json",
+        "source": "spanverify-module/reports/CURRENT_METRICS.json",
         "path": ["corpus_a", "by_split", "test", "spans", "strict_f1"],
         "unit": "F1",
         "dataset": "corpus_a1_synthetic",
@@ -375,7 +375,7 @@ MEASURED_SOURCES: list[dict] = [
     },
     {
         "id": "corpus_a.test.answers.f1",
-        "source": "spanverify-module/reports/METRICS.json",
+        "source": "spanverify-module/reports/CURRENT_METRICS.json",
         "path": ["corpus_a", "by_split", "test", "answers", "f1"],
         "unit": "F1",
         "dataset": "corpus_a1_synthetic",
@@ -383,7 +383,7 @@ MEASURED_SOURCES: list[dict] = [
     },
     {
         "id": "corpus_a.pairs",
-        "source": "spanverify-module/reports/METRICS.json",
+        "source": "spanverify-module/reports/CURRENT_METRICS.json",
         "path": ["corpus_a", "pairs"],
         "unit": "пар",
         "dataset": "corpus_a1_synthetic",
@@ -391,7 +391,7 @@ MEASURED_SOURCES: list[dict] = [
     },
     {
         "id": "corpus_a.shared_groups",
-        "source": "spanverify-module/reports/METRICS.json",
+        "source": "spanverify-module/reports/CURRENT_METRICS.json",
         "path": ["corpus_a", "shared_groups"],
         "unit": "групп",
         "dataset": "corpus_a1_synthetic",
@@ -400,7 +400,7 @@ MEASURED_SOURCES: list[dict] = [
     # --- реальные документы (демо-режим) ---
     {
         "id": "corpus_a3_real.test.tokens.f1",
-        "source": "spanverify-module/reports/METRICS.json",
+        "source": "spanverify-module/reports/CURRENT_METRICS.json",
         "path": ["corpus_a3_real", "by_split", "test", "tokens", "f1"],
         "unit": "F1",
         "dataset": "corpus_a3_real",
@@ -408,7 +408,7 @@ MEASURED_SOURCES: list[dict] = [
     },
     {
         "id": "corpus_a3_real.test.tokens.fpr",
-        "source": "spanverify-module/reports/METRICS.json",
+        "source": "spanverify-module/reports/CURRENT_METRICS.json",
         "path": ["corpus_a3_real", "by_split", "test", "tokens", "fpr"],
         "unit": "FPR",
         "dataset": "corpus_a3_real",
@@ -417,7 +417,7 @@ MEASURED_SOURCES: list[dict] = [
     # --- демонстрационный корпус (синтетика) ---
     {
         "id": "demo.validation.f1",
-        "source": "spanverify-module/reports/METRICS.json",
+        "source": "spanverify-module/reports/CURRENT_METRICS.json",
         "path": ["demo", "validation", "f1"],
         "unit": "F1",
         "dataset": "demo",
@@ -425,7 +425,7 @@ MEASURED_SOURCES: list[dict] = [
     },
     {
         "id": "demo.validation.fpr",
-        "source": "spanverify-module/reports/METRICS.json",
+        "source": "spanverify-module/reports/CURRENT_METRICS.json",
         "path": ["demo", "validation", "fpr"],
         "unit": "FPR",
         "dataset": "demo",
@@ -742,6 +742,7 @@ def main() -> int:
     args = parser.parse_args()
 
     payload = build()
+    payload.update(run_id="numbers-build", date=str(payload.get("generated_at", "2026-10-19"))[:10])
     out = ROOT / args.out
     rendered = json.dumps(payload, ensure_ascii=False, indent=2) + "\n"
     if args.check:

@@ -35,6 +35,7 @@ import statistics
 from collections.abc import Mapping, Sequence
 from dataclasses import dataclass, field
 from functools import lru_cache
+from threading import RLock
 from typing import Any
 
 from .core import Token, number_value, numbers_in, split_chunks
@@ -535,8 +536,9 @@ def _normalised_support(mass: Sequence[float], tokens: Sequence[Token], eps: flo
         return [0.0] * len(mass)
     background = sum(mass[index] for index in content) / len(content)
     out = [0.0] * len(mass)
+    content_set = set(content)  # Preserve summation order, index membership only.
     for index in range(len(mass)):
-        if index not in content:
+        if index not in content_set:
             out[index] = min(1.0, max(0.0, mass[index]))
             continue
         out[index] = min(1.0, max(0.0, mass[index] / (background if background > eps else eps)))
@@ -1127,14 +1129,26 @@ def map_token_positions(
     наш токен получает все позиции модели, которые с ним существенно
     перекрываются, — признаки такого токена усредняются по его подсловам.
     """
+    from bisect import bisect_left, bisect_right
+
+    # Sorted starts and prefix-max ends form a conservative interval index.
+    # This supports nested, duplicate and unsorted offsets, not just tokenizer
+    # output. Candidate pruning never changes overlap arithmetic or thresholds.
+    indexed = sorted(model_spans, key=lambda span: span[1])
+    starts = [span[1] for span in indexed]
+    prefix_ends = []
+    for _position, _start, end in indexed:
+        prefix_ends.append(max(prefix_ends[-1], end) if prefix_ends else end)
     mapping: list[list[int]] = []
     for start, end in token_spans:
         absolute = (start + answer_start, end + answer_start)
-        hits = [
-            (position, _span_overlap(absolute, (span_start, span_end)))
-            for position, span_start, span_end in model_spans
-            if _span_overlap(absolute, (span_start, span_end)) > 0
-        ]
+        lo = bisect_right(prefix_ends, absolute[0])
+        hi = bisect_left(starts, absolute[1])
+        hits = []
+        for position, span_start, span_end in indexed[lo:hi]:
+            overlap = _span_overlap(absolute, (span_start, span_end))
+            if overlap > 0:
+                hits.append((position, overlap))
         if not hits:
             mapping.append([])
             continue
@@ -1144,15 +1158,55 @@ def map_token_positions(
     return mapping
 
 
+_HF_RUNTIME_LOCK = RLock()
+
+
+class _LockedTokenizer:
+    """Fast tokenizers mutate truncation state; serialize only tokenizer calls."""
+
+    def __init__(self, tokenizer):
+        self.tokenizer = tokenizer
+        self.lock = RLock()
+
+    def __call__(self, *args, **kwargs):
+        with self.lock:
+            return self.tokenizer(*args, **kwargs)
+
+    def __getattr__(self, key):
+        return getattr(self.tokenizer, key)
+
+
+def _load_hf_runtime(model_name, device):
+    # Lazy cache is model identity/device only, never answer text or predictions.
+    with _HF_RUNTIME_LOCK:
+        return _cached_hf_runtime(model_name, device)
+
+
+@lru_cache(maxsize=2)
+def _cached_hf_runtime(model_name, device):
+    import torch
+    from transformers import AutoModelForCausalLM, AutoTokenizer
+
+    tokenizer = AutoTokenizer.from_pretrained(model_name)
+    model = AutoModelForCausalLM.from_pretrained(model_name, attn_implementation="eager", output_attentions=True)
+    model.eval()
+    model.config.output_attentions = True
+    model.config.output_hidden_states = True
+    model.to(device or ("cuda" if torch.cuda.is_available() else "cpu"))
+    return _LockedTokenizer(tokenizer), model
+
+
 def hf_features(
     answer: str,
     context: str | Sequence[str] | None,
     model_name: str = "ai-forever/rugpt3small_based_on_gpt2",
     k: int = 5,
     device: str | None = None,
-    max_length: int = 1024,
+    max_length: int = 512,
     answer_tokens: Sequence[Token] | None = None,
     layer: int | str = "last",
+    _runtime=None,
+    _windowed: bool = False,
 ) -> FeatureMatrix:
     """Реальные признаки модели: энтропия внимания, масса на контекст, плотность.
 
@@ -1177,7 +1231,6 @@ def hf_features(
         raise BackendUnavailable(reason)
 
     import torch  # noqa: PLC0415
-    from transformers import AutoModelForCausalLM, AutoTokenizer  # noqa: PLC0415
 
     tokens = list(answer_tokens) if answer_tokens is not None else tokenize_with_offsets(answer)
     if not tokens:
@@ -1189,24 +1242,30 @@ def hf_features(
     answer_start = len(prompt) - len(answer)
 
     try:
-        tokenizer = AutoTokenizer.from_pretrained(model_name)
-        model = AutoModelForCausalLM.from_pretrained(model_name, attn_implementation="eager", output_attentions=True)
+        tokenizer, model = _runtime or _load_hf_runtime(model_name, device)
     except Exception as exc:  # pragma: no cover - зависит от окружения
         raise BackendUnavailable(
             f"не удалось загрузить модель {model_name}: {type(exc).__name__}: {exc}. "
             "Проверьте доступ к весам или укажите другую модель."
         ) from exc
 
-    model.eval()
-    # Скрытые состояния нужны третьему признаку (плотность представлений), а
-    # карты внимания — первым двум. Флаги ставим в конфиге: так одинаково
-    # работают и старые, и новые версии transformers.
-    model.config.output_attentions = True
-    model.config.output_hidden_states = True
-    torch_device = device or ("cuda" if torch.cuda.is_available() else "cpu")
-    model.to(torch_device)
+    if not _windowed:
+        answer_ids = tokenizer(answer, add_special_tokens=False)["input_ids"]
+        if len(answer_ids) > max_length:
+            from .hf_windows import full_answer_features
 
-    encoded = tokenizer(prompt, return_tensors="pt", truncation=True, max_length=max_length)
+            return full_answer_features(
+                answer,
+                context_text,
+                tokens,
+                tokenizer,
+                (tokenizer, model),
+                hf_features,
+                dict(model_name=model_name, k=k, device=device, max_length=max_length, layer=layer),
+            )
+    encoded = tokenizer(prompt, return_tensors="pt", truncation=not _windowed, max_length=max_length)
+    if _windowed and encoded["input_ids"].shape[-1] > max_length:
+        raise BackendUnavailable("HF internal window exceeds model limit; no truncation allowed")
     attention_mask = encoded["attention_mask"]
     with torch.no_grad():
         outputs = model(**encoded)
@@ -1221,7 +1280,7 @@ def hf_features(
     # Разные версии transformers отдают смещения то как тензор/`BatchEncoding`
     # (с методом ``tolist``), то как обычный список списков — приводим к списку
     # кортежей, иначе на свежих версиях падало бы AttributeError.
-    raw_offsets = tokenizer(prompt, return_offsets_mapping=True, truncation=True, max_length=max_length)[
+    raw_offsets = tokenizer(prompt, return_offsets_mapping=True, truncation=not _windowed, max_length=max_length)[
         "offset_mapping"
     ]
     if hasattr(raw_offsets, "tolist"):
@@ -1272,6 +1331,13 @@ def hf_features(
         for position in context_positions:
             context_token_embeddings.append(hidden_cpu[position].tolist())
 
+    context_norms = [sum(x * x for x in v) ** 0.5 for v in context_token_embeddings]
+    try:
+        import numpy as np
+
+        context_array = np.asarray(context_token_embeddings, dtype=np.float64)
+    except ImportError:
+        context_array = context_token_embeddings
     for positions in token_positions:
         if not positions:
             entropy_values.append(0.5)
@@ -1311,10 +1377,9 @@ def hf_features(
                 # Считаем похожесть вместе с позицией источника: для признаков
                 # итерации 2 важно не только значение максимума, но и где именно
                 # в документе лежит подтверждающий фрагмент.
-                scored = [
-                    (_cosine_dense(vector, other), source_position)
-                    for other, source_position in zip(context_token_embeddings, context_positions, strict=False)
-                ]
+                norm = sum(x * x for x in vector) ** 0.5
+                similarities_exact = _dense_cosine_scores_exact(vector, context_array, norm, context_norms)
+                scored = list(zip(similarities_exact, context_positions, strict=True))
                 best_similarity, best_position = max(scored, key=lambda pair: pair[0])
                 distance = int(abs(position - best_position))
                 # Масштаб затухания — 10 % длины: устойчив к размеру документа.
@@ -1377,8 +1442,189 @@ def hf_features(
             "seq_len": seq_len,
             "context_tokens": len(context_positions),
             "k": k,
+            **({"all_answer_tokens_mapped": all(token_positions)} if _windowed else {}),
         },
     )
+
+
+def hf_features_chunked(
+    answer: str,
+    context: str | Sequence[str] | None,
+    model_name: str = "ai-forever/rugpt3small_based_on_gpt2",
+    k: int = 5,
+    device: str | None = None,
+    max_length: int = 512,
+    answer_tokens: Sequence[Token] | None = None,
+    layer: int | str = "last",
+    top_k_chunks: int = 3,
+    max_tokens_per_chunk: int = 380,
+) -> FeatureMatrix:
+    """Признаки с чанкингом: документ разбивается на фрагменты, отбираются релевантные.
+
+    Вместо подачи всего контекста в модель (что приводит к обрезке длинных
+    документов) — документ разбивается на чанки, отбираются top-k релевантных
+    (BM25), и для каждого чанка делается отдельный проход модели.
+
+    Признаки для каждого токена ответа агрегируются по чанкам:
+    - Для признаков опоры (ctx_attention_mass, ctx_max_similarity, embedding_density):
+      максимум по чанкам (больше опоры = достовернее)
+    - Для attention_entropy: максимум (выше энтропия = подозрительнее)
+
+    Если чанкинг не нужен (короткий контекст) — fallback к обычному hf_features.
+    """
+    from .backends.base import BackendUnavailable  # noqa: PLC0415
+    from .backends.hf import HFBackend  # noqa: PLC0415
+    from .chunking import chunk_document, estimate_tokens, select_relevant_chunks  # noqa: PLC0415
+    from .core import tokenize_with_offsets  # noqa: PLC0415
+
+    ok, reason = HFBackend.dependencies()
+    if not ok:
+        raise BackendUnavailable(reason)
+
+    tokens = list(answer_tokens) if answer_tokens is not None else tokenize_with_offsets(answer)
+    if not tokens:
+        return FeatureMatrix(meta={"backend": "hf", "empty": True, "chunked": True})
+
+    # Если контекст короткий — обычный проход
+    if isinstance(context, str):
+        context_text = context
+    elif context:
+        context_text = "\n".join(str(item) for item in context)
+    else:
+        context_text = ""
+
+    if not context_text or estimate_tokens(context_text) <= max_tokens_per_chunk:
+        # Контекст помещается целиком — обычный проход
+        result = hf_features(
+            answer,
+            context,
+            model_name=model_name,
+            k=k,
+            device=device,
+            max_length=max_length,
+            answer_tokens=tokens,
+            layer=layer,
+        )
+        result.meta["chunked"] = False
+        return result
+
+    # Разбить контекст на чанки
+    doc_chunks = chunk_document(context_text, max_tokens_per_chunk=max_tokens_per_chunk)
+    if len(doc_chunks.chunks) <= 1:
+        result = hf_features(
+            answer,
+            context,
+            model_name=model_name,
+            k=k,
+            device=device,
+            max_length=max_length,
+            answer_tokens=tokens,
+            layer=layer,
+        )
+        result.meta["chunked"] = False
+        return result
+
+    # Отбрать релевантные чанки
+    relevant_indices = select_relevant_chunks(answer, doc_chunks, top_k=top_k_chunks)
+    if not relevant_indices:
+        relevant_indices = [0]
+
+    # Для каждого релевантного чанка сделать проход модели
+    chunk_matrices: list[FeatureMatrix] = []
+    for chunk_idx in relevant_indices:
+        chunk = doc_chunks.chunks[chunk_idx]
+        try:
+            fm = hf_features(
+                answer,
+                chunk.text,
+                model_name=model_name,
+                k=k,
+                device=device,
+                max_length=max_length,
+                answer_tokens=tokens,
+                layer=layer,
+            )
+            chunk_matrices.append(fm)
+        except Exception as exc:
+            from .hf_windows import FullAnswerCoverageError
+
+            if isinstance(exc, FullAnswerCoverageError):
+                raise
+            continue
+
+    if not chunk_matrices:
+        tokenizer, _ = _load_hf_runtime(model_name, device)
+        if len(tokenizer(answer, add_special_tokens=False)["input_ids"]) > max_length:
+            from .hf_windows import FullAnswerCoverageError
+
+            raise FullAnswerCoverageError("All selected long-answer contexts failed; no policy-changing fallback")
+        # Fallback: обычный проход
+        result = hf_features(
+            answer,
+            context,
+            model_name=model_name,
+            k=k,
+            device=device,
+            max_length=max_length,
+            answer_tokens=tokens,
+            layer=layer,
+        )
+        result.meta["chunked"] = False
+        return result
+
+    # Объединить признаки: максимум по каждому токену
+    n_tokens = len(tokens)
+    merged = FeatureMatrix(
+        meta={
+            "backend": "hf",
+            "model": model_name,
+            "chunked": True,
+            "n_chunks_total": len(doc_chunks.chunks),
+            "n_chunks_relevant": len(relevant_indices),
+            "relevant_indices": relevant_indices,
+        }
+    )
+
+    if any(m.meta.get("full_answer") for m in chunk_matrices):
+        from .hf_windows import FullAnswerCoverageError
+
+        if len(chunk_matrices) != len(relevant_indices):
+            raise FullAnswerCoverageError("A selected long-answer context failed; partial scoring forbidden")
+        if not all(m.meta.get("all_answer_tokens_mapped") for m in chunk_matrices):
+            raise ValueError("Incomplete HF answer coverage; refusing mixed/truncated matrices")
+        merged.meta.update(
+            answer_feature_contract="window512_full_answer_v1",
+            full_answer=True,
+            all_answer_tokens_mapped=True,
+            scored_answer_tokens=n_tokens,
+            answer_last_end=tokens[-1].end,
+            model_calls=sum(m.meta.get("model_calls", 0) for m in chunk_matrices),
+            identical_window_cache_hits=sum(m.meta.get("identical_window_cache_hits", 0) for m in chunk_matrices),
+            answer_windows=[m.meta["answer_windows"] for m in chunk_matrices],
+        )
+
+    for feat in (
+        "attention_entropy",
+        "ctx_attention_mass",
+        "embedding_density",
+        "ctx_attention_mass_norm",
+        "ctx_max_similarity",
+    ):
+        values = []
+        for tok_idx in range(n_tokens):
+            feat_vals = []
+            for fm in chunk_matrices:
+                feat_list = getattr(fm, feat, [])
+                if tok_idx < len(feat_list):
+                    feat_vals.append(feat_list[tok_idx])
+            # Для признаков опоры: максимум = больше опоры
+            # Для attention_entropy: максимум = подозрительнее (риск выше)
+            # В обоих случаях: максимум = максимальный сигнал
+            values.append(max(feat_vals) if feat_vals else 0.0)
+        setattr(merged, feat, values)
+
+    merged.meta["n_chunks_processed"] = len(chunk_matrices)
+    return merged
 
 
 def resolve_layer(layer: int | str, total: int) -> int:
@@ -1409,6 +1655,34 @@ def resolve_layer(layer: int | str, total: int) -> int:
     return max(0, min(total - 1, index if index >= 0 else total + index))
 
 
+def _dense_cosine_scores_exact(vector, others, norm, other_norms):
+    """Vectorized products, sequential float64 accumulation (NOT BLAS/tree sum)."""
+    if len(others) == 0:
+        return []
+    import sys
+
+    # Python 3.12 changed builtin sum to compensated summation. Its frozen
+    # arithmetic is NOT numpy's sequential cumsum: preserve that reference.
+    if sys.version_info >= (3, 12):
+        return [_cosine_dense_normed(vector, other, norm, n) for other, n in zip(others, other_norms, strict=True)]
+    try:
+        import numpy as np
+    except ImportError:
+        return [_cosine_dense_normed(vector, other, norm, n) for other, n in zip(others, other_norms, strict=True)]
+    products = np.multiply(others, vector, dtype=np.float64)
+    numerators = np.cumsum(products, axis=1, dtype=np.float64)[:, -1].tolist()
+    return [
+        max(0.0, v / (norm * n)) if norm > 0 and n > 0 else 0.0 for v, n in zip(numerators, other_norms, strict=True)
+    ]
+
+
+def _cosine_dense_normed(a, b, norm_a, norm_b):
+    numerator = sum(x * y for x, y in zip(a, b, strict=False))
+    if norm_a <= 0 or norm_b <= 0:
+        return 0.0
+    return max(0.0, numerator / (norm_a * norm_b))
+
+
 def _cosine_dense(a: Sequence[float], b: Sequence[float]) -> float:
     numerator = sum(x * y for x, y in zip(a, b, strict=False))
     norm_a = sum(x * x for x in a) ** 0.5
@@ -1428,7 +1702,9 @@ _ACTIVE_FEATURE_CACHE: dict[str, FeatureMatrix] | None = None
 def set_feature_cache(cache: Mapping[str, FeatureMatrix] | None) -> None:
     """Включить (или выключить при ``None``) глобальный кеш признаков."""
     global _ACTIVE_FEATURE_CACHE  # noqa: PLW0603
-    _ACTIVE_FEATURE_CACHE = dict(cache) if cache is not None else None
+    # НЕ конвертируем CountingFeatureCache в dict — теряется счётчик hits/misses.
+    # Передаём как есть, чтобы лог эксперимента показывал попадания/промахи.
+    _ACTIVE_FEATURE_CACHE = cache if cache is not None else None
 
 
 def get_feature_cache() -> Mapping[str, FeatureMatrix] | None:
@@ -1460,11 +1736,17 @@ class CountingFeatureCache(dict):
         return f"<CountingFeatureCache {len(self)} ключей, попаданий {self.hits}, промахов {self.misses}>"
 
 
-def load_feature_cache(paths: Any, counting: bool = False) -> dict[str, FeatureMatrix]:
+def load_feature_cache(paths: Any, counting: bool = False, strict: bool = False) -> dict[str, FeatureMatrix]:
     """Прочитать кеш из файла(.ов) JSONL или из каталога с шардами.
 
     Шарды пишутся независимыми job'ами в ``features_*.jsonl``; здесь они
     склеиваются в один словарь. Порядок не важен: обращение по ключу.
+
+    Если ``strict=True``, проверяет полноту кеша: все 5 признаков из
+    FEATURE_NAMES должны быть непустыми. Используется экспериментом, чтобы
+    поймать старый формат кеша (без двух полей) до обучения, а не через
+    40 минут в train.py:138. По умолчанию ``strict=False`` — тесты пишут
+    частичные кеши для режима demo, им проверка не нужна.
     """
     import json  # noqa: PLC0415
     from pathlib import Path  # noqa: PLC0415
@@ -1493,8 +1775,20 @@ def load_feature_cache(paths: Any, counting: bool = False) -> dict[str, FeatureM
                 cache[key] = FeatureMatrix(
                     attention_entropy=[float(x) for x in row.get("attention_entropy", [])],
                     ctx_attention_mass=[float(x) for x in row.get("ctx_attention_mass", [])],
+                    ctx_attention_mass_norm=[float(x) for x in row.get("ctx_attention_mass_norm", [])],
+                    ctx_max_similarity=[float(x) for x in row.get("ctx_max_similarity", [])],
                     embedding_density=[float(x) for x in row.get("embedding_density", [])],
                     meta={"from_cache": True, "pair_id": row.get("pair_id")},
+                )
+    # Проверка полноты: если strict=True и кеш старого формата (без двух полей),
+    # ловим сразу, а не через 40 минут в train.py:138.
+    if strict:
+        for check_key, matrix in cache.items():
+            missing = [n for n in FEATURE_NAMES if not getattr(matrix, n)]
+            if missing:
+                raise ValueError(
+                    f"кеш неполон для ключа {check_key[:40]}... "
+                    f"(нет полей {missing}); пересчитайте precompute_features.py --chunked"
                 )
     return cache
 
@@ -1506,19 +1800,27 @@ def load_feature_cache(paths: Any, counting: bool = False) -> dict[str, FeatureM
 # падала, если torch не установлен.
 HF_MODEL_DEFAULT = "ai-forever/rugpt3small_based_on_gpt2"
 
+# Версия чанкинга — включается в ключ кеша, чтобы при изменении алгоритма
+# отбора фрагментов старый кеш не использовался с новыми признаками.
+CHUNKING_VERSION = "v2-chunked-bm25-top3"
+
 
 def feature_cache_key(
     answer: str,
     context: str | Sequence[str] | None,
     mode: str,
     model_name: str = "",
+    chunking: bool = False,
+    max_length: int = 512,
 ) -> str:
-    """Ключ кеша признаков: ответ + контекст + режим + модель.
+    """Ключ кеша признаков: ответ + контекст + режим + модель + версия чанкинга + окно.
 
     Счёт признаков на реальной модели занимает минуты на пару, и в
     кросс-валидации каждая пара встречается в нескольких фолдах. Кеш делает
     дорогой проход однократным. Ключ включает модель и режим: признаки разных
     моделей несопоставимы, и подмена одного другим исказила бы результат.
+    При chunking=True добавляется версия алгоритма чанкинга.
+    max_length включён: признаки при разном окне несопоставимы.
     """
     import hashlib  # noqa: PLC0415
 
@@ -1528,7 +1830,8 @@ def feature_cache_key(
         context_text = "\n".join(str(item) for item in context)
     else:
         context_text = ""
-    payload = f"{mode}|{model_name}|{answer}|{context_text}"
+    chunk_tag = f"|chunking={CHUNKING_VERSION}" if chunking else ""
+    payload = f"{mode}|{model_name}|{max_length}|{answer}|{context_text}{chunk_tag}"
     return hashlib.sha256(payload.encode("utf-8")).hexdigest()
 
 

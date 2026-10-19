@@ -514,5 +514,13 @@
   "artifacts": {
     "weights": "reports/experiments/a/weights.json",
     "head": "reports/experiments/a/config/head.json"
+  },
+  "evidence_context": {
+    "run_id": "37609202780",
+    "date": "2026-10-14",
+    "status": "NON_AUTHORITATIVE historical/reference; consult current indices",
+    "successor": "reports/EXPERIMENTS_INDEX.md",
+    "source_commit": "fc438ea7069b4a3c8ad78097f4c29df1767937ec",
+    "limitation": null
   }
 }

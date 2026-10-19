@@ -1,0 +1,9 @@
+{
+  "run_id": "39271014161",
+  "date": "2026-10-19",
+  "scope": "last18000 bytes of original job log; entire failed publication step included",
+  "raw_tail_sha256": "ab69460c359f8539e2426b70ff88ca27b606efafea16dc1b4a36b96d03773af8",
+  "failure": "PS scalar flag splat: no matches found for `-`",
+  "prediction_rerun": false,
+  "rebuild": false
+}

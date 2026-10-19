@@ -1,0 +1,9 @@
+{
+  "all_source_bundle_fields_identical": true,
+  "only_added_field": "localization_decoder",
+  "answer_head_identical": true,
+  "isotonic_identical": true,
+  "token_head_identical": true,
+  "answer_threshold_identical": true,
+  "source_token_threshold_identical": true
+}

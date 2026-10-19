@@ -1,0 +1,28 @@
+{
+  "source_oof_states.jsonl.gz": {
+    "compressed_match": true,
+    "raw_match": true,
+    "raw_bytes": 5742956
+  },
+  "source_dev_evidence.jsonl.gz": {
+    "compressed_match": true,
+    "raw_match": true,
+    "raw_bytes": 3932617
+  },
+  "50_fit_receipts_disjoint_documents": true,
+  "bundle_sha_match": true,
+  "actual_published_sizes_differ_from_pre_stdout_manifest": {
+    "measurement.log": {
+      "manifest_before_final_stdout": 8906,
+      "published": 12667
+    }
+  },
+  "note": "measurement.log continues through tee after manifest generation; final inventory below supersedes its pre-stdout size only. Original runner evidence is not edited.",
+  "dev_full_token_risks": 13150,
+  "token_oracle_threshold_counts_replayed": {
+    "tp": 696,
+    "fp": 439,
+    "fn": 688,
+    "f1": 0.5526002381897578
+  }
+}

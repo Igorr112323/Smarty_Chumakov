@@ -1,0 +1,77 @@
+{
+  "stage": "P6",
+  "model_sha256": "e0b13c693a058dfd66ed24a52fc14e9c70964e95885358e7b99cc1f328ad6892",
+  "training": "Existing synthetic/demo regression fit/train calls only, explicitly authorized; no scientific or product training",
+  "official_test177": "reserved; audit guard rejects test.jsonl and unsplit pairs.jsonl",
+  "incident": "The initial aborted regression invoked the pre-existing chunking test which parsed the unsplit corpus before slicing 20 rows. No official model evaluation was performed. Test now uses train only; this is a recorded protocol breach, not claimed pristine isolation.",
+  "mode_mapping_before_numbers": {
+    "numeric_substitutions": {
+      "corpus_mode": "number_attribution",
+      "declared_corpus_pairs": 132
+    },
+    "contradictions": {
+      "corpus_mode": "contradiction",
+      "declared_corpus_pairs": 144
+    },
+    "wording_changes": {
+      "interpretation": "partial/unconfirmed proxy, NOT paraphrase robustness proof",
+      "corpus_modes": [
+        "partial",
+        "unconfirmed"
+      ]
+    },
+    "omissions": {
+      "interpretation": "missing/oversight proxy",
+      "corpus_modes": [
+        "missing",
+        "oversight"
+      ]
+    }
+  },
+  "token_convention": "P5 scored positions inside kept spans plus mandatory rules. Historical P2/P3/P4 numbers are not recomputed.",
+  "benchmark": {
+    "modes": [
+      "demo",
+      "hf"
+    ],
+    "repeats": 3,
+    "thermal_states": [
+      "cold-process",
+      "warm-model"
+    ],
+    "sizes_chars": [
+      1000,
+      50000,
+      2000000
+    ],
+    "scenarios": [
+      "document-context",
+      "answer-text"
+    ],
+    "limits_seconds": {
+      "1000": 0.03,
+      "50000": 1.0,
+      "2000000": 60.0
+    },
+    "timeout_seconds": 75,
+    "cold_definition": "Fresh process and model initialization; weights already on runner disk; download excluded and reported separately",
+    "warm_definition": "Fresh process performs one short product request before timed full request; no feature cache supplied",
+    "timeout_reporting": "Censored lower bounds, NOT successful timing samples; median/max null if any repetition is censored",
+    "data": "Deterministic repetition of first train context/answer; final string has exactly requested Unicode character count, UTF-8 byte count separately recorded",
+    "no_execution_optimization": true,
+    "profiling": "Separate diagnostic requests only; native benchmark samples have profiler disabled. Python import/process startup is not in seconds; cold bundle/model initialization is included."
+  },
+  "ai_share": {
+    "fractions": [
+      0,
+      0.25,
+      0.5,
+      0.75,
+      1
+    ],
+    "source": "train contexts plus explicitly programmatically generated machine-style blocks; no external generation, fitting or calibration",
+    "caution": "ai_share measures unsupportedness; ai_participation is a separate style estimate. Neither synthetic mixture test certifies real authorship calibration."
+  },
+  "release": "RC prerelease only, never latest; immutable measured commit; no automatic repository writes",
+  "mode_mapping_note": "132/144 are declared whole-corpus mode counts, not train counts (train 92/104). All saved evidence modes are reported, with no selection. Lists clarify the user-requested partial/unconfirmed and missing/oversight grouping; no fitting or metric changes."
+}

@@ -1,0 +1,86 @@
+kNone_w1 fold 0 complete
+kNone_w1 fold 1 complete
+kNone_w1 fold 2 complete
+kNone_w1 fold 3 complete
+kNone_w1 fold 4 complete
+Candidate {"config": {"type": "seed_grow_v1", "schema_version": 1, "tau_low": 0.382602175322462, "tau_high": 0.7038362509143306, "bridge_unscored_tokens": 1, "min_seed_tokens": 1, "attribution_boundary": "exact"}, "tokens": {"tp": 753, "fp": 968, "fn": 631, "tn": 44255, "precision": 0.4375363160952934, "recall": 0.5440751445086706, "f1": 0.485024154589372, "fpr": 0.02140503725980143}, "spans": {"precision": 0.3863080684596577, "recall": 0.33832976445396146, "f1": 0.3607305936073059, "tp": 158, "fp": 251, "fn": 309, "iou_threshold": 0.5}, "objective": 0.3607305936073059, "k": null, "w": 1, "candidate": "kNone_w1", "seconds": 32.79101722400001}
+k1_w1 fold 0 complete
+k1_w1 fold 1 complete
+k1_w1 fold 2 complete
+k1_w1 fold 3 complete
+k1_w1 fold 4 complete
+Candidate {"config": {"type": "seed_grow_v1", "schema_version": 1, "tau_low": 0.382602175322462, "tau_high": 0.7038362509143306, "bridge_unscored_tokens": 1, "min_seed_tokens": 1, "attribution_boundary": "exact"}, "tokens": {"tp": 816, "fp": 1024, "fn": 568, "tn": 44199, "precision": 0.4434782608695652, "recall": 0.5895953757225434, "f1": 0.5062034739454094, "fpr": 0.0226433452004511}, "spans": {"precision": 0.3968609865470852, "recall": 0.37901498929336186, "f1": 0.3877327491785323, "tp": 177, "fp": 269, "fn": 290, "iou_threshold": 0.5}, "objective": 0.3877327491785323, "k": 1, "w": 1, "candidate": "k1_w1", "seconds": 220.00367638800003}
+k1_w2 fold 0 complete
+k1_w2 fold 1 complete
+k1_w2 fold 2 complete
+k1_w2 fold 3 complete
+k1_w2 fold 4 complete
+Candidate {"config": {"type": "seed_grow_v1", "schema_version": 1, "tau_low": 0.382602175322462, "tau_high": 0.7038362509143306, "bridge_unscored_tokens": 1, "min_seed_tokens": 1, "attribution_boundary": "exact"}, "tokens": {"tp": 976, "fp": 2381, "fn": 408, "tn": 42842, "precision": 0.2907357759904677, "recall": 0.7052023121387283, "f1": 0.4117274836532377, "fpr": 0.05265020011940827}, "spans": {"precision": 0.2702702702702703, "recall": 0.44967880085653106, "f1": 0.33762057877813506, "tp": 210, "fp": 567, "fn": 257, "iou_threshold": 0.5}, "objective": 0.33762057877813506, "k": 1, "w": 2, "candidate": "k1_w2", "seconds": 221.70840139799998}
+k1_w4 fold 0 complete
+k1_w4 fold 1 complete
+k1_w4 fold 2 complete
+k1_w4 fold 3 complete
+k1_w4 fold 4 complete
+Candidate {"config": {"type": "seed_grow_v1", "schema_version": 1, "tau_low": 0.382602175322462, "tau_high": 0.7038362509143306, "bridge_unscored_tokens": 1, "min_seed_tokens": 1, "attribution_boundary": "exact"}, "tokens": {"tp": 1062, "fp": 4424, "fn": 322, "tn": 40799, "precision": 0.19358366751731682, "recall": 0.7673410404624278, "f1": 0.3091703056768559, "fpr": 0.09782632731132389}, "spans": {"precision": 0.17455138662316477, "recall": 0.4582441113490364, "f1": 0.2528056704075605, "tp": 214, "fp": 1012, "fn": 253, "iou_threshold": 0.5}, "objective": 0.2528056704075605, "k": 1, "w": 4, "candidate": "k1_w4", "seconds": 219.92107950800005}
+k2_w1 fold 0 complete
+k2_w1 fold 1 complete
+k2_w1 fold 2 complete
+k2_w1 fold 3 complete
+k2_w1 fold 4 complete
+Candidate {"config": {"type": "seed_grow_v1", "schema_version": 1, "tau_low": 0.382602175322462, "tau_high": 0.7038362509143306, "bridge_unscored_tokens": 1, "min_seed_tokens": 1, "attribution_boundary": "exact"}, "tokens": {"tp": 838, "fp": 843, "fn": 546, "tn": 44380, "precision": 0.49851279000594884, "recall": 0.6054913294797688, "f1": 0.5468189233278956, "fpr": 0.018640957035136987}, "spans": {"precision": 0.45979899497487436, "recall": 0.39186295503211993, "f1": 0.423121387283237, "tp": 183, "fp": 215, "fn": 284, "iou_threshold": 0.5}, "objective": 0.423121387283237, "k": 2, "w": 1, "candidate": "k2_w1", "seconds": 221.170335196}
+k2_w2 fold 0 complete
+k2_w2 fold 1 complete
+k2_w2 fold 2 complete
+k2_w2 fold 3 complete
+k2_w2 fold 4 complete
+Candidate {"config": {"type": "seed_grow_v1", "schema_version": 1, "tau_low": 0.382602175322462, "tau_high": 0.7038362509143306, "bridge_unscored_tokens": 1, "min_seed_tokens": 1, "attribution_boundary": "exact"}, "tokens": {"tp": 960, "fp": 2133, "fn": 424, "tn": 43090, "precision": 0.31037827352085356, "recall": 0.6936416184971098, "f1": 0.4288586106767925, "fpr": 0.047166264953674014}, "spans": {"precision": 0.29124820659971307, "recall": 0.4346895074946467, "f1": 0.34879725085910657, "tp": 203, "fp": 494, "fn": 264, "iou_threshold": 0.5}, "objective": 0.34879725085910657, "k": 2, "w": 2, "candidate": "k2_w2", "seconds": 219.06370034999998}
+k2_w4 fold 0 complete
+k2_w4 fold 1 complete
+k2_w4 fold 2 complete
+k2_w4 fold 3 complete
+k2_w4 fold 4 complete
+Candidate {"config": {"type": "seed_grow_v1", "schema_version": 1, "tau_low": 0.382602175322462, "tau_high": 0.7038362509143306, "bridge_unscored_tokens": 1, "min_seed_tokens": 1, "attribution_boundary": "exact"}, "tokens": {"tp": 1069, "fp": 4052, "fn": 315, "tn": 41171, "precision": 0.20874829134934583, "recall": 0.7723988439306358, "f1": 0.32867025365103764, "fpr": 0.0896004245627225}, "spans": {"precision": 0.19237749546279492, "recall": 0.4539614561027837, "f1": 0.27023581899298915, "tp": 212, "fp": 890, "fn": 255, "iou_threshold": 0.5}, "objective": 0.27023581899298915, "k": 2, "w": 4, "candidate": "k2_w4", "seconds": 221.74622030799992}
+k3_w1 fold 0 complete
+k3_w1 fold 1 complete
+k3_w1 fold 2 complete
+k3_w1 fold 3 complete
+k3_w1 fold 4 complete
+Candidate {"config": {"type": "seed_grow_v1", "schema_version": 1, "tau_low": 0.382602175322462, "tau_high": 0.7038362509143306, "bridge_unscored_tokens": 1, "min_seed_tokens": 1, "attribution_boundary": "exact"}, "tokens": {"tp": 834, "fp": 716, "fn": 550, "tn": 44507, "precision": 0.5380645161290323, "recall": 0.6026011560693642, "f1": 0.5685071574642127, "fpr": 0.015832651526877916}, "spans": {"precision": 0.48148148148148145, "recall": 0.3897216274089936, "f1": 0.43076923076923074, "tp": 182, "fp": 196, "fn": 285, "iou_threshold": 0.5}, "objective": 0.43076923076923074, "k": 3, "w": 1, "candidate": "k3_w1", "seconds": 221.22706996700003}
+k3_w2 fold 0 complete
+k3_w2 fold 1 complete
+k3_w2 fold 2 complete
+k3_w2 fold 3 complete
+k3_w2 fold 4 complete
+Candidate {"config": {"type": "seed_grow_v1", "schema_version": 1, "tau_low": 0.382602175322462, "tau_high": 0.7038362509143306, "bridge_unscored_tokens": 1, "min_seed_tokens": 1, "attribution_boundary": "exact"}, "tokens": {"tp": 980, "fp": 1926, "fn": 404, "tn": 43297, "precision": 0.3372333103922918, "recall": 0.708092485549133, "f1": 0.4568764568764569, "fpr": 0.0425889481016297}, "spans": {"precision": 0.32228915662650603, "recall": 0.4582441113490364, "f1": 0.3784261715296198, "tp": 214, "fp": 450, "fn": 253, "iou_threshold": 0.5}, "objective": 0.3784261715296198, "k": 3, "w": 2, "candidate": "k3_w2", "seconds": 218.7525898890001}
+k3_w4 fold 0 complete
+k3_w4 fold 1 complete
+k3_w4 fold 2 complete
+k3_w4 fold 3 complete
+k3_w4 fold 4 complete
+Candidate {"config": {"type": "seed_grow_v1", "schema_version": 1, "tau_low": 0.382602175322462, "tau_high": 0.7038362509143306, "bridge_unscored_tokens": 1, "min_seed_tokens": 1, "attribution_boundary": "exact"}, "tokens": {"tp": 1064, "fp": 3502, "fn": 320, "tn": 41721, "precision": 0.23302671922908455, "recall": 0.7687861271676301, "f1": 0.35764705882352943, "fpr": 0.07743847157419897}, "spans": {"precision": 0.21456692913385828, "recall": 0.4668094218415418, "f1": 0.2939986513823331, "tp": 218, "fp": 798, "fn": 249, "iou_threshold": 0.5}, "objective": 0.2939986513823331, "k": 3, "w": 4, "candidate": "k3_w4", "seconds": 217.8621247579997}
+Search low 0.0 completed configs 100
+Search low 0.07222345351776255 completed configs 196
+Search low 0.17686433173150704 completed configs 288
+Search low 0.23033743140829965 completed configs 376
+Search low 0.3047312347276744 completed configs 460
+Search low 0.4186579753072923 completed configs 540
+Search low 0.46823304343873473 completed configs 616
+Search low 0.5167329860746196 completed configs 688
+Search low 0.5475108604374854 completed configs 756
+Search low 0.5653513416423852 completed configs 820
+Search low 0.5812254377605992 completed configs 880
+Search low 0.6060770302907125 completed configs 936
+Search low 0.6287422757811378 completed configs 988
+Search low 0.6525538736835022 completed configs 1036
+Search low 0.6913825154840593 completed configs 1080
+Search low 0.7124882896416256 completed configs 1120
+Search low 0.7302384894898114 completed configs 1156
+Search low 0.7475958728452998 completed configs 1188
+Search low 0.7600378323046545 completed configs 1216
+Search low 0.7802570027464603 completed configs 1240
+Search low 0.8761733280454665 completed configs 1260
+Search low 0.9309332232155898 completed configs 1276
+Search low 0.9438265957681604 completed configs 1288
+Search low 0.956884926316551 completed configs 1296
+Search low 0.9568849263165511 completed configs 1300
+{"selected_model": {"config": {"type": "seed_grow_v1", "schema_version": 1, "tau_low": 0.382602175322462, "tau_high": 0.7038362509143306, "bridge_unscored_tokens": 1, "min_seed_tokens": 1, "attribution_boundary": "exact"}, "tokens": {"tp": 834, "fp": 716, "fn": 550, "tn": 44507, "precision": 0.5380645161290323, "recall": 0.6026011560693642, "f1": 0.5685071574642127, "fpr": 0.015832651526877916}, "spans": {"precision": 0.48148148148148145, "recall": 0.3897216274089936, "f1": 0.43076923076923074, "tp": 182, "fp": 196, "fn": 285, "iou_threshold": 0.5}, "objective": 0.43076923076923074, "k": 3, "w": 1, "candidate": "k3_w1", "seconds": 221.22706996700003}, "selected_decoder": {"config": {"type": "seed_grow_v1", "schema_version": 1, "tau_low": 0.46823304343873473, "tau_high": 0.6287422757811378, "bridge_unscored_tokens": 1, "min_seed_tokens": 2, "attribution_boundary": "exact"}, "tokens": {"tp": 853, "fp": 671, "fn": 531, "tn": 44552, "precision": 0.5597112860892388, "recall": 0.6163294797687862, "f1": 0.5866574965612105, "fpr": 0.014837582645998718}, "spans": {"precision": 0.4847715736040609, "recall": 0.4089935760171306, "f1": 0.4436701509872241, "tp": 191, "fp": 203, "fn": 276, "iou_threshold": 0.5}, "objective": 0.4436701509872241}, "dev": {"tokens": {"precision": 0.46467391304347827, "recall": 0.5958188153310104, "f1": 0.5221374045801527, "fpr": 0.025644363447019005, "tp": 171, "fp": 197, "fn": 116, "tn": 7485, "auc": 0.9615141781276109}, "spans": {"precision": 0.4065934065934066, "recall": 0.3854166666666667, "f1": 0.39572192513368987, "tp": 37, "fp": 54, "fn": 59, "iou_threshold": 0.5, "recall_containment": 0.16666666666666666, "f1_expanded_labels": 0.16042780748663102, "mean_width_ratio": 2.530743243243243}, "answers": {"threshold": 0.5794392523364486, "precision": 0.7777777777777778, "recall": 0.5104166666666666, "f1": 0.6163522012578616, "fpr": 0.16470588235294117, "auc": 0.7338235294117647, "tp": 49, "fp": 14, "fn": 47, "tn": 71}, "verdicts": {"tp": 58, "fp": 18, "fn": 38, "tn": 67, "precision": 0.7632, "recall": 0.6042, "f1": 0.6744, "fpr": 0.2118, "flagged_share": 0.4199}, "gates": {"tokens": {"family": "tokens", "contract": {"gate": {"f1_min": 0.5, "fpr_max": 0.4}, "source": "договор № 20478ГУ/2026, проект 117812, ТЗ п. 4.1 треб. 6", "f1": 0.5221374045801527, "fpr": 0.025644363447019005, "status": "достигнут"}, "internal": {"gate": {"f1_min": 0.9, "fpr_max": 0.1}, "source": "мастер-промт проекта (внутренний ориентир, не приёмка)", "f1": 0.5221374045801527, "fpr": 0.025644363447019005, "status": "НЕ достигнут"}}, "answers": {"family": "answers", "contract": {"gate": {"f1_min": 0.5, "fpr_max": 0.4}, "source": "договор № 20478ГУ/2026, проект 117812, ТЗ п. 4.1 треб. 6", "f1": 0.6163522012578616, "fpr": 0.16470588235294117, "status": "достигнут"}, "internal": {"gate": {"f1_min": 0.9, "fpr_max": 0.1}, "source": "мастер-промт проекта (внутренний ориентир, не приёмка)", "f1": 0.6163522012578616, "fpr": 0.16470588235294117, "status": "НЕ достигнут"}}, "spans": {"family": "spans", "contract": {"gate": {"f1_min": 0.5, "fpr_max": 0.4}, "source": "договор № 20478ГУ/2026, проект 117812, ТЗ п. 4.1 треб. 6", "f1": 0.39572192513368987, "fpr": 0.025644363447019005, "status": "НЕ достигнут"}, "internal": {"gate": {"f1_min": 0.9, "fpr_max": 0.1}, "source": "мастер-промт проекта (внутренний ориентир, не приёмка)", "f1": 0.39572192513368987, "fpr": 0.025644363447019005, "status": "НЕ достигнут"}}}, "pairs": 181, "mode": "hf", "warning": ""}}

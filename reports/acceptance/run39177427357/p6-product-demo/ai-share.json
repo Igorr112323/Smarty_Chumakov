@@ -1,0 +1,136 @@
+{
+  "rows": [
+    {
+      "train_pair_id": "corpus-a3-00119",
+      "fraction": 0.0,
+      "machine_chars": 0,
+      "total_chars": 800,
+      "ai_share": 0.1011647187400035,
+      "ai_participation": 0.910818948000069
+    },
+    {
+      "train_pair_id": "corpus-a3-00119",
+      "fraction": 0.25,
+      "machine_chars": 200,
+      "total_chars": 800,
+      "ai_share": 0.09796836573458424,
+      "ai_participation": 0.8831969971925396
+    },
+    {
+      "train_pair_id": "corpus-a3-00119",
+      "fraction": 0.5,
+      "machine_chars": 400,
+      "total_chars": 800,
+      "ai_share": 0.08205376197701178,
+      "ai_participation": 0.9405923039655436
+    },
+    {
+      "train_pair_id": "corpus-a3-00119",
+      "fraction": 0.75,
+      "machine_chars": 600,
+      "total_chars": 800,
+      "ai_share": 0.04799391047531435,
+      "ai_participation": 0.9021773269691571
+    },
+    {
+      "train_pair_id": "corpus-a3-00119",
+      "fraction": 1.0,
+      "machine_chars": 800,
+      "total_chars": 800,
+      "ai_share": 0.02624403410155888,
+      "ai_participation": 0.9992195064473915
+    },
+    {
+      "train_pair_id": "corpus-a3-00188",
+      "fraction": 0.0,
+      "machine_chars": 0,
+      "total_chars": 800,
+      "ai_share": 0.07296900878756454,
+      "ai_participation": 0.9530741286197506
+    },
+    {
+      "train_pair_id": "corpus-a3-00188",
+      "fraction": 0.25,
+      "machine_chars": 200,
+      "total_chars": 800,
+      "ai_share": 0.090272999274051,
+      "ai_participation": 0.9211450733901185
+    },
+    {
+      "train_pair_id": "corpus-a3-00188",
+      "fraction": 0.5,
+      "machine_chars": 400,
+      "total_chars": 800,
+      "ai_share": 0.07135656453101386,
+      "ai_participation": 0.9537439153375136
+    },
+    {
+      "train_pair_id": "corpus-a3-00188",
+      "fraction": 0.75,
+      "machine_chars": 600,
+      "total_chars": 800,
+      "ai_share": 0.036630550767462855,
+      "ai_participation": 0.9155950038885301
+    },
+    {
+      "train_pair_id": "corpus-a3-00188",
+      "fraction": 1.0,
+      "machine_chars": 800,
+      "total_chars": 800,
+      "ai_share": 0.027073778318108834,
+      "ai_participation": 0.9992306161535873
+    },
+    {
+      "train_pair_id": "corpus-a3-00836",
+      "fraction": 0.0,
+      "machine_chars": 0,
+      "total_chars": 800,
+      "ai_share": 0.04313410825815406,
+      "ai_participation": 0.9999978917482966
+    },
+    {
+      "train_pair_id": "corpus-a3-00836",
+      "fraction": 0.25,
+      "machine_chars": 200,
+      "total_chars": 800,
+      "ai_share": 0.06431371150158002,
+      "ai_participation": 0.9652855137111277
+    },
+    {
+      "train_pair_id": "corpus-a3-00836",
+      "fraction": 0.5,
+      "machine_chars": 400,
+      "total_chars": 800,
+      "ai_share": 0.05379846537491563,
+      "ai_participation": 0.9999999235299292
+    },
+    {
+      "train_pair_id": "corpus-a3-00836",
+      "fraction": 0.75,
+      "machine_chars": 600,
+      "total_chars": 800,
+      "ai_share": 0.015463291940760545,
+      "ai_participation": 0.9571436882773193
+    },
+    {
+      "train_pair_id": "corpus-a3-00836",
+      "fraction": 1.0,
+      "machine_chars": 800,
+      "total_chars": 800,
+      "ai_share": 0.027073778318108834,
+      "ai_participation": 0.9992243743491591
+    }
+  ],
+  "mae": 0.47180164156475,
+  "mean_curve": [
+    0.07242261192857403,
+    0.08418502550340509,
+    0.06906959729431375,
+    0.03336258439451258,
+    0.02679719691259218
+  ],
+  "monotone_mean": false,
+  "synthetic_generator_only": true,
+  "calibration_fitted": false,
+  "mode": "demo"
+}

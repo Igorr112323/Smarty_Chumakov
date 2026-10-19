@@ -1,0 +1,57 @@
+name: P8 evidence receipts only, no inference
+on:
+  push:
+    branches: [arena/c5f69767-smarty-chumakov]
+    paths: [.github/p8-receipts.trigger]
+permissions:
+  contents: read
+  actions: read
+jobs:
+  receipt:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 40
+    strategy:
+      fail-fast: false
+      matrix:
+        artifact: [p8-official177, p8-external-0, p8-external-1, p8-external-2, p8-external-3, p8-external-full, spanverify-windows-x64, p7-windows-hf-autonomy]
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Wait for evidence (never repeat inference)
+        if: matrix.artifact != 'p8-official177'
+        run: gh run watch 39266451529 --exit-status --interval 30
+      - uses: actions/download-artifact@v4
+        with:
+          name: ${{ matrix.artifact }}
+          run-id: ${{ (matrix.artifact == 'spanverify-windows-x64' || matrix.artifact == 'p7-windows-hf-autonomy') && 39271014161 || 39266451529 }}
+          github-token: ${{ github.token }}
+          path: .arena/receipt
+      - name: Lossless compressed metadata receipts and per-pair artifact hashes
+        run: python scripts/p8_emit_receipt.py .arena/receipt '${{ matrix.artifact }}' ${{ (matrix.artifact == 'spanverify-windows-x64' || matrix.artifact == 'p7-windows-hf-autonomy') && 39271014161 || 39266451529 }}
+  windows-logs:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - name: Preserve publication failure log, never rebuild or infer
+        run: |
+          gh api --allow-escape-sequences repos/${{ github.repository }}/actions/jobs/118129110689/logs > windows-log.txt 2> windows-log-error.txt || true
+          cat windows-log-error.txt
+          python -c "from pathlib import Path; print('::notice title=P8 log retrieval status::'+Path('windows-log-error.txt').read_text().replace('\n',' / '))"
+          python -c "import base64,gzip; from pathlib import Path; s=base64.b64encode(gzip.compress((Path('windows-log.txt').read_bytes()[-18000:]+Path('windows-log-error.txt').read_bytes()))).decode(); [print('::notice title=P8 Windows log '+str(i//3000)+'::'+s[i:i+3000]) for i in range(0,len(s),3000)]"
+  rc-publication-logs:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - name: Preserve RC publication failure stderr, NO inference
+        run: |
+          gh api --allow-escape-sequences repos/${{ github.repository }}/actions/jobs/118178153552/logs > rc-log.txt
+          python -c "import base64,gzip; from pathlib import Path; s=base64.b64encode(gzip.compress(Path('rc-log.txt').read_bytes()[-24000:])).decode(); [print('::notice title=P8 RC log '+str(i//3000)+'::'+s[i:i+3000]) for i in range(0,len(s),3000)]"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: p8-rc-publication-failure-log
+          path: rc-log.txt

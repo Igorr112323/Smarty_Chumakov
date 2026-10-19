@@ -1,0 +1,13 @@
+{
+  "run_id": "39183025109",
+  "date": "2026-10-19T00:56:28Z",
+  "commit": "6926a809a9d85d9786b2f27517a6629899278074",
+  "family": "P6",
+  "workflow": "p6-acceptance.yml",
+  "record_kind": "measurement/delivery",
+  "status": "completed",
+  "outcome": "success",
+  "url": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39183025109",
+  "canonical_directories": [],
+  "receipt": "reports/measurements/run39183025109/receipt.json"
+}

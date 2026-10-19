@@ -1,0 +1,35 @@
+........................................................................ [  8%]
+........................................................................ [ 16%]
+........................................................................ [ 24%]
+........................................................................ [ 32%]
+........................................................................ [ 40%]
+........................................................................ [ 48%]
+.......s................................................................ [ 57%]
+........................................................................ [ 65%]
+..................................s..................................... [ 73%]
+........................................................................ [ 81%]
+........................................................................ [ 89%]
+....................................F................................... [ 97%]
+...................                                                      [100%]
+=================================== FAILURES ===================================
+___________ test_no_job_is_longer_than_the_limit[p7-acceptance.yml] ____________
+
+path = PosixPath('/home/user/Smarty_Chumakov/.github/workflows/p7-acceptance.yml')
+
+    @pytest.mark.parametrize("path", _workflow_paths(), ids=lambda p: p.name)
+    def test_no_job_is_longer_than_the_limit(path: Path) -> None:
+        """Лимит 40 минут: «висение» должно заканчиваться за минуты, а не за часы."""
+        data = yaml.safe_load(path.read_text(encoding="utf-8"))
+        limit = HEAVY_JOB_MINUTES.get(path.name, MAX_JOB_MINUTES)
+        over = {
+            name: job["timeout-minutes"]
+            for name, job in (data.get("jobs") or {}).items()
+            if (job or {}).get("timeout-minutes", 0) > limit
+        }
+>       assert not over, f"{path.name}: job'ы дольше {limit} минут: {over}"
+E       AssertionError: p7-acceptance.yml: job'ы дольше 40 минут: {'hf-contract': 60}
+E       assert not {'hf-contract': 60}
+
+tests/test_workflow_limits.py:70: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_workflow_limits.py::test_no_job_is_longer_than_the_limit[p7-acceptance.yml]

@@ -1,0 +1,13 @@
+{
+  "run_id": "P8-closing-local-full-suite",
+  "date": "2026-10-19",
+  "source": "701b99f1128caf9e5ad2b7496eff9297e453220e",
+  "tests_excluded": false,
+  "collected": 910,
+  "passed": 908,
+  "skipped": 2,
+  "failures": 0,
+  "errors": 0,
+  "elapsed_seconds": 410.398,
+  "scope": "Complete existing QA suite, not a new scientific experiment; receipt-only successor changes evidence/docs only, final exact-head CI and local verification repeated"
+}

@@ -21,6 +21,7 @@
 from __future__ import annotations
 
 import json
+import math
 import re
 import sys
 import time
@@ -36,6 +37,7 @@ from .core import (
     SpanResult,
     Token,
     VerificationResult,
+    _SpanIndex,
     mean,
     split_chunks,
     split_sentences,
@@ -56,6 +58,7 @@ from .features import (
     combine,
     extract_features,
     feature_cache_key,
+    hf_features_chunked,
     is_scored_token,
     number_attribution,
 )
@@ -156,6 +159,12 @@ class WeightsBundle:
     span_cap: float = 0.6
     isotonic: IsotonicCalibrator | None = None
     head: dict[str, Any] | None = None
+    answer_head: dict[str, Any] | None = None
+    token_head: dict[str, Any] | None = None  # P2 token-head (GradientBoosting)
+    token_threshold: float | None = None  # Global token threshold для P2
+    context_features_spec: dict[str, Any] | None = None
+    localization_decoder: dict[str, Any] | None = None  # Versioned P3 postprocessor only
+    span_filter: dict[str, Any] | None = None  # P5, frozen P4 risks + keep/drop
     folds: list[dict[str, Any]] | None = None
     seed: int = 42
     version: str = "1.1.0"
@@ -163,19 +172,41 @@ class WeightsBundle:
     meta: dict[str, Any] | None = None
     source: str = "defaults"  # откуда взяты параметры: disk | embedded | defaults
 
+    def __post_init__(self):
+        if self.span_filter is not None:
+            from .span_filter import validate_filter
+
+            validate_filter(self.span_filter)
+            if self.token_head is None or self.context_features_spec is None or self.localization_decoder is None:
+                raise ValueError("P5 requires the frozen context token head and decoder")
+        if self.context_features_spec is not None:
+            from .context_head import validate_spec
+
+            validate_spec(self.context_features_spec)
+        if self.localization_decoder is not None:
+            from .localization import validate_decoder
+
+            validate_decoder(self.localization_decoder)
+
     def to_dict(self) -> dict[str, Any]:
         return {
-            "weights": {name: round(self.weights.get(name, 0.0), 4) for name in FEATURE_NAMES},
-            "threshold": round(self.threshold, 6),
+            "weights": {name: float(self.weights.get(name, 0.0)) for name in FEATURE_NAMES},
+            "threshold": float(self.threshold),
             "target_fpr": self.target_fpr,
             "span_z": self.span_z,
             "span_floor": self.span_floor,
             "span_cap": self.span_cap,
             "isotonic": {
-                "x": [round(v, 6) for v in (self.isotonic.thresholds if self.isotonic else [])],
-                "y": [round(v, 6) for v in (self.isotonic.values if self.isotonic else [])],
+                "x": [float(v) for v in (self.isotonic.thresholds if self.isotonic else [])],
+                "y": [float(v) for v in (self.isotonic.values if self.isotonic else [])],
             },
             "head": self.head or {"type": "none", "file": None},
+            "answer_head": self.answer_head,
+            "token_head": self.token_head,
+            "localization_decoder": self.localization_decoder,
+            "span_filter": self.span_filter,
+            "context_features_spec": self.context_features_spec,
+            "token_threshold": float(self.token_threshold) if self.token_threshold is not None else None,
             "folds": self.folds or [],
             "seed": self.seed,
             "version": self.version,
@@ -216,6 +247,12 @@ class WeightsBundle:
             span_cap=float(data.get("span_cap", 0.6)),
             isotonic=calibrator,
             head=data.get("head"),
+            answer_head=data.get("answer_head"),
+            token_head=data.get("token_head"),
+            localization_decoder=data.get("localization_decoder"),
+            span_filter=data.get("span_filter"),
+            context_features_spec=data.get("context_features_spec"),
+            token_threshold=float(data["token_threshold"]) if data.get("token_threshold") is not None else None,
             folds=list(data.get("folds", [])),
             seed=int(data.get("seed", 42)),
             version=str(data.get("version", "1.1.0")),
@@ -299,6 +336,8 @@ class Verifier:
         verdict_rule: str | None = None,
         span_filter_min_chars: int = 0,
         verdict_params: Mapping[str, Any] | None = None,
+        span_expansion: str = "clause",
+        ai_share_calibrator=None,
     ) -> None:
         self.config = config or Config.load()
         # Правило вердикта берётся из замороженного артефакта калибровки
@@ -320,12 +359,40 @@ class Verifier:
         # помечается. 0 — фильтр выключен (текущее поведение). Порог задаётся
         # снаружи и по тесту не подбирается.
         self.span_filter_min_chars = int(span_filter_min_chars)
+        # Расширение границ фрагментов маски:
+        # - clause (текущий): до границ клаузы (предложение, суженное до запятых/тире)
+        # - mask: ровно по помеченным токенам, без расширения
+        # - clause_capped: клауза, но не шире max(40 знаков, 2 × ширина маски)
+        # - mask_padded: маска + по одному соседнему токену слева и справа
+        # Вариант выбирается на dev и не подстраивается под тест.
+        if span_expansion not in ("clause", "mask", "clause_capped", "mask_padded"):
+            raise ValueError(f"неизвестный span_expansion: {span_expansion!r}")
+        self.span_expansion = span_expansion
         # Явно переданные веса имеют приоритет: иначе обучение, которое считает
         # сквозные метрики «в памяти», случайно перечитало бы файл с диска.
         self.bundle = weights if weights is not None else WeightsBundle.load(weights_path)
         self.weights_loaded = weights is not None or self.bundle.loaded
         self.mode = (mode or self.bundle.mode or self.config.backend or "demo").lower()
         self.model_name = model_name or getattr(self.config, "hf_model", "ai-forever/rugpt3small_based_on_gpt2")
+        # Explicit opt-in only. Frozen ai_share raw, P1 score and token/span risks
+        # are never used as calibration targets or changed by this adapter.
+        import os
+
+        from .share_calibration import AiShareCalibrator
+
+        artifact = ai_share_calibrator or os.environ.get("SPANVERIFY_AI_SHARE_CALIBRATOR")
+        self._share_calibrator = None
+        if artifact is not None:
+            if isinstance(artifact, (str, Path)):
+                artifact = json.loads(Path(artifact).read_text(encoding="utf-8"))
+            self._share_calibrator = AiShareCalibrator.from_dict(artifact)
+            if self._share_calibrator.mode != self.mode or not self.bundle.span_filter:
+                raise ValueError("AI-share calibrator requires matching mode and frozen P5 bundle")
+            if (
+                self._share_calibrator.bundle_sha256
+                != "e0b13c693a058dfd66ed24a52fc14e9c70964e95885358e7b99cc1f328ad6892"
+            ):
+                raise ValueError("AI-share calibrator belongs to a different raw model")
         self._detector = detector
         # Проверка покрытия фактов документа ответом (типы missing и partial).
         #
@@ -351,6 +418,12 @@ class Verifier:
         # Оценка доли участия ИИ (требование заявки) — отдельная голова; если
         # файла нет, поле остаётся нулевым и это видно в stats.
         self.participation = self._load_participation()
+        # P1 answer-голова: отдельная модель на сводках HF-признаков (37 признаков).
+        # Если в бандле есть answer_head, загружаем его как AnswerHeadModel.
+        self._answer_head_model = self._load_answer_head()
+        # P2 token-голова: GradientBoosting на 8 признаках (5 HF + position + length + has_digit).
+        # Если в бандле есть token_head, загружаем его как TokenGBDTModel.
+        self._token_head_model = self._load_token_head()
 
     # ---------------------------------------------------------------- доступ
 
@@ -364,6 +437,49 @@ class Verifier:
                 except (OSError, ValueError, KeyError):
                     return None
         return None
+
+    def _load_answer_head(self) -> Any | None:
+        """Загрузить P1 answer-голову из бандла, если есть."""
+        if self.bundle.answer_head is None:
+            return None
+        try:
+            from .answer_head import AnswerHeadModel
+
+            return AnswerHeadModel.from_dict(self.bundle.answer_head)
+        except (ValueError, KeyError, TypeError) as exc:
+            raise ValueError("Invalid P1 answer_head in bundle") from exc
+
+    @property
+    def answer_head_model(self) -> Any | None:
+        """P1 answer-голова (AnswerHeadModel), если загружена."""
+        return self._answer_head_model
+
+    def _load_token_head(self) -> Any | None:
+        """Загрузить P2 token-голову из бандла, если есть."""
+        if self.bundle.token_head is None:
+            if self.bundle.context_features_spec is not None:
+                raise ValueError("Context spec without token head")
+            return None
+        try:
+            from .token_head import TokenGBDTModel
+
+            if self.bundle.token_head.get("type") == "context_token_gbdt":
+                from .context_head import ContextGBDTModel
+
+                model = ContextGBDTModel.from_dict(self.bundle.token_head)
+                if model.context_features != self.bundle.context_features_spec:
+                    raise ValueError("Context model/bundle spec mismatch")
+                return model
+            if self.bundle.context_features_spec is not None:
+                raise ValueError("Context spec requires context token model")
+            return TokenGBDTModel.from_dict(self.bundle.token_head)
+        except (ValueError, KeyError, TypeError) as exc:
+            raise ValueError("Invalid P2 token_head in bundle") from exc
+
+    @property
+    def token_head_model(self) -> Any | None:
+        """P2 token-голова (TokenGBDTModel), если загружена."""
+        return self._token_head_model
 
     @property
     def detector(self) -> Detector:
@@ -411,7 +527,7 @@ class Verifier:
                 ai_share_hard=0.0,
                 threshold=self.bundle.threshold,
                 spans=[],
-                stats={"token_count": 0, "empty": True, "warning": self.warning},
+                stats={"token_count": 0, "empty": True, "warning": self.warning, "raw_score_full": 0.0},
                 latency_ms=(time.perf_counter() - started) * 1000,
                 mode=self.mode,
                 warning=self.warning,
@@ -429,45 +545,94 @@ class Verifier:
             coverage_context = ""
         tokens = tokenize_with_offsets(answer)
         features = self._features(answer, context_text, tokens)
-        risk = combine(
-            features.attention_entropy,
-            features.ctx_attention_mass,
-            features.embedding_density,
-            self.bundle.weights,
-            entropy_quantile=self.entropy_quantile,
-            mass_norm=features.ctx_attention_mass_norm,
-            max_similarity=features.ctx_max_similarity,
-        )
-        if self.bundle.head and self.bundle.head.get("type") == "logreg":
-            head_risk = _head_risk(self.bundle.head, features, risk, tokens)
-            if head_risk is not None:
-                risk = head_risk
+
+        # P2 token-head или legacy token risk
+        if self._token_head_model is not None:
+            # P2: GradientBoosting на 8 признаках
+            from .token_head import extract_token_features
+
+            total_tokens = len(tokens)
+            token_features_matrix = []
+            for i, token in enumerate(tokens):
+                # Извлекаем 5 HF признаков для этого токена
+                hf_features_dict = {name: getattr(features, name)[i] for name in FEATURE_NAMES}
+                # Извлекаем 8 признаков (5 HF + position + length + has_digit)
+                token_features = extract_token_features(
+                    token_index=i,
+                    total_tokens=total_tokens,
+                    token_text=token.text,
+                    hf_features=hf_features_dict,
+                )
+                token_features_matrix.append(token_features)
+
+            if self.bundle.context_features_spec is not None:
+                from .context_head import build_context_features
+
+                token_features_matrix = build_context_features(
+                    token_features_matrix, [is_scored_token(t.text) for t in tokens], self.bundle.context_features_spec
+                )
+            # Предсказываем token risk через P2/P4 (raw HF matrix is unchanged)
+            risk = self._token_head_model.predict_many(token_features_matrix)
+        else:
+            # Legacy: combine() + head
+            risk = combine(
+                features.attention_entropy,
+                features.ctx_attention_mass,
+                features.embedding_density,
+                self.bundle.weights,
+                entropy_quantile=self.entropy_quantile,
+                mass_norm=features.ctx_attention_mass_norm,
+                max_similarity=features.ctx_max_similarity,
+            )
+            if self.bundle.head and self.bundle.head.get("type") == "logreg":
+                head_risk = _head_risk(self.bundle.head, features, risk, tokens)
+                if head_risk is not None:
+                    risk = head_risk
         # Пунктуация и короткие служебные слова не могут быть выдумкой: их риск
         # обнуляется до сглаживания, иначе соседние пики «размываются» их шумом.
         scored_indices = [i for i, token in enumerate(tokens) if is_scored_token(token.text)]
-        masked = [risk[i] if i in set(scored_indices) else 0.0 for i in range(len(risk))]
-        smoothed = _smooth(masked, SMOOTH_WINDOW)
+        scored_set = set(scored_indices)  # Вычисляем один раз
+        smoothed = smooth_token_risks(risk, [i in scored_set for i in range(len(tokens))])
         scored = [smoothed[i] for i in scored_indices] or [0.0]
-        span_threshold = span_threshold_for(scored, self.bundle.span_z, self.bundle.span_floor, self.bundle.span_cap)
-        mask_spans = self._build_spans(answer, tokens, smoothed, span_threshold)
-        # Вариант маски «короткий фрагмент без числа не помечается»: токены
-        # отброшенных фрагментов перестают считаться помеченными и в метриках.
-        kept_flagged: set[int] | None = None
-        if self.span_filter_min_chars > 0:
-            mask_spans, kept_flagged = self._filter_short_mask_spans(mask_spans)
-        # Правило привязки числа к объекту (дефект D): текстовое, поверх маски.
-        spans = _merge_spans(
-            [
-                *mask_spans,
-                *self._attribution_spans(answer, context_text, tokens, smoothed, span_threshold),
-                *self._coverage_spans(answer, coverage_context, tokens, span_threshold),
-            ]
+        span_threshold, spans, kept_flagged = self._localize(
+            answer, context_text, coverage_context, tokens, smoothed, scored
         )
 
-        raw_score = _answer_score(scored)
+        # Вычисление raw answer score
+        if self._answer_head_model is not None:
+            # P1 answer-голова: извлекаем 37 признаков из полных FeatureMatrix
+            from .answer_head import extract_answer_features
+
+            # Создаём scored_mask для всех токенов (используем уже вычисленный scored_set)
+            scored_mask = [i in scored_set for i in range(len(tokens))]
+            # Извлекаем признаки для всех токенов
+            features_list = []
+            for i in range(len(tokens)):
+                features_dict = {name: getattr(features, name)[i] for name in FEATURE_NAMES}
+                features_list.append(features_dict)
+            # Извлекаем answer-признаки (37)
+            answer_features_vector = extract_answer_features(features_list, scored_mask)
+            # Предсказываем raw score через P1
+            raw_score = self._answer_head_model.predict(answer_features_vector)
+        else:
+            # Legacy: token-head risk → current агрегатор
+            raw_score = _answer_score(scored)
         score = self._calibrate(raw_score)
         threshold = self.bundle.threshold
-        ai_share_soft, ai_share_hard = self._shares(tokens, smoothed, scored_indices, spans)
+        if self.bundle.span_filter is not None:
+            from .span_filter import build_candidates, filter_candidates
+
+            cfg = self.bundle.span_filter
+            rules = [
+                *self._attribution_spans(answer, context_text, tokens, smoothed, self._span_threshold(scored)),
+                *self._coverage_spans(answer, coverage_context, tokens, self._span_threshold(scored)),
+            ]
+            candidates = build_candidates(
+                answer, tokens, smoothed, [i in scored_set for i in range(len(tokens))], cfg["generator"], score, rules
+            )
+            kept_flagged, spans = filter_candidates(answer, tokens, candidates, cfg, rules)
+            span_threshold = cfg["generator"]["tau_low"]
+        ai_share_soft, ai_share_hard = self._shares(tokens, smoothed, scored_indices, spans, kept_flagged)
         ai_participation = self.participation.estimate(answer, features) if self.participation is not None else 0.0
 
         tokens_payload = _token_payload(tokens, features, smoothed, span_threshold, flagged_override=kept_flagged)
@@ -488,7 +653,8 @@ class Verifier:
             "mean_risk": round(mean(scored), 4),
             "p90_risk": round(_percentile(scored, 90), 4),
             "raw_score": round(raw_score, 4),
-            "span_threshold": round(span_threshold, 4),
+            "raw_score_full": float(raw_score),
+            "span_threshold": span_threshold,
             "span_z": self.bundle.span_z,
             "span_floor": self.bundle.span_floor,
             "weights": {name: round(self.bundle.weights.get(name, 0.0), 3) for name in FEATURE_NAMES},
@@ -500,7 +666,7 @@ class Verifier:
             "warning": self.warning,
         }
 
-        return VerificationResult(
+        result = VerificationResult(
             score=score,
             is_hallucination=score >= threshold,
             ai_share=ai_share_soft,
@@ -515,6 +681,16 @@ class Verifier:
             warning=self.warning,
             verdict=_verdict(score, threshold, spans, self.verdict_rule, self.verdict_params, stats),
         )
+
+        if self._share_calibrator is not None:
+            result.stats["ai_share_raw"] = result.ai_share
+            result.ai_share = self._share_calibrator.transform(result.ai_share)
+            result.stats["ai_share_calibrator_v1"] = {
+                "mode": self.mode,
+                "bundle_sha256": self._share_calibrator.bundle_sha256,
+                "scope": "synthetic train-only calibration, not real-LLM authorship validation",
+            }
+        return result
 
     # ---------------------------------------------------------------- оценка
 
@@ -556,7 +732,7 @@ class Verifier:
                 token_rows = result.tokens[index] if index < len(result.tokens) else {}
                 labels.append(1 if any(token.start < end and token.end > start for start, end in pair_truth) else 0)
                 flags.append(bool(token_rows.get("flagged")))
-                risks.append(float(token_rows.get("risk", 0.0)))
+                risks.append(float(token_rows.get("raw_risk", token_rows.get("risk", 0.0))))
 
             answer_labels.append(1 if pair_truth else 0)
             answer_scores.append(result.score)
@@ -616,23 +792,87 @@ class Verifier:
     def _features(self, answer: str, context: str | Sequence[str] | None, tokens: Sequence[Token]) -> FeatureMatrix:
         cache = self.features_cache
         if self.mode == "hf":
+            max_length = getattr(self.config, "hf_max_tokens", 512)
             if cache is not None:
                 # Ключ считается здесь, а не внутри extract_features: модель
-                # известна наверняка только верификатору.
-                key = feature_cache_key(answer, context, "hf", self.model_name)
+                # известна наверняка только верификатору. Включаем chunking=True
+                # чтобы ключ отличался от не-чанкованного кеша.
+                key = feature_cache_key(
+                    answer,
+                    context,
+                    "hf",
+                    self.model_name,
+                    chunking=True,
+                    max_length=max_length,
+                )
                 hit = cache.get(key)
                 if hit is not None:
                     return hit
-            return extract_features(answer, context, mode="hf", model_name=self.model_name, answer_tokens=tokens)
+            return hf_features_chunked(
+                answer,
+                context,
+                model_name=self.model_name,
+                max_length=max_length,
+                answer_tokens=tokens,
+            )
         return extract_features(answer, context, mode="demo", answer_tokens=tokens)
+
+    def _localize(self, answer, context_text, coverage_context, tokens, smoothed, scored):
+        if self.bundle.localization_decoder is not None:
+            from .localization import localize_state
+
+            config = self.bundle.localization_decoder
+            # Keep rule confidence semantics on the frozen P2 threshold.
+            rule_threshold = self._span_threshold(scored)
+            kept, _, spans = localize_state(
+                answer,
+                tokens,
+                smoothed,
+                [is_scored_token(t.text) for t in tokens],
+                config,
+                self._attribution_spans(answer, context_text, tokens, smoothed, rule_threshold),
+                self._coverage_spans(answer, coverage_context, tokens, rule_threshold),
+            )
+            return config["tau_low"], spans, kept
+        span_threshold = self._span_threshold(scored)
+        mask_spans = self._build_spans(answer, tokens, smoothed, span_threshold)
+        # Вариант маски «короткий фрагмент без числа не помечается»: токены
+        # отброшенных фрагментов перестают считаться помеченными и в метриках.
+        kept_flagged: set[int] | None = None
+        if self.span_filter_min_chars > 0:
+            mask_spans, kept_flagged = self._filter_short_mask_spans(mask_spans)
+        # Правило привязки числа к объекту (дефект D): текстовое, поверх маски.
+        spans = _merge_spans(
+            [
+                *mask_spans,
+                *self._attribution_spans(answer, context_text, tokens, smoothed, span_threshold),
+                *self._coverage_spans(answer, coverage_context, tokens, span_threshold),
+            ]
+        )
+
+        if self.bundle.token_threshold is not None:
+            selected = {i for i, t in enumerate(tokens) if is_scored_token(t.text) and smoothed[i] >= span_threshold}
+            kept_flagged = selected if kept_flagged is None else selected & kept_flagged
+        return span_threshold, spans, kept_flagged
 
     def _span_threshold(self, risk: Sequence[float]) -> float:
         """Порог маски для текущего набора весов (см. :func:`span_threshold_for`)."""
+        if self.bundle.token_threshold is not None:
+            tau = float(self.bundle.token_threshold)
+            if not math.isfinite(tau) or tau < 0:
+                raise ValueError("token_threshold must be finite and nonnegative (above-one sentinel allowed)")
+            return tau
         return span_threshold_for(risk, self.bundle.span_z, self.bundle.span_floor, self.bundle.span_cap)
 
     def _calibrate(self, raw_score: float) -> float:
         if self.bundle.isotonic is None:
             return raw_score
+        if (self.bundle.meta or {}).get("isotonic_threshold_semantics") == "lower_bounds_legacy_v1":
+            # Old demo compression saved FIRST points; P1/P5 remains upper-bound.
+            import bisect
+
+            index = max(0, bisect.bisect_right(self.bundle.isotonic.thresholds, raw_score) - 1)
+            return float(self.bundle.isotonic.values[index])
         return self.bundle.isotonic.transform_one(raw_score)
 
     def _shares(
@@ -641,6 +881,7 @@ class Verifier:
         smoothed: Sequence[float],
         scored_indices: Sequence[int],
         spans: Sequence[SpanResult] = (),
+        retained_mask: set[int] | None = None,
     ) -> tuple[float, float]:
         """Доли «недостоверного» текста в ответе (поля ai_share/ai_share_hard).
 
@@ -655,21 +896,19 @@ class Verifier:
         """
         if not scored_indices:
             return 0.0, 0.0
-        mask_threshold = span_threshold_for(
-            [smoothed[index] for index in scored_indices],
-            self.bundle.span_z,
-            self.bundle.span_floor,
-            self.bundle.span_cap,
-        )
+        mask_threshold = self._span_threshold([smoothed[i] for i in scored_indices])
         # Токены, попавшие в отчётные фрагменты (в том числе по правилу привязки
         # числа к объекту), считаются помеченными: иначе ответ с найденным
         # фрагментом сообщал бы «доля спорного текста 0.000».
-        in_span = {
-            index for index in scored_indices if any(span.start <= tokens[index].start < span.end for span in spans)
-        }
+        span_index = _SpanIndex(spans)
+        in_span = {index for index in scored_indices if span_index.contains(tokens[index].start)}
         probabilities = [1.0 if index in in_span else self._calibrate(smoothed[index]) for index in scored_indices]
         soft = sum(probabilities) / len(probabilities)
         hard_numerator = sum(1 for index in scored_indices if index in in_span or smoothed[index] >= mask_threshold)
+        if self.bundle.localization_decoder is not None:
+            if retained_mask is None:
+                raise ValueError("P3 retained mask must be explicit, including empty set")
+            hard_numerator = sum(i in retained_mask for i in scored_indices)
         hard = hard_numerator / len(scored_indices)
         return min(1.0, max(0.0, soft)), min(1.0, max(0.0, hard))
 
@@ -700,7 +939,11 @@ class Verifier:
                 if id(token) in allowed and token.start >= start and token.end <= end
             ]
             risk_value = max([*token_risk, threshold])
-            span_start, span_end = _shrink_to_clause(answer, start, end, start, end)
+            span_start, span_end = (
+                (start, end)
+                if self.bundle.localization_decoder is not None
+                else _shrink_to_clause(answer, start, end, start, end)
+            )
             fragment = answer[span_start:span_end]
             if not fragment.strip():
                 continue
@@ -804,7 +1047,43 @@ class Verifier:
         for group in groups:
             keep_start = tokens[group[0]].start
             keep_end = tokens[group[-1]].end
-            start, end = _shrink_to_clause(answer, keep_start, keep_end, keep_start, keep_end)
+            # Выбор стратегии расширения границ в зависимости от span_expansion
+            if self.span_expansion == "mask":
+                # Ровно по помеченным токенам, без расширения
+                start, end = keep_start, keep_end
+            elif self.span_expansion == "clause":
+                # Текущее поведение: расширение до границ клаузы
+                start, end = _shrink_to_clause(answer, keep_start, keep_end, keep_start, keep_end)
+            elif self.span_expansion == "clause_capped":
+                # Клауза, но не шире max(40 знаков, 2 × ширина маски)
+                clause_start, clause_end = _shrink_to_clause(answer, keep_start, keep_end, keep_start, keep_end)
+                mask_width = keep_end - keep_start
+                max_width = max(40, 2 * mask_width)
+                # Обрезаем клаузу до max_width, центрируя на маске
+                clause_width = clause_end - clause_start
+                if clause_width > max_width:
+                    # Центрируем на середине маски
+                    mask_mid = (keep_start + keep_end) // 2
+                    start = max(clause_start, mask_mid - max_width // 2)
+                    end = min(clause_end, start + max_width)
+                    # Убеждаемся, что маска полностью внутри
+                    start = min(start, keep_start)
+                    end = max(end, keep_end)
+                else:
+                    start, end = clause_start, clause_end
+            elif self.span_expansion == "mask_padded":
+                # Маска + по одному соседнему токену слева и справа
+                start = keep_start
+                end = keep_end
+                # Добавляем токен слева, если есть
+                if group[0] > 0:
+                    start = tokens[group[0] - 1].start
+                # Добавляем токен справа, если есть
+                if group[-1] < len(tokens) - 1:
+                    end = tokens[group[-1] + 1].end
+            else:
+                # Не должно произойти из-за проверки в __init__
+                raise ValueError(f"неизвестный span_expansion: {self.span_expansion!r}")
             fragment = answer[start:end]
             if not fragment.strip():
                 continue
@@ -1225,6 +1504,13 @@ def _merge_spans(spans: Sequence[SpanResult]) -> list[SpanResult]:
     return merged
 
 
+def smooth_token_risks(risks, scored_mask):
+    """Canonical full-sequence zero-mask and smoothing, shared with P2 OOF."""
+    if len(risks) != len(scored_mask):
+        raise ValueError("Risk/mask length mismatch")
+    return _smooth([float(r) if m else 0.0 for r, m in zip(risks, scored_mask, strict=False)], SMOOTH_WINDOW)
+
+
 def _token_payload(
     tokens: Sequence[Token],
     features: FeatureMatrix,
@@ -1249,6 +1535,7 @@ def _token_payload(
                     if index < len(getattr(features, name))
                 },
                 "risk": round(risk[index], 4),
+                "raw_risk": risk[index],  # Неокруглённое значение для точных вычислений
                 "flagged": flagged,
                 "label": (
                     "likely_hallucination"

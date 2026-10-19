@@ -1,0 +1,53 @@
+# Frozen experiment evidence must have identical bytes on Linux and Windows.
+# In particular the P5 bundle SHA is a raw-byte integrity requirement.
+spanverify-module/reports/experiments/** -text
+
+# P8 raw-byte production manifest: preserve Git blobs on Windows too.
+spanverify-module/config/calibration.json -text
+spanverify-module/config/config.json -text
+spanverify-module/config/head.json -text
+spanverify-module/config/participation.json -text
+spanverify-module/config/verdict.json -text
+spanverify-module/config/weights.json -text
+spanverify-module/spanverify/__init__.py -text
+spanverify-module/spanverify/__main__.py -text
+spanverify-module/spanverify/_version.py -text
+spanverify-module/spanverify/answer_head.py -text
+spanverify-module/spanverify/api.py -text
+spanverify-module/spanverify/backends/__init__.py -text
+spanverify-module/spanverify/backends/base.py -text
+spanverify-module/spanverify/backends/hf.py -text
+spanverify-module/spanverify/backends/surrogate.py -text
+spanverify-module/spanverify/calibration.py -text
+spanverify-module/spanverify/chunking.py -text
+spanverify-module/spanverify/cli.py -text
+spanverify-module/spanverify/config.py -text
+spanverify-module/spanverify/context_head.py -text
+spanverify-module/spanverify/core.py -text
+spanverify-module/spanverify/corpus_alt.py -text
+spanverify-module/spanverify/coverage.py -text
+spanverify-module/spanverify/dataset.py -text
+spanverify-module/spanverify/demo_data.py -text
+spanverify-module/spanverify/detector.py -text
+spanverify-module/spanverify/engine.py -text
+spanverify-module/spanverify/external_datasets.py -text
+spanverify-module/spanverify/features.py -text
+spanverify-module/spanverify/gates.py -text
+spanverify-module/spanverify/hf_windows.py -text
+spanverify-module/spanverify/lexicon.py -text
+spanverify-module/spanverify/limits.py -text
+spanverify-module/spanverify/localization.py -text
+spanverify-module/spanverify/logreg.py -text
+spanverify-module/spanverify/normalize.py -text
+spanverify-module/spanverify/oof.py -text
+spanverify-module/spanverify/participation.py -text
+spanverify-module/spanverify/rushallu_metrics.py -text
+spanverify-module/spanverify/server.py -text
+spanverify-module/spanverify/share_calibration.py -text
+spanverify-module/spanverify/span_filter.py -text
+spanverify-module/spanverify/text.py -text
+spanverify-module/spanverify/token_head.py -text
+spanverify-module/spanverify/train.py -text
+spanverify-module/spanverify/training.py -text
+spanverify-module/spanverify/vectors.py -text
+spanverify-module/spanverify/webui.py -text

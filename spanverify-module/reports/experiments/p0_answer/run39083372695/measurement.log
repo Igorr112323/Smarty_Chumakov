@@ -1,0 +1,85 @@
+============================================================
+P0-2: Полное сравнение трёх агрегаторов
+============================================================
+
+[1/6] Загрузка HF-бандла...
+✓ Бандл загружен из reports/experiments/p0_span/run39060670054/clause_capped/experiment.json
+  Source run: 39060670054
+  Source commit: 14ea3a0792e0ca9502d9b78870dd2caf874f1163
+  Model: ai-forever/rugpt3small_based_on_gpt2
+
+[2/6] Загрузка данных...
+✓ Train: 842 pairs
+✓ Dev: 181 pairs
+
+[3/6] Загрузка кеша признаков...
+  Путь к кешу: reports/hf-cache-v2
+  Директория существует: /home/runner/work/Smarty_Chumakov/Smarty_Chumakov/spanverify-module/reports/hf-cache-v2
+  Всего файлов: 16
+  Файлов .jsonl: 8
+  Файлов features_*.jsonl: 8
+  Примеры файлов:
+    - features_shard2of8-chunked.jsonl
+    - features_shard6of8-chunked.jsonl
+    - features_shard4of8-chunked.jsonl
+    - features_shard1of8-chunked.jsonl
+    - features_shard3of8-chunked.jsonl
+✓ Кеш: 1195 ключей
+
+[4/6] Создание верификатора с HF-бандлом...
+✓ Verifier создан
+
+[5/6] Контроль токенных метрик...
+✓ Токенные метрики совпадают с ожидаемыми
+
+[6/6] Сравнение трёх агрегаторов...
+  Выходная директория: /home/runner/work/Smarty_Chumakov/Smarty_Chumakov/spanverify-module/reports/p0_answer_comparison
+
+  Агрегатор: current
+    Обучение калибратора с OOF...
+    Порог: 0.5758
+    FPR на OOF: 0.2693
+    Constraint met: True
+    Оценка на dev...
+    Dev F1: 0.0000
+    Dev FPR: 0.0000
+    Dev Raw AUC: 0.5032
+    Dev Calibrated AUC: 0.5000
+
+  Агрегатор: max
+    Обучение калибратора с OOF...
+    Порог: 0.5719
+    FPR на OOF: 0.2053
+    Constraint met: True
+    Оценка на dev...
+    Dev F1: 0.0000
+    Dev FPR: 0.0000
+    Dev Raw AUC: 0.4710
+    Dev Calibrated AUC: 0.5000
+
+  Агрегатор: mean_top3
+    Обучение калибратора с OOF...
+    Порог: 0.5681
+    FPR на OOF: 0.2267
+    Constraint met: True
+    Оценка на dev...
+    Dev F1: 0.0000
+    Dev FPR: 0.0000
+    Dev Raw AUC: 0.5078
+    Dev Calibrated AUC: 0.5000
+
+✓ Лучший агрегатор: current (F1=0.0000, FPR<=0.30)
+
+============================================================
+Сохранение результатов
+============================================================
+✓ Runtime manifest: reports/p0_answer_comparison/runtime_manifest.json
+✓ Результаты: reports/p0_answer_comparison/p0_answer_comparison.json
+✓ Markdown отчёт: reports/p0_answer_comparison/p0_answer_comparison.md
+✓ Evidence для current: reports/p0_answer_comparison/evidence_current.jsonl
+✓ Evidence для max: reports/p0_answer_comparison/evidence_max.jsonl
+✓ Evidence для mean_top3: reports/p0_answer_comparison/evidence_mean_top3.jsonl
+
+============================================================
+✓ Завершено за 48.5s
+============================================================

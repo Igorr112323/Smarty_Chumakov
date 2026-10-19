@@ -1,0 +1,15 @@
+{
+  "schema_version": "p1-measurement-v2",
+  "created_at": "2026-10-18T10:05:59Z",
+  "cache_source_run_id": 39060670054,
+  "measurement_run_id": 39116955685,
+  "measurement_commit": "b87850781b73d8630832cb972037158d0ec88927",
+  "train_count": 842,
+  "dev_count": 181,
+  "p1_features_count": 37,
+  "p1_schema_version": "1.0",
+  "n_folds": 5,
+  "seed": 42,
+  "oof_method": "cross-fitting",
+  "threshold_method": "choose_threshold_report(max_fpr=0.30)"
+}

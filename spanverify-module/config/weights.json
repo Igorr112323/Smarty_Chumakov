@@ -114,6 +114,7 @@
       "type": "participation-logreg",
       "auc_out_of_fold": 1.0,
       "calibrated_on": "synthetic-participation-corpus 1.0 (два стиля, доля смеси известна)"
-    }
+    },
+    "isotonic_threshold_semantics": "lower_bounds_legacy_v1"
   }
 }

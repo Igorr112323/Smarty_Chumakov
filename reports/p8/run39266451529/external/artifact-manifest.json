@@ -1,0 +1,18 @@
+{
+  "role": "p8-external-full",
+  "run_id": "39266451529",
+  "date": "2026-10-19",
+  "manifest": {
+    "result.json": {
+      "bytes": 3862,
+      "sha256": "47ef99b29a38de041295705b002643add0046d03025032e8e6390b0d16df6c16"
+    }
+  },
+  "artifact": {
+    "id": 12195185508,
+    "digest": "sha256:8e38ed45e462abcc8c5f7e091313f56f844727aa659350e378165357d51ccbb5",
+    "bytes": 1234,
+    "url": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39266451529/artifacts/12195185508"
+  },
+  "receipt_job": 118112776410
+}

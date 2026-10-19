@@ -12,8 +12,8 @@
   (``Invalid access to memory location``) на сборочном раннере, поэтому там
   стрип отключён — размером жертвуем ради работоспособности;
 * ``name="spanverify"`` — имя файла совпадает с именем в релизе;
-* ``datas`` включает ``config/`` и ``data/`` — обученные веса, калибратор и
-  демонстрационный корпус едут внутри файла, поэтому .exe работает сам по себе
+* ``datas`` включает ``config/`` — веса и калибратор едут внутри файла.
+  Демонстрационные обучающие корпуса серверу не нужны и остаются внешними
   (файл ``config/weights.json`` рядом с .exe, если он есть, имеет приоритет);
 * ``hiddenimports`` — модули, которые PyInstaller не видит за ленивыми
   импортами (режим ``hf`` подключается только при наличии torch);
@@ -31,16 +31,15 @@ block_cipher = None
 ROOT = Path(SPECPATH)
 
 # В поставку едут только те данные, которые нужны работающему приложению:
-# конфигурация (веса, голова, калибратор) и демонстрационные корпуса для
-# примеров. Исследовательские корпуса (``data/corpus_a*``, ``data/metrics``,
+# конфигурация (веса, голова, калибратор). Демонстрационные корпуса
+# для train/evaluate не используются server launcher и не встраиваются.
+# Исследовательские корпуса (``data/corpus_a*``, ``data/metrics``,
 # ``data/review_queue``) — рабочие материалы НИР, а не часть поставки: договор
 # (ТЗ п. 4.2) ограничивает объём исполняемого файла 9 МБ, и 40 МБ корпусов в
 # бандле этому не помогают. Проверка ``contract_check.py`` (4.2.1) следит за
 # объёмом собранного пакета, а объём .exe проверяет задание сборки.
 datas = [
     (str(ROOT / "config"), "config"),
-    (str(ROOT / "data" / "demo_pairs.jsonl"), "data"),
-    (str(ROOT / "data" / "demo_dataset.jsonl"), "data"),
 ]
 
 hiddenimports = [
@@ -57,9 +56,25 @@ hiddenimports = [
 ]
 
 excludes = [
-    "torch", "transformers", "faiss", "streamlit", "tkinter", "unittest",
-    "pydoc", "pytest", "setuptools", "pip", "matplotlib", "pandas", "scipy",
-    "PIL", "IPython", "notebook", "numpy.testing",
+    "torch",
+    "transformers",
+    "faiss",
+    "streamlit",
+    "tkinter",
+    "unittest",
+    "pydoc",
+    "pytest",
+    "setuptools",
+    "pip",
+    "matplotlib",
+    "pandas",
+    "scipy",
+    "PIL",
+    "IPython",
+    "notebook",
+    "numpy",
+    "numpy.testing",
+    "sklearn",
 ]
 
 a = Analysis(
@@ -78,6 +93,11 @@ a = Analysis(
     noarchive=False,
 )
 
+# Lossless archive compression only: retain all bytecode/assertions/modules.
+# The strict 9,000,000-byte gate remains unchanged.
+from PyInstaller.archive.writers import ZlibArchiveWriter
+
+ZlibArchiveWriter._COMPRESSION_LEVEL = 9
 pyz = PYZ(a.pure, a.zipped_data, cipher=block_cipher)
 
 exe = EXE(

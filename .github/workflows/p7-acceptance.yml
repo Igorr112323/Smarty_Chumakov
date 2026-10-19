@@ -1,0 +1,201 @@
+name: P7 frozen engineering gates
+on:
+  workflow_dispatch:
+  push:
+    branches: [arena/c5f69767-smarty-chumakov]
+    paths: [.github/p7-acceptance.trigger]
+permissions:
+  contents: read
+  actions: read
+jobs:
+  parity:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: pip install -r spanverify-module/requirements-token-head-tests.txt
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: hf-cache-a3-v2-*
+          merge-multiple: false
+          path: .arena/hf-reference
+          run-id: 39060670054
+          github-token: ${{ github.token }}
+      - name: Actual frozen public dev replay; zero drift required, no fitting
+        working-directory: spanverify-module
+        run: python scripts/p6_acceptance.py parity --cache ../.arena/hf-reference --out ../reports/acceptance/parity
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: p7-parity
+          path: reports/acceptance/parity/
+      - name: Byte-exact pre-change golden I/O
+        run: python spanverify-module/scripts/p7_golden.py check reports/p7/pre-change-golden-stable.json
+  hf-contract:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    env:
+      OMP_NUM_THREADS: '2'
+      MKL_NUM_THREADS: '2'
+      OPENBLAS_NUM_THREADS: '2'
+      P7_FULL_DEV_REPLAY: '1'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Fixed product HF dependencies
+        run: |
+          pip install 'torch==2.14.1+cpu' --index-url https://download.pytorch.org/whl/cpu
+          pip install 'transformers==5.20.1' 'sentencepiece==0.2.2' 'numpy==2.4.6'
+      - name: Actual HF golden, train/dev tokenizer audit and long-answer coverage
+        run: python spanverify-module/scripts/p7_hf_audit.py reports/p7/hf-contract
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: p7-hf-contract
+          path: reports/p7/hf-contract/
+          retention-days: 90
+  benchmark:
+    needs: [parity]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 40
+    strategy:
+      fail-fast: false
+      matrix:
+        mode: [demo, hf]
+    env:
+      OMP_NUM_THREADS: '2'
+      MKL_NUM_THREADS: '2'
+      OPENBLAS_NUM_THREADS: '2'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Fixed P6 product stack
+        if: matrix.mode == 'hf'
+        run: |
+          pip install 'torch==2.14.1+cpu' --index-url https://download.pytorch.org/whl/cpu
+          pip install 'transformers==5.20.1' 'sentencepiece==0.2.2' 'numpy==2.4.6'
+          python spanverify-module/scripts/p6_acceptance.py worker --mode hf --out reports/p7/hf/download.json
+      - name: Three cold/warm native repeats and independent profiles
+        run: python -u spanverify-module/scripts/p6_acceptance.py benchmark --mode ${{ matrix.mode }} --out reports/p7/benchmark-${{ matrix.mode }}
+      - name: Seconds per 1000 chars and uncensored evidence references
+        run: python spanverify-module/scripts/p7_measurements.py rates --out reports/p7/benchmark-${{ matrix.mode }}
+      - name: Actual product interfaces
+        run: python spanverify-module/scripts/p6_acceptance.py interfaces --mode ${{ matrix.mode }} --out reports/p7/interfaces-${{ matrix.mode }}
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: p7-benchmark-${{ matrix.mode }}
+          path: reports/p7/
+          retention-days: 90
+  calibration:
+    needs: [parity]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 40
+    strategy:
+      fail-fast: false
+      matrix:
+        mode: [demo, hf]
+    env:
+      OMP_NUM_THREADS: '2'
+      MKL_NUM_THREADS: '2'
+      OPENBLAS_NUM_THREADS: '2'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Fixed product dependencies
+        if: matrix.mode == 'hf'
+        run: |
+          pip install 'torch==2.14.1+cpu' --index-url https://download.pytorch.org/whl/cpu
+          pip install 'transformers==5.20.1' 'sentencepiece==0.2.2' 'numpy==2.4.6'
+      - name: Original five document folds, frozen raw, train-only isotonic
+        run: python -u spanverify-module/scripts/p7_share_calibration.py --mode ${{ matrix.mode }} --out reports/p7/calibration-${{ matrix.mode }}
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: p7-calibration-${{ matrix.mode }}
+          path: reports/p7/calibration-${{ matrix.mode }}/
+          retention-days: 90
+  full-hf-input:
+    needs: [parity]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 40
+    env:
+      OMP_NUM_THREADS: '2'
+      MKL_NUM_THREADS: '2'
+      OPENBLAS_NUM_THREADS: '2'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: |
+          pip install 'torch==2.14.1+cpu' --index-url https://download.pytorch.org/whl/cpu
+          pip install 'transformers==5.20.1' 'sentencepiece==0.2.2' 'numpy==2.4.6'
+      - name: Full real HF 2M answer, no truncation or synthetic tail
+        env:
+          P7_COMPARE_SPAN_INDEX_BASELINE: '1'
+        run: timeout 1800 python -u spanverify-module/scripts/p7_measurements.py functional --mode hf --out reports/p7/full-hf
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: p7-full-hf
+          path: reports/p7/full-hf/
+          retention-days: 90
+  acceptance-archive:
+    needs: [parity, hf-contract, benchmark, calibration, full-hf-input]
+    if: always()
+    runs-on: ubuntu-24.04
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+      - name: Matching Windows workflow receipt
+        id: windows
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          run_id=$(gh run list --workflow build-and-release-exe.yml --commit "$GITHUB_SHA" --json databaseId --jq '.[0].databaseId')
+          test -n "$run_id" && test "$run_id" != null
+          failed=0
+          gh run watch "$run_id" --exit-status || failed=$?
+          gh run view "$run_id" --json headSha,url,conclusion,jobs > reports/p7/windows-workflow.json
+          echo "run_id=$run_id" >> "$GITHUB_OUTPUT"
+          exit "$failed"
+      - uses: actions/download-artifact@v4
+        if: always() && steps.windows.outputs.run_id != ''
+        with:
+          name: p7-windows-hf-autonomy
+          path: reports/p7/windows-hf-autonomy
+          run-id: ${{ steps.windows.outputs.run_id }}
+          github-token: ${{ github.token }}
+      - uses: actions/download-artifact@v4
+        if: always()
+        with:
+          pattern: p7-*
+          path: reports/p7/workflow-evidence
+      - name: Acceptance archive, never release asset upload
+        if: always()
+        run: |
+          python -c "import shutil; shutil.make_archive('p7-acceptance', 'zip', 'reports/p7')"
+          sha256sum p7-acceptance.zip > p7-acceptance.zip.sha256
+          echo "::notice title=P7 archive::$(cat p7-acceptance.zip.sha256)"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: p7-acceptance-archive
+          path: |
+            p7-acceptance.zip
+            p7-acceptance.zip.sha256
+          retention-days: 90

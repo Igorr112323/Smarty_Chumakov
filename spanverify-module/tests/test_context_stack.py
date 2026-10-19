@@ -756,7 +756,11 @@ def test_train_produces_valid_bundle():
     report = train(tiny_pairs(80, seed=5), mode="demo", seed=42, folds=5, dataset_name="tests")
     bundle = report.bundle
     assert sum(bundle.weights.values()) == pytest.approx(1.0)
-    assert 0.0 <= bundle.threshold <= 1.0
+    # The all-negative sentinel is deliberately max(probability) + 1e-9.
+    # It is not itself a probability and must not be clamped to 1.
+    assert 0.0 <= bundle.threshold <= 1.0 + 1e-9
+    if bundle.threshold > 1.0:
+        assert bundle.threshold == 1.0 + 1e-9
     assert bundle.isotonic is not None
     assert len(bundle.folds) == 5
     assert bundle.meta["synthetic"] is True

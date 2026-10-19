@@ -1,0 +1,13 @@
+{
+  "release_tag": "v1.3.1-rc.p6.39184437541",
+  "attempted_assets": [
+    "p6-acceptance-14a018a.zip",
+    "p6-acceptance-14a018a.zip.sha256",
+    "P6_ACCEPTANCE_REPORT.md"
+  ],
+  "exit_code": 1,
+  "error": "POST uploads.github.com: EOF",
+  "additional_assets_uploaded": false,
+  "existing_six_RC_assets_untouched": true,
+  "delivery": "Complete final archive and SHA256 delivered in Arena workspace; final report published as RC notes via api.github.com; current JUnit/interfaces also in successful Actions artifacts"
+}

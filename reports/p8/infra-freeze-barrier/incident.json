@@ -1,0 +1,16 @@
+{
+  "run_id": "39266027509",
+  "date": "2026-10-19",
+  "commit": "4b28132e69b829bddfb91839eb810baae2d5dd53",
+  "job": 118107779326,
+  "artifact": 12192328736,
+  "artifact_created_at": "2026-10-19T14:12:03Z",
+  "cause": "if: always() bypassed cancelled needs barrier",
+  "fit": "scripts/contract_check.py::Benchmark.participation -> ParticipationModel.fit on synthetic240",
+  "used_official_or_B_for_fit": false,
+  "production_bundle_changed": false,
+  "protocol_status": "NOT ACHIEVED",
+  "numeric_official_joint_gate": true,
+  "official_repeat": false,
+  "remedy": "Require needs.p8-freeze-barrier.result success even for always-contract; retain every check after seal; conservative RC, latest unchanged"
+}

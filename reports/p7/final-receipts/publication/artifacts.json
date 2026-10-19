@@ -1,0 +1,25 @@
+{
+  "total_count": 1,
+  "artifacts": [
+    {
+      "id": 12181377477,
+      "node_id": "MDg6QXJ0aWZhY3QxMjE4MTM3NzQ3Nw==",
+      "name": "p7-final-acceptance-archive",
+      "size_in_bytes": 4762168,
+      "url": "https://api.github.com/repos/Igorr112323/Smarty_Chumakov/actions/artifacts/12181377477",
+      "archive_download_url": "https://api.github.com/repos/Igorr112323/Smarty_Chumakov/actions/artifacts/12181377477/zip",
+      "expired": false,
+      "digest": "sha256:1c76bc15f7cd91956b462614fa473e545abdcf18f81ff9072c57ddbf4328b14d",
+      "created_at": "2026-10-19T11:03:23Z",
+      "updated_at": "2026-10-19T11:03:23Z",
+      "expires_at": "2027-01-17T11:03:04Z",
+      "workflow_run": {
+        "id": 39241808393,
+        "repository_id": 1402768620,
+        "head_repository_id": 1402768620,
+        "head_branch": "arena/c5f69767-smarty-chumakov",
+        "head_sha": "b5eb133a55c1d1b8062851919f5978676497dbfc"
+      }
+    }
+  ]
+}

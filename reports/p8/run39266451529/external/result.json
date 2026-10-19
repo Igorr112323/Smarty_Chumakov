@@ -1,0 +1,130 @@
+{
+  "metrics": {
+    "tokens": {
+      "precision": 0.229607250755287,
+      "recall": 0.016853309679565363,
+      "f1": 0.031401714698894745,
+      "fpr": 0.026744978761340396,
+      "tp": 152,
+      "fp": 510,
+      "fn": 8867,
+      "tn": 18559,
+      "auc": 0.43746190000958873
+    },
+    "spans": {
+      "precision": 0.031914893617021274,
+      "recall": 0.014184397163120567,
+      "f1": 0.019639934533551555,
+      "tp": 6,
+      "fp": 182,
+      "fn": 417,
+      "iou_threshold": 0.5,
+      "recall_containment": 0.0,
+      "mean_width_ratio": 0.0
+    },
+    "answers": {
+      "tp": 203,
+      "fp": 271,
+      "fn": 130,
+      "tn": 396,
+      "precision": 0.4282700421940928,
+      "recall": 0.6096096096096096,
+      "f1": 0.5030978934324659,
+      "fpr": 0.4062968515742129,
+      "raw_auc": 0.6215045630337984,
+      "calibrated_auc": 0.616484550517534,
+      "positive_predictions": 474,
+      "auc": 0.616484550517534
+    },
+    "verdicts": {
+      "tp": 221,
+      "fp": 319,
+      "fn": 112,
+      "tn": 348,
+      "precision": 0.4093,
+      "recall": 0.6637,
+      "f1": 0.5063,
+      "fpr": 0.4783,
+      "flagged_share": 0.54
+    }
+  },
+  "gates": {
+    "tokens": {
+      "family": "tokens",
+      "contract": {
+        "gate": {
+          "f1_min": 0.5,
+          "fpr_max": 0.4
+        },
+        "source": "договор № 20478ГУ/2026, проект 117812, ТЗ п. 4.1 треб. 6",
+        "f1": 0.031401714698894745,
+        "fpr": 0.026744978761340396,
+        "status": "НЕ достигнут"
+      },
+      "internal": {
+        "gate": {
+          "f1_min": 0.9,
+          "fpr_max": 0.1
+        },
+        "source": "мастер-промт проекта (внутренний ориентир, не приёмка)",
+        "f1": 0.031401714698894745,
+        "fpr": 0.026744978761340396,
+        "status": "НЕ достигнут"
+      }
+    },
+    "spans": {
+      "family": "spans",
+      "contract": {
+        "gate": {
+          "f1_min": 0.5,
+          "fpr_max": 0.4
+        },
+        "source": "договор № 20478ГУ/2026, проект 117812, ТЗ п. 4.1 треб. 6",
+        "f1": 0.019639934533551555,
+        "fpr": 0.026744978761340396,
+        "status": "НЕ достигнут"
+      },
+      "internal": {
+        "gate": {
+          "f1_min": 0.9,
+          "fpr_max": 0.1
+        },
+        "source": "мастер-промт проекта (внутренний ориентир, не приёмка)",
+        "f1": 0.019639934533551555,
+        "fpr": 0.026744978761340396,
+        "status": "НЕ достигнут"
+      }
+    },
+    "answers": {
+      "family": "answers",
+      "contract": {
+        "gate": {
+          "f1_min": 0.5,
+          "fpr_max": 0.4
+        },
+        "source": "договор № 20478ГУ/2026, проект 117812, ТЗ п. 4.1 треб. 6",
+        "f1": 0.5030978934324659,
+        "fpr": 0.4062968515742129,
+        "status": "НЕ достигнут"
+      },
+      "internal": {
+        "gate": {
+          "f1_min": 0.9,
+          "fpr_max": 0.1
+        },
+        "source": "мастер-промт проекта (внутренний ориентир, не приёмка)",
+        "f1": 0.5030978934324659,
+        "fpr": 0.4062968515742129,
+        "status": "НЕ достигнут"
+      }
+    }
+  },
+  "joint_gate": false,
+  "span_fpr_convention": "unchanged P5 token-FPR proxy, no invented span TN",
+  "kind": "external validation, NOT contractual gate",
+  "pairs": 1000,
+  "annotation_granularity": "human exact spans:423 original spans/333positive answers; original adapter first occurrence for one ambiguity; all families supported, no fabricated spans",
+  "dataset_sha256": "a520f5fcab3cd9d3988e6b0039efe733153f40a0808dc2b7c5ff5ad7613c70d3",
+  "run_id": "39266451529",
+  "commit": "dd4454b05867495018abe5a2f657fc4d6d0fd9a6"
+}

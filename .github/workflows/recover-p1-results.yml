@@ -1,0 +1,117 @@
+name: Export existing P1 raw files
+
+on:
+  push:
+    branches:
+      - arena/c5f69767-smarty-chumakov
+    paths:
+      - .github/workflows/recover-p1-results.yml
+  workflow_dispatch:
+
+permissions:
+  actions: read
+  contents: write
+
+env:
+  SOURCE_RUN_ID: "39116955685"
+  SOURCE_SHA: b87850781b73d8630832cb972037158d0ec88927
+  REPORT_BRANCH: arena/c5f69767-smarty-chumakov
+
+jobs:
+  export:
+    name: Copy downloaded evidence to the working branch
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download original comparison without suppressing errors
+        uses: actions/download-artifact@v4
+        with:
+          repository: ${{ github.repository }}
+          run-id: ${{ env.SOURCE_RUN_ID }}
+          github-token: ${{ github.token }}
+          name: p1-comparison-${{ env.SOURCE_RUN_ID }}
+          path: p1_raw_download
+
+      - name: Find and copy original files without running a parser
+        run: |
+          set -euo pipefail
+          find p1_raw_download -type f -printf '%s %p\n' | sort
+          mapfile -d '' matches < <(find p1_raw_download -type f -name p1_comparison.json -print0)
+          if [ "${#matches[@]}" -ne 1 ]; then
+            echo "Expected exactly one original p1_comparison.json"
+            exit 1
+          fi
+          SOURCE_DIR="$(dirname "${matches[0]}")"
+          for name in p1_comparison.json dev_predictions.jsonl oof_predictions.jsonl thresholds.json; do
+            test -s "$SOURCE_DIR/$name"
+          done
+          mkdir -p p1_raw_payload
+          cp -R "$SOURCE_DIR/." p1_raw_payload/
+          printf '%s\n' \
+            "kind=raw_copy_only_no_training_no_recompute" \
+            "requested_source_run_id=$SOURCE_RUN_ID" \
+            "requested_source_sha=$SOURCE_SHA" \
+            "source_artifact=p1-comparison-$SOURCE_RUN_ID" \
+            "export_run_id=$GITHUB_RUN_ID" \
+            "export_code_sha=$GITHUB_SHA" \
+            > p1_raw_payload/RAW_EXPORT_PROVENANCE.txt
+          (cd p1_raw_payload && find . -type f -print0 | sort -z | xargs -0 sha256sum) > p1_raw_checksums.txt
+          mv p1_raw_checksums.txt p1_raw_payload/RAW_EXPORT_SHA256SUMS.txt
+
+      - name: Upload raw backup
+        uses: actions/upload-artifact@v4
+        with:
+          name: p1-raw-${{ env.SOURCE_RUN_ID }}
+          path: p1_raw_payload/
+          if-no-files-found: error
+          retention-days: 30
+
+      - name: Commit raw files on latest branch state before any analysis
+        run: |
+          set -euo pipefail
+          case "$REPORT_BRANCH" in
+            arena/c5f69767-smarty-chumakov) ;;
+            *) echo "Unexpected destination branch"; exit 1 ;;
+          esac
+          git fetch --no-tags origin "$REPORT_BRANCH"
+          PUBLISH_DIR="$RUNNER_TEMP/p1-raw-publish-${GITHUB_RUN_ID}"
+          git worktree add --detach "$PUBLISH_DIR" FETCH_HEAD
+          DEST="spanverify-module/reports/experiments/p1_raw/run${SOURCE_RUN_ID}"
+          mkdir -p "$PUBLISH_DIR/$DEST"
+          cp -R p1_raw_payload/. "$PUBLISH_DIR/$DEST/"
+          git -C "$PUBLISH_DIR" config user.name "github-actions[bot]"
+          git -C "$PUBLISH_DIR" config user.email "github-actions[bot]@users.noreply.github.com"
+          git -C "$PUBLISH_DIR" add -f -- "$DEST"
+          if git -C "$PUBLISH_DIR" diff --cached --quiet; then
+            echo "Raw files already match the branch."
+          else
+            git -C "$PUBLISH_DIR" commit -m "reports: expose original P1 evidence from run ${SOURCE_RUN_ID} [skip ci]"
+            pushed=0
+            for attempt in 1 2 3; do
+              if git -C "$PUBLISH_DIR" push origin "HEAD:refs/heads/${REPORT_BRANCH}"; then
+                pushed=1
+                break
+              fi
+              git -C "$PUBLISH_DIR" fetch --no-tags origin "$REPORT_BRANCH"
+              if ! git -C "$PUBLISH_DIR" rebase FETCH_HEAD; then
+                git -C "$PUBLISH_DIR" rebase --abort
+                exit 1
+              fi
+            done
+            test "$pushed" -eq 1
+          fi
+          REPORT_SHA="$(git -C "$PUBLISH_DIR" rev-parse HEAD)"
+          JSON_URL="https://raw.githubusercontent.com/${GITHUB_REPOSITORY}/${REPORT_SHA}/${DEST}/p1_comparison.json"
+          DEV_URL="https://raw.githubusercontent.com/${GITHUB_REPOSITORY}/${REPORT_SHA}/${DEST}/dev_predictions.jsonl"
+          echo "RAW_JSON_URL=$JSON_URL"
+          echo "RAW_DEV_EVIDENCE_URL=$DEV_URL"
+          printf '%s\n' \
+            "# Original P1 files exported; no training or metric recomputation" \
+            "Source run: $SOURCE_RUN_ID" \
+            "Source SHA: $SOURCE_SHA" \
+            "Report commit: $REPORT_SHA" \
+            "Comparison JSON: $JSON_URL" \
+            "Dev evidence: $DEV_URL" \
+            >> "$GITHUB_STEP_SUMMARY"

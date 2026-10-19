@@ -1,0 +1,915 @@
+{
+  "run": {
+    "conclusion": "",
+    "createdAt": "2026-10-19T08:39:33Z",
+    "headSha": "22ae68c2a8a309adcdd7194eac5b5870f2128bd3",
+    "jobs": [
+      {
+        "completedAt": "0001-01-01T00:00:00Z",
+        "conclusion": "success",
+        "databaseId": 117966841500,
+        "name": "hf-contract",
+        "startedAt": "2026-10-19T08:39:35Z",
+        "status": "completed",
+        "steps": [
+          {
+            "conclusion": "success",
+            "name": "Set up job",
+            "number": 1,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Run actions/checkout@v4",
+            "number": 2,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Run actions/setup-python@v5",
+            "number": 3,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Fixed product HF dependencies",
+            "number": 4,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Actual HF golden, train/dev tokenizer audit and long-answer coverage",
+            "number": 5,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Run actions/upload-artifact@v4",
+            "number": 6,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Post Run actions/setup-python@v5",
+            "number": 11,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Post Run actions/checkout@v4",
+            "number": 12,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Complete job",
+            "number": 13,
+            "status": "completed"
+          }
+        ],
+        "url": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39224331662/job/117966841500"
+      },
+      {
+        "completedAt": "0001-01-01T00:00:00Z",
+        "conclusion": "success",
+        "databaseId": 117966842017,
+        "name": "parity",
+        "startedAt": "2026-10-19T08:39:35Z",
+        "status": "completed",
+        "steps": [
+          {
+            "conclusion": "success",
+            "name": "Set up job",
+            "number": 1,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Run actions/checkout@v4",
+            "number": 2,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Run actions/setup-python@v5",
+            "number": 3,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Run pip install -r spanverify-module/requirements-token-head-tests.txt",
+            "number": 4,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Run actions/download-artifact@v4",
+            "number": 5,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Actual frozen public dev replay; zero drift required, no fitting",
+            "number": 6,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Run actions/upload-artifact@v4",
+            "number": 7,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Byte-exact pre-change golden I/O",
+            "number": 8,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Post Run actions/setup-python@v5",
+            "number": 15,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Post Run actions/checkout@v4",
+            "number": 16,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Complete job",
+            "number": 17,
+            "status": "completed"
+          }
+        ],
+        "url": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39224331662/job/117966842017"
+      },
+      {
+        "completedAt": "0001-01-01T00:00:00Z",
+        "conclusion": "success",
+        "databaseId": 117978599032,
+        "name": "calibration (demo)",
+        "startedAt": "2026-10-19T09:09:17Z",
+        "status": "completed",
+        "steps": [
+          {
+            "conclusion": "success",
+            "name": "Set up job",
+            "number": 1,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Run actions/checkout@v4",
+            "number": 2,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Run actions/setup-python@v5",
+            "number": 3,
+            "status": "completed"
+          },
+          {
+            "conclusion": "skipped",
+            "name": "Fixed product dependencies",
+            "number": 4,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Original five document folds, frozen raw, train-only isotonic",
+            "number": 5,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Run actions/upload-artifact@v4",
+            "number": 6,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Post Run actions/setup-python@v5",
+            "number": 11,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Post Run actions/checkout@v4",
+            "number": 12,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Complete job",
+            "number": 13,
+            "status": "completed"
+          }
+        ],
+        "url": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39224331662/job/117978599032"
+      },
+      {
+        "completedAt": "0001-01-01T00:00:00Z",
+        "conclusion": "failure",
+        "databaseId": 117978599093,
+        "name": "benchmark (demo)",
+        "startedAt": "2026-10-19T09:09:17Z",
+        "status": "completed",
+        "steps": [
+          {
+            "conclusion": "success",
+            "name": "Set up job",
+            "number": 1,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Run actions/checkout@v4",
+            "number": 2,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Run actions/setup-python@v5",
+            "number": 3,
+            "status": "completed"
+          },
+          {
+            "conclusion": "skipped",
+            "name": "Fixed P6 product stack",
+            "number": 4,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Three cold/warm native repeats and independent profiles",
+            "number": 5,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Seconds per 1000 chars and uncensored evidence references",
+            "number": 6,
+            "status": "completed"
+          },
+          {
+            "conclusion": "failure",
+            "name": "Actual product interfaces",
+            "number": 7,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Run actions/upload-artifact@v4",
+            "number": 8,
+            "status": "completed"
+          },
+          {
+            "conclusion": "skipped",
+            "name": "Post Run actions/setup-python@v5",
+            "number": 15,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Post Run actions/checkout@v4",
+            "number": 16,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Complete job",
+            "number": 17,
+            "status": "completed"
+          }
+        ],
+        "url": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39224331662/job/117978599093"
+      },
+      {
+        "completedAt": null,
+        "conclusion": "",
+        "databaseId": 117978599103,
+        "name": "benchmark (hf)",
+        "startedAt": "2026-10-19T09:09:16Z",
+        "status": "in_progress",
+        "steps": [
+          {
+            "conclusion": "success",
+            "name": "Set up job",
+            "number": 1,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Run actions/checkout@v4",
+            "number": 2,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Run actions/setup-python@v5",
+            "number": 3,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Fixed P6 product stack",
+            "number": 4,
+            "status": "completed"
+          },
+          {
+            "conclusion": "",
+            "name": "Three cold/warm native repeats and independent profiles",
+            "number": 5,
+            "status": "in_progress"
+          },
+          {
+            "conclusion": "",
+            "name": "Seconds per 1000 chars and uncensored evidence references",
+            "number": 6,
+            "status": "pending"
+          },
+          {
+            "conclusion": "",
+            "name": "Actual product interfaces",
+            "number": 7,
+            "status": "pending"
+          },
+          {
+            "conclusion": "",
+            "name": "Run actions/upload-artifact@v4",
+            "number": 8,
+            "status": "pending"
+          },
+          {
+            "conclusion": "",
+            "name": "Post Run actions/setup-python@v5",
+            "number": 15,
+            "status": "pending"
+          },
+          {
+            "conclusion": "",
+            "name": "Post Run actions/checkout@v4",
+            "number": 16,
+            "status": "pending"
+          }
+        ],
+        "url": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39224331662/job/117978599103"
+      },
+      {
+        "completedAt": "0001-01-01T00:00:00Z",
+        "conclusion": "success",
+        "databaseId": 117978599242,
+        "name": "full-hf-input",
+        "startedAt": "2026-10-19T09:09:17Z",
+        "status": "completed",
+        "steps": [
+          {
+            "conclusion": "success",
+            "name": "Set up job",
+            "number": 1,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Run actions/checkout@v4",
+            "number": 2,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Run actions/setup-python@v5",
+            "number": 3,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Run pip install 'torch==2.14.1+cpu' --index-url https://download.pytorch.org/whl/cpu",
+            "number": 4,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Full real HF 2M answer, no truncation or synthetic tail",
+            "number": 5,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Run actions/upload-artifact@v4",
+            "number": 6,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Post Run actions/setup-python@v5",
+            "number": 11,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Post Run actions/checkout@v4",
+            "number": 12,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Complete job",
+            "number": 13,
+            "status": "completed"
+          }
+        ],
+        "url": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39224331662/job/117978599242"
+      },
+      {
+        "completedAt": null,
+        "conclusion": "",
+        "databaseId": 117978599310,
+        "name": "calibration (hf)",
+        "startedAt": "2026-10-19T09:09:16Z",
+        "status": "in_progress",
+        "steps": [
+          {
+            "conclusion": "success",
+            "name": "Set up job",
+            "number": 1,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Run actions/checkout@v4",
+            "number": 2,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Run actions/setup-python@v5",
+            "number": 3,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Fixed product dependencies",
+            "number": 4,
+            "status": "completed"
+          },
+          {
+            "conclusion": "",
+            "name": "Original five document folds, frozen raw, train-only isotonic",
+            "number": 5,
+            "status": "in_progress"
+          },
+          {
+            "conclusion": "",
+            "name": "Run actions/upload-artifact@v4",
+            "number": 6,
+            "status": "pending"
+          },
+          {
+            "conclusion": "",
+            "name": "Post Run actions/setup-python@v5",
+            "number": 11,
+            "status": "pending"
+          },
+          {
+            "conclusion": "",
+            "name": "Post Run actions/checkout@v4",
+            "number": 12,
+            "status": "pending"
+          }
+        ],
+        "url": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39224331662/job/117978599310"
+      }
+    ],
+    "name": "P7 frozen engineering gates",
+    "status": "in_progress",
+    "updatedAt": "2026-10-19T09:09:17Z",
+    "url": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39224331662"
+  },
+  "artifacts": {
+    "total_count": 5,
+    "artifacts": [
+      {
+        "id": 12175701388,
+        "node_id": "MDg6QXJ0aWZhY3QxMjE3NTcwMTM4OA==",
+        "name": "p7-benchmark-demo",
+        "size_in_bytes": 244946,
+        "url": "https://api.github.com/repos/Igorr112323/Smarty_Chumakov/actions/artifacts/12175701388",
+        "archive_download_url": "https://api.github.com/repos/Igorr112323/Smarty_Chumakov/actions/artifacts/12175701388/zip",
+        "expired": false,
+        "digest": "sha256:eec9df363527ea6bc0ab27422fbaddda85361e403600c7bac81cb4c250e84cd6",
+        "created_at": "2026-10-19T09:13:00Z",
+        "updated_at": "2026-10-19T09:13:00Z",
+        "expires_at": "2027-01-17T08:39:33Z",
+        "workflow_run": {
+          "id": 39224331662,
+          "repository_id": 1402768620,
+          "head_repository_id": 1402768620,
+          "head_branch": "arena/c5f69767-smarty-chumakov",
+          "head_sha": "22ae68c2a8a309adcdd7194eac5b5870f2128bd3"
+        }
+      },
+      {
+        "id": 12175381533,
+        "node_id": "MDg6QXJ0aWZhY3QxMjE3NTM4MTUzMw==",
+        "name": "p7-full-hf",
+        "size_in_bytes": 2736,
+        "url": "https://api.github.com/repos/Igorr112323/Smarty_Chumakov/actions/artifacts/12175381533",
+        "archive_download_url": "https://api.github.com/repos/Igorr112323/Smarty_Chumakov/actions/artifacts/12175381533/zip",
+        "expired": false,
+        "digest": "sha256:2601b988939bf8d947591a6821bbd250845b1460eaf7a63e5f81e0cc92b2d275",
+        "created_at": "2026-10-19T09:12:10Z",
+        "updated_at": "2026-10-19T09:12:10Z",
+        "expires_at": "2027-01-17T08:39:33Z",
+        "workflow_run": {
+          "id": 39224331662,
+          "repository_id": 1402768620,
+          "head_repository_id": 1402768620,
+          "head_branch": "arena/c5f69767-smarty-chumakov",
+          "head_sha": "22ae68c2a8a309adcdd7194eac5b5870f2128bd3"
+        }
+      },
+      {
+        "id": 12175076210,
+        "node_id": "MDg6QXJ0aWZhY3QxMjE3NTA3NjIxMA==",
+        "name": "p7-hf-contract",
+        "size_in_bytes": 31495,
+        "url": "https://api.github.com/repos/Igorr112323/Smarty_Chumakov/actions/artifacts/12175076210",
+        "archive_download_url": "https://api.github.com/repos/Igorr112323/Smarty_Chumakov/actions/artifacts/12175076210/zip",
+        "expired": false,
+        "digest": "sha256:eec4d481179fcd490fb86cd572ad623d26c516998e95b7a9548133f195e1b3f0",
+        "created_at": "2026-10-19T09:09:12Z",
+        "updated_at": "2026-10-19T09:09:12Z",
+        "expires_at": "2027-01-17T08:39:33Z",
+        "workflow_run": {
+          "id": 39224331662,
+          "repository_id": 1402768620,
+          "head_repository_id": 1402768620,
+          "head_branch": "arena/c5f69767-smarty-chumakov",
+          "head_sha": "22ae68c2a8a309adcdd7194eac5b5870f2128bd3"
+        }
+      },
+      {
+        "id": 12174945778,
+        "node_id": "MDg6QXJ0aWZhY3QxMjE3NDk0NTc3OA==",
+        "name": "p7-calibration-demo",
+        "size_in_bytes": 42394,
+        "url": "https://api.github.com/repos/Igorr112323/Smarty_Chumakov/actions/artifacts/12174945778",
+        "archive_download_url": "https://api.github.com/repos/Igorr112323/Smarty_Chumakov/actions/artifacts/12174945778/zip",
+        "expired": false,
+        "digest": "sha256:7c35977f532981bd4a15f498132213d0d112df50dd1013ca7b7f3c4936ee6319",
+        "created_at": "2026-10-19T09:09:42Z",
+        "updated_at": "2026-10-19T09:09:42Z",
+        "expires_at": "2027-01-17T08:39:33Z",
+        "workflow_run": {
+          "id": 39224331662,
+          "repository_id": 1402768620,
+          "head_repository_id": 1402768620,
+          "head_branch": "arena/c5f69767-smarty-chumakov",
+          "head_sha": "22ae68c2a8a309adcdd7194eac5b5870f2128bd3"
+        }
+      },
+      {
+        "id": 12172489685,
+        "node_id": "MDg6QXJ0aWZhY3QxMjE3MjQ4OTY4NQ==",
+        "name": "p7-parity",
+        "size_in_bytes": 2114,
+        "url": "https://api.github.com/repos/Igorr112323/Smarty_Chumakov/actions/artifacts/12172489685",
+        "archive_download_url": "https://api.github.com/repos/Igorr112323/Smarty_Chumakov/actions/artifacts/12172489685/zip",
+        "expired": false,
+        "digest": "sha256:c6271998a7448e12994440ac4a8a2a8c0df254c121e89e86a117ad7d3eeed85d",
+        "created_at": "2026-10-19T08:39:53Z",
+        "updated_at": "2026-10-19T08:39:53Z",
+        "expires_at": "2027-01-17T08:39:33Z",
+        "workflow_run": {
+          "id": 39224331662,
+          "repository_id": 1402768620,
+          "head_repository_id": 1402768620,
+          "head_branch": "arena/c5f69767-smarty-chumakov",
+          "head_sha": "22ae68c2a8a309adcdd7194eac5b5870f2128bd3"
+        }
+      }
+    ]
+  },
+  "notices": [
+    {
+      "job": "hf-contract",
+      "job_id": 117966841500,
+      "title": "P7 exact long cache",
+      "data": {
+        "passed": true,
+        "sha256": "03c1c7cfdf507d486269858bb1969e74bf24d5916e1e796471f62ba92f94dbe1"
+      }
+    },
+    {
+      "job": "hf-contract",
+      "job_id": 117966841500,
+      "title": "P7 fresh contract",
+      "data": {
+        "short_dev_pairs": 178,
+        "short_byte_mismatches": 0,
+        "changed_dev_long_rows": 3,
+        "train_long_feature_rows": 22,
+        "contract": "window512_full_answer_v1"
+      }
+    },
+    {
+      "job": "hf-contract",
+      "job_id": 117966841500,
+      "title": "P7 truncation audit",
+      "data": {
+        "train": {
+          "answers": 842,
+          "answer_over_512": 22,
+          "max_answer_model_tokens": 1923,
+          "answer_input_sha256": "5b59e375b54a2ef7a11123230566f9c0993606d25ddd19912fc883190ef894f4"
+        },
+        "dev": {
+          "answers": 181,
+          "answer_over_512": 3,
+          "max_answer_model_tokens": 1046,
+          "answer_input_sha256": "c02e34fc96c696af6bf2b20270489a7a007a8adecfa257013a7b37b774dd3c57"
+        }
+      }
+    },
+    {
+      "job": "parity",
+      "job_id": 117966842017,
+      "title": "P6 parity",
+      "data": {
+        "pairs": 181,
+        "full_token_risks": 13150,
+        "mismatches": [],
+        "p1_max_abs_delta": 0.0,
+        "cache_misses": 0,
+        "bundle_sha256": "e0b13c693a058dfd66ed24a52fc14e9c70964e95885358e7b99cc1f328ad6892",
+        "passed": true,
+        "environment_omitted_from_notice": true
+      }
+    },
+    {
+      "job": "calibration (demo)",
+      "job_id": 117978599032,
+      "title": "P7 AI-share",
+      "data": {
+        "mode": "demo",
+        "documents": 265,
+        "mixtures": 1325,
+        "original_document_folds": true,
+        "pooled_before": {
+          "mae": 0.4497321882850523,
+          "mean_curve": [
+            0.0936904306893239,
+            0.10222346268431477,
+            0.11634289217555363,
+            0.08425647499700699,
+            0.043514887378350506
+          ],
+          "monotone": false
+        },
+        "pooled_after": {
+          "mae": 0.2989009919597126,
+          "mean_curve": [
+            0.4924897062813976,
+            0.50285623781367,
+            0.50285623781367,
+            0.5008409842965045,
+            0.50285623781367
+          ],
+          "monotone": false
+        },
+        "status": "частично",
+        "limitation": "Synthetic train-only diagnostic, NOT real-LLM authorship calibration; no quality fitting."
+      }
+    },
+    {
+      "job": "benchmark (demo)",
+      "job_id": 117978599093,
+      "title": "P7 speed",
+      "data": {
+        "mode": "demo",
+        "scenario": "answer-text",
+        "chars": 50000,
+        "thermal": "cold-process",
+        "median_seconds": 0.7239118190000013,
+        "max_seconds": 0.7268138350000015,
+        "limit_seconds": 1.0,
+        "status": "достигнут",
+        "seconds_per_1000_chars": 0.014478236380000026
+      }
+    },
+    {
+      "job": "benchmark (demo)",
+      "job_id": 117978599093,
+      "title": "P7 speed",
+      "data": {
+        "mode": "demo",
+        "scenario": "answer-text",
+        "chars": 1000,
+        "thermal": "warm-model",
+        "median_seconds": 0.0164386750000034,
+        "max_seconds": 0.016471124999995368,
+        "limit_seconds": 0.03,
+        "status": "достигнут",
+        "seconds_per_1000_chars": 0.0164386750000034
+      }
+    },
+    {
+      "job": "benchmark (demo)",
+      "job_id": 117978599093,
+      "title": "P7 speed",
+      "data": {
+        "mode": "demo",
+        "scenario": "answer-text",
+        "chars": 1000,
+        "thermal": "cold-process",
+        "median_seconds": 0.024884698000001038,
+        "max_seconds": 0.025877645999997867,
+        "limit_seconds": 0.03,
+        "status": "достигнут",
+        "seconds_per_1000_chars": 0.024884698000001038
+      }
+    },
+    {
+      "job": "benchmark (demo)",
+      "job_id": 117978599093,
+      "title": "P7 speed",
+      "data": {
+        "mode": "demo",
+        "scenario": "document-context",
+        "chars": 2000000,
+        "thermal": "warm-model",
+        "median_seconds": 3.550254615,
+        "max_seconds": 3.555847215,
+        "limit_seconds": 60.0,
+        "status": "достигнут",
+        "seconds_per_1000_chars": 0.0017751273075
+      }
+    },
+    {
+      "job": "benchmark (demo)",
+      "job_id": 117978599093,
+      "title": "P7 speed",
+      "data": {
+        "mode": "demo",
+        "scenario": "document-context",
+        "chars": 2000000,
+        "thermal": "cold-process",
+        "median_seconds": 3.545300259000001,
+        "max_seconds": 3.5777853969999995,
+        "limit_seconds": 60.0,
+        "status": "достигнут",
+        "seconds_per_1000_chars": 0.0017726501295000005
+      }
+    },
+    {
+      "job": "benchmark (demo)",
+      "job_id": 117978599093,
+      "title": "P7 speed",
+      "data": {
+        "mode": "demo",
+        "scenario": "document-context",
+        "chars": 50000,
+        "thermal": "warm-model",
+        "median_seconds": 0.07678946100000417,
+        "max_seconds": 0.07737720000000081,
+        "limit_seconds": 1.0,
+        "status": "достигнут",
+        "seconds_per_1000_chars": 0.0015357892200000833
+      }
+    },
+    {
+      "job": "benchmark (demo)",
+      "job_id": 117978599093,
+      "title": "P7 speed",
+      "data": {
+        "mode": "demo",
+        "scenario": "document-context",
+        "chars": 50000,
+        "thermal": "cold-process",
+        "median_seconds": 0.08479759799999442,
+        "max_seconds": 0.0854422919999962,
+        "limit_seconds": 1.0,
+        "status": "достигнут",
+        "seconds_per_1000_chars": 0.0016959519599998884
+      }
+    },
+    {
+      "job": "benchmark (demo)",
+      "job_id": 117978599093,
+      "title": "P7 speed",
+      "data": {
+        "mode": "demo",
+        "scenario": "document-context",
+        "chars": 1000,
+        "thermal": "warm-model",
+        "median_seconds": 0.003595529999998348,
+        "max_seconds": 0.0036173160000032567,
+        "limit_seconds": 0.03,
+        "status": "достигнут",
+        "seconds_per_1000_chars": 0.003595529999998348
+      }
+    },
+    {
+      "job": "benchmark (demo)",
+      "job_id": 117978599093,
+      "title": "P7 speed",
+      "data": {
+        "mode": "demo",
+        "scenario": "document-context",
+        "chars": 1000,
+        "thermal": "cold-process",
+        "median_seconds": 0.01305059500000283,
+        "max_seconds": 0.030848664999993503,
+        "limit_seconds": 0.03,
+        "status": "не достигнут",
+        "diagnostic_profile": "profile-demo-document-context-1000-cold-process.json.prof",
+        "seconds_per_1000_chars": 0.01305059500000283,
+        "profile_top": [
+          {
+            "function": "verify",
+            "calls": 1,
+            "self_seconds": 0.000182558,
+            "cumulative_seconds": 0.012928391000000001
+          },
+          {
+            "function": "_features",
+            "calls": 1,
+            "self_seconds": 3.6560000000000002e-06,
+            "cumulative_seconds": 0.0057027300000000005
+          },
+          {
+            "function": "extract_features",
+            "calls": 1,
+            "self_seconds": 2.7252000000000003e-05,
+            "cumulative_seconds": 0.005699074
+          },
+          {
+            "function": "demo_features",
+            "calls": 1,
+            "self_seconds": 0.000159554,
+            "cumulative_seconds": 0.005671822
+          },
+          {
+            "function": "predict_many",
+            "calls": 1,
+            "self_seconds": 1.192e-06,
+            "cumulative_seconds": 0.0030536680000000003
+          }
+        ]
+      }
+    },
+    {
+      "job": "benchmark (demo)",
+      "job_id": 117978599093,
+      "title": "P7 benchmark environment",
+      "data": {
+        "cpu": "AMD EPYC 7763 64-Core Processor",
+        "logical_cpu": 4,
+        "ram": "MemTotal:       16373452 kB",
+        "python": "3.11.17 (main, Oct  1 2026, 14:32:31) [GCC 13.3.0]",
+        "platform": "Linux-6.17.0-1022-azure-x86_64-with-glibc2.39",
+        "versions": {},
+        "commit": "22ae68c2a8a309adcdd7194eac5b5870f2128bd3",
+        "run_url": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39224331662"
+      }
+    },
+    {
+      "job": "full-hf-input",
+      "job_id": 117978599242,
+      "title": "P7 full 2M",
+      "data": {
+        "mode": "hf",
+        "seconds": 125.52154527700002,
+        "seconds_per_1000_chars": 0.06276077263850001,
+        "answer_chars": 2000000,
+        "utf8_bytes": 3660605,
+        "token_records": 282830,
+        "last_end": 2000000,
+        "all_risks_finite_bounded": true,
+        "schema_valid": true,
+        "full_token_sha256": "56c3028861b5ea021310a59f98272fa1bff6e33a43755af6fae0bc00f89655a4",
+        "features": {
+          "answer_feature_contract": "window512_full_answer_v1",
+          "backend": "hf",
+          "model": "ai-forever/rugpt3small_based_on_gpt2",
+          "full_answer": true,
+          "answer_windows": 3283,
+          "context_subwindows": 1,
+          "model_calls": 14,
+          "identical_window_cache_hits": 3269,
+          "logical_window_scores": 3283,
+          "all_answer_tokens_mapped": true,
+          "scored_answer_tokens": 282830,
+          "answer_last_end": 2000000,
+          "chunked": false
+        },
+        "functional_passed": true,
+        "speed_60s_met": false
+      }
+    }
+  ]
+}

@@ -1,0 +1,87 @@
+{
+  "assets": [
+    {
+      "apiUrl": "https://api.github.com/repos/Igorr112323/Smarty_Chumakov/releases/assets/654925332",
+      "contentType": "application/json",
+      "createdAt": "2026-10-19T01:26:25Z",
+      "downloadCount": 0,
+      "id": "RA_kwDOU5yM7M4nCV4U",
+      "label": "",
+      "name": "frozen-p5.json",
+      "size": 122874,
+      "state": "uploaded",
+      "updatedAt": "2026-10-19T01:26:25Z",
+      "url": "https://github.com/Igorr112323/Smarty_Chumakov/releases/download/v1.3.1-rc.p6.39184437541/frozen-p5.json"
+    },
+    {
+      "apiUrl": "https://api.github.com/repos/Igorr112323/Smarty_Chumakov/releases/assets/654925321",
+      "contentType": "application/json",
+      "createdAt": "2026-10-19T01:26:25Z",
+      "downloadCount": 0,
+      "id": "RA_kwDOU5yM7M4nCV4J",
+      "label": "",
+      "name": "p5-runtime.json",
+      "size": 2969,
+      "state": "uploaded",
+      "updatedAt": "2026-10-19T01:26:25Z",
+      "url": "https://github.com/Igorr112323/Smarty_Chumakov/releases/download/v1.3.1-rc.p6.39184437541/p5-runtime.json"
+    },
+    {
+      "apiUrl": "https://api.github.com/repos/Igorr112323/Smarty_Chumakov/releases/assets/654925337",
+      "contentType": "text/plain; charset=utf-8",
+      "createdAt": "2026-10-19T01:26:25Z",
+      "downloadCount": 0,
+      "id": "RA_kwDOU5yM7M4nCV4Z",
+      "label": "",
+      "name": "SHA256SUMS.txt",
+      "size": 415,
+      "state": "uploaded",
+      "updatedAt": "2026-10-19T01:26:25Z",
+      "url": "https://github.com/Igorr112323/Smarty_Chumakov/releases/download/v1.3.1-rc.p6.39184437541/SHA256SUMS.txt"
+    },
+    {
+      "apiUrl": "https://api.github.com/repos/Igorr112323/Smarty_Chumakov/releases/assets/654925330",
+      "contentType": "application/zip",
+      "createdAt": "2026-10-19T01:26:25Z",
+      "downloadCount": 0,
+      "id": "RA_kwDOU5yM7M4nCV4S",
+      "label": "",
+      "name": "spanverify-win.zip",
+      "size": 9136772,
+      "state": "uploaded",
+      "updatedAt": "2026-10-19T01:26:26Z",
+      "url": "https://github.com/Igorr112323/Smarty_Chumakov/releases/download/v1.3.1-rc.p6.39184437541/spanverify-win.zip"
+    },
+    {
+      "apiUrl": "https://api.github.com/repos/Igorr112323/Smarty_Chumakov/releases/assets/654925318",
+      "contentType": "application/x-msdownload",
+      "createdAt": "2026-10-19T01:26:25Z",
+      "downloadCount": 0,
+      "id": "RA_kwDOU5yM7M4nCV4G",
+      "label": "",
+      "name": "spanverify.exe",
+      "size": 8985072,
+      "state": "uploaded",
+      "updatedAt": "2026-10-19T01:26:25Z",
+      "url": "https://github.com/Igorr112323/Smarty_Chumakov/releases/download/v1.3.1-rc.p6.39184437541/spanverify.exe"
+    },
+    {
+      "apiUrl": "https://api.github.com/repos/Igorr112323/Smarty_Chumakov/releases/assets/654925322",
+      "contentType": "application/x-zip-compressed",
+      "createdAt": "2026-10-19T01:26:25Z",
+      "downloadCount": 0,
+      "id": "RA_kwDOU5yM7M4nCV4K",
+      "label": "",
+      "name": "spanverify.pyz",
+      "size": 227008,
+      "state": "uploaded",
+      "updatedAt": "2026-10-19T01:26:25Z",
+      "url": "https://github.com/Igorr112323/Smarty_Chumakov/releases/download/v1.3.1-rc.p6.39184437541/spanverify.pyz"
+    }
+  ],
+  "isDraft": false,
+  "isPrerelease": true,
+  "tagName": "v1.3.1-rc.p6.39184437541",
+  "targetCommitish": "14a018a1b90b51cc47cd8baf628147ac22e1d8b1",
+  "url": "https://github.com/Igorr112323/Smarty_Chumakov/releases/tag/v1.3.1-rc.p6.39184437541"
+}

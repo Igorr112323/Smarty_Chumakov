@@ -32,6 +32,7 @@ from .calibration import IsotonicCalibrator, choose_threshold_report, metrics_at
 from .core import tokenize_with_offsets
 from .engine import (
     SMOOTH_WINDOW,
+    VERDICT_MIN_TWO_TOKENS,
     Verifier,
     WeightsBundle,
     _answer_score,
@@ -830,7 +831,19 @@ def train(
 
     # 6. Сквозная проверка: те же параметры, но через публичный verify() — то, что
     #    реально увидит пользователь API. Числа берутся из настоящего пути.
-    end_to_end = Verifier(mode=mode, weights=bundle).evaluate(test_pairs)
+    #    Кеш признаков передаём: без него HF-режим заново считает признаки на
+    #    каждой паре отложенной выборки (360 × 6,4 с ≈ 38 мин — упирается в
+    #    таймаут 30 мин). Признаки из кеша идентичны тем, что считались в
+    #    кросс-валидации (та же модель, окно, чанкинг) — это не подмена числа.
+    end_to_end = Verifier(
+        mode=mode,
+        weights=bundle,
+        model_name=getattr(verifier, "model_name", None),
+        features_cache=getattr(verifier, "features_cache", None),
+        span_expansion=getattr(verifier, "span_expansion", "clause"),
+        span_filter_min_chars=getattr(verifier, "span_filter_min_chars", 0),
+        verdict_rule=getattr(verifier, "verdict_rule", VERDICT_MIN_TWO_TOKENS),
+    ).evaluate(test_pairs)
 
     report = TrainReport(
         bundle=bundle,

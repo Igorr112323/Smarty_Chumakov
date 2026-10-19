@@ -1,0 +1,570 @@
+candidate cell 0 rows 2701
+candidate cell 1 rows 3737
+candidate cell 2 rows 5471
+candidate cell 3 rows 6622
+candidate cell 4 rows 8144
+candidate cell 5 rows 9208
+candidate cell 6 rows 10661
+candidate cell 7 rows 11373
+candidate cell 8 rows 12456
+candidate cell 9 rows 13160
+candidate cell 10 rows 14151
+candidate cell 11 rows 14810
+candidate cell 12 rows 15641
+candidate cell 13 rows 16191
+candidate cell 14 rows 16915
+candidate cell 15 rows 17400
+candidate cell 16 rows 18074
+candidate cell 17 rows 18534
+candidate cell 18 rows 19156
+candidate cell 19 rows 19558
+candidate cell 20 rows 20104
+candidate cell 21 rows 20453
+candidate cell 22 rows 20967
+candidate cell 23 rows 21308
+candidate cell 24 rows 21822
+candidate cell 25 rows 22154
+candidate cell 26 rows 22599
+candidate cell 27 rows 22883
+candidate cell 28 rows 23308
+candidate cell 29 rows 23584
+candidate cell 30 rows 23908
+candidate cell 31 rows 24121
+candidate cell 32 rows 24398
+candidate cell 33 rows 24571
+candidate cell 34 rows 24842
+candidate cell 35 rows 25014
+candidate cell 36 rows 27717
+candidate cell 37 rows 28752
+candidate cell 38 rows 30509
+candidate cell 39 rows 31671
+candidate cell 40 rows 33227
+candidate cell 41 rows 34308
+candidate cell 42 rows 35761
+candidate cell 43 rows 36473
+candidate cell 44 rows 37570
+candidate cell 45 rows 38280
+candidate cell 46 rows 39289
+candidate cell 47 rows 39957
+candidate cell 48 rows 40788
+candidate cell 49 rows 41338
+candidate cell 50 rows 42069
+candidate cell 51 rows 42558
+candidate cell 52 rows 43242
+candidate cell 53 rows 43710
+candidate cell 54 rows 44332
+candidate cell 55 rows 44734
+candidate cell 56 rows 45284
+candidate cell 57 rows 45635
+candidate cell 58 rows 46155
+candidate cell 59 rows 46497
+candidate cell 60 rows 47011
+candidate cell 61 rows 47343
+candidate cell 62 rows 47791
+candidate cell 63 rows 48076
+candidate cell 64 rows 48504
+candidate cell 65 rows 48781
+candidate cell 66 rows 49105
+candidate cell 67 rows 49318
+candidate cell 68 rows 49595
+candidate cell 69 rows 49768
+candidate cell 70 rows 50039
+candidate cell 71 rows 50211
+candidate cell 72 rows 52915
+candidate cell 73 rows 53949
+candidate cell 74 rows 55731
+candidate cell 75 rows 56901
+candidate cell 76 rows 58499
+candidate cell 77 rows 59596
+candidate cell 78 rows 61049
+candidate cell 79 rows 61761
+candidate cell 80 rows 62867
+candidate cell 81 rows 63581
+candidate cell 82 rows 64604
+candidate cell 83 rows 65280
+candidate cell 84 rows 66111
+candidate cell 85 rows 66661
+candidate cell 86 rows 67396
+candidate cell 87 rows 67887
+candidate cell 88 rows 68578
+candidate cell 89 rows 69050
+candidate cell 90 rows 69672
+candidate cell 91 rows 70074
+candidate cell 92 rows 70628
+candidate cell 93 rows 70978
+candidate cell 94 rows 71504
+candidate cell 95 rows 71845
+candidate cell 96 rows 72359
+candidate cell 97 rows 72691
+candidate cell 98 rows 73141
+candidate cell 99 rows 73426
+candidate cell 100 rows 73857
+candidate cell 101 rows 74134
+candidate cell 102 rows 74458
+candidate cell 103 rows 74671
+candidate cell 104 rows 74948
+candidate cell 105 rows 75121
+candidate cell 106 rows 75392
+candidate cell 107 rows 75564
+candidate cell 108 rows 78268
+candidate cell 109 rows 79302
+candidate cell 110 rows 81097
+candidate cell 111 rows 82268
+candidate cell 112 rows 83893
+candidate cell 113 rows 84996
+candidate cell 114 rows 86449
+candidate cell 115 rows 87161
+candidate cell 116 rows 88271
+candidate cell 117 rows 88986
+candidate cell 118 rows 90018
+candidate cell 119 rows 90697
+candidate cell 120 rows 91528
+candidate cell 121 rows 92078
+candidate cell 122 rows 92815
+candidate cell 123 rows 93306
+candidate cell 124 rows 94001
+candidate cell 125 rows 94474
+candidate cell 126 rows 95096
+candidate cell 127 rows 95498
+candidate cell 128 rows 96052
+candidate cell 129 rows 96402
+candidate cell 130 rows 96929
+candidate cell 131 rows 97271
+candidate cell 132 rows 97785
+candidate cell 133 rows 98117
+candidate cell 134 rows 98567
+candidate cell 135 rows 98852
+candidate cell 136 rows 99284
+candidate cell 137 rows 99562
+candidate cell 138 rows 99886
+candidate cell 139 rows 100099
+candidate cell 140 rows 100376
+candidate cell 141 rows 100549
+candidate cell 142 rows 100821
+candidate cell 143 rows 100992
+candidate cell 144 rows 103699
+candidate cell 145 rows 104734
+candidate cell 146 rows 106556
+candidate cell 147 rows 107734
+candidate cell 148 rows 109404
+candidate cell 149 rows 110527
+candidate cell 150 rows 111980
+candidate cell 151 rows 112692
+candidate cell 152 rows 113811
+candidate cell 153 rows 114528
+candidate cell 154 rows 115578
+candidate cell 155 rows 116264
+candidate cell 156 rows 117095
+candidate cell 157 rows 117645
+candidate cell 158 rows 118383
+candidate cell 159 rows 118874
+candidate cell 160 rows 119578
+candidate cell 161 rows 120050
+candidate cell 162 rows 120672
+candidate cell 163 rows 121074
+candidate cell 164 rows 121629
+candidate cell 165 rows 121979
+candidate cell 166 rows 122512
+candidate cell 167 rows 122854
+candidate cell 168 rows 123368
+candidate cell 169 rows 123700
+candidate cell 170 rows 124151
+candidate cell 171 rows 124436
+candidate cell 172 rows 124871
+candidate cell 173 rows 125150
+candidate cell 174 rows 125474
+candidate cell 175 rows 125687
+candidate cell 176 rows 125964
+candidate cell 177 rows 126137
+candidate cell 178 rows 126409
+candidate cell 179 rows 126580
+candidate cell 180 rows 129294
+candidate cell 181 rows 130330
+candidate cell 182 rows 132195
+candidate cell 183 rows 133380
+candidate cell 184 rows 135121
+candidate cell 185 rows 136266
+candidate cell 186 rows 137722
+candidate cell 187 rows 138437
+candidate cell 188 rows 139567
+candidate cell 189 rows 140285
+candidate cell 190 rows 141361
+candidate cell 191 rows 142052
+candidate cell 192 rows 142885
+candidate cell 193 rows 143437
+candidate cell 194 rows 144180
+candidate cell 195 rows 144673
+candidate cell 196 rows 145389
+candidate cell 197 rows 145866
+candidate cell 198 rows 146490
+candidate cell 199 rows 146893
+candidate cell 200 rows 147450
+candidate cell 201 rows 147801
+candidate cell 202 rows 148340
+candidate cell 203 rows 148685
+candidate cell 204 rows 149201
+candidate cell 205 rows 149533
+candidate cell 206 rows 149986
+candidate cell 207 rows 150271
+candidate cell 208 rows 150710
+candidate cell 209 rows 150989
+candidate cell 210 rows 151313
+candidate cell 211 rows 151526
+candidate cell 212 rows 151803
+candidate cell 213 rows 151976
+candidate cell 214 rows 152248
+candidate cell 215 rows 152419
+candidate cell 216 rows 155156
+candidate cell 217 rows 156190
+candidate cell 218 rows 158143
+candidate cell 219 rows 159336
+candidate cell 220 rows 161194
+candidate cell 221 rows 162361
+candidate cell 222 rows 163822
+candidate cell 223 rows 164539
+candidate cell 224 rows 165691
+candidate cell 225 rows 166415
+candidate cell 226 rows 167525
+candidate cell 227 rows 168232
+candidate cell 228 rows 169068
+candidate cell 229 rows 169622
+candidate cell 230 rows 170375
+candidate cell 231 rows 170872
+candidate cell 232 rows 171606
+candidate cell 233 rows 172091
+candidate cell 234 rows 172717
+candidate cell 235 rows 173122
+candidate cell 236 rows 173683
+candidate cell 237 rows 174038
+candidate cell 238 rows 174586
+candidate cell 239 rows 174936
+candidate cell 240 rows 175454
+candidate cell 241 rows 175788
+candidate cell 242 rows 176245
+candidate cell 243 rows 176533
+candidate cell 244 rows 176980
+candidate cell 245 rows 177263
+candidate cell 246 rows 177589
+candidate cell 247 rows 177802
+candidate cell 248 rows 178082
+candidate cell 249 rows 178254
+candidate cell 250 rows 178530
+candidate cell 251 rows 178701
+candidate cell 252 rows 180162
+candidate cell 253 rows 180879
+candidate cell 254 rows 182046
+candidate cell 255 rows 182769
+candidate cell 256 rows 183902
+candidate cell 257 rows 184612
+candidate cell 258 rows 185448
+candidate cell 259 rows 186002
+candidate cell 260 rows 186761
+candidate cell 261 rows 187260
+candidate cell 262 rows 188006
+candidate cell 263 rows 188497
+candidate cell 264 rows 189123
+candidate cell 265 rows 189528
+candidate cell 266 rows 190092
+candidate cell 267 rows 190447
+candidate cell 268 rows 191001
+candidate cell 269 rows 191353
+candidate cell 270 rows 191871
+candidate cell 271 rows 192205
+candidate cell 272 rows 192664
+candidate cell 273 rows 192950
+candidate cell 274 rows 193402
+candidate cell 275 rows 193684
+candidate cell 276 rows 194010
+candidate cell 277 rows 194223
+candidate cell 278 rows 194503
+candidate cell 279 rows 194675
+candidate cell 280 rows 194953
+candidate cell 281 rows 195124
+fit fold 0 {'export_max_delta': 1.4432899320127035e-15, 'iterations': 113, 'fit_rows': 154740, 'positive': 43468, 'negative': 111272, 'class_weights': {'0': 0.6953231720468761, '1': 1.7799300634949848}}
+fit fold 1 {'export_max_delta': 1.2212453270876722e-15, 'iterations': 113, 'fit_rows': 155653, 'positive': 43324, 'negative': 112329, 'class_weights': {'0': 0.692844234347319, '1': 1.7963830671221495}}
+fit fold 2 {'export_max_delta': 1.4432899320127035e-15, 'iterations': 116, 'fit_rows': 159633, 'positive': 42866, 'negative': 116767, 'class_weights': {'0': 0.6835535724990793, '1': 1.8620001866280969}}
+fit fold 3 {'export_max_delta': 9.992007221626409e-16, 'iterations': 120, 'fit_rows': 153946, 'positive': 42160, 'negative': 111786, 'class_weights': {'0': 0.6885745978924016, '1': 1.825735294117647}}
+fit fold 4 {'export_max_delta': 1.2212453270876722e-15, 'iterations': 105, 'fit_rows': 156524, 'positive': 40766, 'negative': 115758, 'class_weights': {'0': 0.6760828625235404, '1': 1.9197860962566844}}
+scored cell 0
+scored cell 1
+scored cell 2
+scored cell 3
+scored cell 4
+scored cell 5
+scored cell 6
+scored cell 7
+scored cell 8
+scored cell 9
+scored cell 10
+scored cell 11
+scored cell 12
+scored cell 13
+scored cell 14
+scored cell 15
+scored cell 16
+scored cell 17
+scored cell 18
+scored cell 19
+scored cell 20
+scored cell 21
+scored cell 22
+scored cell 23
+scored cell 24
+scored cell 25
+scored cell 26
+scored cell 27
+scored cell 28
+scored cell 29
+scored cell 30
+scored cell 31
+scored cell 32
+scored cell 33
+scored cell 34
+scored cell 35
+scored cell 36
+scored cell 37
+scored cell 38
+scored cell 39
+scored cell 40
+scored cell 41
+scored cell 42
+scored cell 43
+scored cell 44
+scored cell 45
+scored cell 46
+scored cell 47
+scored cell 48
+scored cell 49
+scored cell 50
+scored cell 51
+scored cell 52
+scored cell 53
+scored cell 54
+scored cell 55
+scored cell 56
+scored cell 57
+scored cell 58
+scored cell 59
+scored cell 60
+scored cell 61
+scored cell 62
+scored cell 63
+scored cell 64
+scored cell 65
+scored cell 66
+scored cell 67
+scored cell 68
+scored cell 69
+scored cell 70
+scored cell 71
+scored cell 72
+scored cell 73
+scored cell 74
+scored cell 75
+scored cell 76
+scored cell 77
+scored cell 78
+scored cell 79
+scored cell 80
+scored cell 81
+scored cell 82
+scored cell 83
+scored cell 84
+scored cell 85
+scored cell 86
+scored cell 87
+scored cell 88
+scored cell 89
+scored cell 90
+scored cell 91
+scored cell 92
+scored cell 93
+scored cell 94
+scored cell 95
+scored cell 96
+scored cell 97
+scored cell 98
+scored cell 99
+scored cell 100
+scored cell 101
+scored cell 102
+scored cell 103
+scored cell 104
+scored cell 105
+scored cell 106
+scored cell 107
+scored cell 108
+scored cell 109
+scored cell 110
+scored cell 111
+scored cell 112
+scored cell 113
+scored cell 114
+scored cell 115
+scored cell 116
+scored cell 117
+scored cell 118
+scored cell 119
+scored cell 120
+scored cell 121
+scored cell 122
+scored cell 123
+scored cell 124
+scored cell 125
+scored cell 126
+scored cell 127
+scored cell 128
+scored cell 129
+scored cell 130
+scored cell 131
+scored cell 132
+scored cell 133
+scored cell 134
+scored cell 135
+scored cell 136
+scored cell 137
+scored cell 138
+scored cell 139
+scored cell 140
+scored cell 141
+scored cell 142
+scored cell 143
+scored cell 144
+scored cell 145
+scored cell 146
+scored cell 147
+scored cell 148
+scored cell 149
+scored cell 150
+scored cell 151
+scored cell 152
+scored cell 153
+scored cell 154
+scored cell 155
+scored cell 156
+scored cell 157
+scored cell 158
+scored cell 159
+scored cell 160
+scored cell 161
+scored cell 162
+scored cell 163
+scored cell 164
+scored cell 165
+scored cell 166
+scored cell 167
+scored cell 168
+scored cell 169
+scored cell 170
+scored cell 171
+scored cell 172
+scored cell 173
+scored cell 174
+scored cell 175
+scored cell 176
+scored cell 177
+scored cell 178
+scored cell 179
+scored cell 180
+scored cell 181
+scored cell 182
+scored cell 183
+scored cell 184
+scored cell 185
+scored cell 186
+scored cell 187
+scored cell 188
+scored cell 189
+scored cell 190
+scored cell 191
+scored cell 192
+scored cell 193
+scored cell 194
+scored cell 195
+scored cell 196
+scored cell 197
+scored cell 198
+scored cell 199
+scored cell 200
+scored cell 201
+scored cell 202
+scored cell 203
+scored cell 204
+scored cell 205
+scored cell 206
+scored cell 207
+scored cell 208
+scored cell 209
+scored cell 210
+scored cell 211
+scored cell 212
+scored cell 213
+scored cell 214
+scored cell 215
+scored cell 216
+scored cell 217
+scored cell 218
+scored cell 219
+scored cell 220
+scored cell 221
+scored cell 222
+scored cell 223
+scored cell 224
+scored cell 225
+scored cell 226
+scored cell 227
+scored cell 228
+scored cell 229
+scored cell 230
+scored cell 231
+scored cell 232
+scored cell 233
+scored cell 234
+scored cell 235
+scored cell 236
+scored cell 237
+scored cell 238
+scored cell 239
+scored cell 240
+scored cell 241
+scored cell 242
+scored cell 243
+scored cell 244
+scored cell 245
+scored cell 246
+scored cell 247
+scored cell 248
+scored cell 249
+scored cell 250
+scored cell 251
+scored cell 252
+scored cell 253
+scored cell 254
+scored cell 255
+scored cell 256
+scored cell 257
+scored cell 258
+scored cell 259
+scored cell 260
+scored cell 261
+scored cell 262
+scored cell 263
+scored cell 264
+scored cell 265
+scored cell 266
+scored cell 267
+scored cell 268
+scored cell 269
+scored cell 270
+scored cell 271
+scored cell 272
+scored cell 273
+scored cell 274
+scored cell 275
+scored cell 276
+scored cell 277
+scored cell 278
+scored cell 279
+scored cell 280
+scored cell 281
+COMPLETE {'tokens': {'precision': 0.588957055214724, 'recall': 0.6689895470383276, 'f1': 0.6264274061990214, 'fpr': 0.01744337412132257, 'tp': 192, 'fp': 134, 'fn': 95, 'tn': 7548, 'auc': 0.9615141781276109}, 'spans': {'precision': 0.5897435897435898, 'recall': 0.4791666666666667, 'f1': 0.5287356321839081, 'tp': 46, 'fp': 32, 'fn': 50, 'iou_threshold': 0.5, 'recall_containment': 0.2604166666666667, 'mean_width_ratio': 2.0985637065637066}, 'answers': {'tp': 49, 'fp': 14, 'fn': 47, 'tn': 71, 'precision': 0.7777777777777778, 'recall': 0.5104166666666666, 'f1': 0.6163522012578616, 'fpr': 0.16470588235294117, 'auc': 0.7338235294117647, 'threshold': 0.5794392523364486}, 'verdicts': {'tp': 58, 'fp': 20, 'fn': 38, 'tn': 65, 'precision': 0.7436, 'recall': 0.6042, 'f1': 0.6667, 'fpr': 0.2353, 'flagged_share': 0.4309}}

@@ -1,0 +1,9 @@
+{
+  "run_id": "P8-guard-provenance-correction",
+  "date": "2026-10-19",
+  "guard_commit": "5ff79f9a7bed33c00c6278f67d68ddff73f8325c",
+  "guard_commit_date": "2026-10-18T23:34:59+00:00",
+  "verified_by": "git show -s --format=%H %cI 5ff79f9",
+  "actual_read_time": null,
+  "scope": "Correct prose SHA/year concatenation only; no reinterpretation of historical read or model changes"
+}

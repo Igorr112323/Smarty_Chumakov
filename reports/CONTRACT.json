@@ -1138,5 +1138,15 @@
       "duration_s": 0.05
     }
   ],
-  "rule": "статус «соответствует» ставится только по факту выполненной проверки; «не измерено» допустимо лишь с обоснованием"
+  "rule": "статус «соответствует» ставится только по факту выполненной проверки; «не измерено» допустимо лишь с обоснованием",
+  "provenance": "local",
+  "provenance_note": "Historical locally generated report, not a CI artifact; no acceptance claim for frozen P5.",
+  "evidence_context": {
+    "run_id": "historical-local-unrecorded:5ff79f9a7bed33c00c6278f67d68ddff73f8325c",
+    "date": "2026-10-18",
+    "status": "NON_AUTHORITATIVE historical/reference; consult current indices",
+    "successor": "reports/EXPERIMENTS_INDEX.md",
+    "source_commit": "5ff79f9a7bed33c00c6278f67d68ddff73f8325c",
+    "limitation": "Original remote run not recorded; do not misrepresent as current independent measurement"
+  }
 }

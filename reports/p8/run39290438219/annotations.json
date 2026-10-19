@@ -1,0 +1,26 @@
+[
+  {
+    "path": ".github",
+    "blob_href": "https://github.com/Igorr112323/Smarty_Chumakov/blob/879cd14f69b3c63a47fbb29f55cc4e8a55d5acf5/.github",
+    "start_line": 2,
+    "start_column": null,
+    "end_line": 2,
+    "end_column": null,
+    "annotation_level": "warning",
+    "title": "",
+    "message": "Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@v4, actions/download-artifact@v4, actions/upload-artifact@v4. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/",
+    "raw_details": ""
+  },
+  {
+    "path": ".github",
+    "blob_href": "https://github.com/Igorr112323/Smarty_Chumakov/blob/879cd14f69b3c63a47fbb29f55cc4e8a55d5acf5/.github",
+    "start_line": 7,
+    "start_column": null,
+    "end_line": 7,
+    "end_column": null,
+    "annotation_level": "notice",
+    "title": "P8 final archive",
+    "message": "{\"runs\": {\"evaluation\": {\"conclusion\": \"success\", \"headSha\": \"dd4454b05867495018abe5a2f657fc4d6d0fd9a6\", \"status\": \"completed\", \"url\": \"https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39266451529\"}, \"windows\": {\"conclusion\": \"failure\", \"headSha\": \"654a48e3f074654d62fb4adb38a6c37555c53681\", \"status\": \"completed\", \"url\": \"https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39271014161\"}, \"ci\": {\"conclusion\": \"success\", \"headSha\": \"879cd14f69b3c63a47fbb29f55cc4e8a55d5acf5\", \"status\": \"completed\", \"url\": \"https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39290451085\"}}, \"ci_runs\": [39290451085, 39290438244], \"windows_run\": 39271014161, \"tests_excluded\": false, \"documentation_source\": \"879cd14f69b3c63a47fbb29f55cc4e8a55d5acf5\", \"release_tag\": \"v1.3.1-rc.p8.20261019\", \"stable_promotion\": false, \"execution_freeze_status\": \"NOT ACHIEVED: cancelled early CI always-contract bypass caused pre-seal temporary synthetic ParticipationModel.fit\", \"windows_source_failure_scope\": \"Publication only; all build/test/size/offline checks SUCCESS, original failure retained\", \"publication_run\": \"39290438219\", \"sha256\": \"58143baac4a39d86aeaa46879c497d5195f0202f58174c91af746d94dfe2f158\", \"bytes\": 65248935}",
+    "raw_details": ""
+  }
+]

@@ -1,0 +1,15 @@
+{
+  "run_id": "39177127063",
+  "date": "2026-10-18T23:35:02Z",
+  "commit": "5ff79f9a7bed33c00c6278f67d68ddff73f8325c",
+  "family": "P1",
+  "workflow": "p1-public-replay.yml",
+  "record_kind": "measurement/delivery",
+  "status": "completed",
+  "outcome": "success",
+  "url": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39177127063",
+  "canonical_directories": [
+    "spanverify-module/reports/experiments/p1_public_replay/run39177127063"
+  ],
+  "receipt": "reports/measurements/run39177127063/receipt.json"
+}

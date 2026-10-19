@@ -1,0 +1,272 @@
+[
+  {
+    "file": "/home/runner/work/Smarty_Chumakov/Smarty_Chumakov/spanverify-module/spanverify/engine.py",
+    "line": 479,
+    "function": "verify",
+    "primitive_calls": 1,
+    "calls": 1,
+    "self_seconds": 1.5883e-05,
+    "cumulative_seconds": 74.947976729
+  },
+  {
+    "file": "/home/runner/work/Smarty_Chumakov/Smarty_Chumakov/spanverify-module/spanverify/engine.py",
+    "line": 761,
+    "function": "_features",
+    "primitive_calls": 1,
+    "calls": 1,
+    "self_seconds": 5.919e-06,
+    "cumulative_seconds": 74.201960967
+  },
+  {
+    "file": "/home/runner/work/Smarty_Chumakov/Smarty_Chumakov/spanverify-module/spanverify/features.py",
+    "line": 1718,
+    "function": "extract_features",
+    "primitive_calls": 1,
+    "calls": 1,
+    "self_seconds": 1.0275e-05,
+    "cumulative_seconds": 74.201955048
+  },
+  {
+    "file": "/home/runner/work/Smarty_Chumakov/Smarty_Chumakov/spanverify-module/spanverify/features.py",
+    "line": 416,
+    "function": "demo_features",
+    "primitive_calls": 1,
+    "calls": 1,
+    "self_seconds": 0.814895251,
+    "cumulative_seconds": 74.20194477300001
+  },
+  {
+    "file": "/home/runner/work/Smarty_Chumakov/Smarty_Chumakov/spanverify-module/spanverify/features.py",
+    "line": 523,
+    "function": "_normalised_support",
+    "primitive_calls": 1,
+    "calls": 1,
+    "self_seconds": 67.440562936,
+    "cumulative_seconds": 67.76344063500001
+  },
+  {
+    "file": "/home/runner/work/Smarty_Chumakov/Smarty_Chumakov/spanverify-module/spanverify/features.py",
+    "line": 666,
+    "function": "similarities",
+    "primitive_calls": 181821,
+    "calls": 181821,
+    "self_seconds": 0.567887169,
+    "cumulative_seconds": 2.0715140190000003
+  },
+  {
+    "file": "/home/runner/work/Smarty_Chumakov/Smarty_Chumakov/spanverify-module/spanverify/features.py",
+    "line": 546,
+    "function": "_group_number_values",
+    "primitive_calls": 3,
+    "calls": 3,
+    "self_seconds": 0.373933504,
+    "cumulative_seconds": 1.7126763520000001
+  },
+  {
+    "file": "/home/runner/work/Smarty_Chumakov/Smarty_Chumakov/spanverify-module/spanverify/core.py",
+    "line": 185,
+    "function": "number_value",
+    "primitive_calls": 1252680,
+    "calls": 1252680,
+    "self_seconds": 0.766253209,
+    "cumulative_seconds": 1.516322795
+  },
+  {
+    "file": "/home/runner/work/Smarty_Chumakov/Smarty_Chumakov/spanverify-module/spanverify/features.py",
+    "line": 1064,
+    "function": "_apply_number_consistency",
+    "primitive_calls": 1,
+    "calls": 1,
+    "self_seconds": 0.085231095,
+    "cumulative_seconds": 0.9755368200000001
+  },
+  {
+    "file": "/home/runner/work/Smarty_Chumakov/Smarty_Chumakov/spanverify-module/spanverify/core.py",
+    "line": 77,
+    "function": "word",
+    "primitive_calls": 2606411,
+    "calls": 2606411,
+    "self_seconds": 0.608613516,
+    "cumulative_seconds": 0.950548995
+  },
+  {
+    "file": "/home/runner/work/Smarty_Chumakov/Smarty_Chumakov/spanverify-module/spanverify/features.py",
+    "line": 1043,
+    "function": "_apply_number_attribution",
+    "primitive_calls": 1,
+    "calls": 1,
+    "self_seconds": 0.00042525200000000004,
+    "cumulative_seconds": 0.8682791540000001
+  },
+  {
+    "file": "/home/runner/work/Smarty_Chumakov/Smarty_Chumakov/spanverify-module/spanverify/features.py",
+    "line": 975,
+    "function": "_attribute_tokens",
+    "primitive_calls": 1,
+    "calls": 1,
+    "self_seconds": 0.08902976,
+    "cumulative_seconds": 0.867435602
+  },
+  {
+    "file": "/home/runner/work/Smarty_Chumakov/Smarty_Chumakov/spanverify-module/spanverify/core.py",
+    "line": 110,
+    "function": "tokenize_with_offsets",
+    "primitive_calls": 4,
+    "calls": 4,
+    "self_seconds": 0.516145264,
+    "cumulative_seconds": 0.7465589880000001
+  },
+  {
+    "file": "/home/runner/work/Smarty_Chumakov/Smarty_Chumakov/spanverify-module/spanverify/features.py",
+    "line": 640,
+    "function": "_candidates",
+    "primitive_calls": 181821,
+    "calls": 181821,
+    "self_seconds": 0.5512869300000001,
+    "cumulative_seconds": 0.743664226
+  },
+  {
+    "file": "/home/runner/work/Smarty_Chumakov/Smarty_Chumakov/spanverify-module/spanverify/features.py",
+    "line": 598,
+    "function": "_jaccard",
+    "primitive_calls": 981812,
+    "calls": 981812,
+    "self_seconds": 0.5329035750000001,
+    "cumulative_seconds": 0.6099904
+  },
+  {
+    "file": "/home/runner/work/Smarty_Chumakov/Smarty_Chumakov/spanverify-module/spanverify/features.py",
+    "line": 411,
+    "function": "_is_content",
+    "primitive_calls": 565730,
+    "calls": 565730,
+    "self_seconds": 0.23902804100000002,
+    "cumulative_seconds": 0.510121573
+  },
+  {
+    "file": "~",
+    "line": 0,
+    "function": "<method 'strip' of 'str' objects>",
+    "primitive_calls": 5398736,
+    "calls": 5398736,
+    "self_seconds": 0.353548376,
+    "cumulative_seconds": 0.353548376
+  },
+  {
+    "file": "/home/runner/work/Smarty_Chumakov/Smarty_Chumakov/spanverify-module/spanverify/features.py",
+    "line": 533,
+    "function": "<listcomp>",
+    "primitive_calls": 1,
+    "calls": 1,
+    "self_seconds": 0.047760021,
+    "cumulative_seconds": 0.27662764100000004
+  },
+  {
+    "file": "~",
+    "line": 0,
+    "function": "<method 'lower' of 'str' objects>",
+    "primitive_calls": 2525562,
+    "calls": 2525562,
+    "self_seconds": 0.24661592100000002,
+    "cumulative_seconds": 0.24661592100000002
+  },
+  {
+    "file": "~",
+    "line": 0,
+    "function": "<built-in method builtins.len>",
+    "primitive_calls": 5176308,
+    "calls": 5176308,
+    "self_seconds": 0.22549233300000002,
+    "cumulative_seconds": 0.22549233300000002
+  },
+  {
+    "file": "/home/runner/work/Smarty_Chumakov/Smarty_Chumakov/spanverify-module/spanverify/lexicon.py",
+    "line": 192,
+    "function": "find_phrase_hits",
+    "primitive_calls": 1,
+    "calls": 1,
+    "self_seconds": 0.134662879,
+    "cumulative_seconds": 0.22056536300000001
+  },
+  {
+    "file": "~",
+    "line": 0,
+    "function": "<method 'append' of 'list' objects>",
+    "primitive_calls": 3596614,
+    "calls": 3596614,
+    "self_seconds": 0.168802753,
+    "cumulative_seconds": 0.168802753
+  },
+  {
+    "file": "<string>",
+    "line": 2,
+    "function": "__init__",
+    "primitive_calls": 509468,
+    "calls": 509468,
+    "self_seconds": 0.14301471600000001,
+    "cumulative_seconds": 0.14301471600000001
+  },
+  {
+    "file": "/home/runner/work/Smarty_Chumakov/Smarty_Chumakov/spanverify-module/spanverify/features.py",
+    "line": 825,
+    "function": "_subject_words",
+    "primitive_calls": 24250,
+    "calls": 24250,
+    "self_seconds": 0.086404036,
+    "cumulative_seconds": 0.14003536700000002
+  },
+  {
+    "file": "~",
+    "line": 0,
+    "function": "<built-in method builtins.min>",
+    "primitive_calls": 1266640,
+    "calls": 1266640,
+    "self_seconds": 0.128180981,
+    "cumulative_seconds": 0.128180981
+  },
+  {
+    "file": "~",
+    "line": 0,
+    "function": "<method 'get' of 'dict' objects>",
+    "primitive_calls": 1939397,
+    "calls": 1939397,
+    "self_seconds": 0.12084623200000001,
+    "cumulative_seconds": 0.12084623200000001
+  },
+  {
+    "file": "~",
+    "line": 0,
+    "function": "<built-in method builtins.max>",
+    "primitive_calls": 1064622,
+    "calls": 1064622,
+    "self_seconds": 0.111261095,
+    "cumulative_seconds": 0.111261095
+  },
+  {
+    "file": "~",
+    "line": 0,
+    "function": "<method 'replace' of 'str' objects>",
+    "primitive_calls": 1608247,
+    "calls": 1608247,
+    "self_seconds": 0.09818088700000001,
+    "cumulative_seconds": 0.09818088700000001
+  },
+  {
+    "file": "/home/runner/work/Smarty_Chumakov/Smarty_Chumakov/spanverify-module/spanverify/lexicon.py",
+    "line": 198,
+    "function": "<listcomp>",
+    "primitive_calls": 1,
+    "calls": 1,
+    "self_seconds": 0.042640483,
+    "cumulative_seconds": 0.08590189300000001
+  },
+  {
+    "file": "~",
+    "line": 0,
+    "function": "<method 'isdigit' of 'str' objects>",
+    "primitive_calls": 1333494,
+    "calls": 1333494,
+    "self_seconds": 0.069528544,
+    "cumulative_seconds": 0.069528544
+  }
+]

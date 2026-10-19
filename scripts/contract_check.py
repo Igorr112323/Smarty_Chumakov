@@ -35,10 +35,8 @@ import os
 import platform
 import re
 import shutil
-import statistics
 import subprocess
 import sys
-import sysconfig
 import tempfile
 import time
 from collections.abc import Callable
@@ -61,9 +59,7 @@ EXTRACTION_DOC = ROOT / "docs" / "ДОГОВОР_ИЗВЛЕЧЕНИЕ.md"
 CLOSING_DOC = ROOT / "docs" / "ЗАКРЫТИЕ_ДОГОВОРА_ПО_КОДУ.md"
 REPORT_APPENDIX_DOC = ROOT / "docs" / "ОТЧЁТ_ПРИЛОЖЕНИЕ_СООТВЕТСТВИЕ.md"
 CONTRACT_PDF_NAME = "Договор_0117812 (25).pdf"
-CONTRACT_PDF_SHA256 = (
-    "e5eb6ad8522fa70135f75bf22b0b5f3464fcc17d9c6f04d81b48976a42e69cd5"
-)
+CONTRACT_PDF_SHA256 = "e5eb6ad8522fa70135f75bf22b0b5f3464fcc17d9c6f04d81b48976a42e69cd5"
 CONTRACT_PDF_BYTES = 5_019_351
 CONTRACT_PDF_PAGES = 32
 CONTRACT_EXE_MAX_MB = 9.0
@@ -111,15 +107,36 @@ CONTRACT_TEXT_MARKERS: dict[str, str] = {
 #: перечисляются — договор требует их представления в АС «Фонд-М» вместе с
 #: отчётностью, и подписания УКЭП программно выполнить нельзя.
 GRANTEE_ZONE: list[tuple[str, str]] = [
-    ("Преакселерация", "свидетельство о прохождении преакселерационной программы или акселератора вуза (Приложение № 4, этап 2)"),
-    ("Бизнес-план", "бизнес-план инновационного проекта по Приложению № 11 (не менее 20 страниц) либо заявка на «Студенческий стартап»/«Старт»"),
+    (
+        "Преакселерация",
+        "свидетельство о прохождении преакселерационной программы или акселератора вуза (Приложение № 4, этап 2)",
+    ),
+    (
+        "Бизнес-план",
+        "бизнес-план инновационного проекта по Приложению № 11 (не менее 20 страниц) либо заявка на «Студенческий стартап»/«Старт»",
+    ),
     ("Дорожная карта", "дорожная карта развития проекта по Приложению № 12"),
-    ("РИД", "заявка на регистрацию прав на результат интеллектуальной деятельности и переписка с Роспатентом (ТЗ п. 6)"),
-    ("Оригинальность отчёта", "проверка текста отчёта во внешней системе; требуется не менее 80 % (Приложение № 10, п. 4)"),
-    ("Финансовый отчёт", "отчёт о расходовании средств гранта по каждому этапу (Приложение № 4)"),
+    (
+        "РИД",
+        "заявка на регистрацию прав на результат интеллектуальной деятельности и переписка с Роспатентом (ТЗ п. 6)",
+    ),
+    (
+        "Оригинальность отчёта",
+        "проверка текста отчёта во внешней системе; требуется не менее 80 % (Приложение № 10, п. 4)",
+    ),
+    (
+        "Финансовый отчёт",
+        "отчёт о расходовании средств гранта по каждому этапу (Приложение № 4)",
+    ),
     ("Акт", "акт о выполнении Работ по каждому этапу (Приложения № 8 и № 9)"),
-    ("Отчёт о достижении значений результата", "по Приложению № 2 к договору: «Завершённый проект», план 0 (2026) / 1 (2027)"),
-    ("Подача в АС «Фонд-М»", "отчётность представляется не позднее чем за 20 календарных дней до окончания этапа и подписывается УКЭП (п. 6.1)"),
+    (
+        "Отчёт о достижении значений результата",
+        "по Приложению № 2 к договору: «Завершённый проект», план 0 (2026) / 1 (2027)",
+    ),
+    (
+        "Подача в АС «Фонд-М»",
+        "отчётность представляется не позднее чем за 20 календарных дней до окончания этапа и подписывается УКЭП (п. 6.1)",
+    ),
 ]
 
 STATUS_OK = "соответствует"
@@ -168,6 +185,7 @@ def run_module(args: list[str], timeout: int = 900) -> subprocess.CompletedProce
         text=True,
         timeout=timeout,
         env={**os.environ, "PYTHONPATH": str(MODULE), "PYTHONUTF8": "1"},
+        check=False,
     )
 
 
@@ -181,6 +199,7 @@ def run_python(
         text=True,
         timeout=timeout,
         env={**os.environ, "PYTHONPATH": str(MODULE), "PYTHONUTF8": "1"},
+        check=False,
     )
 
 
@@ -258,7 +277,11 @@ def code_limits() -> dict[str, dict[str, Any]]:
     corpus = MODULE / "data" / "corpus_a" / "pairs.jsonl"
     pairs = None
     if corpus.is_file():
-        pairs = sum(1 for line in corpus.read_text(encoding="utf-8").splitlines() if line.strip())
+        pairs = sum(
+            1
+            for line in corpus.read_text(encoding="utf-8").splitlines()
+            if line.strip()
+        )
     out["пар_в_наборе"] = {
         "value": pairs,
         "unit": "пар",
@@ -272,7 +295,7 @@ def read_extraction() -> dict[str, Any] | None:
     if not EXTRACTION_DOC.is_file():
         return None
     text = EXTRACTION_DOC.read_text(encoding="utf-8")
-    match = re.search(r"```json\n(.*?)\n```", text, re.S)
+    match = re.search(r"```json\n(.*?)\n```", text, re.DOTALL)
     if not match:
         return None
     try:
@@ -300,7 +323,7 @@ def sha256_file(path: Path) -> str:
 def contract_pdf_text(path: Path) -> str | None:
     """Текст подписанного PDF, если есть pypdf. Без библиотеки — None."""
     try:
-        from pypdf import PdfReader  # noqa: PLC0415
+        from pypdf import PdfReader
     except ImportError:
         return None
     reader = PdfReader(str(path))
@@ -338,6 +361,7 @@ def artifact_payload(
     """Стандартная схема артефакта: commit, seed, mode, dataset, metrics, note, gate."""
     return {
         "id": check_id,
+        "run_id": os.environ.get("GITHUB_RUN_ID", "local-contract:" + git_commit()),
         "commit": git_commit(),
         "seed": SEED,
         "mode": fact.pop("mode", "demo"),
@@ -366,7 +390,17 @@ def dir_size_mb(path: Path) -> float:
 #: .gitignore), но на рабочей машине занимают десятки мегабайт: считать их
 #: «поставкой без весов» — значит мерить машину, а не продукт.
 DELIVERY_SKIP_DIRS = frozenset(
-    {".git", ".venv", "venv", "__pycache__", ".ruff_cache", ".pytest_cache", ".mypy_cache", "build", "dist"}
+    {
+        ".git",
+        ".venv",
+        "venv",
+        "__pycache__",
+        ".ruff_cache",
+        ".pytest_cache",
+        ".mypy_cache",
+        "build",
+        "dist",
+    }
 )
 #: Пути относительно каталога модуля, которые в поставку не входят: сырые внешние
 #: данные (лицензия не подтверждена, каталог в .gitignore, в клон не попадает).
@@ -388,7 +422,9 @@ def delivery_size_mb(root: Path) -> float:
         if any(part in DELIVERY_SKIP_DIRS for part in rel.parts):
             continue
         text = rel.as_posix()
-        if any(text == skip or text.startswith(skip + "/") for skip in DELIVERY_SKIP_PATHS):
+        if any(
+            text == skip or text.startswith(skip + "/") for skip in DELIVERY_SKIP_PATHS
+        ):
             continue
         try:
             total += item.stat().st_size
@@ -415,7 +451,7 @@ class Check:
     requirement: str
     how: str
     command: str
-    runner: Callable[["Runner"], tuple[str, dict[str, Any], str]]
+    runner: Callable[[Runner], tuple[str, dict[str, Any], str]]
     heavy: bool = False
     #: Проверка выполняется после перегенерации документа соответствия: она читает
     #: сам документ, а тот собирается из CONTRACT.json — иначе получается
@@ -742,6 +778,7 @@ print(json.dumps({{
             text=True,
             timeout=900,
             env={**os.environ, "PYTHONPATH": str(MODULE), "PYTHONUTF8": "1"},
+            check=False,
         )
         payload: dict[str, Any] = {
             "build_returncode": proc.returncode,
@@ -762,6 +799,7 @@ print(json.dumps({{
                 text=True,
                 timeout=900,
                 env={**os.environ, "PYTHONUTF8": "1"},
+                check=False,
             )
             payload["smoke_returncode"] = smoke.returncode
             payload["smoke_tail"] = (smoke.stdout or smoke.stderr)[-300:]
@@ -771,10 +809,14 @@ print(json.dumps({{
             payload["copy_sha256_equal"] = sha256_of(copied) == payload["pyz_sha256"]
         payload["module_size_mb"] = delivery_size_mb(MODULE)
         payload["module_size_without_data_mb"] = round(
-            delivery_size_mb(MODULE / "spanverify") + delivery_size_mb(MODULE / "config"), 3
+            delivery_size_mb(MODULE / "spanverify")
+            + delivery_size_mb(MODULE / "config"),
+            3,
         )
         data_dir = MODULE / "data"
-        payload["data_dir_mb"] = delivery_size_mb(data_dir) if data_dir.is_dir() else None
+        payload["data_dir_mb"] = (
+            delivery_size_mb(data_dir) if data_dir.is_dir() else None
+        )
         payload["size_rule"] = (
             "размер поставки — файлы клона без каталогов разработки (.venv, кэши, build/dist) "
             "и без сырых внешних данных (data/external)"
@@ -794,6 +836,7 @@ print(json.dumps({{
             capture_output=True,
             text=True,
             timeout=120,
+            check=False,
         )
         if info.returncode != 0:
             self.shared["release"] = {
@@ -827,6 +870,7 @@ print(json.dumps({{
             capture_output=True,
             text=True,
             timeout=120,
+            check=False,
         )
         workflow_runs = json.loads(runs.stdout) if runs.returncode == 0 else []
         result: dict[str, Any] = {
@@ -865,6 +909,7 @@ print(json.dumps({{
                 capture_output=True,
                 text=True,
                 timeout=600,
+                check=False,
             )
             result["download_returncode"] = download.returncode
             pyz = workdir / "spanverify.pyz"
@@ -895,6 +940,7 @@ print(json.dumps({{
                     capture_output=True,
                     text=True,
                     timeout=300,
+                    check=False,
                 )
                 result["checksum_verified"] = verify.returncode == 0
                 result["checksum_tail"] = (
@@ -928,6 +974,7 @@ print(json.dumps({{
             capture_output=True,
             text=True,
             timeout=900,
+            check=False,
         )
         count = 0
         for line in collected.stdout.splitlines():
@@ -1166,6 +1213,7 @@ def check_metric_groups(runner: Runner) -> tuple[str, dict[str, Any], str]:
         capture_output=True,
         text=True,
         timeout=600,
+        check=False,
     )
     if proc.returncode != 0:
         problems.append("тест схемы фрагмента не прошёл")
@@ -1366,8 +1414,10 @@ def check_delivery(runner: Runner) -> tuple[str, dict[str, Any], str]:
         return (
             STATUS_UNKNOWN,
             fact,
-            "переносимый пакет собран, смоук-тест и сверка суммы копии пройдены; "
-            "опубликованный релиз недоступен из окружения прогона, поэтому размер .exe и его сумма не проверены",
+            (
+                "переносимый пакет собран, смоук-тест и сверка суммы копии пройдены; "
+                "опубликованный релиз недоступен из окружения прогона, поэтому размер .exe и его сумма не проверены"
+            ),
         )
     checksum = release.get("checksum_verified")
     if checksum is True:
@@ -1455,9 +1505,11 @@ def check_delivery_size(runner: Runner) -> tuple[str, dict[str, Any], str]:
         return (
             STATUS_OK,
             fact,
-            f"второй вариант поставки выполнен: пакет {pyz_bytes} байт "
-            f"({round(pyz_bytes / 1_048_576, 4)} МиБ / {round(pyz_bytes / 1_000_000, 4)} МБ) "
-            f"укладывается в 0,6 МБ при любой трактовке; опубликованный файл .exe — {exe_bytes} байт",
+            (
+                f"второй вариант поставки выполнен: пакет {pyz_bytes} байт "
+                f"({round(pyz_bytes / 1_048_576, 4)} МиБ / {round(pyz_bytes / 1_000_000, 4)} МБ) "
+                f"укладывается в 0,6 МБ при любой трактовке; опубликованный файл .exe — {exe_bytes} байт"
+            ),
         )
     if exe_ok and exe_ok_decimal:
         return (
@@ -1468,9 +1520,11 @@ def check_delivery_size(runner: Runner) -> tuple[str, dict[str, Any], str]:
     return (
         STATUS_FAIL,
         fact,
-        f"пакет {pyz_bytes} байт не укладывается в 0,6 МБ, файл {exe_bytes} байт — "
-        f"в 9 МБ ({'МиБ' if exe_ok else ''}{'МБ' if exe_ok_decimal else ''}): ни один вариант не выполнен "
-        "при строгой трактовке мегабайта",
+        (
+            f"пакет {pyz_bytes} байт не укладывается в 0,6 МБ, файл {exe_bytes} байт — "
+            f"в 9 МБ ({'МиБ' if exe_ok else ''}{'МБ' if exe_ok_decimal else ''}): ни один вариант не выполнен "
+            "при строгой трактовке мегабайта"
+        ),
     )
 
 
@@ -1581,6 +1635,7 @@ def check_build_checksum(runner: Runner) -> tuple[str, dict[str, Any], str]:
             capture_output=True,
             text=True,
             timeout=300,
+            check=False,
         ).returncode
         != 0
     ):
@@ -1593,7 +1648,7 @@ def check_build_checksum(runner: Runner) -> tuple[str, dict[str, Any], str]:
         "workflow_has_sha256sums": "SHA256SUMS" in text,
         "checksum_helper": str(helper.relative_to(ROOT)) if helper.is_file() else None,
         "release_tag": release.get("tag"),
-        "release_assets": list((release.get("assets") or {})),
+        "release_assets": list(release.get("assets") or {}),
         "release_checksum_verified": release.get("checksum_verified"),
         "dataset": "build-artifacts",
     }
@@ -1603,9 +1658,11 @@ def check_build_checksum(runner: Runner) -> tuple[str, dict[str, Any], str]:
         return (
             STATUS_OK,
             fact,
-            "сборка автоматическая, SHA256SUMS.txt формируется и публикуется в релизе; "
-            "инструмент сверки проверен самопроверкой; сверка суммы опубликованного файла в этом окружении "
-            "не выполнялась (файлы релиза недоступны из сети прогона) — это указано как ограничение",
+            (
+                "сборка автоматическая, SHA256SUMS.txt формируется и публикуется в релизе; "
+                "инструмент сверки проверен самопроверкой; сверка суммы опубликованного файла в этом окружении "
+                "не выполнялась (файлы релиза недоступны из сети прогона) — это указано как ограничение"
+            ),
         )
     return STATUS_OK, fact, "сборка автоматическая, суммы публикуются и сверены"
 
@@ -1640,9 +1697,11 @@ def check_hf_footprint(runner: Runner) -> tuple[str, dict[str, Any], str]:
         return (
             STATUS_UNKNOWN,
             fact,
-            "прогон не выполнен: в этом окружении нет torch/transformers и кэша "
-            "весов модели; нужна машина с доступом к хранилищу весов — артефакт "
-            "создаёт CI-задание hf-footprint (.github/workflows/hf-footprint.yml)",
+            (
+                "прогон не выполнен: в этом окружении нет torch/transformers и кэша "
+                "весов модели; нужна машина с доступом к хранилищу весов — артефакт "
+                "создаёт CI-задание hf-footprint (.github/workflows/hf-footprint.yml)"
+            ),
         )
     metrics = payload["metrics"]
     fact.update(
@@ -1675,10 +1734,12 @@ def check_hf_footprint(runner: Runner) -> tuple[str, dict[str, Any], str]:
     return (
         STATUS_OK,
         fact,
-        f"измерено на раннере: библиотеки {fact['libraries_mb']} МБ "
-        f"(ориентир договора 500 МБ, отклонение {libs_dev} % — это оценка из ТЗ, "
-        f"жёсткого предела у неё нет; предел хранения 1,5 ГБ проверяет 4.2.6), "
-        f"веса {fact['weights_mb']} МБ (ориентир 530 МБ, отклонение {weights_dev} %)",
+        (
+            f"измерено на раннере: библиотеки {fact['libraries_mb']} МБ "
+            f"(ориентир договора 500 МБ, отклонение {libs_dev} % — это оценка из ТЗ, "
+            f"жёсткого предела у неё нет; предел хранения 1,5 ГБ проверяет 4.2.6), "
+            f"веса {fact['weights_mb']} МБ (ориентир 530 МБ, отклонение {weights_dev} %)"
+        ),
     )
 
 
@@ -1719,9 +1780,11 @@ def check_storage(runner: Runner) -> tuple[str, dict[str, Any], str]:
         return (
             STATUS_UNKNOWN,
             fact,
-            f"объём без весов {module_mb} МБ укладывается в 100 МБ; объём с весами "
-            "(≤ 1,5 ГБ) в этом окружении не измеряется — нет кэша весов модели, "
-            "его измеряет CI-задание hf-footprint",
+            (
+                f"объём без весов {module_mb} МБ укладывается в 100 МБ; объём с весами "
+                "(≤ 1,5 ГБ) в этом окружении не измеряется — нет кэша весов модели, "
+                "его измеряет CI-задание hf-footprint"
+            ),
         )
     metrics = weights_payload["metrics"]
     with_weights = metrics.get("storage_with_weights_mb")
@@ -1790,6 +1853,7 @@ def check_portable_copy(runner: Runner) -> tuple[str, dict[str, Any], str]:
             text=True,
             timeout=300,
             env={**os.environ, "PYTHONUTF8": "1"},
+            check=False,
         )
         if proc.returncode != 0:
             problems.append("самопроверка скрипта суммы не прошла")
@@ -2131,8 +2195,10 @@ def check_originality(runner: Runner) -> tuple[str, dict[str, Any], str]:
     return (
         STATUS_UNKNOWN,
         fact,
-        "фактический процент оригинальности не измерен: нужна внешняя система проверки текста; "
-        "в шаблоне поле и процедура описаны",
+        (
+            "фактический процент оригинальности не измерен: нужна внешняя система проверки текста; "
+            "в шаблоне поле и процедура описаны"
+        ),
     )
 
 
@@ -2154,6 +2220,7 @@ def check_numbers_registry(runner: Runner) -> tuple[str, dict[str, Any], str]:
         text=True,
         timeout=300,
         env={**os.environ, "PYTHONUTF8": "1"},
+        check=False,
     )
     if proc.returncode != 0:
         return STATUS_FAIL, {"stderr": proc.stderr[-400:]}, "реестр чисел не собрался"
@@ -2167,6 +2234,7 @@ def check_numbers_registry(runner: Runner) -> tuple[str, dict[str, Any], str]:
         text=True,
         timeout=300,
         env={**os.environ, "PYTHONUTF8": "1"},
+        check=False,
     )
     fact = {
         "entries": len(payload["entries"]),
@@ -2198,7 +2266,7 @@ def check_numbers_script(runner: Runner) -> tuple[str, dict[str, Any], str]:
             sys.executable,
             str(MODULE / "scripts" / "check_numbers.py"),
             "--metrics",
-            "reports/METRICS.json",
+            "reports/CURRENT_METRICS.json",
             "--numbers",
             str(ROOT / "reports" / "NUMBERS.json"),
         ],
@@ -2207,6 +2275,7 @@ def check_numbers_script(runner: Runner) -> tuple[str, dict[str, Any], str]:
         text=True,
         timeout=600,
         env={**os.environ, "PYTHONUTF8": "1"},
+        check=False,
     )
     # В факт идёт счёт расхождений и первая строка, а не весь список: этот
     # артефакт потом попадает в документ соответствия, который та же проверка
@@ -2405,12 +2474,18 @@ def check_contract_source(runner: Runner) -> tuple[str, dict[str, Any], str]:
     fact["problems"] = problems
     if problems:
         return STATUS_FAIL, fact, "; ".join(problems)
-    where = "текст подписанного PDF" if fact.get("mode") == "pdf" else "извлечение требований"
+    where = (
+        "текст подписанного PDF"
+        if fact.get("mode") == "pdf"
+        else "извлечение требований"
+    )
     return (
         STATUS_OK,
         fact,
-        f"{fact['compared_total']} требований договора совпали с константами кода; "
-        f"проверено по: {where}",
+        (
+            f"{fact['compared_total']} требований договора совпали с константами кода; "
+            f"проверено по: {where}"
+        ),
     )
 
 
@@ -2481,7 +2556,11 @@ def check_contract_doc_hash(runner: Runner) -> tuple[str, dict[str, Any], str]:
     fact["problems"] = problems
     if problems:
         return STATUS_FAIL, fact, "; ".join(problems)
-    where = "пересчитан по файлу" if fact["pdf_present"] else "из извлечения (файл не в репозитории)"
+    where = (
+        "пересчитан по файлу"
+        if fact["pdf_present"]
+        else "из извлечения (файл не в репозитории)"
+    )
     return (
         STATUS_OK,
         fact,
@@ -2638,7 +2717,9 @@ RESERVE_ROWS: tuple[dict[str, Any], ...] = (
         "direction": "max",
         "unit": "мс",
         "source": "reports/contract/4.1.7-performance.json",
-        "value": lambda payload: _fact_value(payload, "4.1.7-performance", "limit_run", "ms_per_1000_chars"),
+        "value": lambda payload: _fact_value(
+            payload, "4.1.7-performance", "limit_run", "ms_per_1000_chars"
+        ),
     },
     {
         "point": "ТЗ п. 4.1 треб. 7",
@@ -2647,7 +2728,9 @@ RESERVE_ROWS: tuple[dict[str, Any], ...] = (
         "direction": "max",
         "unit": "с",
         "source": "reports/contract/4.1.7-performance.json",
-        "value": lambda payload: _fact_value(payload, "4.1.7-performance", "limit_run", "seconds"),
+        "value": lambda payload: _fact_value(
+            payload, "4.1.7-performance", "limit_run", "seconds"
+        ),
     },
     {
         "point": "ТЗ п. 4.1 треб. 6",
@@ -2656,7 +2739,9 @@ RESERVE_ROWS: tuple[dict[str, Any], ...] = (
         "direction": "min",
         "unit": "",
         "source": "reports/contract/4.1.6-gate-corpus-a.json",
-        "value": lambda payload: _fact_value(payload, "4.1.6-gate-corpus-a", "tokens", "f1"),
+        "value": lambda payload: _fact_value(
+            payload, "4.1.6-gate-corpus-a", "tokens", "f1"
+        ),
     },
     {
         "point": "ТЗ п. 4.1 треб. 6",
@@ -2665,7 +2750,9 @@ RESERVE_ROWS: tuple[dict[str, Any], ...] = (
         "direction": "max",
         "unit": "",
         "source": "reports/contract/4.1.6-gate-corpus-a.json",
-        "value": lambda payload: _fact_value(payload, "4.1.6-gate-corpus-a", "tokens", "fpr"),
+        "value": lambda payload: _fact_value(
+            payload, "4.1.6-gate-corpus-a", "tokens", "fpr"
+        ),
     },
     {
         "point": "ТЗ п. 4.1 треб. 4",
@@ -2683,7 +2770,9 @@ RESERVE_ROWS: tuple[dict[str, Any], ...] = (
         "direction": "max",
         "unit": "байт",
         "source": "reports/release_sizes.json",
-        "value": lambda payload: _json_artifact("reports", "release_sizes.json").get("exe_bytes"),
+        "value": lambda payload: _json_artifact("reports", "release_sizes.json").get(
+            "exe_bytes"
+        ),
     },
     {
         "point": "ТЗ п. 4.2",
@@ -2692,7 +2781,9 @@ RESERVE_ROWS: tuple[dict[str, Any], ...] = (
         "direction": "max",
         "unit": "байт",
         "source": "reports/contract/4.1.9-delivery-artifacts.json",
-        "value": lambda payload: _fact_value(payload, "4.1.9-delivery-artifacts", "pyz_size_bytes"),
+        "value": lambda payload: _fact_value(
+            payload, "4.1.9-delivery-artifacts", "pyz_size_bytes"
+        ),
     },
     {
         "point": "ТЗ п. 4.2 треб. 6",
@@ -2701,7 +2792,9 @@ RESERVE_ROWS: tuple[dict[str, Any], ...] = (
         "direction": "max",
         "unit": "МБ",
         "source": "reports/contract/4.2.6-storage.json",
-        "value": lambda payload: _fact_value(payload, "4.2.6-storage", "with_weights_mb"),
+        "value": lambda payload: _fact_value(
+            payload, "4.2.6-storage", "with_weights_mb"
+        ),
     },
     {
         "point": "ТЗ п. 4.2 треб. 6",
@@ -2710,7 +2803,9 @@ RESERVE_ROWS: tuple[dict[str, Any], ...] = (
         "direction": "max",
         "unit": "МБ",
         "source": "reports/contract/4.2.6-storage.json",
-        "value": lambda payload: _fact_value(payload, "4.2.6-storage", "module_size_mb"),
+        "value": lambda payload: _fact_value(
+            payload, "4.2.6-storage", "module_size_mb"
+        ),
     },
 )
 
@@ -2722,9 +2817,10 @@ PROJECT_TARGET_ROWS: tuple[dict[str, Any], ...] = (
         "norm": 600.0,
         "direction": "min",
         "unit": "",
-        "source": "spanverify-module/reports/METRICS.json (tests.collected)",
+        "source": "spanverify-module/reports/CURRENT_METRICS.json (tests.collected)",
         "value": lambda payload: (
-            _json_artifact("spanverify-module", "reports", "METRICS.json").get("tests") or {}
+            _json_artifact("spanverify-module", "reports", "CURRENT_METRICS.json").get("tests")
+            or {}
         ).get("collected"),
     },
     {
@@ -2732,9 +2828,10 @@ PROJECT_TARGET_ROWS: tuple[dict[str, Any], ...] = (
         "norm": 90.0,
         "direction": "min",
         "unit": "%",
-        "source": "spanverify-module/reports/METRICS.json (tests.coverage_percent)",
+        "source": "spanverify-module/reports/CURRENT_METRICS.json (tests.coverage_percent)",
         "value": lambda payload: (
-            _json_artifact("spanverify-module", "reports", "METRICS.json").get("tests") or {}
+            _json_artifact("spanverify-module", "reports", "CURRENT_METRICS.json").get("tests")
+            or {}
         ).get("coverage_percent"),
     },
     {
@@ -2743,7 +2840,9 @@ PROJECT_TARGET_ROWS: tuple[dict[str, Any], ...] = (
         "direction": "min",
         "unit": "",
         "source": "reports/contract/4.1.6-gate-corpus-a.json",
-        "value": lambda payload: _fact_value(payload, "4.1.6-gate-corpus-a", "tokens", "f1"),
+        "value": lambda payload: _fact_value(
+            payload, "4.1.6-gate-corpus-a", "tokens", "f1"
+        ),
     },
     {
         "what": "Вердикт уровня ответа на реальных актах (A3): F1",
@@ -2752,8 +2851,12 @@ PROJECT_TARGET_ROWS: tuple[dict[str, Any], ...] = (
         "unit": "",
         "source": "spanverify-module/reports/verdict_calibration.json (test)",
         "value": lambda payload: (
-            (_json_artifact("spanverify-module", "reports", "verdict_calibration.json").get("test") or {})
-            .get("rule_corroborated")
+            (
+                _json_artifact(
+                    "spanverify-module", "reports", "verdict_calibration.json"
+                ).get("test")
+                or {}
+            ).get("rule_corroborated")
             or {}
         ).get("f1"),
     },
@@ -2764,8 +2867,12 @@ PROJECT_TARGET_ROWS: tuple[dict[str, Any], ...] = (
         "unit": "",
         "source": "spanverify-module/reports/verdict_calibration.json (test)",
         "value": lambda payload: (
-            (_json_artifact("spanverify-module", "reports", "verdict_calibration.json").get("test") or {})
-            .get("rule_corroborated")
+            (
+                _json_artifact(
+                    "spanverify-module", "reports", "verdict_calibration.json"
+                ).get("test")
+                or {}
+            ).get("rule_corroborated")
             or {}
         ).get("fpr"),
     },
@@ -2775,12 +2882,16 @@ PROJECT_TARGET_ROWS: tuple[dict[str, Any], ...] = (
         "direction": "max",
         "unit": "байт",
         "source": "reports/release_sizes.json",
-        "value": lambda payload: _json_artifact("reports", "release_sizes.json").get("exe_bytes"),
+        "value": lambda payload: _json_artifact("reports", "release_sizes.json").get(
+            "exe_bytes"
+        ),
     },
 )
 
 
-def _reserve_lines(rows: tuple[dict[str, Any], ...], payload: dict[str, Any], *, with_point: bool) -> list[str]:
+def _reserve_lines(
+    rows: tuple[dict[str, Any], ...], payload: dict[str, Any], *, with_point: bool
+) -> list[str]:
     """Собрать таблицу запаса: норма → факт → запас в процентах."""
     header = "| Пункт | Что меряется | Норма | Факт | Запас | Источник |"
     if not with_point:
@@ -2793,7 +2904,18 @@ def _reserve_lines(rows: tuple[dict[str, Any], ...], payload: dict[str, Any], *,
         norm = float(row["norm"])
         if value is None:
             lines.append(
-                "| " + " | ".join([*( [row["point"]] if with_point else [] ), row["what"], f"{norm:g}", "не измерено", "—", row["source"]]) + " |"
+                "| "
+                + " | ".join(
+                    [
+                        *([row["point"]] if with_point else []),
+                        row["what"],
+                        f"{norm:g}",
+                        "не измерено",
+                        "—",
+                        row["source"],
+                    ]
+                )
+                + " |"
             )
             continue
         fact = float(value)
@@ -2810,7 +2932,14 @@ def _reserve_lines(rows: tuple[dict[str, Any], ...], payload: dict[str, Any], *,
         lines.append(
             "| "
             + " | ".join(
-                [*([row["point"]] if with_point else []), row["what"], norm_text, fact_text, verdict, row["source"]]
+                [
+                    *([row["point"]] if with_point else []),
+                    row["what"],
+                    norm_text,
+                    fact_text,
+                    verdict,
+                    row["source"],
+                ]
             )
             + " |"
         )
@@ -2865,7 +2994,7 @@ def _reproduction_block() -> list[str]:
         "",
         "# 3а. То же напрямую из модуля (если запускать из spanverify-module)",
         "python spanverify-module/scripts/check_numbers.py \\",
-        "    --metrics spanverify-module/reports/METRICS.json --reports-root .",
+        "    --metrics spanverify-module/reports/CURRENT_METRICS.json --reports-root .",
         "",
         "# 4. Тесты модуля, включая контрактные",
         "cd spanverify-module && python -m pytest -q",
@@ -2884,11 +3013,13 @@ def render_report_appendix(payload: dict[str, Any]) -> str:
         "Собран автоматически скриптом `scripts/contract_check.py` из `reports/CONTRACT.json`:",
         "числа в него не вписываются руками.",
         "",
-        f"- Договор № 20478ГУ/2026 (проект 117812), ТЗ (Приложение № 3), календарный план (Приложение № 4)",
+        "- Договор № 20478ГУ/2026 (проект 117812), ТЗ (Приложение № 3), календарный план (Приложение № 4)",
         f"- Коммит прогона: `{payload['commit']}`",
         f"- Дата: {payload['environment']['date']}",
-        f"- Проверок: {len(payload['checks'])}; соответствует — {payload['summary'][STATUS_OK]}, "
-        f"не соответствует — {payload['summary'][STATUS_FAIL]}, не измерено — {payload['summary'][STATUS_UNKNOWN]}",
+        (
+            f"- Проверок: {len(payload['checks'])}; соответствует — {payload['summary'][STATUS_OK]}, "
+            f"не соответствует — {payload['summary'][STATUS_FAIL]}, не измерено — {payload['summary'][STATUS_UNKNOWN]}"
+        ),
         "",
         "## Таблица соответствия",
         "",
@@ -2952,11 +3083,15 @@ def render_closing_doc(payload: dict[str, Any]) -> str:
         "",
         f"- Коммит прогона: `{payload['commit']}`",
         f"- Дата прогона: {payload['environment']['date']}",
-        f"- Окружение: Python {payload['environment']['python']}, "
-        f"{payload['environment']['platform']}, ядер {payload['environment']['cpu_count']}",
-        f"- Проверок: {len(payload['checks'])}; соответствует — {payload['summary'][STATUS_OK]}, "
-        f"не соответствует — {payload['summary'][STATUS_FAIL]}, "
-        f"не измерено — {payload['summary'][STATUS_UNKNOWN]}",
+        (
+            f"- Окружение: Python {payload['environment']['python']}, "
+            f"{payload['environment']['platform']}, ядер {payload['environment']['cpu_count']}"
+        ),
+        (
+            f"- Проверок: {len(payload['checks'])}; соответствует — {payload['summary'][STATUS_OK]}, "
+            f"не соответствует — {payload['summary'][STATUS_FAIL]}, "
+            f"не измерено — {payload['summary'][STATUS_UNKNOWN]}"
+        ),
         "",
         "## Пункт договора → статус → команда → факт → файл-источник",
         "",
@@ -2969,7 +3104,9 @@ def render_closing_doc(payload: dict[str, Any]) -> str:
             continue
         lines.append(f"- **{item['id']}** — {item['status']}: {item['note']}")
     if all(item["status"] == STATUS_OK for item in payload["checks"]):
-        lines.append("- Все проверки пройдены: не достигнутых и неизмеренных пунктов нет.")
+        lines.append(
+            "- Все проверки пройдены: не достигнутых и неизмеренных пунктов нет."
+        )
     lines += ["", "## Зона получателя гранта (к коду не относится)", ""]
     lines.append(
         "Эти пункты договор требует представить в АС «Фонд-М» вместе с отчётностью;"
@@ -2986,7 +3123,7 @@ def render_closing_doc(payload: dict[str, Any]) -> str:
     lines += [
         "",
         "Числа и материалы для этих пунктов готовит кодовая часть: метрики —",
-        "`spanverify-module/reports/METRICS.json`, таблица соответствия — этот документ",
+        "`spanverify-module/reports/CURRENT_METRICS.json`, таблица соответствия — этот документ",
         "и `docs/СООТВЕТСТВИЕ_ДОГОВОРУ.md`, приложение к отчёту —",
         "`docs/ОТЧЁТ_ПРИЛОЖЕНИЕ_СООТВЕТСТВИЕ.md`, инструкция по оригинальности —",
         "`docs/ПРОВЕРКА_ОРИГИНАЛЬНОСТИ.md`.",
@@ -3007,10 +3144,14 @@ def render_compliance_doc(payload: dict[str, Any]) -> str:
         "",
         f"- Коммит прогона: `{payload['commit']}`",
         f"- Дата прогона: {payload['environment']['date']}",
-        f"- Окружение: Python {payload['environment']['python']}, {payload['environment']['platform']}, "
-        f"ядер {payload['environment']['cpu_count']}, seed {payload['environment']['seed']}",
-        f"- Проверок: {len(payload['checks'])}; соответствует — {payload['summary'][STATUS_OK]}, "
-        f"не соответствует — {payload['summary'][STATUS_FAIL]}, не измерено — {payload['summary'][STATUS_UNKNOWN]}",
+        (
+            f"- Окружение: Python {payload['environment']['python']}, {payload['environment']['platform']}, "
+            f"ядер {payload['environment']['cpu_count']}, seed {payload['environment']['seed']}"
+        ),
+        (
+            f"- Проверок: {len(payload['checks'])}; соответствует — {payload['summary'][STATUS_OK]}, "
+            f"не соответствует — {payload['summary'][STATUS_FAIL]}, не измерено — {payload['summary'][STATUS_UNKNOWN]}"
+        ),
         "",
         "Статус «не измерено» означает, что прогон в этом окружении невозможен; причина указана в столбце «факт».",
         "",
@@ -3080,7 +3221,9 @@ def main() -> int:
             "environment": env_info(),
             "summary": {
                 STATUS_OK: sum(1 for item in results if item["status"] == STATUS_OK),
-                STATUS_FAIL: sum(1 for item in results if item["status"] == STATUS_FAIL),
+                STATUS_FAIL: sum(
+                    1 for item in results if item["status"] == STATUS_FAIL
+                ),
                 STATUS_UNKNOWN: sum(
                     1 for item in results if item["status"] == STATUS_UNKNOWN
                 ),
@@ -3106,6 +3249,9 @@ def main() -> int:
     }
     payload = {
         "kind": "contract_check",
+        "run_id": os.environ.get("GITHUB_RUN_ID", "local-contract:" + git_commit()),
+        "date": time.strftime("%Y-%m-%d", time.gmtime()),
+        "provenance": "local",
         "commit": git_commit(),
         "environment": env_info(),
         "generated_at": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
@@ -3132,7 +3278,9 @@ def main() -> int:
         COMPLIANCE_DOC.parent.mkdir(parents=True, exist_ok=True)
         COMPLIANCE_DOC.write_text(render_compliance_doc(payload), encoding="utf-8")
         CLOSING_DOC.write_text(render_closing_doc(payload), encoding="utf-8")
-        REPORT_APPENDIX_DOC.write_text(render_report_appendix(payload), encoding="utf-8")
+        REPORT_APPENDIX_DOC.write_text(
+            render_report_appendix(payload), encoding="utf-8"
+        )
 
     print(f"проверок: {len(results)}")
     for item in results:

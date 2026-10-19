@@ -1,0 +1,12 @@
+{
+  "schema": "frozen-p1-runtime-v1",
+  "mode": "hf",
+  "model_name": "ai-forever/rugpt3small_based_on_gpt2",
+  "hf_max_tokens": 512,
+  "chunking": true,
+  "span_expansion": "mask",
+  "cache_source_run_id": 39060670054,
+  "answer_target_fpr": 0.3,
+  "source_measurement_run_id": 39116955685,
+  "source_measurement_commit": "b87850781b73d8630832cb972037158d0ec88927"
+}

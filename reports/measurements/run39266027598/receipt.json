@@ -1,0 +1,13 @@
+{
+  "run_id": "39266027598",
+  "date": "2026-10-19T14:06:56Z",
+  "commit": "4b28132e69b829bddfb91839eb810baae2d5dd53",
+  "family": "P8",
+  "workflow": "p8-final-evaluation.yml",
+  "record_kind": "measurement/delivery",
+  "status": "completed",
+  "outcome": "failure",
+  "url": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39266027598",
+  "canonical_directories": [],
+  "receipt": "reports/measurements/run39266027598/receipt.json"
+}

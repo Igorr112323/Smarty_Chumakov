@@ -1,0 +1,13 @@
+{
+  "run_id": "38425751064",
+  "date": "2026-10-13T15:52:23Z",
+  "commit": "1a2a8e47b06105c5e6eb5187057a38fa6eafe024",
+  "family": "P0",
+  "workflow": "hf-footprint.yml",
+  "record_kind": "measurement/delivery",
+  "status": "completed",
+  "outcome": "success",
+  "url": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/38425751064",
+  "canonical_directories": [],
+  "receipt": "reports/measurements/run38425751064/receipt.json"
+}

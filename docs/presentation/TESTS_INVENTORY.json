@@ -1,0 +1,1437 @@
+{
+  "date": "2026-10-19",
+  "baseline": "725824030f24862830c277d9e537c5f05727d8b0",
+  "collection_source_head": "ce68caf72c0294630039e6874fd24ef6e53e4c49",
+  "command": "cd spanverify-module && python -m pytest --collect-only -q",
+  "total": 910,
+  "files": [
+    {
+      "path": "spanverify-module/tests/test_answer_head.py",
+      "collected_nodes": 17,
+      "module_docstring": "Тесты для P1 answer-головы.",
+      "nodeids": [
+        "tests/test_answer_head.py::TestComputePercentile::test_single_value",
+        "tests/test_answer_head.py::TestComputePercentile::test_median_odd",
+        "tests/test_answer_head.py::TestComputePercentile::test_q10_q90",
+        "tests/test_answer_head.py::TestExtractAnswerFeatures::test_basic_extraction",
+        "tests/test_answer_head.py::TestExtractAnswerFeatures::test_empty_scored",
+        "tests/test_answer_head.py::TestExtractAnswerFeatures::test_length_mismatch_raises",
+        "tests/test_answer_head.py::TestExtractAnswerFeatures::test_nan_raises",
+        "tests/test_answer_head.py::TestAnswerHeadModel::test_n_features_property",
+        "tests/test_answer_head.py::TestAnswerHeadModel::test_predict_scalar",
+        "tests/test_answer_head.py::TestAnswerHeadModel::test_predict_many",
+        "tests/test_answer_head.py::TestAnswerHeadModel::test_predict_wrong_size_raises",
+        "tests/test_answer_head.py::TestAnswerHeadModel::test_save_load_roundtrip",
+        "tests/test_answer_head.py::TestAnswerHeadModel::test_save_load_predict_equality",
+        "tests/test_answer_head.py::TestTrainAnswerHead::test_basic_training",
+        "tests/test_answer_head.py::TestTrainAnswerHead::test_length_mismatch_raises",
+        "tests/test_answer_head.py::TestTrainAnswerHead::test_nan_raises",
+        "tests/test_answer_head.py::TestSmokeIntegration::test_full_pipeline"
+      ]
+    },
+    {
+      "path": "spanverify-module/tests/test_answer_label.py",
+      "collected_nodes": 7,
+      "module_docstring": "Тесты для функции answer_label (задача 2.1).",
+      "nodeids": [
+        "tests/test_answer_label.py::test_answer_label_positive",
+        "tests/test_answer_label.py::test_answer_label_negative",
+        "tests/test_answer_label.py::test_answer_label_empty_labels",
+        "tests/test_answer_label.py::test_answer_label_missing_labels",
+        "tests/test_answer_label.py::test_answer_label_single_char_number",
+        "tests/test_answer_label.py::test_answer_label_string_vs_int_labels",
+        "tests/test_answer_label.py::test_answer_label_multiple_fragments"
+      ]
+    },
+    {
+      "path": "spanverify-module/tests/test_api.py",
+      "collected_nodes": 3,
+      "module_docstring": "Совместимость модуля ``spanverify.api``.\n\nС версии 1.1.0 HTTP-сервис живёт в :mod:`spanverify.server` и работает по\nконтракту «ответ против контекста». Этот модуль проверяет, что прежние имена\nиз ``spanverify.api`` продолжают импортироваться: внешние скрипты не должны\nломаться из-за переезда.",
+      "nodeids": [
+        "tests/test_api.py::test_api_reexports_service",
+        "tests/test_api.py::test_api_reexports_helper_functions",
+        "tests/test_api.py::test_service_has_contract_methods"
+      ]
+    },
+    {
+      "path": "spanverify-module/tests/test_backends.py",
+      "collected_nodes": 9,
+      "module_docstring": "Тесты фабрики бэкендов и режима 'hf' без установленных зависимостей.",
+      "nodeids": [
+        "tests/test_backends.py::test_factory_creates_surrogate_backend",
+        "tests/test_backends.py::test_factory_accepts_aliases",
+        "tests/test_backends.py::test_surrogate_ignores_model_arguments",
+        "tests/test_backends.py::test_surrogate_returns_features_for_each_word",
+        "tests/test_backends.py::test_surrogate_marks_service_words_uninformative",
+        "tests/test_backends.py::test_surrogate_handles_empty_input",
+        "tests/test_backends.py::test_hf_backend_reports_missing_dependencies_or_works",
+        "tests/test_backends.py::test_cli_accepts_global_options_in_both_positions",
+        "tests/test_backends.py::test_unknown_backend_raises_value_error"
+      ]
+    },
+    {
+      "path": "spanverify-module/tests/test_calibration.py",
+      "collected_nodes": 15,
+      "module_docstring": "Тесты калибровки: PAVA, порог, метрики, кросс-валидация.",
+      "nodeids": [
+        "tests/test_calibration.py::test_pava_output_is_non_decreasing",
+        "tests/test_calibration.py::test_pava_with_separable_data_gives_extremes",
+        "tests/test_calibration.py::test_pava_rejects_length_mismatch",
+        "tests/test_calibration.py::test_pava_empty_input",
+        "tests/test_calibration.py::test_isotonic_calibrator_is_monotone_and_bounded",
+        "tests/test_calibration.py::test_calibrator_roundtrip_through_dict",
+        "tests/test_calibration.py::test_calibrator_save_and_load",
+        "tests/test_calibration.py::test_calibrator_load_missing_file_returns_none",
+        "tests/test_calibration.py::test_calibrator_compresses_pava_output",
+        "tests/test_calibration.py::test_calibrator_rejects_mismatched_lengths",
+        "tests/test_calibration.py::test_metrics_at_hand_computed",
+        "tests/test_calibration.py::test_choose_threshold_respects_fpr_limit",
+        "tests/test_calibration.py::test_choose_threshold_with_empty_input",
+        "tests/test_calibration.py::test_cross_validate_reports_folds_and_mean",
+        "tests/test_calibration.py::test_cross_validate_handles_tiny_dataset"
+      ]
+    },
+    {
+      "path": "spanverify-module/tests/test_calibration_fix.py",
+      "collected_nodes": 13,
+      "module_docstring": "Regression tests for calibration fixes.\n\nTests the following fixes:\n1. transform_one uses bisect_left correctly for upper bounds\n2. pava groups identical x values before applying weighted PAVA\n3. pava is permutation-invariant for ties\n4. _compress preserves block boundaries\n5. WeightsBundle roundtrip preserves near-threshold decisions",
+      "nodeids": [
+        "tests/test_calibration_fix.py::test_transform_one_basic",
+        "tests/test_calibration_fix.py::test_transform_one_compression",
+        "tests/test_calibration_fix.py::test_transform_repeated_scores",
+        "tests/test_calibration_fix.py::test_transform_boundary_values",
+        "tests/test_calibration_fix.py::test_pava_same_x",
+        "tests/test_calibration_fix.py::test_pava_permutation_invariant",
+        "tests/test_calibration_fix.py::test_pava_counterexample",
+        "tests/test_calibration_fix.py::test_serialization_roundtrip",
+        "tests/test_calibration_fix.py::test_empty_input",
+        "tests/test_calibration_fix.py::test_monotonicity",
+        "tests/test_calibration_fix.py::test_compress_preserves_changes",
+        "tests/test_calibration_fix.py::test_compress_exact_mode",
+        "tests/test_calibration_fix.py::test_no_compress_for_answer_calibration"
+      ]
+    },
+    {
+      "path": "spanverify-module/tests/test_check_numbers.py",
+      "collected_nodes": 4,
+      "module_docstring": "Тесты для scripts/check_numbers.py — сверка чисел в документах.",
+      "nodeids": [
+        "tests/test_check_numbers.py::test_coverage_pattern_decimal",
+        "tests/test_check_numbers.py::test_coverage_pattern_no_false_positives",
+        "tests/test_check_numbers.py::test_trap_wrong_coverage",
+        "tests/test_check_numbers.py::test_correct_coverage_is_silent"
+      ]
+    },
+    {
+      "path": "spanverify-module/tests/test_chunking.py",
+      "collected_nodes": 23,
+      "module_docstring": "Тесты для модуля чанкинга и отбора релевантных фрагментов.",
+      "nodeids": [
+        "tests/test_chunking.py::TestEstimateTokens::test_empty",
+        "tests/test_chunking.py::TestEstimateTokens::test_short_text",
+        "tests/test_chunking.py::TestEstimateTokens::test_long_text",
+        "tests/test_chunking.py::TestNormalizeForRetrieval::test_lowercase",
+        "tests/test_chunking.py::TestNormalizeForRetrieval::test_whitespace",
+        "tests/test_chunking.py::TestNormalizeForRetrieval::test_numbers_to_digits",
+        "tests/test_chunking.py::TestChunkDocument::test_empty",
+        "tests/test_chunking.py::TestChunkDocument::test_short_text_single_chunk",
+        "tests/test_chunking.py::TestChunkDocument::test_long_text_multiple_chunks",
+        "tests/test_chunking.py::TestChunkDocument::test_overlap",
+        "tests/test_chunking.py::TestChunkDocument::test_paragraph_aware",
+        "tests/test_chunking.py::TestChunkDocument::test_chunk_positions_valid",
+        "tests/test_chunking.py::TestChunkDocument::test_long_sentence_split",
+        "tests/test_chunking.py::TestChunkDocument::test_normalized_populated",
+        "tests/test_chunking.py::TestSelectRelevantChunks::test_empty_doc",
+        "tests/test_chunking.py::TestSelectRelevantChunks::test_single_chunk",
+        "tests/test_chunking.py::TestSelectRelevantChunks::test_fewer_than_top_k",
+        "tests/test_chunking.py::TestSelectRelevantChunks::test_sorted_by_position",
+        "tests/test_chunking.py::TestSelectRelevantChunks::test_exact_match_found",
+        "tests/test_chunking.py::TestSelectRelevantChunks::test_on_corpus_a3_sample",
+        "tests/test_chunking.py::TestSelectRelevantChunksForClaims::test_empty_claims",
+        "tests/test_chunking.py::TestSelectRelevantChunksForClaims::test_multiple_claims_union",
+        "tests/test_chunking.py::TestCorpusAIntegration::test_bm25_finds_values"
+      ]
+    },
+    {
+      "path": "spanverify-module/tests/test_ci_workflows.py",
+      "collected_nodes": 5,
+      "module_docstring": "Проверки документа о заданиях CI (`docs/ЗАДАНИЯ_CI.md`, `scripts/collect_ci_workflows.py`).\n\nЗачем это нужно. Заданий много, и по файлам не видно, какие обязаны быть зелёными.\nДокумент собирается скриптом из двух источников фактов, и проверки здесь\nудерживают его от расхождений с ними:\n\n1. каждое задание из `.github/workflows/*.yml` попадает в документ (иначе о\n   задании молчат, и «все зелёные» будет неправдой);\n2. у каждого задания в документе есть запуск и статус, а не пустая строка;\n3. у задания с числами приёмки (замер объёмов режима hf, размеры поставки) в\n   документе назван источник этих чисел — файл, откуда число попадает в реестр;\n4. скрипт не выдумывает статусы: если прогонов нет, так и написано.",
+      "nodeids": [
+        "tests/test_ci_workflows.py::test_document_lists_every_workflow",
+        "tests/test_ci_workflows.py::test_document_has_trigger_and_status_for_each_job",
+        "tests/test_ci_workflows.py::test_acceptance_numbers_have_a_named_registry_file",
+        "tests/test_ci_workflows.py::test_script_declares_sources_and_does_not_invent_statuses",
+        "tests/test_ci_workflows.py::test_windows_rc_keeps_strict_size_and_frozen_packaging_contract"
+      ]
+    },
+    {
+      "path": "spanverify-module/tests/test_clean_pair_fpr.py",
+      "collected_nodes": 3,
+      "module_docstring": "Доля ложных замечаний на корректных ответах (дефект B4 реестра).\n\nСмысл проверки: программа, которая обвиняет корректный ответ, хуже программы,\nкоторая ничего не находит. Обвинение без основания подрывает доверие к каждому\nвыданному фрагменту, поэтому доля ложных замечаний на чистых парах — отдельный\nпоказатель, а не побочный продукт точности.\n\nКритерий «готово» из реестра: доля помеченных чистых пар ≤ 0,10 без подбора\nпорога по тестовой части. Проверяется на отложенной части корпуса A.",
+      "nodeids": [
+        "tests/test_clean_pair_fpr.py::test_clean_split_is_not_empty",
+        "tests/test_clean_pair_fpr.py::test_false_mark_rate_on_clean_pairs_is_low",
+        "tests/test_clean_pair_fpr.py::test_clean_pairs_have_no_spans"
+      ]
+    },
+    {
+      "path": "spanverify-module/tests/test_collect_experiments.py",
+      "collected_nodes": 4,
+      "module_docstring": "Единый файл чисел читает прогонные файлы: эксперименты и внешние срезы hf.\n\nСмысл набора: числа из ``reports/experiments/*/experiment.json`` и внешних\nсрезов ``reports/ext_*_hf.json`` обязаны попадать в ``METRICS.json`` тем же\nскриптом ``collect_metrics.py``, иначе документы нечем сверять с прогонными\nфайлами. Пока числа не в METRICS — в документы они не попадают.",
+      "nodeids": [
+        "tests/test_collect_experiments.py::test_hf_experiments_block_reads_run_files",
+        "tests/test_collect_experiments.py::test_experiment_block_maps_official_test_fields",
+        "tests/test_collect_experiments.py::test_hf_external_slices_block_reads_committed_slice",
+        "tests/test_collect_experiments.py::test_check_numbers_allows_experiment_and_slice_values"
+      ]
+    },
+    {
+      "path": "spanverify-module/tests/test_config.py",
+      "collected_nodes": 16,
+      "module_docstring": "Тесты конфигурации.",
+      "nodeids": [
+        "tests/test_config.py::test_defaults_are_loaded",
+        "tests/test_config.py::test_from_dict_ignores_unknown_keys_and_casts_types",
+        "tests/test_config.py::test_with_overrides_ignores_none_and_keeps_instance",
+        "tests/test_config.py::test_with_overrides_keeps_untouched_fields",
+        "tests/test_config.py::test_with_overrides_ignores_unknown_keys",
+        "tests/test_config.py::test_with_overrides_without_arguments_returns_same_values",
+        "tests/test_config.py::test_load_reads_json_file",
+        "tests/test_config.py::test_load_ignores_missing_file",
+        "tests/test_config.py::test_environment_overrides_file",
+        "tests/test_config.py::test_save_creates_parent_directories",
+        "tests/test_config.py::test_describe_mentions_key_parameters",
+        "tests/test_config.py::test_runtime_roots_include_frozen_bundle",
+        "tests/test_config.py::test_read_runtime_text_reads_pyz_archive",
+        "tests/test_config.py::test_resolve_runtime_path_falls_back",
+        "tests/test_config.py::test_detector_loads_calibrator_from_bundle",
+        "tests/test_config.py::test_all_defaults_map_to_config_fields"
+      ]
+    },
+    {
+      "path": "spanverify-module/tests/test_context_index.py",
+      "collected_nodes": 5,
+      "module_docstring": "Индекс слов контекста считает ровно то же, что и полный перебор.\n\nУскорение признаков (ТЗ п. 4.1 треб. 7 — быстродействие) сделано индексом:\nслова документа сравниваются только с теми словами ответа, у которых есть общая\nсимвольная триграмма. Это не приближение, а тот же расчёт, поэтому тесты ниже\nсверяют быстрый путь с прямым перебором на реальных словах:\n\n* :meth:`ContextWords.support` против прежней формулы «основа совпала → 1.0,\n  иначе 0.7 × Jaccard по всем словам документа»;\n* :meth:`ContextWords.similarities` против «доля по ``k`` ближайшим» и\n  «ближайшее слово»;\n* значения признаков ``embedding_density`` и ``ctx_max_similarity`` из\n  :func:`demo_features` против тех же величин, посчитанных в лоб.\n\nЕсли кто-то поменяет индекс так, что признаки разойдутся с прежним расчётом,\nтесты упадут — тогда качество на корпусах изменилось бы незаметно.",
+      "nodeids": [
+        "tests/test_context_index.py::test_support_matches_brute_force",
+        "tests/test_context_index.py::test_similarities_match_brute_force",
+        "tests/test_context_index.py::test_index_keeps_duplicate_words",
+        "tests/test_context_index.py::test_empty_context_is_falsy_and_zero",
+        "tests/test_context_index.py::test_demo_features_density_matches_manual_calculation"
+      ]
+    },
+    {
+      "path": "spanverify-module/tests/test_context_mass_norm.py",
+      "collected_nodes": 8,
+      "module_docstring": "Нормировка массы внимания на длину контекста (итерация 1 доработки признаков).\n\nПроверяются только чистые функции: тензоров и весов модели для этого не нужно.\nСодержание проверки — что нормализованная масса убирает артефакт длины\nконтекста и позиции токена, из-за которого сырая масса несравнима между\nдокументами.",
+      "nodeids": [
+        "tests/test_context_mass_norm.py::test_expected_mass_is_share_of_visible_positions",
+        "tests/test_context_mass_norm.py::test_expected_mass_degenerate_cases",
+        "tests/test_context_mass_norm.py::test_normalised_mass_is_one_when_attention_is_uniform",
+        "tests/test_context_mass_norm.py::test_normalised_mass_removes_context_length_artifact",
+        "tests/test_context_mass_norm.py::test_normalised_mass_orders_by_support_not_by_length",
+        "tests/test_context_mass_norm.py::test_normalised_mass_zero_expected_gives_zero",
+        "tests/test_context_mass_norm.py::test_lift_is_bounded_and_signed",
+        "tests/test_context_mass_norm.py::test_position_monotonicity_of_expected_mass"
+      ]
+    },
+    {
+      "path": "spanverify-module/tests/test_context_stack.py",
+      "collected_nodes": 90,
+      "module_docstring": "Тесты контекстного конвейера: ядро, признаки, движок, корпус, обучение.\n\nКаждый тест проверяет свойство, которое важно для продукта: непрерывность\nкоординат, абсолютный смысл признака опоры, поведение порога маски, честность\nметрик. Числовые пороги в тестах подобраны с запасом, чтобы не ломаться от\nнебольших изменений данных.",
+      "nodeids": [
+        "tests/test_context_stack.py::test_tokens_cover_text_continuously",
+        "tests/test_context_stack.py::test_tokens_keep_offsets_consistent",
+        "tests/test_context_stack.py::test_whitespace_only_text_gives_no_tokens",
+        "tests/test_context_stack.py::test_sentences_split_covers_whole_text",
+        "tests/test_context_stack.py::test_chunks_from_string_and_list_are_equivalent_in_content",
+        "tests/test_context_stack.py::test_chunks_of_none_is_empty",
+        "tests/test_context_stack.py::test_number_value_reads_digits_and_words",
+        "tests/test_context_stack.py::test_numbers_in_collects_unique_values",
+        "tests/test_context_stack.py::test_verification_result_roundtrip_keeps_fields",
+        "tests/test_context_stack.py::test_scored_token_rejects_non_content[.]",
+        "tests/test_context_stack.py::test_scored_token_rejects_non_content[,]",
+        "tests/test_context_stack.py::test_scored_token_rejects_non_content[\\u2014]",
+        "tests/test_context_stack.py::test_scored_token_rejects_non_content[\\u0438]",
+        "tests/test_context_stack.py::test_scored_token_rejects_non_content[\\u0432]",
+        "tests/test_context_stack.py::test_scored_token_rejects_non_content[  ]",
+        "tests/test_context_stack.py::test_scored_token_rejects_non_content[\\u043d\\u0430]",
+        "tests/test_context_stack.py::test_scored_token_accepts_content[10]",
+        "tests/test_context_stack.py::test_scored_token_accepts_content[\\u0445\\u0440\\u0430\\u043d\\u0435\\u043d\\u0438\\u044f]",
+        "tests/test_context_stack.py::test_scored_token_accepts_content[\\u0434\\u043e\\u043a\\u0443\\u043c\\u0435\\u043d\\u0442\\u043e\\u0432]",
+        "tests/test_context_stack.py::test_scored_token_accepts_content[\\u0430\\u0443\\u0434\\u0438\\u0442\\u043e\\u0440\\u043e\\u043c]",
+        "tests/test_context_stack.py::test_scale_keeps_zero_and_normalises_maximum",
+        "tests/test_context_stack.py::test_combine_uses_absolute_mass_not_relative",
+        "tests/test_context_stack.py::test_combine_weights_are_normalised",
+        "tests/test_context_stack.py::test_combine_handles_nan_safely",
+        "tests/test_context_stack.py::test_clamp01_limits_values",
+        "tests/test_context_stack.py::test_trigrams_are_case_and_yo_insensitive",
+        "tests/test_context_stack.py::test_stem_is_prefix_of_four_characters",
+        "tests/test_context_stack.py::test_jaccard_bounds",
+        "tests/test_context_stack.py::test_support_overlap_rewards_shared_stem",
+        "tests/test_context_stack.py::test_demo_features_zero_mass_for_unconfirmed_number",
+        "tests/test_context_stack.py::test_demo_features_full_mass_for_confirmed_number",
+        "tests/test_context_stack.py::test_demo_features_matrix_has_one_row_per_token",
+        "tests/test_context_stack.py::test_demo_features_marks_backend",
+        "tests/test_context_stack.py::test_demo_warning_is_explicit",
+        "tests/test_context_stack.py::test_hf_features_without_torch_is_explicit",
+        "tests/test_context_stack.py::test_verify_contract_keys_present",
+        "tests/test_context_stack.py::test_grounded_answer_has_no_spans",
+        "tests/test_context_stack.py::test_substituted_value_is_flagged",
+        "tests/test_context_stack.py::test_fabricated_sentence_is_flagged",
+        "tests/test_context_stack.py::test_empty_answer_is_handled",
+        "tests/test_context_stack.py::test_without_context_answer_is_not_confirmed",
+        "tests/test_context_stack.py::test_punctuation_does_not_create_spans",
+        "tests/test_context_stack.py::test_tokens_payload_returned_on_request",
+        "tests/test_context_stack.py::test_verify_text_helper_uses_defaults",
+        "tests/test_context_stack.py::test_verifier_keeps_passed_bundle",
+        "tests/test_context_stack.py::test_span_threshold_respects_bounds",
+        "tests/test_context_stack.py::test_smoothing_keeps_a_single_peak",
+        "tests/test_context_stack.py::test_smoothing_short_sequence_is_identity",
+        "tests/test_context_stack.py::test_answer_score_rewards_peaks",
+        "tests/test_context_stack.py::test_answer_score_of_empty_is_zero",
+        "tests/test_context_stack.py::test_non_content_tokens_do_not_shift_risks",
+        "tests/test_context_stack.py::test_weights_bundle_roundtrip",
+        "tests/test_context_stack.py::test_weights_bundle_defaults_without_file",
+        "tests/test_context_stack.py::test_head_changes_decisions",
+        "tests/test_context_stack.py::test_broken_head_falls_back_to_rule",
+        "tests/test_context_stack.py::test_evaluate_returns_documented_sections",
+        "tests/test_context_stack.py::test_evaluate_containment_recall_is_full_for_matching_pipeline",
+        "tests/test_context_stack.py::test_span_f1_helpers_agree_on_identical_ranges",
+        "tests/test_context_stack.py::test_mean_width_ratio_reports_expansion",
+        "tests/test_context_stack.py::test_dataset_is_reproducible",
+        "tests/test_context_stack.py::test_dataset_labels_are_inside_answer",
+        "tests/test_context_stack.py::test_faithful_pairs_have_no_labels",
+        "tests/test_context_stack.py::test_substitution_pairs_flag_a_number",
+        "tests/test_context_stack.py::test_fabrication_text_absent_from_context",
+        "tests/test_context_stack.py::test_corpus_statistics_counts_kinds",
+        "tests/test_context_stack.py::test_write_and_read_pairs_roundtrip",
+        "tests/test_context_stack.py::test_pick_unused_cycles_after_exhaustion",
+        "tests/test_context_stack.py::test_unit_form_agrees_with_number",
+        "tests/test_context_stack.py::test_value_span_prefers_digit_form",
+        "tests/test_context_stack.py::test_make_pair_uses_distinct_answer_templates",
+        "tests/test_context_stack.py::test_fact_properties_are_consistent",
+        "tests/test_context_stack.py::test_pair_dict_shape",
+        "tests/test_context_stack.py::test_weight_grid_is_a_simplex",
+        "tests/test_context_stack.py::test_auc_perfect_and_inverted",
+        "tests/test_context_stack.py::test_auc_single_class_is_nan",
+        "tests/test_context_stack.py::test_collect_samples_matches_labels",
+        "tests/test_context_stack.py::test_standardize_gives_zero_mean",
+        "tests/test_context_stack.py::test_logreg_learns_order",
+        "tests/test_context_stack.py::test_head_scores_rejects_wrong_dimensionality",
+        "tests/test_context_stack.py::test_head_scores_falls_back_without_model",
+        "tests/test_context_stack.py::test_train_produces_valid_bundle",
+        "tests/test_context_stack.py::test_train_reports_validation_and_selection",
+        "tests/test_context_stack.py::test_train_is_reproducible",
+        "tests/test_context_stack.py::test_train_requires_data",
+        "tests/test_context_stack.py::test_save_training_artifacts_writes_weights",
+        "tests/test_context_stack.py::test_saved_head_is_readable",
+        "tests/test_context_stack.py::test_load_head_missing_file_returns_none",
+        "tests/test_context_stack.py::test_select_mask_respects_fpr_limit",
+        "tests/test_context_stack.py::test_span_f1_counts_only_close_matches",
+        "tests/test_context_stack.py::test_weights_json_matches_schema_on_disk"
+      ]
+    },
+    {
+      "path": "spanverify-module/tests/test_contract.py",
+      "collected_nodes": 21,
+      "module_docstring": "Контрактные тесты договора: проверки, реестр чисел, документы и CI.\n\nЗдесь проверяется не поведение движка (это делает ``test_contract_surface.py``),\nа сама система доказательств:\n\n* ``scripts/contract_check.py`` покрывает все пункты ТЗ пп. 4.1 и 4.2, плана и\n  отчётности, и пишет артефакт по каждому пункту;\n* ``reports/NUMBERS.json`` — реестр чисел с происхождением (коммит, seed, режим,\n  набор данных, источник);\n* ``docs/СООТВЕТСТВИЕ_ДОГОВОРУ.md`` собирается из ``reports/CONTRACT.json``;\n* документы договора (календарный план, структура отчёта, руководство) содержат\n  обязательные разделы;\n* CI содержит обязательную job ``contract``.\n\nТесты быстрые: тяжёлые прогоны (предельный текст 2 000 000 знаков, корпуса,\nрелиз) выполняет ``contract_check.py``, а не тестовый прогон.",
+      "nodeids": [
+        "tests/test_contract.py::test_harness_covers_every_numbered_requirement",
+        "tests/test_contract.py::test_harness_covers_plan_reporting_and_rules",
+        "tests/test_contract.py::test_every_check_has_command_and_explanation",
+        "tests/test_contract.py::test_contract_json_is_complete_and_traceable",
+        "tests/test_contract.py::test_measured_checks_have_artifacts_with_provenance",
+        "tests/test_contract.py::test_compliance_doc_is_generated_from_contract_json",
+        "tests/test_contract.py::test_agent_in_script_and_generated_doc_agree",
+        "tests/test_contract.py::test_numbers_registry_exists_with_provenance",
+        "tests/test_contract.py::test_numbers_registry_matches_artifacts",
+        "tests/test_contract.py::test_check_numbers_accepts_documents",
+        "tests/test_contract.py::test_check_numbers_rejects_invented_value",
+        "tests/test_contract.py::test_checksum_script_detects_substitution",
+        "tests/test_contract.py::test_zipapp_fits_contract_package_limit",
+        "tests/test_contract.py::test_calendar_plan_follows_contract",
+        "tests/test_contract.py::test_reporting_list_is_complete",
+        "tests/test_contract.py::test_report_template_follows_appendix_10",
+        "tests/test_contract.py::test_report_abstract_has_keywords_and_originality",
+        "tests/test_contract.py::test_guide_has_install_update_and_remove",
+        "tests/test_contract.py::test_acceptance_program_uses_contract_harness",
+        "tests/test_contract.py::test_ci_has_required_contract_job",
+        "tests/test_contract.py::test_ci_keeps_coverage_gate"
+      ]
+    },
+    {
+      "path": "spanverify-module/tests/test_contract_provenance.py",
+      "collected_nodes": 2,
+      "module_docstring": "Test for CONTRACT.json provenance validation.\n\nEnsures that if provenance is \"ci\", the artifact must have source_artifact\nand commit matching the artifact.",
+      "nodeids": [
+        "tests/test_contract_provenance.py::test_contract_provenance_local_or_ci",
+        "tests/test_contract_provenance.py::test_contract_provenance_ci_without_artifact_fails"
+      ]
+    },
+    {
+      "path": "spanverify-module/tests/test_contract_surface.py",
+      "collected_nodes": 14,
+      "module_docstring": "Поверхность требований договора: признаки, лимиты, критерии, уверенность.\n\nЭти тесты проверяют то, что дальше проверяет контрактный прогон\n(``scripts/contract_check.py``), но на уровне модуля — быстро и без сети:\n\n* ТЗ п. 4.1 треб. 2 — у фрагмента есть номера символов, метка и уверенность 0…1;\n* ТЗ п. 4.1 треб. 3 — ровно пять именованных признаков на токен, числа конечны;\n* ТЗ п. 4.1 треб. 1 — лимит 2 000 000 знаков объявлен и исполняется;\n* ТЗ п. 4.1 треб. 6 — критерии считаются по одному источнику (``spanverify.gates``);\n* ТЗ п. 4.1 треб. 8 — HTTP-маршрут дампа признаков отвечает пятью признаками.",
+      "nodeids": [
+        "tests/test_contract_surface.py::test_exactly_five_named_features_per_token",
+        "tests/test_contract_surface.py::test_feature_vectors_cover_all_five_names",
+        "tests/test_contract_surface.py::test_demo_density_scale_reference_is_positive",
+        "tests/test_contract_surface.py::test_combine_keeps_five_feature_signs",
+        "tests/test_contract_surface.py::test_span_has_offsets_label_and_confidence",
+        "tests/test_contract_surface.py::test_span_confidence_is_complement_of_risk",
+        "tests/test_contract_surface.py::test_text_limit_is_declared_and_enforced",
+        "tests/test_contract_surface.py::test_request_body_limit_covers_two_texts",
+        "tests/test_contract_surface.py::test_engine_rejects_too_long_text",
+        "tests/test_contract_surface.py::test_gates_use_contract_numbers",
+        "tests/test_contract_surface.py::test_gate_report_statuses",
+        "tests/test_contract_surface.py::test_evaluate_reports_gates_for_all_families",
+        "tests/test_contract_surface.py::test_cli_features_prints_five_features",
+        "tests/test_contract_surface.py::test_http_features_route_returns_five_features"
+      ]
+    },
+    {
+      "path": "spanverify-module/tests/test_corpus_a.py",
+      "collected_nodes": 14,
+      "module_docstring": "Тесты корпуса A: детерминированность, баланс классов и корректность разметки.\n\nКорпус A — обучающий корпус, собранный скриптом. Ошибка в нём (перепутанные метки,\nутечка между сплитами, слишком мало чистых пар) незаметна в метриках, зато портит\nвсе выводы. Поэтому проверяются именно эти свойства, а не числа на выходе модели.",
+      "nodeids": [
+        "tests/test_corpus_a.py::test_target_and_balance_are_met",
+        "tests/test_corpus_a.py::test_taxonomy_types_are_all_present",
+        "tests/test_corpus_a.py::test_every_span_matches_answer_slice",
+        "tests/test_corpus_a.py::test_splits_share_no_documents",
+        "tests/test_corpus_a.py::test_generation_is_deterministic",
+        "tests/test_corpus_a.py::test_number_attribution_uses_other_subject_value",
+        "tests/test_corpus_a.py::test_mode_requires_matching_feature_for_attribution",
+        "tests/test_corpus_a.py::test_clean_pairs_have_no_labels",
+        "tests/test_corpus_a.py::test_balance_check_reports_shortfall",
+        "tests/test_corpus_a.py::test_shared_groups_detects_leak",
+        "tests/test_corpus_a.py::test_check_spans_detects_broken_labels",
+        "tests/test_corpus_a.py::test_split_pairs_keeps_groups_together",
+        "tests/test_corpus_a.py::test_manifest_hashes_are_stable",
+        "tests/test_corpus_a.py::test_taxonomy_mapping_covers_all_modes"
+      ]
+    },
+    {
+      "path": "spanverify-module/tests/test_corpus_a2.py",
+      "collected_nodes": 8,
+      "module_docstring": "Тесты корпуса A2 (естественные ответы модели).\n\nЗапуск генерации требует GPU и весов, поэтому в CI проверяется подготовительная\nчасть: разбор фактов из документа, вопросы и промты, режим ``--dry-run`` и то, что\nчерновые метки никогда не выдаются за истину (``needs_expert_review``).",
+      "nodeids": [
+        "tests/test_corpus_a2.py::test_read_facts_extracts_subject_feature_value",
+        "tests/test_corpus_a2.py::test_read_facts_splits_condition",
+        "tests/test_corpus_a2.py::test_question_wording_matches_feature",
+        "tests/test_corpus_a2.py::test_prompt_requires_answer_from_document_only",
+        "tests/test_corpus_a2.py::test_collect_tasks_is_deterministic_and_limited",
+        "tests/test_corpus_a2.py::test_dry_run_writes_tasks_without_claiming_metrics",
+        "tests/test_corpus_a2.py::test_draft_labels_are_marked_for_expert_review",
+        "tests/test_corpus_a2.py::test_missing_documents_directory_reports_error"
+      ]
+    },
+    {
+      "path": "spanverify-module/tests/test_corpus_a3.py",
+      "collected_nodes": 12,
+      "module_docstring": "Тесты корпуса A3: пары на фрагментах реальных документов.\n\nЗадание требует пяти проверок, и каждая проверяется здесь **как проверка**, а не как\nнаблюдение: для проверок есть негативные тесты (испорченный контекст и подменённое\nчисло обязаны находиться), а не только утверждение «проблем нет».\n\n1. каждый ``context`` дословно (после нормализации пробелов) есть в файлах источников;\n2. ``answer[start:end] == span`` для каждой метки;\n3. при «атрибуции числа» новое число присутствует в другом месте того же документа;\n4. документ не попадает более чем в одну часть (train/dev/test);\n5. манифест содержит SHA256 файлов и каждой пары, и они воспроизводятся повторно.",
+      "nodeids": [
+        "tests/test_corpus_a3.py::test_plan_reserves_clean_pairs_and_min_per_mode",
+        "tests/test_corpus_a3.py::test_every_context_is_verbatim_in_sources",
+        "tests/test_corpus_a3.py::test_context_check_catches_tampered_context",
+        "tests/test_corpus_a3.py::test_spans_match_answer_slices",
+        "tests/test_corpus_a3.py::test_number_attribution_value_is_elsewhere_in_same_document",
+        "tests/test_corpus_a3.py::test_number_attribution_check_catches_foreign_value",
+        "tests/test_corpus_a3.py::test_document_is_in_exactly_one_split",
+        "tests/test_corpus_a3.py::test_manifest_hashes_are_reproducible",
+        "tests/test_corpus_a3.py::test_rebuild_gives_same_numbers",
+        "tests/test_corpus_a3.py::test_pairs_have_real_document_metadata",
+        "tests/test_corpus_a3.py::test_pairs_are_unique",
+        "tests/test_corpus_a3.py::test_build_real_refuses_empty_and_generated_documents"
+      ]
+    },
+    {
+      "path": "spanverify-module/tests/test_corpus_a3_report.py",
+      "collected_nodes": 5,
+      "module_docstring": "Тесты отчёта по корпусу A3: числа берутся из манифеста, разделы на месте.\n\nОтчёт — то, что читает проверяющий, поэтому проверяется не «текст красиво выглядит», а\nконкретные обязательства задания: числа совпадают с манифестом, числа A1 и A3 не\nскладываются, есть список источников с числом документов, есть раздел «не сделано» и\nответы на два вопроса (документы по источникам; расхождения контекстов).",
+      "nodeids": [
+        "tests/test_corpus_a3_report.py::test_report_numbers_match_manifest",
+        "tests/test_corpus_a3_report.py::test_report_separates_a1_and_a3",
+        "tests/test_corpus_a3_report.py::test_report_has_sources_checks_and_not_done",
+        "tests/test_corpus_a3_report.py::test_report_without_corpus_says_so",
+        "tests/test_corpus_a3_report.py::test_update_summary_is_idempotent"
+      ]
+    },
+    {
+      "path": "spanverify-module/tests/test_coverage.py",
+      "collected_nodes": 14,
+      "module_docstring": "Тесты покрытия фактов документа ответом (исправление B2/B3: missing и partial).\n\nСмысл проверок: конвейер раньше отвечал только на вопрос «есть ли в ответе\nлишнее», поэтому пропуск сведения не ловился вообще (``missing.recall = 0.0``).\nЭти тесты фиксируют, что пропуск и отброшенное условие теперь обнаруживаются, а\nна корректном ответе замечаний не появляется.",
+      "nodeids": [
+        "tests/test_coverage.py::test_extract_facts_finds_values",
+        "tests/test_coverage.py::test_fact_has_subject",
+        "tests/test_coverage.py::test_mentioned_when_value_present",
+        "tests/test_coverage.py::test_number_in_words_is_mentioned",
+        "tests/test_coverage.py::test_omitted_when_value_dropped",
+        "tests/test_coverage.py::test_omitted_is_detected_by_missing_coverages",
+        "tests/test_coverage.py::test_distorted_when_other_number_used",
+        "tests/test_coverage.py::test_partial_when_condition_dropped",
+        "tests/test_coverage.py::test_partial_is_detected_by_partial_coverages",
+        "tests/test_coverage.py::test_irrelevant_when_answer_about_other_thing",
+        "tests/test_coverage.py::test_mentioning_one_object_does_not_blame_another",
+        "tests/test_coverage.py::test_empty_input_gives_no_coverages",
+        "tests/test_coverage.py::test_coverage_points_into_answer",
+        "tests/test_coverage.py::test_extract_facts_respects_min_words"
+      ]
+    },
+    {
+      "path": "spanverify-module/tests/test_dataset_validation.py",
+      "collected_nodes": 10,
+      "module_docstring": "Дефект E (N1): чужой формат датасета должен отвергаться, а не считаться молча.\n\nПроверяющий воспроизвёл на релизе v1.2.0: файл с полями ``question/label`` вместо\n``context/labels`` принимался, метрики печатались как ``F1 0.000, AUC=nan``, код\nвозврата был 0. Эти тесты падают на v1.2.0 и проходят после валидации схемы.",
+      "nodeids": [
+        "tests/test_dataset_validation.py::test_foreign_schema_is_rejected",
+        "tests/test_dataset_validation.py::test_missing_required_key_reports_line_number",
+        "tests/test_dataset_validation.py::test_label_bounds_are_checked",
+        "tests/test_dataset_validation.py::test_broken_json_reports_line_number",
+        "tests/test_dataset_validation.py::test_empty_file_is_rejected",
+        "tests/test_dataset_validation.py::test_valid_corpus_still_reads",
+        "tests/test_dataset_validation.py::test_cli_evaluate_rejects_foreign_dataset",
+        "tests/test_dataset_validation.py::test_cli_evaluate_accepts_valid_dataset",
+        "tests/test_dataset_validation.py::test_cli_evaluate_json_has_no_nan",
+        "tests/test_dataset_validation.py::test_zipapp_propagates_exit_codes"
+      ]
+    },
+    {
+      "path": "spanverify-module/tests/test_demo_data.py",
+      "collected_nodes": 7,
+      "module_docstring": "Тесты генератора демонстрационного корпуса.",
+      "nodeids": [
+        "tests/test_demo_data.py::test_dataset_generation_is_reproducible",
+        "tests/test_demo_data.py::test_different_seeds_give_different_texts",
+        "tests/test_demo_data.py::test_labels_are_ordered_and_inside_text",
+        "tests/test_demo_data.py::test_labels_alternate_between_classes",
+        "tests/test_demo_data.py::test_ai_and_human_paragraphs_differ_in_vocabulary",
+        "tests/test_demo_data.py::test_write_and_read_dataset_roundtrip",
+        "tests/test_demo_data.py::test_dataset_statistics_shape"
+      ]
+    },
+    {
+      "path": "spanverify-module/tests/test_detector.py",
+      "collected_nodes": 12,
+      "module_docstring": "Тесты ядра: оценка текста, локализация фрагментов, устойчивость.",
+      "nodeids": [
+        "tests/test_detector.py::test_empty_text_returns_zero_result",
+        "tests/test_detector.py::test_result_is_serializable",
+        "tests/test_detector.py::test_ai_text_scores_higher_than_human_text",
+        "tests/test_detector.py::test_spans_are_inside_text_and_ordered",
+        "tests/test_detector.py::test_span_length_respects_min_span_tokens",
+        "tests/test_detector.py::test_higher_threshold_never_increases_ai_share",
+        "tests/test_detector.py::test_surrogate_mode_adds_honest_warning",
+        "tests/test_detector.py::test_analysis_is_deterministic",
+        "tests/test_detector.py::test_mixed_document_estimates_track_ground_truth",
+        "tests/test_detector.py::test_explain_returns_per_token_table",
+        "tests/test_detector.py::test_unknown_backend_is_rejected",
+        "tests/test_detector.py::test_load_detector_helper_uses_overrides"
+      ]
+    },
+    {
+      "path": "spanverify-module/tests/test_engine.py",
+      "collected_nodes": 3,
+      "module_docstring": "Тесты загрузки обученных параметров: приоритет источников и смысл source.\n\nПроверяется именно то, от чего зависит обещание «.exe работает автономно»:\nвстроенные в бандл веса не должны подменяться случайным файлом из текущей\nпапки, но осознанно положенные рядом с приложением — должны иметь приоритет.",
+      "nodeids": [
+        "tests/test_engine.py::test_weights_from_bundle_win_over_current_directory",
+        "tests/test_engine.py::test_weights_near_executable_win_over_bundle",
+        "tests/test_engine.py::test_weights_fall_back_to_defaults_when_nothing_found"
+      ]
+    },
+    {
+      "path": "spanverify-module/tests/test_experiment_official_split.py",
+      "collected_nodes": 3,
+      "module_docstring": "Эксперимент с официальными разбиениями: тест не участвует в выборе порога.\n\nСмысл набора: когда у корпуса есть официальные сплиты\n(``splits/{train,dev,test}.jsonl``), веса, маска и порог выбираются только на\nобучающей части, а официальный тест измеряется отдельно — вместе с метриками по\nтипам, долей ложных пометок на чистых парах, кривой маски и сравнением правила\nвердикта. Этого требует пункт «отчёт по официальному test, отдельно от всех\nпар» — без него числа считались по парам, на которых выбиралась маска.",
+      "nodeids": [
+        "tests/test_experiment_official_split.py::test_experiment_reports_official_test_separately",
+        "tests/test_experiment_official_split.py::test_experiment_without_splits_keeps_old_path",
+        "tests/test_experiment_official_split.py::test_no_splits_flag_ignores_official_splits"
+      ]
+    },
+    {
+      "path": "spanverify-module/tests/test_external_datasets.py",
+      "collected_nodes": 13,
+      "module_docstring": "Тесты адаптеров внешних наборов.\n\nВнешний набор — чужая разметка: её нельзя «поправить», её можно только проверить.\nПоэтому тесты ловят три класса ошибок: неверное извлечение контекста (у RAGTruth\nполе ``source_info`` бывает строкой и словарём), тихую «починку» сдвинутых меток\n(должен расти счётчик ``unverified``, а не появляться новая метка) и потерю\nпроисхождения разметки (LLM-метки нельзя выдавать за человеческие).",
+      "nodeids": [
+        "tests/test_external_datasets.py::test_ragtruth_context_handles_string_and_mapping",
+        "tests/test_external_datasets.py::test_ragtruth_context_rejects_unexpected_type",
+        "tests/test_external_datasets.py::test_ragtruth_pairs_use_passages_as_context",
+        "tests/test_external_datasets.py::test_text_offsets_and_ambiguity",
+        "tests/test_external_datasets.py::test_shifted_label_is_not_repaired_but_counted",
+        "tests/test_external_datasets.py::test_label_out_of_bounds_goes_to_unverified",
+        "tests/test_external_datasets.py::test_label_origin_is_recorded_as_human",
+        "tests/test_external_datasets.py::test_fixture_spans_match_slices",
+        "tests/test_external_datasets.py::test_totals_match_published_control_numbers_for_fixture",
+        "tests/test_external_datasets.py::test_summarize_pairs_reports_origin_and_unverified",
+        "tests/test_external_datasets.py::test_validate_pairs_detects_broken_offsets_and_missing_pairs",
+        "tests/test_external_datasets.py::test_rushallu_spans_reports_unverified_instead_of_repair",
+        "tests/test_external_datasets.py::test_rushallu_pairs_counts_types"
+      ]
+    },
+    {
+      "path": "spanverify-module/tests/test_external_fetch_and_eval.py",
+      "collected_nodes": 16,
+      "module_docstring": "Тесты загрузчика внешних наборов и оценки на них.\n\nСеть в тестах не используется: проверяется то, что определяет корректность\nрезультата — реестр (что берём и что исключено), реакция на расхождение хеша,\nсборка адаптированных файлов из фикстур и сами прогоны оценки (метрики считаются,\nпроисхождение разметки попадает в отчёт, срез помечается, baseline не выдумывается).",
+      "nodeids": [
+        "tests/test_external_fetch_and_eval.py::test_registry_contains_control_numbers",
+        "tests/test_external_fetch_and_eval.py::test_registry_records_excluded_datasets_with_reasons",
+        "tests/test_external_fetch_and_eval.py::test_registry_marks_non_human_label_origin",
+        "tests/test_external_fetch_and_eval.py::test_revisions_are_pinned",
+        "tests/test_external_fetch_and_eval.py::test_hash_mismatch_stops_download",
+        "tests/test_external_fetch_and_eval.py::test_control_number_mismatch_is_loud",
+        "tests/test_external_fetch_and_eval.py::test_evaluate_accepts_adapted_file",
+        "tests/test_external_fetch_and_eval.py::test_evaluate_marks_slice_as_slice",
+        "tests/test_external_fetch_and_eval.py::test_evaluate_warns_about_demo_mode",
+        "tests/test_external_fetch_and_eval.py::test_missing_file_gives_hint",
+        "tests/test_external_fetch_and_eval.py::test_combined_file_keeps_runs_separate",
+        "tests/test_external_fetch_and_eval.py::test_compact_metrics_shape",
+        "tests/test_external_fetch_and_eval.py::test_report_table_contains_origin_and_numbers",
+        "tests/test_external_fetch_and_eval.py::test_report_without_runs_is_honest",
+        "tests/test_external_fetch_and_eval.py::test_annotation_prints_control_numbers_and_metrics",
+        "tests/test_external_fetch_and_eval.py::test_annotation_warns_without_files"
+      ]
+    },
+    {
+      "path": "spanverify-module/tests/test_feature_cache.py",
+      "collected_nodes": 13,
+      "module_docstring": "Кеш признаков: ключ, попадание, чтение шардов.\n\nТесты идут в режиме ``demo`` — веса модели для них не нужны. Проверяется то, от\nчего зависит корректность эксперимента на реальной модели: что ключ однозначно\nсоответствует паре, что попадание возвращает ровно то, что было посчитано, что\nпромах считает заново, и что шарды склеиваются.",
+      "nodeids": [
+        "tests/test_feature_cache.py::test_key_is_stable_for_the_same_input",
+        "tests/test_feature_cache.py::test_key_differs_for_every_significant_part",
+        "tests/test_feature_cache.py::test_list_context_matches_joined_string",
+        "tests/test_feature_cache.py::test_cache_hit_returns_the_cached_matrix",
+        "tests/test_feature_cache.py::test_cache_miss_computes_normally",
+        "tests/test_feature_cache.py::test_key_that_is_not_in_cache_is_ignored",
+        "tests/test_feature_cache.py::test_global_cache_registry_round_trip",
+        "tests/test_feature_cache.py::test_global_cache_is_used_without_explicit_argument",
+        "tests/test_feature_cache.py::test_load_feature_cache_merges_shards",
+        "tests/test_feature_cache.py::test_load_feature_cache_ignores_blank_lines_and_missing",
+        "tests/test_feature_cache.py::test_load_feature_cache_of_a_single_file",
+        "tests/test_feature_cache.py::test_counting_cache_counts_hits_and_misses",
+        "tests/test_feature_cache.py::test_load_feature_cache_can_count"
+      ]
+    },
+    {
+      "path": "spanverify-module/tests/test_feature_cache_roundtrip.py",
+      "collected_nodes": 3,
+      "module_docstring": "Тест round-trip кеша признаков: dump → load сохраняет все FEATURE_NAMES.\n\nРегрессия: в версии 7 октября FEATURE_NAMES был из 3 признаков, потом добавили\nещё 2 (ctx_attention_mass_norm, ctx_max_similarity), а dump_matrix и\nload_feature_cache не обновили. Кеш хранил только 3 поля, train.py:138 падал\nс IndexError при обращении к пустому списку.\n\nТест ловит этот класс ошибок: создаёт FeatureMatrix со всеми 5 полями,\nдампит через dump_matrix, загружает через load_feature_cache, проверяет:\n1. Все 5 полей присутствуют\n2. Длины массивов равны длине ответа (не пустые)\n3. train.py:collect_samples проходит на загруженной матрице",
+      "nodeids": [
+        "tests/test_feature_cache_roundtrip.py::test_dump_load_roundtrip_preserves_all_features",
+        "tests/test_feature_cache_roundtrip.py::test_load_feature_cache_detects_old_format",
+        "tests/test_feature_cache_roundtrip.py::test_collect_samples_works_with_cached_matrix"
+      ]
+    },
+    {
+      "path": "spanverify-module/tests/test_fetch_npa_corpus.py",
+      "collected_nodes": 9,
+      "module_docstring": "Тесты загрузчика A3: robots.txt, отбор по темам, извлечение текста, хеши.\n\nСеть в тестах не используется: проверяются решающие функции — те, где ошибка тихо\nпортит корпус (запрещённый robots.txt путь, документ не по теме, пустой текст вместо\nскана, потерянный при повторном запуске хеш).",
+      "nodeids": [
+        "tests/test_fetch_npa_corpus.py::test_robots_parser_and_allowed_paths",
+        "tests/test_fetch_npa_corpus.py::test_robots_empty_disallow_allows_everything",
+        "tests/test_fetch_npa_corpus.py::test_theme_of_matches_priority_topics",
+        "tests/test_fetch_npa_corpus.py::test_pick_extraction_prefers_text_layer_then_ocr",
+        "tests/test_fetch_npa_corpus.py::test_write_sources_and_verify_hashes",
+        "tests/test_fetch_npa_corpus.py::test_verify_sources_reports_missing_manifest",
+        "tests/test_fetch_npa_corpus.py::test_load_existing_skips_tampered_files",
+        "tests/test_fetch_npa_corpus.py::test_plan_downloads_covers_themes_and_skips_existing",
+        "tests/test_fetch_npa_corpus.py::test_extract_facts_needs_values_and_words"
+      ]
+    },
+    {
+      "path": "spanverify-module/tests/test_fetch_rushallu.py",
+      "collected_nodes": 9,
+      "module_docstring": "Тесты загрузчика внешнего корпуса RusHallu-RAG.\n\nСеть в тестах не используется: скачивание подменяется записью заранее известных\nбайтов, а проверяется то, что важнее — перевод разметки в смещения символов,\nсклейка документов, контроль SHA256 и содержимое манифеста. Именно эти части\nопределяют, попадёт ли в отчёт корректный корпус.",
+      "nodeids": [
+        "tests/test_fetch_rushallu.py::test_spans_to_labels_gives_character_offsets",
+        "tests/test_fetch_rushallu.py::test_spans_to_labels_counts_ambiguous_offsets",
+        "tests/test_fetch_rushallu.py::test_spans_to_labels_rejects_span_absent_in_answer",
+        "tests/test_fetch_rushallu.py::test_empty_annotation_means_clean_pair",
+        "tests/test_fetch_rushallu.py::test_build_context_keeps_document_order_and_separators",
+        "tests/test_fetch_rushallu.py::test_build_pairs_collects_statistics_by_type",
+        "tests/test_fetch_rushallu.py::test_sha256_file_matches_hashlib",
+        "tests/test_fetch_rushallu.py::test_fetch_verifies_hashes_and_writes_manifest",
+        "tests/test_fetch_rushallu.py::test_fetch_fails_loudly_on_hash_mismatch"
+      ]
+    },
+    {
+      "path": "spanverify-module/tests/test_gold_counts.py",
+      "collected_nodes": 2,
+      "module_docstring": "Тест для проверки правильности gold counts на реальных данных (задача 2.1).",
+      "nodeids": [
+        "tests/test_gold_counts.py::test_gold_counts",
+        "tests/test_gold_counts.py::test_specific_pairs"
+      ]
+    },
+    {
+      "path": "spanverify-module/tests/test_head_applied.py",
+      "collected_nodes": 8,
+      "module_docstring": "Оценка должна применять ту голову, которую только что обучили.\n\nПрогон 37472951524: кросс-валидация головы на корпусе A3 дала AUC 0,85, а\nсквозной token F1 — 0,013. Причина не в признаках. Бандл хранил только путь\n``config/head.json``, и оценка прочитала голову из поставки (обученную на\nдемо-корпусе), а не модель этого прогона. Маска, подобранная под свежую\nголову, применилась к чужим вероятностям.",
+      "nodeids": [
+        "tests/test_head_applied.py::test_inline_head_is_used_and_shipped_file_is_not_read",
+        "tests/test_head_applied.py::test_file_head_is_still_loaded_when_model_is_absent",
+        "tests/test_head_applied.py::test_choose_threshold_does_not_go_silent_when_fpr_is_impossible",
+        "tests/test_head_applied.py::test_choose_threshold_reports_when_constraint_holds",
+        "tests/test_head_applied.py::test_scale_robust_matches_scale_at_quantile_one",
+        "tests/test_head_applied.py::test_scale_robust_does_not_let_one_spike_zero_the_rest",
+        "tests/test_head_applied.py::test_cache_key_uses_the_model_the_experiment_names",
+        "tests/test_head_applied.py::test_mask_floor_grid_can_sit_below_a_quarter"
+      ]
+    },
+    {
+      "path": "spanverify-module/tests/test_hf_chunked.py",
+      "collected_nodes": 6,
+      "module_docstring": "Тесты для hf_features_chunked с фальшивым токенизатором (без torch).\n\nЭти тесты проверяют логику чанкинга и агрегации признаков без реальной модели.\nЦель: увеличить покрытие features.py (сейчас 69.9%) и предотвратить незаметные\nполомки hf-ветки.",
+      "nodeids": [
+        "tests/test_hf_chunked.py::test_hf_features_chunked_short_context",
+        "tests/test_hf_chunked.py::test_hf_features_chunked_long_context",
+        "tests/test_hf_chunked.py::test_hf_features_chunked_empty_answer",
+        "tests/test_hf_chunked.py::test_hf_features_chunked_empty_context",
+        "tests/test_hf_chunked.py::test_hf_features_chunked_aggregation",
+        "tests/test_hf_chunked.py::test_chunk_document_integration"
+      ]
+    },
+    {
+      "path": "spanverify-module/tests/test_hf_footprint_measure.py",
+      "collected_nodes": 10,
+      "module_docstring": "Проверки измерителя объёмов режима hf (``scripts/measure_hf_footprint.py``).\n\nСкрипт не запускается в CI-тестах целиком (ему нужны torch и кеш весов), но его\nарифметика обязана быть проверяемой: от неё зависят числа приёмки по ТЗ п. 4.2.\nЗдесь проверяются три вещи:\n\n1. урезание считается по расширениям и каталогам, а не «на глаз»: заголовки,\n   метаданные, кеши и заглушки типов не попадают в объём, а модули и разделяемые\n   библиотеки — попадают;\n2. жёсткие ссылки одного файла не удваивают объём (иначе кеш весов раздувается\n   вдвое, ведь Hugging Face раскладывает один файл в ``blobs`` и ``snapshots``);\n3. десятичные мегабайты и МиБ считаются раздельно: договор называет «МБ», и\n   подмена одной величины другой запрещена.",
+      "nodeids": [
+        "tests/test_hf_footprint_measure.py::test_prune_keeps_loadable_files",
+        "tests/test_hf_footprint_measure.py::test_prune_suffixes_do_not_touch_python_or_binaries",
+        "tests/test_hf_footprint_measure.py::test_megabytes_are_decimal_and_mib_separate",
+        "tests/test_hf_footprint_measure.py::test_runtime_probe_mentions_hf_mode",
+        "tests/test_hf_footprint_measure.py::test_model_weights_use_main_revision_and_one_format",
+        "tests/test_hf_footprint_measure.py::test_model_weights_fall_back_to_pytorch_without_safetensors",
+        "tests/test_hf_footprint_measure.py::test_model_weights_report_all_formats_of_selected_revision",
+        "tests/test_hf_footprint_measure.py::test_hardlinks_are_counted_once",
+        "tests/test_hf_footprint_measure.py::test_model_weights_without_refs_use_all_snapshots",
+        "tests/test_hf_footprint_measure.py::test_model_weights_catch_model_shards"
+      ]
+    },
+    {
+      "path": "spanverify-module/tests/test_hf_no_silent_fallback.py",
+      "collected_nodes": 5,
+      "module_docstring": "Запрет тихой подмены режима hf на demo (дефект A3 реестра).\n\nПравило продукта: если запрошен реальный режим (``hf``), ответ должен быть либо\nреальным, либо явной ошибкой. Молчаливый переход на лексические суррогаты\nнедопустим — иначе таблица метрик с колонкой «режим» теряет смысл, и demo\nвыдаётся за научный результат.\n\nТесты написаны так, чтобы работать в обоих окружениях: там, где torch и\ntransformers установлены, проверяется, что признаки действительно считаны\nмоделью; там, где их нет — что ошибка явная и понятная.",
+      "nodeids": [
+        "tests/test_hf_no_silent_fallback.py::test_hf_missing_dependencies_raise_clear_error",
+        "tests/test_hf_no_silent_fallback.py::test_verifier_in_hf_mode_does_not_fall_back_to_demo",
+        "tests/test_hf_no_silent_fallback.py::test_demo_mode_is_reported_honestly",
+        "tests/test_hf_no_silent_fallback.py::test_hf_features_return_model_backend_when_available",
+        "tests/test_hf_no_silent_fallback.py::test_cli_returns_error_code_when_hf_unavailable"
+      ]
+    },
+    {
+      "path": "spanverify-module/tests/test_metrics_files.py",
+      "collected_nodes": 12,
+      "module_docstring": "Единый файл чисел и его сверка с документами (исправление P0-3 аудита).\n\nСмысл набора: числа в документах больше не берутся из памяти. Есть один файл\n``reports/CURRENT_METRICS.json``, собранный прогоном кода, и есть проверка, которая\nпадает, если документ разошёлся с ним. Тесты ниже защищают это правило и\nчестные оговорки, которые нельзя потерять при правках.",
+      "nodeids": [
+        "tests/test_metrics_files.py::test_metrics_json_labels_demo_corpus_as_synthetic",
+        "tests/test_metrics_files.py::test_metrics_json_records_group_split_without_shared_subjects",
+        "tests/test_metrics_files.py::test_metrics_json_keeps_cross_corpus_drop",
+        "tests/test_metrics_files.py::test_metrics_json_exposes_strict_span_quality",
+        "tests/test_metrics_files.py::test_check_numbers_reports_stale_value",
+        "tests/test_metrics_files.py::test_check_numbers_requires_itog_sections",
+        "tests/test_metrics_files.py::test_documents_match_metrics_file",
+        "tests/test_metrics_files.py::test_full_suite_detection_compares_args_with_testpaths",
+        "tests/test_metrics_files.py::test_metrics_file_is_not_behind_the_suite",
+        "tests/test_metrics_files.py::test_document_test_claims_match_this_session",
+        "tests/test_metrics_files.py::test_pilot_publishes_control_thresholds_and_draws_png",
+        "tests/test_metrics_files.py::test_evaluate_reports_verdict_metrics"
+      ]
+    },
+    {
+      "path": "spanverify-module/tests/test_no_test_isolation.py",
+      "collected_nodes": 2,
+      "module_docstring": "Тест изоляции официального теста при --no-test (P0 шаг 1).\n\nПроверяет, что при --no-test:\n1. Без splits → ошибка (код 3)\n2. С splits → test split не передаётся в verifier.evaluate()\n3. metrics считаются только по train+dev\n4. test_official = null в JSON отчёте",
+      "nodeids": [
+        "tests/test_no_test_isolation.py::test_no_test_without_splits_errors",
+        "tests/test_no_test_isolation.py::test_no_test_with_splits_excludes_test"
+      ]
+    },
+    {
+      "path": "spanverify-module/tests/test_normalize.py",
+      "collected_nodes": 12,
+      "module_docstring": "Тесты нормализации текста, чисел и единиц измерения (исправление C3).\n\nПроверяется то, из-за чего метод рассыпался на внешних наборах: требование\nпочти дословного совпадения. Числа прописью, разные падежи единиц и разные\nформы дат обязаны давать один и тот же нормализованный вид — иначе пересказ\nдокумента воспринимается как расхождение.",
+      "nodeids": [
+        "tests/test_normalize.py::test_numbers_to_digits_simple",
+        "tests/test_normalize.py::test_numbers_to_digits_compound",
+        "tests/test_normalize.py::test_numbers_to_digits_keeps_existing_digits",
+        "tests/test_normalize.py::test_canonical_units_reduces_cases",
+        "tests/test_normalize.py::test_normalize_dates_words_and_digits",
+        "tests/test_normalize.py::test_number_words_equal_to_digits",
+        "tests/test_normalize.py::test_digits_are_not_lost_in_match_form",
+        "tests/test_normalize.py::test_stem_reduces_word_forms",
+        "tests/test_normalize.py::test_stem_keeps_short_words",
+        "tests/test_normalize.py::test_stem_handles_yo",
+        "tests/test_normalize.py::test_stem_text_returns_all_words",
+        "tests/test_normalize.py::test_empty_input_is_safe"
+      ]
+    },
+    {
+      "path": "spanverify-module/tests/test_number_attribution.py",
+      "collected_nodes": 8,
+      "module_docstring": "Дефект D: число ответа привязывается к своему объекту, а не «находится где-то».\n\nПроверяющий воспроизвёл на релизе v1.2.0: контекст с двумя сроками (первичные —\nпять лет, вторичные — десять лет), ответ про **первичные** говорит «десять лет» —\nи получал «ОПОРА НА КОНТЕКСТ ЕСТЬ», потому что слово «десять» действительно есть\nв контексте, но в предложении про другой объект.\n\nЭти тесты падают на коде v1.2.0 (где привязки нет) и проходят после исправления.",
+      "nodeids": [
+        "tests/test_number_attribution.py::test_measurements_split_by_subject",
+        "tests/test_number_attribution.py::test_number_from_other_object_is_not_grounded",
+        "tests/test_number_attribution.py::test_number_from_own_object_is_grounded",
+        "tests/test_number_attribution.py::test_attribution_finds_correct_subject_among_three",
+        "tests/test_number_attribution.py::test_substitution_of_sentence_in_three_facts_is_flagged",
+        "tests/test_number_attribution.py::test_attribution_requires_two_measurements",
+        "tests/test_number_attribution.py::test_attribution_is_quiet_without_subject",
+        "tests/test_number_attribution.py::test_demo_corpus_metrics_do_not_degrade[demo]"
+      ]
+    },
+    {
+      "path": "spanverify-module/tests/test_number_words_in_answer.py",
+      "collected_nodes": 6,
+      "module_docstring": "Число прописью в ответе не считается расхождением (дефект C3 реестра).\n\nСмысл проверки: если документ содержит «25 мегабайт», а ответ написан\n«двадцать пять мегабайт», ответ корректен. Пока значение числа считалось\nпо одному токену, «двадцать» превращалось в «20», «пять» — в «5», ни того\nни другого в документе не было, и корректный ответ обвинялся в подмене.\n\nЗдесь проверяется не только сама нормализация, но и то, что она доходит\nдо вердикта: признак может быть посчитан верно, а вердикт — нет.",
+      "nodeids": [
+        "tests/test_number_words_in_answer.py::test_words_to_number_joins_group",
+        "tests/test_number_words_in_answer.py::test_numbers_to_digits_converts_words",
+        "tests/test_number_words_in_answer.py::test_group_value_covers_both_tokens",
+        "tests/test_number_words_in_answer.py::test_answer_with_number_in_words_is_grounded",
+        "tests/test_number_words_in_answer.py::test_substituted_number_still_detected",
+        "tests/test_number_words_in_answer.py::test_words_do_not_create_spans"
+      ]
+    },
+    {
+      "path": "spanverify-module/tests/test_oof_protocol.py",
+      "collected_nodes": 11,
+      "module_docstring": "Тесты для проверки корректности OOF-протокола в P0-2.\n\nЭти тесты гарантируют:\n1. Final fit получает raw OOF (не calibrated)\n2. Порог выбран на той же шкале, что inference\n3. Голова обучается вне held-out документов\n4. Каждый raw OOF score ровно один раз\n5. Runtime precision/roundtrip",
+      "nodeids": [
+        "tests/test_oof_protocol.py::test_aggregate_from_dict_current",
+        "tests/test_oof_protocol.py::test_aggregate_from_dict_max",
+        "tests/test_oof_protocol.py::test_aggregate_from_dict_mean_top3",
+        "tests/test_oof_protocol.py::test_train_model_on_subset",
+        "tests/test_oof_protocol.py::test_get_risks_with_head",
+        "tests/test_oof_protocol.py::test_fit_answer_calibration_receives_raw_scores",
+        "tests/test_oof_protocol.py::test_threshold_on_same_scale_as_inference",
+        "tests/test_oof_protocol.py::test_oof_coverage_no_duplicates",
+        "tests/test_oof_protocol.py::test_runtime_roundtrip_precision",
+        "tests/test_oof_protocol.py::test_aggregator_empty_scores",
+        "tests/test_oof_protocol.py::test_calibrator_compress_false"
+      ]
+    },
+    {
+      "path": "spanverify-module/tests/test_oof_public_pipeline.py",
+      "collected_nodes": 6,
+      "module_docstring": "Тесты для проверки унификации OOF/dev с публичным Verifier API.\n\nЭти тесты проверяют, что OOF-протокол использует публичный Verifier.verify()\nс fold-весами и fold-головой, а не реализует собственную логику сглаживания.",
+      "nodeids": [
+        "tests/test_oof_public_pipeline.py::test_answer_label_uses_gold_labels",
+        "tests/test_oof_public_pipeline.py::test_answer_label_with_single_digit",
+        "tests/test_oof_public_pipeline.py::test_oof_risks_returns_correct_structure",
+        "tests/test_oof_public_pipeline.py::test_oof_uses_answer_label",
+        "tests/test_oof_public_pipeline.py::test_verify_with_tokens_returns_raw_risk",
+        "tests/test_oof_public_pipeline.py::test_dev_uses_answer_label"
+      ]
+    },
+    {
+      "path": "spanverify-module/tests/test_p1_integration.py",
+      "collected_nodes": 6,
+      "module_docstring": "Тест, доказывающий что P1 реально влияет на публичный Verifier.verify().",
+      "nodeids": [
+        "tests/test_p1_integration.py::test_p1_changes_public_score",
+        "tests/test_p1_integration.py::test_p1_save_load_roundtrip_preserves_score",
+        "tests/test_p1_integration.py::test_legacy_bundle_without_answer_head",
+        "tests/test_p1_integration.py::test_p1_rejects_nan_input",
+        "tests/test_p1_integration.py::test_p1_rejects_unsupported_schema",
+        "tests/test_p1_integration.py::test_p1_rejects_nan_in_weights"
+      ]
+    },
+    {
+      "path": "spanverify-module/tests/test_p1_replay_contract.py",
+      "collected_nodes": 13,
+      "module_docstring": "Real entrypoint/schema/parity checks. Fixture HF caches are NOT HF quality evidence.",
+      "nodeids": [
+        "tests/test_p1_replay_contract.py::test_real_frozen_candidate_cli_and_calibration_schema",
+        "tests/test_p1_replay_contract.py::test_frozen_hash_allows_git_crlf_but_not_parameter_changes",
+        "tests/test_p1_replay_contract.py::test_public_raw_is_not_calibrated_alias",
+        "tests/test_p1_replay_contract.py::test_whole_bundle_near_threshold_decision_roundtrip",
+        "tests/test_p1_replay_contract.py::test_present_corrupted_p1_does_not_fall_back_to_legacy",
+        "tests/test_p1_replay_contract.py::test_parity_detects_per_id_errors[raw_score-0.2]",
+        "tests/test_p1_replay_contract.py::test_parity_detects_per_id_errors[calibrated_score-0.2]",
+        "tests/test_p1_replay_contract.py::test_parity_detects_per_id_errors[prediction-0]",
+        "tests/test_p1_replay_contract.py::test_parity_detects_per_id_errors[gold-0]",
+        "tests/test_p1_replay_contract.py::test_parity_detects_per_id_errors[threshold-0.8]",
+        "tests/test_p1_replay_contract.py::test_parity_rejects_duplicate_ids",
+        "tests/test_p1_replay_contract.py::test_auc_constant_scores_is_half",
+        "tests/test_p1_replay_contract.py::test_cached_hf_fixture_full_replay_no_backend"
+      ]
+    },
+    {
+      "path": "spanverify-module/tests/test_p2_public_influence.py",
+      "collected_nodes": 9,
+      "module_docstring": "Тесты public influence P2 token-head.\n\nКритические проверки:\n1. P2 реально меняет token raw_risk и flags/spans\n2. P1 answer raw/calibrated score НЕ меняется\n3. P1 answer prediction НЕ меняется\n4. JSON save/load не меняет предсказания\n5. Пустой/повреждённый P2 вызывает ошибку (не silent fallback)\n6. Старый bundle без P2 работает как раньше",
+      "nodeids": [
+        "tests/test_p2_public_influence.py::TestP2PublicInfluence::test_p2_changes_token_risk",
+        "tests/test_p2_public_influence.py::TestP2PublicInfluence::test_p1_answer_score_unchanged",
+        "tests/test_p2_public_influence.py::TestP2PublicInfluence::test_p2_save_load_preserves_predictions",
+        "tests/test_p2_public_influence.py::TestP2PublicInfluence::test_broken_p2_raises_error",
+        "tests/test_p2_public_influence.py::TestP2PublicInfluence::test_bundle_without_p2_works",
+        "tests/test_p2_public_influence.py::TestP2PublicInfluence::test_p2_changes_flags_and_spans",
+        "tests/test_p2_public_influence.py::TestP2Lifecycle::test_n_features_property",
+        "tests/test_p2_public_influence.py::TestP2Lifecycle::test_predict_one_predict_many",
+        "tests/test_p2_public_influence.py::TestP2Lifecycle::test_save_load_roundtrip"
+      ]
+    },
+    {
+      "path": "spanverify-module/tests/test_p2_tau.py",
+      "collected_nodes": 4,
+      "module_docstring": "Behavior, not field-presence tests for global cutoff and frozen P1.",
+      "nodeids": [
+        "tests/test_p2_tau.py::test_tau_changes_public_mask_and_roundtrip",
+        "tests/test_p2_tau.py::test_legacy_and_sentinel",
+        "tests/test_p2_tau.py::test_frozen_bundle_full_roundtrip",
+        "tests/test_p2_tau.py::test_fit_receipt_uses_only_requested_documents"
+      ]
+    },
+    {
+      "path": "spanverify-module/tests/test_p3_localization.py",
+      "collected_nodes": 17,
+      "module_docstring": "Functional P3 tests; synthetic states are unit fixtures, never quality evidence.",
+      "nodeids": [
+        "tests/test_p3_localization.py::test_growth_and_weak_component",
+        "tests/test_p3_localization.py::test_support_count",
+        "tests/test_p3_localization.py::test_bridge_unscored_not_scored_gap",
+        "tests/test_p3_localization.py::test_empty_single_number_edges_and_punctuation",
+        "tests/test_p3_localization.py::test_malformed_fails_closed[change0]",
+        "tests/test_p3_localization.py::test_malformed_fails_closed[change1]",
+        "tests/test_p3_localization.py::test_malformed_fails_closed[change2]",
+        "tests/test_p3_localization.py::test_malformed_fails_closed[change3]",
+        "tests/test_p3_localization.py::test_malformed_fails_closed[change4]",
+        "tests/test_p3_localization.py::test_malformed_fails_closed[change5]",
+        "tests/test_p3_localization.py::test_malformed_fails_closed[change6]",
+        "tests/test_p3_localization.py::test_malformed_fails_closed[change7]",
+        "tests/test_p3_localization.py::test_malformed_fails_closed[change8]",
+        "tests/test_p3_localization.py::test_malformed_fails_closed[change9]",
+        "tests/test_p3_localization.py::test_nan_risk_length_fail",
+        "tests/test_p3_localization.py::test_anchor_exact_and_merge_metadata",
+        "tests/test_p3_localization.py::test_public_pure_invariance_roundtrip_empty_mask"
+      ]
+    },
+    {
+      "path": "spanverify-module/tests/test_p4_context.py",
+      "collected_nodes": 14,
+      "module_docstring": "P4 pure context windows, export/runtime, frozen P1 and fold isolation.",
+      "nodeids": [
+        "tests/test_p4_context.py::test_scored_clamp_and_pair_boundary[1]",
+        "tests/test_p4_context.py::test_scored_clamp_and_pair_boundary[2]",
+        "tests/test_p4_context.py::test_scored_clamp_and_pair_boundary[3]",
+        "tests/test_p4_context.py::test_spec_fail_closed[change0]",
+        "tests/test_p4_context.py::test_spec_fail_closed[change1]",
+        "tests/test_p4_context.py::test_spec_fail_closed[change2]",
+        "tests/test_p4_context.py::test_spec_fail_closed[change3]",
+        "tests/test_p4_context.py::test_spec_fail_closed[change4]",
+        "tests/test_p4_context.py::test_spec_fail_closed[change5]",
+        "tests/test_p4_context.py::test_spec_fail_closed[change6]",
+        "tests/test_p4_context.py::test_bad_inputs",
+        "tests/test_p4_context.py::test_folds_use_source_membership_and_leakage_guard",
+        "tests/test_p4_context.py::test_export_runtime_same_sklearn_object",
+        "tests/test_p4_context.py::test_public_context_roundtrip_p1_and_unmodified_matrix"
+      ]
+    },
+    {
+      "path": "spanverify-module/tests/test_p5_span_filter.py",
+      "collected_nodes": 21,
+      "module_docstring": "P5 pure candidate/filter, strict schemas and frozen runtime integration.",
+      "nodeids": [
+        "tests/test_p5_span_filter.py::test_candidate_edges_finite_deterministic[0--risks0]",
+        "tests/test_p5_span_filter.py::test_candidate_edges_finite_deterministic[0-\\u0441\\u043b\\u043e\\u0432\\u043e-risks1]",
+        "tests/test_p5_span_filter.py::test_candidate_edges_finite_deterministic[0-\\u0441\\u043b\\u043e\\u0432\\u043e-risks2]",
+        "tests/test_p5_span_filter.py::test_candidate_edges_finite_deterministic[0-\\u0441\\u043b\\u043e\\u0432\\u043e, \\u0442\\u0435\\u0441\\u0442-risks3]",
+        "tests/test_p5_span_filter.py::test_candidate_edges_finite_deterministic[1--risks0]",
+        "tests/test_p5_span_filter.py::test_candidate_edges_finite_deterministic[1-\\u0441\\u043b\\u043e\\u0432\\u043e-risks1]",
+        "tests/test_p5_span_filter.py::test_candidate_edges_finite_deterministic[1-\\u0441\\u043b\\u043e\\u0432\\u043e-risks2]",
+        "tests/test_p5_span_filter.py::test_candidate_edges_finite_deterministic[1-\\u0441\\u043b\\u043e\\u0432\\u043e, \\u0442\\u0435\\u0441\\u0442-risks3]",
+        "tests/test_p5_span_filter.py::test_candidate_edges_finite_deterministic[2--risks0]",
+        "tests/test_p5_span_filter.py::test_candidate_edges_finite_deterministic[2-\\u0441\\u043b\\u043e\\u0432\\u043e-risks1]",
+        "tests/test_p5_span_filter.py::test_candidate_edges_finite_deterministic[2-\\u0441\\u043b\\u043e\\u0432\\u043e-risks2]",
+        "tests/test_p5_span_filter.py::test_candidate_edges_finite_deterministic[2-\\u0441\\u043b\\u043e\\u0432\\u043e, \\u0442\\u0435\\u0441\\u0442-risks3]",
+        "tests/test_p5_span_filter.py::test_no_gold_features",
+        "tests/test_p5_span_filter.py::test_schema_fail_closed[change0]",
+        "tests/test_p5_span_filter.py::test_schema_fail_closed[change1]",
+        "tests/test_p5_span_filter.py::test_schema_fail_closed[change2]",
+        "tests/test_p5_span_filter.py::test_schema_fail_closed[change3]",
+        "tests/test_p5_span_filter.py::test_schema_fail_closed[change4]",
+        "tests/test_p5_span_filter.py::test_empty_is_authoritative_and_rules_unfiltered",
+        "tests/test_p5_span_filter.py::test_doc_cross_fit_guard",
+        "tests/test_p5_span_filter.py::test_roundtrip_legacy_and_public_pure"
+      ]
+    },
+    {
+      "path": "spanverify-module/tests/test_p7_engineering.py",
+      "collected_nodes": 6,
+      "module_docstring": "P7 exact arithmetic/offset regressions, independent of HF availability.",
+      "nodeids": [
+        "tests/test_p7_engineering.py::test_interval_index_and_membership_match_legacy_byte_exact",
+        "tests/test_p7_engineering.py::test_window_partition_preserves_unicode_boundaries_and_all_characters",
+        "tests/test_p7_engineering.py::test_full_answer_stitches_every_token_once_without_zero_fill",
+        "tests/test_p7_engineering.py::test_cached_cosine_norms_are_float_exact",
+        "tests/test_p7_engineering.py::test_sentence_index_matches_prefix_reference_and_style_rows",
+        "tests/test_p7_engineering.py::test_share_calibration_is_monotone_versioned_and_quality_invariant"
+      ]
+    },
+    {
+      "path": "spanverify-module/tests/test_p7_publication.py",
+      "collected_nodes": 2,
+      "module_docstring": "Final artifact publication must retain raw proof and reject corrupt/unsafe ZIPs.",
+      "nodeids": [
+        "tests/test_p7_publication.py::test_final_publication_keeps_raw_and_overlays_final_report",
+        "tests/test_p7_publication.py::test_final_publication_rejects_path_escape_and_wrong_checksum"
+      ]
+    },
+    {
+      "path": "spanverify-module/tests/test_p8_evidence_hygiene.py",
+      "collected_nodes": 5,
+      "module_docstring": "P8 provenance regression: no metric or historical number quietly changes roles.",
+      "nodeids": [
+        "tests/test_p8_evidence_hygiene.py::test_all_non_run_metric_documents_have_provenance",
+        "tests/test_p8_evidence_hygiene.py::test_legacy_numbers_immutable_and_superseded",
+        "tests/test_p8_evidence_hygiene.py::test_index_covers_latest_run_in_every_family",
+        "tests/test_p8_evidence_hygiene.py::test_frozen_prediction_files_byte_identical",
+        "tests/test_p8_evidence_hygiene.py::test_ci_collector_only_copies_sealed_a3_receipt"
+      ]
+    },
+    {
+      "path": "spanverify-module/tests/test_participation.py",
+      "collected_nodes": 7,
+      "module_docstring": "Тесты оценки доли участия ИИ (``ai_participation``) — требование заявки.\n\nЗаявка (У-640148) требует «определение доли участия ИИ в контенте»; в коде это\nотдельное поле, не совпадающее с ``ai_share`` (долей недостоверного текста).\nЗдесь проверяется: поле есть в API/CLI/UI, лежит в [0..1], растёт с долей\nмашинных оборотов и отличается по смыслу от доли флагов маски.",
+      "nodeids": [
+        "tests/test_participation.py::test_participation_present_and_bounded_in_service",
+        "tests/test_participation.py::test_participation_grows_with_ai_fraction",
+        "tests/test_participation.py::test_participation_differs_from_flag_share",
+        "tests/test_participation.py::test_participation_model_roundtrip",
+        "tests/test_participation.py::test_participation_available_without_torch",
+        "tests/test_participation.py::test_cli_prints_participation",
+        "tests/test_participation.py::test_ui_shows_participation_metric"
+      ]
+    },
+    {
+      "path": "spanverify-module/tests/test_review_server.py",
+      "collected_nodes": 7,
+      "module_docstring": "Тесты сервера ручной проверки корпуса.\n\nСервер пишет файл решений человека — то есть влияет на то, что попадёт в отчёт о\nкачестве корпуса. Поэтому проверяется не «страница открывается», а: решения\nдописываются и не теряются, чужой id и неверный вердикт отвергаются, прогресс\nсчитается по последнему решению, а выборка берётся случайно с заданным seed.",
+      "nodeids": [
+        "tests/test_review_server.py::test_page_shows_first_pending_pair",
+        "tests/test_review_server.py::test_decision_is_appended_and_next_pair_shown",
+        "tests/test_review_server.py::test_stats_count_decisions",
+        "tests/test_review_server.py::test_unknown_id_and_bad_verdict_are_rejected",
+        "tests/test_review_server.py::test_second_decision_overwrites_in_index",
+        "tests/test_review_server.py::test_make_sample_is_deterministic_and_takes_share",
+        "tests/test_review_server.py::test_make_sample_fails_on_empty_source"
+      ]
+    },
+    {
+      "path": "spanverify-module/tests/test_rus_hallu_eval.py",
+      "collected_nodes": 5,
+      "module_docstring": "Тесты оценки на внешнем корпусе: структура отчёта и запрет выдуманных чисел.\n\nОценка на реальных 1000 парах требует скачанных данных (в CI их нет — лицензия не\nподтверждена). Здесь проверяется сама логика на маленьком локальном наборе: что\nобе группы метрик считаются, что предсказания сравниваются с разметкой и что в\nотчёте нет сравнения с baseline, пока числа статьи не извлечены.",
+      "nodeids": [
+        "tests/test_rus_hallu_eval.py::test_true_span_texts_extract_exact_substrings",
+        "tests/test_rus_hallu_eval.py::test_evaluate_reports_both_metric_groups",
+        "tests/test_rus_hallu_eval.py::test_baseline_comparison_is_not_invented",
+        "tests/test_rus_hallu_eval.py::test_evaluate_handles_clean_pairs_without_labels",
+        "tests/test_rus_hallu_eval.py::test_missing_dataset_raises_with_hint"
+      ]
+    },
+    {
+      "path": "spanverify-module/tests/test_rushallu_metrics.py",
+      "collected_nodes": 8,
+      "module_docstring": "Тесты перевода метрик RusHallu-RAG на stdlib.\n\nСмысл: внешний бенчмарк оценивается нашим кодом, но их метриками. Значит формулы\nобязаны совпадать с оригиналом (``metrics/span_metrics.py`` закреплённого коммита),\nиначе сравнение с публикацией некорректно. Здесь проверяется совпадение с\nбиблиотекой ``rouge_score`` (если установлена), разумность формул совпадения и\nаккуратная обработка пустой разметки (у них там получается ``nan``).",
+      "nodeids": [
+        "tests/test_rushallu_metrics.py::test_tokenization_is_per_character",
+        "tests/test_rushallu_metrics.py::test_rouge_n_counts_repeated_ngrams",
+        "tests/test_rushallu_metrics.py::test_rouge_l_is_lcs_f_measure",
+        "tests/test_rushallu_metrics.py::test_rouge_matches_rouge_score_library",
+        "tests/test_rushallu_metrics.py::test_match_metrics_known_values",
+        "tests/test_rushallu_metrics.py::test_match_metrics_do_not_return_nan_on_empty_reference",
+        "tests/test_rushallu_metrics.py::test_rouge_scores_for_identical_batches_is_one",
+        "tests/test_rushallu_metrics.py::test_evaluate_spans_returns_both_groups"
+      ]
+    },
+    {
+      "path": "spanverify-module/tests/test_server_cli.py",
+      "collected_nodes": 33,
+      "module_docstring": "Тесты HTTP-контракта и командной строки.\n\nПроверяется то, что увидит пользователь: поля ответа API, коды возврата CLI,\nпонятные сообщения об ошибках. Сервер поднимается на свободном порту в потоке и\nзакрывается после теста — тесты не зависят от занятости 8765.",
+      "nodeids": [
+        "tests/test_server_cli.py::test_service_health_reports_mode_and_version",
+        "tests/test_server_cli.py::test_service_config_exposes_weights_schema",
+        "tests/test_server_cli.py::test_service_model_reports_head_and_folds",
+        "tests/test_server_cli.py::test_service_verify_matches_contract",
+        "tests/test_server_cli.py::test_service_verify_accepts_legacy_text_field",
+        "tests/test_server_cli.py::test_service_verify_requires_answer",
+        "tests/test_server_cli.py::test_service_verify_accepts_context_list",
+        "tests/test_server_cli.py::test_service_verify_rejects_non_object",
+        "tests/test_server_cli.py::test_free_port_returns_available_port",
+        "tests/test_server_cli.py::test_health_endpoint",
+        "tests/test_server_cli.py::test_config_and_model_endpoints",
+        "tests/test_server_cli.py::test_verify_endpoint_contract",
+        "tests/test_server_cli.py::test_verify_endpoint_with_tokens",
+        "tests/test_server_cli.py::test_index_page_is_served",
+        "tests/test_server_cli.py::test_unknown_route_returns_404",
+        "tests/test_server_cli.py::test_bad_json_returns_400",
+        "tests/test_server_cli.py::test_missing_answer_returns_400",
+        "tests/test_server_cli.py::test_options_preflight",
+        "tests/test_server_cli.py::test_cli_verify_confirmed_answer",
+        "tests/test_server_cli.py::test_cli_verify_json_output",
+        "tests/test_server_cli.py::test_cli_verify_tokens_flag",
+        "tests/test_server_cli.py::test_cli_verify_accepts_files",
+        "tests/test_server_cli.py::test_cli_verify_without_answer_is_error",
+        "tests/test_server_cli.py::test_cli_selftest_passes",
+        "tests/test_server_cli.py::test_cli_config_prints_json",
+        "tests/test_server_cli.py::test_cli_evaluate_on_generated_corpus",
+        "tests/test_server_cli.py::test_cli_train_and_calibrate",
+        "tests/test_server_cli.py::test_cli_train_generates_dataset_when_missing",
+        "tests/test_server_cli.py::test_cli_train_without_dataset_is_error",
+        "tests/test_server_cli.py::test_cli_demo_runs_end_to_end",
+        "tests/test_server_cli.py::test_cli_analyze_legacy_branch",
+        "tests/test_server_cli.py::test_cli_without_command_prints_help",
+        "tests/test_server_cli.py::test_cli_unknown_command_is_error"
+      ]
+    },
+    {
+      "path": "spanverify-module/tests/test_similarity_contrast.py",
+      "collected_nodes": 5,
+      "module_docstring": "Признаки итерации 3: выделенность максимума похожести над фоном.\n\nЧистые функции — без тензоров и весов модели. Содержание проверки: один и тот\nже максимум должен означать разное в «гладком» документе (где всё похоже на всё)\nи в «рваном» (где есть один явный источник).",
+      "nodeids": [
+        "tests/test_similarity_contrast.py::test_contrast_is_zero_when_all_sources_are_equal",
+        "tests/test_similarity_contrast.py::test_contrast_separates_peak_from_smooth_document",
+        "tests/test_similarity_contrast.py::test_margin_is_zero_with_a_single_candidate",
+        "tests/test_similarity_contrast.py::test_margin_grows_with_uniqueness_of_the_source",
+        "tests/test_similarity_contrast.py::test_contrast_and_margin_are_signed"
+      ]
+    },
+    {
+      "path": "spanverify-module/tests/test_span_boundaries.py",
+      "collected_nodes": 7,
+      "module_docstring": "Тесты точности границ фрагментов (исправление B1).\n\nРаньше найденный токен расширялся до границ всего предложения: фрагмент был\nв ~24 раза шире истинной ошибки, строгий span-F1 держался на 0,098–0,283.\nЗдесь фиксируется, что фрагмент ограничивается клаузой, в которой стоит\nспорное значение, и не захватывает соседние части предложения.",
+      "nodeids": [
+        "tests/test_span_boundaries.py::test_shrink_keeps_flagged_token",
+        "tests/test_span_boundaries.py::test_shrink_does_not_capture_neighbour_clauses",
+        "tests/test_span_boundaries.py::test_shrink_is_narrower_than_sentence",
+        "tests/test_span_boundaries.py::test_shrink_single_clause_keeps_sentence",
+        "tests/test_span_boundaries.py::test_span_on_real_substitution_is_local",
+        "tests/test_span_boundaries.py::test_span_boundaries_are_valid",
+        "tests/test_span_boundaries.py::test_missing_fact_gives_span_when_coverage_enabled"
+      ]
+    },
+    {
+      "path": "spanverify-module/tests/test_span_filter.py",
+      "collected_nodes": 8,
+      "module_docstring": "Фильтр коротких фрагментов маски (вариант сравнения маски).\n\nГипотеза из разбора чистых пар (``data/metrics/clean_false_flags_a3.md``,\nкеш прогона 37609202780): ложные пометки — длинные канцелярские обороты и\nзаголовки, а не одиночные токены. Вариант маски: фрагмент короче порога\nзнаков, в котором нет числа, даты или денежной суммы, не помечается. Здесь\nпроверяется только механика фильтра в движке и в подборе на обучающей части;\nпорог фиксирован снаружи и по тесту не подбирается.",
+      "nodeids": [
+        "tests/test_span_filter.py::test_contains_number_date_or_amount",
+        "tests/test_span_filter.py::test_filter_short_mask_spans_drops_short_text_without_numbers",
+        "tests/test_span_filter.py::test_verify_filter_removes_short_span_and_token_flags",
+        "tests/test_span_filter.py::test_verify_filter_keeps_short_span_with_number",
+        "tests/test_span_filter.py::test_token_payload_flagged_override",
+        "tests/test_span_filter.py::test_filter_short_flagged_groups_directly",
+        "tests/test_span_filter.py::test_score_pairs_filter_unflags_short_group",
+        "tests/test_span_filter.py::test_score_pairs_filter_keeps_long_group_without_numbers"
+      ]
+    },
+    {
+      "path": "spanverify-module/tests/test_split_and_version.py",
+      "collected_nodes": 5,
+      "module_docstring": "Тесты честного разделения корпуса и единого источника версии.\n\nДефект, который здесь закрывается: построчный шаффл оставлял один и тот же\nсубъект и шаблон вопроса и в обучении, и в «отложенной» части, поэтому метрика\nпереставала быть отложенной. Официальное разделение — групповое.",
+      "nodeids": [
+        "tests/test_split_and_version.py::test_group_split_has_no_shared_groups",
+        "tests/test_split_and_version.py::test_row_split_demonstrates_old_defect",
+        "tests/test_split_and_version.py::test_train_uses_group_split_by_default",
+        "tests/test_split_and_version.py::test_version_matches_pyproject_and_weights",
+        "tests/test_split_and_version.py::test_participation_artifact_version_matches"
+      ]
+    },
+    {
+      "path": "spanverify-module/tests/test_support_distance.py",
+      "collected_nodes": 7,
+      "module_docstring": "Признаки итерации 2: расстояние до подтверждающего фрагмента контекста.\n\nПроверяются чистые функции — тензоров и весов модели для этого не нужно.\nСодержание: расстояние нормируется на длину текста (иначе «200 токенов» в\nкоротком и длинном акте означали бы разное), а штраф за удалённость сохраняет\nшкалу похожести.",
+      "nodeids": [
+        "tests/test_support_distance.py::test_distance_is_normalised_by_sequence_length",
+        "tests/test_support_distance.py::test_distance_degenerate_cases",
+        "tests/test_support_distance.py::test_same_relative_distance_is_the_same_feature_value",
+        "tests/test_support_distance.py::test_decay_keeps_similarity_scale_at_zero_distance",
+        "tests/test_support_distance.py::test_decay_is_exponential_and_monotone",
+        "tests/test_support_distance.py::test_decay_scale_is_stable",
+        "tests/test_support_distance.py::test_decay_prefers_close_support_over_distant"
+      ]
+    },
+    {
+      "path": "spanverify-module/tests/test_text.py",
+      "collected_nodes": 13,
+      "module_docstring": "Тесты токенизации и разбиения на предложения.",
+      "nodeids": [
+        "tests/test_text.py::test_tokenization_covers_text_without_gaps",
+        "tests/test_text.py::test_tokenization_word_offsets_match_source",
+        "tests/test_text.py::test_word_tokens_only_returns_words",
+        "tests/test_text.py::test_empty_text_gives_no_tokens",
+        "tests/test_text.py::test_sentences_split_and_keep_text",
+        "tests/test_text.py::test_sentence_span_indices_point_to_word_tokens",
+        "tests/test_text.py::test_hyphenated_and_numeric_words_are_single_tokens",
+        "tests/test_text.py::test_char_ngrams_have_borders",
+        "tests/test_text.py::test_normalize_word_folds_case_and_yo",
+        "tests/test_text.py::test_char_ngrams_length_matches_formula[2]",
+        "tests/test_text.py::test_char_ngrams_length_matches_formula[3]",
+        "tests/test_text.py::test_char_ngrams_length_matches_formula[4]",
+        "tests/test_text.py::test_split_paragraphs_finds_blocks"
+      ]
+    },
+    {
+      "path": "spanverify-module/tests/test_token_head.py",
+      "collected_nodes": 30,
+      "module_docstring": "Тесты для P2 token-head (GradientBoosting с экспортом в JSON).\n\nКритические проверки:\n1. Точный паритет runtime vs sklearn (max delta ≤ 1e-12)\n2. float32 конвертация для порогов деревьев\n3. init=\"zero\" → initial_prediction=0.0\n4. Guards: NaN/inf, schema, feature indices, missing children\n5. Save/load roundtrip без изменения предсказаний",
+      "nodeids": [
+        "tests/test_token_head.py::TestExtractTokenFeatures::test_basic_extraction",
+        "tests/test_token_head.py::TestExtractTokenFeatures::test_no_digit",
+        "tests/test_token_head.py::TestExtractTokenFeatures::test_missing_feature_raises",
+        "tests/test_token_head.py::TestExtractTokenFeatures::test_nan_feature_raises",
+        "tests/test_token_head.py::TestToFloat32::test_exact_match",
+        "tests/test_token_head.py::TestToFloat32::test_threshold_boundary",
+        "tests/test_token_head.py::TestToFloat32::test_precision_loss",
+        "tests/test_token_head.py::TestTokenGBDTModel::test_predict_one_basic",
+        "tests/test_token_head.py::TestTokenGBDTModel::test_predict_one_right_branch",
+        "tests/test_token_head.py::TestTokenGBDTModel::test_predict_many",
+        "tests/test_token_head.py::TestTokenGBDTModel::test_wrong_feature_count_raises",
+        "tests/test_token_head.py::TestTokenGBDTModel::test_nan_input_raises",
+        "tests/test_token_head.py::TestTokenGBDTModel::test_inf_input_raises",
+        "tests/test_token_head.py::TestTokenGBDTModel::test_save_load_roundtrip",
+        "tests/test_token_head.py::TestTokenGBDTModel::test_unknown_schema_raises",
+        "tests/test_token_head.py::TestTokenGBDTModel::test_unknown_type_raises",
+        "tests/test_token_head.py::TestTokenGBDTModel::test_nan_in_saved_model_raises",
+        "tests/test_token_head.py::TestTokenGBDTModel::test_wrong_n_features_raises",
+        "tests/test_token_head.py::TestDecisionTree::test_leaf_predict",
+        "tests/test_token_head.py::TestDecisionTree::test_internal_predict",
+        "tests/test_token_head.py::TestDecisionTree::test_internal_missing_children_raises",
+        "tests/test_token_head.py::TestDecisionTree::test_to_dict_internal_missing_children_raises",
+        "tests/test_token_head.py::TestDecisionTree::test_to_dict_from_dict",
+        "tests/test_token_head.py::TestTrainTokenGBDT::test_tiny_fixture",
+        "tests/test_token_head.py::TestTrainTokenGBDT::test_exact_parity_with_sklearn_balanced",
+        "tests/test_token_head.py::TestTrainTokenGBDT::test_exact_parity_imbalanced",
+        "tests/test_token_head.py::TestTrainTokenGBDT::test_exact_parity_custom_weights",
+        "tests/test_token_head.py::TestTrainTokenGBDT::test_exact_parity_held_out",
+        "tests/test_token_head.py::TestTrainTokenGBDT::test_parity_after_save_load",
+        "tests/test_token_head.py::TestTrainTokenGBDT::test_parity_at_threshold_boundary"
+      ]
+    },
+    {
+      "path": "spanverify-module/tests/test_token_mapping.py",
+      "collected_nodes": 4,
+      "module_docstring": "Регрессия на сопоставление токенов и подслов модели (баг «одинаковых значений»).\n\nСимптом дефекта: признаки на «факт-токене» в пилоте совпадали у групп\n«с опорой» и «без опоры» до шестого знака (0.544094 против 0.544094), потому что\nпризнак брался по индексу нашего токена в списке позиций модели, а модель режет\nслова на подслова и индекс попадал на соседнее слово. Исправление — сопоставление\nпо перекрытию символов с усреднением по подсловам.",
+      "nodeids": [
+        "tests/test_token_mapping.py::test_map_token_positions_matches_subwords_by_characters",
+        "tests/test_token_mapping.py::test_map_token_positions_averages_over_split_subwords",
+        "tests/test_token_mapping.py::test_map_token_positions_without_overlap_is_empty",
+        "tests/test_token_mapping.py::test_span_overlap_counts_characters"
+      ]
+    },
+    {
+      "path": "spanverify-module/tests/test_vectors.py",
+      "collected_nodes": 9,
+      "module_docstring": "Тесты векторизации и контекстной плотности.",
+      "nodeids": [
+        "tests/test_vectors.py::test_hash_index_is_deterministic_and_in_range",
+        "tests/test_vectors.py::test_token_vector_is_normalized",
+        "tests/test_vectors.py::test_cosine_identical_vectors_is_one",
+        "tests/test_vectors.py::test_cosine_range_for_unrelated_words",
+        "tests/test_vectors.py::test_normalize_handles_empty_vector",
+        "tests/test_vectors.py::test_vectorize_uses_neighbours_as_context",
+        "tests/test_vectors.py::test_knn_density_is_higher_for_repeated_words",
+        "tests/test_vectors.py::test_knn_density_handles_single_token",
+        "tests/test_vectors.py::test_knn_density_mask_excludes_neighbours"
+      ]
+    },
+    {
+      "path": "spanverify-module/tests/test_verdict_calibration.py",
+      "collected_nodes": 15,
+      "module_docstring": "Калибровка агрегации вердикта: замороженный конфиг, отчёт, таблицы свидетельств.\n\nПричина проверки: вердикт уровня ответа считался той же маской, что и токены, и\nна длинных честных ответах реальных актов почти всегда находилась пара ложных\nтокенов. Отдельная калибровка агрегации (dev → заморозка → один тест) закрывает\nэто, но её результат живёт в трёх артефактах — ``config/verdict.json``,\n``reports/verdict_calibration.json`` и ``reports/verdict/evidence_*.json``.\nЭти тесты следят, чтобы артефакты не разошлись между собой и с кодом: правило в\nконфиге обязано быть известно движку, параметры — совпадать с отчётом, а\nобъявленное правило выбора — не подменяться подгонкой по тесту.",
+      "nodeids": [
+        "tests/test_verdict_calibration.py::test_frozen_config_is_valid_and_complete",
+        "tests/test_verdict_calibration.py::test_frozen_config_matches_calibration_report",
+        "tests/test_verdict_calibration.py::test_calibration_used_declared_selection_rule",
+        "tests/test_verdict_calibration.py::test_dev_reaches_declared_target",
+        "tests/test_verdict_calibration.py::test_test_split_is_reported_once_with_frozen_rule",
+        "tests/test_verdict_calibration.py::test_evidence_tables_match_report_splits",
+        "tests/test_verdict_calibration.py::test_dev_f1_matches_recount_from_evidence_table",
+        "tests/test_verdict_calibration.py::test_corroborated_requires_token_count_and_fragment_length",
+        "tests/test_verdict_calibration.py::test_corroborated_respects_flagged_share",
+        "tests/test_verdict_calibration.py::test_text_rule_decisive_switch_controls_attribution",
+        "tests/test_verdict_calibration.py::test_frozen_rule_replaces_default_and_can_be_overridden",
+        "tests/test_verdict_calibration.py::test_verdict_config_from_params_round_trip",
+        "tests/test_verdict_calibration.py::test_legacy_rules_still_available_for_comparison",
+        "tests/test_verdict_calibration.py::test_apply_rule_and_metrics_over_evidence_table",
+        "tests/test_verdict_calibration.py::test_choose_respects_target_and_never_takes_test"
+      ]
+    },
+    {
+      "path": "spanverify-module/tests/test_verdict_rule.py",
+      "collected_nodes": 8,
+      "module_docstring": "Правило вердикта: одиночный токен маски не обвиняет весь ответ.\n\nПричина проверки: историческое правило «любой фрагмент — ответ спорный» на\nкорпусе A3 (прогон 37532050295) пометило 1047 ответов из 1200 (вердикт\nFPR 0.893) — один случайный токен маски делал спорным весь ответ. Новое\nправило требует хотя бы два помеченных токена маски, но фрагменты текстовых\nправил (привязка числа к объекту) по-прежнему решают и в одиночку.",
+      "nodeids": [
+        "tests/test_verdict_rule.py::test_single_mask_token_does_not_flip_verdict",
+        "tests/test_verdict_rule.py::test_two_mask_tokens_flip_verdict",
+        "tests/test_verdict_rule.py::test_attribution_span_is_decisive_alone",
+        "tests/test_verdict_rule.py::test_score_above_threshold_still_means_hallucination",
+        "tests/test_verdict_rule.py::test_legacy_rule_reproduces_old_behaviour",
+        "tests/test_verdict_rule.py::test_unknown_rule_is_rejected",
+        "tests/test_verdict_rule.py::test_demo_pair_single_token_verdict_before_after",
+        "tests/test_verdict_rule.py::test_evaluate_tokens_identical_under_both_rules"
+      ]
+    },
+    {
+      "path": "spanverify-module/tests/test_version.py",
+      "collected_nodes": 1,
+      "module_docstring": "Версия релиза одна: пакет и метаданные сборки не имеют права разъехаться.\n\nПричина проверки: релиз публикуется с одним номером; если ``_version.py`` и\n``pyproject.toml`` разойдутся, собранный артефакт будет называться не так, как\nего описывают документы и тег релиза.",
+      "nodeids": [
+        "tests/test_version.py::test_package_version_matches_pyproject"
+      ]
+    },
+    {
+      "path": "spanverify-module/tests/test_workflow_limits.py",
+      "collected_nodes": 143,
+      "module_docstring": "Правила оформления workflow: таймауты и кавычки в `name:`.\n\nОба правила выучены на собственных ошибках, и обе ошибки стоили прогона:\n\n* job без ``timeout-minutes`` висел до общего лимита в 6 часов (диагноз\n  «почему CI висит», причина 1: job загрузки корпуса не успевал закончиться);\n* ``name:`` с двоеточием без кавычек ломает YAML целиком — прогон завершался\n  ``failure`` без единого job'а (прогон 37465518131), что выглядит как загадка,\n  а не как опечатка.\n\nТест дешёвый (читает несколько файлов) и стоит в общем прогоне, поэтому\nнарушение будет поймано до пуша, а не после.",
+      "nodeids": [
+        "tests/test_workflow_limits.py::test_there_are_workflows_to_check",
+        "tests/test_workflow_limits.py::test_workflow_is_valid_yaml[build-and-release-exe.yml]",
+        "tests/test_workflow_limits.py::test_workflow_is_valid_yaml[ci.yml]",
+        "tests/test_workflow_limits.py::test_workflow_is_valid_yaml[corpus-a3.yml]",
+        "tests/test_workflow_limits.py::test_workflow_is_valid_yaml[hf-analysis.yml]",
+        "tests/test_workflow_limits.py::test_workflow_is_valid_yaml[hf-collect.yml]",
+        "tests/test_workflow_limits.py::test_workflow_is_valid_yaml[hf-experiments.yml]",
+        "tests/test_workflow_limits.py::test_workflow_is_valid_yaml[hf-footprint.yml]",
+        "tests/test_workflow_limits.py::test_workflow_is_valid_yaml[hf-pilot.yml]",
+        "tests/test_workflow_limits.py::test_workflow_is_valid_yaml[hf-remeasure.yml]",
+        "tests/test_workflow_limits.py::test_workflow_is_valid_yaml[hf-runs.yml]",
+        "tests/test_workflow_limits.py::test_workflow_is_valid_yaml[hf-salvage.yml]",
+        "tests/test_workflow_limits.py::test_workflow_is_valid_yaml[hf-span-filter.yml]",
+        "tests/test_workflow_limits.py::test_workflow_is_valid_yaml[p1-build-test.yml]",
+        "tests/test_workflow_limits.py::test_workflow_is_valid_yaml[p1-public-replay.yml]",
+        "tests/test_workflow_limits.py::test_workflow_is_valid_yaml[p2-experiment.yml]",
+        "tests/test_workflow_limits.py::test_workflow_is_valid_yaml[p3-postprocess.yml]",
+        "tests/test_workflow_limits.py::test_workflow_is_valid_yaml[p4-context-head.yml]",
+        "tests/test_workflow_limits.py::test_workflow_is_valid_yaml[p5-span-filter.yml]",
+        "tests/test_workflow_limits.py::test_workflow_is_valid_yaml[p6-acceptance.yml]",
+        "tests/test_workflow_limits.py::test_workflow_is_valid_yaml[p7-acceptance.yml]",
+        "tests/test_workflow_limits.py::test_workflow_is_valid_yaml[p7-paired-benchmark.yml]",
+        "tests/test_workflow_limits.py::test_workflow_is_valid_yaml[p7-publish-acceptance.yml]",
+        "tests/test_workflow_limits.py::test_workflow_is_valid_yaml[p8-final-evaluation.yml]",
+        "tests/test_workflow_limits.py::test_workflow_is_valid_yaml[p8-receipts.yml]",
+        "tests/test_workflow_limits.py::test_workflow_is_valid_yaml[postprocess-p0-answer-p1.yml]",
+        "tests/test_workflow_limits.py::test_workflow_is_valid_yaml[postprocess-p0-answer.yml]",
+        "tests/test_workflow_limits.py::test_workflow_is_valid_yaml[postprocess-span-comparison.yml]",
+        "tests/test_workflow_limits.py::test_workflow_is_valid_yaml[recover-p1-results.yml]",
+        "tests/test_workflow_limits.py::test_every_job_has_timeout[build-and-release-exe.yml]",
+        "tests/test_workflow_limits.py::test_every_job_has_timeout[ci.yml]",
+        "tests/test_workflow_limits.py::test_every_job_has_timeout[corpus-a3.yml]",
+        "tests/test_workflow_limits.py::test_every_job_has_timeout[hf-analysis.yml]",
+        "tests/test_workflow_limits.py::test_every_job_has_timeout[hf-collect.yml]",
+        "tests/test_workflow_limits.py::test_every_job_has_timeout[hf-experiments.yml]",
+        "tests/test_workflow_limits.py::test_every_job_has_timeout[hf-footprint.yml]",
+        "tests/test_workflow_limits.py::test_every_job_has_timeout[hf-pilot.yml]",
+        "tests/test_workflow_limits.py::test_every_job_has_timeout[hf-remeasure.yml]",
+        "tests/test_workflow_limits.py::test_every_job_has_timeout[hf-runs.yml]",
+        "tests/test_workflow_limits.py::test_every_job_has_timeout[hf-salvage.yml]",
+        "tests/test_workflow_limits.py::test_every_job_has_timeout[hf-span-filter.yml]",
+        "tests/test_workflow_limits.py::test_every_job_has_timeout[p1-build-test.yml]",
+        "tests/test_workflow_limits.py::test_every_job_has_timeout[p1-public-replay.yml]",
+        "tests/test_workflow_limits.py::test_every_job_has_timeout[p2-experiment.yml]",
+        "tests/test_workflow_limits.py::test_every_job_has_timeout[p3-postprocess.yml]",
+        "tests/test_workflow_limits.py::test_every_job_has_timeout[p4-context-head.yml]",
+        "tests/test_workflow_limits.py::test_every_job_has_timeout[p5-span-filter.yml]",
+        "tests/test_workflow_limits.py::test_every_job_has_timeout[p6-acceptance.yml]",
+        "tests/test_workflow_limits.py::test_every_job_has_timeout[p7-acceptance.yml]",
+        "tests/test_workflow_limits.py::test_every_job_has_timeout[p7-paired-benchmark.yml]",
+        "tests/test_workflow_limits.py::test_every_job_has_timeout[p7-publish-acceptance.yml]",
+        "tests/test_workflow_limits.py::test_every_job_has_timeout[p8-final-evaluation.yml]",
+        "tests/test_workflow_limits.py::test_every_job_has_timeout[p8-receipts.yml]",
+        "tests/test_workflow_limits.py::test_every_job_has_timeout[postprocess-p0-answer-p1.yml]",
+        "tests/test_workflow_limits.py::test_every_job_has_timeout[postprocess-p0-answer.yml]",
+        "tests/test_workflow_limits.py::test_every_job_has_timeout[postprocess-span-comparison.yml]",
+        "tests/test_workflow_limits.py::test_every_job_has_timeout[recover-p1-results.yml]",
+        "tests/test_workflow_limits.py::test_no_job_is_longer_than_the_limit[build-and-release-exe.yml]",
+        "tests/test_workflow_limits.py::test_no_job_is_longer_than_the_limit[ci.yml]",
+        "tests/test_workflow_limits.py::test_no_job_is_longer_than_the_limit[corpus-a3.yml]",
+        "tests/test_workflow_limits.py::test_no_job_is_longer_than_the_limit[hf-analysis.yml]",
+        "tests/test_workflow_limits.py::test_no_job_is_longer_than_the_limit[hf-collect.yml]",
+        "tests/test_workflow_limits.py::test_no_job_is_longer_than_the_limit[hf-experiments.yml]",
+        "tests/test_workflow_limits.py::test_no_job_is_longer_than_the_limit[hf-footprint.yml]",
+        "tests/test_workflow_limits.py::test_no_job_is_longer_than_the_limit[hf-pilot.yml]",
+        "tests/test_workflow_limits.py::test_no_job_is_longer_than_the_limit[hf-remeasure.yml]",
+        "tests/test_workflow_limits.py::test_no_job_is_longer_than_the_limit[hf-runs.yml]",
+        "tests/test_workflow_limits.py::test_no_job_is_longer_than_the_limit[hf-salvage.yml]",
+        "tests/test_workflow_limits.py::test_no_job_is_longer_than_the_limit[hf-span-filter.yml]",
+        "tests/test_workflow_limits.py::test_no_job_is_longer_than_the_limit[p1-build-test.yml]",
+        "tests/test_workflow_limits.py::test_no_job_is_longer_than_the_limit[p1-public-replay.yml]",
+        "tests/test_workflow_limits.py::test_no_job_is_longer_than_the_limit[p2-experiment.yml]",
+        "tests/test_workflow_limits.py::test_no_job_is_longer_than_the_limit[p3-postprocess.yml]",
+        "tests/test_workflow_limits.py::test_no_job_is_longer_than_the_limit[p4-context-head.yml]",
+        "tests/test_workflow_limits.py::test_no_job_is_longer_than_the_limit[p5-span-filter.yml]",
+        "tests/test_workflow_limits.py::test_no_job_is_longer_than_the_limit[p6-acceptance.yml]",
+        "tests/test_workflow_limits.py::test_no_job_is_longer_than_the_limit[p7-acceptance.yml]",
+        "tests/test_workflow_limits.py::test_no_job_is_longer_than_the_limit[p7-paired-benchmark.yml]",
+        "tests/test_workflow_limits.py::test_no_job_is_longer_than_the_limit[p7-publish-acceptance.yml]",
+        "tests/test_workflow_limits.py::test_no_job_is_longer_than_the_limit[p8-final-evaluation.yml]",
+        "tests/test_workflow_limits.py::test_no_job_is_longer_than_the_limit[p8-receipts.yml]",
+        "tests/test_workflow_limits.py::test_no_job_is_longer_than_the_limit[postprocess-p0-answer-p1.yml]",
+        "tests/test_workflow_limits.py::test_no_job_is_longer_than_the_limit[postprocess-p0-answer.yml]",
+        "tests/test_workflow_limits.py::test_no_job_is_longer_than_the_limit[postprocess-span-comparison.yml]",
+        "tests/test_workflow_limits.py::test_no_job_is_longer_than_the_limit[recover-p1-results.yml]",
+        "tests/test_workflow_limits.py::test_step_timeouts_do_not_exceed_job_timeout[build-and-release-exe.yml]",
+        "tests/test_workflow_limits.py::test_step_timeouts_do_not_exceed_job_timeout[ci.yml]",
+        "tests/test_workflow_limits.py::test_step_timeouts_do_not_exceed_job_timeout[corpus-a3.yml]",
+        "tests/test_workflow_limits.py::test_step_timeouts_do_not_exceed_job_timeout[hf-analysis.yml]",
+        "tests/test_workflow_limits.py::test_step_timeouts_do_not_exceed_job_timeout[hf-collect.yml]",
+        "tests/test_workflow_limits.py::test_step_timeouts_do_not_exceed_job_timeout[hf-experiments.yml]",
+        "tests/test_workflow_limits.py::test_step_timeouts_do_not_exceed_job_timeout[hf-footprint.yml]",
+        "tests/test_workflow_limits.py::test_step_timeouts_do_not_exceed_job_timeout[hf-pilot.yml]",
+        "tests/test_workflow_limits.py::test_step_timeouts_do_not_exceed_job_timeout[hf-remeasure.yml]",
+        "tests/test_workflow_limits.py::test_step_timeouts_do_not_exceed_job_timeout[hf-runs.yml]",
+        "tests/test_workflow_limits.py::test_step_timeouts_do_not_exceed_job_timeout[hf-salvage.yml]",
+        "tests/test_workflow_limits.py::test_step_timeouts_do_not_exceed_job_timeout[hf-span-filter.yml]",
+        "tests/test_workflow_limits.py::test_step_timeouts_do_not_exceed_job_timeout[p1-build-test.yml]",
+        "tests/test_workflow_limits.py::test_step_timeouts_do_not_exceed_job_timeout[p1-public-replay.yml]",
+        "tests/test_workflow_limits.py::test_step_timeouts_do_not_exceed_job_timeout[p2-experiment.yml]",
+        "tests/test_workflow_limits.py::test_step_timeouts_do_not_exceed_job_timeout[p3-postprocess.yml]",
+        "tests/test_workflow_limits.py::test_step_timeouts_do_not_exceed_job_timeout[p4-context-head.yml]",
+        "tests/test_workflow_limits.py::test_step_timeouts_do_not_exceed_job_timeout[p5-span-filter.yml]",
+        "tests/test_workflow_limits.py::test_step_timeouts_do_not_exceed_job_timeout[p6-acceptance.yml]",
+        "tests/test_workflow_limits.py::test_step_timeouts_do_not_exceed_job_timeout[p7-acceptance.yml]",
+        "tests/test_workflow_limits.py::test_step_timeouts_do_not_exceed_job_timeout[p7-paired-benchmark.yml]",
+        "tests/test_workflow_limits.py::test_step_timeouts_do_not_exceed_job_timeout[p7-publish-acceptance.yml]",
+        "tests/test_workflow_limits.py::test_step_timeouts_do_not_exceed_job_timeout[p8-final-evaluation.yml]",
+        "tests/test_workflow_limits.py::test_step_timeouts_do_not_exceed_job_timeout[p8-receipts.yml]",
+        "tests/test_workflow_limits.py::test_step_timeouts_do_not_exceed_job_timeout[postprocess-p0-answer-p1.yml]",
+        "tests/test_workflow_limits.py::test_step_timeouts_do_not_exceed_job_timeout[postprocess-p0-answer.yml]",
+        "tests/test_workflow_limits.py::test_step_timeouts_do_not_exceed_job_timeout[postprocess-span-comparison.yml]",
+        "tests/test_workflow_limits.py::test_step_timeouts_do_not_exceed_job_timeout[recover-p1-results.yml]",
+        "tests/test_workflow_limits.py::test_names_with_colon_are_quoted[build-and-release-exe.yml]",
+        "tests/test_workflow_limits.py::test_names_with_colon_are_quoted[ci.yml]",
+        "tests/test_workflow_limits.py::test_names_with_colon_are_quoted[corpus-a3.yml]",
+        "tests/test_workflow_limits.py::test_names_with_colon_are_quoted[hf-analysis.yml]",
+        "tests/test_workflow_limits.py::test_names_with_colon_are_quoted[hf-collect.yml]",
+        "tests/test_workflow_limits.py::test_names_with_colon_are_quoted[hf-experiments.yml]",
+        "tests/test_workflow_limits.py::test_names_with_colon_are_quoted[hf-footprint.yml]",
+        "tests/test_workflow_limits.py::test_names_with_colon_are_quoted[hf-pilot.yml]",
+        "tests/test_workflow_limits.py::test_names_with_colon_are_quoted[hf-remeasure.yml]",
+        "tests/test_workflow_limits.py::test_names_with_colon_are_quoted[hf-runs.yml]",
+        "tests/test_workflow_limits.py::test_names_with_colon_are_quoted[hf-salvage.yml]",
+        "tests/test_workflow_limits.py::test_names_with_colon_are_quoted[hf-span-filter.yml]",
+        "tests/test_workflow_limits.py::test_names_with_colon_are_quoted[p1-build-test.yml]",
+        "tests/test_workflow_limits.py::test_names_with_colon_are_quoted[p1-public-replay.yml]",
+        "tests/test_workflow_limits.py::test_names_with_colon_are_quoted[p2-experiment.yml]",
+        "tests/test_workflow_limits.py::test_names_with_colon_are_quoted[p3-postprocess.yml]",
+        "tests/test_workflow_limits.py::test_names_with_colon_are_quoted[p4-context-head.yml]",
+        "tests/test_workflow_limits.py::test_names_with_colon_are_quoted[p5-span-filter.yml]",
+        "tests/test_workflow_limits.py::test_names_with_colon_are_quoted[p6-acceptance.yml]",
+        "tests/test_workflow_limits.py::test_names_with_colon_are_quoted[p7-acceptance.yml]",
+        "tests/test_workflow_limits.py::test_names_with_colon_are_quoted[p7-paired-benchmark.yml]",
+        "tests/test_workflow_limits.py::test_names_with_colon_are_quoted[p7-publish-acceptance.yml]",
+        "tests/test_workflow_limits.py::test_names_with_colon_are_quoted[p8-final-evaluation.yml]",
+        "tests/test_workflow_limits.py::test_names_with_colon_are_quoted[p8-receipts.yml]",
+        "tests/test_workflow_limits.py::test_names_with_colon_are_quoted[postprocess-p0-answer-p1.yml]",
+        "tests/test_workflow_limits.py::test_names_with_colon_are_quoted[postprocess-p0-answer.yml]",
+        "tests/test_workflow_limits.py::test_names_with_colon_are_quoted[postprocess-span-comparison.yml]",
+        "tests/test_workflow_limits.py::test_names_with_colon_are_quoted[recover-p1-results.yml]",
+        "tests/test_workflow_limits.py::test_ci_has_concurrency",
+        "tests/test_workflow_limits.py::test_metrics_job_runs_on_every_push_not_only_at_night"
+      ]
+    }
+  ]
+}

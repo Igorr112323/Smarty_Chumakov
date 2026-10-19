@@ -1,0 +1,226 @@
+s 6083
+2026-10-19T14:58:26.8415137Z Finished uploading artifact content to blob storage!
+2026-10-19T14:58:26.8416317Z SHA256 digest of uploaded artifact zip is 3a43d504af56efe7e53321a3b282362ec91ecd9a955ae458965b8bafa03de505
+2026-10-19T14:58:26.8418650Z Finalizing artifact upload
+2026-10-19T14:58:27.1040974Z Artifact p7-windows-hf-autonomy.zip successfully finalized. Artifact ID 12197325361
+2026-10-19T14:58:27.1042575Z Artifact p7-windows-hf-autonomy has been successfully uploaded! Final size is 6083 bytes. Artifact ID is 12197325361
+2026-10-19T14:58:27.1053962Z Artifact download URL: https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39271014161/artifacts/12197325361
+2026-10-19T14:58:27.1372912Z ##[group]Run actions/upload-artifact@v4
+2026-10-19T14:58:27.1373338Z with:
+2026-10-19T14:58:27.1373614Z   name: p7-hf-portable-runtime
+2026-10-19T14:58:27.1373981Z   path: D:\a\_temp/p7-hf-portable.zip
+2026-10-19T14:58:27.1374309Z   compression-level: 0
+2026-10-19T14:58:27.1374576Z   retention-days: 90
+2026-10-19T14:58:27.1374870Z   if-no-files-found: warn
+2026-10-19T14:58:27.1375149Z   overwrite: false
+2026-10-19T14:58:27.1375419Z   include-hidden-files: false
+2026-10-19T14:58:27.1375741Z env:
+2026-10-19T14:58:27.1375972Z   PYTHONUTF8: 1
+2026-10-19T14:58:27.1376496Z   PYTHONIOENCODING: utf-8
+2026-10-19T14:58:27.1376873Z   pythonLocation: C:\hostedtoolcache\windows\Python\3.11.9\x64
+2026-10-19T14:58:27.1377392Z   PKG_CONFIG_PATH: C:\hostedtoolcache\windows\Python\3.11.9\x64/lib/pkgconfig
+2026-10-19T14:58:27.1377943Z   Python_ROOT_DIR: C:\hostedtoolcache\windows\Python\3.11.9\x64
+2026-10-19T14:58:27.1378502Z   Python2_ROOT_DIR: C:\hostedtoolcache\windows\Python\3.11.9\x64
+2026-10-19T14:58:27.1378977Z   Python3_ROOT_DIR: C:\hostedtoolcache\windows\Python\3.11.9\x64
+2026-10-19T14:58:27.1379390Z ##[endgroup]
+2026-10-19T14:58:27.3449880Z (node:572) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+2026-10-19T14:58:27.3453180Z (Use `node --trace-deprecation ...` to show where the warning was created)
+2026-10-19T14:58:27.3509587Z With the provided path, there will be 1 file uploaded
+2026-10-19T14:58:27.3515690Z Artifact name is valid!
+2026-10-19T14:58:27.3517904Z Root directory input is valid!
+2026-10-19T14:58:27.5519962Z Beginning upload of artifact content to blob storage
+2026-10-19T14:58:27.6108801Z (node:572) [DEP0169] DeprecationWarning: `url.parse()` behavior is not standardized and prone to errors that have security implications. Use the WHATWG URL API instead. CVEs are not issued for `url.parse()` vulnerabilities.
+2026-10-19T14:58:27.8195271Z Uploaded bytes 8388608
+2026-10-19T14:58:27.8846128Z Uploaded bytes 16777216
+2026-10-19T14:58:27.9559790Z Uploaded bytes 25165824
+2026-10-19T14:58:28.0121274Z Uploaded bytes 33554432
+2026-10-19T14:58:28.1545983Z Uploaded bytes 41943040
+2026-10-19T14:58:28.2117696Z Uploaded bytes 50331648
+2026-10-19T14:58:28.2433865Z Uploaded bytes 58720256
+2026-10-19T14:58:28.2578474Z Uploaded bytes 67108864
+2026-10-19T14:58:28.3601357Z Uploaded bytes 75497472
+2026-10-19T14:58:28.4416623Z Uploaded bytes 83886080
+2026-10-19T14:58:28.4861749Z Uploaded bytes 92274688
+2026-10-19T14:58:28.4946051Z Uploaded bytes 100663296
+2026-10-19T14:58:28.5491703Z Uploaded bytes 109051904
+2026-10-19T14:58:28.6395894Z Uploaded bytes 117440512
+2026-10-19T14:58:28.7189353Z Uploaded bytes 125829120
+2026-10-19T14:58:28.7342220Z Uploaded bytes 134217728
+2026-10-19T14:58:28.7538616Z Uploaded bytes 142606336
+2026-10-19T14:58:28.9319353Z Uploaded bytes 150994944
+2026-10-19T14:58:28.9420607Z Uploaded bytes 159383552
+2026-10-19T14:58:28.9503778Z Uploaded bytes 167772160
+2026-10-19T14:58:28.9838240Z Uploaded bytes 176160768
+2026-10-19T14:58:29.1669331Z Uploaded bytes 184549376
+2026-10-19T14:58:29.1763997Z Uploaded bytes 192937984
+2026-10-19T14:58:29.2088864Z Uploaded bytes 201326592
+2026-10-19T14:58:29.2512487Z Uploaded bytes 209715200
+2026-10-19T14:58:29.3737439Z Uploaded bytes 218103808
+2026-10-19T14:58:29.3834845Z Uploaded bytes 226492416
+2026-10-19T14:58:29.4087976Z Uploaded bytes 234881024
+2026-10-19T14:58:29.4169158Z Uploaded bytes 243269632
+2026-10-19T14:58:29.5793432Z Uploaded bytes 251658240
+2026-10-19T14:58:29.6123339Z Uploaded bytes 260046848
+2026-10-19T14:58:29.6208369Z Uploaded bytes 268435456
+2026-10-19T14:58:29.6282413Z Uploaded bytes 276824064
+2026-10-19T14:58:29.7780087Z Uploaded bytes 285212672
+2026-10-19T14:58:29.8159764Z Uploaded bytes 293601280
+2026-10-19T14:58:29.8316509Z Uploaded bytes 301989888
+2026-10-19T14:58:29.8619437Z Uploaded bytes 310378496
+2026-10-19T14:58:29.8987783Z Uploaded bytes 318767104
+2026-10-19T14:58:30.0070175Z Uploaded bytes 327155712
+2026-10-19T14:58:30.0396971Z Uploaded bytes 335544320
+2026-10-19T14:58:30.0477068Z Uploaded bytes 343932928
+2026-10-19T14:58:30.0554239Z Uploaded bytes 352321536
+2026-10-19T14:58:30.1474614Z Uploaded bytes 360710144
+2026-10-19T14:58:30.3015039Z Uploaded bytes 369098752
+2026-10-19T14:58:30.3097096Z Uploaded bytes 377487360
+2026-10-19T14:58:30.3476166Z Uploaded bytes 385875968
+2026-10-19T14:58:30.3582804Z Uploaded bytes 394264576
+2026-10-19T14:58:30.4644790Z Uploaded bytes 402653184
+2026-10-19T14:58:30.4728506Z Uploaded bytes 411041792
+2026-10-19T14:58:30.5204263Z Uploaded bytes 419430400
+2026-10-19T14:58:30.5283929Z Uploaded bytes 427819008
+2026-10-19T14:58:30.6733274Z Uploaded bytes 436207616
+2026-10-19T14:58:30.6813804Z Uploaded bytes 444596224
+2026-10-19T14:58:30.6949136Z Uploaded bytes 452984832
+2026-10-19T14:58:30.7124003Z Uploaded bytes 461373440
+2026-10-19T14:58:30.8768344Z Uploaded bytes 469762048
+2026-10-19T14:58:30.8968171Z Uploaded bytes 478150656
+2026-10-19T14:58:30.9049214Z Uploaded bytes 486539264
+2026-10-19T14:58:30.9130124Z Uploaded bytes 494927872
+2026-10-19T14:58:31.0445310Z Uploaded bytes 503316480
+2026-10-19T14:58:31.1299516Z Uploaded bytes 511705088
+2026-10-19T14:58:31.1426524Z Uploaded bytes 520093696
+2026-10-19T14:58:31.1682024Z Uploaded bytes 528482304
+2026-10-19T14:58:31.2690076Z Uploaded bytes 536870912
+2026-10-19T14:58:31.3154459Z Uploaded bytes 545259520
+2026-10-19T14:58:31.3481924Z Uploaded bytes 553648128
+2026-10-19T14:58:31.3587296Z Uploaded bytes 562036736
+2026-10-19T14:58:31.4611330Z Uploaded bytes 570425344
+2026-10-19T14:58:31.4691242Z Uploaded bytes 578813952
+2026-10-19T14:58:31.4770556Z Uploaded bytes 587202560
+2026-10-19T14:58:31.4890869Z Uploaded bytes 595591168
+2026-10-19T14:58:31.6062687Z Uploaded bytes 603979776
+2026-10-19T14:58:31.6130646Z Uploaded bytes 612368384
+2026-10-19T14:58:31.6156186Z Uploaded bytes 620756992
+2026-10-19T14:58:31.6351480Z Uploaded bytes 629145600
+2026-10-19T14:58:31.7759365Z Uploaded bytes 637048763
+2026-10-19T14:58:31.7986203Z Finished uploading artifact content to blob storage!
+2026-10-19T14:58:31.7991243Z SHA256 digest of uploaded artifact zip is 929eaa07c45d1173497ca95bd9d53e8d2985717496a559d00127d6efdb4c9220
+2026-10-19T14:58:31.7994609Z Finalizing artifact upload
+2026-10-19T14:58:32.0406382Z Artifact p7-hf-portable-runtime.zip successfully finalized. Artifact ID 12195949376
+2026-10-19T14:58:32.0407923Z Artifact p7-hf-portable-runtime has been successfully uploaded! Final size is 637048763 bytes. Artifact ID is 12195949376
+2026-10-19T14:58:32.0422922Z Artifact download URL: https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39271014161/artifacts/12195949376
+2026-10-19T14:58:32.0806291Z ##[group]Run python ../scripts/build_numbers.py
+2026-10-19T14:58:32.0806750Z python ../scripts/build_numbers.py
+2026-10-19T14:58:32.0890259Z shell: C:\Program Files\PowerShell\7\pwsh.EXE -command ". '{0}'"
+2026-10-19T14:58:32.0890641Z env:
+2026-10-19T14:58:32.0890850Z   PYTHONUTF8: 1
+2026-10-19T14:58:32.0891066Z   PYTHONIOENCODING: utf-8
+2026-10-19T14:58:32.0891403Z   pythonLocation: C:\hostedtoolcache\windows\Python\3.11.9\x64
+2026-10-19T14:58:32.0891890Z   PKG_CONFIG_PATH: C:\hostedtoolcache\windows\Python\3.11.9\x64/lib/pkgconfig
+2026-10-19T14:58:32.0892373Z   Python_ROOT_DIR: C:\hostedtoolcache\windows\Python\3.11.9\x64
+2026-10-19T14:58:32.0892842Z   Python2_ROOT_DIR: C:\hostedtoolcache\windows\Python\3.11.9\x64
+2026-10-19T14:58:32.0893316Z   Python3_ROOT_DIR: C:\hostedtoolcache\windows\Python\3.11.9\x64
+2026-10-19T14:58:32.0893658Z ##[endgroup]
+2026-10-19T14:58:32.5367971Z D:\a\Smarty_Chumakov\Smarty_Chumakov\reports\NUMBERS.json: записей 66, измеренных 31
+2026-10-19T14:58:32.6767284Z ##[group]Run actions/upload-artifact@v4
+2026-10-19T14:58:32.6767827Z with:
+2026-10-19T14:58:32.6768157Z   name: spanverify-windows-x64
+2026-10-19T14:58:32.6771898Z   path: spanverify-module/release/spanverify.exe
+spanverify-module/release/spanverify-win.zip
+spanverify-module/release/spanverify.pyz
+spanverify-module/release/SHA256SUMS.txt
+spanverify-module/release/pyz-verify.json
+spanverify-module/release/frozen-p5.json
+spanverify-module/release/p5-runtime.json
+spanverify-module/release/size.txt
+spanverify-module/release/sizes.json
+spanverify-module/reports/release_sizes.json
+spanverify-module/release/README.md
+spanverify-module/release/autonomy*.json
+
+2026-10-19T14:58:32.6775545Z   retention-days: 90
+2026-10-19T14:58:32.6776016Z   if-no-files-found: warn
+2026-10-19T14:58:32.6776442Z   compression-level: 6
+2026-10-19T14:58:32.6776828Z   overwrite: false
+2026-10-19T14:58:32.6777193Z   include-hidden-files: false
+2026-10-19T14:58:32.6777910Z env:
+2026-10-19T14:58:32.6778238Z   PYTHONUTF8: 1
+2026-10-19T14:58:32.6778590Z   PYTHONIOENCODING: utf-8
+2026-10-19T14:58:32.6779312Z   pythonLocation: C:\hostedtoolcache\windows\Python\3.11.9\x64
+2026-10-19T14:58:32.6780163Z   PKG_CONFIG_PATH: C:\hostedtoolcache\windows\Python\3.11.9\x64/lib/pkgconfig
+2026-10-19T14:58:32.6781013Z   Python_ROOT_DIR: C:\hostedtoolcache\windows\Python\3.11.9\x64
+2026-10-19T14:58:32.6782176Z   Python2_ROOT_DIR: C:\hostedtoolcache\windows\Python\3.11.9\x64
+2026-10-19T14:58:32.6782947Z   Python3_ROOT_DIR: C:\hostedtoolcache\windows\Python\3.11.9\x64
+2026-10-19T14:58:32.6783577Z ##[endgroup]
+2026-10-19T14:58:32.9060997Z (node:7428) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+2026-10-19T14:58:32.9062246Z (Use `node --trace-deprecation ...` to show where the warning was created)
+2026-10-19T14:58:32.9253022Z Multiple search paths detected. Calculating the least common ancestor of all paths
+2026-10-19T14:58:32.9256993Z The least common ancestor is D:\a\Smarty_Chumakov\Smarty_Chumakov\spanverify-module. This will be the root directory of the artifact
+2026-10-19T14:58:32.9258256Z With the provided path, there will be 16 files uploaded
+2026-10-19T14:58:32.9264348Z Artifact name is valid!
+2026-10-19T14:58:32.9265940Z Root directory input is valid!
+2026-10-19T14:58:33.7768376Z (node:7428) [DEP0169] DeprecationWarning: `url.parse()` behavior is not standardized and prone to errors that have security implications. Use the WHATWG URL API instead. CVEs are not issued for `url.parse()` vulnerabilities.
+2026-10-19T14:58:33.7778629Z Beginning upload of artifact content to blob storage
+2026-10-19T14:58:33.7779279Z Uploaded bytes 8388608
+2026-10-19T14:58:33.9121867Z Uploaded bytes 16777216
+2026-10-19T14:58:33.9547937Z Uploaded bytes 18159922
+2026-10-19T14:58:33.9769997Z Finished uploading artifact content to blob storage!
+2026-10-19T14:58:33.9771624Z SHA256 digest of uploaded artifact zip is f198f16050acdba10a5d85257fe09800adaefc924b4aaed2c05b003a08e7950a
+2026-10-19T14:58:33.9774763Z Finalizing artifact upload
+2026-10-19T14:58:34.2510594Z Artifact spanverify-windows-x64.zip successfully finalized. Artifact ID 12197265568
+2026-10-19T14:58:34.2512398Z Artifact spanverify-windows-x64 has been successfully uploaded! Final size is 18159922 bytes. Artifact ID is 12197265568
+2026-10-19T14:58:34.2523640Z Artifact download URL: https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39271014161/artifacts/12197265568
+2026-10-19T14:58:34.2866444Z ##[group]Run $quality = Get-Content ../../reports/p8/run39266451529/official/result.json -Raw | ConvertFrom-Json
+2026-10-19T14:58:34.2867551Z $quality = Get-Content ../../reports/p8/run39266451529/official/result.json -Raw | ConvertFrom-Json
+2026-10-19T14:58:34.2868503Z $pass = ($quality.joint_gate -eq $true) -and ($quality.metrics.tokens.f1 -ge 0.5) -and ($quality.metrics.spans.f1 -ge 0.5) -and ($quality.metrics.tokens.fpr -le 0.4)
+2026-10-19T14:58:34.2869353Z $tag = if ($pass) { "p8-final-20261019" } else { "v1.3.1-rc.p8.39271014161" }
+2026-10-19T14:58:34.2869894Z $flags = if ($pass) { @("--latest=true") } else { @("--prerelease", "--latest=false") }
+2026-10-19T14:58:34.2870659Z gh release create $tag spanverify.exe spanverify-win.zip spanverify.pyz frozen-p5.json p5-runtime.json SHA256SUMS.txt `
+2026-10-19T14:58:34.2871656Z   --repo "Igorr112323/Smarty_Chumakov" --target "654a48e3f074654d62fb4adb38a6c37555c53681" --title "SpanVerify 1.3.1 — P8 final evaluation" `
+2026-10-19T14:58:34.2872387Z   --notes-file ../../reports/p8/RELEASE_NOTES.md @flags
+2026-10-19T14:58:34.2873068Z if ($LASTEXITCODE -ne 0) { throw "P8 conditional publication failed" }
+2026-10-19T14:58:34.2873585Z python ../../scripts/p8_emit_receipt.py . p8-windows 39271014161
+2026-10-19T14:58:34.2874092Z gh release view $tag --repo "Igorr112323/Smarty_Chumakov" --json url,assets
+2026-10-19T14:58:34.2947203Z shell: C:\Program Files\PowerShell\7\pwsh.EXE -command ". '{0}'"
+2026-10-19T14:58:34.2947561Z env:
+2026-10-19T14:58:34.2947755Z   PYTHONUTF8: 1
+2026-10-19T14:58:34.2947967Z   PYTHONIOENCODING: utf-8
+2026-10-19T14:58:34.2948293Z   pythonLocation: C:\hostedtoolcache\windows\Python\3.11.9\x64
+2026-10-19T14:58:34.2948758Z   PKG_CONFIG_PATH: C:\hostedtoolcache\windows\Python\3.11.9\x64/lib/pkgconfig
+2026-10-19T14:58:34.2949230Z   Python_ROOT_DIR: C:\hostedtoolcache\windows\Python\3.11.9\x64
+2026-10-19T14:58:34.2949673Z   Python2_ROOT_DIR: C:\hostedtoolcache\windows\Python\3.11.9\x64
+2026-10-19T14:58:34.2950097Z   Python3_ROOT_DIR: C:\hostedtoolcache\windows\Python\3.11.9\x64
+2026-10-19T14:58:34.2953626Z   GH_TOKEN: ***
+2026-10-19T14:58:34.2953840Z ##[endgroup]
+2026-10-19T14:58:38.6145573Z no matches found for `-`
+2026-10-19T14:58:38.8433291Z Exception: D:\a\_temp\2f9fbd30-da77-460a-be0a-08b2d6d78d32.ps1:9
+2026-10-19T14:58:38.8434470Z Line |
+2026-10-19T14:58:38.8435791Z    9 |  … f ($LASTEXITCODE -ne 0) { throw "P8 conditional publication failed" }
+2026-10-19T14:58:38.8437321Z      |                              ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+2026-10-19T14:58:38.8438380Z      | P8 conditional publication failed
+2026-10-19T14:58:38.8988037Z ##[error]Process completed with exit code 1.
+2026-10-19T14:58:38.9263854Z Post job cleanup.
+2026-10-19T14:58:39.1366711Z [command]"C:\Program Files\Git\bin\git.exe" version
+2026-10-19T14:58:39.1744554Z git version 2.56.0.windows.2
+2026-10-19T14:58:39.1818154Z Temporarily overriding HOME='D:\a\_temp\cabb9735-f4d6-4148-bdd3-d88878254cbe' before making global git config changes
+2026-10-19T14:58:39.1819838Z Adding repository directory to the temporary git global config as a safe directory
+2026-10-19T14:58:39.1830755Z [command]"C:\Program Files\Git\bin\git.exe" config --global --add safe.directory D:\a\Smarty_Chumakov\Smarty_Chumakov
+2026-10-19T14:58:39.2271153Z [command]"C:\Program Files\Git\bin\git.exe" config --local --name-only --get-regexp core\.sshCommand
+2026-10-19T14:58:39.2692562Z [command]"C:\Program Files\Git\bin\git.exe" submodule foreach --recursive "sh -c \"git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :\""
+2026-10-19T14:58:39.8554410Z [command]"C:\Program Files\Git\bin\git.exe" config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-10-19T14:58:39.8930849Z http.https://github.com/.extraheader
+2026-10-19T14:58:39.8982427Z [command]"C:\Program Files\Git\bin\git.exe" config --local --unset-all http.https://github.com/.extraheader
+2026-10-19T14:58:39.9400574Z [command]"C:\Program Files\Git\bin\git.exe" submodule foreach --recursive "sh -c \"git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :\""
+2026-10-19T14:58:40.5599739Z [command]"C:\Program Files\Git\bin\git.exe" config --local --name-only --get-regexp ^includeIf\.gitdir:
+2026-10-19T14:58:40.6028413Z [command]"C:\Program Files\Git\bin\git.exe" submodule foreach --recursive "git config --local --show-origin --name-only --get-regexp remote.origin.url"
+2026-10-19T14:58:41.2335690Z Cleaning up orphan processes
+2026-10-19T14:58:41.2531369Z Terminate orphan process: pid (6528) (conhost)
+2026-10-19T14:58:41.2924386Z Terminate orphan process: pid (2016) (spanverify)
+2026-10-19T14:58:41.3023997Z Terminate orphan process: pid (7116) (conhost)
+2026-10-19T14:58:41.3386218Z Terminate orphan process: pid (4916) (spanverify)
+2026-10-19T14:58:41.3632506Z Terminate orphan process: pid (5300) (conhost)
+2026-10-19T14:58:41.4046612Z Terminate orphan process: pid (1864) (spanverify)
+2026-10-19T14:58:41.4061200Z ##[warning]Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@v4, actions/setup-python@v5, actions/upload-artifact@v4. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/

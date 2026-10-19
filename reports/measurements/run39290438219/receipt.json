@@ -1,0 +1,15 @@
+{
+  "run_id": "39290438219",
+  "date": "2026-10-19T17:00:42Z",
+  "commit": "879cd14f69b3c63a47fbb29f55cc4e8a55d5acf5",
+  "family": "P8",
+  "workflow": "p7-publish-acceptance.yml",
+  "record_kind": "publication/recovery",
+  "status": "completed",
+  "outcome": "success",
+  "url": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39290438219",
+  "canonical_directories": [
+    "reports/p8/run39290438219"
+  ],
+  "receipt": "reports/measurements/run39290438219/receipt.json"
+}

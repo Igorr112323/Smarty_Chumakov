@@ -1,20 +1,20 @@
-build-and-release-exe запускается пушем этого файла (см. .github/workflows/build-and-release-exe.yml).
-
-2026-10-13 — прогон после починки пайплайна: сборка .exe на windows-latest, смоук-тест,
-контрольные суммы SHA256SUMS.txt и проверка размеров поставки (ТЗ п. 4.2: .exe <= 9 МБ,
-пакет <= 0,6 МБ). Релиз при таком запуске не публикуется — публикация только по тегу v*.
-
-2026-10-13 — прогон 2: проверка после починки пайплайна (отмена ног матрицы запрещена,
-тесты и форматирование зелёные на коммите d5b687c).
-
-2026-10-13 — прогон 3: размеры поставки (8,97 МБ .exe и 0,1722 МБ пакета) пишутся
-коммитом в ветку прогона: запись через API в main из задания hf-footprint работает,
-а здесь шаг падал (release_sizes.json не появлялся в репозитории).
-
-2026-10-13 — прогон 4: путь к файлу размеров считается от рабочего каталога задания
-(в прогоне 38467373828 шаг искал spanverify-module/reports/release_sizes.json внутри
-spanverify-module и не нашёл файл).
-
-2026-10-13 — прогон 5: reports/release_sizes.json пишется и в корень репозитория
-(реестр чисел читает именно корневой путь), прогон 4 записал файл только в
-spanverify-module/reports.
+P6 RC frozen bundle, no training fallback
+P6 publish RC only
+P6 final RC autonomy request/response evidence
+P6 inventory 871, includes new workflow limit tests
+P6 exact LF frozen artifacts and true clean working directory
+P6 lean packaging, both size limits mandatory
+P6 server-only assets: externalize unused demonstration corpora; preserve config and strict limits
+P6 final measured receipts publication; runtime unchanged
+P7 external HF offline autonomy RC
+P7 external HF layout, corrected generic schema bounds
+P7 offline HF generic span bounds
+P7 complete portable external stdlib and diagnostic HF smoke
+P7 portable HF runtime artifact, no user installation, complete external stdlib
+P7 explicit portable dependency and HTTP500 JSON diagnostics
+P7 complete frozen stdlib package paths; portable HF must pass actual verify
+P7 preserve workflow limits and validate actual complete HF runtime
+P7 current test inventory888, all existing guards retained
+P7 matching full-history acceptance source; parallel independent checks
+P7 portable abi3 Python DLL search and lossless archive compression
+P8 acceptance build: official joint PASS, external1000 published, frozen P7 product

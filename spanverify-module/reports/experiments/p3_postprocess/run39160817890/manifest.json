@@ -1,0 +1,63 @@
+{
+  "run_id": "39160817890",
+  "code_sha": "36d92c5524c96a7ea7e05ce8490aff94e507d69a",
+  "source": {
+    "run_id": 39155368906,
+    "artifact_id": 12146627081,
+    "code_sha": "7e0ed4454180c9c1ff0bf39ffbec5b993e41ade5",
+    "files": {
+      "oof_states.jsonl": {
+        "sha256": "5ca0ff5121707e950a4a710c8d733c092aeca477857ca146847c5de0ef98959b",
+        "bytes": 5742956,
+        "gzip_sha256": "96facdab18c9cb01c7a53a523c700c1b829c0105714fdc68a2cddf12ff01297d",
+        "gzip_bytes": 1379585
+      },
+      "dev_evidence.jsonl": {
+        "sha256": "e54d290b4894246e61a256af5568af500bc979997d7ab72e7f6ea237129d31ce",
+        "bytes": 3932617,
+        "gzip_sha256": "926ca9d19ca100017df9349af2f8c4c69c6adc56ee5a4baca0dea4c0e15d1465",
+        "gzip_bytes": 570090
+      }
+    }
+  },
+  "frozen_models": {
+    "p2_token_head.json": "33112af1997e12afe9aee07a6f84eb29760c9165e1a928938b2979110d822e9e",
+    "combined_bundle.json": "87298b01ec157b20c6a06cee9244d75ce1d7882a30f20abddbb6e9781bbf46ab"
+  },
+  "candidate_bundle_sha256": "bc343e3fcfbfb4ee7056f5f50b016a657ade0a080d8c99b6392d1f99a3ad1e13",
+  "train_pairs": 842,
+  "dev_pairs": 181,
+  "classifier_fits": 0,
+  "fresh_hf_inference": false,
+  "official_test": false,
+  "cache_source": 39060670054,
+  "cache_keys": 1195,
+  "cache_hits": 1267,
+  "cache_misses": 0,
+  "python": "3.11.17",
+  "numpy": "1.26.4",
+  "seconds": 36.950302166,
+  "quality_status": "НЕ ДОСТИГНУТО",
+  "sizes": {
+    "source_dev_evidence.jsonl.gz": 570090,
+    "oof_diagnostic_evidence.jsonl": 239949,
+    "all_family_metrics.json": 6963,
+    "p2_token_head.json": 97494,
+    "selected_decoder.json": 966,
+    "oof_diagnostics.json": 6744,
+    "risk_reload_parity.json": 145,
+    "dev_answers.jsonl": 34717,
+    "dev_evidence.jsonl.gz": 572683,
+    "measurement.log": 1296,
+    "source_oof_states.jsonl.gz": 1379585,
+    "cache_coverage.json": 55,
+    "combined_bundle.json": 115319,
+    "source_provenance.json": 649,
+    "grid_scores.jsonl.gz": 102461,
+    "oof_validation.json": 206,
+    "tests.log": 160,
+    "numeric_candidates.json": 1587,
+    "runtime_config.json": 618,
+    "answer_parity.json": 771
+  }
+}

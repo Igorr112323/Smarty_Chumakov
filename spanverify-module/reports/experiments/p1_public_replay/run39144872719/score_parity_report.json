@@ -1,0 +1,70 @@
+{
+  "status": "passed",
+  "metric_mismatches": [],
+  "expected_metrics_from_source_evidence": {
+    "tp": 49,
+    "fp": 14,
+    "fn": 47,
+    "tn": 71,
+    "precision": 0.7777777777777778,
+    "recall": 0.5104166666666666,
+    "f1": 0.6163522012578616,
+    "fpr": 0.16470588235294117,
+    "raw_auc": 0.7321078431372549,
+    "calibrated_auc": 0.7338235294117647,
+    "positive_predictions": 63
+  },
+  "source_measurement_run_id": 39116955685,
+  "source_measurement_commit": "b87850781b73d8630832cb972037158d0ec88927",
+  "reference_parity": {
+    "matched": true,
+    "mismatches": [],
+    "max_abs_delta": {
+      "raw_score": 0.0,
+      "calibrated_score": 0.0,
+      "threshold": 0.0
+    },
+    "pairs": 181
+  },
+  "roundtrip_parity": {
+    "matched": true,
+    "mismatches": [],
+    "max_abs_delta": {
+      "raw_score": 0.0,
+      "calibrated_score": 0.0,
+      "threshold": 0.0
+    },
+    "pairs": 181
+  },
+  "replay_metrics": {
+    "tp": 49,
+    "fp": 14,
+    "fn": 47,
+    "tn": 71,
+    "precision": 0.7777777777777778,
+    "recall": 0.5104166666666666,
+    "f1": 0.6163522012578616,
+    "fpr": 0.16470588235294117,
+    "raw_auc": 0.7321078431372549,
+    "calibrated_auc": 0.7338235294117647,
+    "positive_predictions": 63
+  },
+  "reference_metrics": {
+    "model": "answer-head",
+    "n_features": 37,
+    "schema_version": "1.0",
+    "threshold": 0.5794392523364486,
+    "dev_raw_auc": 0.7321078431372549,
+    "dev_calibrated_auc": 0.7338235294117647,
+    "tp": 49,
+    "fp": 14,
+    "fn": 47,
+    "tn": 71,
+    "precision": 0.7777777777777778,
+    "recall": 0.5104166666666666,
+    "f1": 0.6163522012578616,
+    "fpr": 0.16470588235294117,
+    "positive_predictions": 63
+  },
+  "token_base_note": "Known historical source token bundle; token/span metrics are measured anew here."
+}

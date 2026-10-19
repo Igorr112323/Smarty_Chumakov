@@ -1,0 +1,26 @@
+[
+  {
+    "path": ".github",
+    "blob_href": "https://github.com/Igorr112323/Smarty_Chumakov/blob/a85c40a14828141447768d3c78d13aa0ced105eb/.github",
+    "start_line": 2,
+    "start_column": null,
+    "end_line": 2,
+    "end_column": null,
+    "annotation_level": "warning",
+    "title": "",
+    "message": "Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@v4, actions/setup-python@v5, actions/upload-artifact@v4. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/",
+    "raw_details": ""
+  },
+  {
+    "path": ".github",
+    "blob_href": "https://github.com/Igorr112323/Smarty_Chumakov/blob/a85c40a14828141447768d3c78d13aa0ced105eb/.github",
+    "start_line": 29,
+    "start_column": null,
+    "end_line": 29,
+    "end_column": null,
+    "annotation_level": "notice",
+    "title": "P7 full 2M",
+    "message": "{\"interval_index_comparison\": {\"before_seconds\": 91.417020584, \"before_public_sha256\": \"e86ac2ade7e182d6f6fb03bce53f81680b92f0a3715804bc39d13d833a1ebd35\", \"before_source\": \"1c3aa13\", \"thermal\": \"both warm-model; same process\", \"used_for_native_repeats\": false, \"after_public_sha256\": \"e86ac2ade7e182d6f6fb03bce53f81680b92f0a3715804bc39d13d833a1ebd35\", \"byte_equal\": true}, \"mode\": \"hf\", \"seconds\": 39.301874182999995, \"seconds_per_1000_chars\": 0.0196509370915, \"answer_chars\": 2000000, \"utf8_bytes\": 3660605, \"token_records\": 282830, \"last_end\": 2000000, \"all_risks_finite_bounded\": true, \"schema_valid\": true, \"full_token_sha256\": \"56c3028861b5ea021310a59f98272fa1bff6e33a43755af6fae0bc00f89655a4\", \"features\": {\"answer_feature_contract\": \"window512_full_answer_v1\", \"backend\": \"hf\", \"model\": \"ai-forever/rugpt3small_based_on_gpt2\", \"full_answer\": true, \"answer_windows\": 3283, \"context_subwindows\": 1, \"model_calls\": 14, \"identical_window_cache_hits\": 3269, \"logical_window_scores\": 3283, \"all_answer_tokens_mapped\": true, \"scored_answer_tokens\": 282830, \"answer_last_end\": 2000000, \"chunked\": false}, \"functional_passed\": true, \"speed_60s_met\": true}",
+    "raw_details": ""
+  }
+]

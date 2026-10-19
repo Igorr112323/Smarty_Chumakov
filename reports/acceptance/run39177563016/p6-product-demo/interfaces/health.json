@@ -1,0 +1,25 @@
+{
+  "status": "ok",
+  "version": "1.3.1",
+  "mode": "demo",
+  "backend": "demo",
+  "calibrated": true,
+  "threshold": 0.579439,
+  "weights": {
+    "attention_entropy": 0.1,
+    "ctx_attention_mass": 0.0,
+    "ctx_attention_mass_norm": 0.1,
+    "ctx_max_similarity": 0.8,
+    "embedding_density": 0.0
+  },
+  "span_threshold": {
+    "z": 1.5,
+    "floor": 0.05,
+    "cap": 0.5
+  },
+  "head": "logreg",
+  "synthetic": false,
+  "uptime_s": 0.1,
+  "weights_source": "disk",
+  "warning": "ДЕМО-РЕЖИМ: признаки считаются лексическими суррогатами без весов языковой модели. Он проверяет работоспособность конвейера и интерфейса, а не достоверность ответа. Подмена числа ловится, если число есть у другого объекта документа (например, «первичные — пять лет» против «вторичные — десять лет»); перефразирования и таблицы требуют режима 'hf'. Научные выводы возможны только в режиме 'hf'."
+}

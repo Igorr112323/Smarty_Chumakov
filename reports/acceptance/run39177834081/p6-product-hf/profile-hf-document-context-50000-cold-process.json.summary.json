@@ -1,0 +1,272 @@
+[
+  {
+    "file": "/home/runner/work/Smarty_Chumakov/Smarty_Chumakov/spanverify-module/spanverify/engine.py",
+    "line": 479,
+    "function": "verify",
+    "primitive_calls": 1,
+    "calls": 1,
+    "self_seconds": 0.00025800300000000003,
+    "cumulative_seconds": 17.534216830000002
+  },
+  {
+    "file": "/home/runner/work/Smarty_Chumakov/Smarty_Chumakov/spanverify-module/spanverify/engine.py",
+    "line": 761,
+    "function": "_features",
+    "primitive_calls": 1,
+    "calls": 1,
+    "self_seconds": 9.104000000000001e-05,
+    "cumulative_seconds": 17.459423349
+  },
+  {
+    "file": "/home/runner/work/Smarty_Chumakov/Smarty_Chumakov/spanverify-module/spanverify/features.py",
+    "line": 1384,
+    "function": "hf_features_chunked",
+    "primitive_calls": 1,
+    "calls": 1,
+    "self_seconds": 0.032940404,
+    "cumulative_seconds": 17.459331838
+  },
+  {
+    "file": "/home/runner/work/Smarty_Chumakov/Smarty_Chumakov/spanverify-module/spanverify/features.py",
+    "line": 1147,
+    "function": "hf_features",
+    "primitive_calls": 3,
+    "calls": 3,
+    "self_seconds": 0.018005956,
+    "cumulative_seconds": 14.350748317
+  },
+  {
+    "file": "~",
+    "line": 0,
+    "function": "<built-in method builtins.sum>",
+    "primitive_calls": 60409,
+    "calls": 60409,
+    "self_seconds": 3.451524408,
+    "cumulative_seconds": 8.243774536
+  },
+  {
+    "file": "/home/runner/work/Smarty_Chumakov/Smarty_Chumakov/spanverify-module/spanverify/features.py",
+    "line": 1314,
+    "function": "<listcomp>",
+    "primitive_calls": 90,
+    "calls": 90,
+    "self_seconds": 0.009846951000000001,
+    "cumulative_seconds": 8.157632128000001
+  },
+  {
+    "file": "/home/runner/work/Smarty_Chumakov/Smarty_Chumakov/spanverify-module/spanverify/features.py",
+    "line": 1566,
+    "function": "_cosine_dense",
+    "primitive_calls": 19080,
+    "calls": 19080,
+    "self_seconds": 0.036628594,
+    "cumulative_seconds": 8.147785177000001
+  },
+  {
+    "file": "<frozen importlib._bootstrap>",
+    "line": 1165,
+    "function": "_find_and_load",
+    "primitive_calls": 19,
+    "calls": 5446,
+    "self_seconds": 0.016426516000000002,
+    "cumulative_seconds": 6.029553857000001
+  },
+  {
+    "file": "<frozen importlib._bootstrap>",
+    "line": 1120,
+    "function": "_find_and_load_unlocked",
+    "primitive_calls": 12,
+    "calls": 2407,
+    "self_seconds": 0.012677753,
+    "cumulative_seconds": 6.029198552
+  },
+  {
+    "file": "<frozen importlib._bootstrap>",
+    "line": 666,
+    "function": "_load_unlocked",
+    "primitive_calls": 14,
+    "calls": 2312,
+    "self_seconds": 0.010025601,
+    "cumulative_seconds": 6.027113615
+  },
+  {
+    "file": "<frozen importlib._bootstrap_external>",
+    "line": 934,
+    "function": "exec_module",
+    "primitive_calls": 14,
+    "calls": 2266,
+    "self_seconds": 0.005980592000000001,
+    "cumulative_seconds": 6.026536783
+  },
+  {
+    "file": "<frozen importlib._bootstrap>",
+    "line": 233,
+    "function": "_call_with_frames_removed",
+    "primitive_calls": 26,
+    "calls": 5224,
+    "self_seconds": 0.003184909,
+    "cumulative_seconds": 6.022373271
+  },
+  {
+    "file": "~",
+    "line": 0,
+    "function": "<built-in method builtins.exec>",
+    "primitive_calls": 14,
+    "calls": 5744,
+    "self_seconds": 0.32847405900000004,
+    "cumulative_seconds": 6.020888777000001
+  },
+  {
+    "file": "<frozen importlib._bootstrap>",
+    "line": 1207,
+    "function": "_handle_fromlist",
+    "primitive_calls": 2149,
+    "calls": 4181,
+    "self_seconds": 0.006996111,
+    "cumulative_seconds": 4.648507191
+  },
+  {
+    "file": "~",
+    "line": 0,
+    "function": "<built-in method builtins.__import__>",
+    "primitive_calls": 119,
+    "calls": 829,
+    "self_seconds": 0.002121862,
+    "cumulative_seconds": 3.2980251120000004
+  },
+  {
+    "file": "~",
+    "line": 0,
+    "function": "<built-in method builtins.hasattr>",
+    "primitive_calls": 29395,
+    "calls": 78212,
+    "self_seconds": 0.033940546,
+    "cumulative_seconds": 3.284518342
+  },
+  {
+    "file": "/opt/hostedtoolcache/Python/3.11.17/x64/lib/python3.11/importlib/__init__.py",
+    "line": 108,
+    "function": "import_module",
+    "primitive_calls": 57,
+    "calls": 3098,
+    "self_seconds": 0.002451481,
+    "cumulative_seconds": 3.265743547
+  },
+  {
+    "file": "<frozen importlib._bootstrap>",
+    "line": 1192,
+    "function": "_gcd_import",
+    "primitive_calls": 57,
+    "calls": 3101,
+    "self_seconds": 0.0019665050000000003,
+    "cumulative_seconds": 3.2656543520000003
+  },
+  {
+    "file": "/home/runner/work/Smarty_Chumakov/Smarty_Chumakov/spanverify-module/spanverify/backends/hf.py",
+    "line": 44,
+    "function": "dependencies",
+    "primitive_calls": 4,
+    "calls": 4,
+    "self_seconds": 2.8544000000000003e-05,
+    "cumulative_seconds": 3.0550543980000002
+  },
+  {
+    "file": "/opt/hostedtoolcache/Python/3.11.17/x64/lib/python3.11/site-packages/transformers/utils/import_utils.py",
+    "line": 2547,
+    "function": "__getattr__",
+    "primitive_calls": 7,
+    "calls": 36,
+    "self_seconds": 0.00019247600000000002,
+    "cumulative_seconds": 2.964894809
+  },
+  {
+    "file": "/opt/hostedtoolcache/Python/3.11.17/x64/lib/python3.11/site-packages/transformers/utils/import_utils.py",
+    "line": 2827,
+    "function": "_get_module",
+    "primitive_calls": 7,
+    "calls": 26,
+    "self_seconds": 5.5838e-05,
+    "cumulative_seconds": 2.964805118
+  },
+  {
+    "file": "/home/runner/work/Smarty_Chumakov/Smarty_Chumakov/spanverify-module/spanverify/features.py",
+    "line": 1567,
+    "function": "<genexpr>",
+    "primitive_calls": 14672520,
+    "calls": 14672520,
+    "self_seconds": 2.169669986,
+    "cumulative_seconds": 2.169669986
+  },
+  {
+    "file": "/opt/hostedtoolcache/Python/3.11.17/x64/lib/python3.11/site-packages/transformers/models/auto/modeling_auto.py",
+    "line": 1,
+    "function": "<module>",
+    "primitive_calls": 1,
+    "calls": 1,
+    "self_seconds": 0.000514763,
+    "cumulative_seconds": 1.9176782540000001
+  },
+  {
+    "file": "/opt/hostedtoolcache/Python/3.11.17/x64/lib/python3.11/site-packages/transformers/models/auto/auto_factory.py",
+    "line": 1,
+    "function": "<module>",
+    "primitive_calls": 1,
+    "calls": 1,
+    "self_seconds": 6.0032000000000004e-05,
+    "cumulative_seconds": 1.894097114
+  },
+  {
+    "file": "/opt/hostedtoolcache/Python/3.11.17/x64/lib/python3.11/site-packages/transformers/generation/utils.py",
+    "line": 1,
+    "function": "<module>",
+    "primitive_calls": 1,
+    "calls": 1,
+    "self_seconds": 0.000159359,
+    "cumulative_seconds": 1.835460058
+  },
+  {
+    "file": "/opt/hostedtoolcache/Python/3.11.17/x64/lib/python3.11/site-packages/transformers/models/auto/auto_factory.py",
+    "line": 265,
+    "function": "from_pretrained",
+    "primitive_calls": 3,
+    "calls": 3,
+    "self_seconds": 0.000208728,
+    "cumulative_seconds": 1.8020635070000002
+  },
+  {
+    "file": "/opt/hostedtoolcache/Python/3.11.17/x64/lib/python3.11/site-packages/torch/__init__.py",
+    "line": 1,
+    "function": "<module>",
+    "primitive_calls": 1,
+    "calls": 1,
+    "self_seconds": 0.002163864,
+    "cumulative_seconds": 1.661265282
+  },
+  {
+    "file": "/opt/hostedtoolcache/Python/3.11.17/x64/lib/python3.11/site-packages/transformers/modeling_utils.py",
+    "line": 3822,
+    "function": "from_pretrained",
+    "primitive_calls": 3,
+    "calls": 3,
+    "self_seconds": 0.002195682,
+    "cumulative_seconds": 1.337406045
+  },
+  {
+    "file": "/opt/hostedtoolcache/Python/3.11.17/x64/lib/python3.11/site-packages/torch/nn/modules/module.py",
+    "line": 1779,
+    "function": "_wrapped_call_impl",
+    "primitive_calls": 3,
+    "calls": 453,
+    "self_seconds": 0.0013903490000000001,
+    "cumulative_seconds": 1.3281129340000002
+  },
+  {
+    "file": "/opt/hostedtoolcache/Python/3.11.17/x64/lib/python3.11/site-packages/torch/nn/modules/module.py",
+    "line": 1787,
+    "function": "_call_impl",
+    "primitive_calls": 3,
+    "calls": 453,
+    "self_seconds": 0.002534788,
+    "cumulative_seconds": 1.3280940300000001
+  }
+]

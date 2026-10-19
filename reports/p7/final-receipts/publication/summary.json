@@ -1,0 +1,150 @@
+{
+  "run": {
+    "conclusion": "success",
+    "createdAt": "2026-10-19T11:03:03Z",
+    "headSha": "b5eb133a55c1d1b8062851919f5978676497dbfc",
+    "jobs": [
+      {
+        "completedAt": "2026-10-19T11:03:26Z",
+        "conclusion": "success",
+        "databaseId": 118024168172,
+        "name": "publish",
+        "startedAt": "2026-10-19T11:03:06Z",
+        "status": "completed",
+        "steps": [
+          {
+            "conclusion": "success",
+            "name": "Set up job",
+            "number": 1,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Run actions/checkout@v4",
+            "number": 2,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Run actions/setup-python@v5",
+            "number": 3,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "All source runs SUCCESS and scientific code unchanged",
+            "number": 4,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Run actions/download-artifact@v4",
+            "number": 5,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Verify source checksum, include final report and committed receipts",
+            "number": 6,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Run actions/upload-artifact@v4",
+            "number": 7,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Post Run actions/setup-python@v5",
+            "number": 13,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Post Run actions/checkout@v4",
+            "number": 14,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Complete job",
+            "number": 15,
+            "status": "completed"
+          }
+        ],
+        "url": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39241808393/job/118024168172"
+      }
+    ],
+    "name": "P7 final acceptance artifact publication",
+    "status": "completed",
+    "updatedAt": "2026-10-19T11:03:27Z",
+    "url": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39241808393"
+  },
+  "artifacts": {
+    "total_count": 1,
+    "artifacts": [
+      {
+        "id": 12181377477,
+        "node_id": "MDg6QXJ0aWZhY3QxMjE4MTM3NzQ3Nw==",
+        "name": "p7-final-acceptance-archive",
+        "size_in_bytes": 4762168,
+        "url": "https://api.github.com/repos/Igorr112323/Smarty_Chumakov/actions/artifacts/12181377477",
+        "archive_download_url": "https://api.github.com/repos/Igorr112323/Smarty_Chumakov/actions/artifacts/12181377477/zip",
+        "expired": false,
+        "digest": "sha256:1c76bc15f7cd91956b462614fa473e545abdcf18f81ff9072c57ddbf4328b14d",
+        "created_at": "2026-10-19T11:03:23Z",
+        "updated_at": "2026-10-19T11:03:23Z",
+        "expires_at": "2027-01-17T11:03:04Z",
+        "workflow_run": {
+          "id": 39241808393,
+          "repository_id": 1402768620,
+          "head_repository_id": 1402768620,
+          "head_branch": "arena/c5f69767-smarty-chumakov",
+          "head_sha": "b5eb133a55c1d1b8062851919f5978676497dbfc"
+        }
+      }
+    ]
+  },
+  "notices": [
+    {
+      "job": "publish",
+      "job_id": 118024168172,
+      "title": "P7 final acceptance archive",
+      "data": {
+        "kind": "artifact-publication-only; no new measurements or fitting",
+        "measurement_source": "a85c40a14828141447768d3c78d13aa0ced105eb",
+        "documentation_source": "b5eb133a55c1d1b8062851919f5978676497dbfc",
+        "runs": {
+          "acceptance": {
+            "conclusion": "success",
+            "headSha": "a85c40a14828141447768d3c78d13aa0ced105eb",
+            "status": "completed",
+            "url": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39236657451"
+          },
+          "windows": {
+            "conclusion": "success",
+            "headSha": "a85c40a14828141447768d3c78d13aa0ced105eb",
+            "status": "completed",
+            "url": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39236657579"
+          },
+          "ci": {
+            "conclusion": "success",
+            "headSha": "b8aa671a6b9256d5bc813cf11412420b60e87fdc",
+            "status": "completed",
+            "url": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39239481352"
+          },
+          "paired": {
+            "conclusion": "success",
+            "headSha": "f7bb7181f950e55a67c04003c570093b3e186b7e",
+            "status": "completed",
+            "url": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39232439363"
+          }
+        },
+        "acceptance_run": 39236657451,
+        "tests_excluded": false,
+        "sha256": "03eaa6e0379c30a9db4d23da7f0ea0cbd0a66a57ac7952bbeca2064fcbc0f143"
+      }
+    }
+  ]
+}

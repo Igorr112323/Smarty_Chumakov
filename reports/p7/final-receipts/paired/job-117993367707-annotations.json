@@ -1,0 +1,86 @@
+[
+  {
+    "path": ".github",
+    "blob_href": "https://github.com/Igorr112323/Smarty_Chumakov/blob/f7bb7181f950e55a67c04003c570093b3e186b7e/.github",
+    "start_line": 2,
+    "start_column": null,
+    "end_line": 2,
+    "end_column": null,
+    "annotation_level": "warning",
+    "title": "",
+    "message": "Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@v4, actions/setup-python@v5, actions/upload-artifact@v4. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/",
+    "raw_details": ""
+  },
+  {
+    "path": ".github",
+    "blob_href": "https://github.com/Igorr112323/Smarty_Chumakov/blob/f7bb7181f950e55a67c04003c570093b3e186b7e/.github",
+    "start_line": 17,
+    "start_column": null,
+    "end_line": 17,
+    "end_column": null,
+    "annotation_level": "notice",
+    "title": "P7 benchmark table",
+    "message": "{\"mode\": \"demo\", \"phase\": \"after\", \"columns\": [\"scenario\", \"chars\", \"thermal\", \"median_seconds\", \"max_seconds\", \"limit_seconds\", \"status\", \"seconds_per_1000_chars\", \"median_lower_bound_seconds\", \"seconds_per_1000_chars_lower_bound\"], \"rows\": [[\"document-context\", 1000, \"cold-process\", 0.013302737999993042, 0.02560429599998315, 0.03, \"достигнут\", 0.013302737999993042, null, null], [\"document-context\", 1000, \"warm-model\", 0.0036294889999908264, 0.0036523919999353893, 0.03, \"достигнут\", 0.0036294889999908264, null, null], [\"document-context\", 50000, \"cold-process\", 0.0845679309999241, 0.08488835000002837, 1.0, \"достигнут\", 0.001691358619998482, null, null], [\"document-context\", 50000, \"warm-model\", 0.07510980500001097, 0.07519851100005326, 1.0, \"достигнут\", 0.0015021961000002194, null, null], [\"document-context\", 2000000, \"cold-process\", 3.54420457599997, 3.5639562489999435, 60.0, \"достигнут\", 0.001772102287999985, null, null], [\"document-context\", 2000000, \"warm-model\", 3.540803935999975, 3.586330907000047, 60.0, \"достигнут\", 0.0017704019679999875, null, null], [\"answer-text\", 1000, \"cold-process\", 0.02542606400004388, 0.02558727500002078, 0.03, \"достигнут\", 0.02542606400004388, null, null], [\"answer-text\", 1000, \"warm-model\", 0.016516769000077147, 0.016601487000002635, 0.03, \"достигнут\", 0.016516769000077147, null, null], [\"answer-text\", 50000, \"cold-process\", 0.7224533570000631, 0.7237123290000227, 1.0, \"достигнут\", 0.014449067140001262, null, null], [\"answer-text\", 50000, \"warm-model\", 0.7145627289999084, 0.7724238219999506, 1.0, \"достигнут\", 0.014291254579998167, null, null], [\"answer-text\", 2000000, \"cold-process\", 30.243664030000105, 30.330629864000002, 60.0, \"достигнут\", 0.015121832015000053, null, null], [\"answer-text\", 2000000, \"warm-model\", 30.09000698, 30.202026483000054, 60.0, \"достигнут\", 0.015045003489999998, null, null]]}",
+    "raw_details": ""
+  },
+  {
+    "path": ".github",
+    "blob_href": "https://github.com/Igorr112323/Smarty_Chumakov/blob/f7bb7181f950e55a67c04003c570093b3e186b7e/.github",
+    "start_line": 16,
+    "start_column": null,
+    "end_line": 16,
+    "end_column": null,
+    "annotation_level": "notice",
+    "title": "P7 benchmark environment",
+    "message": "{\"phase\": \"after\", \"cpu\": \"AMD EPYC 7763 64-Core Processor\", \"logical_cpu\": 4, \"ram\": \"MemTotal:       16373448 kB\", \"python\": \"3.11.17 (main, Oct  1 2026, 14:32:31) [GCC 13.3.0]\", \"platform\": \"Linux-6.17.0-1022-azure-x86_64-with-glibc2.39\", \"versions\": {}, \"commit\": \"f7bb7181f950e55a67c04003c570093b3e186b7e\", \"run_url\": \"https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39232439363\"}",
+    "raw_details": ""
+  },
+  {
+    "path": ".github",
+    "blob_href": "https://github.com/Igorr112323/Smarty_Chumakov/blob/f7bb7181f950e55a67c04003c570093b3e186b7e/.github",
+    "start_line": 19,
+    "start_column": null,
+    "end_line": 19,
+    "end_column": null,
+    "annotation_level": "notice",
+    "title": "P7 benchmark profiles",
+    "message": "{\"mode\": \"demo\", \"cases\": [{\"scenario\": \"answer-text\", \"chars\": 2000000, \"thermal\": \"warm-model\", \"top\": [{\"function\": \"_normalised_support\", \"calls\": 1, \"self_seconds\": 61.69853563, \"cumulative_seconds\": 62.26619071100001}, {\"function\": \"demo_features\", \"calls\": 1, \"self_seconds\": 1.4710757790000002, \"cumulative_seconds\": 73.600272219}, {\"function\": \"number_value\", \"calls\": 1252680, \"self_seconds\": 1.293209029, \"cumulative_seconds\": 2.546290034}, {\"function\": \"word\", \"calls\": 2606411, \"self_seconds\": 1.093368197, \"cumulative_seconds\": 1.6462739620000002}, {\"function\": \"similarities\", \"calls\": 181821, \"self_seconds\": 1.052932811, \"cumulative_seconds\": 3.715499593}]}]}",
+    "raw_details": ""
+  },
+  {
+    "path": ".github",
+    "blob_href": "https://github.com/Igorr112323/Smarty_Chumakov/blob/f7bb7181f950e55a67c04003c570093b3e186b7e/.github",
+    "start_line": 18,
+    "start_column": null,
+    "end_line": 18,
+    "end_column": null,
+    "annotation_level": "notice",
+    "title": "P7 benchmark profiles",
+    "message": "{\"mode\": \"demo\", \"cases\": [{\"scenario\": \"answer-text\", \"chars\": 50000, \"thermal\": \"cold-process\", \"top\": [{\"function\": \"predict_one\", \"calls\": 2263360, \"self_seconds\": 0.731819575, \"cumulative_seconds\": 0.731819575}, {\"function\": \"predict_one\", \"calls\": 7073, \"self_seconds\": 0.22453186900000002, \"cumulative_seconds\": 1.286741074}, {\"function\": \"_normalised_support\", \"calls\": 1, \"self_seconds\": 0.193889464, \"cumulative_seconds\": 0.208997222}, {\"function\": \"_to_float32\", \"calls\": 396088, \"self_seconds\": 0.157310159, \"cumulative_seconds\": 0.228141532}, {\"function\": \"<method 'split' of 're.Pattern' objects>\", \"calls\": 203, \"self_seconds\": 0.11170848400000001, \"cumulative_seconds\": 0.11170848400000001}]}, {\"scenario\": \"answer-text\", \"chars\": 50000, \"thermal\": \"warm-model\", \"top\": [{\"function\": \"predict_one\", \"calls\": 2263360, \"self_seconds\": 0.736501811, \"cumulative_seconds\": 0.736501811}, {\"function\": \"predict_one\", \"calls\": 7073, \"self_seconds\": 0.22450471300000002, \"cumulative_seconds\": 1.294119365}, {\"function\": \"_normalised_support\", \"calls\": 1, \"self_seconds\": 0.194293757, \"cumulative_seconds\": 0.20919257600000002}, {\"function\": \"_to_float32\", \"calls\": 396088, \"self_seconds\": 0.159154292, \"cumulative_seconds\": 0.23140585100000002}, {\"function\": \"<method 'split' of 're.Pattern' objects>\", \"calls\": 203, \"self_seconds\": 0.11950957400000001, \"cumulative_seconds\": 0.11950957400000001}]}, {\"scenario\": \"answer-text\", \"chars\": 2000000, \"thermal\": \"cold-process\", \"top\": [{\"function\": \"_normalised_support\", \"calls\": 1, \"self_seconds\": 60.389142977000006, \"cumulative_seconds\": 60.991377797000006}, {\"function\": \"demo_features\", \"calls\": 1, \"self_seconds\": 1.5189756630000002, \"cumulative_seconds\": 73.636027935}, {\"function\": \"_candidates\", \"calls\": 181821, \"self_seconds\": 1.462326107, \"cumulative_seconds\": 1.779485103}, {\"function\": \"number_value\", \"calls\": 1252680, \"self_seconds\": 1.418017821, \"cumulative_seconds\": 2.7370468480000003}, {\"function\": \"similarities\", \"calls\": 181821, \"self_seconds\": 1.191542447, \"cumulative_seconds\": 4.480292185000001}]}]}",
+    "raw_details": ""
+  },
+  {
+    "path": ".github",
+    "blob_href": "https://github.com/Igorr112323/Smarty_Chumakov/blob/f7bb7181f950e55a67c04003c570093b3e186b7e/.github",
+    "start_line": 17,
+    "start_column": null,
+    "end_line": 17,
+    "end_column": null,
+    "annotation_level": "notice",
+    "title": "P7 benchmark table",
+    "message": "{\"mode\": \"demo\", \"phase\": \"before\", \"columns\": [\"scenario\", \"chars\", \"thermal\", \"median_seconds\", \"max_seconds\", \"limit_seconds\", \"status\", \"seconds_per_1000_chars\", \"median_lower_bound_seconds\", \"seconds_per_1000_chars_lower_bound\"], \"rows\": [[\"document-context\", 1000, \"cold-process\", 0.012390155999995045, 0.023766793999996594, 0.03, \"достигнут\", 0.012390155999995045, null, null], [\"document-context\", 1000, \"warm-model\", 0.0037134559999998373, 0.0037545929999964756, 0.03, \"достигнут\", 0.0037134559999998373, null, null], [\"document-context\", 50000, \"cold-process\", 0.08332885999999462, 0.08334773500000381, 1.0, \"достигнут\", 0.0016665771999998923, null, null], [\"document-context\", 50000, \"warm-model\", 0.07452505600001302, 0.07518283400000314, 1.0, \"достигнут\", 0.0014905011200002606, null, null], [\"document-context\", 2000000, \"cold-process\", 3.555033703999996, 3.558833409000002, 60.0, \"достигнут\", 0.001777516851999998, null, null], [\"document-context\", 2000000, \"warm-model\", 3.5261568880000027, 3.546402115999996, 60.0, \"достигнут\", 0.0017630784440000014, null, null], [\"answer-text\", 1000, \"cold-process\", 0.024932492999994338, 0.025492038000010098, 0.03, \"достигнут\", 0.024932492999994338, null, null], [\"answer-text\", 1000, \"warm-model\", 0.016736730000005196, 0.016954217000005656, 0.03, \"достигнут\", 0.016736730000005196, null, null], [\"answer-text\", 50000, \"cold-process\", 1.0564212829999917, 1.0625867370000037, 1.0, \"не достигнут\", 0.021128425659999835, null, null], [\"answer-text\", 50000, \"warm-model\", 1.0418336970000155, 1.0482958670000073, 1.0, \"не достигнут\", 0.02083667394000031, null, null], [\"answer-text\", 2000000, \"cold-process\", null, null, 60.0, \"не достигнут\", null, 74.92502029999997, 0.03746251014999999], [\"answer-text\", 2000000, \"warm-model\", null, null, 60.0, \"не достигнут\", null, 74.90774364599997, 0.03745387182299999]]}",
+    "raw_details": ""
+  },
+  {
+    "path": ".github",
+    "blob_href": "https://github.com/Igorr112323/Smarty_Chumakov/blob/f7bb7181f950e55a67c04003c570093b3e186b7e/.github",
+    "start_line": 16,
+    "start_column": null,
+    "end_line": 16,
+    "end_column": null,
+    "annotation_level": "notice",
+    "title": "P7 benchmark environment",
+    "message": "{\"phase\": \"before\", \"cpu\": \"AMD EPYC 7763 64-Core Processor\", \"logical_cpu\": 4, \"ram\": \"MemTotal:       16373448 kB\", \"python\": \"3.11.17 (main, Oct  1 2026, 14:32:31) [GCC 13.3.0]\", \"platform\": \"Linux-6.17.0-1022-azure-x86_64-with-glibc2.39\", \"versions\": {}, \"commit\": \"14a018a1b90b51cc47cd8baf628147ac22e1d8b1\", \"run_url\": \"https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39232439363\"}",
+    "raw_details": ""
+  }
+]

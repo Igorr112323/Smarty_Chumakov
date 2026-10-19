@@ -1,0 +1,101 @@
+{
+  "lost_mask_spans": 5,
+  "cases": [
+    {
+      "id": "corpus-a3-00877",
+      "mask_span": [
+        451,
+        466
+      ],
+      "gold_indices": [
+        0
+      ],
+      "final_spans": [
+        [
+          390,
+          393
+        ],
+        [
+          433,
+          493
+        ]
+      ]
+    },
+    {
+      "id": "corpus-a3-00516",
+      "mask_span": [
+        60,
+        79
+      ],
+      "gold_indices": [
+        0
+      ],
+      "final_spans": [
+        [
+          0,
+          3
+        ],
+        [
+          45,
+          86
+        ]
+      ]
+    },
+    {
+      "id": "corpus-a3-00271",
+      "mask_span": [
+        178,
+        191
+      ],
+      "gold_indices": [
+        0
+      ],
+      "final_spans": [
+        [
+          133,
+          203
+        ]
+      ]
+    },
+    {
+      "id": "corpus-a3-01114",
+      "mask_span": [
+        71,
+        104
+      ],
+      "gold_indices": [
+        0
+      ],
+      "final_spans": [
+        [
+          0,
+          15
+        ],
+        [
+          59,
+          139
+        ]
+      ]
+    },
+    {
+      "id": "corpus-a3-00191",
+      "mask_span": [
+        26,
+        28
+      ],
+      "gold_indices": [
+        0
+      ],
+      "final_spans": [
+        [
+          0,
+          78
+        ],
+        [
+          326,
+          338
+        ]
+      ]
+    }
+  ]
+}

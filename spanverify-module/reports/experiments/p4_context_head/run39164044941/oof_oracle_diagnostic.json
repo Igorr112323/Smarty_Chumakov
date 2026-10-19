@@ -1,0 +1,18 @@
+{
+  "diagnostic_only": true,
+  "not_a_candidate": true,
+  "monotone_token_oracle": {
+    "tau": 0.6561100225145975,
+    "f1": 0.5526002381897578,
+    "tp": 696,
+    "fp": 439,
+    "fn": 688
+  },
+  "ideal_merge_gold_snap": {
+    "definition": "oracle removes false spans, snaps every touched gold to its true boundary; not deployable",
+    "tp": 200,
+    "fp": 0,
+    "fn": 267,
+    "f1": 0.5997001499250375
+  }
+}

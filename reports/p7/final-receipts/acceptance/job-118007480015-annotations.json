@@ -1,0 +1,50 @@
+[
+  {
+    "path": ".github",
+    "blob_href": "https://github.com/Igorr112323/Smarty_Chumakov/blob/a85c40a14828141447768d3c78d13aa0ced105eb/.github",
+    "start_line": 2,
+    "start_column": null,
+    "end_line": 2,
+    "end_column": null,
+    "annotation_level": "warning",
+    "title": "",
+    "message": "Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@v4, actions/setup-python@v5, actions/upload-artifact@v4. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/",
+    "raw_details": ""
+  },
+  {
+    "path": ".github",
+    "blob_href": "https://github.com/Igorr112323/Smarty_Chumakov/blob/a85c40a14828141447768d3c78d13aa0ced105eb/.github",
+    "start_line": 15,
+    "start_column": null,
+    "end_line": 15,
+    "end_column": null,
+    "annotation_level": "notice",
+    "title": "P6 HTTP response",
+    "message": "{\"score\": 0.0, \"is_hallucination\": false, \"ai_share\": 0.1429, \"ai_share_soft\": 0.1429, \"ai_share_hard\": 0.1429, \"ai_participation\": 0.0253, \"threshold\": 0.5794, \"verdict\": \"doubtful\", \"spans\": [{\"start\": 46, \"end\": 53, \"text\": \"десять \", \"risk\": 0.5654, \"confidence\": 0.4346, \"label\": \"doubtful\", \"n_tokens\": 1, \"source\": \"attribution\"}], \"latency_ms\": 2.22, \"mode\": \"demo\", \"stats\": {\"token_count\": 8, \"scored_tokens\": 7, \"number_attribution\": [{\"start\": 46, \"end\": 53, \"value\": \"10\", \"subject\": [\"срок\", \"хранения\", \"первичных\", \"документов\"], \"matched_value\": \"5\", \"matched_subject\": [\"регламенту\", \"срок\", \"хранения\", \"первичных\", \"документов\"], \"ok\": false}], \"fact_coverage\": [], \"mean_risk\": 0.2012, \"p90_risk\": 0.3016, \"raw_score\": 0.1756, \"raw_score_full\": 0.17561758312823864, \"span_threshold\": 0.4186579753072923, \"span_z\": 1.5, \"span_floor\": 0.05, \"weights\": {\"attention_entropy\": 0.1, \"ctx_attention_mass\": 0.0, \"ctx_attention_mass_norm\": 0.1, \"ctx_max_similarity\": 0.8, \"embedding_density\": 0.0}, \"features\": {\"backend\": \"demo\", \"token_count\": 8, \"context_tokens\": 19, \"context_numbers\": [\"10\", \"5\"], \"k\": 5}, \"ai_participation\": 0.0253, \"ai_participation_calibrated_on\": \"synthetic-participation-corpus 1.0 (два стиля, доля смеси известна)\", \"warning\": \"ДЕМО-РЕЖИМ: признаки считаются лексическими суррогатами без весов языковой модели. Он проверяет работоспособность конвейера и интерфейса, а не достоверность ответа. Подмена числа ловится, если число есть у другого объекта документа (например, «первичные — пять лет» против «вторичные — десять лет»); перефразирования и таблицы требуют режима 'hf'. Научные выводы возможны только в режиме 'hf'.\"}}",
+    "raw_details": ""
+  },
+  {
+    "path": ".github",
+    "blob_href": "https://github.com/Igorr112323/Smarty_Chumakov/blob/a85c40a14828141447768d3c78d13aa0ced105eb/.github",
+    "start_line": 16,
+    "start_column": null,
+    "end_line": 16,
+    "end_column": null,
+    "annotation_level": "notice",
+    "title": "P7 benchmark table",
+    "message": "{\"mode\": \"demo\", \"phase\": \"after\", \"columns\": [\"scenario\", \"chars\", \"thermal\", \"median_seconds\", \"max_seconds\", \"limit_seconds\", \"status\", \"seconds_per_1000_chars\", \"median_lower_bound_seconds\", \"seconds_per_1000_chars_lower_bound\"], \"rows\": [[\"document-context\", 1000, \"cold-process\", 0.012808458999998606, 0.023992513999999687, 0.03, \"достигнут\", 0.012808458999998606, null, null], [\"document-context\", 1000, \"warm-model\", 0.0035200480000057155, 0.0062230850000020155, 0.03, \"достигнут\", 0.0035200480000057155, null, null], [\"document-context\", 50000, \"cold-process\", 0.0823882760000032, 0.08245458100000036, 1.0, \"достигнут\", 0.001647765520000064, null, null], [\"document-context\", 50000, \"warm-model\", 0.0741039360000002, 0.07446716599999803, 1.0, \"достигнут\", 0.001482078720000004, null, null], [\"document-context\", 2000000, \"cold-process\", 3.454000999999998, 3.4820823219999966, 60.0, \"достигнут\", 0.0017270004999999989, null, null], [\"document-context\", 2000000, \"warm-model\", 3.4445513639999916, 3.4751512249999976, 60.0, \"достигнут\", 0.0017222756819999959, null, null], [\"answer-text\", 1000, \"cold-process\", 0.024434627999994518, 0.024528523000000746, 0.03, \"достигнут\", 0.024434627999994518, null, null], [\"answer-text\", 1000, \"warm-model\", 0.015931377000001135, 0.0160510099999982, 0.03, \"достигнут\", 0.015931377000001135, null, null], [\"answer-text\", 50000, \"cold-process\", 0.7062585609999985, 0.7124696319999941, 1.0, \"достигнут\", 0.01412517121999997, null, null], [\"answer-text\", 50000, \"warm-model\", 0.7032288930000021, 0.7047269319999998, 1.0, \"достигнут\", 0.014064577860000043, null, null], [\"answer-text\", 2000000, \"cold-process\", 29.950420819000016, 29.995070379000012, 60.0, \"достигнут\", 0.014975210409500008, null, null], [\"answer-text\", 2000000, \"warm-model\", 29.876726123999987, 30.019291500999998, 60.0, \"достигнут\", 0.014938363061999993, null, null]]}",
+    "raw_details": ""
+  },
+  {
+    "path": ".github",
+    "blob_href": "https://github.com/Igorr112323/Smarty_Chumakov/blob/a85c40a14828141447768d3c78d13aa0ced105eb/.github",
+    "start_line": 15,
+    "start_column": null,
+    "end_line": 15,
+    "end_column": null,
+    "annotation_level": "notice",
+    "title": "P7 benchmark environment",
+    "message": "{\"phase\": \"after\", \"cpu\": \"AMD EPYC 7763 64-Core Processor\", \"logical_cpu\": 4, \"ram\": \"MemTotal:       16373452 kB\", \"python\": \"3.11.17 (main, Oct  1 2026, 14:32:31) [GCC 13.3.0]\", \"platform\": \"Linux-6.17.0-1022-azure-x86_64-with-glibc2.39\", \"versions\": {}, \"commit\": \"a85c40a14828141447768d3c78d13aa0ced105eb\", \"run_url\": \"https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39236657451\"}",
+    "raw_details": ""
+  }
+]

@@ -1,0 +1,49 @@
+{
+  "scope": "supplemental audit of frozen TRAIN candidate pool, not a new candidate/config; union of cells is NOT deployable selected generator",
+  "gold": 467,
+  "union_any_overlap": 415,
+  "union_iou05_coverage": 392,
+  "union_gold_uncovered_any": 52,
+  "union_gold_uncovered_strict": 75,
+  "unique_offsets_across_cells": 8407,
+  "full_cell_specific_rows": 195124,
+  "unique_candidates_per_gold": {
+    "count": 467,
+    "quantiles": {
+      "min": 0.0,
+      "p25": 3.0,
+      "p50": 4.0,
+      "p75": 5.0,
+      "p90": 7.0,
+      "p95": 8.0,
+      "p99": 9.0,
+      "max": 12.0
+    }
+  },
+  "cell_specific_candidates_per_clean": {
+    "count": 375,
+    "quantiles": {
+      "min": 0.0,
+      "p25": 45.0,
+      "p50": 138.0,
+      "p75": 276.0,
+      "p90": 482.4000000000001,
+      "p95": 576.6000000000001,
+      "p99": 901.2399999999993,
+      "max": 1671.0
+    }
+  },
+  "unique_candidates_per_clean": {
+    "count": 375,
+    "quantiles": {
+      "min": 0.0,
+      "p25": 4.0,
+      "p50": 7.0,
+      "p75": 13.0,
+      "p90": 21.0,
+      "p95": 27.0,
+      "p99": 38.25999999999999,
+      "max": 47.0
+    }
+  }
+}

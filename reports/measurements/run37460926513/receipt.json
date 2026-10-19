@@ -1,0 +1,13 @@
+{
+  "run_id": "37460926513",
+  "date": "2026-10-06T12:06:32Z",
+  "commit": "5490abcf98e00fc0d550399e2f0d10f4dee302ba",
+  "family": "P0",
+  "workflow": "hf-pilot.yml",
+  "record_kind": "measurement/delivery",
+  "status": "completed",
+  "outcome": "success",
+  "url": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/37460926513",
+  "canonical_directories": [],
+  "receipt": "reports/measurements/run37460926513/receipt.json"
+}

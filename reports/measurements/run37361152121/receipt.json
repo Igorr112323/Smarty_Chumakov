@@ -1,0 +1,13 @@
+{
+  "run_id": "37361152121",
+  "date": "2026-10-05T19:07:45Z",
+  "commit": "174b0d00a85ce6d85dd1299d1dcd2b55564796cf",
+  "family": "P0",
+  "workflow": "corpus-a3.yml",
+  "record_kind": "measurement/delivery",
+  "status": "completed",
+  "outcome": "cancelled",
+  "url": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/37361152121",
+  "canonical_directories": [],
+  "receipt": "reports/measurements/run37361152121/receipt.json"
+}

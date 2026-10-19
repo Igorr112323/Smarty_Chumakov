@@ -1,0 +1,1537 @@
+{
+  "stage": "P6",
+  "tests_excluded": false,
+  "token_convention": "P5 kept spans + mandatory rules; historical baseline counts unchanged",
+  "requirements": [
+    {
+      "id": "speed-demo",
+      "status": "не достигнут",
+      "receipt": "reports/acceptance/run39177834081/p6-product-demo/benchmark.json",
+      "run_url": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39177834081",
+      "source_sha": "34a82a565f2e7cc84648f4d85b35826b558cd2e8"
+    },
+    {
+      "id": "interfaces-demo",
+      "status": "подтверждено",
+      "receipt": "reports/acceptance/final-interface-replay/demo-http-response.json",
+      "run_url": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39184437524",
+      "fact": {
+        "mode": "demo",
+        "passed": true,
+        "head_sha": "14a018a1b90b51cc47cd8baf628147ac22e1d8b1",
+        "run_url": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39184437524",
+        "job_url": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39184437524/job/117843764907",
+        "artifact_names": [
+          "p6-product-demo"
+        ],
+        "source": "successful real CLI/web8765/HTTP step; complete requests/responses/HTML/server logs retained in artifact; HTTP body mirrored from check annotation",
+        "benchmark_repeated": false,
+        "benchmark_reference_run": 39177834081
+      }
+    },
+    {
+      "id": "ai-share-demo",
+      "status": "измерено, не доказательство калибровки",
+      "receipt": "reports/acceptance/run39177834081/p6-product-demo/ai-share.json",
+      "run_url": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39177834081",
+      "fact": {
+        "rows": [
+          {
+            "train_pair_id": "corpus-a3-00119",
+            "fraction": 0.0,
+            "machine_chars": 0,
+            "total_chars": 800,
+            "ai_share": 0.1011647187400035,
+            "ai_participation": 0.910818948000069
+          },
+          {
+            "train_pair_id": "corpus-a3-00119",
+            "fraction": 0.25,
+            "machine_chars": 200,
+            "total_chars": 800,
+            "ai_share": 0.09796836573458424,
+            "ai_participation": 0.8831969971925396
+          },
+          {
+            "train_pair_id": "corpus-a3-00119",
+            "fraction": 0.5,
+            "machine_chars": 400,
+            "total_chars": 800,
+            "ai_share": 0.08205376197701178,
+            "ai_participation": 0.9405923039655436
+          },
+          {
+            "train_pair_id": "corpus-a3-00119",
+            "fraction": 0.75,
+            "machine_chars": 600,
+            "total_chars": 800,
+            "ai_share": 0.04799391047531435,
+            "ai_participation": 0.9021773269691571
+          },
+          {
+            "train_pair_id": "corpus-a3-00119",
+            "fraction": 1.0,
+            "machine_chars": 800,
+            "total_chars": 800,
+            "ai_share": 0.02624403410155888,
+            "ai_participation": 0.9992195064473915
+          },
+          {
+            "train_pair_id": "corpus-a3-00188",
+            "fraction": 0.0,
+            "machine_chars": 0,
+            "total_chars": 800,
+            "ai_share": 0.07296900878756454,
+            "ai_participation": 0.9530741286197506
+          },
+          {
+            "train_pair_id": "corpus-a3-00188",
+            "fraction": 0.25,
+            "machine_chars": 200,
+            "total_chars": 800,
+            "ai_share": 0.090272999274051,
+            "ai_participation": 0.9211450733901185
+          },
+          {
+            "train_pair_id": "corpus-a3-00188",
+            "fraction": 0.5,
+            "machine_chars": 400,
+            "total_chars": 800,
+            "ai_share": 0.07135656453101386,
+            "ai_participation": 0.9537439153375136
+          },
+          {
+            "train_pair_id": "corpus-a3-00188",
+            "fraction": 0.75,
+            "machine_chars": 600,
+            "total_chars": 800,
+            "ai_share": 0.036630550767462855,
+            "ai_participation": 0.9155950038885301
+          },
+          {
+            "train_pair_id": "corpus-a3-00188",
+            "fraction": 1.0,
+            "machine_chars": 800,
+            "total_chars": 800,
+            "ai_share": 0.027073778318108834,
+            "ai_participation": 0.9992306161535873
+          },
+          {
+            "train_pair_id": "corpus-a3-00836",
+            "fraction": 0.0,
+            "machine_chars": 0,
+            "total_chars": 800,
+            "ai_share": 0.04313410825815406,
+            "ai_participation": 0.9999978917482966
+          },
+          {
+            "train_pair_id": "corpus-a3-00836",
+            "fraction": 0.25,
+            "machine_chars": 200,
+            "total_chars": 800,
+            "ai_share": 0.06431371150158002,
+            "ai_participation": 0.9652855137111277
+          },
+          {
+            "train_pair_id": "corpus-a3-00836",
+            "fraction": 0.5,
+            "machine_chars": 400,
+            "total_chars": 800,
+            "ai_share": 0.05379846537491563,
+            "ai_participation": 0.9999999235299292
+          },
+          {
+            "train_pair_id": "corpus-a3-00836",
+            "fraction": 0.75,
+            "machine_chars": 600,
+            "total_chars": 800,
+            "ai_share": 0.015463291940760545,
+            "ai_participation": 0.9571436882773193
+          },
+          {
+            "train_pair_id": "corpus-a3-00836",
+            "fraction": 1.0,
+            "machine_chars": 800,
+            "total_chars": 800,
+            "ai_share": 0.027073778318108834,
+            "ai_participation": 0.9992243743491591
+          }
+        ],
+        "mae": 0.47180164156475,
+        "mean_curve": [
+          0.07242261192857403,
+          0.08418502550340509,
+          0.06906959729431375,
+          0.03336258439451258,
+          0.02679719691259218
+        ],
+        "monotone_mean": false,
+        "synthetic_generator_only": true,
+        "calibration_fitted": false,
+        "mode": "demo"
+      }
+    },
+    {
+      "id": "speed-hf",
+      "status": "не достигнут",
+      "receipt": "reports/acceptance/run39177834081/p6-product-hf/benchmark.json",
+      "run_url": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39177834081",
+      "source_sha": "34a82a565f2e7cc84648f4d85b35826b558cd2e8"
+    },
+    {
+      "id": "interfaces-hf",
+      "status": "подтверждено",
+      "receipt": "reports/acceptance/final-interface-replay/hf-http-response.json",
+      "run_url": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39184437524",
+      "fact": {
+        "mode": "hf",
+        "passed": true,
+        "head_sha": "14a018a1b90b51cc47cd8baf628147ac22e1d8b1",
+        "run_url": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39184437524",
+        "job_url": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39184437524/job/117843765072",
+        "artifact_names": [
+          "p6-product-hf"
+        ],
+        "source": "successful real CLI/web8765/HTTP step; complete requests/responses/HTML/server logs retained in artifact; HTTP body mirrored from check annotation",
+        "benchmark_repeated": false,
+        "benchmark_reference_run": 39177834081
+      }
+    },
+    {
+      "id": "ai-share-hf",
+      "status": "измерено, не доказательство калибровки",
+      "receipt": "reports/acceptance/run39177834081/p6-product-hf/ai-share.json",
+      "run_url": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39177834081",
+      "fact": {
+        "rows": [
+          {
+            "train_pair_id": "corpus-a3-00119",
+            "fraction": 0.0,
+            "machine_chars": 0,
+            "total_chars": 800,
+            "ai_share": 0.08652692920264567,
+            "ai_participation": 0.959933128072006
+          },
+          {
+            "train_pair_id": "corpus-a3-00119",
+            "fraction": 0.25,
+            "machine_chars": 200,
+            "total_chars": 800,
+            "ai_share": 0.1877357643450858,
+            "ai_participation": 0.9471860951279282
+          },
+          {
+            "train_pair_id": "corpus-a3-00119",
+            "fraction": 0.5,
+            "machine_chars": 400,
+            "total_chars": 800,
+            "ai_share": 0.1519265532557309,
+            "ai_participation": 0.9736385859004903
+          },
+          {
+            "train_pair_id": "corpus-a3-00119",
+            "fraction": 0.75,
+            "machine_chars": 600,
+            "total_chars": 800,
+            "ai_share": 0.1977550530510346,
+            "ai_participation": 0.9344703731977188
+          },
+          {
+            "train_pair_id": "corpus-a3-00119",
+            "fraction": 1.0,
+            "machine_chars": 800,
+            "total_chars": 800,
+            "ai_share": 0.0809411450820834,
+            "ai_participation": 0.9998082244595955
+          },
+          {
+            "train_pair_id": "corpus-a3-00188",
+            "fraction": 0.0,
+            "machine_chars": 0,
+            "total_chars": 800,
+            "ai_share": 0.07614022498205994,
+            "ai_participation": 0.9867576457130097
+          },
+          {
+            "train_pair_id": "corpus-a3-00188",
+            "fraction": 0.25,
+            "machine_chars": 200,
+            "total_chars": 800,
+            "ai_share": 0.16828738880186533,
+            "ai_participation": 0.9717658487380579
+          },
+          {
+            "train_pair_id": "corpus-a3-00188",
+            "fraction": 0.5,
+            "machine_chars": 400,
+            "total_chars": 800,
+            "ai_share": 0.15159674142454188,
+            "ai_participation": 0.9873393187911924
+          },
+          {
+            "train_pair_id": "corpus-a3-00188",
+            "fraction": 0.75,
+            "machine_chars": 600,
+            "total_chars": 800,
+            "ai_share": 0.19207941298301676,
+            "ai_participation": 0.9479903003812402
+          },
+          {
+            "train_pair_id": "corpus-a3-00188",
+            "fraction": 1.0,
+            "machine_chars": 800,
+            "total_chars": 800,
+            "ai_share": 0.0809411450820834,
+            "ai_participation": 0.9997987405074011
+          },
+          {
+            "train_pair_id": "corpus-a3-00836",
+            "fraction": 0.0,
+            "machine_chars": 0,
+            "total_chars": 800,
+            "ai_share": 0.046875,
+            "ai_participation": 0.9999994068441271
+          },
+          {
+            "train_pair_id": "corpus-a3-00836",
+            "fraction": 0.25,
+            "machine_chars": 200,
+            "total_chars": 800,
+            "ai_share": 0.13344279610158916,
+            "ai_participation": 0.9851096137311217
+          },
+          {
+            "train_pair_id": "corpus-a3-00836",
+            "fraction": 0.5,
+            "machine_chars": 400,
+            "total_chars": 800,
+            "ai_share": 0.12880896189471705,
+            "ai_participation": 0.99999998375667
+          },
+          {
+            "train_pair_id": "corpus-a3-00836",
+            "fraction": 0.75,
+            "machine_chars": 600,
+            "total_chars": 800,
+            "ai_share": 0.15714285714285714,
+            "ai_participation": 0.9571511820326307
+          },
+          {
+            "train_pair_id": "corpus-a3-00836",
+            "fraction": 1.0,
+            "machine_chars": 800,
+            "total_chars": 800,
+            "ai_share": 0.0809411450820834,
+            "ai_participation": 0.9998154851919643
+          }
+        ],
+        "mae": 0.3998628793292011,
+        "mean_curve": [
+          0.0698473847282352,
+          0.16315531641618009,
+          0.14411075219166328,
+          0.18232577439230283,
+          0.0809411450820834
+        ],
+        "monotone_mean": false,
+        "synthetic_generator_only": true,
+        "calibration_fitted": false,
+        "mode": "hf"
+      }
+    },
+    {
+      "id": "frozen-public-parity",
+      "status": "подтверждено",
+      "fact": {
+        "pairs": 181,
+        "full_token_risks": 13150,
+        "mismatches": [],
+        "p1_max_abs_delta": 0.0,
+        "cache_misses": 0,
+        "bundle_sha256": "e0b13c693a058dfd66ed24a52fc14e9c70964e95885358e7b99cc1f328ad6892",
+        "passed": true,
+        "source_run_url": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39184437524",
+        "head_sha": "14a018a1b90b51cc47cd8baf628147ac22e1d8b1",
+        "source": "check-run 117843765134 checked JSON prefix before environment (4096-byte annotation cap); full environment retained in p6-parity artifact"
+      },
+      "receipt": "reports/acceptance/parity-summary.json",
+      "run_url": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39184437524"
+    },
+    {
+      "id": "local-suite",
+      "status": "подтверждено",
+      "fact": {
+        "tests": 872,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 2
+      },
+      "tests_excluded": false,
+      "receipt": "reports/acceptance/full-suite.xml"
+    },
+    {
+      "id": "ordinary-ci",
+      "status": "подтверждено",
+      "fact": {
+        "conclusion": "success",
+        "headSha": "14a018a1b90b51cc47cd8baf628147ac22e1d8b1",
+        "jobs": [
+          {
+            "completedAt": "2026-10-19T01:24:27Z",
+            "conclusion": "success",
+            "databaseId": 117843765264,
+            "name": "Линтер, форматирование, покрытие",
+            "startedAt": "2026-10-19T01:14:25Z",
+            "status": "completed",
+            "steps": [
+              {
+                "conclusion": "success",
+                "name": "Set up job",
+                "number": 1,
+                "status": "completed"
+              },
+              {
+                "conclusion": "success",
+                "name": "Run actions/checkout@v4",
+                "number": 2,
+                "status": "completed"
+              },
+              {
+                "conclusion": "success",
+                "name": "Run actions/setup-python@v5",
+                "number": 3,
+                "status": "completed"
+              },
+              {
+                "conclusion": "success",
+                "name": "Зависимости проверки",
+                "number": 4,
+                "status": "completed"
+              },
+              {
+                "conclusion": "success",
+                "name": "Линтер (ruff)",
+                "number": 5,
+                "status": "completed"
+              },
+              {
+                "conclusion": "success",
+                "name": "Форматирование (black --check)",
+                "number": 6,
+                "status": "completed"
+              },
+              {
+                "conclusion": "success",
+                "name": "Тесты с порогом покрытия 85 %",
+                "number": 7,
+                "status": "completed"
+              },
+              {
+                "conclusion": "success",
+                "name": "Воспроизводимость обучения (один seed → один результат)",
+                "number": 8,
+                "status": "completed"
+              },
+              {
+                "conclusion": "success",
+                "name": "Метрики на отложенной части (числа в лог)",
+                "number": 9,
+                "status": "completed"
+              },
+              {
+                "conclusion": "success",
+                "name": "Чистая установка в отдельном venv (пины из requirements.txt)",
+                "number": 10,
+                "status": "completed"
+              },
+              {
+                "conclusion": "success",
+                "name": "Отчёт покрытия для единого файла чисел",
+                "number": 11,
+                "status": "completed"
+              },
+              {
+                "conclusion": "success",
+                "name": "Сохранить отчёт обучения",
+                "number": 12,
+                "status": "completed"
+              },
+              {
+                "conclusion": "success",
+                "name": "Post Run actions/setup-python@v5",
+                "number": 23,
+                "status": "completed"
+              },
+              {
+                "conclusion": "success",
+                "name": "Post Run actions/checkout@v4",
+                "number": 24,
+                "status": "completed"
+              },
+              {
+                "conclusion": "success",
+                "name": "Complete job",
+                "number": 25,
+                "status": "completed"
+              }
+            ],
+            "url": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39184437556/job/117843765264"
+          },
+          {
+            "completedAt": "2026-10-19T01:24:27Z",
+            "conclusion": "success",
+            "databaseId": 117843765525,
+            "name": "Тесты (Python 3.11, ubuntu-latest)",
+            "startedAt": "2026-10-19T01:14:25Z",
+            "status": "completed",
+            "steps": [
+              {
+                "conclusion": "success",
+                "name": "Set up job",
+                "number": 1,
+                "status": "completed"
+              },
+              {
+                "conclusion": "success",
+                "name": "Run actions/checkout@v4",
+                "number": 2,
+                "status": "completed"
+              },
+              {
+                "conclusion": "success",
+                "name": "Run actions/setup-python@v5",
+                "number": 3,
+                "status": "completed"
+              },
+              {
+                "conclusion": "success",
+                "name": "Зависимости тестов",
+                "number": 4,
+                "status": "completed"
+              },
+              {
+                "conclusion": "success",
+                "name": "Тесты",
+                "number": 5,
+                "status": "completed"
+              },
+              {
+                "conclusion": "success",
+                "name": "Само-проверка конвейера",
+                "number": 6,
+                "status": "completed"
+              },
+              {
+                "conclusion": "success",
+                "name": "Проверка HTTP-контракта (реальный запрос к сервису)",
+                "number": 7,
+                "status": "completed"
+              },
+              {
+                "conclusion": "success",
+                "name": "Full matrix JUnit, including failures",
+                "number": 8,
+                "status": "completed"
+              },
+              {
+                "conclusion": "success",
+                "name": "Post Run actions/setup-python@v5",
+                "number": 15,
+                "status": "completed"
+              },
+              {
+                "conclusion": "success",
+                "name": "Post Run actions/checkout@v4",
+                "number": 16,
+                "status": "completed"
+              },
+              {
+                "conclusion": "success",
+                "name": "Complete job",
+                "number": 17,
+                "status": "completed"
+              }
+            ],
+            "url": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39184437556/job/117843765525"
+          },
+          {
+            "completedAt": "2026-10-19T01:24:27Z",
+            "conclusion": "success",
+            "databaseId": 117843765534,
+            "name": "Тесты (Python 3.12, windows-latest)",
+            "startedAt": "2026-10-19T01:14:24Z",
+            "status": "completed",
+            "steps": [
+              {
+                "conclusion": "success",
+                "name": "Set up job",
+                "number": 1,
+                "status": "completed"
+              },
+              {
+                "conclusion": "success",
+                "name": "Run actions/checkout@v4",
+                "number": 2,
+                "status": "completed"
+              },
+              {
+                "conclusion": "success",
+                "name": "Run actions/setup-python@v5",
+                "number": 3,
+                "status": "completed"
+              },
+              {
+                "conclusion": "success",
+                "name": "Зависимости тестов",
+                "number": 4,
+                "status": "completed"
+              },
+              {
+                "conclusion": "success",
+                "name": "Тесты",
+                "number": 5,
+                "status": "completed"
+              },
+              {
+                "conclusion": "success",
+                "name": "Само-проверка конвейера",
+                "number": 6,
+                "status": "completed"
+              },
+              {
+                "conclusion": "success",
+                "name": "Проверка HTTP-контракта (реальный запрос к сервису)",
+                "number": 7,
+                "status": "completed"
+              },
+              {
+                "conclusion": "success",
+                "name": "Full matrix JUnit, including failures",
+                "number": 8,
+                "status": "completed"
+              },
+              {
+                "conclusion": "success",
+                "name": "Post Run actions/setup-python@v5",
+                "number": 15,
+                "status": "completed"
+              },
+              {
+                "conclusion": "success",
+                "name": "Post Run actions/checkout@v4",
+                "number": 16,
+                "status": "completed"
+              },
+              {
+                "conclusion": "success",
+                "name": "Complete job",
+                "number": 17,
+                "status": "completed"
+              }
+            ],
+            "url": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39184437556/job/117843765534"
+          },
+          {
+            "completedAt": "2026-10-19T01:24:27Z",
+            "conclusion": "skipped",
+            "databaseId": 117843766604,
+            "name": "Разведка официальных источников (не блокирует CI)",
+            "startedAt": "2026-10-19T01:14:23Z",
+            "status": "completed",
+            "steps": [],
+            "url": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39184437556/job/117843766604"
+          },
+          {
+            "completedAt": "2026-10-19T01:24:27Z",
+            "conclusion": "success",
+            "databaseId": 117846071389,
+            "name": "Соответствие договору (проект 117812)",
+            "startedAt": "2026-10-19T01:24:29Z",
+            "status": "completed",
+            "steps": [
+              {
+                "conclusion": "success",
+                "name": "Set up job",
+                "number": 1,
+                "status": "completed"
+              },
+              {
+                "conclusion": "success",
+                "name": "Run actions/checkout@v4",
+                "number": 2,
+                "status": "completed"
+              },
+              {
+                "conclusion": "success",
+                "name": "Отчёт покрытия из job «Качество» (если он есть)",
+                "number": 3,
+                "status": "completed"
+              },
+              {
+                "conclusion": "success",
+                "name": "Run actions/setup-python@v5",
+                "number": 4,
+                "status": "completed"
+              },
+              {
+                "conclusion": "success",
+                "name": "Зависимости",
+                "number": 5,
+                "status": "completed"
+              },
+              {
+                "conclusion": "success",
+                "name": "Контрактные тесты",
+                "number": 6,
+                "status": "completed"
+              },
+              {
+                "conclusion": "success",
+                "name": "Реестр чисел и его сверка с артефактами",
+                "number": 7,
+                "status": "completed"
+              },
+              {
+                "conclusion": "success",
+                "name": "Контрактные проверки (requirement → fact → status)",
+                "number": 8,
+                "status": "completed"
+              },
+              {
+                "conclusion": "success",
+                "name": "Сверка чисел в документах с реестром",
+                "number": 9,
+                "status": "completed"
+              },
+              {
+                "conclusion": "success",
+                "name": "Артефакты контрактной проверки",
+                "number": 10,
+                "status": "completed"
+              },
+              {
+                "conclusion": "success",
+                "name": "Post Run actions/setup-python@v5",
+                "number": 19,
+                "status": "completed"
+              },
+              {
+                "conclusion": "success",
+                "name": "Post Run actions/checkout@v4",
+                "number": 20,
+                "status": "completed"
+              },
+              {
+                "conclusion": "success",
+                "name": "Complete job",
+                "number": 21,
+                "status": "completed"
+              }
+            ],
+            "url": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39184437556/job/117846071389"
+          },
+          {
+            "completedAt": "2026-10-19T01:24:27Z",
+            "conclusion": "success",
+            "databaseId": 117846072224,
+            "name": "Единый файл чисел (METRICS.json) и сверка документов",
+            "startedAt": "2026-10-19T01:24:29Z",
+            "status": "completed",
+            "steps": [
+              {
+                "conclusion": "success",
+                "name": "Set up job",
+                "number": 1,
+                "status": "completed"
+              },
+              {
+                "conclusion": "success",
+                "name": "Run actions/checkout@v4",
+                "number": 2,
+                "status": "completed"
+              },
+              {
+                "conclusion": "success",
+                "name": "Run actions/setup-python@v5",
+                "number": 3,
+                "status": "completed"
+              },
+              {
+                "conclusion": "success",
+                "name": "Зависимости",
+                "number": 4,
+                "status": "completed"
+              },
+              {
+                "conclusion": "success",
+                "name": "Скачать отчёт покрытия",
+                "number": 5,
+                "status": "completed"
+              },
+              {
+                "conclusion": "success",
+                "name": "Скачать отчёт пилота (JSON + PNG)",
+                "number": 6,
+                "status": "completed"
+              },
+              {
+                "conclusion": "success",
+                "name": "Скачать результаты внешних наборов",
+                "number": 7,
+                "status": "completed"
+              },
+              {
+                "conclusion": "success",
+                "name": "Кросс-корпусный тест (обучение на A, оценка на B)",
+                "number": 8,
+                "status": "completed"
+              },
+              {
+                "conclusion": "success",
+                "name": "Собрать единый файл чисел",
+                "number": 9,
+                "status": "completed"
+              },
+              {
+                "conclusion": "success",
+                "name": "Ключевые числа в аннотации (чтобы их можно было прочитать без скачивания)",
+                "number": 10,
+                "status": "completed"
+              },
+              {
+                "conclusion": "success",
+                "name": "Сверить числа в документах с METRICS.json",
+                "number": 11,
+                "status": "completed"
+              },
+              {
+                "conclusion": "success",
+                "name": "Артефакт чисел",
+                "number": 12,
+                "status": "completed"
+              },
+              {
+                "conclusion": "success",
+                "name": "Post Run actions/setup-python@v5",
+                "number": 23,
+                "status": "completed"
+              },
+              {
+                "conclusion": "success",
+                "name": "Post Run actions/checkout@v4",
+                "number": 24,
+                "status": "completed"
+              },
+              {
+                "conclusion": "success",
+                "name": "Complete job",
+                "number": 25,
+                "status": "completed"
+              }
+            ],
+            "url": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39184437556/job/117846072224"
+          },
+          {
+            "completedAt": "2026-10-19T01:24:27Z",
+            "conclusion": "skipped",
+            "databaseId": 117846072338,
+            "name": "Пилот на реальной модели (rugpt3small, CPU)",
+            "startedAt": "2026-10-19T01:24:27Z",
+            "status": "completed",
+            "steps": [],
+            "url": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39184437556/job/117846072338"
+          },
+          {
+            "completedAt": "2026-10-19T01:24:27Z",
+            "conclusion": "skipped",
+            "databaseId": 117846072787,
+            "name": "Внешние размеченные наборы (скачивание, контрольные ...",
+            "startedAt": "2026-10-19T01:24:27Z",
+            "status": "completed",
+            "steps": [],
+            "url": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39184437556/job/117846072787"
+          }
+        ],
+        "status": "completed",
+        "url": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39184437556"
+      },
+      "run_url": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39184437556"
+    },
+    {
+      "id": "windows-rc",
+      "status": "подтверждено",
+      "fact": {
+        "conclusion": "success",
+        "headSha": "14a018a1b90b51cc47cd8baf628147ac22e1d8b1",
+        "jobs": [
+          {
+            "completedAt": "2026-10-19T01:26:32Z",
+            "conclusion": "success",
+            "databaseId": 117843765395,
+            "name": "Тесты (Python 3.12)",
+            "startedAt": "2026-10-19T01:14:25Z",
+            "status": "completed",
+            "steps": [
+              {
+                "conclusion": "success",
+                "name": "Set up job",
+                "number": 1,
+                "status": "completed"
+              },
+              {
+                "conclusion": "success",
+                "name": "Run actions/checkout@v4",
+                "number": 2,
+                "status": "completed"
+              },
+              {
+                "conclusion": "success",
+                "name": "Run actions/setup-python@v5",
+                "number": 3,
+                "status": "completed"
+              },
+              {
+                "conclusion": "success",
+                "name": "Зависимости (пины из requirements.txt)",
+                "number": 4,
+                "status": "completed"
+              },
+              {
+                "conclusion": "success",
+                "name": "Тесты",
+                "number": 5,
+                "status": "completed"
+              },
+              {
+                "conclusion": "success",
+                "name": "Само-проверка конвейера",
+                "number": 6,
+                "status": "completed"
+              },
+              {
+                "conclusion": "success",
+                "name": "Post Run actions/setup-python@v5",
+                "number": 11,
+                "status": "completed"
+              },
+              {
+                "conclusion": "success",
+                "name": "Post Run actions/checkout@v4",
+                "number": 12,
+                "status": "completed"
+              },
+              {
+                "conclusion": "success",
+                "name": "Complete job",
+                "number": 13,
+                "status": "completed"
+              }
+            ],
+            "url": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39184437541/job/117843765395"
+          },
+          {
+            "completedAt": "2026-10-19T01:26:32Z",
+            "conclusion": "success",
+            "databaseId": 117843765502,
+            "name": "Тесты (Python 3.10)",
+            "startedAt": "2026-10-19T01:14:25Z",
+            "status": "completed",
+            "steps": [
+              {
+                "conclusion": "success",
+                "name": "Set up job",
+                "number": 1,
+                "status": "completed"
+              },
+              {
+                "conclusion": "success",
+                "name": "Run actions/checkout@v4",
+                "number": 2,
+                "status": "completed"
+              },
+              {
+                "conclusion": "success",
+                "name": "Run actions/setup-python@v5",
+                "number": 3,
+                "status": "completed"
+              },
+              {
+                "conclusion": "success",
+                "name": "Зависимости (пины из requirements.txt)",
+                "number": 4,
+                "status": "completed"
+              },
+              {
+                "conclusion": "success",
+                "name": "Тесты",
+                "number": 5,
+                "status": "completed"
+              },
+              {
+                "conclusion": "success",
+                "name": "Само-проверка конвейера",
+                "number": 6,
+                "status": "completed"
+              },
+              {
+                "conclusion": "success",
+                "name": "Post Run actions/setup-python@v5",
+                "number": 11,
+                "status": "completed"
+              },
+              {
+                "conclusion": "success",
+                "name": "Post Run actions/checkout@v4",
+                "number": 12,
+                "status": "completed"
+              },
+              {
+                "conclusion": "success",
+                "name": "Complete job",
+                "number": 13,
+                "status": "completed"
+              }
+            ],
+            "url": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39184437541/job/117843765502"
+          },
+          {
+            "completedAt": "2026-10-19T01:26:32Z",
+            "conclusion": "success",
+            "databaseId": 117843765623,
+            "name": "Тесты (Python 3.11)",
+            "startedAt": "2026-10-19T01:14:24Z",
+            "status": "completed",
+            "steps": [
+              {
+                "conclusion": "success",
+                "name": "Set up job",
+                "number": 1,
+                "status": "completed"
+              },
+              {
+                "conclusion": "success",
+                "name": "Run actions/checkout@v4",
+                "number": 2,
+                "status": "completed"
+              },
+              {
+                "conclusion": "success",
+                "name": "Run actions/setup-python@v5",
+                "number": 3,
+                "status": "completed"
+              },
+              {
+                "conclusion": "success",
+                "name": "Зависимости (пины из requirements.txt)",
+                "number": 4,
+                "status": "completed"
+              },
+              {
+                "conclusion": "success",
+                "name": "Тесты",
+                "number": 5,
+                "status": "completed"
+              },
+              {
+                "conclusion": "success",
+                "name": "Само-проверка конвейера",
+                "number": 6,
+                "status": "completed"
+              },
+              {
+                "conclusion": "success",
+                "name": "Post Run actions/setup-python@v5",
+                "number": 11,
+                "status": "completed"
+              },
+              {
+                "conclusion": "success",
+                "name": "Post Run actions/checkout@v4",
+                "number": 12,
+                "status": "completed"
+              },
+              {
+                "conclusion": "success",
+                "name": "Complete job",
+                "number": 13,
+                "status": "completed"
+              }
+            ],
+            "url": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39184437541/job/117843765623"
+          },
+          {
+            "completedAt": "2026-10-19T01:26:32Z",
+            "conclusion": "success",
+            "databaseId": 117846202318,
+            "name": "Сборка и проверка .exe",
+            "startedAt": "2026-10-19T01:25:03Z",
+            "status": "completed",
+            "steps": [
+              {
+                "conclusion": "success",
+                "name": "Set up job",
+                "number": 1,
+                "status": "completed"
+              },
+              {
+                "conclusion": "success",
+                "name": "Run actions/checkout@v4",
+                "number": 2,
+                "status": "completed"
+              },
+              {
+                "conclusion": "success",
+                "name": "Run actions/setup-python@v5",
+                "number": 3,
+                "status": "completed"
+              },
+              {
+                "conclusion": "success",
+                "name": "Зависимости сборки",
+                "number": 4,
+                "status": "completed"
+              },
+              {
+                "conclusion": "success",
+                "name": "Версия пакета совпадает с тегом",
+                "number": 5,
+                "status": "completed"
+              },
+              {
+                "conclusion": "success",
+                "name": "Validate frozen weights; no training fallback",
+                "number": 6,
+                "status": "completed"
+              },
+              {
+                "conclusion": "success",
+                "name": "Сборка onefile spanverify.exe",
+                "number": 7,
+                "status": "completed"
+              },
+              {
+                "conclusion": "success",
+                "name": "Диагностика: сверить Python DLL внутри .exe с исходной",
+                "number": 8,
+                "status": "completed"
+              },
+              {
+                "conclusion": "success",
+                "name": "Сборка onedir (вариант для строгих антивирусов)",
+                "number": 9,
+                "status": "completed"
+              },
+              {
+                "conclusion": "success",
+                "name": "Сборка переносимого zipapp",
+                "number": 10,
+                "status": "completed"
+              },
+              {
+                "conclusion": "success",
+                "name": "Комплектация release/",
+                "number": 11,
+                "status": "completed"
+              },
+              {
+                "conclusion": "success",
+                "name": "Смоук-тест собранного .exe (Приложение Б)",
+                "number": 12,
+                "status": "completed"
+              },
+              {
+                "conclusion": "success",
+                "name": "Проверка автономности .exe (config внутри файла)",
+                "number": 13,
+                "status": "completed"
+              },
+              {
+                "conclusion": "success",
+                "name": "Смоук-тест zipapp (Python-версия)",
+                "number": 14,
+                "status": "completed"
+              },
+              {
+                "conclusion": "success",
+                "name": "Контрольные суммы",
+                "number": 15,
+                "status": "completed"
+              },
+              {
+                "conclusion": "success",
+                "name": "Проверка размеров поставки (ТЗ п. 4.2: ≤ 9 МБ .exe, ≤ 0,6 МБ пакет)",
+                "number": 16,
+                "status": "completed"
+              },
+              {
+                "conclusion": "success",
+                "name": "Обновить реестр чисел (reports/NUMBERS.json)",
+                "number": 17,
+                "status": "completed"
+              },
+              {
+                "conclusion": "success",
+                "name": "Артефакты сборки",
+                "number": 18,
+                "status": "completed"
+              },
+              {
+                "conclusion": "success",
+                "name": "Публикация релиза (только после успешного смоук-теста)",
+                "number": 19,
+                "status": "completed"
+              },
+              {
+                "conclusion": "success",
+                "name": "Post Run actions/setup-python@v5",
+                "number": 37,
+                "status": "completed"
+              },
+              {
+                "conclusion": "success",
+                "name": "Post Run actions/checkout@v4",
+                "number": 38,
+                "status": "completed"
+              },
+              {
+                "conclusion": "success",
+                "name": "Complete job",
+                "number": 39,
+                "status": "completed"
+              }
+            ],
+            "url": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39184437541/job/117846202318"
+          }
+        ],
+        "status": "completed",
+        "url": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39184437541",
+        "measured_size_gate": {
+          "exe_bytes": 8985072,
+          "pyz_bytes": 227008,
+          "exe_ok": true,
+          "pyz_ok": true
+        }
+      },
+      "run_url": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39184437541",
+      "scope": "Windows default-demo executable + packaged frozen P5/config; both strict size gates, clean-CWD autonomy, application registry-key checks; not external Windows HF autonomy"
+    },
+    {
+      "id": "full-2M-demo-answer",
+      "status": "подтверждено функционально; скорость не достигнута",
+      "fact": {
+        "mode": "demo",
+        "functional_passed": true,
+        "answer_chars": 2000000,
+        "answer_utf8_bytes": 3660605,
+        "answer_sha256": "4c01a95caa3557617572f8e9660fc21c3c352c8ad778e844c7386b7acf496538",
+        "context_chars": 494,
+        "token_count": 282830,
+        "last_token_end": 2000000,
+        "all_full_token_risks_finite_and_bounded": true,
+        "all_spans_schema_and_slices_valid": true,
+        "full_token_records_sha256": "5e68bd503774557c878ffcbb25a182f3c829dff42b2fe711615f64a73a2fcfda",
+        "seconds": 363.41488864500025,
+        "speed_limit_60s_met": false,
+        "score": 0.0,
+        "verdict": "grounded",
+        "note": "Real sandbox CPU product request; separate environment from GitHub benchmarks. No HF full-answer coverage claim."
+      },
+      "receipt": "reports/acceptance/functional-2M-demo-final.json"
+    },
+    {
+      "id": "native-HF-long-answer-without-truncation",
+      "status": "не достигнут",
+      "receipt": "reports/acceptance/long-answer-limitation.json"
+    },
+    {
+      "id": "robustness",
+      "status": "измерено на saved OOF/dev, не новая независимая проверка",
+      "receipt": "reports/acceptance/robustness.json"
+    },
+    {
+      "id": "official-test177",
+      "status": "не запускался",
+      "incident": "Initial old chunking test parsed unsplit corpus; see protocol incident. No model evaluation or selection on test177."
+    },
+    {
+      "id": "whole-contract",
+      "status": "не принят",
+      "reason": "Dev success and interface smoke are not full contract acceptance; speed failures, censored full-text requests and external Windows HF runtime need explicit accounting."
+    }
+  ],
+  "benchmarks": [
+    {
+      "mode": "demo",
+      "scenario": "document-context",
+      "chars": 1000,
+      "thermal": "cold-process",
+      "median_seconds": 0.007070377000005124,
+      "max_seconds": 0.01361029800000324,
+      "status": "достигнут",
+      "receipt": "reports/acceptance/run39177834081/p6-product-demo/benchmark.json",
+      "run_url": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39177834081"
+    },
+    {
+      "mode": "demo",
+      "scenario": "document-context",
+      "chars": 1000,
+      "thermal": "warm-model",
+      "median_seconds": 0.0020004269999986946,
+      "max_seconds": 0.0020111529999979894,
+      "status": "достигнут",
+      "receipt": "reports/acceptance/run39177834081/p6-product-demo/benchmark.json",
+      "run_url": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39177834081"
+    },
+    {
+      "mode": "demo",
+      "scenario": "document-context",
+      "chars": 50000,
+      "thermal": "cold-process",
+      "median_seconds": 0.04681097200000295,
+      "max_seconds": 0.04691091099999767,
+      "status": "достигнут",
+      "receipt": "reports/acceptance/run39177834081/p6-product-demo/benchmark.json",
+      "run_url": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39177834081"
+    },
+    {
+      "mode": "demo",
+      "scenario": "document-context",
+      "chars": 50000,
+      "thermal": "warm-model",
+      "median_seconds": 0.042196130999997195,
+      "max_seconds": 0.042376238000002786,
+      "status": "достигнут",
+      "receipt": "reports/acceptance/run39177834081/p6-product-demo/benchmark.json",
+      "run_url": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39177834081"
+    },
+    {
+      "mode": "demo",
+      "scenario": "document-context",
+      "chars": 2000000,
+      "thermal": "cold-process",
+      "median_seconds": 2.3095699399999887,
+      "max_seconds": 2.316568701999998,
+      "status": "достигнут",
+      "receipt": "reports/acceptance/run39177834081/p6-product-demo/benchmark.json",
+      "run_url": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39177834081"
+    },
+    {
+      "mode": "demo",
+      "scenario": "document-context",
+      "chars": 2000000,
+      "thermal": "warm-model",
+      "median_seconds": 2.3123810719999938,
+      "max_seconds": 2.3253580020000015,
+      "status": "достигнут",
+      "receipt": "reports/acceptance/run39177834081/p6-product-demo/benchmark.json",
+      "run_url": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39177834081"
+    },
+    {
+      "mode": "demo",
+      "scenario": "answer-text",
+      "chars": 1000,
+      "thermal": "cold-process",
+      "median_seconds": 0.013407542999999578,
+      "max_seconds": 0.013634439999989922,
+      "status": "достигнут",
+      "receipt": "reports/acceptance/run39177834081/p6-product-demo/benchmark.json",
+      "run_url": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39177834081"
+    },
+    {
+      "mode": "demo",
+      "scenario": "answer-text",
+      "chars": 1000,
+      "thermal": "warm-model",
+      "median_seconds": 0.00858227000000511,
+      "max_seconds": 0.008736450000000673,
+      "status": "достигнут",
+      "receipt": "reports/acceptance/run39177834081/p6-product-demo/benchmark.json",
+      "run_url": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39177834081"
+    },
+    {
+      "mode": "demo",
+      "scenario": "answer-text",
+      "chars": 50000,
+      "thermal": "cold-process",
+      "median_seconds": 0.5451400299999989,
+      "max_seconds": 0.5452188559999911,
+      "status": "достигнут",
+      "receipt": "reports/acceptance/run39177834081/p6-product-demo/benchmark.json",
+      "run_url": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39177834081"
+    },
+    {
+      "mode": "demo",
+      "scenario": "answer-text",
+      "chars": 50000,
+      "thermal": "warm-model",
+      "median_seconds": 0.5357318509999942,
+      "max_seconds": 0.5742777539999935,
+      "status": "достигнут",
+      "receipt": "reports/acceptance/run39177834081/p6-product-demo/benchmark.json",
+      "run_url": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39177834081"
+    },
+    {
+      "mode": "demo",
+      "scenario": "answer-text",
+      "chars": 2000000,
+      "thermal": "cold-process",
+      "median_seconds": null,
+      "max_seconds": null,
+      "status": "не достигнут",
+      "receipt": "reports/acceptance/run39177834081/p6-product-demo/benchmark.json",
+      "run_url": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39177834081"
+    },
+    {
+      "mode": "demo",
+      "scenario": "answer-text",
+      "chars": 2000000,
+      "thermal": "warm-model",
+      "median_seconds": null,
+      "max_seconds": null,
+      "status": "не достигнут",
+      "receipt": "reports/acceptance/run39177834081/p6-product-demo/benchmark.json",
+      "run_url": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39177834081"
+    },
+    {
+      "mode": "hf",
+      "scenario": "document-context",
+      "chars": 1000,
+      "thermal": "cold-process",
+      "median_seconds": 5.759504465000006,
+      "max_seconds": 5.766685546000005,
+      "status": "не достигнут",
+      "receipt": "reports/acceptance/run39177834081/p6-product-hf/benchmark.json",
+      "run_url": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39177834081"
+    },
+    {
+      "mode": "hf",
+      "scenario": "document-context",
+      "chars": 1000,
+      "thermal": "warm-model",
+      "median_seconds": 1.4694539609999993,
+      "max_seconds": 1.4819093520000024,
+      "status": "не достигнут",
+      "receipt": "reports/acceptance/run39177834081/p6-product-hf/benchmark.json",
+      "run_url": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39177834081"
+    },
+    {
+      "mode": "hf",
+      "scenario": "document-context",
+      "chars": 50000,
+      "thermal": "cold-process",
+      "median_seconds": 8.605325195999995,
+      "max_seconds": 8.725292445999997,
+      "status": "не достигнут",
+      "receipt": "reports/acceptance/run39177834081/p6-product-hf/benchmark.json",
+      "run_url": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39177834081"
+    },
+    {
+      "mode": "hf",
+      "scenario": "document-context",
+      "chars": 50000,
+      "thermal": "warm-model",
+      "median_seconds": 4.220389256000004,
+      "max_seconds": 4.262031673000024,
+      "status": "не достигнут",
+      "receipt": "reports/acceptance/run39177834081/p6-product-hf/benchmark.json",
+      "run_url": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39177834081"
+    },
+    {
+      "mode": "hf",
+      "scenario": "document-context",
+      "chars": 2000000,
+      "thermal": "cold-process",
+      "median_seconds": 9.524675689999981,
+      "max_seconds": 9.649384985000012,
+      "status": "достигнут",
+      "receipt": "reports/acceptance/run39177834081/p6-product-hf/benchmark.json",
+      "run_url": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39177834081"
+    },
+    {
+      "mode": "hf",
+      "scenario": "document-context",
+      "chars": 2000000,
+      "thermal": "warm-model",
+      "median_seconds": 5.344215689000009,
+      "max_seconds": 5.349798615999987,
+      "status": "достигнут",
+      "receipt": "reports/acceptance/run39177834081/p6-product-hf/benchmark.json",
+      "run_url": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39177834081"
+    },
+    {
+      "mode": "hf",
+      "scenario": "answer-text",
+      "chars": 1000,
+      "thermal": "cold-process",
+      "median_seconds": 7.681687864999958,
+      "max_seconds": 17.582006344999968,
+      "status": "не достигнут",
+      "receipt": "reports/acceptance/run39177834081/p6-product-hf/benchmark.json",
+      "run_url": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39177834081"
+    },
+    {
+      "mode": "hf",
+      "scenario": "answer-text",
+      "chars": 1000,
+      "thermal": "warm-model",
+      "median_seconds": 3.3287632779999967,
+      "max_seconds": 3.3453974079999966,
+      "status": "не достигнут",
+      "receipt": "reports/acceptance/run39177834081/p6-product-hf/benchmark.json",
+      "run_url": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39177834081"
+    },
+    {
+      "mode": "hf",
+      "scenario": "answer-text",
+      "chars": 50000,
+      "thermal": "cold-process",
+      "median_seconds": 8.131707099000039,
+      "max_seconds": 8.16342842299997,
+      "status": "не достигнут",
+      "receipt": "reports/acceptance/run39177834081/p6-product-hf/benchmark.json",
+      "run_url": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39177834081"
+    },
+    {
+      "mode": "hf",
+      "scenario": "answer-text",
+      "chars": 50000,
+      "thermal": "warm-model",
+      "median_seconds": 3.664374754999983,
+      "max_seconds": 3.680787724999959,
+      "status": "не достигнут",
+      "receipt": "reports/acceptance/run39177834081/p6-product-hf/benchmark.json",
+      "run_url": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39177834081"
+    },
+    {
+      "mode": "hf",
+      "scenario": "answer-text",
+      "chars": 2000000,
+      "thermal": "cold-process",
+      "median_seconds": null,
+      "max_seconds": null,
+      "status": "не достигнут",
+      "receipt": "reports/acceptance/run39177834081/p6-product-hf/benchmark.json",
+      "run_url": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39177834081"
+    },
+    {
+      "mode": "hf",
+      "scenario": "answer-text",
+      "chars": 2000000,
+      "thermal": "warm-model",
+      "median_seconds": null,
+      "max_seconds": null,
+      "status": "не достигнут",
+      "receipt": "reports/acceptance/run39177834081/p6-product-hf/benchmark.json",
+      "run_url": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39177834081"
+    }
+  ],
+  "validated_code_head": "14a018a1b90b51cc47cd8baf628147ac22e1d8b1",
+  "evidence_context": {
+    "run_id": "historical-local-unrecorded:cd335b2d554a7edb22ad59f8286b47c75bb985bc",
+    "date": "2026-10-19",
+    "status": "NON_AUTHORITATIVE historical/reference; consult current indices",
+    "successor": "reports/EXPERIMENTS_INDEX.md",
+    "source_commit": "cd335b2d554a7edb22ad59f8286b47c75bb985bc",
+    "limitation": "Original remote run not recorded; do not misrepresent as current independent measurement"
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "pairs": 181,
+  "full_token_risks": 13150,
+  "mismatches": [],
+  "p1_max_abs_delta": 0.0,
+  "cache_misses": 0,
+  "bundle_sha256": "e0b13c693a058dfd66ed24a52fc14e9c70964e95885358e7b99cc1f328ad6892",
+  "passed": true,
+  "source_run_url": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39184437524",
+  "head_sha": "14a018a1b90b51cc47cd8baf628147ac22e1d8b1",
+  "source": "check-run 117843765134 checked JSON prefix before environment (4096-byte annotation cap); full environment retained in p6-parity artifact"
+}

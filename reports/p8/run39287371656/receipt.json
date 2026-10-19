@@ -1,0 +1,9 @@
+{
+  "run_id": "39287371656",
+  "date": "2026-10-19",
+  "source": "fd1b863c3a04c9db7120c4181854af2007a4a629",
+  "recovery_receipt_run": 39290438326,
+  "receipt_job": 118189390214,
+  "raw_tail_bytes": 24000,
+  "scope": "Metadata publication only; no inference repeat, no production/model changes"
+}

@@ -255,11 +255,11 @@ jobs:
         working-directory: spanverify-module
         timeout-minutes: 10
         run: |
-          python scripts/collect_metrics.py --out reports/METRICS.json
+          python scripts/collect_metrics.py --out reports/CURRENT_METRICS.json
           python scripts/cross_corpus.py --out reports/cross_corpus.json || true
           python - <<'PY'
           import json, pathlib
-          metrics = json.loads(pathlib.Path("reports/METRICS.json").read_text(encoding="utf-8"))
+          metrics = json.loads(pathlib.Path("reports/CURRENT_METRICS.json").read_text(encoding="utf-8"))
           print("прогонов hf:", metrics.get("external_tests", {}).get("hf_runs"))
           for key in ("corpus_a", "corpus_a3_real"):
               modes = metrics.get(key, {}).get("by_mode", {})
@@ -274,7 +274,7 @@ jobs:
         with:
           name: hf-metrics-summary
           path: |
-            spanverify-module/reports/METRICS.json
+            spanverify-module/reports/CURRENT_METRICS.json
             spanverify-module/reports/cross_corpus.json
           if-no-files-found: warn
           retention-days: 30
@@ -292,7 +292,7 @@ jobs:
           mkdir -p experiments
           cp -r /tmp/keepexp/reports/experiments-a3 experiments/ 2>/dev/null || true
           cp -r /tmp/keepexp/reports/experiments-a experiments/ 2>/dev/null || true
-          cp /tmp/keepexp/reports/METRICS.json experiments/METRICS-hf-${{ github.run_number }}.json 2>/dev/null || true
+          cp /tmp/keepexp/reports/CURRENT_METRICS.json experiments/METRICS-hf-${{ github.run_number }}.json 2>/dev/null || true
           git add -A experiments
           git diff --cached --quiet && echo "изменений нет" && exit 0
           git commit -m "hf: эксперименты с кешем признаков, прогон ${{ github.run_number }} [skip ci]"

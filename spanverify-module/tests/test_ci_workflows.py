@@ -16,8 +16,12 @@ from __future__ import annotations
 
 import importlib.util
 import json
+import re
 import sys
 from pathlib import Path
+from urllib.parse import unquote, urlsplit
+
+import pytest
 
 MODULE_ROOT = Path(__file__).resolve().parents[1]
 REPO_ROOT = MODULE_ROOT.parent
@@ -36,7 +40,7 @@ def _load_script():
     return module
 
 
-def test_document_lists_every_workflow() -> None:
+def test_document_lists_every_workflow(request: pytest.FixtureRequest) -> None:
     """В документе есть каждое задание из .github/workflows."""
     assert DOC.is_file(), "нет docs/ЗАДАНИЯ_CI.md (собрать: scripts/collect_ci_workflows.py)"
     payload = json.loads(PAYLOAD.read_text(encoding="utf-8"))
@@ -46,6 +50,55 @@ def test_document_lists_every_workflow() -> None:
     assert len(names) == len(list(WORKFLOWS.glob("*.yml"))), "не все файлы заданий попали в реестр"
     for name in names:
         assert f"`{name}`" in doc, f"{name}: задания нет в документе"
+
+    # Presentation-only guards: preserve all existing workflow assertions above.
+    readme = (REPO_ROOT / "README.md").read_text(encoding="utf-8")
+    links = re.findall(r"\]\(([^\s)]+)\)", readme)
+    downloads = {
+        f"https://github.com/Igorr112323/Smarty_Chumakov/releases/latest/download/{asset}"
+        for asset in ("spanverify.exe", "spanverify.pyz", "spanverify-win.zip", "SHA256SUMS.txt")
+    }
+    assert downloads <= set(links), "README: отсутствует стабильная ссылка скачивания"
+    assert readme.index("## Скачать для Windows") < len(readme) // 3
+    evidence = {
+        "reports/ACCEPTANCE_PASSPORT.md",
+        "reports/FINAL_REPORT.md",
+        "reports/DEVIATIONS.md",
+        "reports/contract/coverage-matrix.json",
+        "reports/contract/coverage-matrix.md",
+        "reports/EXPERIMENTS_INDEX.md",
+        "reports/p8/VERIFICATION.json",
+        "reports/p8/run39266451529/official/result.json",
+        "docs/TESTS.md",
+    }
+    assert evidence <= set(links), "README: неполная карта доказательств"
+    for relative in ("README.md", "docs/TESTS.md", "docs/presentation/HF_RUNTIME.md"):
+        path = REPO_ROOT / relative
+        for target in re.findall(r"\]\(([^\s)]+)\)", path.read_text(encoding="utf-8")):
+            parsed = urlsplit(target)
+            if parsed.scheme or parsed.netloc or not parsed.path:
+                continue
+            resolved = (path.parent / unquote(parsed.path)).resolve()
+            assert REPO_ROOT in resolved.parents, f"{relative}: ссылка вне репозитория: {target}"
+            assert resolved.exists(), f"{relative}: несуществующая ссылка: {target}"
+
+    inventory = json.loads((REPO_ROOT / "docs/presentation/TESTS_INVENTORY.json").read_text(encoding="utf-8"))
+    files = inventory["files"]
+    recorded = [node for entry in files for node in entry["nodeids"]]
+    assert inventory["total"] == len(recorded) == len(set(recorded))
+    assert all(entry["collected_nodes"] == len(entry["nodeids"]) for entry in files)
+    assert {entry["path"] for entry in files} == {
+        path.relative_to(REPO_ROOT).as_posix() for path in (MODULE_ROOT / "tests").glob("test_*.py")
+    }
+    table = (REPO_ROOT / "docs/TESTS.md").read_text(encoding="utf-8")
+    rows = re.findall(r"^\| \[(test_[^]]+\.py)\]\([^)]+\) \| (\d+) \|", table, re.MULTILINE)
+    assert len(rows) == len(files)
+    assert dict(rows) == {Path(entry["path"]).name: str(entry["collected_nodes"]) for entry in files}
+    # A targeted invocation must still run every link assertion, but cannot
+    # compare its partial collection with the full-suite inventory.
+    config = request.config
+    if list(config.args) == list(config.getini("testpaths")) and not (config.option.keyword or config.option.markexpr):
+        assert sorted(recorded) == sorted(item.nodeid for item in request.session.items)
 
 
 def test_document_has_trigger_and_status_for_each_job() -> None:
@@ -83,3 +136,31 @@ def test_script_declares_sources_and_does_not_invent_statuses() -> None:
     payload = json.loads(PAYLOAD.read_text(encoding="utf-8"))
     assert payload["source"] == ".github/workflows/*.yml + reports/CI_RUNS.json"
     assert payload["runs_considered"] >= 1, "не записано, сколько прогонов просмотрено"
+
+
+def test_windows_rc_keeps_strict_size_and_frozen_packaging_contract() -> None:
+    """P6: оба size limits обязательны; fit-зависимости не попадают в exe-среду."""
+    import ast
+
+    import yaml
+
+    workflow = yaml.safe_load((WORKFLOWS / "build-and-release-exe.yml").read_text(encoding="utf-8"))
+    jobs = workflow["jobs"]
+    tests = "\n".join(str(s.get("run", "")) for s in jobs["test"]["steps"])
+    build = "\n".join(str(s.get("run", "")) for s in jobs["windows-exe"]["steps"])
+    assert "requirements-token-head-tests.txt" in tests
+    assert "requirements-token-head-tests.txt" not in build
+    assert 'if ((-not $sizes["exe_ok"]) -or (-not $sizes["pyz_ok"]))' in build
+    assert "spanverify train" not in build and "git push" not in build
+    assert "--prerelease" in build and "--latest=false" in build
+    assert "spanverify-module/reports/experiments/** -text" in (REPO_ROOT / ".gitattributes").read_text()
+    spec = (MODULE_ROOT / "spanverify.spec").read_text(encoding="utf-8")
+    assert 'ROOT / "data"' not in spec  # Server never needs embedded training corpora.
+    assert '--add-data "data/' not in build
+    tree = ast.parse(spec)
+    excluded = next(
+        ast.literal_eval(n.value)
+        for n in tree.body
+        if isinstance(n, ast.Assign) and any(isinstance(t, ast.Name) and t.id == "excludes" for t in n.targets)
+    )
+    assert {"numpy", "sklearn", "scipy", "torch", "transformers"} <= set(excluded)

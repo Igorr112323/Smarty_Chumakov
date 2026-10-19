@@ -1,0 +1,594 @@
+{
+  "conclusion": "failure",
+  "event": "push",
+  "jobs": [
+    {
+      "completedAt": "2026-10-18T22:09:40Z",
+      "conclusion": "failure",
+      "databaseId": 117803777536,
+      "name": "Линтер, форматирование, покрытие",
+      "startedAt": "2026-10-18T22:09:19Z",
+      "status": "completed",
+      "steps": [
+        {
+          "conclusion": "success",
+          "name": "Set up job",
+          "number": 1,
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Run actions/checkout@v4",
+          "number": 2,
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Run actions/setup-python@v5",
+          "number": 3,
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Зависимости проверки",
+          "number": 4,
+          "status": "completed"
+        },
+        {
+          "conclusion": "failure",
+          "name": "Линтер (ruff)",
+          "number": 5,
+          "status": "completed"
+        },
+        {
+          "conclusion": "skipped",
+          "name": "Форматирование (black --check)",
+          "number": 6,
+          "status": "completed"
+        },
+        {
+          "conclusion": "skipped",
+          "name": "Тесты с порогом покрытия 85 %",
+          "number": 7,
+          "status": "completed"
+        },
+        {
+          "conclusion": "skipped",
+          "name": "Воспроизводимость обучения (один seed → один результат)",
+          "number": 8,
+          "status": "completed"
+        },
+        {
+          "conclusion": "skipped",
+          "name": "Метрики на отложенной части (числа в лог)",
+          "number": 9,
+          "status": "completed"
+        },
+        {
+          "conclusion": "skipped",
+          "name": "Чистая установка в отдельном venv (пины из requirements.txt)",
+          "number": 10,
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Отчёт покрытия для единого файла чисел",
+          "number": 11,
+          "status": "completed"
+        },
+        {
+          "conclusion": "skipped",
+          "name": "Сохранить отчёт обучения",
+          "number": 12,
+          "status": "completed"
+        },
+        {
+          "conclusion": "skipped",
+          "name": "Post Run actions/setup-python@v5",
+          "number": 23,
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Post Run actions/checkout@v4",
+          "number": 24,
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Complete job",
+          "number": 25,
+          "status": "completed"
+        }
+      ],
+      "url": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39170981159/job/117803777536",
+      "annotations": [
+        {
+          "path": ".github",
+          "blob_href": "https://github.com/Igorr112323/Smarty_Chumakov/blob/977e9dc81b378cd2b775b815864898aad92496d4/.github",
+          "start_line": 2,
+          "start_column": null,
+          "end_line": 2,
+          "end_column": null,
+          "annotation_level": "warning",
+          "title": "",
+          "message": "Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@v4, actions/setup-python@v5, actions/upload-artifact@v4. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/",
+          "raw_details": ""
+        },
+        {
+          "path": ".github",
+          "blob_href": "https://github.com/Igorr112323/Smarty_Chumakov/blob/977e9dc81b378cd2b775b815864898aad92496d4/.github",
+          "start_line": 22,
+          "start_column": null,
+          "end_line": 22,
+          "end_column": null,
+          "annotation_level": "warning",
+          "title": "",
+          "message": "No files were found with the provided path: spanverify-module/reports/coverage.json. No artifacts will be uploaded.",
+          "raw_details": ""
+        },
+        {
+          "path": ".github",
+          "blob_href": "https://github.com/Igorr112323/Smarty_Chumakov/blob/977e9dc81b378cd2b775b815864898aad92496d4/.github",
+          "start_line": 17244,
+          "start_column": null,
+          "end_line": 17244,
+          "end_column": null,
+          "annotation_level": "failure",
+          "title": "",
+          "message": "Process completed with exit code 1.",
+          "raw_details": ""
+        },
+        {
+          "path": ".github",
+          "blob_href": "https://github.com/Igorr112323/Smarty_Chumakov/blob/977e9dc81b378cd2b775b815864898aad92496d4/.github",
+          "start_line": 1,
+          "start_column": null,
+          "end_line": 1,
+          "end_column": null,
+          "annotation_level": "notice",
+          "title": "",
+          "message": "\"The ubuntu-latest label will migrate to Ubuntu 26 beginning October 19, 2026. For more information, see https://github.com/actions/runner-images/issues/14748\"",
+          "raw_details": ""
+        }
+      ]
+    },
+    {
+      "completedAt": "2026-10-18T22:09:40Z",
+      "conclusion": "failure",
+      "databaseId": 117803777680,
+      "name": "Тесты (Python 3.12, windows-latest)",
+      "startedAt": "2026-10-18T22:09:19Z",
+      "status": "completed",
+      "steps": [
+        {
+          "conclusion": "success",
+          "name": "Set up job",
+          "number": 1,
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Run actions/checkout@v4",
+          "number": 2,
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Run actions/setup-python@v5",
+          "number": 3,
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Зависимости тестов",
+          "number": 4,
+          "status": "completed"
+        },
+        {
+          "conclusion": "failure",
+          "name": "Тесты",
+          "number": 5,
+          "status": "completed"
+        },
+        {
+          "conclusion": "skipped",
+          "name": "Само-проверка конвейера",
+          "number": 6,
+          "status": "completed"
+        },
+        {
+          "conclusion": "skipped",
+          "name": "Проверка HTTP-контракта (реальный запрос к сервису)",
+          "number": 7,
+          "status": "completed"
+        },
+        {
+          "conclusion": "skipped",
+          "name": "Post Run actions/setup-python@v5",
+          "number": 13,
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Post Run actions/checkout@v4",
+          "number": 14,
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Complete job",
+          "number": 15,
+          "status": "completed"
+        }
+      ],
+      "url": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39170981159/job/117803777680",
+      "annotations": [
+        {
+          "path": ".github",
+          "blob_href": "https://github.com/Igorr112323/Smarty_Chumakov/blob/977e9dc81b378cd2b775b815864898aad92496d4/.github",
+          "start_line": 2,
+          "start_column": null,
+          "end_line": 2,
+          "end_column": null,
+          "annotation_level": "warning",
+          "title": "",
+          "message": "Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@v4, actions/setup-python@v5. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/",
+          "raw_details": ""
+        },
+        {
+          "path": ".github",
+          "blob_href": "https://github.com/Igorr112323/Smarty_Chumakov/blob/977e9dc81b378cd2b775b815864898aad92496d4/.github",
+          "start_line": 704,
+          "start_column": null,
+          "end_line": 704,
+          "end_column": null,
+          "annotation_level": "failure",
+          "title": "",
+          "message": "Process completed with exit code 1.",
+          "raw_details": ""
+        }
+      ]
+    },
+    {
+      "completedAt": "2026-10-18T22:09:40Z",
+      "conclusion": "failure",
+      "databaseId": 117803777763,
+      "name": "Тесты (Python 3.11, ubuntu-latest)",
+      "startedAt": "2026-10-18T22:09:19Z",
+      "status": "completed",
+      "steps": [
+        {
+          "conclusion": "success",
+          "name": "Set up job",
+          "number": 1,
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Run actions/checkout@v4",
+          "number": 2,
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Run actions/setup-python@v5",
+          "number": 3,
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Зависимости тестов",
+          "number": 4,
+          "status": "completed"
+        },
+        {
+          "conclusion": "failure",
+          "name": "Тесты",
+          "number": 5,
+          "status": "completed"
+        },
+        {
+          "conclusion": "skipped",
+          "name": "Само-проверка конвейера",
+          "number": 6,
+          "status": "completed"
+        },
+        {
+          "conclusion": "skipped",
+          "name": "Проверка HTTP-контракта (реальный запрос к сервису)",
+          "number": 7,
+          "status": "completed"
+        },
+        {
+          "conclusion": "skipped",
+          "name": "Post Run actions/setup-python@v5",
+          "number": 13,
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Post Run actions/checkout@v4",
+          "number": 14,
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Complete job",
+          "number": 15,
+          "status": "completed"
+        }
+      ],
+      "url": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39170981159/job/117803777763",
+      "annotations": [
+        {
+          "path": ".github",
+          "blob_href": "https://github.com/Igorr112323/Smarty_Chumakov/blob/977e9dc81b378cd2b775b815864898aad92496d4/.github",
+          "start_line": 2,
+          "start_column": null,
+          "end_line": 2,
+          "end_column": null,
+          "annotation_level": "warning",
+          "title": "",
+          "message": "Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@v4, actions/setup-python@v5. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/",
+          "raw_details": ""
+        },
+        {
+          "path": ".github",
+          "blob_href": "https://github.com/Igorr112323/Smarty_Chumakov/blob/977e9dc81b378cd2b775b815864898aad92496d4/.github",
+          "start_line": 705,
+          "start_column": null,
+          "end_line": 705,
+          "end_column": null,
+          "annotation_level": "failure",
+          "title": "",
+          "message": "Process completed with exit code 1.",
+          "raw_details": ""
+        },
+        {
+          "path": ".github",
+          "blob_href": "https://github.com/Igorr112323/Smarty_Chumakov/blob/977e9dc81b378cd2b775b815864898aad92496d4/.github",
+          "start_line": 1,
+          "start_column": null,
+          "end_line": 1,
+          "end_column": null,
+          "annotation_level": "notice",
+          "title": "",
+          "message": "\"The ubuntu-latest label will migrate to Ubuntu 26 beginning October 19, 2026. For more information, see https://github.com/actions/runner-images/issues/14748\"",
+          "raw_details": ""
+        }
+      ]
+    },
+    {
+      "completedAt": "2026-10-18T22:09:40Z",
+      "conclusion": "skipped",
+      "databaseId": 117803778446,
+      "name": "Разведка официальных источников (не блокирует CI)",
+      "startedAt": "2026-10-18T22:09:18Z",
+      "status": "completed",
+      "steps": [],
+      "url": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39170981159/job/117803778446"
+    },
+    {
+      "completedAt": "2026-10-18T22:09:40Z",
+      "conclusion": "failure",
+      "databaseId": 117803858993,
+      "name": "Соответствие договору (проект 117812)",
+      "startedAt": "2026-10-18T22:09:42Z",
+      "status": "completed",
+      "steps": [
+        {
+          "conclusion": "success",
+          "name": "Set up job",
+          "number": 1,
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Run actions/checkout@v4",
+          "number": 2,
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Отчёт покрытия из job «Качество» (если он есть)",
+          "number": 3,
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Run actions/setup-python@v5",
+          "number": 4,
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Зависимости",
+          "number": 5,
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Контрактные тесты",
+          "number": 6,
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Реестр чисел и его сверка с артефактами",
+          "number": 7,
+          "status": "completed"
+        },
+        {
+          "conclusion": "failure",
+          "name": "Контрактные проверки (requirement → fact → status)",
+          "number": 8,
+          "status": "completed"
+        },
+        {
+          "conclusion": "skipped",
+          "name": "Сверка чисел в документах с реестром",
+          "number": 9,
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Артефакты контрактной проверки",
+          "number": 10,
+          "status": "completed"
+        },
+        {
+          "conclusion": "skipped",
+          "name": "Post Run actions/setup-python@v5",
+          "number": 19,
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Post Run actions/checkout@v4",
+          "number": 20,
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Complete job",
+          "number": 21,
+          "status": "completed"
+        }
+      ],
+      "url": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39170981159/job/117803858993",
+      "annotations": [
+        {
+          "path": ".github",
+          "blob_href": "https://github.com/Igorr112323/Smarty_Chumakov/blob/977e9dc81b378cd2b775b815864898aad92496d4/.github",
+          "start_line": 2,
+          "start_column": null,
+          "end_line": 2,
+          "end_column": null,
+          "annotation_level": "warning",
+          "title": "",
+          "message": "Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@v4, actions/download-artifact@v4, actions/setup-python@v5, actions/upload-artifact@v4. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/",
+          "raw_details": ""
+        },
+        {
+          "path": ".github",
+          "blob_href": "https://github.com/Igorr112323/Smarty_Chumakov/blob/977e9dc81b378cd2b775b815864898aad92496d4/.github",
+          "start_line": 55,
+          "start_column": null,
+          "end_line": 55,
+          "end_column": null,
+          "annotation_level": "failure",
+          "title": "",
+          "message": "Process completed with exit code 1.",
+          "raw_details": ""
+        },
+        {
+          "path": ".github",
+          "blob_href": "https://github.com/Igorr112323/Smarty_Chumakov/blob/977e9dc81b378cd2b775b815864898aad92496d4/.github",
+          "start_line": 52,
+          "start_column": null,
+          "end_line": 52,
+          "end_column": null,
+          "annotation_level": "notice",
+          "title": "Контрактные проверки",
+          "message": "соответствует 30, не соответствует 2, не измерено 2",
+          "raw_details": ""
+        },
+        {
+          "path": ".github",
+          "blob_href": "https://github.com/Igorr112323/Smarty_Chumakov/blob/977e9dc81b378cd2b775b815864898aad92496d4/.github",
+          "start_line": 51,
+          "start_column": null,
+          "end_line": 51,
+          "end_column": null,
+          "annotation_level": "warning",
+          "title": "report.originality",
+          "message": "Приложение № 10 (оригинальность): фактический процент оригинальности не измерен: нужна внешняя система проверки текста; в шаблоне поле и процедура описаны",
+          "raw_details": ""
+        },
+        {
+          "path": ".github",
+          "blob_href": "https://github.com/Igorr112323/Smarty_Chumakov/blob/977e9dc81b378cd2b775b815864898aad92496d4/.github",
+          "start_line": 50,
+          "start_column": null,
+          "end_line": 50,
+          "end_column": null,
+          "annotation_level": "warning",
+          "title": "dod.tests",
+          "message": "Правило готовности (промт §7): нет отчёта покрытия: прогон с --cov не выполнялся в этом окружении",
+          "raw_details": ""
+        },
+        {
+          "path": ".github",
+          "blob_href": "https://github.com/Igorr112323/Smarty_Chumakov/blob/977e9dc81b378cd2b775b815864898aad92496d4/.github",
+          "start_line": 49,
+          "start_column": null,
+          "end_line": 49,
+          "end_column": null,
+          "annotation_level": "failure",
+          "title": "4.1.9-delivery-artifacts",
+          "message": "ТЗ п. 4.1 треб. 9: смоук-тест пакета не прошёл",
+          "raw_details": ""
+        },
+        {
+          "path": ".github",
+          "blob_href": "https://github.com/Igorr112323/Smarty_Chumakov/blob/977e9dc81b378cd2b775b815864898aad92496d4/.github",
+          "start_line": 16,
+          "start_column": null,
+          "end_line": 16,
+          "end_column": null,
+          "annotation_level": "failure",
+          "title": "",
+          "message": "Unable to download artifact(s): Artifact not found for name: coverage-json\n        Please ensure that your artifact is not expired and the artifact was uploaded using a compatible version of toolkit/upload-artifact.\n        For more information, visit the GitHub Artifacts FAQ: https://github.com/actions/toolkit/blob/main/packages/artifact/docs/faq.md",
+          "raw_details": ""
+        },
+        {
+          "path": ".github",
+          "blob_href": "https://github.com/Igorr112323/Smarty_Chumakov/blob/977e9dc81b378cd2b775b815864898aad92496d4/.github",
+          "start_line": 1,
+          "start_column": null,
+          "end_line": 1,
+          "end_column": null,
+          "annotation_level": "notice",
+          "title": "",
+          "message": "\"The ubuntu-latest label will migrate to Ubuntu 26 beginning October 19, 2026. For more information, see https://github.com/actions/runner-images/issues/14748\"",
+          "raw_details": ""
+        }
+      ]
+    },
+    {
+      "completedAt": "2026-10-18T22:09:40Z",
+      "conclusion": "skipped",
+      "databaseId": 117803859977,
+      "name": "Пилот на реальной модели (rugpt3small, CPU)",
+      "startedAt": "2026-10-18T22:09:41Z",
+      "status": "completed",
+      "steps": [],
+      "url": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39170981159/job/117803859977"
+    },
+    {
+      "completedAt": "2026-10-18T22:09:40Z",
+      "conclusion": "skipped",
+      "databaseId": 117803860378,
+      "name": "Внешние размеченные наборы (скачивание, контрольные ...",
+      "startedAt": "2026-10-18T22:09:41Z",
+      "status": "completed",
+      "steps": [],
+      "url": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39170981159/job/117803860378"
+    },
+    {
+      "completedAt": "2026-10-18T22:09:40Z",
+      "conclusion": "skipped",
+      "databaseId": 117803860452,
+      "name": "Единый файл чисел (METRICS.json) и сверка документов",
+      "startedAt": "2026-10-18T22:09:41Z",
+      "status": "completed",
+      "steps": [],
+      "url": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39170981159/job/117803860452"
+    }
+  ],
+  "status": "completed",
+  "run_id": 39170981159,
+  "code_sha": "977e9dc81b378cd2b775b815864898aad92496d4",
+  "scope": "ordinary CI FAILED, distinct from successful P5 CPU measurement and exact local full-suite traceback"
+}

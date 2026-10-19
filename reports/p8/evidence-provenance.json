@@ -1,0 +1,232 @@
+{
+  "run_id": "P8-hygiene",
+  "date": "2026-10-19",
+  "index": "reports/EXPERIMENTS_INDEX.md",
+  "files": [
+    {
+      "path": "reports/CONTRACT.json",
+      "run_id": null,
+      "date": "2026-10-19"
+    },
+    {
+      "path": "reports/NUMBERS.json",
+      "run_id": null,
+      "date": "2026-10-19"
+    },
+    {
+      "path": "reports/METRICS.json",
+      "run_id": "37609202780",
+      "date": "2026-10-19"
+    },
+    {
+      "path": "reports/contract/4.1.10-no-network.json",
+      "run_id": null,
+      "date": "2026-10-19"
+    },
+    {
+      "path": "reports/contract/4.1.4-ai-participation.json",
+      "run_id": null,
+      "date": "2026-10-19"
+    },
+    {
+      "path": "reports/contract/4.1.5-metric-groups.json",
+      "run_id": null,
+      "date": "2026-10-19"
+    },
+    {
+      "path": "reports/contract/4.1.6-gate-corpus-a.json",
+      "run_id": null,
+      "date": "2026-10-19"
+    },
+    {
+      "path": "reports/contract/4.1.7-performance.json",
+      "run_id": null,
+      "date": "2026-10-19"
+    },
+    {
+      "path": "reports/contract/numbers.check.json",
+      "run_id": null,
+      "date": "2026-10-19"
+    },
+    {
+      "path": "reports/contract/numbers.registry.json",
+      "run_id": null,
+      "date": "2026-10-19"
+    },
+    {
+      "path": "reports/contract/4.1.6-demo.json",
+      "run_id": null,
+      "date": "2026-10-19"
+    },
+    {
+      "path": "reports/contract/4.1.6-hf-a3.json",
+      "run_id": "37609202780",
+      "date": "2026-10-19"
+    },
+    {
+      "path": "reports/contract/4.1.6-hf-gate-a3.json",
+      "run_id": "37609202780",
+      "date": "2026-10-19"
+    },
+    {
+      "path": "reports/contract/4.1.6-hf-gate.json",
+      "run_id": "37609202780",
+      "date": "2026-10-19"
+    },
+    {
+      "path": "reports/contract/4.1.6-hf.json",
+      "run_id": "37609202780",
+      "date": "2026-10-19"
+    },
+    {
+      "path": "reports/contract/coverage-matrix.json",
+      "run_id": "39266451529",
+      "date": "2026-10-19"
+    },
+    {
+      "path": "reports/acceptance/benchmark-source-parity.json",
+      "run_id": null,
+      "date": "2026-10-19"
+    },
+    {
+      "path": "reports/acceptance/coverage-matrix.json",
+      "run_id": null,
+      "date": "2026-10-19"
+    },
+    {
+      "path": "reports/acceptance/robustness.json",
+      "run_id": null,
+      "date": "2026-10-19"
+    },
+    {
+      "path": "reports/p7/ai-share-oof-curves.json",
+      "run_id": "39236657451",
+      "date": "2026-10-19"
+    },
+    {
+      "path": "reports/p7/coverage-matrix.json",
+      "run_id": null,
+      "date": "2026-10-19"
+    },
+    {
+      "path": "reports/p7/calibration-demo-local/oof-calibration.json",
+      "run_id": null,
+      "date": "2026-10-19"
+    },
+    {
+      "path": "reports/p7/final-receipts/native-benchmark.json",
+      "run_id": null,
+      "date": "2026-10-19"
+    },
+    {
+      "path": "reports/p7/final-receipts/native-profiles.json",
+      "run_id": null,
+      "date": "2026-10-19"
+    },
+    {
+      "path": "reports/p7/saved-oof-replay/robustness.json",
+      "run_id": null,
+      "date": "2026-10-19"
+    },
+    {
+      "path": "reports/experiments/a3/experiment.json",
+      "run_id": "37609202780",
+      "date": "2026-10-19"
+    },
+    {
+      "path": "spanverify-module/reports/METRICS.json",
+      "run_id": "37609202780",
+      "date": "2026-10-19"
+    },
+    {
+      "path": "spanverify-module/reports/SIGN_AUDIT.json",
+      "run_id": null,
+      "date": "2026-10-19"
+    },
+    {
+      "path": "spanverify-module/reports/cross_corpus.json",
+      "run_id": null,
+      "date": "2026-10-19"
+    },
+    {
+      "path": "spanverify-module/reports/cross_corpus_hf.json",
+      "run_id": null,
+      "date": "2026-10-19"
+    },
+    {
+      "path": "spanverify-module/reports/ext_ragtruth_data2txt.json",
+      "run_id": null,
+      "date": "2026-10-19"
+    },
+    {
+      "path": "spanverify-module/reports/ext_ragtruth_qa.json",
+      "run_id": null,
+      "date": "2026-10-19"
+    },
+    {
+      "path": "spanverify-module/reports/ext_ragtruth_qa_hf.json",
+      "run_id": null,
+      "date": "2026-10-19"
+    },
+    {
+      "path": "spanverify-module/reports/ext_ragtruth_summary.json",
+      "run_id": null,
+      "date": "2026-10-19"
+    },
+    {
+      "path": "spanverify-module/reports/ext_rushallu.json",
+      "run_id": null,
+      "date": "2026-10-19"
+    },
+    {
+      "path": "spanverify-module/reports/external_tests.json",
+      "run_id": null,
+      "date": "2026-10-19"
+    },
+    {
+      "path": "spanverify-module/reports/rus_hallu_eval.json",
+      "run_id": null,
+      "date": "2026-10-19"
+    },
+    {
+      "path": "spanverify-module/reports/verdict_calibration.json",
+      "run_id": null,
+      "date": "2026-10-19"
+    },
+    {
+      "path": "spanverify-module/reports/CURRENT_METRICS.json",
+      "run_id": "39266451529",
+      "date": "2026-10-19"
+    },
+    {
+      "path": "spanverify-module/reports/demo/report.json",
+      "run_id": null,
+      "date": "2026-10-19"
+    },
+    {
+      "path": "spanverify-module/reports/experiments/experiment.json",
+      "run_id": null,
+      "date": "2026-10-19"
+    },
+    {
+      "path": "spanverify-module/reports/experiments/hf_a3_run39045874159.json",
+      "run_id": "39045874159",
+      "date": "2026-10-19"
+    },
+    {
+      "path": "spanverify-module/reports/experiments/a/experiment.json",
+      "run_id": "37609202780",
+      "date": "2026-10-19"
+    },
+    {
+      "path": "spanverify-module/reports/experiments/a3/experiment.json",
+      "run_id": "37609202780",
+      "date": "2026-10-19"
+    },
+    {
+      "path": "spanverify-module/reports/experiments/pilot/pilot.json",
+      "run_id": null,
+      "date": "2026-10-19"
+    }
+  ]
+}

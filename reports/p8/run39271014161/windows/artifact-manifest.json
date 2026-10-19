@@ -1,0 +1,71 @@
+{
+  "role": "spanverify-windows-x64",
+  "run_id": "39271014161",
+  "date": "2026-10-19",
+  "manifest": {
+    "release/README.md": {
+      "bytes": 21465,
+      "sha256": "966b802cfc8197422ddc822e66e6b52d43f44b685928d87eca40612e179e2e5e"
+    },
+    "release/SHA256SUMS.txt": {
+      "bytes": 415,
+      "sha256": "e043808d106871c80b92b383059940eaa88aa5acd2d09882b4f3377e87bcbb35"
+    },
+    "release/autonomy-health.json": {
+      "bytes": 1226,
+      "sha256": "70c71d30eaf8a1fc2c5efd8995efe96db51e17c288b9fa622a1802410a809462"
+    },
+    "release/autonomy-registry.json": {
+      "bytes": 246,
+      "sha256": "43a8cbd038f1b7ffd5a8d880dc2e8574e4ed4778dfe56f3065f6936b3cd80cc2"
+    },
+    "release/autonomy-request.json": {
+      "bytes": 247,
+      "sha256": "42d8d11a774369c555854034c063af609e132630bc942734ef1ac31d46a0cf70"
+    },
+    "release/autonomy-response.json": {
+      "bytes": 2187,
+      "sha256": "0056dd1f7703bdf65269f9ba2ba4622bb85ce4bf7cf1500dbd49ba56170aaf5d"
+    },
+    "release/autonomy.json": {
+      "bytes": 186,
+      "sha256": "4a9740ba163650cdc5de0af6a6b89faaf16cd0b8f695397be90531862cd9e89c"
+    },
+    "release/frozen-p5.json": {
+      "bytes": 122874,
+      "sha256": "e0b13c693a058dfd66ed24a52fc14e9c70964e95885358e7b99cc1f328ad6892"
+    },
+    "release/p5-runtime.json": {
+      "bytes": 2969,
+      "sha256": "1af8a345655d23d2015c498cd0dfc3cf51a1dddceb31ef7ea42ec05a5eca7749"
+    },
+    "release/pyz-verify.json": {
+      "bytes": 2187,
+      "sha256": "5f6b591dd850699b1a43059b13c457b7050121f6238adf4b7dfe8010dd4597c0"
+    },
+    "release/size.txt": {
+      "bytes": 47,
+      "sha256": "2d85fef045ce486a7b3eb92a0b40e2f3950f8da1c711219fba561dd20aa49bdf"
+    },
+    "release/sizes.json": {
+      "bytes": 608,
+      "sha256": "832d45a0ed1a5ea69292ac6b71d4bda2c857fdc88d1633819d93b3ac68200d49"
+    },
+    "release/spanverify-win.zip": {
+      "bytes": 9148872,
+      "sha256": "6a565d95c9b96d087764bd48f3169254992acaff4367baf97f0a1d58afb45ac8"
+    },
+    "release/spanverify.exe": {
+      "bytes": 8981233,
+      "sha256": "93f354eeea49633b72df0c8d3548ba912465c3b3309d9e72452fed815f274362"
+    },
+    "release/spanverify.pyz": {
+      "bytes": 232874,
+      "sha256": "4006d891adfb9cd0c8554178b0c1d505aaf5b21b8b78bf72e800faddd33ae76f"
+    },
+    "reports/release_sizes.json": {
+      "bytes": 608,
+      "sha256": "832d45a0ed1a5ea69292ac6b71d4bda2c857fdc88d1633819d93b3ac68200d49"
+    }
+  }
+}

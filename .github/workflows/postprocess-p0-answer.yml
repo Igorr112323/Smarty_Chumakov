@@ -1,0 +1,191 @@
+# P0-2: Полное сравнение трёх агрегаторов с новой answer-калибровкой
+# Загружает кеш признаков из run 39060670054 и выполняет полное измерение
+name: P0-2 Ответы
+
+on:
+  push:
+    branches:
+      - arena/c5f69767-smarty-chumakov
+    paths:
+      - .github/postprocess-p0-answer.trigger
+  workflow_dispatch:
+
+permissions:
+  actions: read
+  contents: write
+
+jobs:
+  measure-aggregators:
+    name: Измерение агрегаторов
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      
+      - name: Install dependencies
+        working-directory: spanverify-module
+        run: |
+          python -m pip install --upgrade pip
+          pip install -q -r requirements.txt
+          pip install -q "torch~=2.14" --index-url https://download.pytorch.org/whl/cpu
+          pip install -q -r requirements-hf.txt
+      
+      - name: Download cache from source run
+        uses: actions/download-artifact@v4
+        with:
+          pattern: hf-cache-a3-v2-*
+          path: spanverify-module/reports/hf-cache-v2-raw
+          run-id: 39060670054
+          github-token: ${{ github.token }}
+      
+      - name: Merge cache artifacts
+        working-directory: spanverify-module
+        run: |
+          set -euo pipefail
+          echo "=== Исходная структура ==="
+          find reports/hf-cache-v2-raw -type f | head -20
+          echo ""
+          
+          # Создаём целевую директорию
+          mkdir -p reports/hf-cache-v2
+          
+          # Копируем все файлы в одну директорию
+          find reports/hf-cache-v2-raw -type f -name "*.jsonl" -exec cp {} reports/hf-cache-v2/ \;
+          find reports/hf-cache-v2-raw -type f -name "*.json" -exec cp {} reports/hf-cache-v2/ \;
+          
+          echo "=== Результат объединения ==="
+          ls -la reports/hf-cache-v2/
+          echo ""
+          echo "Количество файлов:"
+          echo "  .jsonl: $(find reports/hf-cache-v2 -name "*.jsonl" | wc -l)"
+          echo "  features_*.jsonl: $(find reports/hf-cache-v2 -name "features_*.jsonl" | wc -l)"
+      
+      - name: Download experiment artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: hf-experiment-a3-clause_capped
+          path: spanverify-module/reports/experiments/p0_span/run39060670054/clause_capped
+          run-id: 39060670054
+          github-token: ${{ github.token }}
+      
+      - name: Verify cache and data
+        working-directory: spanverify-module
+        run: |
+          set -euo pipefail
+          echo "=== Структура кеша ==="
+          find reports/hf-cache-v2 -type f | wc -l
+          echo "Файлов features_*.jsonl: $(find reports/hf-cache-v2 -name "features_*.jsonl" | wc -l)"
+          echo ""
+          echo "=== Проверка baseline experiment ==="
+          if [ ! -f reports/experiments/p0_span/run39060670054/clause_capped/experiment.json ]; then
+            echo "❌ experiment.json не найден!"
+            exit 1
+          fi
+          echo "✓ experiment.json найден"
+          echo ""
+          echo "=== Проверка данных ==="
+          echo "Train pairs: $(wc -l < data/corpus_a3/splits/train.jsonl)"
+          echo "Dev pairs: $(wc -l < data/corpus_a3/splits/dev.jsonl)"
+      
+      - name: Run regression tests
+        working-directory: spanverify-module
+        run: |
+          python -m pytest tests/test_calibration_fix.py -v
+          python -m pytest tests/test_oof_protocol.py -v
+      
+      - name: Minimal OOF logic test
+        working-directory: spanverify-module
+        run: |
+          set -euo pipefail
+          echo "=== Запуск минимального теста OOF-логики ==="
+          python -u -X faulthandler scripts/test_oof_minimal.py 2>&1 | tee /tmp/test_oof_minimal.log
+          echo "=== Минимальный тест завершен ==="
+      
+      - name: Measure aggregators (full comparison with OOF)
+        working-directory: spanverify-module
+        run: |
+          set -euo pipefail
+          mkdir -p reports/p0_answer_comparison
+          
+          # Запускаем полное измерение с unbuffered выводом и сохранением логов
+          python -u -X faulthandler scripts/measure_aggregators.py \
+            --dataset data/corpus_a3/pairs.jsonl \
+            --splits data/corpus_a3/splits \
+            --mode hf \
+            --features-cache reports/hf-cache-v2 \
+            --baseline-experiment reports/experiments/p0_span/run39060670054/clause_capped/experiment.json \
+            --out reports/p0_answer_comparison \
+            --cache-source-run-id 39060670054 \
+            --measurement-run-id ${{ github.run_id }} \
+            --measurement-commit ${{ github.sha }} \
+            2>&1 | tee reports/p0_answer_comparison/measurement.log
+          
+          echo ""
+          echo "=== Измерение завершено ==="
+          ls -lh reports/p0_answer_comparison/
+      
+      - name: Upload measurement logs
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: measurement-logs-${{ github.run_id }}
+          path: |
+            spanverify-module/reports/p0_answer_comparison/measurement.log
+          retention-days: 7
+          if-no-files-found: warn
+      
+      - name: Upload results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: p0-answer-comparison-${{ github.run_id }}
+          path: |
+            spanverify-module/reports/p0_answer_comparison/
+          retention-days: 30
+          if-no-files-found: error
+      
+      - name: Save report to branch
+        if: success()
+        run: |
+          set -euo pipefail
+          
+          # Используем measurement run ID для уникального каталога
+          MEASUREMENT_RUN_ID="${{ github.run_id }}"
+          REPORT_DIR="spanverify-module/reports/experiments/p0_answer/run${MEASUREMENT_RUN_ID}"
+          mkdir -p "$REPORT_DIR"
+          
+          # Копируем все файлы результатов
+          cp -r spanverify-module/reports/p0_answer_comparison/* "$REPORT_DIR/"
+          
+          echo "✓ Отчёт сохранён в $REPORT_DIR"
+          echo "  Файлы:"
+          ls -lh "$REPORT_DIR"
+          
+          # Конфигурируем git
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          
+          # Добавляем только отчётную директорию
+          git add "$REPORT_DIR"
+          
+          # Коммитим и пушим с [skip ci]
+          git commit -m "chore: сохранить отчёт P0-2 сравнение агрегаторов из run ${MEASUREMENT_RUN_ID} [skip ci]"
+          
+          # Проверяем ветку перед push
+          CURRENT_BRANCH=$(git branch --show-current)
+          if [ "$CURRENT_BRANCH" != "arena/c5f69767-smarty-chumakov" ]; then
+            echo "❌ Ожидалась ветка arena/c5f69767-smarty-chumakov, получена $CURRENT_BRANCH"
+            exit 1
+          fi
+          
+          # Пушим
+          git push origin arena/c5f69767-smarty-chumakov
+          
+          echo "✓ Отчёт запушен в ветку"

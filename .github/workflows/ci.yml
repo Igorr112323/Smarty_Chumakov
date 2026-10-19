@@ -19,12 +19,13 @@ on:
 # Новый пуш отменяет предыдущий прогон той же ветки. Без этого каждый коммит
 # плодил полный прогон, старые продолжали работать, и очередь не рассасывалась.
 concurrency:
-  group: ci-${{ github.workflow }}-${{ github.ref }}
+  group: ci-p8-acceptance-${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
 # CI ничего не пишет обратно в ветку: коммиты бота были источником
 # rebase-конфликтов и петель. Результаты уходят в артефакты.
 permissions:
+  actions: read
   contents: read
 
 env:
@@ -32,13 +33,40 @@ env:
   PYTHONIOENCODING: "utf-8"
 
 jobs:
+  p8-freeze-barrier:
+    name: P8 no-fit barrier until official177 is sealed
+    runs-on: ubuntu-24.04
+    timeout-minutes: 40
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - name: Wait for authorized official measurement, never execute tests before it
+        run: |
+          for attempt in $(seq 1 450); do
+            runs=$(gh api 'repos/${{ github.repository }}/actions/workflows/p8-final-evaluation.yml/runs?branch=arena%2Fc5f69767-smarty-chumakov&per_page=10' --jq '.workflow_runs[].id')
+            for run in $runs; do
+              state=$(gh api "repos/${{ github.repository }}/actions/runs/$run/jobs?per_page=100" --jq '.jobs[] | select(.name=="official") | .conclusion')
+              if [ "$state" = success ]; then
+                echo "Official177 sealed by run $run; existing CI/tests/fits may now proceed."
+                exit 0
+              fi
+            done
+            sleep 5
+          done
+          echo '::error::No sealed authorized official run; refuse all test fits.'
+          exit 1
   quality:
+    needs: p8-freeze-barrier
     name: Линтер, форматирование, покрытие
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     # В job'е не только линтер, но и прогон с покрытием, воспроизводимость
     # обучения и чистая установка в отдельный venv: 20 минут не хватило
     # (job снимался на 20-й минуте), сорок — с запасом.
     timeout-minutes: 40
+    # Python 3.12 monitoring observes the same full suite without per-line trace overhead.
+    # No exclusions and the coverage gate remains 85%.
+    env:
+      COVERAGE_CORE: sysmon
     defaults:
       run:
         working-directory: spanverify-module
@@ -47,14 +75,14 @@ jobs:
 
       - uses: actions/setup-python@v5
         with:
-          python-version: "3.11"
+          python-version: "3.12"
           cache: pip
           cache-dependency-path: spanverify-module/requirements.txt
 
       - name: Зависимости проверки
         run: |
           python -m pip install --upgrade pip
-          python -m pip install -r requirements.txt
+          python -m pip install -r requirements.txt -r requirements-token-head-tests.txt
 
       - name: Линтер (ruff)
         run: python -m ruff check .
@@ -63,7 +91,7 @@ jobs:
         run: python -m black --check .
 
       - name: Тесты с порогом покрытия 85 %
-        run: python -m pytest --cov=spanverify --cov-report=term --cov-report=json:reports/coverage.json --cov-fail-under=85
+        run: python -m pytest --cov=spanverify --cov-report=term --cov-report=json:reports/coverage.json --cov-fail-under=85 --junitxml=reports/quality-junit.xml
 
       - name: Воспроизводимость обучения (один seed → один результат)
         run: |
@@ -95,7 +123,9 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: coverage-json
-          path: spanverify-module/reports/coverage.json
+          path: |
+            spanverify-module/reports/coverage.json
+            spanverify-module/reports/quality-junit.xml
           if-no-files-found: warn
           retention-days: 30
 
@@ -116,7 +146,7 @@ jobs:
   # кодом или с документами, и это должно быть видно на каждом push.
   contract:
     name: Соответствие договору (проект 117812)
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 40
     # GH_TOKEN нужен проверке поставки: состав и размеры релиза читаются через
     # API GitHub. Без токена эта проверка честно пишет «не измерено», а не падает.
@@ -126,8 +156,8 @@ jobs:
     # тесты с покрытием не запускает (иначе они шли бы дважды). Если job качества
     # упал и артефакта нет, контрактная проверка продолжает работу и пишет по
     # правилу готовности «не измерено» с причиной.
-    needs: quality
-    if: always()
+    needs: [quality, p8-freeze-barrier]
+    if: always() && needs.p8-freeze-barrier.result == 'success'
     steps:
       - uses: actions/checkout@v4
 
@@ -147,7 +177,7 @@ jobs:
       - name: Зависимости
         run: |
           python -m pip install --upgrade pip
-          python -m pip install -r spanverify-module/requirements.txt
+          python -m pip install -r spanverify-module/requirements.txt -r spanverify-module/requirements-token-head-tests.txt
 
       - name: Контрактные тесты
         working-directory: spanverify-module
@@ -163,7 +193,7 @@ jobs:
 
       - name: Сверка чисел в документах с реестром
         working-directory: spanverify-module
-        run: python scripts/check_numbers.py --metrics reports/METRICS.json --numbers ../reports/NUMBERS.json
+        run: python scripts/check_numbers.py --metrics reports/CURRENT_METRICS.json --numbers ../reports/NUMBERS.json
 
       - name: Артефакты контрактной проверки
         if: always()
@@ -178,6 +208,7 @@ jobs:
           retention-days: 90
 
   tests:
+    needs: p8-freeze-barrier
     name: Тесты (Python ${{ matrix.python }}, ${{ matrix.os }})
     runs-on: ${{ matrix.os }}
     timeout-minutes: 30
@@ -186,7 +217,7 @@ jobs:
       matrix:
         # На каждый push — две контрольные комбинации. Полная матрица
         # (3 версии Python x 2 системы) идёт по расписанию и при ручном запуске.
-        include: ${{ github.event_name == 'push' && fromJSON('[{"os":"ubuntu-latest","python":"3.11"},{"os":"windows-latest","python":"3.12"}]') || fromJSON('[{"os":"ubuntu-latest","python":"3.10"},{"os":"ubuntu-latest","python":"3.11"},{"os":"ubuntu-latest","python":"3.12"},{"os":"windows-latest","python":"3.10"},{"os":"windows-latest","python":"3.11"},{"os":"windows-latest","python":"3.12"}]') }}
+        include: ${{ github.event_name == 'push' && fromJSON('[{"os":"ubuntu-24.04","python":"3.11"},{"os":"windows-latest","python":"3.12"}]') || fromJSON('[{"os":"ubuntu-24.04","python":"3.10"},{"os":"ubuntu-24.04","python":"3.11"},{"os":"ubuntu-24.04","python":"3.12"},{"os":"windows-latest","python":"3.10"},{"os":"windows-latest","python":"3.11"},{"os":"windows-latest","python":"3.12"}]') }}
     defaults:
       run:
         working-directory: spanverify-module
@@ -202,10 +233,10 @@ jobs:
       - name: Зависимости тестов
         run: |
           python -m pip install --upgrade pip
-          python -m pip install pytest "pyyaml~=6.0"
+          python -m pip install pytest "pyyaml~=6.0" -r requirements-token-head-tests.txt
 
       - name: Тесты
-        run: python -m pytest -q
+        run: python -m pytest -q --junitxml=reports/tests-junit.xml
 
       - name: Само-проверка конвейера
         run: python -m spanverify selftest
@@ -237,14 +268,21 @@ jobs:
             if ($proc -and -not $proc.HasExited) { Stop-Process -Id $proc.Id -Force }
           }
 
+      - name: Full matrix JUnit, including failures
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-junit-${{ matrix.os }}-${{ matrix.python }}
+          path: spanverify-module/reports/tests-junit.xml
+
   pilot:
     name: Пилот на реальной модели (rugpt3small, CPU)
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     # Качает веса модели и считает на CPU — 22-32 минуты. На каждый push
     # это незачем: только вручную или по ночному расписанию.
     if: github.event_name == 'workflow_dispatch' || github.event_name == 'schedule'
     timeout-minutes: 40
-    needs: quality
+    needs: [quality, p8-freeze-barrier]
     defaults:
       run:
         working-directory: spanverify-module
@@ -327,9 +365,9 @@ jobs:
 
   metrics:
     name: Единый файл чисел (METRICS.json) и сверка документов
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 30
-    needs: [quality, pilot, external]
+    needs: [quality, pilot, external, p8-freeze-barrier]
     # На пуш job'ы pilot и external пропускаются (они работают по расписанию и
     # вручную), а пропущенный needs по умолчанию пропускает и зависимый job.
     # Из-за этого сверка чисел выполнялась раз в сутки и её падение не
@@ -356,7 +394,7 @@ jobs:
       - name: Зависимости
         run: |
           python -m pip install --upgrade pip
-          python -m pip install -r requirements.txt
+          python -m pip install -r requirements.txt -r requirements-token-head-tests.txt
 
       - name: Скачать отчёт покрытия
         uses: actions/download-artifact@v4
@@ -386,13 +424,23 @@ jobs:
         run: python scripts/cross_corpus.py --out reports/cross_corpus.json
 
       - name: Собрать единый файл чисел
-        run: python scripts/collect_metrics.py --out reports/METRICS.json --coverage-json reports/coverage.json
+        run: python scripts/collect_metrics.py --out reports/CURRENT_METRICS.json --coverage-json reports/coverage.json
 
       - name: Ключевые числа в аннотации (чтобы их можно было прочитать без скачивания)
-        run: python scripts/print_metrics_annotation.py --metrics reports/METRICS.json
+        run: python scripts/print_metrics_annotation.py --metrics reports/CURRENT_METRICS.json
 
       - name: Сверить числа в документах с METRICS.json
-        run: python scripts/check_numbers.py --metrics reports/METRICS.json
+        run: |
+          python - <<'PYCODE'
+          import subprocess, sys
+          result = subprocess.run([sys.executable, "scripts/check_numbers.py", "--metrics", "reports/CURRENT_METRICS.json"], capture_output=True, text=True)
+          print(result.stdout)
+          print(result.stderr, file=sys.stderr)
+          if result.returncode:
+              for line in result.stdout.splitlines():
+                  print("::error title=Document numbers::" + line.replace("%", "%25").replace("\r", "%0D"))
+          raise SystemExit(result.returncode)
+          PYCODE
 
       - name: Артефакт чисел
         if: always()
@@ -400,19 +448,19 @@ jobs:
         with:
           name: metrics
           path: |
-            spanverify-module/reports/METRICS.json
+            spanverify-module/reports/CURRENT_METRICS.json
             spanverify-module/reports/cross_corpus.json
             spanverify-module/reports/CORPUS_REPORT.md
           retention-days: 90
 
   external:
     name: Внешние размеченные наборы (скачивание, контрольные числа, оценка)
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     # Скачивание внешних наборов занимает десятки минут: только вручную
     # или по ночному расписанию.
     if: github.event_name == 'workflow_dispatch' || github.event_name == 'schedule'
     timeout-minutes: 40
-    needs: quality
+    needs: [quality, p8-freeze-barrier]
     defaults:
       run:
         working-directory: spanverify-module
@@ -482,8 +530,9 @@ jobs:
   # пары, манифест, отчёт) коммитится в main — иначе его не увидеть из окружения
   # разработки, а проверяющему нужны сами документы для выборочной сверки.
   probe-sources:
+    needs: p8-freeze-barrier
     name: Разведка официальных источников (не блокирует CI)
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 40
     # Отключено по той же причине, что и corpus-a3: акты загружены вручную,
     # разведка доступности источников больше не нужна, а job без таймаута
@@ -591,3 +640,25 @@ jobs:
             spanverify-module/reports/ips_list_probe.json
             spanverify-module/reports/ips_final_probe.json
           retention-days: 30
+
+  final-verification:
+    name: Final CI read-only P8 seal
+    needs: [p8-freeze-barrier, quality, tests, contract, metrics]
+    # Override GitHub's transitive skip from optional pilot/external ancestors.
+    # Every required direct dependency MUST still be successful; no bypass.
+    if: ${{ !cancelled() && needs.p8-freeze-barrier.result == 'success' && needs.quality.result == 'success' && needs.tests.result == 'success' && needs.contract.result == 'success' && needs.metrics.result == 'success' }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Verify existing hashes, stable assets, gate and staged cleanliness, NO scoring
+        run: python scripts/p8_verify_closure.py
+      - uses: actions/upload-artifact@v4
+        with:
+          name: p8-final-head-verification
+          path: reports/p8/VERIFICATION.json
+          retention-days: 90

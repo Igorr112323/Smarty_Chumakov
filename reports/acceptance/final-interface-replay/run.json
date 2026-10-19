@@ -1,0 +1,255 @@
+{
+  "conclusion": "success",
+  "headSha": "14a018a1b90b51cc47cd8baf628147ac22e1d8b1",
+  "jobs": [
+    {
+      "completedAt": "2026-10-19T01:15:52Z",
+      "conclusion": "success",
+      "databaseId": 117843764907,
+      "name": "product (demo)",
+      "startedAt": "2026-10-19T01:14:24Z",
+      "status": "completed",
+      "steps": [
+        {
+          "conclusion": "success",
+          "name": "Set up job",
+          "number": 1,
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Run actions/checkout@v4",
+          "number": 2,
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Run actions/setup-python@v5",
+          "number": 3,
+          "status": "completed"
+        },
+        {
+          "conclusion": "skipped",
+          "name": "Product HF dependencies, not experimental inference",
+          "number": 4,
+          "status": "completed"
+        },
+        {
+          "conclusion": "skipped",
+          "name": "Download weights by one public product request (separately timed, no benchmark credit)",
+          "number": 5,
+          "status": "completed"
+        },
+        {
+          "conclusion": "skipped",
+          "name": "Three cold and warm repeats, both input roles, profiles, 2M UTF-8 evidence",
+          "number": 6,
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Real CLI, local web 8765, HTTP requests and responses",
+          "number": 7,
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Known train-only synthetic mixtures, no calibration",
+          "number": 8,
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Run actions/upload-artifact@v4",
+          "number": 9,
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Post Run actions/setup-python@v5",
+          "number": 17,
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Post Run actions/checkout@v4",
+          "number": 18,
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Complete job",
+          "number": 19,
+          "status": "completed"
+        }
+      ],
+      "url": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39184437524/job/117843764907"
+    },
+    {
+      "completedAt": "2026-10-19T01:15:52Z",
+      "conclusion": "success",
+      "databaseId": 117843765072,
+      "name": "product (hf)",
+      "startedAt": "2026-10-19T01:14:25Z",
+      "status": "completed",
+      "steps": [
+        {
+          "conclusion": "success",
+          "name": "Set up job",
+          "number": 1,
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Run actions/checkout@v4",
+          "number": 2,
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Run actions/setup-python@v5",
+          "number": 3,
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Product HF dependencies, not experimental inference",
+          "number": 4,
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Download weights by one public product request (separately timed, no benchmark credit)",
+          "number": 5,
+          "status": "completed"
+        },
+        {
+          "conclusion": "skipped",
+          "name": "Three cold and warm repeats, both input roles, profiles, 2M UTF-8 evidence",
+          "number": 6,
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Real CLI, local web 8765, HTTP requests and responses",
+          "number": 7,
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Known train-only synthetic mixtures, no calibration",
+          "number": 8,
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Run actions/upload-artifact@v4",
+          "number": 9,
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Post Run actions/setup-python@v5",
+          "number": 17,
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Post Run actions/checkout@v4",
+          "number": 18,
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Complete job",
+          "number": 19,
+          "status": "completed"
+        }
+      ],
+      "url": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39184437524/job/117843765072"
+    },
+    {
+      "completedAt": "2026-10-19T01:15:52Z",
+      "conclusion": "success",
+      "databaseId": 117843765134,
+      "name": "parity",
+      "startedAt": "2026-10-19T01:14:25Z",
+      "status": "completed",
+      "steps": [
+        {
+          "conclusion": "success",
+          "name": "Set up job",
+          "number": 1,
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Run actions/checkout@v4",
+          "number": 2,
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Run actions/setup-python@v5",
+          "number": 3,
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Run pip install -r spanverify-module/requirements-token-head-tests.txt",
+          "number": 4,
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Run actions/download-artifact@v4",
+          "number": 5,
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Actual frozen public dev replay; zero drift required, no fitting",
+          "number": 6,
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Run actions/upload-artifact@v4",
+          "number": 7,
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Post Run actions/setup-python@v5",
+          "number": 13,
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Post Run actions/checkout@v4",
+          "number": 14,
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Complete job",
+          "number": 15,
+          "status": "completed"
+        }
+      ],
+      "url": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39184437524/job/117843765134"
+    },
+    {
+      "completedAt": "2026-10-19T01:15:52Z",
+      "conclusion": "skipped",
+      "databaseId": 117844117812,
+      "name": "publish-evidence",
+      "startedAt": "2026-10-19T01:15:52Z",
+      "status": "completed",
+      "steps": [],
+      "url": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39184437524/job/117844117812"
+    }
+  ],
+  "status": "completed",
+  "url": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39184437524"
+}

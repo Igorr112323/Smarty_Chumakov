@@ -1,0 +1,130 @@
+name: P1 Public Replay
+on:
+  push:
+    branches:
+      - arena/c5f69767-smarty-chumakov
+    paths:
+      - .github/workflows/p1-public-replay.yml
+      - spanverify-module/scripts/build_p1_candidate.py
+      - spanverify-module/scripts/replay_p1_dev.py
+      - spanverify-module/tests/test_p1_replay_contract.py
+  workflow_dispatch:
+
+permissions:
+  actions: read
+  contents: write
+
+jobs:
+  replay:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install ordinary project dependencies
+        working-directory: spanverify-module
+        run: python -m pip install -q -r requirements.txt
+
+      - name: Fast builder, loader and entrypoint regression tests
+        working-directory: spanverify-module
+        run: |
+          set -euo pipefail
+          OUT="reports/p1_replay/run${GITHUB_RUN_ID}"
+          mkdir -p "$OUT"
+          python -m pytest tests/test_p1_replay_contract.py tests/test_p1_integration.py tests/test_answer_head.py -q \
+            2>&1 | tee "$OUT/tests.log"
+
+      - name: Download compatible cached HF features
+        uses: actions/download-artifact@v4
+        with:
+          pattern: hf-cache-a3-v2-*
+          merge-multiple: false
+          path: spanverify-module/reports/hf-cache-v2-raw
+          run-id: 39060670054
+          github-token: ${{ github.token }}
+
+      - name: Normalize cache files and verify source dataset
+        working-directory: spanverify-module
+        run: |
+          set -euo pipefail
+          mkdir -p reports/hf-cache-v2
+          mapfile -d '' files < <(find reports/hf-cache-v2-raw -type f -name 'features_*.jsonl' -print0)
+          test "${#files[@]}" -eq 8
+          for file in "${files[@]}"; do
+            target="reports/hf-cache-v2/$(basename "$file")"
+            if [ -f "$target" ]; then cmp "$file" "$target"; else cp "$file" "$target"; fi
+          done
+          test "$(find reports/hf-cache-v2 -maxdepth 1 -name 'features_*.jsonl' | wc -l)" -eq 8
+          test -s data/corpus_a3/splits/dev.jsonl
+          wc -l data/corpus_a3/splits/dev.jsonl
+
+      - name: Build the frozen candidate with public calibration schema
+        id: build
+        working-directory: spanverify-module
+        run: |
+          set -euo pipefail
+          OUT="reports/p1_replay/run${GITHUB_RUN_ID}"
+          mkdir -p "$OUT"
+          python -u scripts/build_p1_candidate.py \
+            reports/experiments/p1_raw/run39116955685 --output-dir "$OUT" \
+            2>&1 | tee "$OUT/build.log"
+
+      - name: Public dev replay and lossless save-load parity
+        id: replay
+        working-directory: spanverify-module
+        run: |
+          set -euo pipefail
+          OUT="reports/p1_replay/run${GITHUB_RUN_ID}"
+          python -u -X faulthandler scripts/replay_p1_dev.py \
+            reports/experiments/p1_raw/run39116955685 reports/hf-cache-v2 \
+            --candidate "$OUT/p1_candidate_bundle.json" \
+            --runtime-config "$OUT/runtime_config.json" \
+            --dev "$PWD/data/corpus_a3/splits/dev.jsonl" --output-dir "$OUT" \
+            2>&1 | tee "$OUT/replay.log"
+
+      - name: Upload replay outputs even on failure
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: p1-public-replay-${{ github.run_id }}
+          path: spanverify-module/reports/p1_replay/run${{ github.run_id }}/
+          retention-days: 30
+          if-no-files-found: warn
+
+      - name: Publish measured outputs or failure logs without force push
+        if: always()
+        env:
+          BUILD_OUTCOME: ${{ steps.build.outcome || 'not_started' }}
+          REPLAY_OUTCOME: ${{ steps.replay.outcome || 'not_started' }}
+        run: |
+          set -euo pipefail
+          OUT="spanverify-module/reports/p1_replay/run${GITHUB_RUN_ID}"
+          mkdir -p "$OUT"
+          printf '{"run_id":"%s","code_sha":"%s","build":"%s","replay":"%s"}\n' \
+            "$GITHUB_RUN_ID" "$GITHUB_SHA" "$BUILD_OUTCOME" "$REPLAY_OUTCOME" > "$OUT/workflow_status.json"
+          BRANCH="arena/c5f69767-smarty-chumakov"
+          git fetch --no-tags origin "$BRANCH"
+          PUB="$RUNNER_TEMP/p1-replay-publish-${GITHUB_RUN_ID}"
+          git worktree add --detach "$PUB" FETCH_HEAD
+          DEST="spanverify-module/reports/experiments/p1_public_replay/run${GITHUB_RUN_ID}"
+          mkdir -p "$PUB/$DEST"
+          cp -R "$OUT/." "$PUB/$DEST/"
+          git -C "$PUB" config user.name "github-actions[bot]"
+          git -C "$PUB" config user.email "github-actions[bot]@users.noreply.github.com"
+          git -C "$PUB" add -f -- "$DEST"
+          if ! git -C "$PUB" diff --cached --quiet; then
+            git -C "$PUB" commit -m "reports: P1 public replay run ${GITHUB_RUN_ID} (${REPLAY_OUTCOME}) [skip ci]"
+            pushed=0
+            for attempt in 1 2 3; do
+              if git -C "$PUB" push origin "HEAD:refs/heads/${BRANCH}"; then pushed=1; break; fi
+              git -C "$PUB" fetch --no-tags origin "$BRANCH"
+              if ! git -C "$PUB" rebase FETCH_HEAD; then git -C "$PUB" rebase --abort; exit 1; fi
+            done
+            test "$pushed" -eq 1
+          fi
+          SHA="$(git -C "$PUB" rev-parse HEAD)"
+          echo "Replay outcome: $REPLAY_OUTCOME" >> "$GITHUB_STEP_SUMMARY"
+          echo "Outputs: https://github.com/${GITHUB_REPOSITORY}/tree/${SHA}/${DEST}" >> "$GITHUB_STEP_SUMMARY"
+          echo "REPORT_COMMIT=$SHA"

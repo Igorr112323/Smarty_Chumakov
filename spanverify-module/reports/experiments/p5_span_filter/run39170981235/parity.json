@@ -1,0 +1,16 @@
+{
+  "p1": {
+    "matched": true,
+    "mismatches": [],
+    "max_abs_delta": {
+      "raw_score": 0.0,
+      "calibrated_score": 0.0,
+      "threshold": 0.0
+    },
+    "pairs": 181
+  },
+  "reload_and_pure_mismatches": [],
+  "p4_risk_max_delta": 0.0,
+  "full_token_risks": 13150,
+  "frozen_fields_unchanged": true
+}
