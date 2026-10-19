@@ -62,7 +62,7 @@ jobs:
           path: reports/p7/hf-contract/
           retention-days: 90
   benchmark:
-    needs: [parity, hf-contract]
+    needs: [parity]
     runs-on: ubuntu-24.04
     timeout-minutes: 40
     strategy:
@@ -97,7 +97,7 @@ jobs:
           path: reports/p7/
           retention-days: 90
   calibration:
-    needs: [parity, hf-contract]
+    needs: [parity]
     runs-on: ubuntu-24.04
     timeout-minutes: 40
     strategy:
@@ -127,7 +127,7 @@ jobs:
           path: reports/p7/calibration-${{ matrix.mode }}/
           retention-days: 90
   full-hf-input:
-    needs: [parity, hf-contract]
+    needs: [parity]
     runs-on: ubuntu-24.04
     timeout-minutes: 40
     env:
@@ -136,6 +136,8 @@ jobs:
       OPENBLAS_NUM_THREADS: '2'
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - uses: actions/setup-python@v5
         with:
           python-version: '3.11'

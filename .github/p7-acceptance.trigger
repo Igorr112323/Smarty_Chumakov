@@ -13,3 +13,4 @@ P7 actual legacy combined-token audit and complete acceptance; Windows error bod
 P7 exact interval lookup, full2M public golden, native repeat acceptance
 P7 preserve existing40min guard; final full-input and native gates
 P7 current inventory888 across all documentation, no scientific changes
+parallel independent measurements; historical full-HF comparison requires full history

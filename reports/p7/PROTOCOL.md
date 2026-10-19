@@ -88,3 +88,10 @@ workflow guard. It is reverted to40, not granted an exception or test skip.
 All prior completed fresh HF replay jobs fit40min. The additional paired
 workflow adds5existing parametrized infrastructure tests: current collection888,
 not883. No original test was deleted, relaxed, or newly skipped.
+
+The7262 full-HF job failed before producing an artifact: its historical
+`git show 1c3aa13:...` comparison was combined with default shallow checkout.
+Full-HF checkout now fetches history. Independent benchmark/calibration/full2M
+jobs depend on cached parity, not serial fresh-HF audit; the final archive still
+requires EVERY job, including fresh HF audit. No check is removed or weakened.
+The fresh HF7262 audit completed09:31:41→10:02:19UTC (30m38s), within40min.
