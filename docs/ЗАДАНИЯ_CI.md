@@ -5,7 +5,7 @@
 (что оно делало в последний раз). Числа и номера прогонов не вписаны
 руками: их источник — реестр прогонов.
 
-Команда: `python scripts/collect_ci_workflows.py` (запуск: 2026-10-19T16:40:20Z).
+Команда: `python scripts/collect_ci_workflows.py` (запуск: 2026-10-19T17:00:36Z).
 
 | Задание | Запуск | Последний прогон | Артефакты | Числа в реестре |
 | --- | --- | --- | --- | --- |
@@ -32,7 +32,7 @@
 | `P7 paired same-host benchmark` | на пуш; пуш `.github/p7-paired.trigger`; ветки `arena/c5f69767-smarty-chumakov` | прогонов нет | да | — |
 | `P7 final acceptance artifact publication` | на пуш; пуш `.github/p7-publication.trigger`, `.github/p8-publication.trigger`; ветки `arena/c5f69767-smarty-chumakov` | прогонов нет | да | — |
 | `P8 single official test and external validation` | вручную, на пуш; пуш `.github/p8-evaluation.trigger`; ветки `arena/c5f69767-smarty-chumakov` | прогонов нет | да | — |
-| `P8 evidence receipts only, no inference` | на пуш; пуш `.github/p8-receipts.trigger`; ветки `arena/c5f69767-smarty-chumakov` | прогонов нет | нет | — |
+| `P8 evidence receipts only, no inference` | на пуш; пуш `.github/p8-receipts.trigger`; ветки `arena/c5f69767-smarty-chumakov` | прогонов нет | да | — |
 | `P0-3 P1 Answer Head` | на пуш, вручную; пуш `spanverify-module/spanverify/answer_head.py`, `spanverify-module/spanverify/oof.py`, `spanverify-module/scripts/measure_p1.py`, `spanverify-module/tests/test_answer_head.py`, `.github/workflows/postprocess-p0-answer-p1.yml`; ветки `arena/c5f69767-smarty-chumakov` | прогонов нет | да | — |
 | `P0-2 Ответы` | на пуш, вручную; пуш `.github/postprocess-p0-answer.trigger`; ветки `arena/c5f69767-smarty-chumakov` | прогонов нет | да | — |
 | `Постобработка span_expansion` | на пуш, вручную; пуш `.github/postprocess-span-comparison.trigger`; ветки `arena/c5f69767-smarty-chumakov` | прогонов нет | да | — |

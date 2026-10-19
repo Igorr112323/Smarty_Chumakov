@@ -93,7 +93,7 @@ def main():
     assert branch["object"]["sha"] == os.environ["GITHUB_SHA"], "Superseded publication source; refuse publishing"
     assets = [str(binaries / name) for name in ("spanverify.exe", "spanverify-win.zip", "spanverify.pyz", "frozen-p5.json", "p5-runtime.json", "SHA256SUMS.txt")]
     # Real argv list, not PowerShell scalar-string splatting. No rebuild/re-inference.
-    subprocess.run(["gh", "release", "create", meta["release_tag"], *assets, "--repo", REPO, "--target", meta["runs"]["windows"]["headSha"], "--title", "SpanVerify 1.3.1 — P8 final evaluation", "--notes-file", str(ROOT / "reports/p8/RELEASE_NOTES.md"), *(["--latest=true"] if meta["stable_promotion"] else ["--prerelease", "--latest=false"])], check=True)
+    subprocess.run(["gh", "release", "create", meta["release_tag"], *assets, "--repo", REPO, "--target", meta["documentation_source"], "--title", "SpanVerify 1.3.1 — P8 final evaluation", "--notes-file", str(ROOT / "reports/p8/RELEASE_NOTES.md"), *(["--latest=true"] if meta["stable_promotion"] else ["--prerelease", "--latest=false"])], check=True, capture_output=True, text=True)
     out = ROOT / ".arena/p8-publication/p8-final-acceptance.zip"
     out.parent.mkdir(parents=True, exist_ok=True)
     checks = {}
@@ -112,13 +112,15 @@ def main():
     digest = hashlib.sha256(out.read_bytes()).hexdigest()
     sha = out.with_suffix(".zip.sha256")
     sha.write_text(f"{digest}  {out.name}\n")
-    subprocess.run(["gh", "release", "upload", meta["release_tag"], str(out), str(sha)], check=True)
+    subprocess.run(["gh", "release", "upload", meta["release_tag"], str(out), str(sha)], check=True, capture_output=True, text=True)
     print("::notice title=P8 final archive::" + json.dumps(dict(meta, sha256=digest, bytes=out.stat().st_size)))
 
 
 if __name__ == "__main__":
     try:
         main()
-    except BaseException:
+    except BaseException as exc:
+        if isinstance(exc, subprocess.CalledProcessError):
+            print("::error title=P8 command stderr::" + ((exc.stderr or "") + (exc.stdout or "")).replace("%", "%25").replace("\n", "%0A").replace("\r", "%0D"))
         print("::error title=P8 publication infrastructure::" + traceback.format_exc().replace("\n", "%0A"))
         raise

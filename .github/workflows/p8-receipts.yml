@@ -41,3 +41,17 @@ jobs:
           cat windows-log-error.txt
           python -c "from pathlib import Path; print('::notice title=P8 log retrieval status::'+Path('windows-log-error.txt').read_text().replace('\n',' / '))"
           python -c "import base64,gzip; from pathlib import Path; s=base64.b64encode(gzip.compress((Path('windows-log.txt').read_bytes()[-18000:]+Path('windows-log-error.txt').read_bytes()))).decode(); [print('::notice title=P8 Windows log '+str(i//3000)+'::'+s[i:i+3000]) for i in range(0,len(s),3000)]"
+  rc-publication-logs:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - name: Preserve RC publication failure stderr, NO inference
+        run: |
+          gh api --allow-escape-sequences repos/${{ github.repository }}/actions/jobs/118178153552/logs > rc-log.txt
+          python -c "import base64,gzip; from pathlib import Path; s=base64.b64encode(gzip.compress(Path('rc-log.txt').read_bytes()[-24000:])).decode(); [print('::notice title=P8 RC log '+str(i//3000)+'::'+s[i:i+3000]) for i in range(0,len(s),3000)]"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: p8-rc-publication-failure-log
+          path: rc-log.txt

@@ -1,7 +1,7 @@
 {
   "kind": "ci_workflows",
   "runs_considered": 100,
-  "generated_at": "2026-10-19T16:40:20Z",
+  "generated_at": "2026-10-19T17:00:36Z",
   "command": "python scripts/collect_ci_workflows.py",
   "source": ".github/workflows/*.yml + reports/CI_RUNS.json",
   "registry": {
@@ -884,6 +884,13 @@
           "timeout_minutes": 5,
           "steps": 1,
           "uploads_artifacts": false,
+          "runs_python": "ubuntu-24.04"
+        },
+        {
+          "name": "rc-publication-logs",
+          "timeout_minutes": 5,
+          "steps": 2,
+          "uploads_artifacts": true,
           "runs_python": "ubuntu-24.04"
         }
       ],
