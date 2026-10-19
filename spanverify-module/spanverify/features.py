@@ -1229,9 +1229,20 @@ def hf_features(
             "Проверьте доступ к весам или укажите другую модель."
         ) from exc
 
-    # P7 automatic full-answer dispatch is rejected: tokenizer audit found
-    # 22 train / 3 dev answers >512, contrary to the preregistered assumption.
-    # Preserve the frozen public feature contract until explicit authorization.
+    if not _windowed:
+        answer_ids = tokenizer(answer, add_special_tokens=False)["input_ids"]
+        if len(answer_ids) > max_length:
+            from .hf_windows import full_answer_features
+
+            return full_answer_features(
+                answer,
+                context_text,
+                tokens,
+                tokenizer,
+                (tokenizer, model),
+                hf_features,
+                dict(model_name=model_name, k=k, device=device, max_length=max_length, layer=layer),
+            )
     encoded = tokenizer(prompt, return_tensors="pt", truncation=not _windowed, max_length=max_length)
     if _windowed and encoded["input_ids"].shape[-1] > max_length:
         raise BackendUnavailable("HF internal window exceeds model limit; no truncation allowed")
@@ -1550,6 +1561,7 @@ def hf_features_chunked(
         if not all(m.meta.get("all_answer_tokens_mapped") for m in chunk_matrices):
             raise ValueError("Incomplete HF answer coverage; refusing mixed/truncated matrices")
         merged.meta.update(
+            answer_feature_contract="window512_full_answer_v1",
             full_answer=True,
             all_answer_tokens_mapped=True,
             scored_answer_tokens=n_tokens,
@@ -1613,6 +1625,12 @@ def _dense_cosine_scores_exact(vector, others, norm, other_norms):
     """Vectorized products, sequential float64 accumulation (NOT BLAS/tree sum)."""
     if len(others) == 0:
         return []
+    import sys
+
+    # Python 3.12 changed builtin sum to compensated summation. Its frozen
+    # arithmetic is NOT numpy's sequential cumsum: preserve that reference.
+    if sys.version_info >= (3, 12):
+        return [_cosine_dense_normed(vector, other, norm, n) for other, n in zip(others, other_norms, strict=True)]
     try:
         import numpy as np
     except ImportError:

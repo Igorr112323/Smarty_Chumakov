@@ -90,6 +90,7 @@ def full_answer_features(answer, context, tokens, tokenizer, runtime, scorer, op
     return FeatureMatrix(
         **{name: [v / w for v, w in zip(values, weights, strict=True)] for name, values in sums.items()},
         meta=dict(
+            answer_feature_contract="window512_full_answer_v1",
             backend="hf",
             model=options["model_name"],
             full_answer=True,
