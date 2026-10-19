@@ -8,3 +8,4 @@ P6 server-only assets: externalize unused demonstration corpora; preserve config
 P6 final measured receipts publication; runtime unchanged
 P7 external HF offline autonomy RC
 P7 external HF layout, corrected generic schema bounds
+P7 offline HF generic span bounds

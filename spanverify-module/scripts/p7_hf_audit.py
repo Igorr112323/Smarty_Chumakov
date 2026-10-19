@@ -10,7 +10,7 @@ import types
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from p6_acceptance import MODEL, ROOT, environment, read_pairs, save
+from p6_acceptance import MODEL, P5, ROOT, environment, read_pairs, save
 
 from spanverify import features
 
@@ -34,14 +34,12 @@ def main(out):
         dict(
             splits=audit,
             official_test_read=False,
-            blocked="Saved OOF/dev contain long answers; full-answer semantics need explicit authorization",
+            long_contract="window512_full_answer_v1; user authorized >512 only",
             environment=environment(),
         ),
     )
     print("::notice title=P7 truncation audit::" + json.dumps(audit))
-    assert (
-        audit["train"]["answer_over_512"] == 0 and audit["dev"]["answer_over_512"] == 0
-    ), "Long-answer change would affect saved OOF/dev states; reject it"
+    assert audit["train"]["answer_over_512"] == 22 and audit["dev"]["answer_over_512"] == 3
     source = subprocess.check_output(["git", "show", "14a018a:spanverify-module/spanverify/features.py"], text=True)
     old = types.ModuleType("spanverify._p7_legacy_features")
     old.__package__ = "spanverify"
@@ -64,6 +62,99 @@ def main(out):
             environment=environment(),
         ),
     )
+    import hashlib
+    import os
+    from unittest.mock import patch
+
+    from p6_acceptance import verifier
+
+    if os.getenv("P7_FULL_DEV_REPLAY") == "1":
+        short, changed = [], []
+        reference = {r["pair_id"]: r for r in json.loads((P5 / "dev_answers.json").read_text())}
+        legacy, current = verifier("hf"), verifier("hf")
+        legacy._features = lambda answer, context, tokens: old.hf_features_chunked(
+            answer, context, model_name=MODEL, answer_tokens=tokens, max_length=512
+        )
+        for split in ("dev", "train"):
+            for pair in read_pairs(ROOT / f"data/corpus_a3/splits/{split}.jsonl"):
+                length = len(tokenizer(pair["answer"], add_special_tokens=False)["input_ids"])
+                if split == "train" and length <= 512:
+                    continue
+                # Reuse the identical eval weights in the baseline replay only;
+                # this is not a timing trial and does not alter its arithmetic.
+                with (
+                    patch("transformers.AutoTokenizer.from_pretrained", return_value=tokenizer),
+                    patch("transformers.AutoModelForCausalLM.from_pretrained", return_value=_model),
+                ):
+                    if split == "dev":
+                        before = legacy.verify(pair["answer"], pair["context"], with_tokens=True).to_dict(
+                            with_tokens=True
+                        )
+                        after = current.verify(pair["answer"], pair["context"], with_tokens=True).to_dict(
+                            with_tokens=True
+                        )
+                        before.pop("latency_ms", None)
+                        after.pop("latency_ms", None)
+                        a = json.dumps(before, ensure_ascii=False, sort_keys=True, separators=(",", ":")).encode()
+                        b = json.dumps(after, ensure_ascii=False, sort_keys=True, separators=(",", ":")).encode()
+                        if length <= 512:
+                            assert a == b, pair["id"]
+                            short.append(dict(id=pair["id"], sha256=hashlib.sha256(a).hexdigest(), equal=True))
+                        else:
+                            changed.append(
+                                dict(
+                                    split=split,
+                                    id=pair["id"],
+                                    model_tokens=length,
+                                    before_sha256=hashlib.sha256(a).hexdigest(),
+                                    after_sha256=hashlib.sha256(b).hexdigest(),
+                                    legacy_score=before["score"],
+                                    new_score=after["score"],
+                                    saved_P5_score=reference[pair["id"]]["calibrated_score"],
+                                    changed_token_records=sum(
+                                        x != y for x, y in zip(before["tokens"], after["tokens"], strict=True)
+                                    ),
+                                )
+                            )
+                    else:
+                        before = old.hf_features_chunked(pair["answer"], pair["context"], model_name=MODEL)
+                        after = features.hf_features_chunked(pair["answer"], pair["context"], model_name=MODEL)
+                        deltas = {
+                            name: max(
+                                (abs(a - b) for a, b in zip(getattr(before, name), getattr(after, name), strict=True)),
+                                default=0.0,
+                            )
+                            for name in features.FEATURE_NAMES
+                        }
+                        changed.append(dict(split=split, id=pair["id"], model_tokens=length, max_feature_deltas=deltas))
+                save(
+                    out / "fresh-feature-contract.json",
+                    dict(
+                        short_dev=short,
+                        authorized_long_rows=changed,
+                        contract="window512_full_answer_v1",
+                        historical_metrics_overwritten=False,
+                        quality_fitting=False,
+                    ),
+                )
+        assert (
+            len(short) == 178
+            and sum(r["split"] == "dev" for r in changed) == 3
+            and sum(r["split"] == "train" for r in changed) == 22
+        )
+        print(
+            "::notice title=P7 fresh contract::"
+            + json.dumps(
+                dict(
+                    short_dev_pairs=len(short),
+                    short_byte_mismatches=0,
+                    changed_dev_long_rows=3,
+                    train_long_feature_rows=22,
+                    contract="window512_full_answer_v1",
+                )
+            )
+        )
+
     # Actual >512 model positions: every native token must map, no surrogate fallback.
     text = "Срок хранения первичных документов десять лет. " * 120
     matrix = features.hf_features(text, "", model_name=MODEL)

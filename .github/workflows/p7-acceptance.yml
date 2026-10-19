@@ -41,6 +41,7 @@ jobs:
       OMP_NUM_THREADS: '2'
       MKL_NUM_THREADS: '2'
       OPENBLAS_NUM_THREADS: '2'
+      P7_FULL_DEV_REPLAY: '1'
     steps:
       - uses: actions/checkout@v4
         with:

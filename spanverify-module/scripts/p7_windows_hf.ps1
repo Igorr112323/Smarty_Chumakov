@@ -75,13 +75,14 @@ try {
         Start-Sleep -Seconds 1
       }
       if (-not $ready) { throw "$kind did not start" }
+      $answerText = 'Срок хранения первичных документов составляет десять лет.'
       $body = @{answer='Срок хранения первичных документов составляет десять лет.';context='Регламент: первичные документы хранятся пять лет, вторичные документы — десять лет.';with_tokens=$true} | ConvertTo-Json -Compress
       $body | Set-Content -Encoding utf8 (Join-Path $out "$kind-request.json")
       $response = Invoke-RestMethod "http://127.0.0.1:$port/v1/verify" -Method Post -Body ([Text.Encoding]::UTF8.GetBytes($body)) -ContentType 'application/json; charset=utf-8' -TimeoutSec 120
       if ($response.mode -ne 'hf' -or $response.stats.features.backend -ne 'hf') { throw 'HF surrogate fallback forbidden' }
       if ($response.spans.Count -eq 0) { throw 'mandatory attribution span missing' }
       foreach ($s in $response.spans) {
-        if ($s.start -lt 0 -or $s.end -gt 55 -or $s.end -le $s.start -or $s.risk -lt 0 -or $s.risk -gt 1) { throw 'invalid span' }
+        if ($s.start -lt 0 -or $s.end -gt $answerText.Length -or $s.end -le $s.start -or $s.risk -lt 0 -or $s.risk -gt 1) { throw 'invalid span' }
       }
       $response | ConvertTo-Json -Depth 15 | Set-Content -Encoding utf8 (Join-Path $out "$kind-response.json")
       $receipts += @{kind=$kind; mode='hf'; backend='hf'; HTTP=200; offline=$true; firewall_block=$true; working_directory=$layout; model=$model; libraries=$libs; interpreter=$command; response_file="$kind-response.json"}

@@ -22,3 +22,11 @@ The prior short-answer assumption is false. Cached dev replay passes but bypasse
 new feature extraction, so is NOT proof of fresh long-path parity. Automatic long
 dispatch reverted immediately; no test177 reads. An explicit contract decision
 is needed before enabling changed long-answer features on those saved inputs.
+
+## User-authorized amendment
+After observed22 train/3 dev >512, user explicitly selected authorize_versioned_long_path.
+Long outputs may change only for >512 model positions, version window512_full_answer_v1.
+Historical P5 metrics and all quality parameters unchanged.178 short dev rows require
+fresh old/new byte parity; cached181 replay is separately labeled cached compatibility.
+22 long train rows get feature deltas,3 long dev rows get actual output deltas.
+Python3.12 compensated builtin sum is preserved by Python fallback (no false numpy exact claim).
