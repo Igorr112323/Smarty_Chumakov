@@ -21,10 +21,52 @@ def main(out):
     for split in ("train", "dev"):
         pairs = list(read_pairs(ROOT / f"data/corpus_a3/splits/{split}.jsonl"))
         counts = [len(tokenizer(p["answer"], add_special_tokens=False)["input_ids"]) for p in pairs]
+        from spanverify.chunking import chunk_document, estimate_tokens, select_relevant_chunks
+        from spanverify.core import tokenize_with_offsets
+
+        coverage_rows = []
+        for pair, n in zip(pairs, counts, strict=True):
+            answer, context = pair["answer"], pair["context"]
+            selected = [context]
+            if context and estimate_tokens(context) > 380:
+                chunks = chunk_document(context, max_tokens_per_chunk=380)
+                if len(chunks.chunks) > 1:
+                    selected = [chunks.chunks[i].text for i in (select_relevant_chunks(answer, chunks, top_k=3) or [0])]
+            tokens = tokenize_with_offsets(answer)
+            covered = [False] * len(tokens)
+            lengths = []
+            for ctx in selected:
+                prompt = f"{ctx}\n{answer}" if ctx else answer
+                shift = len(prompt) - len(answer)
+                lengths.append(len(tokenizer(prompt)["input_ids"]))
+                offsets = tokenizer(prompt, return_offsets_mapping=True, truncation=True, max_length=512)[
+                    "offset_mapping"
+                ]
+                spans = [(i, a, b) for i, (a, b) in enumerate(offsets) if b > a and a >= shift and i < 512]
+                positions = features.map_token_positions([(t.start, t.end) for t in tokens], spans, shift)
+                covered = [x or bool(y) for x, y in zip(covered, positions, strict=True)]
+            missing = [t.start for t, ok in zip(tokens, covered, strict=True) if not ok]
+            coverage_rows.append(
+                dict(
+                    id=pair["id"],
+                    answer_model_tokens=n,
+                    native_tokens=len(tokens),
+                    selected_contexts=len(selected),
+                    max_prompt_model_tokens=max(lengths, default=0),
+                    legacy_unmapped_native_tokens=len(missing),
+                    first_unmapped_start=missing[0] if missing else None,
+                )
+            )
+        save(out / f"legacy-coverage-{split}.json", coverage_rows)
         audit[split] = dict(
             answers=len(counts),
             answer_over_512=sum(n > 512 for n in counts),
             max_answer_model_tokens=max(counts),
+            legacy_rows_with_unmapped_native_tokens=sum(r["legacy_unmapped_native_tokens"] > 0 for r in coverage_rows),
+            legacy_short_rows_with_unmapped_native_tokens=sum(
+                r["legacy_unmapped_native_tokens"] > 0 and r["answer_model_tokens"] <= 512 for r in coverage_rows
+            ),
+            legacy_unmapped_native_tokens=sum(r["legacy_unmapped_native_tokens"] for r in coverage_rows),
             answer_input_sha256=__import__("hashlib")
             .sha256(json.dumps([(p["id"], p["answer"]) for p in pairs], ensure_ascii=False).encode())
             .hexdigest(),
@@ -109,8 +151,8 @@ def main(out):
                                     model_tokens=length,
                                     before_sha256=hashlib.sha256(a).hexdigest(),
                                     after_sha256=hashlib.sha256(b).hexdigest(),
-                                    legacy_score=before["score"],
-                                    new_score=after["score"],
+                                    legacy_score=before_result.score,
+                                    new_score=after_result.score,
                                     saved_P5_score=reference[pair["id"]]["calibrated_score"],
                                     changed_token_records=sum(
                                         x != y for x, y in zip(before["tokens"], after["tokens"], strict=True)
@@ -155,6 +197,8 @@ def main(out):
                 )
             )
         )
+
+        print("::notice title=P7 long dev deltas::" + json.dumps([r for r in changed if r["split"] == "dev"]))
 
     # Cache optimization golden against the previously accepted uncached P7
     # window contract, full public tokens/risks/texts/offsets included.

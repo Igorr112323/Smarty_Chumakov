@@ -48,3 +48,9 @@ No autonomy claim is made from a successful health response. The smoke remains
 mandatory. The next build preserves the server JSON error body, and declares
 setuptools in the isolated external runtime (it is no longer inherited from the
 build interpreter's removed development site-packages).
+
+Tokenizer-only audit also reconstructs exact legacy selected top3 contexts and
+native-token coverage after combined context+answer512 truncation, not merely
+answer-alone length. Any <=512-answer gaps are disclosed and remain on the
+byte-frozen short path: authorization permits changes only >512. No scope is
+silently expanded to repair those legacy short-path outputs.
