@@ -4,9 +4,9 @@
   "github_endpoint": "POST https://api.github.com/markdown",
   "mode": "gfm",
   "context": "Igorr112323/Smarty_Chumakov",
-  "readme_git_blob": "61d35776f9b4913cbdda4ba8930e8c3ff96aa05a",
-  "readme_sha256": "403b5c3f2b753e40c5716f04766d4f5ea92851e976c88932c289f732b4b44c7c",
-  "rendered_html_sha256": "6381761a5c4bf3a2247a335744d01d5c46dc320f6e1bbc9e0b9bca70da57633e",
+  "readme_git_blob": "dac7c6c196851e6b2d07ef9332dd32436d3f7b29",
+  "readme_sha256": "4dceb2435a57c1ab5010012b7b2e0de47e8c713c59fb7841cb2955b9e5885fcb",
+  "rendered_html_sha256": "f947606ecc8d74ac2ddd8a02e0c1d3b3d696b2183c484fe352e4c6e139525496",
   "css_package": "github-markdown-css",
   "css_package_version": "5.9.0",
   "css_sha256": "de2d14b5290b8cf2af74c95e92560d9c00642ae72de0b856cece3e4eddb2d885",
@@ -44,5 +44,6 @@
       "height": 19
     }
   },
-  "limitation": "github.com page HTML was reachable, but github.githubassets.com CSS is outside sandbox network allowlist. This is genuine GitHub Markdown API HTML rendered with local GitHub markdown CSS, NOT a screenshot of the github.com repository chrome. Caption in screenshot states this explicitly."
+  "limitation": "github.com page HTML was reachable, but github.githubassets.com CSS is outside sandbox network allowlist. This is genuine GitHub Markdown API HTML rendered with local GitHub markdown CSS, NOT a screenshot of the github.com repository chrome. Caption in screenshot states this explicitly.",
+  "badges_are_live_status_snapshots_not_final_ci_evidence": true
 }

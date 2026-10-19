@@ -13,7 +13,7 @@
   ],
   "preflight": {
     "targeted_document_contract_provenance_suite": {
-      "passed": 37,
+      "passed": 38,
       "failed": 0
     },
     "ruff_touched_test": "PASS",
@@ -150,5 +150,11 @@
     "required_before_merge": "Full local suite and ordinary push/PR CI SUCCESS at the final presentation commit; actual Final CI read-only seal job SUCCESS, not skipped",
     "required_after_merge": "Fetch main without switching branches; verify two parents, exact tree delta of only preserved ZIP, every baseline branch commit ancestor, branch HEAD unchanged, main push CI SUCCESS and latest asset digests unchanged",
     "immutable_external_proof_location": "Final response lists exact commit SHA and GitHub Actions run/job IDs. Those results are intentionally not fabricated before the commit exists."
+  },
+  "documentation_wording_correction": {
+    "parent": "7fbc42280ca93ee09cb0502678f85253f522c538",
+    "finding": "Existing numeric checker interprets the digit 1 in Russian wording F1 токенов as a token count. Full preflight exposed this; two README phrases corrected to токенный F1. No numbers or checker assertions changed.",
+    "history_policy": "Extra small documentation correction commit instead of amend/force; both initial commits already pushed.",
+    "full_exact_head_qa_required_again": true
   }
 }
