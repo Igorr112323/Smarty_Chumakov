@@ -37,5 +37,7 @@ jobs:
     steps:
       - name: Preserve publication failure log, never rebuild or infer
         run: |
-          gh api repos/${{ github.repository }}/actions/jobs/118129110689/logs > windows-log.txt
-          python -c "import base64,gzip; from pathlib import Path; s=base64.b64encode(gzip.compress(Path('windows-log.txt').read_bytes()[-18000:])).decode(); [print('::notice title=P8 Windows log '+str(i//3000)+'::'+s[i:i+3000]) for i in range(0,len(s),3000)]"
+          gh api repos/${{ github.repository }}/actions/jobs/118129110689/logs > windows-log.txt 2> windows-log-error.txt || true
+          cat windows-log-error.txt
+          python -c "from pathlib import Path; print('::notice title=P8 log retrieval status::'+Path('windows-log-error.txt').read_text().replace('\n',' / '))"
+          python -c "import base64,gzip; from pathlib import Path; s=base64.b64encode(gzip.compress((Path('windows-log.txt').read_bytes()[-18000:]+Path('windows-log-error.txt').read_bytes()))).decode(); [print('::notice title=P8 Windows log '+str(i//3000)+'::'+s[i:i+3000]) for i in range(0,len(s),3000)]"
