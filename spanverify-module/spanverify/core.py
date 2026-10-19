@@ -15,8 +15,10 @@ from __future__ import annotations
 
 import re
 import sys
+from bisect import bisect_left, bisect_right
 from collections.abc import Iterable, Sequence
 from dataclasses import dataclass, field
+from itertools import accumulate
 from typing import Any
 
 __all__ = [
@@ -30,6 +32,24 @@ __all__ = [
     "SpanResult",
     "VerificationResult",
 ]
+
+
+class _SpanIndex:
+    """Exact interval-existence queries; no score arithmetic or span changes."""
+
+    def __init__(self, spans):
+        pairs = sorted((s.start, s.end) for s in spans)
+        self.starts = [a for a, _ in pairs]
+        self.ends = list(accumulate((b for _, b in pairs), max))
+
+    def overlaps(self, start, end):
+        i = bisect_left(self.starts, end)
+        return i > 0 and self.ends[i - 1] > start
+
+    def contains(self, point):
+        i = bisect_right(self.starts, point)
+        return i > 0 and self.ends[i - 1] > point
+
 
 # Токен: слово (буквы/цифры с внутренними дефисами) либо одиночный не-пробельный знак.
 TOKEN_RE = re.compile(r"\w+(?:[-'’]\w+)*|[^\w\s]", re.UNICODE)

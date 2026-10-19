@@ -1,0 +1,7 @@
+{
+  "require_success": false,
+  "acceptance": 39224331662,
+  "windows": 39224331816,
+  "ci": 39224331759,
+  "tests_excluded": false
+}

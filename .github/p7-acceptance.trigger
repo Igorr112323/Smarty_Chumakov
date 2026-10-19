@@ -10,3 +10,4 @@ P7 enforce authorized long scope and fresh short178/long25 audits
 P7 exact repeated-window reuse; actual long byte golden and all short fresh gates required
 P7 robust path resolution, complete benchmark receipts, bounded repeated-window cache4096
 P7 actual legacy combined-token audit and complete acceptance; Windows error body
+P7 exact interval lookup, full2M public golden, native repeat acceptance

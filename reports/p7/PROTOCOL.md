@@ -54,3 +54,21 @@ native-token coverage after combined context+answer512 truncation, not merely
 answer-alone length. Any <=512-answer gaps are disclosed and remain on the
 byte-frozen short path: authorization permits changes only >512. No scope is
 silently expanded to repair those legacy short-path outputs.
+
+Pre-index full HF 2M: actual uncached1738.99458161s vs identical-window cache
+125.521545277s; both282830 token records, end2000000, SHA56c3028861b5ea021310a59f98272fa1bff6e33a43755af6fae0bc00f89655a4.
+These are single functional observations, not three-repeat speed acceptance.
+After removing3283->14 duplicate model computations, two remaining O(tokens*spans)
+boolean queries in P5 flags and AI-share membership are replaced by an exact
+sorted-start/prefix-max-end index. The predicates (strict overlap vs start-point
+containment) remain distinct. No scores, ordering, spans, thresholds or features
+are modified.100000 synthetic random interval queries matched reference, including
+empty, duplicate, inverted and boundary coordinates. A fresh SAME-PROCESS full2M
+public JSON comparison against1c3aa13 excludes only latency; native3-repeat
+cold/warm timing remains separate. Historical P3/P5 artifacts remain untouched.
+
+Windows failure1c3aa13: real /v1/verify500 body reports missing urllib.error.
+The frozen parent urllib package was partial; adding Lib to sys.path alone is
+insufficient. The launcher now extends already-loaded stdlib package search paths
+with the matching portable Lib, and ships app-local VC++ runtime dependencies.
+No install, source checkout, host-Python path or registry edits are introduced.

@@ -1,0 +1,25 @@
+{
+  "total_count": 1,
+  "artifacts": [
+    {
+      "id": 12173358907,
+      "node_id": "MDg6QXJ0aWZhY3QxMjE3MzM1ODkwNw==",
+      "name": "p7-windows-hf-autonomy",
+      "size_in_bytes": 912,
+      "url": "https://api.github.com/repos/Igorr112323/Smarty_Chumakov/actions/artifacts/12173358907",
+      "archive_download_url": "https://api.github.com/repos/Igorr112323/Smarty_Chumakov/actions/artifacts/12173358907/zip",
+      "expired": false,
+      "digest": "sha256:11e41d904476b96a4e21cef1e838411bc1d906b412aca6cddb116451615a05dd",
+      "created_at": "2026-10-19T08:55:13Z",
+      "updated_at": "2026-10-19T08:55:13Z",
+      "expires_at": "2027-01-17T08:39:33Z",
+      "workflow_run": {
+        "id": 39224331816,
+        "repository_id": 1402768620,
+        "head_repository_id": 1402768620,
+        "head_branch": "arena/c5f69767-smarty-chumakov",
+        "head_sha": "22ae68c2a8a309adcdd7194eac5b5870f2128bd3"
+      }
+    }
+  ]
+}

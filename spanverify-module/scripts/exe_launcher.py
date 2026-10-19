@@ -61,6 +61,14 @@ def main(argv: list[str] | None = None) -> int:
         for path in (libraries.parent / "python" / "DLLs", libraries.parent / "python" / "Lib", libraries):
             if path.is_dir():
                 sys.path.insert(0, str(path))
+        # A frozen stdlib package may already exist but contain only a subset
+        # of modules (urllib.parse without urllib.error, etc.). Extend package
+        # search paths with the matching portable stdlib, not host Python.
+        stdlib = libraries.parent / "python" / "Lib"
+        for name, module in list(sys.modules.items()):
+            path = stdlib.joinpath(*name.split("."))
+            if getattr(module, "__path__", None) is not None and path.is_dir():
+                module.__path__ = [str(path), *module.__path__]
     port = free_port(args.port)
     if not args.quiet or args.port_file:
         print(f"[spanverify] сервис будет запущен на http://127.0.0.1:{port}", flush=True)

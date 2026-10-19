@@ -36,7 +36,7 @@ jobs:
         run: python spanverify-module/scripts/p7_golden.py check reports/p7/pre-change-golden-stable.json
   hf-contract:
     runs-on: ubuntu-latest
-    timeout-minutes: 40
+    timeout-minutes: 60
     env:
       OMP_NUM_THREADS: '2'
       MKL_NUM_THREADS: '2'
@@ -143,6 +143,8 @@ jobs:
           pip install 'torch==2.14.1+cpu' --index-url https://download.pytorch.org/whl/cpu
           pip install 'transformers==5.20.1' 'sentencepiece==0.2.2' 'numpy==2.4.6'
       - name: Full real HF 2M answer, no truncation or synthetic tail
+        env:
+          P7_COMPARE_SPAN_INDEX_BASELINE: '1'
         run: timeout 1800 python -u spanverify-module/scripts/p7_measurements.py functional --mode hf --out reports/p7/full-hf
       - uses: actions/upload-artifact@v4
         if: always()

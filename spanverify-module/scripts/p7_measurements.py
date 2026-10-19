@@ -6,8 +6,11 @@ import argparse
 import hashlib
 import json
 import math
+import os
+import subprocess
 import sys
 import time
+import types
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
@@ -90,6 +93,43 @@ def rates(out):
 
 def functional(mode, out):
     a, c = document(2_000_000, "answer-text")
+    comparison = {}
+
+    def public_hash(result):
+        payload = result.to_dict(with_tokens=True)
+        payload.pop("latency_ms", None)
+        return hashlib.sha256(
+            json.dumps(payload, ensure_ascii=False, sort_keys=True, separators=(",", ":")).encode()
+        ).hexdigest()
+
+    if mode == "hf" and os.environ.get("P7_COMPARE_SPAN_INDEX_BASELINE") == "1":
+        from unittest.mock import patch
+
+        from spanverify import engine, span_filter
+
+        modules = []
+        for name in ("engine", "span_filter"):
+            module = types.ModuleType(f"spanverify._p7_preindex_{name}")
+            module.__package__ = "spanverify"
+            sys.modules[module.__name__] = module
+            source = subprocess.check_output(
+                ["git", "show", f"1c3aa13:spanverify-module/spanverify/{name}.py"], text=True
+            )
+            exec(compile(source, "<accepted-preindex-P7>", "exec"), module.__dict__)
+            modules.append(module)
+        verifier(mode).verify(*document(1000, "document-context"))
+        with (
+            patch.object(engine.Verifier, "_shares", modules[0].Verifier._shares),
+            patch.object(span_filter, "filter_candidates", modules[1].filter_candidates),
+        ):
+            began = time.perf_counter()
+            before = verifier(mode).verify(a, c, with_tokens=True)
+            comparison["before_seconds"] = time.perf_counter() - began
+            comparison["before_public_sha256"] = public_hash(before)
+            del before
+        comparison.update(
+            before_source="1c3aa13", thermal="both warm-model; same process", used_for_native_repeats=False
+        )
     start = time.perf_counter()
     result = verifier(mode).verify(a, c, with_tokens=True)
     seconds = time.perf_counter() - start
@@ -99,7 +139,12 @@ def functional(mode, out):
     assert len(result.tokens) == result.stats["token_count"]
     if mode == "hf":
         assert result.stats["features"]["full_answer"] and result.stats["features"]["all_answer_tokens_mapped"]
+    if comparison:
+        comparison["after_public_sha256"] = public_hash(result)
+        comparison["byte_equal"] = comparison["before_public_sha256"] == comparison["after_public_sha256"]
+        assert comparison["byte_equal"], "Span index changed full 2M public JSON"
     report = dict(
+        interval_index_comparison=comparison,
         mode=mode,
         seconds=seconds,
         seconds_per_1000_chars=seconds / 2000,

@@ -9,7 +9,7 @@ from __future__ import annotations
 import math
 from dataclasses import replace
 
-from .core import SpanResult
+from .core import SpanResult, _SpanIndex
 from .localization import merge_localized_spans
 
 FEATURES = (
@@ -198,5 +198,6 @@ def filter_candidates(answer, tokens, candidates, config, rules=(), probabilitie
         raise ValueError("Invalid span probabilities")
     kept = [replace(s) for (s, _), p in zip(candidates, ps, strict=True) if p >= config["keep_threshold"]]
     spans = merge_localized_spans(answer, tokens, [*kept, *rules])
-    flags = {i for i, t in enumerate(tokens) if any(t.start < s.end and t.end > s.start for s in spans)}
+    index = _SpanIndex(spans)
+    flags = {i for i, t in enumerate(tokens) if index.overlaps(t.start, t.end)}
     return flags, spans

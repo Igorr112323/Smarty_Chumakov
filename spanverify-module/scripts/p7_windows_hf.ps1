@@ -27,6 +27,16 @@ if ($LASTEXITCODE -ne 0) { throw 'external torch preparation failed' }
 & $python -m pip install --target $libs --upgrade 'setuptools==80.9.0' 'transformers==5.20.1' 'sentencepiece==0.2.2' 'numpy==2.4.6'
 if ($LASTEXITCODE -ne 0) { throw 'external HF libraries preparation failed' }
 Remove-Item Env:PYTHONHOME -ErrorAction SilentlyContinue
+# App-local VC++ dependencies: the portable runtime must not require a
+# separate redist installation on a clean Windows machine.
+foreach ($file in @('msvcp140*.dll','vcruntime140*.dll','concrt140.dll')) {
+  foreach ($dll in (Get-ChildItem (Join-Path $env:WINDIR "System32/$file") -ErrorAction SilentlyContinue)) {
+    foreach ($dest in @((Join-Path $layout 'python'),(Join-Path $libs 'torch/lib'))) {
+      $target=Join-Path $dest $dll.Name
+      if (-not (Test-Path $target)) { Copy-Item $dll.FullName $target }
+    }
+  }
+}
 $env:PYTHONPATH = $libs
 $env:PYTHONNOUSERSITE = '1'
 $env:P7_MODEL = $model
@@ -112,7 +122,7 @@ try {
   $hashes = @(Get-ChildItem $model -File -Recurse | Where-Object { $_.FullName -notmatch '\.cache' } | ForEach-Object { @{file=$_.FullName.Substring($model.Length+1);bytes=$_.Length;sha256=(Get-FileHash $_.FullName -Algorithm SHA256).Hash.ToLower()} })
   $report = @{status='success';code=$env:GITHUB_SHA;run=$env:GITHUB_RUN_ID;offline=$true;registry_product_keys_unchanged=$true;layout=@{python='python/python.exe';libs='libs/';weights='model/';exe='spanverify.exe';pyz='spanverify.pyz';quality_bundle='frozen-p5.json';runtime='p5-runtime.json'};libs_bytes=(Get-ChildItem $libs -File -Recurse | Measure-Object Length -Sum).Sum;model_files=$hashes;receipts=$receipts}
   $report | ConvertTo-Json -Depth 20 | Set-Content -Encoding utf8 (Join-Path $out 'windows-hf-autonomy.json')
-  Write-Host ('::notice title=P7 Windows model files::'+(@{files=@($hashes | Where-Object { $_.name -match '\.(bin|safetensors)$' })} | ConvertTo-Json -Depth 5 -Compress))
+  Write-Host ('::notice title=P7 Windows model files::'+(@{files=@($hashes | Where-Object { $_.file -match '\.(bin|safetensors)$' })} | ConvertTo-Json -Depth 5 -Compress))
   Write-Host ('::notice title=P7 Windows HF autonomy::'+(@{status='success';code=$env:GITHUB_SHA;offline=$true;exe_HF=$true;pyz_HF=$true;registry_product_keys_unchanged=$true;libs_bytes=$report.libs_bytes} | ConvertTo-Json -Compress))
 } finally {
   foreach ($name in $rules) { Remove-NetFirewallRule -DisplayName $name -ErrorAction SilentlyContinue }

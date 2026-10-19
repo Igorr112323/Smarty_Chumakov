@@ -25,6 +25,20 @@ def test_interval_index_and_membership_match_legacy_byte_exact():
         assert map_token_positions(tokens, spans, shift) == expected
     assert map_token_positions([], [], 0) == []
     assert map_token_positions([(0, 1)], [(3, 0, 1)], 0) == [[3]]
+    from types import SimpleNamespace
+
+    from spanverify.core import _SpanIndex
+
+    for _ in range(300):
+        spans = [
+            SimpleNamespace(start=rng.randrange(-20, 100), end=rng.randrange(-20, 100))
+            for _ in range(rng.randrange(60))
+        ]
+        index = _SpanIndex(spans)
+        for _ in range(100):
+            a, b = rng.randrange(-25, 110), rng.randrange(-25, 110)
+            assert index.overlaps(a, b) == any(a < t.end and b > t.start for t in spans)
+            assert index.contains(a) == any(t.start <= a < t.end for t in spans)
     for text in ["", "Один", ", !", "Ёлка 10 лет. " * 1000]:
         tokens = tokenize_with_offsets(text)
         mass = [rng.random() for _ in tokens]
@@ -53,7 +67,7 @@ def test_window_partition_preserves_unicode_boundaries_and_all_characters():
     assert all(spans[i][1] == spans[i + 1][0] for i in range(len(spans) - 1))
 
 
-def test_full_answer_stitches_every_token_once_without_zero_fill(monkeypatch):
+def test_full_answer_stitches_every_token_once_without_zero_fill(monkeypatch, tmp_path):
     from dataclasses import fields
 
     from spanverify.features import FeatureMatrix
@@ -138,6 +152,33 @@ def test_full_answer_stitches_every_token_once_without_zero_fill(monkeypatch):
             )
 
     features._cached_hf_runtime.cache_clear()
+
+    # A frozen parent package may lack an optional stdlib submodule. The
+    # portable Lib path must extend that package, not just top-level sys.path.
+    import importlib.util
+    from pathlib import Path
+
+    libs = tmp_path / "libs"
+    libs.mkdir()
+    stdlib = tmp_path / "python" / "Lib"
+    probe_path = stdlib / "p7_stdlib_probe"
+    probe_path.mkdir(parents=True)
+    (tmp_path / "python" / "DLLs").mkdir()
+    probe = types.ModuleType("p7_stdlib_probe")
+    probe.__path__ = ["frozen-only"]
+    with monkeypatch.context() as m:
+        m.setattr(sys, "path", list(sys.path))
+        m.setitem(sys.modules, "p7_stdlib_probe", probe)
+        m.chdir(Path(__file__).resolve().parents[1])
+        spec = importlib.util.spec_from_file_location("p7_launcher_fixture", "scripts/exe_launcher.py")
+        launcher = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(launcher)
+        m.setattr(launcher, "configure_stdio", lambda: None)
+        m.setattr(launcher, "free_port", lambda port: 18779)
+        m.setattr(launcher, "serve", lambda **kwargs: None)
+        assert launcher.main(["--runtime-dir", str(libs), "--quiet", "--no-browser"]) == 0
+        assert str(libs) == sys.path[0]
+        assert probe.__path__ == [str(probe_path), "frozen-only"]
 
 
 def test_cached_cosine_norms_are_float_exact():

@@ -37,6 +37,7 @@ from .core import (
     SpanResult,
     Token,
     VerificationResult,
+    _SpanIndex,
     mean,
     split_chunks,
     split_sentences,
@@ -899,9 +900,8 @@ class Verifier:
         # Токены, попавшие в отчётные фрагменты (в том числе по правилу привязки
         # числа к объекту), считаются помеченными: иначе ответ с найденным
         # фрагментом сообщал бы «доля спорного текста 0.000».
-        in_span = {
-            index for index in scored_indices if any(span.start <= tokens[index].start < span.end for span in spans)
-        }
+        span_index = _SpanIndex(spans)
+        in_span = {index for index in scored_indices if span_index.contains(tokens[index].start)}
         probabilities = [1.0 if index in in_span else self._calibrate(smoothed[index]) for index in scored_indices]
         soft = sum(probabilities) / len(probabilities)
         hard_numerator = sum(1 for index in scored_indices if index in in_span or smoothed[index] >= mask_threshold)

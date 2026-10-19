@@ -12,3 +12,4 @@ P7 offline HF generic span bounds
 P7 complete portable external stdlib and diagnostic HF smoke
 P7 portable HF runtime artifact, no user installation, complete external stdlib
 P7 explicit portable dependency and HTTP500 JSON diagnostics
+P7 complete frozen stdlib package paths; portable HF must pass actual verify
