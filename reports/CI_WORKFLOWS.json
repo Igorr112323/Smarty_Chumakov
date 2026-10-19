@@ -1,7 +1,7 @@
 {
   "kind": "ci_workflows",
   "runs_considered": 100,
-  "generated_at": "2026-10-19T15:32:09Z",
+  "generated_at": "2026-10-19T15:56:25Z",
   "command": "python scripts/collect_ci_workflows.py",
   "source": ".github/workflows/*.yml + reports/CI_RUNS.json",
   "registry": {
@@ -73,21 +73,21 @@
           "timeout_minutes": 40,
           "steps": 1,
           "uploads_artifacts": false,
-          "runs_python": "ubuntu-latest"
+          "runs_python": "ubuntu-24.04-arm"
         },
         {
           "name": "Линтер, форматирование, покрытие",
           "timeout_minutes": 40,
           "steps": 11,
           "uploads_artifacts": true,
-          "runs_python": "ubuntu-latest"
+          "runs_python": "ubuntu-24.04-arm"
         },
         {
           "name": "Соответствие договору (проект 117812)",
           "timeout_minutes": 40,
           "steps": 9,
           "uploads_artifacts": true,
-          "runs_python": "ubuntu-latest"
+          "runs_python": "ubuntu-24.04-arm"
         },
         {
           "name": "Тесты (Python ${{ matrix.python }}, ${{ matrix.os }})",
@@ -101,28 +101,28 @@
           "timeout_minutes": 40,
           "steps": 8,
           "uploads_artifacts": true,
-          "runs_python": "ubuntu-latest"
+          "runs_python": "ubuntu-24.04-arm"
         },
         {
           "name": "Единый файл чисел (METRICS.json) и сверка документов",
           "timeout_minutes": 30,
           "steps": 11,
           "uploads_artifacts": true,
-          "runs_python": "ubuntu-latest"
+          "runs_python": "ubuntu-24.04-arm"
         },
         {
           "name": "Внешние размеченные наборы (скачивание, контрольные числа, оценка)",
           "timeout_minutes": 40,
           "steps": 11,
           "uploads_artifacts": true,
-          "runs_python": "ubuntu-latest"
+          "runs_python": "ubuntu-24.04-arm"
         },
         {
           "name": "Разведка официальных источников (не блокирует CI)",
           "timeout_minutes": 40,
           "steps": 17,
           "uploads_artifacts": true,
-          "runs_python": "ubuntu-latest"
+          "runs_python": "ubuntu-24.04-arm"
         }
       ],
       "manual_only": false,
@@ -810,7 +810,7 @@
           "timeout_minutes": 40,
           "steps": 7,
           "uploads_artifacts": true,
-          "runs_python": "ubuntu-24.04"
+          "runs_python": "ubuntu-24.04-arm"
         }
       ],
       "manual_only": false,
