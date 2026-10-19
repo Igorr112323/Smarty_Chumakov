@@ -213,7 +213,7 @@ def main():
         "control_sample",
         "Control sample / corpus1200 / held-out document split",
         "частично",
-        "Frozen A3 manifest1200, train842/dev181. Original fold membership validated; test177 not read, no full official acceptance.",
+        "Frozen A3 manifest1200, train842/dev181. Original folds unchanged; official177 not evaluated. Legacy unsplit read disclosed in reports/p7/freeze-and-incident.json; no new P7 reads.",
         "spanverify-module/data/corpus_a3/manifest.json",
         P5 + "/manifest.json",
         P5 + "/oof_validation.json",
@@ -229,16 +229,33 @@ def main():
         "as_of": "2026-10-19",
         "source": "User-specified Appendix3 requirements; evidence only, no invented acceptance",
         "current_measurement_run": f"{URL}/actions/runs/{RUN}",
-        "official_test_read": False,
+        "official_test_read": True,
+        "official_test_evaluated": False,
+        "official_test_read_scope": "legacy P6 chunking-test unsplit read, not new P7 evaluation",
+        "incident_evidence": "reports/p7/freeze-and-incident.json",
         "overall": "не достигнут",
         "no_artifact_rule": "No current proof => not achieved; historical/demo proof cannot establish P5 speed/delivery/official quality",
         "requirements": rows,
     }
+    # A versioned evidence overlay updates ONLY explicitly measured requirements.
+    # Historical P5 quality rows/denominators are retained, never recomputed here.
+    overlay_path = ROOT / "reports/p7/contract-overlay.json"
+    if overlay_path.exists():
+        overlay = json.loads(overlay_path.read_text(encoding="utf-8"))
+        known = {r["id"]: r for r in rows}
+        assert len({r["id"] for r in overlay["requirements"]}) == len(overlay["requirements"])
+        for update in overlay["requirements"]:
+            assert update["id"] in known
+            assert update["evidence"] and update["note"] and update["current_run"]
+            assert all((ROOT / e["path"]).is_file() for e in update["evidence"])
+            known[update["id"]].update(update)
+        payload["current_measurement_run"] = overlay["current_measurement_run"]
+        payload["p7_evidence_overlay"] = str(overlay_path.relative_to(ROOT))
     out = ROOT / "reports/contract"
     (out / "coverage-matrix.json").write_text(
         json.dumps(payload, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
     )
-    text = "# Appendix3: evidence coverage matrix\n\nAs of 2026-10-19. **Overall: НЕ ДОСТИГНУТ.** Official test177 remains closed.\n\nHistorical/demo artifacts are not current P5 HF acceptance. A dev gate cannot establish speed, delivery or the whole contract.\n\n| Requirement | Status | Scope / limitation | Real evidence |\n|---|---|---|---|\n"
+    text = "# Appendix3: evidence coverage matrix\n\nAs of 2026-10-19. **Overall: НЕ ДОСТИГНУТ.** Official test177 not evaluated; legacy read incident is disclosed.\n\nHistorical/demo artifacts are not current P5 HF acceptance. A dev gate cannot establish speed, delivery or the whole contract.\n\n| Requirement | Status | Scope / limitation | Real evidence |\n|---|---|---|---|\n"
     for r in rows:
         links = "; ".join(f"[{e['path'].split('/')[-1]}]({e['url']})" for e in r["evidence"])
         text += f"| {r['requirement']} | {r['status']} | {r['note']} | {links} |\n"

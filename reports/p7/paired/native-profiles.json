@@ -1,0 +1,861 @@
+[
+  {
+    "mode": "hf",
+    "cases": [
+      {
+        "scenario": "answer-text",
+        "chars": 50000,
+        "thermal": "cold-process",
+        "top": [
+          {
+            "function": "<built-in method torch.addmm>",
+            "calls": 672,
+            "self_seconds": 3.3096891320000004,
+            "cumulative_seconds": 3.3096891320000004
+          },
+          {
+            "function": "<built-in method builtins.exec>",
+            "calls": 5745,
+            "self_seconds": 0.338284623,
+            "cumulative_seconds": 6.034494455000001
+          },
+          {
+            "function": "hf_features",
+            "calls": 15,
+            "self_seconds": 0.155021699,
+            "cumulative_seconds": 11.678807423
+          },
+          {
+            "function": "full_answer_features",
+            "calls": 1,
+            "self_seconds": 0.045539022000000005,
+            "cumulative_seconds": 7.708073337
+          },
+          {
+            "function": "<built-in method builtins.hasattr>",
+            "calls": 72306,
+            "self_seconds": 0.031127046000000002,
+            "cumulative_seconds": 3.126575529
+          }
+        ]
+      },
+      {
+        "scenario": "answer-text",
+        "chars": 50000,
+        "thermal": "warm-model",
+        "top": [
+          {
+            "function": "<built-in method torch.addmm>",
+            "calls": 672,
+            "self_seconds": 3.282462616,
+            "cumulative_seconds": 3.282462616
+          },
+          {
+            "function": "<built-in method torch._C._nn.linear>",
+            "calls": 14,
+            "self_seconds": 1.611283129,
+            "cumulative_seconds": 1.611283129
+          },
+          {
+            "function": "predict_one",
+            "calls": 2263360,
+            "self_seconds": 0.7466313680000001,
+            "cumulative_seconds": 0.7466313680000001
+          },
+          {
+            "function": "<method 'cumsum' of 'numpy.ndarray' objects>",
+            "calls": 1927,
+            "self_seconds": 0.59630023,
+            "cumulative_seconds": 0.59630023
+          },
+          {
+            "function": "predict_one",
+            "calls": 7073,
+            "self_seconds": 0.229088479,
+            "cumulative_seconds": 1.3192120740000002
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "mode": "hf",
+    "cases": [
+      {
+        "scenario": "document-context",
+        "chars": 50000,
+        "thermal": "warm-model",
+        "top": [
+          {
+            "function": "<built-in method torch.addmm>",
+            "calls": 144,
+            "self_seconds": 0.725402041,
+            "cumulative_seconds": 0.725402041
+          },
+          {
+            "function": "<built-in method torch._C._nn.linear>",
+            "calls": 3,
+            "self_seconds": 0.362959001,
+            "cumulative_seconds": 0.362959001
+          },
+          {
+            "function": "<built-in method builtins.sum>",
+            "calls": 1009,
+            "self_seconds": 0.043054712,
+            "cumulative_seconds": 0.092938344
+          },
+          {
+            "function": "forward",
+            "calls": 36,
+            "self_seconds": 0.028499769,
+            "cumulative_seconds": 0.07537487600000001
+          },
+          {
+            "function": "_dense_cosine_scores_exact",
+            "calls": 90,
+            "self_seconds": 0.021069141000000003,
+            "cumulative_seconds": 0.086720129
+          }
+        ]
+      },
+      {
+        "scenario": "answer-text",
+        "chars": 1000,
+        "thermal": "cold-process",
+        "top": [
+          {
+            "function": "<built-in method builtins.exec>",
+            "calls": 5744,
+            "self_seconds": 0.340927605,
+            "cumulative_seconds": 6.046396252
+          },
+          {
+            "function": "create_import_structure_from_path",
+            "calls": 1075,
+            "self_seconds": 0.15776116,
+            "cumulative_seconds": 1.213918354
+          },
+          {
+            "function": "<built-in method builtins.hasattr>",
+            "calls": 71692,
+            "self_seconds": 0.030934982000000003,
+            "cumulative_seconds": 3.221652363
+          },
+          {
+            "function": "hf_features",
+            "calls": 1,
+            "self_seconds": 0.020570565000000002,
+            "cumulative_seconds": 4.818593289000001
+          },
+          {
+            "function": "_find_and_load",
+            "calls": 5442,
+            "self_seconds": 0.016043855000000003,
+            "cumulative_seconds": 6.055546570000001
+          }
+        ]
+      },
+      {
+        "scenario": "answer-text",
+        "chars": 1000,
+        "thermal": "warm-model",
+        "top": [
+          {
+            "function": "<built-in method torch.addmm>",
+            "calls": 48,
+            "self_seconds": 0.32304429100000004,
+            "cumulative_seconds": 0.32304429100000004
+          },
+          {
+            "function": "<built-in method torch._C._nn.linear>",
+            "calls": 1,
+            "self_seconds": 0.15614893500000002,
+            "cumulative_seconds": 0.15614893500000002
+          },
+          {
+            "function": "<method 'cumsum' of 'numpy.ndarray' objects>",
+            "calls": 246,
+            "self_seconds": 0.07616592200000001,
+            "cumulative_seconds": 0.07616592200000001
+          },
+          {
+            "function": "_dense_cosine_scores_exact",
+            "calls": 246,
+            "self_seconds": 0.0309927,
+            "cumulative_seconds": 0.121158575
+          },
+          {
+            "function": "<built-in method torch.matmul>",
+            "calls": 24,
+            "self_seconds": 0.028622613,
+            "cumulative_seconds": 0.028622613
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "mode": "hf",
+    "cases": [
+      {
+        "scenario": "document-context",
+        "chars": 1000,
+        "thermal": "cold-process",
+        "top": [
+          {
+            "function": "<built-in method builtins.exec>",
+            "calls": 5744,
+            "self_seconds": 0.33743121600000003,
+            "cumulative_seconds": 6.02899048
+          },
+          {
+            "function": "create_import_structure_from_path",
+            "calls": 1075,
+            "self_seconds": 0.157678958,
+            "cumulative_seconds": 1.212264123
+          },
+          {
+            "function": "<built-in method builtins.hasattr>",
+            "calls": 71691,
+            "self_seconds": 0.031195209,
+            "cumulative_seconds": 3.2072907030000004
+          },
+          {
+            "function": "_find_and_load",
+            "calls": 5442,
+            "self_seconds": 0.015674925,
+            "cumulative_seconds": 6.038023614
+          },
+          {
+            "function": "_find_and_load_unlocked",
+            "calls": 2407,
+            "self_seconds": 0.013096817,
+            "cumulative_seconds": 6.037612958
+          }
+        ]
+      },
+      {
+        "scenario": "document-context",
+        "chars": 1000,
+        "thermal": "warm-model",
+        "top": [
+          {
+            "function": "<built-in method torch.addmm>",
+            "calls": 48,
+            "self_seconds": 0.25241430000000004,
+            "cumulative_seconds": 0.25241430000000004
+          },
+          {
+            "function": "<built-in method torch._C._nn.linear>",
+            "calls": 1,
+            "self_seconds": 0.122401834,
+            "cumulative_seconds": 0.122401834
+          },
+          {
+            "function": "<method 'cumsum' of 'numpy.ndarray' objects>",
+            "calls": 30,
+            "self_seconds": 0.018967711,
+            "cumulative_seconds": 0.018967711
+          },
+          {
+            "function": "<built-in method torch.matmul>",
+            "calls": 24,
+            "self_seconds": 0.016475345000000002,
+            "cumulative_seconds": 0.016475345000000002
+          },
+          {
+            "function": "<genexpr>",
+            "calls": 165335,
+            "self_seconds": 0.014665225,
+            "cumulative_seconds": 0.014665225
+          }
+        ]
+      },
+      {
+        "scenario": "document-context",
+        "chars": 50000,
+        "thermal": "cold-process",
+        "top": [
+          {
+            "function": "<built-in method builtins.exec>",
+            "calls": 5744,
+            "self_seconds": 0.332883058,
+            "cumulative_seconds": 5.920256323
+          },
+          {
+            "function": "create_import_structure_from_path",
+            "calls": 1075,
+            "self_seconds": 0.15656508600000002,
+            "cumulative_seconds": 1.2062656580000002
+          },
+          {
+            "function": "<built-in method builtins.hasattr>",
+            "calls": 71765,
+            "self_seconds": 0.029579746,
+            "cumulative_seconds": 3.1389910920000004
+          },
+          {
+            "function": "_find_and_load",
+            "calls": 5442,
+            "self_seconds": 0.015674264,
+            "cumulative_seconds": 5.928843134
+          },
+          {
+            "function": "_find_and_load_unlocked",
+            "calls": 2407,
+            "self_seconds": 0.012729242,
+            "cumulative_seconds": 5.928470843
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "mode": "hf",
+    "cases": [
+      {
+        "scenario": "answer-text",
+        "chars": 2000000,
+        "thermal": "warm-model",
+        "top": [
+          {
+            "function": "_span_overlap",
+            "calls": 52807413,
+            "self_seconds": 23.619702846000003,
+            "cumulative_seconds": 46.584844944000004
+          },
+          {
+            "function": "<listcomp>",
+            "calls": 103140,
+            "self_seconds": 16.033357153,
+            "cumulative_seconds": 62.618202097
+          },
+          {
+            "function": "<built-in method builtins.max>",
+            "calls": 105615192,
+            "self_seconds": 14.534768502,
+            "cumulative_seconds": 14.534783110000001
+          },
+          {
+            "function": "<built-in method builtins.min>",
+            "calls": 52807557,
+            "self_seconds": 8.43052331,
+            "cumulative_seconds": 8.43052331
+          },
+          {
+            "function": "<method 'encode_batch' of 'tokenizers.Tokenizer' objects>",
+            "calls": 2,
+            "self_seconds": 2.729966499,
+            "cumulative_seconds": 2.729966499
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "mode": "hf",
+    "cases": [
+      {
+        "scenario": "answer-text",
+        "chars": 50000,
+        "thermal": "cold-process",
+        "top": [
+          {
+            "function": "_span_overlap",
+            "calls": 3622157,
+            "self_seconds": 1.712936744,
+            "cumulative_seconds": 3.2864347670000003
+          },
+          {
+            "function": "<listcomp>",
+            "calls": 7073,
+            "self_seconds": 1.132489848,
+            "cumulative_seconds": 4.418924615
+          },
+          {
+            "function": "<built-in method builtins.exec>",
+            "calls": 5744,
+            "self_seconds": 0.33106714000000004,
+            "cumulative_seconds": 5.989612779000001
+          },
+          {
+            "function": "predict_one",
+            "calls": 7073,
+            "self_seconds": 0.224108304,
+            "cumulative_seconds": 1.307036055
+          },
+          {
+            "function": "create_import_structure_from_path",
+            "calls": 1075,
+            "self_seconds": 0.157440674,
+            "cumulative_seconds": 1.2061236160000002
+          }
+        ]
+      },
+      {
+        "scenario": "answer-text",
+        "chars": 50000,
+        "thermal": "warm-model",
+        "top": [
+          {
+            "function": "_span_overlap",
+            "calls": 3622157,
+            "self_seconds": 1.654433969,
+            "cumulative_seconds": 3.225121805
+          },
+          {
+            "function": "<listcomp>",
+            "calls": 7073,
+            "self_seconds": 1.1286793050000001,
+            "cumulative_seconds": 4.35380111
+          },
+          {
+            "function": "<built-in method builtins.max>",
+            "calls": 7498245,
+            "self_seconds": 1.0541640250000002,
+            "cumulative_seconds": 1.054351136
+          },
+          {
+            "function": "predict_one",
+            "calls": 2263360,
+            "self_seconds": 0.7383419440000001,
+            "cumulative_seconds": 0.7383419440000001
+          },
+          {
+            "function": "<built-in method builtins.min>",
+            "calls": 3769613,
+            "self_seconds": 0.5912592720000001,
+            "cumulative_seconds": 0.5912592720000001
+          }
+        ]
+      },
+      {
+        "scenario": "answer-text",
+        "chars": 2000000,
+        "thermal": "cold-process",
+        "top": [
+          {
+            "function": "_span_overlap",
+            "calls": 52864295,
+            "self_seconds": 23.589128644000002,
+            "cumulative_seconds": 46.181088535
+          },
+          {
+            "function": "<listcomp>",
+            "calls": 103251,
+            "self_seconds": 16.380540240000002,
+            "cumulative_seconds": 62.561628775
+          },
+          {
+            "function": "<built-in method builtins.max>",
+            "calls": 105739700,
+            "self_seconds": 14.451287529,
+            "cumulative_seconds": 14.455565052
+          },
+          {
+            "function": "<built-in method builtins.min>",
+            "calls": 52880345,
+            "self_seconds": 8.150848,
+            "cumulative_seconds": 8.153004244
+          },
+          {
+            "function": "<method 'encode_batch' of 'tokenizers.Tokenizer' objects>",
+            "calls": 2,
+            "self_seconds": 2.8851646050000004,
+            "cumulative_seconds": 2.8851646050000004
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "mode": "hf",
+    "cases": [
+      {
+        "scenario": "document-context",
+        "chars": 50000,
+        "thermal": "warm-model",
+        "top": [
+          {
+            "function": "<built-in method builtins.sum>",
+            "calls": 57568,
+            "self_seconds": 3.301729082,
+            "cumulative_seconds": 8.16326384
+          },
+          {
+            "function": "<genexpr>",
+            "calls": 14672520,
+            "self_seconds": 2.217785048,
+            "cumulative_seconds": 2.217785048
+          },
+          {
+            "function": "<genexpr>",
+            "calls": 14672520,
+            "self_seconds": 1.3233041520000002,
+            "cumulative_seconds": 1.3233041520000002
+          },
+          {
+            "function": "<genexpr>",
+            "calls": 14672520,
+            "self_seconds": 1.3195373970000002,
+            "cumulative_seconds": 1.3195373970000002
+          },
+          {
+            "function": "<method 'read' of '_ssl._SSLSocket' objects>",
+            "calls": 30,
+            "self_seconds": 1.2881429240000002,
+            "cumulative_seconds": 1.2881429240000002
+          }
+        ]
+      },
+      {
+        "scenario": "answer-text",
+        "chars": 1000,
+        "thermal": "cold-process",
+        "top": [
+          {
+            "function": "<built-in method builtins.sum>",
+            "calls": 81397,
+            "self_seconds": 4.419449136,
+            "cumulative_seconds": 10.885257354
+          },
+          {
+            "function": "<genexpr>",
+            "calls": 19674096,
+            "self_seconds": 2.9119771130000003,
+            "cumulative_seconds": 2.9119771130000003
+          },
+          {
+            "function": "<genexpr>",
+            "calls": 19674096,
+            "self_seconds": 1.778542451,
+            "cumulative_seconds": 1.778542451
+          },
+          {
+            "function": "<genexpr>",
+            "calls": 19674096,
+            "self_seconds": 1.7694642880000002,
+            "cumulative_seconds": 1.7694642880000002
+          },
+          {
+            "function": "<built-in method builtins.exec>",
+            "calls": 5744,
+            "self_seconds": 0.33802814200000003,
+            "cumulative_seconds": 6.05806862
+          }
+        ]
+      },
+      {
+        "scenario": "answer-text",
+        "chars": 1000,
+        "thermal": "warm-model",
+        "top": [
+          {
+            "function": "<built-in method builtins.sum>",
+            "calls": 78556,
+            "self_seconds": 4.444861444000001,
+            "cumulative_seconds": 10.879119622000001
+          },
+          {
+            "function": "<genexpr>",
+            "calls": 19674096,
+            "self_seconds": 2.923099139,
+            "cumulative_seconds": 2.923099139
+          },
+          {
+            "function": "<genexpr>",
+            "calls": 19674096,
+            "self_seconds": 1.7581708070000002,
+            "cumulative_seconds": 1.7581708070000002
+          },
+          {
+            "function": "<genexpr>",
+            "calls": 19674096,
+            "self_seconds": 1.751400225,
+            "cumulative_seconds": 1.751400225
+          },
+          {
+            "function": "_cosine_dense",
+            "calls": 25584,
+            "self_seconds": 0.055593441,
+            "cumulative_seconds": 10.938285576
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "mode": "hf",
+    "cases": [
+      {
+        "scenario": "document-context",
+        "chars": 1000,
+        "thermal": "cold-process",
+        "top": [
+          {
+            "function": "<built-in method builtins.sum>",
+            "calls": 22434,
+            "self_seconds": 1.1087838840000002,
+            "cumulative_seconds": 2.7458701690000002
+          },
+          {
+            "function": "<built-in method builtins.exec>",
+            "calls": 5744,
+            "self_seconds": 0.32910408500000005,
+            "cumulative_seconds": 6.043082246
+          },
+          {
+            "function": "create_import_structure_from_path",
+            "calls": 1075,
+            "self_seconds": 0.15807389300000002,
+            "cumulative_seconds": 1.2138851240000001
+          },
+          {
+            "function": "<built-in method builtins.hasattr>",
+            "calls": 71682,
+            "self_seconds": 0.029568006,
+            "cumulative_seconds": 3.267612149
+          },
+          {
+            "function": "_find_and_load",
+            "calls": 5442,
+            "self_seconds": 0.016665120000000002,
+            "cumulative_seconds": 6.052195483
+          }
+        ]
+      },
+      {
+        "scenario": "document-context",
+        "chars": 1000,
+        "thermal": "warm-model",
+        "top": [
+          {
+            "function": "<built-in method builtins.sum>",
+            "calls": 19593,
+            "self_seconds": 1.23968214,
+            "cumulative_seconds": 3.027254119
+          },
+          {
+            "function": "<genexpr>",
+            "calls": 4960050,
+            "self_seconds": 0.788839226,
+            "cumulative_seconds": 0.788839226
+          },
+          {
+            "function": "<genexpr>",
+            "calls": 4960050,
+            "self_seconds": 0.49977355700000003,
+            "cumulative_seconds": 0.49977355700000003
+          },
+          {
+            "function": "<genexpr>",
+            "calls": 4960050,
+            "self_seconds": 0.49826642600000004,
+            "cumulative_seconds": 0.49826642600000004
+          },
+          {
+            "function": "_cosine_dense",
+            "calls": 6450,
+            "self_seconds": 0.014272171,
+            "cumulative_seconds": 3.0421311220000002
+          }
+        ]
+      },
+      {
+        "scenario": "document-context",
+        "chars": 50000,
+        "thermal": "cold-process",
+        "top": [
+          {
+            "function": "<built-in method builtins.sum>",
+            "calls": 60409,
+            "self_seconds": 3.391559586,
+            "cumulative_seconds": 8.183040153
+          },
+          {
+            "function": "<genexpr>",
+            "calls": 14672520,
+            "self_seconds": 2.177045084,
+            "cumulative_seconds": 2.177045084
+          },
+          {
+            "function": "<built-in method builtins.exec>",
+            "calls": 5744,
+            "self_seconds": 0.33038554400000003,
+            "cumulative_seconds": 5.972338234
+          },
+          {
+            "function": "_cosine_dense",
+            "calls": 19080,
+            "self_seconds": 0.040985017000000006,
+            "cumulative_seconds": 8.118121272
+          },
+          {
+            "function": "hf_features_chunked",
+            "calls": 1,
+            "self_seconds": 0.033141639,
+            "cumulative_seconds": 18.250940481
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "mode": "demo",
+    "cases": [
+      {
+        "scenario": "answer-text",
+        "chars": 2000000,
+        "thermal": "warm-model",
+        "top": [
+          {
+            "function": "_normalised_support",
+            "calls": 1,
+            "self_seconds": 61.69853563,
+            "cumulative_seconds": 62.26619071100001
+          },
+          {
+            "function": "demo_features",
+            "calls": 1,
+            "self_seconds": 1.4710757790000002,
+            "cumulative_seconds": 73.600272219
+          },
+          {
+            "function": "number_value",
+            "calls": 1252680,
+            "self_seconds": 1.293209029,
+            "cumulative_seconds": 2.546290034
+          },
+          {
+            "function": "word",
+            "calls": 2606411,
+            "self_seconds": 1.093368197,
+            "cumulative_seconds": 1.6462739620000002
+          },
+          {
+            "function": "similarities",
+            "calls": 181821,
+            "self_seconds": 1.052932811,
+            "cumulative_seconds": 3.715499593
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "mode": "demo",
+    "cases": [
+      {
+        "scenario": "answer-text",
+        "chars": 50000,
+        "thermal": "cold-process",
+        "top": [
+          {
+            "function": "predict_one",
+            "calls": 2263360,
+            "self_seconds": 0.731819575,
+            "cumulative_seconds": 0.731819575
+          },
+          {
+            "function": "predict_one",
+            "calls": 7073,
+            "self_seconds": 0.22453186900000002,
+            "cumulative_seconds": 1.286741074
+          },
+          {
+            "function": "_normalised_support",
+            "calls": 1,
+            "self_seconds": 0.193889464,
+            "cumulative_seconds": 0.208997222
+          },
+          {
+            "function": "_to_float32",
+            "calls": 396088,
+            "self_seconds": 0.157310159,
+            "cumulative_seconds": 0.228141532
+          },
+          {
+            "function": "<method 'split' of 're.Pattern' objects>",
+            "calls": 203,
+            "self_seconds": 0.11170848400000001,
+            "cumulative_seconds": 0.11170848400000001
+          }
+        ]
+      },
+      {
+        "scenario": "answer-text",
+        "chars": 50000,
+        "thermal": "warm-model",
+        "top": [
+          {
+            "function": "predict_one",
+            "calls": 2263360,
+            "self_seconds": 0.736501811,
+            "cumulative_seconds": 0.736501811
+          },
+          {
+            "function": "predict_one",
+            "calls": 7073,
+            "self_seconds": 0.22450471300000002,
+            "cumulative_seconds": 1.294119365
+          },
+          {
+            "function": "_normalised_support",
+            "calls": 1,
+            "self_seconds": 0.194293757,
+            "cumulative_seconds": 0.20919257600000002
+          },
+          {
+            "function": "_to_float32",
+            "calls": 396088,
+            "self_seconds": 0.159154292,
+            "cumulative_seconds": 0.23140585100000002
+          },
+          {
+            "function": "<method 'split' of 're.Pattern' objects>",
+            "calls": 203,
+            "self_seconds": 0.11950957400000001,
+            "cumulative_seconds": 0.11950957400000001
+          }
+        ]
+      },
+      {
+        "scenario": "answer-text",
+        "chars": 2000000,
+        "thermal": "cold-process",
+        "top": [
+          {
+            "function": "_normalised_support",
+            "calls": 1,
+            "self_seconds": 60.389142977000006,
+            "cumulative_seconds": 60.991377797000006
+          },
+          {
+            "function": "demo_features",
+            "calls": 1,
+            "self_seconds": 1.5189756630000002,
+            "cumulative_seconds": 73.636027935
+          },
+          {
+            "function": "_candidates",
+            "calls": 181821,
+            "self_seconds": 1.462326107,
+            "cumulative_seconds": 1.779485103
+          },
+          {
+            "function": "number_value",
+            "calls": 1252680,
+            "self_seconds": 1.418017821,
+            "cumulative_seconds": 2.7370468480000003
+          },
+          {
+            "function": "similarities",
+            "calls": 181821,
+            "self_seconds": 1.191542447,
+            "cumulative_seconds": 4.480292185000001
+          }
+        ]
+      }
+    ]
+  }
+]

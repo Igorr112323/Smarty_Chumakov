@@ -15,3 +15,4 @@ P7 preserve existing40min guard; final full-input and native gates
 P7 current inventory888 across all documentation, no scientific changes
 parallel independent measurements; historical full-HF comparison requires full history
 P7 matching Windows trigger path corrected; science unchanged
+P7 matching portable ABI loader source; all scientific gates retained

@@ -93,6 +93,11 @@ a = Analysis(
     noarchive=False,
 )
 
+# Lossless archive compression only: retain all bytecode/assertions/modules.
+# The strict 9,000,000-byte gate remains unchanged.
+from PyInstaller.archive.writers import ZlibArchiveWriter
+
+ZlibArchiveWriter._COMPRESSION_LEVEL = 9
 pyz = PYZ(a.pure, a.zipped_data, cipher=block_cipher)
 
 exe = EXE(

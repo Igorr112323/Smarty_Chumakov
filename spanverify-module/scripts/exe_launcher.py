@@ -53,6 +53,7 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--version", action="version", version=f"SpanVerify {__version__}")
     args = parser.parse_args(argv)
 
+    dll_handles = []  # Keep Windows loader search cookies alive throughout serve().
     if args.runtime_dir:
         libraries = Path(args.runtime_dir).resolve()
         # HF's external runtime includes optional stdlib modules deliberately
@@ -61,6 +62,17 @@ def main(argv: list[str] | None = None) -> int:
         for path in (libraries.parent / "python" / "DLLs", libraries.parent / "python" / "Lib", libraries):
             if path.is_dir():
                 sys.path.insert(0, str(path))
+        # Native abi3 extensions (tokenizers) need portable python3.dll/MSVC,
+        # not just sys.path. Python 3.8+ uses restricted DLL search directories.
+        if hasattr(os, "add_dll_directory"):
+            for path in (
+                libraries.parent / "python",
+                libraries.parent / "python" / "DLLs",
+                libraries,
+                *libraries.glob("*.libs"),
+            ):
+                if path.is_dir():
+                    dll_handles.append(os.add_dll_directory(str(path)))
         # A frozen stdlib package may already exist but contain only a subset
         # of modules (urllib.parse without urllib.error, etc.). Extend package
         # search paths with the matching portable stdlib, not host Python.

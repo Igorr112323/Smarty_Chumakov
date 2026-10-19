@@ -160,6 +160,7 @@ def test_full_answer_stitches_every_token_once_without_zero_fill(monkeypatch, tm
 
     libs = tmp_path / "libs"
     libs.mkdir()
+    (libs / "numpy.libs").mkdir()
     stdlib = tmp_path / "python" / "Lib"
     probe_path = stdlib / "p7_stdlib_probe"
     probe_path.mkdir(parents=True)
@@ -175,8 +176,16 @@ def test_full_answer_stitches_every_token_once_without_zero_fill(monkeypatch, tm
         spec.loader.exec_module(launcher)
         m.setattr(launcher, "configure_stdio", lambda: None)
         m.setattr(launcher, "free_port", lambda port: 18779)
+        dll_paths = []
+        m.setattr(launcher.os, "add_dll_directory", lambda path: dll_paths.append(path) or object(), raising=False)
         m.setattr(launcher, "serve", lambda **kwargs: None)
         assert launcher.main(["--runtime-dir", str(libs), "--quiet", "--no-browser"]) == 0
+        assert {
+            str(tmp_path / "python"),
+            str(tmp_path / "python" / "DLLs"),
+            str(libs),
+            str(libs / "numpy.libs"),
+        } == set(dll_paths)
         assert str(libs) == sys.path[0]
         assert probe.__path__ == [str(probe_path), "frozen-only"]
 

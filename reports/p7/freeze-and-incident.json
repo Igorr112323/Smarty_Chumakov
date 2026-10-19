@@ -19,6 +19,11 @@
       }
     ],
     "explanation": "Legacy test parsed unsplit corpus before slicing first20. No official test evaluation or model/config selection. Frozen bundle/historical tree hashes and later saved-evidence parity retained. This does not claim the reserved data was never read.",
-    "guard": "tests/conftest.py + p6_acceptance.guard imported by every P7 measurement/calibration/audit runner"
+    "guard": "tests/conftest.py + p6_acceptance.guard imported by every P7 measurement/calibration/audit runner",
+    "test": "tests/test_chunking.py::TestSelectRelevantChunks::test_on_corpus_a3_sample",
+    "fixed_at_utc": "2026-10-18T23:34:59Z",
+    "fix_commit": "5ff79f9a7bed33c00c6278f67d68ddff73f8325c",
+    "read_timestamp": "not recoverable; initial stopped P6 regression before fix",
+    "source_evidence": "git show5ff79f9 --spanverify-module/tests/test_chunking.py (source only; no corpus read)"
   }
 }

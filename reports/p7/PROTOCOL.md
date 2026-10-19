@@ -95,3 +95,12 @@ Full-HF checkout now fetches history. Independent benchmark/calibration/full2M
 jobs depend on cached parity, not serial fresh-HF audit; the final archive still
 requires EVERY job, including fresh HF audit. No check is removed or weakened.
 The fresh HF7262 audit completed09:31:41→10:02:19UTC (30m38s), within40min.
+
+Windows409 reached native tokenizers but failed DLL loading. Reference Windows
+abi3 wheel PE imports include python3.dll; sys.path does not configure dependent
+DLL resolution. Register portable python/, DLLs, libs and *.libs via
+os.add_dll_directory, retain handles throughout serve. Portable-import preflight
+is separate from mandatory actual exe/pyz offline requests. Pure archive zlib
+compression6→9 provides size headroom without removing bytecode/assertions.
+Current409 sizes before this fix8999498/232874B pass strict9M/600k gates;
+this is not a successful HF autonomy receipt.
