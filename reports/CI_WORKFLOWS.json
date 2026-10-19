@@ -1,7 +1,7 @@
 {
   "kind": "ci_workflows",
   "runs_considered": 100,
-  "generated_at": "2026-10-19T14:55:54Z",
+  "generated_at": "2026-10-19T15:05:29Z",
   "command": "python scripts/collect_ci_workflows.py",
   "source": ".github/workflows/*.yml + reports/CI_RUNS.json",
   "registry": {
@@ -808,7 +808,7 @@
         {
           "name": "p8-final",
           "timeout_minutes": 40,
-          "steps": 6,
+          "steps": 7,
           "uploads_artifacts": true,
           "runs_python": "ubuntu-24.04"
         }
@@ -876,6 +876,13 @@
           "name": "receipt",
           "timeout_minutes": 40,
           "steps": 4,
+          "uploads_artifacts": false,
+          "runs_python": "ubuntu-24.04"
+        },
+        {
+          "name": "windows-logs",
+          "timeout_minutes": 5,
+          "steps": 1,
           "uploads_artifacts": false,
           "runs_python": "ubuntu-24.04"
         }

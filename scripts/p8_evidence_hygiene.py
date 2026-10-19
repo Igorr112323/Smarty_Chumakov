@@ -11,7 +11,7 @@ def is_run(path):
     return any(re.fullmatch(r'run\d+',p) for p in path.parts) or any((p/'run.json').is_file() for p in path.parents if p!=ROOT and p.is_relative_to(ROOT))
 
 def metric_file(path,data):
-    if path.name in ('weights.json','combined_bundle.json') or 'model' in path.name or 'calibrator_v1' in path.name or 'golden' in path.name:return False
+    if path.name in ('weights.json','combined_bundle.json') or path.name in ('model.json','model-bundle.json') or 'calibrator_v1' in path.name or 'golden' in path.name:return False
     def contains(x):
         if isinstance(x,dict):return any(k.lower() in ('f1','mae','strict_f1','token_f1','calibrated_auc','auc','precision','recall','fpr','accuracy','mse','brier','median_s','median_seconds','elapsed_seconds','wall_seconds','elapsed','mae_before','mae_after') for k in x) or any(contains(v) for v in x.values())
         return isinstance(x,list) and any(contains(v) for v in x)

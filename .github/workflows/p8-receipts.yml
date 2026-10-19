@@ -29,3 +29,13 @@ jobs:
           path: .arena/receipt
       - name: Lossless compressed metadata receipts and per-pair artifact hashes
         run: python scripts/p8_emit_receipt.py .arena/receipt '${{ matrix.artifact }}'
+  windows-logs:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - name: Preserve publication failure log, never rebuild or infer
+        run: |
+          gh api repos/${{ github.repository }}/actions/jobs/118129110689/logs > windows-log.txt
+          python -c "import base64,gzip; from pathlib import Path; s=base64.b64encode(gzip.compress(Path('windows-log.txt').read_bytes()[-18000:])).decode(); [print('::notice title=P8 Windows log '+str(i//3000)+'::'+s[i:i+3000]) for i in range(0,len(s),3000)]"

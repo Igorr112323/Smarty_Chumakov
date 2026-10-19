@@ -25,6 +25,7 @@ def test_all_non_run_metric_documents_have_provenance():
     assert found >= 20
     path = Path("arbitrary-new-name.json")
     assert hygiene.metric_file(path, {"auc": 0.75})
+    assert hygiene.metric_file(Path("model_metrics.json"), {"auc": 0.75})
     assert hygiene.provenance_problems(path, {"auc": 0.75})
     broken = {"f1": 0.5, "run_id": "local-probe", "date": "2026-10-19", "_status": "SUPERSEDED"}
     assert any("successor" in p for p in hygiene.provenance_problems(path, broken))
