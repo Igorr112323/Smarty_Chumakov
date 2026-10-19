@@ -1,0 +1,272 @@
+[
+  {
+    "file": "/home/runner/work/Smarty_Chumakov/Smarty_Chumakov/spanverify-module/spanverify/engine.py",
+    "line": 479,
+    "function": "verify",
+    "primitive_calls": 1,
+    "calls": 1,
+    "self_seconds": 0.000229072,
+    "cumulative_seconds": 3.9717725460000004
+  },
+  {
+    "file": "/home/runner/work/Smarty_Chumakov/Smarty_Chumakov/spanverify-module/spanverify/engine.py",
+    "line": 761,
+    "function": "_features",
+    "primitive_calls": 1,
+    "calls": 1,
+    "self_seconds": 1.5048e-05,
+    "cumulative_seconds": 3.963698742
+  },
+  {
+    "file": "/home/runner/work/Smarty_Chumakov/Smarty_Chumakov/spanverify-module/spanverify/features.py",
+    "line": 1384,
+    "function": "hf_features_chunked",
+    "primitive_calls": 1,
+    "calls": 1,
+    "self_seconds": 0.00936152,
+    "cumulative_seconds": 3.963682642
+  },
+  {
+    "file": "/home/runner/work/Smarty_Chumakov/Smarty_Chumakov/spanverify-module/spanverify/features.py",
+    "line": 1147,
+    "function": "hf_features",
+    "primitive_calls": 1,
+    "calls": 1,
+    "self_seconds": 0.004413906,
+    "cumulative_seconds": 3.954306895
+  },
+  {
+    "file": "/home/runner/work/Smarty_Chumakov/Smarty_Chumakov/spanverify-module/spanverify/features.py",
+    "line": 1314,
+    "function": "<listcomp>",
+    "primitive_calls": 30,
+    "calls": 30,
+    "self_seconds": 0.003041939,
+    "cumulative_seconds": 2.735009374
+  },
+  {
+    "file": "/home/runner/work/Smarty_Chumakov/Smarty_Chumakov/spanverify-module/spanverify/features.py",
+    "line": 1566,
+    "function": "_cosine_dense",
+    "primitive_calls": 6450,
+    "calls": 6450,
+    "self_seconds": 0.012571083,
+    "cumulative_seconds": 2.731967435
+  },
+  {
+    "file": "~",
+    "line": 0,
+    "function": "<built-in method builtins.sum>",
+    "primitive_calls": 19593,
+    "calls": 19593,
+    "self_seconds": 1.111921294,
+    "cumulative_seconds": 2.718778728
+  },
+  {
+    "file": "/home/runner/work/Smarty_Chumakov/Smarty_Chumakov/spanverify-module/spanverify/features.py",
+    "line": 1567,
+    "function": "<genexpr>",
+    "primitive_calls": 4960050,
+    "calls": 4960050,
+    "self_seconds": 0.732046999,
+    "cumulative_seconds": 0.732046999
+  },
+  {
+    "file": "/opt/hostedtoolcache/Python/3.11.17/x64/lib/python3.11/site-packages/transformers/models/auto/auto_factory.py",
+    "line": 265,
+    "function": "from_pretrained",
+    "primitive_calls": 1,
+    "calls": 1,
+    "self_seconds": 7.7642e-05,
+    "cumulative_seconds": 0.472139923
+  },
+  {
+    "file": "/home/runner/work/Smarty_Chumakov/Smarty_Chumakov/spanverify-module/spanverify/features.py",
+    "line": 1568,
+    "function": "<genexpr>",
+    "primitive_calls": 4960050,
+    "calls": 4960050,
+    "self_seconds": 0.43782114200000005,
+    "cumulative_seconds": 0.43782114200000005
+  },
+  {
+    "file": "/home/runner/work/Smarty_Chumakov/Smarty_Chumakov/spanverify-module/spanverify/features.py",
+    "line": 1569,
+    "function": "<genexpr>",
+    "primitive_calls": 4960050,
+    "calls": 4960050,
+    "self_seconds": 0.43632043600000003,
+    "cumulative_seconds": 0.43632043600000003
+  },
+  {
+    "file": "/opt/hostedtoolcache/Python/3.11.17/x64/lib/python3.11/site-packages/torch/nn/modules/module.py",
+    "line": 1779,
+    "function": "_wrapped_call_impl",
+    "primitive_calls": 1,
+    "calls": 151,
+    "self_seconds": 0.00038404300000000004,
+    "cumulative_seconds": 0.43365490700000003
+  },
+  {
+    "file": "/opt/hostedtoolcache/Python/3.11.17/x64/lib/python3.11/site-packages/torch/nn/modules/module.py",
+    "line": 1787,
+    "function": "_call_impl",
+    "primitive_calls": 1,
+    "calls": 151,
+    "self_seconds": 0.000762566,
+    "cumulative_seconds": 0.43364446700000003
+  },
+  {
+    "file": "/opt/hostedtoolcache/Python/3.11.17/x64/lib/python3.11/site-packages/transformers/utils/generic.py",
+    "line": 937,
+    "function": "wrapper",
+    "primitive_calls": 1,
+    "calls": 1,
+    "self_seconds": 1.1211e-05,
+    "cumulative_seconds": 0.43362655400000005
+  },
+  {
+    "file": "/opt/hostedtoolcache/Python/3.11.17/x64/lib/python3.11/site-packages/transformers/models/gpt2/modeling_gpt2.py",
+    "line": 647,
+    "function": "forward",
+    "primitive_calls": 1,
+    "calls": 1,
+    "self_seconds": 5.2849e-05,
+    "cumulative_seconds": 0.43360808
+  },
+  {
+    "file": "/opt/hostedtoolcache/Python/3.11.17/x64/lib/python3.11/site-packages/transformers/modeling_utils.py",
+    "line": 3822,
+    "function": "from_pretrained",
+    "primitive_calls": 1,
+    "calls": 1,
+    "self_seconds": 0.0005151870000000001,
+    "cumulative_seconds": 0.391297946
+  },
+  {
+    "file": "/opt/hostedtoolcache/Python/3.11.17/x64/lib/python3.11/site-packages/httpx2/_client.py",
+    "line": 743,
+    "function": "request",
+    "primitive_calls": 5,
+    "calls": 5,
+    "self_seconds": 2.4073e-05,
+    "cumulative_seconds": 0.385373108
+  },
+  {
+    "file": "/opt/hostedtoolcache/Python/3.11.17/x64/lib/python3.11/site-packages/httpx2/_client.py",
+    "line": 949,
+    "function": "send",
+    "primitive_calls": 5,
+    "calls": 5,
+    "self_seconds": 3.7439000000000005e-05,
+    "cumulative_seconds": 0.383397372
+  },
+  {
+    "file": "/opt/hostedtoolcache/Python/3.11.17/x64/lib/python3.11/site-packages/httpx2/_client.py",
+    "line": 996,
+    "function": "_send_handling_auth",
+    "primitive_calls": 5,
+    "calls": 5,
+    "self_seconds": 2.2916000000000002e-05,
+    "cumulative_seconds": 0.38121221600000005
+  },
+  {
+    "file": "/opt/hostedtoolcache/Python/3.11.17/x64/lib/python3.11/site-packages/httpx2/_client.py",
+    "line": 1030,
+    "function": "_send_handling_redirects",
+    "primitive_calls": 5,
+    "calls": 5,
+    "self_seconds": 3.367e-05,
+    "cumulative_seconds": 0.38115682100000003
+  },
+  {
+    "file": "/opt/hostedtoolcache/Python/3.11.17/x64/lib/python3.11/site-packages/httpx2/_client.py",
+    "line": 1065,
+    "function": "_send_single_request",
+    "primitive_calls": 5,
+    "calls": 5,
+    "self_seconds": 9.147300000000001e-05,
+    "cumulative_seconds": 0.380726432
+  },
+  {
+    "file": "/opt/hostedtoolcache/Python/3.11.17/x64/lib/python3.11/site-packages/httpx2/_transports/default.py",
+    "line": 225,
+    "function": "handle_request",
+    "primitive_calls": 5,
+    "calls": 5,
+    "self_seconds": 0.000114325,
+    "cumulative_seconds": 0.380297895
+  },
+  {
+    "file": "/opt/hostedtoolcache/Python/3.11.17/x64/lib/python3.11/site-packages/httpcore2/_sync/connection_pool.py",
+    "line": 191,
+    "function": "handle_request",
+    "primitive_calls": 5,
+    "calls": 5,
+    "self_seconds": 0.000113151,
+    "cumulative_seconds": 0.379606969
+  },
+  {
+    "file": "/opt/hostedtoolcache/Python/3.11.17/x64/lib/python3.11/site-packages/httpcore2/_sync/connection.py",
+    "line": 67,
+    "function": "handle_request",
+    "primitive_calls": 5,
+    "calls": 5,
+    "self_seconds": 3.1923e-05,
+    "cumulative_seconds": 0.378772154
+  },
+  {
+    "file": "/opt/hostedtoolcache/Python/3.11.17/x64/lib/python3.11/site-packages/httpcore2/_sync/http11.py",
+    "line": 63,
+    "function": "handle_request",
+    "primitive_calls": 5,
+    "calls": 5,
+    "self_seconds": 0.00013278700000000001,
+    "cumulative_seconds": 0.378715837
+  },
+  {
+    "file": "/opt/hostedtoolcache/Python/3.11.17/x64/lib/python3.11/site-packages/httpcore2/_sync/http11.py",
+    "line": 194,
+    "function": "_receive_event",
+    "primitive_calls": 14,
+    "calls": 14,
+    "self_seconds": 0.000134467,
+    "cumulative_seconds": 0.37745772
+  },
+  {
+    "file": "/opt/hostedtoolcache/Python/3.11.17/x64/lib/python3.11/site-packages/httpcore2/_sync/http11.py",
+    "line": 160,
+    "function": "_receive_response_headers",
+    "primitive_calls": 5,
+    "calls": 5,
+    "self_seconds": 3.078e-05,
+    "cumulative_seconds": 0.37680580500000005
+  },
+  {
+    "file": "/opt/hostedtoolcache/Python/3.11.17/x64/lib/python3.11/site-packages/httpcore2/_backends/sync.py",
+    "line": 123,
+    "function": "read",
+    "primitive_calls": 9,
+    "calls": 9,
+    "self_seconds": 5.3782e-05,
+    "cumulative_seconds": 0.37509322
+  },
+  {
+    "file": "/opt/hostedtoolcache/Python/3.11.17/x64/lib/python3.11/ssl.py",
+    "line": 1301,
+    "function": "recv",
+    "primitive_calls": 9,
+    "calls": 9,
+    "self_seconds": 2.1821e-05,
+    "cumulative_seconds": 0.37496125300000005
+  },
+  {
+    "file": "/opt/hostedtoolcache/Python/3.11.17/x64/lib/python3.11/ssl.py",
+    "line": 1170,
+    "function": "read",
+    "primitive_calls": 9,
+    "calls": 9,
+    "self_seconds": 1.7411e-05,
+    "cumulative_seconds": 0.37493833000000004
+  }
+]

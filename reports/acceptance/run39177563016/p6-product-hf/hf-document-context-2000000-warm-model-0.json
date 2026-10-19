@@ -1,0 +1,51 @@
+{
+  "status": "completed",
+  "profile_enabled": false,
+  "seconds": 6.012783807000005,
+  "warmup_seconds": 5.667209125999989,
+  "answer_chars": 79,
+  "context_chars": 2000000,
+  "answer_utf8_bytes": 137,
+  "context_utf8_bytes": 3660605,
+  "input_sha256": "fe5bfdf13122e800580c20b76410bcfd148fe06cebf0c3eb976d31dba0e934c0",
+  "schema_valid": true,
+  "stats": {
+    "token_count": 16,
+    "scored_tokens": 10,
+    "number_attribution": [],
+    "fact_coverage": [],
+    "mean_risk": 0.3271,
+    "p90_risk": 0.4424,
+    "raw_score": 0.4143,
+    "raw_score_full": 0.4142945250135,
+    "span_threshold": 0.4186579753072923,
+    "span_z": 1.5,
+    "span_floor": 0.05,
+    "weights": {
+      "attention_entropy": 0.1,
+      "ctx_attention_mass": 0.0,
+      "ctx_attention_mass_norm": 0.1,
+      "ctx_max_similarity": 0.8,
+      "embedding_density": 0.0
+    },
+    "features": {
+      "backend": "hf",
+      "model": "ai-forever/rugpt3small_based_on_gpt2",
+      "chunked": true,
+      "n_chunks_total": 2022,
+      "n_chunks_relevant": 3,
+      "relevant_indices": [
+        0,
+        1,
+        2020
+      ],
+      "n_chunks_processed": 3
+    },
+    "ai_participation": 0.9275,
+    "ai_participation_calibrated_on": "synthetic-participation-corpus 1.0 (два стиля, доля смеси известна)",
+    "warning": ""
+  },
+  "spans": [],
+  "score": 0.3969465648854962,
+  "verdict": "grounded"
+}

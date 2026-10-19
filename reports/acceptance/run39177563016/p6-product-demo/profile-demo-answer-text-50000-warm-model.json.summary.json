@@ -1,0 +1,272 @@
+[
+  {
+    "file": "/home/runner/work/Smarty_Chumakov/Smarty_Chumakov/spanverify-module/spanverify/engine.py",
+    "line": 479,
+    "function": "verify",
+    "primitive_calls": 1,
+    "calls": 1,
+    "self_seconds": 0.012876823,
+    "cumulative_seconds": 2.9461840120000002
+  },
+  {
+    "file": "/home/runner/work/Smarty_Chumakov/Smarty_Chumakov/spanverify-module/spanverify/token_head.py",
+    "line": 245,
+    "function": "predict_many",
+    "primitive_calls": 1,
+    "calls": 1,
+    "self_seconds": 3.216e-06,
+    "cumulative_seconds": 1.298950609
+  },
+  {
+    "file": "/home/runner/work/Smarty_Chumakov/Smarty_Chumakov/spanverify-module/spanverify/token_head.py",
+    "line": 247,
+    "function": "<listcomp>",
+    "primitive_calls": 1,
+    "calls": 1,
+    "self_seconds": 0.003966367,
+    "cumulative_seconds": 1.2989473930000002
+  },
+  {
+    "file": "/home/runner/work/Smarty_Chumakov/Smarty_Chumakov/spanverify-module/spanverify/token_head.py",
+    "line": 216,
+    "function": "predict_one",
+    "primitive_calls": 7073,
+    "calls": 7073,
+    "self_seconds": 0.22600381900000002,
+    "cumulative_seconds": 1.294981026
+  },
+  {
+    "file": "/home/runner/work/Smarty_Chumakov/Smarty_Chumakov/spanverify-module/spanverify/token_head.py",
+    "line": 141,
+    "function": "predict_one",
+    "primitive_calls": 565840,
+    "calls": 2263360,
+    "self_seconds": 0.732452991,
+    "cumulative_seconds": 0.732452991
+  },
+  {
+    "file": "/home/runner/work/Smarty_Chumakov/Smarty_Chumakov/spanverify-module/spanverify/engine.py",
+    "line": 761,
+    "function": "_features",
+    "primitive_calls": 1,
+    "calls": 1,
+    "self_seconds": 6.9230000000000005e-06,
+    "cumulative_seconds": 0.49683485600000005
+  },
+  {
+    "file": "/home/runner/work/Smarty_Chumakov/Smarty_Chumakov/spanverify-module/spanverify/features.py",
+    "line": 1718,
+    "function": "extract_features",
+    "primitive_calls": 1,
+    "calls": 1,
+    "self_seconds": 9.8045e-05,
+    "cumulative_seconds": 0.49682793300000005
+  },
+  {
+    "file": "/home/runner/work/Smarty_Chumakov/Smarty_Chumakov/spanverify-module/spanverify/features.py",
+    "line": 416,
+    "function": "demo_features",
+    "primitive_calls": 1,
+    "calls": 1,
+    "self_seconds": 0.036538063,
+    "cumulative_seconds": 0.496729888
+  },
+  {
+    "file": "/home/runner/work/Smarty_Chumakov/Smarty_Chumakov/spanverify-module/spanverify/token_head.py",
+    "line": 234,
+    "function": "<listcomp>",
+    "primitive_calls": 7073,
+    "calls": 7073,
+    "self_seconds": 0.076726025,
+    "cumulative_seconds": 0.31206219300000004
+  },
+  {
+    "file": "/home/runner/work/Smarty_Chumakov/Smarty_Chumakov/spanverify-module/spanverify/context_head.py",
+    "line": 52,
+    "function": "build_context_features",
+    "primitive_calls": 1,
+    "calls": 1,
+    "self_seconds": 0.114219392,
+    "cumulative_seconds": 0.305283833
+  },
+  {
+    "file": "/home/runner/work/Smarty_Chumakov/Smarty_Chumakov/spanverify-module/spanverify/participation.py",
+    "line": 281,
+    "function": "estimate",
+    "primitive_calls": 1,
+    "calls": 1,
+    "self_seconds": 0.00047337500000000005,
+    "cumulative_seconds": 0.275649303
+  },
+  {
+    "file": "/home/runner/work/Smarty_Chumakov/Smarty_Chumakov/spanverify-module/spanverify/participation.py",
+    "line": 183,
+    "function": "token_rows",
+    "primitive_calls": 1,
+    "calls": 1,
+    "self_seconds": 0.012368956,
+    "cumulative_seconds": 0.248969302
+  },
+  {
+    "file": "/home/runner/work/Smarty_Chumakov/Smarty_Chumakov/spanverify-module/spanverify/token_head.py",
+    "line": 35,
+    "function": "_to_float32",
+    "primitive_calls": 396088,
+    "calls": 396088,
+    "self_seconds": 0.16179473,
+    "cumulative_seconds": 0.235336168
+  },
+  {
+    "file": "/home/runner/work/Smarty_Chumakov/Smarty_Chumakov/spanverify-module/spanverify/features.py",
+    "line": 523,
+    "function": "_normalised_support",
+    "primitive_calls": 1,
+    "calls": 1,
+    "self_seconds": 0.194469534,
+    "cumulative_seconds": 0.20997742800000002
+  },
+  {
+    "file": "/home/runner/work/Smarty_Chumakov/Smarty_Chumakov/spanverify-module/spanverify/features.py",
+    "line": 961,
+    "function": "number_attribution",
+    "primitive_calls": 3,
+    "calls": 3,
+    "self_seconds": 0.000102977,
+    "cumulative_seconds": 0.20775687
+  },
+  {
+    "file": "/home/runner/work/Smarty_Chumakov/Smarty_Chumakov/spanverify-module/spanverify/core.py",
+    "line": 110,
+    "function": "tokenize_with_offsets",
+    "primitive_calls": 8,
+    "calls": 8,
+    "self_seconds": 0.104385507,
+    "cumulative_seconds": 0.157182751
+  },
+  {
+    "file": "/home/runner/work/Smarty_Chumakov/Smarty_Chumakov/spanverify-module/spanverify/features.py",
+    "line": 975,
+    "function": "_attribute_tokens",
+    "primitive_calls": 4,
+    "calls": 4,
+    "self_seconds": 0.017682065,
+    "cumulative_seconds": 0.152353221
+  },
+  {
+    "file": "/home/runner/work/Smarty_Chumakov/Smarty_Chumakov/spanverify-module/spanverify/features.py",
+    "line": 546,
+    "function": "_group_number_values",
+    "primitive_calls": 6,
+    "calls": 6,
+    "self_seconds": 0.032730431000000004,
+    "cumulative_seconds": 0.146883316
+  },
+  {
+    "file": "/home/runner/work/Smarty_Chumakov/Smarty_Chumakov/spanverify-module/spanverify/engine.py",
+    "line": 885,
+    "function": "_attribution_spans",
+    "primitive_calls": 2,
+    "calls": 2,
+    "self_seconds": 0.0008604970000000001,
+    "cumulative_seconds": 0.144992341
+  },
+  {
+    "file": "/home/runner/work/Smarty_Chumakov/Smarty_Chumakov/spanverify-module/spanverify/core.py",
+    "line": 185,
+    "function": "number_value",
+    "primitive_calls": 56328,
+    "calls": 56328,
+    "self_seconds": 0.058831748,
+    "cumulative_seconds": 0.115958634
+  },
+  {
+    "file": "/home/runner/work/Smarty_Chumakov/Smarty_Chumakov/spanverify-module/spanverify/participation.py",
+    "line": 159,
+    "function": "_sentence_bounds",
+    "primitive_calls": 1,
+    "calls": 1,
+    "self_seconds": 8.636e-06,
+    "cumulative_seconds": 0.109125647
+  },
+  {
+    "file": "/home/runner/work/Smarty_Chumakov/Smarty_Chumakov/spanverify-module/spanverify/text.py",
+    "line": 99,
+    "function": "sentences",
+    "primitive_calls": 1,
+    "calls": 1,
+    "self_seconds": 0.006132869,
+    "cumulative_seconds": 0.109117011
+  },
+  {
+    "file": "/opt/hostedtoolcache/Python/3.11.17/x64/lib/python3.11/re/__init__.py",
+    "line": 198,
+    "function": "split",
+    "primitive_calls": 203,
+    "calls": 203,
+    "self_seconds": 0.00015485,
+    "cumulative_seconds": 0.102694611
+  },
+  {
+    "file": "~",
+    "line": 0,
+    "function": "<method 'split' of 're.Pattern' objects>",
+    "primitive_calls": 203,
+    "calls": 203,
+    "self_seconds": 0.10203488000000001,
+    "cumulative_seconds": 0.10203488000000001
+  },
+  {
+    "file": "/home/runner/work/Smarty_Chumakov/Smarty_Chumakov/spanverify-module/spanverify/features.py",
+    "line": 666,
+    "function": "similarities",
+    "primitive_calls": 4546,
+    "calls": 4546,
+    "self_seconds": 0.026253873,
+    "cumulative_seconds": 0.093413835
+  },
+  {
+    "file": "/home/runner/work/Smarty_Chumakov/Smarty_Chumakov/spanverify-module/spanverify/engine.py",
+    "line": 789,
+    "function": "_localize",
+    "primitive_calls": 1,
+    "calls": 1,
+    "self_seconds": 0.000350503,
+    "cumulative_seconds": 0.08824369900000001
+  },
+  {
+    "file": "/home/runner/work/Smarty_Chumakov/Smarty_Chumakov/spanverify-module/spanverify/engine.py",
+    "line": 1484,
+    "function": "_token_payload",
+    "primitive_calls": 1,
+    "calls": 1,
+    "self_seconds": 0.016144827,
+    "cumulative_seconds": 0.071823448
+  },
+  {
+    "file": "/home/runner/work/Smarty_Chumakov/Smarty_Chumakov/spanverify-module/spanverify/context_head.py",
+    "line": 70,
+    "function": "<listcomp>",
+    "primitive_calls": 35560,
+    "calls": 35560,
+    "self_seconds": 0.046010932000000004,
+    "cumulative_seconds": 0.0715799
+  },
+  {
+    "file": "~",
+    "line": 0,
+    "function": "<built-in method builtins.any>",
+    "primitive_calls": 21170,
+    "calls": 28243,
+    "self_seconds": 0.018966502,
+    "cumulative_seconds": 0.065158168
+  },
+  {
+    "file": "/home/runner/work/Smarty_Chumakov/Smarty_Chumakov/spanverify-module/spanverify/core.py",
+    "line": 77,
+    "function": "word",
+    "primitive_calls": 97331,
+    "calls": 97331,
+    "self_seconds": 0.040553708,
+    "cumulative_seconds": 0.061384018000000005
+  }
+]
