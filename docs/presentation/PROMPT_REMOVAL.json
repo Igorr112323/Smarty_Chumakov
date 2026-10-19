@@ -1,0 +1,38 @@
+{
+  "date": "2026-10-19",
+  "scope": "Presentation only; four root prompt files removed from tree, retained in unchanged git history",
+  "baseline": "725824030f24862830c277d9e537c5f05727d8b0",
+  "reference_scan_before": [
+    "README.md:188:| [`ПРОМТ_ИИ_СДЕЛАЙ_ВСЁ_НА_GITHUB.md`](ПРОМТ_ИИ_СДЕЛАЙ_ВСЁ_НА_GITHUB.md) ( + `.docx`) | Мастер-промт, по которому выполнялась работа |",
+    "README.md:189:| [`Промты_для_ИИ.md`](Промты_для_ИИ.md) ( + `.docx`) | Пакет промтов: собрать приложение, `.exe`, боевой режим, приёмка |"
+  ],
+  "references_in_CI_or_tests": false,
+  "deleted_files": [
+    {
+      "path": "ПРОМТ_ИИ_СДЕЛАЙ_ВСЁ_НА_GITHUB.md",
+      "sha256": "a0a573f869e0fdd221b9a9e8a56978eb7ff91f50d77e0df49556cbff98964681",
+      "bytes": 15948,
+      "history_url": "https://github.com/Igorr112323/Smarty_Chumakov/blob/725824030f24862830c277d9e537c5f05727d8b0/ПРОМТ_ИИ_СДЕЛАЙ_ВСЁ_НА_GITHUB.md"
+    },
+    {
+      "path": "ПРОМТ_ИИ_СДЕЛАЙ_ВСЁ_НА_GITHUB.docx",
+      "sha256": "cb7678dcefa9efc8b28d65e097b508f0d06fddcf5474a1569fd4e7123611694f",
+      "bytes": 44056,
+      "history_url": "https://github.com/Igorr112323/Smarty_Chumakov/blob/725824030f24862830c277d9e537c5f05727d8b0/ПРОМТ_ИИ_СДЕЛАЙ_ВСЁ_НА_GITHUB.docx"
+    },
+    {
+      "path": "Промты_для_ИИ.md",
+      "sha256": "f4670f2b3eaddb4b0731bfba21ac0d16e43d363c84273f49d0c323d1bd95c311",
+      "bytes": 19980,
+      "history_url": "https://github.com/Igorr112323/Smarty_Chumakov/blob/725824030f24862830c277d9e537c5f05727d8b0/Промты_для_ИИ.md"
+    },
+    {
+      "path": "Промты_для_ИИ.docx",
+      "sha256": "3bbe6a90bc62ace4814bf396946a5e8d6df9b891f43c1fd1ca5f5ec954d77ab6",
+      "bytes": 45458,
+      "history_url": "https://github.com/Igorr112323/Smarty_Chumakov/blob/725824030f24862830c277d9e537c5f05727d8b0/Промты_для_ИИ.docx"
+    }
+  ],
+  "other_deletions": false,
+  "history_rewritten": false
+}
