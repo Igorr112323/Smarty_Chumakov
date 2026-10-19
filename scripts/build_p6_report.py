@@ -137,14 +137,28 @@ def main():
         p = OUT / (name + ".json")
         if p.exists():
             fact = load(p)
+            accepted = fact.get("conclusion") == "success"
+            if name == "windows-rc":
+                release_path = OUT / "rc-release.json"
+                release = load(release_path) if release_path.exists() else {}
+                sizes = {a["name"]: a["size"] for a in release.get("assets", [])}
+                fact["measured_size_gate"] = {
+                    "exe_bytes": sizes.get("spanverify.exe"),
+                    "pyz_bytes": sizes.get("spanverify.pyz"),
+                    "exe_ok": sizes.get("spanverify.exe", 10**12) <= 9000000,
+                    "pyz_ok": sizes.get("spanverify.pyz", 10**12) <= 600000,
+                }
+                accepted = (
+                    accepted
+                    and release.get("isPrerelease", False)
+                    and release.get("targetCommitish") == fact.get("headSha")
+                    and fact["measured_size_gate"]["exe_ok"]
+                    and fact["measured_size_gate"]["pyz_ok"]
+                )
             rows.append(
                 {
                     "id": name,
-                    "status": (
-                        "подтверждено"
-                        if fact.get("conclusion") == "success"
-                        else "не достигнут"
-                    ),
+                    "status": ("подтверждено" if accepted else "не достигнут"),
                     "fact": fact,
                     "run_url": fact.get("url"),
                 }

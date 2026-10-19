@@ -2,8 +2,8 @@
   "files": [
     {
       "path": "reports/acceptance/README.md",
-      "bytes": 9849,
-      "sha256": "98333d3dee86b14eb7cd01a150a17033ce18f30a656a6371fb83e9e9aeb418f4"
+      "bytes": 9884,
+      "sha256": "29f2f93330dfc2b25bcdad513fbc4e6b8fef2721c80bbf3024ecc943d0932c8d"
     },
     {
       "path": "reports/acceptance/benchmark-source-parity.json",
@@ -12,23 +12,63 @@
     },
     {
       "path": "reports/acceptance/coverage-matrix.json",
-      "bytes": 70021,
-      "sha256": "74ed77a78a0d4c6e9a1c458a4dbeb1235b02ace2cbc3b27ae4f55232b7f3ddcd"
+      "bytes": 82773,
+      "sha256": "af16244d230564914a237a422bef82b6e0d056ee44f1d6ed886d781b26973e13"
     },
     {
       "path": "reports/acceptance/coverage-matrix.md",
-      "bytes": 4742,
-      "sha256": "08b7c4c555969375fcf7f1b04ca2e45c3cdad9cc2be867295649e03e9e2839a2"
+      "bytes": 4802,
+      "sha256": "add80ef1dfd0ea0c78ba4bf6c5d5d15f8c4b07852e86158845e706bd3f1df652"
+    },
+    {
+      "path": "reports/acceptance/final-interface-replay/demo-annotations.json",
+      "bytes": 3727,
+      "sha256": "cba1dece8802d38a796a62d1854725e146c4c2dfc97dec92e2f8f81849278eed"
+    },
+    {
+      "path": "reports/acceptance/final-interface-replay/demo-http-response.json",
+      "bytes": 2531,
+      "sha256": "d5c2cd971e21e78c5544bbacf9d5f97303b13d4bc3be48420adf0a052ea66849"
+    },
+    {
+      "path": "reports/acceptance/final-interface-replay/demo-interfaces.json",
+      "bytes": 574,
+      "sha256": "44954c7a53014a6f032bcadf766deb2010ff0c122201b3663c506805f34ab2f4"
+    },
+    {
+      "path": "reports/acceptance/final-interface-replay/hf-annotations.json",
+      "bytes": 3106,
+      "sha256": "9df44946089ae6c9b5643f3db9e20640b8469ca53c97d77252cb3ef387a006a1"
+    },
+    {
+      "path": "reports/acceptance/final-interface-replay/hf-http-response.json",
+      "bytes": 1902,
+      "sha256": "df08539cf3fa829bc9875be0131d33526d9d4d4112bcb8804e6d6a5a5a879967"
+    },
+    {
+      "path": "reports/acceptance/final-interface-replay/hf-interfaces.json",
+      "bytes": 570,
+      "sha256": "68811b9288cdabf81b5565ca736c500a699c66575524041ca2e6a5dededc2072"
+    },
+    {
+      "path": "reports/acceptance/final-runtime-manifest.json",
+      "bytes": 1087,
+      "sha256": "3f39ad276de42a613e0f87ce878915f8c7153587ffcfb646a029ad1b80519108"
     },
     {
       "path": "reports/acceptance/full-suite.log",
       "bytes": 1083,
-      "sha256": "57a675af78a1e50236b63debde7f19ea4b79f55609d3148680bd9dc071e6f846"
+      "sha256": "bbdf7785b7ae520cfb278b0fc6fa68bab3f581c84c0357db9a7fc521825e8e54"
     },
     {
       "path": "reports/acceptance/full-suite.xml",
       "bytes": 98073,
-      "sha256": "b95e158233de880cf213aeea73b6f4ddb661e7d1b73c0431285b24cf9328ccfa"
+      "sha256": "70af30f70651a78be2744d16c9fec067a23e3ed19723788193713d1b265f4d56"
+    },
+    {
+      "path": "reports/acceptance/functional-2M-demo-final.json",
+      "bytes": 7863,
+      "sha256": "6c6157b0fd887b81904aa0a65c0c3284f78e5829d3d32ab5871775421bc15edf"
     },
     {
       "path": "reports/acceptance/functional-2M-demo.json",
@@ -52,8 +92,8 @@
     },
     {
       "path": "reports/acceptance/ordinary-ci.json",
-      "bytes": 9536,
-      "sha256": "e2f80a616fb631277859ce3aa65f020f08c584aa451b4b05844612028855312f"
+      "bytes": 9744,
+      "sha256": "c5a646e615e22614fd7a1bcc9cc7daf77b935cad53eab255d295e1eec4611923"
     },
     {
       "path": "reports/acceptance/parity-summary.json",
@@ -61,9 +101,24 @@
       "sha256": "2c9da26bf35dc6148739d6e30828ca0379c99ef6e7dc694a558921be6affc3a5"
     },
     {
+      "path": "reports/acceptance/prior-ci-metric-annotations.json",
+      "bytes": 3557,
+      "sha256": "8aa936e1a06461878b97e66fbc13d1eab99aef67f58e8a61f3b4256bee1004bd"
+    },
+    {
       "path": "reports/acceptance/protocol.json",
       "bytes": 3357,
       "sha256": "e1f4d3e95b5f26da4bb99befbfe8088caa958361e2132af2ed2f62563786e253"
+    },
+    {
+      "path": "reports/acceptance/rc-release.json",
+      "bytes": 2827,
+      "sha256": "a8f0e9a0ea12acb238dc49265ace4ccc2686ae73c02389a618841fad1c1c898c"
+    },
+    {
+      "path": "reports/acceptance/rejected-rc-size-annotations.json",
+      "bytes": 8204,
+      "sha256": "a59c370de518596b9a20f0c63948c64b32419e60c17b34c7b4f1eb70ca7526e5"
     },
     {
       "path": "reports/acceptance/robustness.json",
@@ -3829,6 +3884,11 @@
       "path": "reports/acceptance/run39177834081/receipt.json",
       "bytes": 163,
       "sha256": "8c35c1e6b0a787693e4d0553b2a1fa27f24f6d5db4b0903fae9d0b791f6bbe31"
+    },
+    {
+      "path": "reports/acceptance/windows-rc.json",
+      "bytes": 6430,
+      "sha256": "4c512bf1386550704570fc2081c2cd3f7e2e2d67a620b6d8a1372266239383aa"
     }
   ]
 }

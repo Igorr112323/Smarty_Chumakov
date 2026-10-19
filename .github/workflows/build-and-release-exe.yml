@@ -105,7 +105,7 @@ jobs:
       - name: Зависимости сборки
         run: |
           python -m pip install --upgrade pip
-          python -m pip install -r requirements.txt -r requirements-token-head-tests.txt
+          python -m pip install -r requirements.txt
 
       - name: Версия пакета совпадает с тегом
         shell: pwsh
@@ -174,7 +174,7 @@ jobs:
           --add-data "config;config" --add-data "data/demo_pairs.jsonl;data" --add-data "data/demo_dataset.jsonl;data"
           --hidden-import spanverify.server --hidden-import spanverify.cli
           --exclude-module torch --exclude-module transformers --exclude-module streamlit
-          --exclude-module numpy --exclude-module pandas --exclude-module matplotlib
+          --exclude-module numpy --exclude-module sklearn --exclude-module scipy --exclude-module pandas --exclude-module matplotlib
           --exclude-module tkinter --exclude-module pytest
           scripts/exe_launcher.py
 
@@ -430,7 +430,7 @@ jobs:
             "limit_pyz_bytes" = 600000
             "exe_ok" = ($exe -le 9000000)
             "pyz_ok" = ($pyz -le 600000)
-            "gate" = "ТЗ п. 4.2: исполняемый файл не более 9 МБ либо переносимый пакет не более 0,6 МБ"
+            "gate" = "ТЗ п. 4.2: P6: exe <= 9 MB AND portable <= 0.6 MB"
             "command" = "python -m PyInstaller spanverify.spec; python scripts/make_zipapp.py --out release"
           }
           $json = $sizes | ConvertTo-Json -Depth 4
@@ -447,8 +447,8 @@ jobs:
           if (-not $sizes["pyz_ok"]) {
             Write-Host "::error title=размер пакета::spanverify.pyz $pyz байт больше 0,6 МБ"
           }
-          if ((-not $sizes["exe_ok"]) -and (-not $sizes["pyz_ok"])) {
-            throw "поставка не уложилась ни в 9 МБ (.exe), ни в 0,6 МБ (пакет)"
+          if ((-not $sizes["exe_ok"]) -or (-not $sizes["pyz_ok"])) {
+            throw "P6 requires BOTH limits: exe <= 9 MB AND portable <= 0.6 MB"
           }
           Write-Host "::notice title=размеры поставки::exe $exe байт ($exeMb МБ), pyz $pyz байт ($pyzMb МБ)"
 

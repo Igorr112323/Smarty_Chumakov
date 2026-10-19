@@ -28,7 +28,7 @@
   },
   "disclaimer": "Демонстрационные метрики получены на синтетическом корпусе и научным результатом не являются. Для подтверждения требуются 1200 пар «вопрос–ответ» с экспертной разметкой на реальных регламентах организации.",
   "tests": {
-    "collected": 871,
+    "collected": 872,
     "coverage_percent": 87.82,
     "coverage_gate_percent": 85,
     "inventory_note": "P6 current collection; pass/fail and coverage require current JUnit, historical coverage retained."

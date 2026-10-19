@@ -83,3 +83,28 @@ def test_script_declares_sources_and_does_not_invent_statuses() -> None:
     payload = json.loads(PAYLOAD.read_text(encoding="utf-8"))
     assert payload["source"] == ".github/workflows/*.yml + reports/CI_RUNS.json"
     assert payload["runs_considered"] >= 1, "не записано, сколько прогонов просмотрено"
+
+
+def test_windows_rc_keeps_strict_size_and_frozen_packaging_contract() -> None:
+    """P6: оба size limits обязательны; fit-зависимости не попадают в exe-среду."""
+    import ast
+
+    import yaml
+
+    workflow = yaml.safe_load((WORKFLOWS / "build-and-release-exe.yml").read_text(encoding="utf-8"))
+    jobs = workflow["jobs"]
+    tests = "\n".join(str(s.get("run", "")) for s in jobs["test"]["steps"])
+    build = "\n".join(str(s.get("run", "")) for s in jobs["windows-exe"]["steps"])
+    assert "requirements-token-head-tests.txt" in tests
+    assert "requirements-token-head-tests.txt" not in build
+    assert 'if ((-not $sizes["exe_ok"]) -or (-not $sizes["pyz_ok"]))' in build
+    assert "spanverify train" not in build and "git push" not in build
+    assert "--prerelease" in build and "--latest=false" in build
+    assert "spanverify-module/reports/experiments/** -text" in (REPO_ROOT / ".gitattributes").read_text()
+    tree = ast.parse((MODULE_ROOT / "spanverify.spec").read_text(encoding="utf-8"))
+    excluded = next(
+        ast.literal_eval(n.value)
+        for n in tree.body
+        if isinstance(n, ast.Assign) and any(isinstance(t, ast.Name) and t.id == "excludes" for t in n.targets)
+    )
+    assert {"numpy", "sklearn", "scipy", "torch", "transformers"} <= set(excluded)

@@ -12,8 +12,8 @@
 | ai-share-hf | измерено, не доказательство калибровки | https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39177834081 |
 | frozen-public-parity | подтверждено | https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39177834081 |
 | local-suite | подтверждено | reports/acceptance/full-suite.xml |
-| ordinary-ci | подтверждено | https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39177834071 |
-| windows-rc | не измерено | protocol.json |
+| ordinary-ci | подтверждено | https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39180292854 |
+| windows-rc | не достигнут | https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39180292839 |
 | full-2M-demo-answer | подтверждено функционально; скорость не достигнута | reports/acceptance/functional-2M-demo.json |
 | native-HF-long-answer-without-truncation | не достигнут | reports/acceptance/long-answer-limitation.json |
 | robustness | измерено на saved OOF/dev, не новая независимая проверка | reports/acceptance/robustness.json |

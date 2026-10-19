@@ -57,9 +57,25 @@ hiddenimports = [
 ]
 
 excludes = [
-    "torch", "transformers", "faiss", "streamlit", "tkinter", "unittest",
-    "pydoc", "pytest", "setuptools", "pip", "matplotlib", "pandas", "scipy",
-    "PIL", "IPython", "notebook", "numpy.testing",
+    "torch",
+    "transformers",
+    "faiss",
+    "streamlit",
+    "tkinter",
+    "unittest",
+    "pydoc",
+    "pytest",
+    "setuptools",
+    "pip",
+    "matplotlib",
+    "pandas",
+    "scipy",
+    "PIL",
+    "IPython",
+    "notebook",
+    "numpy",
+    "numpy.testing",
+    "sklearn",
 ]
 
 a = Analysis(
