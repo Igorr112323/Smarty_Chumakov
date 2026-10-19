@@ -20,3 +20,12 @@ Before official completion, preregistration push uses [skip ci] solely to enforc
 user's absolute no-test-fit barrier. Ordinary CI is not disabled/modified;
 full suites and normal CI run only AFTER the official measurement is sealed.
 Bad numbers are published, not tuned. Joint test gate alone permits latest release.
+
+## Sole infrastructure recovery
+Original39266027598 failed before first completed prediction: eval() calls
+transformers.train(False), rejected by wrapper's too-narrow torch-only exception.
+Traceback retained. Recovery changes only measurement guard to allow the same
+False-mode transformers evaluation call, never train(True)/fit. Product unchanged.
+Before recovery, download original artifact and assert empty evidence/no result;
+retain original consumed tag, atomically create separate recovery-1 tag.
+Long metadata audit177/7over512/max1266 already published before labels.

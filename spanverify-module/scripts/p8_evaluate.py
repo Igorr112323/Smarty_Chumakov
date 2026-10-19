@@ -89,7 +89,7 @@ def main(args):
     fit_calls=[]
     def no_fit(frame,event,arg):
         if event=='call' and frame.f_code.co_name in ('fit','fit_transform','train'):
-            if frame.f_code.co_name=='train' and frame.f_globals.get('__name__','').startswith('torch.') and frame.f_locals.get('mode') is False:return
+            if frame.f_code.co_name=='train' and frame.f_globals.get('__name__','').startswith(('torch.','transformers.')) and frame.f_locals.get('mode') is False:return
             fit_calls.append(dict(file=frame.f_code.co_filename,function=frame.f_code.co_name))
             raise RuntimeError('P8 forbidden fit/train call')
     sys.setprofile(no_fit)

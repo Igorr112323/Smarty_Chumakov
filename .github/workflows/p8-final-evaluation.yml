@@ -37,9 +37,18 @@ jobs:
         run: |
           pip install 'torch==2.14.1+cpu' --index-url https://download.pytorch.org/whl/cpu
           pip install 'transformers==5.20.1' 'numpy==2.4.6' 'sentencepiece==0.2.2' ijson
+      - uses: actions/download-artifact@v4
+        with:
+          name: p8-official177
+          run-id: 39266027598
+          github-token: ${{ github.token }}
+          path: .arena/p8-first-failure
+      - name: Infrastructure recovery permitted only before first completed prediction
+        run: |
+          python -c "from pathlib import Path; p=Path('../.arena/p8-first-failure'); assert (p/'evidence.jsonl').stat().st_size==0; assert not (p/'result.json').exists(); t=(p/'INFRASTRUCTURE-TRACEBACK.txt').read_text(); assert 'P8 forbidden fit/train call' in t and 'return self.train(False)' in t"
       - name: Atomically consume the one official authorization
         run: |
-          gh api --method POST repos/${{ github.repository }}/git/refs -f ref=refs/tags/p8-official-test177-consumed -f sha=${{ github.sha }}
+          gh api --method POST repos/${{ github.repository }}/git/refs -f ref=refs/tags/p8-official-test177-recovery-1-consumed -f sha=${{ github.sha }}
           mkdir -p ../reports/p8/official
           printf '{"run_id":"%s","commit":"%s","attempt":1,"authorization":"P8 user one official177, no quality retries"}\n' '${{ github.run_id }}' '${{ github.sha }}' > ../reports/p8/official/CONSUMED.json
       - name: ONE official inference, metadata-only long audit before labels
