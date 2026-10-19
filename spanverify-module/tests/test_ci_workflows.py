@@ -88,7 +88,7 @@ def test_document_lists_every_workflow(request: pytest.FixtureRequest) -> None:
     assert inventory["total"] == len(recorded) == len(set(recorded))
     assert all(entry["collected_nodes"] == len(entry["nodeids"]) for entry in files)
     assert {entry["path"] for entry in files} == {
-        str(path.relative_to(REPO_ROOT)) for path in (MODULE_ROOT / "tests").glob("test_*.py")
+        path.relative_to(REPO_ROOT).as_posix() for path in (MODULE_ROOT / "tests").glob("test_*.py")
     }
     table = (REPO_ROOT / "docs/TESTS.md").read_text(encoding="utf-8")
     rows = re.findall(r"^\| \[(test_[^]]+\.py)\]\([^)]+\) \| (\d+) \|", table, re.MULTILINE)

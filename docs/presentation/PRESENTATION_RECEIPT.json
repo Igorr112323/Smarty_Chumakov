@@ -156,5 +156,13 @@
     "finding": "Existing numeric checker interprets the digit 1 in Russian wording F1 токенов as a token count. Full preflight exposed this; two README phrases corrected to токенный F1. No numbers or checker assertions changed.",
     "history_policy": "Extra small documentation correction commit instead of amend/force; both initial commits already pushed.",
     "full_exact_head_qa_required_again": true
+  },
+  "documentation_guard_windows_portability": {
+    "parent": "bf0af208469dea407e0a31e61664892d6216915c",
+    "finding": "Full local suite passed 908+2, but Windows CI failed. Inspection found new documentation guard comparing native Windows backslash paths against canonical POSIX inventory paths. Normalize the filesystem-relative representation with as_posix; retain full set equality and every prior assertion.",
+    "failed_windows_job": 118287245440,
+    "production_changes": false,
+    "history_policy": "Normal additional documentation-test fix commit; no amend/rebase/force.",
+    "full_exact_head_qa_required_again": true
   }
 }
