@@ -1,0 +1,36 @@
+name: P7 frozen engineering gates
+on:
+  workflow_dispatch:
+  push:
+    branches: [arena/c5f69767-smarty-chumakov]
+    paths: [.github/p7-acceptance.trigger]
+permissions:
+  contents: read
+  actions: read
+jobs:
+  parity:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: pip install -r spanverify-module/requirements-token-head-tests.txt
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: hf-cache-a3-v2-*
+          merge-multiple: false
+          path: .arena/hf-reference
+          run-id: 39060670054
+          github-token: ${{ github.token }}
+      - name: Actual frozen public dev replay; zero drift required, no fitting
+        working-directory: spanverify-module
+        run: python scripts/p6_acceptance.py parity --cache ../.arena/hf-reference --out ../reports/acceptance/parity
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: p7-parity
+          path: reports/acceptance/parity/
+      - name: Byte-exact pre-change golden I/O
+        run: python spanverify-module/scripts/p7_golden.py check reports/p7/pre-change-golden.json

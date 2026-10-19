@@ -5,15 +5,15 @@
 | Проверка | Статус | Прямой источник |
 |---|---|---|
 | speed-demo | не достигнут | https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39177834081 |
-| interfaces-demo | подтверждено | https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39183025109 |
+| interfaces-demo | подтверждено | https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39184437524 |
 | ai-share-demo | измерено, не доказательство калибровки | https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39177834081 |
 | speed-hf | не достигнут | https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39177834081 |
-| interfaces-hf | подтверждено | https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39183025109 |
+| interfaces-hf | подтверждено | https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39184437524 |
 | ai-share-hf | измерено, не доказательство калибровки | https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39177834081 |
-| frozen-public-parity | подтверждено | https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39183025109 |
+| frozen-public-parity | подтверждено | https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39184437524 |
 | local-suite | подтверждено | reports/acceptance/full-suite.xml |
-| ordinary-ci | подтверждено | https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39183025069 |
-| windows-rc | подтверждено | https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39183025124 |
+| ordinary-ci | подтверждено | https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39184437556 |
+| windows-rc | подтверждено | https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39184437541 |
 | full-2M-demo-answer | подтверждено функционально; скорость не достигнута | reports/acceptance/functional-2M-demo-final.json |
 | native-HF-long-answer-without-truncation | не достигнут | reports/acceptance/long-answer-limitation.json |
 | robustness | измерено на saved OOF/dev, не новая независимая проверка | reports/acceptance/robustness.json |

@@ -1,167 +1,13 @@
 {
   "conclusion": "success",
-  "headSha": "6926a809a9d85d9786b2f27517a6629899278074",
+  "headSha": "14a018a1b90b51cc47cd8baf628147ac22e1d8b1",
   "jobs": [
     {
-      "completedAt": "2026-10-19T01:09:47Z",
+      "completedAt": "2026-10-19T01:24:27Z",
       "conclusion": "success",
-      "databaseId": 117839626389,
-      "name": "Тесты (Python 3.12, windows-latest)",
-      "startedAt": "2026-10-19T00:56:30Z",
-      "status": "completed",
-      "steps": [
-        {
-          "conclusion": "success",
-          "name": "Set up job",
-          "number": 1,
-          "status": "completed"
-        },
-        {
-          "conclusion": "success",
-          "name": "Run actions/checkout@v4",
-          "number": 2,
-          "status": "completed"
-        },
-        {
-          "conclusion": "success",
-          "name": "Run actions/setup-python@v5",
-          "number": 3,
-          "status": "completed"
-        },
-        {
-          "conclusion": "success",
-          "name": "Зависимости тестов",
-          "number": 4,
-          "status": "completed"
-        },
-        {
-          "conclusion": "success",
-          "name": "Тесты",
-          "number": 5,
-          "status": "completed"
-        },
-        {
-          "conclusion": "success",
-          "name": "Само-проверка конвейера",
-          "number": 6,
-          "status": "completed"
-        },
-        {
-          "conclusion": "success",
-          "name": "Проверка HTTP-контракта (реальный запрос к сервису)",
-          "number": 7,
-          "status": "completed"
-        },
-        {
-          "conclusion": "success",
-          "name": "Full matrix JUnit, including failures",
-          "number": 8,
-          "status": "completed"
-        },
-        {
-          "conclusion": "success",
-          "name": "Post Run actions/setup-python@v5",
-          "number": 15,
-          "status": "completed"
-        },
-        {
-          "conclusion": "success",
-          "name": "Post Run actions/checkout@v4",
-          "number": 16,
-          "status": "completed"
-        },
-        {
-          "conclusion": "success",
-          "name": "Complete job",
-          "number": 17,
-          "status": "completed"
-        }
-      ],
-      "url": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39183025069/job/117839626389"
-    },
-    {
-      "completedAt": "2026-10-19T01:09:47Z",
-      "conclusion": "success",
-      "databaseId": 117839626648,
-      "name": "Тесты (Python 3.11, ubuntu-latest)",
-      "startedAt": "2026-10-19T00:56:30Z",
-      "status": "completed",
-      "steps": [
-        {
-          "conclusion": "success",
-          "name": "Set up job",
-          "number": 1,
-          "status": "completed"
-        },
-        {
-          "conclusion": "success",
-          "name": "Run actions/checkout@v4",
-          "number": 2,
-          "status": "completed"
-        },
-        {
-          "conclusion": "success",
-          "name": "Run actions/setup-python@v5",
-          "number": 3,
-          "status": "completed"
-        },
-        {
-          "conclusion": "success",
-          "name": "Зависимости тестов",
-          "number": 4,
-          "status": "completed"
-        },
-        {
-          "conclusion": "success",
-          "name": "Тесты",
-          "number": 5,
-          "status": "completed"
-        },
-        {
-          "conclusion": "success",
-          "name": "Само-проверка конвейера",
-          "number": 6,
-          "status": "completed"
-        },
-        {
-          "conclusion": "success",
-          "name": "Проверка HTTP-контракта (реальный запрос к сервису)",
-          "number": 7,
-          "status": "completed"
-        },
-        {
-          "conclusion": "success",
-          "name": "Full matrix JUnit, including failures",
-          "number": 8,
-          "status": "completed"
-        },
-        {
-          "conclusion": "success",
-          "name": "Post Run actions/setup-python@v5",
-          "number": 15,
-          "status": "completed"
-        },
-        {
-          "conclusion": "success",
-          "name": "Post Run actions/checkout@v4",
-          "number": 16,
-          "status": "completed"
-        },
-        {
-          "conclusion": "success",
-          "name": "Complete job",
-          "number": 17,
-          "status": "completed"
-        }
-      ],
-      "url": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39183025069/job/117839626648"
-    },
-    {
-      "completedAt": "2026-10-19T01:09:47Z",
-      "conclusion": "success",
-      "databaseId": 117839626661,
+      "databaseId": 117843765264,
       "name": "Линтер, форматирование, покрытие",
-      "startedAt": "2026-10-19T00:56:30Z",
+      "startedAt": "2026-10-19T01:14:25Z",
       "status": "completed",
       "steps": [
         {
@@ -255,24 +101,178 @@
           "status": "completed"
         }
       ],
-      "url": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39183025069/job/117839626661"
+      "url": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39184437556/job/117843765264"
     },
     {
-      "completedAt": "2026-10-19T01:09:47Z",
+      "completedAt": "2026-10-19T01:24:27Z",
+      "conclusion": "success",
+      "databaseId": 117843765525,
+      "name": "Тесты (Python 3.11, ubuntu-latest)",
+      "startedAt": "2026-10-19T01:14:25Z",
+      "status": "completed",
+      "steps": [
+        {
+          "conclusion": "success",
+          "name": "Set up job",
+          "number": 1,
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Run actions/checkout@v4",
+          "number": 2,
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Run actions/setup-python@v5",
+          "number": 3,
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Зависимости тестов",
+          "number": 4,
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Тесты",
+          "number": 5,
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Само-проверка конвейера",
+          "number": 6,
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Проверка HTTP-контракта (реальный запрос к сервису)",
+          "number": 7,
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Full matrix JUnit, including failures",
+          "number": 8,
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Post Run actions/setup-python@v5",
+          "number": 15,
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Post Run actions/checkout@v4",
+          "number": 16,
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Complete job",
+          "number": 17,
+          "status": "completed"
+        }
+      ],
+      "url": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39184437556/job/117843765525"
+    },
+    {
+      "completedAt": "2026-10-19T01:24:27Z",
+      "conclusion": "success",
+      "databaseId": 117843765534,
+      "name": "Тесты (Python 3.12, windows-latest)",
+      "startedAt": "2026-10-19T01:14:24Z",
+      "status": "completed",
+      "steps": [
+        {
+          "conclusion": "success",
+          "name": "Set up job",
+          "number": 1,
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Run actions/checkout@v4",
+          "number": 2,
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Run actions/setup-python@v5",
+          "number": 3,
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Зависимости тестов",
+          "number": 4,
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Тесты",
+          "number": 5,
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Само-проверка конвейера",
+          "number": 6,
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Проверка HTTP-контракта (реальный запрос к сервису)",
+          "number": 7,
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Full matrix JUnit, including failures",
+          "number": 8,
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Post Run actions/setup-python@v5",
+          "number": 15,
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Post Run actions/checkout@v4",
+          "number": 16,
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Complete job",
+          "number": 17,
+          "status": "completed"
+        }
+      ],
+      "url": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39184437556/job/117843765534"
+    },
+    {
+      "completedAt": "2026-10-19T01:24:27Z",
       "conclusion": "skipped",
-      "databaseId": 117839627358,
+      "databaseId": 117843766604,
       "name": "Разведка официальных источников (не блокирует CI)",
-      "startedAt": "2026-10-19T00:56:28Z",
+      "startedAt": "2026-10-19T01:14:23Z",
       "status": "completed",
       "steps": [],
-      "url": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39183025069/job/117839627358"
+      "url": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39184437556/job/117843766604"
     },
     {
-      "completedAt": "2026-10-19T01:09:47Z",
+      "completedAt": "2026-10-19T01:24:27Z",
       "conclusion": "success",
-      "databaseId": 117842666452,
+      "databaseId": 117846071389,
       "name": "Соответствие договору (проект 117812)",
-      "startedAt": "2026-10-19T01:09:49Z",
+      "startedAt": "2026-10-19T01:24:29Z",
       "status": "completed",
       "steps": [
         {
@@ -354,14 +354,14 @@
           "status": "completed"
         }
       ],
-      "url": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39183025069/job/117842666452"
+      "url": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39184437556/job/117846071389"
     },
     {
-      "completedAt": "2026-10-19T01:09:47Z",
+      "completedAt": "2026-10-19T01:24:27Z",
       "conclusion": "success",
-      "databaseId": 117842666879,
+      "databaseId": 117846072224,
       "name": "Единый файл чисел (METRICS.json) и сверка документов",
-      "startedAt": "2026-10-19T01:09:49Z",
+      "startedAt": "2026-10-19T01:24:29Z",
       "status": "completed",
       "steps": [
         {
@@ -455,29 +455,29 @@
           "status": "completed"
         }
       ],
-      "url": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39183025069/job/117842666879"
+      "url": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39184437556/job/117846072224"
     },
     {
-      "completedAt": "2026-10-19T01:09:47Z",
+      "completedAt": "2026-10-19T01:24:27Z",
       "conclusion": "skipped",
-      "databaseId": 117842667319,
-      "name": "Внешние размеченные наборы (скачивание, контрольные ...",
-      "startedAt": "2026-10-19T01:09:47Z",
-      "status": "completed",
-      "steps": [],
-      "url": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39183025069/job/117842667319"
-    },
-    {
-      "completedAt": "2026-10-19T01:09:47Z",
-      "conclusion": "skipped",
-      "databaseId": 117842667734,
+      "databaseId": 117846072338,
       "name": "Пилот на реальной модели (rugpt3small, CPU)",
-      "startedAt": "2026-10-19T01:09:47Z",
+      "startedAt": "2026-10-19T01:24:27Z",
       "status": "completed",
       "steps": [],
-      "url": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39183025069/job/117842667734"
+      "url": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39184437556/job/117846072338"
+    },
+    {
+      "completedAt": "2026-10-19T01:24:27Z",
+      "conclusion": "skipped",
+      "databaseId": 117846072787,
+      "name": "Внешние размеченные наборы (скачивание, контрольные ...",
+      "startedAt": "2026-10-19T01:24:27Z",
+      "status": "completed",
+      "steps": [],
+      "url": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39184437556/job/117846072787"
     }
   ],
   "status": "completed",
-  "url": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39183025069"
+  "url": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39184437556"
 }

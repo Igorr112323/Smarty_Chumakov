@@ -7,5 +7,7 @@
     "benchmark": true,
     "shares": true
   },
-  "interface_fixture_only_change": "existing mandatory number-attribution contract fixture; no runtime/model change"
+  "interface_fixture_only_change": "existing mandatory number-attribution contract fixture; no runtime/model change",
+  "last_validated_head": "14a018a1b90b51cc47cd8baf628147ac22e1d8b1",
+  "whole_runtime_config_tree_diff_from_native_benchmark": "empty (git diff 34a82a5 HEAD -- spanverify-module/spanverify spanverify-module/config)"
 }

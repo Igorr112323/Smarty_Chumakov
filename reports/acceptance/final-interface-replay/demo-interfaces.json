@@ -1,9 +1,9 @@
 {
   "mode": "demo",
   "passed": true,
-  "head_sha": "6926a809a9d85d9786b2f27517a6629899278074",
-  "run_url": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39183025109",
-  "job_url": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39183025109/job/117839626460",
+  "head_sha": "14a018a1b90b51cc47cd8baf628147ac22e1d8b1",
+  "run_url": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39184437524",
+  "job_url": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39184437524/job/117843764907",
   "artifact_names": [
     "p6-product-demo"
   ],

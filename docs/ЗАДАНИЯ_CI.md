@@ -5,7 +5,7 @@
 (что оно делало в последний раз). Числа и номера прогонов не вписаны
 руками: их источник — реестр прогонов.
 
-Команда: `python scripts/collect_ci_workflows.py` (запуск: 2026-10-19T00:56:24Z).
+Команда: `python scripts/collect_ci_workflows.py` (запуск: 2026-10-19T07:14:32Z).
 
 | Задание | Запуск | Последний прогон | Артефакты | Числа в реестре |
 | --- | --- | --- | --- | --- |
@@ -28,6 +28,7 @@
 | `P4 context token head` | на пуш, вручную; пуш `.github/p4-context.trigger`; ветки `arena/c5f69767-smarty-chumakov` | прогонов нет | да | — |
 | `P5 span keep/drop filter` | на пуш, вручную; пуш `.github/p5-span.trigger`; ветки `arena/c5f69767-smarty-chumakov` | прогонов нет | да | — |
 | `P6 frozen product acceptance` | вручную, на пуш; пуш `.github/p6-acceptance.trigger`; ветки `arena/c5f69767-smarty-chumakov` | прогонов нет | да | — |
+| `P7 frozen engineering gates` | вручную, на пуш; пуш `.github/p7-acceptance.trigger`; ветки `arena/c5f69767-smarty-chumakov` | прогонов нет | да | — |
 | `P0-3 P1 Answer Head` | на пуш, вручную; пуш `spanverify-module/spanverify/answer_head.py`, `spanverify-module/spanverify/oof.py`, `spanverify-module/scripts/measure_p1.py`, `spanverify-module/tests/test_answer_head.py`, `.github/workflows/postprocess-p0-answer-p1.yml`; ветки `arena/c5f69767-smarty-chumakov` | прогонов нет | да | — |
 | `P0-2 Ответы` | на пуш, вручную; пуш `.github/postprocess-p0-answer.trigger`; ветки `arena/c5f69767-smarty-chumakov` | прогонов нет | да | — |
 | `Постобработка span_expansion` | на пуш, вручную; пуш `.github/postprocess-span-comparison.trigger`; ветки `arena/c5f69767-smarty-chumakov` | прогонов нет | да | — |

@@ -19,7 +19,7 @@
       "source": "attribution"
     }
   ],
-  "latency_ms": 753.91,
+  "latency_ms": 580.77,
   "mode": "hf",
   "stats": {
     "token_count": 8,

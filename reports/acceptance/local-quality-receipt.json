@@ -1,0 +1,7 @@
+{
+  "head_sha": "14a018a1b90b51cc47cd8baf628147ac22e1d8b1",
+  "module_ruff": "PASS: ruff check .",
+  "module_black": "PASS: black --check . (182 files unchanged)",
+  "packaging_spec": "PASS: black --check spanverify.spec",
+  "root_scripts": "PASS: ruff check + black --check scripts/build_p6_report.py scripts/contract_check.py"
+}

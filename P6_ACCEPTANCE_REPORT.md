@@ -1,12 +1,12 @@
 # P6 — результаты приёмочного контура
 
-**Приёмка продукта целиком не пройдена.** Приёмочный контур выполнен и результаты зафиксированы без изменения замороженной модели. Проверенный код: `6926a809a9d85d9786b2f27517a6629899278074`. Обычный CI **39183025069 SUCCESS**, Windows **39183025124 SUCCESS**, public parity/interfaces **39183025109 SUCCESS**. После этого публикуются только receipts/отчёты; inference/runtime/config не меняются. Официальная оценка test177 не выполнялась (инцидент чтения описан ниже).
+**Приёмка продукта целиком не пройдена.** Приёмочный контур выполнен и результаты зафиксированы без изменения замороженной модели. Проверенный код: `14a018a1b90b51cc47cd8baf628147ac22e1d8b1`. Обычный CI **39184437556 SUCCESS**, Windows **39184437541 SUCCESS**, public parity/interfaces **39184437524 SUCCESS**. После этого публикуются только receipts/отчёты; inference/runtime/config не меняются. Официальная оценка test177 не выполнялась (инцидент чтения описан ниже).
 
 ## Контроль модели и регрессии
 
 - Frozen P5: **122874 B**, SHA-256 `e0b13c693a058dfd66ed24a52fc14e9c70964e95885358e7b99cc1f328ad6892`.
 - Public dev replay: 181 пара, 13150 полных token-risk записей, несовпадений 0, P1 raw/calibrated/threshold delta 0, cache misses 0. Все span/token поля сравниваются с сохранённым P5, без переобучения.
-- Полный локальный suite: **870 passed, 2 skipped, 0 failures/errors**, 301.725 s, 872 узла. Tests excluded: false. Пропуски прежние: отсутствуют torch/transformers и rouge_score в unit-test окружении; настоящий product HF измеряется отдельно на runner.
+- Полный локальный suite: **870 passed, 2 skipped, 0 failures/errors**, 316.054 s, 872 узла. Tests excluded: false. Пропуски прежние: отсутствуют torch/transformers и rouge_score в unit-test окружении; настоящий product HF измеряется отдельно на runner.
 - Все 22 исходных testcase найдены и PASSED в новом JUnit: [индивидуальные причины и diff](reports/acceptance/historical-22-fixes.md). Исходные положительные grounded/CLI/числовые проверки сохранены; изменено только устаревшее ограничение sentinel-порога.
 - Исторические каталоги P2/P3/P4/P5 побайтно не изменены.
 
@@ -97,13 +97,13 @@ MAE: demo **0.471802**, hf **0.399863**. Обе средние кривые **н
 
 ## Windows RC / окончательная CI-проверка
 
-Итоговые проверки на одном коде `6926a80`:
+Итоговые проверки на одном коде `14a018a`:
 
-- [Обычный ci.yml — **SUCCESS**](https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39183025069): quality Ruff/Black, полный suite и coverage **85.06%** (не demo quality P5), Linux/Windows, contract и numbers jobs SUCCESS. Tests collected **872**, tests_excluded=false; новых unit skips нет. Существующие conditional pilot/external/scout jobs не отключались и не выдаются за запущенные.
-- [Windows workflow — **SUCCESS**](https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39183025124): три тестовые Python-матрицы, onefile/onedir/pyz, HTTP/clean-CWD autonomy smoke, проверка embedded Python DLL SHA и frozen P5 SHA, product registry keys before/after, оба строгих size gate SUCCESS.
-- [Public interfaces/parity — **SUCCESS**](https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39183025109): demo и hf, CLI/web8765/HTTP200; обязательный nonempty span 46..53 «десять », label=doubtful, risk=.5654, confidence=.4346; сохранены реальные HTTP bodies/annotations/artifact links. В `[interfaces-only]` пропущено повторное измерение уже неизменного benchmark, не unit tests. Publisher не создаёт повторные bot-коммиты.
-- [Только prerelease RC, не latest](https://github.com/Igorr112323/Smarty_Chumakov/releases/tag/v1.3.1-rc.p6.39183025124): **exe 8985124 B ≤9000000**, **pyz 227008 B ≤600000**, onedir ZIP **9135445 B**. `.pyz` требует Python ≥3.10, самостоятельный `.exe` содержит Python DLL; ZIP не называется 0.6-MB portable package.
-- SHA256 exe: `526655effe1a30e9e3ae04236e6659ccb3afbc258dc94141fd9e0ee15fa44464`; pyz: `632777edf23dcb680e83e06f0bb92abf623a380b9d1bc1a64d4ae082ac4450ca`; ZIP: `6abe236d14f8d4464d8ae6be9ff3c7ee8e8ae85ab36cf44c119953d976627f67`. Полный SHA256SUMS опубликован с RC и зеркалируется в `RC-SHA256SUMS.txt`; digest взят из GitHub release API, а не придуман из имени файла.
+- [Обычный ci.yml — **SUCCESS**](https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39184437556): quality Ruff/Black, полный suite и coverage **85.06%** (не demo quality P5), Linux/Windows, contract и numbers jobs SUCCESS. Tests collected **872**, tests_excluded=false; новых unit skips нет. Существующие conditional pilot/external/scout jobs не отключались и не выдаются за запущенные.
+- [Windows workflow — **SUCCESS**](https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39184437541): три тестовые Python-матрицы, onefile/onedir/pyz, HTTP/clean-CWD autonomy smoke, проверка embedded Python DLL SHA и frozen P5 SHA, product registry keys before/after, оба строгих size gate SUCCESS.
+- [Public interfaces/parity — **SUCCESS**](https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39184437524): demo и hf, CLI/web8765/HTTP200; обязательный nonempty span 46..53 «десять », label=doubtful, risk=.5654, confidence=.4346; сохранены реальные HTTP bodies/annotations/artifact links. В `[interfaces-only]` пропущено повторное измерение уже неизменного benchmark, не unit tests. Publisher не создаёт повторные bot-коммиты.
+- [Только prerelease RC, не latest](https://github.com/Igorr112323/Smarty_Chumakov/releases/tag/v1.3.1-rc.p6.39184437541): **exe 8985072 B ≤9000000**, **pyz 227008 B ≤600000**, onedir ZIP **9136772 B**. `.pyz` требует Python ≥3.10, самостоятельный `.exe` содержит Python DLL; ZIP не называется 0.6-MB portable package.
+- SHA256 exe: `b8b46a30e7b1775e77fb335afad33f55d58a654826c11e0d3bc206079639b5f7`; pyz: `a447ca798651f78317e55433318fd2f2bc982612afada0071defd3f8fdf901e3`; ZIP: `49383d0bd7b2613623bf0f3639504b8b4eae6cf4434aa6f71e07f3bf7c8c5457`. Полный SHA256SUMS опубликован с RC и зеркалируется в `RC-SHA256SUMS.txt`; digest взят из GitHub release API, а не придуман из имени файла.
 - Фикс CRLF: `.gitattributes -text` оставляет frozen evidence побайтно исходным. Training fallback запрещён, production auto-train не выполнялся. Неиспользуемые server exe train/evaluate корпуса вынесены из exe; модель/config не удалялись, DLL не стрипились.
 
 Portable copy/update: остановить процесс, проверить SHA256SUMS, заменить полный exe/onedir одним RC целиком; не смешивать config/runtime разных поставок. Frozen `frozen-p5.json` и `p5-runtime.json` включены в RC. Конкретные bytes/hash/runtime/env и JUnit находятся в `reports/acceptance/`; `manifest.json` инвентаризирует артефакты.
@@ -126,4 +126,12 @@ CI `39180292854` и Windows workflow `39180292839` завершились SUCCES
 Функциональный повтор на `9d576a8`: **363.414889 s**, 282830 records, последний end=2000000; hash всех token records совпал с первым прогоном: `5e68bd503774557c878ffcbb25a182f3c829dff42b2fe711615f64a73a2fcfda`. Норма 60 s не достигнута. Дерево inference-runtime при исправлении упаковки не меняется.
 
 
-Следующий strict RC run `39181817291` корректно остановился на **9044022 B** (превышение 44022 B); autonomy и HTTP smoke успешны, релиз **не опубликован**. Ненужные server-launcher демонстрационные train/evaluate корпуса (≈1 MB исходных данных, ≈59 KB сжато) вынесены из exe/onedir, без удаления config/моделей или стрипа DLL. Portable CLI по-прежнему содержит свой demo_pairs. Отдельный regression удерживает эту комплектацию. На `ef39a09` обычный CI `39181817272` SUCCESS, локально **870 passed / 2 skipped / 872** за **314.489 s**, все исходные 22 testcase PASSED ([индивидуальные причины и diff](reports/acceptance/historical-22-fixes.md)). Для изменения комплектации запускается свежая заключительная проверка.
+Следующий strict RC run `39181817291` корректно остановился на **9044022 B** (превышение 44022 B); autonomy и HTTP smoke успешны, релиз **не опубликован**. Ненужные server-launcher демонстрационные train/evaluate корпуса (≈1 MB исходных данных, ≈59 KB сжато) вынесены из exe/onedir, без удаления config/моделей или стрипа DLL. Portable CLI по-прежнему содержит свой demo_pairs. Отдельный regression удерживает эту комплектацию. На `ef39a09` обычный CI `39181817272` SUCCESS, локально **870 passed / 2 skipped / 872** за **314.489 s**, все исходные 22 testcase PASSED ([индивидуальные причины и diff](reports/acceptance/historical-22-fixes.md)). Эта проверка завершена; заключительные run links приведены выше.
+
+
+## Заключительная публикация
+
+Окончательный HEAD `14a018a` — receipt-only публикация, после неё повторены полный локальный suite (870 passed / 2 прежних skips / 872, 316.054 s), обычный CI, actual public parity/interfaces и fresh Windows RC. Все три workflows SUCCESS на этом точном SHA. Итоговые машинные receipts обновлены после завершения workflows; они не являются новым inference-кодом. Публичные отчёты на GitHub содержат предыдущий уже проверенный code-equivalent snapshot `6926a80`; текущие receipt/JUnit/manifest также включены в выдаваемый архив и итоговые RC notes. Не утверждается clean working tree: post-run отчётные файлы обновлены без нового изменения модели/кода.
+
+
+Дополнительное прикрепление сводного ZIP/его SHA256/MD к релизу через `uploads.github.com` завершилось **EOF**; ни один из этих трёх дополнительных assets не загружен. Шесть штатных RC-assets (exe, pyz, onedir ZIP, frozen model, runtime config, SHA256SUMS) опубликованы и не затронуты. Полный финальный сводный ZIP и его SHA256 предоставляются в Arena workspace (`reports/p6-acceptance-14a018a.zip`); текущий отчёт также опубликован как RC notes, а текущие JUnit/interfaces — в successful Actions artifacts. Это ограничение дополнительной доставки, не успешная загрузка, и не повод поручать пользователю команды.

@@ -1,7 +1,7 @@
 {
   "kind": "ci_workflows",
   "runs_considered": 100,
-  "generated_at": "2026-10-19T00:56:24Z",
+  "generated_at": "2026-10-19T07:14:32Z",
   "command": "python scripts/collect_ci_workflows.py",
   "source": ".github/workflows/*.yml + reports/CI_RUNS.json",
   "registry": {
@@ -681,6 +681,33 @@
           "timeout_minutes": 10,
           "steps": 3,
           "uploads_artifacts": false,
+          "runs_python": "ubuntu-latest"
+        }
+      ],
+      "manual_only": true,
+      "never_runs_by_itself": false
+    },
+    {
+      "file": ".github/workflows/p7-acceptance.yml",
+      "name": "P7 frozen engineering gates",
+      "triggers": [
+        "workflow_dispatch",
+        "push"
+      ],
+      "schedule": [],
+      "push_paths": [
+        ".github/p7-acceptance.trigger"
+      ],
+      "push_branches": [
+        "arena/c5f69767-smarty-chumakov"
+      ],
+      "push_tags": [],
+      "jobs": [
+        {
+          "name": "parity",
+          "timeout_minutes": 40,
+          "steps": 7,
+          "uploads_artifacts": true,
           "runs_python": "ubuntu-latest"
         }
       ],
