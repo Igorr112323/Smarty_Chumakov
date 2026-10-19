@@ -640,3 +640,22 @@ jobs:
             spanverify-module/reports/ips_list_probe.json
             spanverify-module/reports/ips_final_probe.json
           retention-days: 30
+
+  final-verification:
+    name: Final CI read-only P8 seal
+    needs: [p8-freeze-barrier, quality, tests, contract, metrics]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Verify existing hashes, stable assets, gate and staged cleanliness, NO scoring
+        run: python scripts/p8_verify_closure.py
+      - uses: actions/upload-artifact@v4
+        with:
+          name: p8-final-head-verification
+          path: reports/p8/VERIFICATION.json
+          retention-days: 90

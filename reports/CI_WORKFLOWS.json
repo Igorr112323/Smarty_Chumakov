@@ -1,7 +1,7 @@
 {
   "kind": "ci_workflows",
   "runs_considered": 100,
-  "generated_at": "2026-10-19T17:27:20Z",
+  "generated_at": "2026-10-19T18:29:39Z",
   "command": "python scripts/collect_ci_workflows.py",
   "source": ".github/workflows/*.yml + reports/CI_RUNS.json",
   "registry": {
@@ -121,6 +121,13 @@
           "name": "Разведка официальных источников (не блокирует CI)",
           "timeout_minutes": 40,
           "steps": 17,
+          "uploads_artifacts": true,
+          "runs_python": "ubuntu-24.04"
+        },
+        {
+          "name": "Final CI read-only P8 seal",
+          "timeout_minutes": 15,
+          "steps": 3,
           "uploads_artifacts": true,
           "runs_python": "ubuntu-24.04"
         }
@@ -791,7 +798,8 @@
       "schedule": [],
       "push_paths": [
         ".github/p7-publication.trigger",
-        ".github/p8-publication.trigger"
+        ".github/p8-publication.trigger",
+        ".github/p8-close.trigger"
       ],
       "push_branches": [
         "arena/c5f69767-smarty-chumakov"
@@ -809,6 +817,13 @@
           "name": "p8-final",
           "timeout_minutes": 40,
           "steps": 8,
+          "uploads_artifacts": true,
+          "runs_python": "ubuntu-24.04"
+        },
+        {
+          "name": "p8-close-stable",
+          "timeout_minutes": 15,
+          "steps": 4,
           "uploads_artifacts": true,
           "runs_python": "ubuntu-24.04"
         }

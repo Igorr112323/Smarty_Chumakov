@@ -287,11 +287,34 @@ def main():
             for id_ in ("hf_footprint", "storage"):
                 known[id_].update(status="частично",scope="P8 measured directory/file footprint, not complete installed SDK",note="Actual weight file551290714B; full model/tokenizer directory554277308B; libs870588148B; directory+libs1424865456B PLUS Python/app/filesystem overhead. Complete installed SDK total unmeasured; compressed portable637048763B is not installed storage.",evidence=[dict(path="reports/p8/run39271014161/hf-autonomy/windows-hf-autonomy.json",url=f"{URL}/blob/arena/c5f69767-smarty-chumakov/reports/p8/run39271014161/hf-autonomy/windows-hf-autonomy.json")],current_run=f"{URL}/actions/runs/39271014161")
         payload["evidence_context"] = dict(run_id="39266451529",date="2026-10-19",status="CURRENT authoritative requirements index",successor="reports/EXPERIMENTS_INDEX.md")
+    curator_path = ROOT / "reports/p8/closure/CURATOR_DECISION.json"
+    if curator_path.exists():
+        payload["curator_decision"] = json.loads(curator_path.read_text())
+        payload["numerical_acceptance_valid_with_exception"] = True
+        payload["stable_promotion_authorized"] = True
+        payload["deviations_register"] = "reports/DEVIATIONS.md"
+        known = {r["id"]: r for r in rows}
+        for key in ("official_test", "control_sample"):
+            known[key]["status"] = "достигнут"
+            official_link = dict(path="reports/p8/run39266451529/official/result.json", url=f"{URL}/blob/arena/c5f69767-smarty-chumakov/reports/p8/run39266451529/official/result.json")
+            if official_link not in known[key]["evidence"]:
+                known[key]["evidence"].append(official_link)
+            known[key]["current_run"] = f"{URL}/actions/runs/39266451529"
+        known["execution_freeze"]["disposition"] = "задокументировано/принято как процессное исключение куратором"
+        known["execution_freeze"]["note"] += " Curator accepts numerical validity: separate synthetic job/process/machine, test/B unused, frozen bytes unchanged; historical violation NOT erased, does not block authorized stable."
+        known["execution_freeze"]["evidence"].append(dict(path=str(curator_path.relative_to(ROOT)),url=f"{URL}/blob/arena/c5f69767-smarty-chumakov/{curator_path.relative_to(ROOT)}"))
+        receipt_path = ROOT / "reports/p8/closure/STABLE_RECEIPT.json"
+        if receipt_path.exists():
+            payload["stable_publication"] = json.loads(receipt_path.read_text())
+            payload["stable_promotion"] = True
     out = ROOT / "reports/contract"
     (out / "coverage-matrix.json").write_text(
         json.dumps(payload, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
     )
     text = "# Appendix3: evidence coverage matrix\n\nAs of 2026-10-19. **Overall: НЕ ДОСТИГНУТ.** Official test177 evaluated once in P8; numeric joint quality gate PASS, execution freeze NOT achieved, conservative RC/not latest; overall contract remains NOT achieved; legacy read and infrastructure incident disclosed.\n\nHistorical/demo artifacts are not current P5 HF acceptance. A dev gate cannot establish speed, delivery or the whole contract.\n\n| Requirement | Status | Scope / limitation | Real evidence |\n|---|---|---|---|\n"
+    if curator_path.exists():
+        text = text.replace("execution freeze NOT achieved, conservative RC/not latest", "historical execution-freeze violation accepted as curator exception; numerical acceptance VALID; stable authorized")
+        text += "Closed dispositions: [DEVIATIONS](../DEVIATIONS.md). Acceptance of limitations is NOT a rise in factual compliance status.\n\n"
     for r in rows:
         links = "; ".join(f"[{e['path'].split('/')[-1]}]({e['url']})" for e in r["evidence"])
         text += f"| {r['requirement']} | {r['status']} | {r['note']} | {links} |\n"

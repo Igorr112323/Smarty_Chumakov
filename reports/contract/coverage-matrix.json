@@ -539,6 +539,10 @@
         {
           "path": "reports/p8/run39266451529/external/aggregation-integrity.json",
           "url": "https://github.com/Igorr112323/Smarty_Chumakov/blob/arena/c5f69767-smarty-chumakov/reports/p8/run39266451529/external/aggregation-integrity.json"
+        },
+        {
+          "path": "reports/p8/run39266451529/official/result.json",
+          "url": "https://github.com/Igorr112323/Smarty_Chumakov/blob/arena/c5f69767-smarty-chumakov/reports/p8/run39266451529/official/result.json"
         }
       ],
       "current_run": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39266451529"
@@ -548,14 +552,19 @@
       "requirement": "P8 no ANY fit before official seal",
       "status": "не достигнут",
       "scope": "P8 execution-process violation, separate from numeric official joint PASS",
-      "note": "Early cancelled CI39266027509 always-contract bypass; artifact14:12:03 before official job14:26:51. Temporary synthetic ParticipationModel.fit, no official/B data or product changes. No official retry; guard corrected; conservative RC/latest unchanged.",
+      "note": "Early cancelled CI39266027509 always-contract bypass; artifact14:12:03 before official job14:26:51. Temporary synthetic ParticipationModel.fit, no official/B data or product changes. No official retry; guard corrected; conservative RC/latest unchanged. Curator accepts numerical validity: separate synthetic job/process/machine, test/B unused, frozen bytes unchanged; historical violation NOT erased, does not block authorized stable.",
       "evidence": [
         {
           "path": "reports/p8/infra-freeze-barrier/incident.json",
           "url": "https://github.com/Igorr112323/Smarty_Chumakov/blob/arena/c5f69767-smarty-chumakov/reports/p8/infra-freeze-barrier/incident.json"
+        },
+        {
+          "path": "reports/p8/closure/CURATOR_DECISION.json",
+          "url": "https://github.com/Igorr112323/Smarty_Chumakov/blob/arena/c5f69767-smarty-chumakov/reports/p8/closure/CURATOR_DECISION.json"
         }
       ],
-      "current_run": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39266027509"
+      "current_run": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39266027509",
+      "disposition": "задокументировано/принято как процессное исключение куратором"
     }
   ],
   "p7_evidence_overlay": "reports/p7/contract-overlay.json",
@@ -745,5 +754,20 @@
     "date": "2026-10-19",
     "status": "CURRENT authoritative requirements index",
     "successor": "reports/EXPERIMENTS_INDEX.md"
-  }
+  },
+  "curator_decision": {
+    "run_id": "P8-closing-curator-decision",
+    "date": "2026-10-19",
+    "acceptance_head": "9be619031a6cd0d47e826e7ea63208d87f42315e",
+    "authority": "Explicit curator decision in closing request, recorded verbatim in substance; not a claim of an external signature",
+    "numerical_acceptance": "VALID with documented P8 process exception",
+    "exception": "Early cancelled CI39266027509 fitted synthetic diagnostics in separate job/process/machine. Test/B unused; frozen product bytes unchanged, bundle hash verified, inference workers fit_calls=[]; could not affect measured product. Full disclosure, barrier fixed with regression.",
+    "incident_evidence": "reports/p8/infra-freeze-barrier/incident.json",
+    "stable_promotion_authorized": true,
+    "limits": "No predictive changes, retraining, recalibration, rescoring or rebuilding; transfer identical existing RC files by digest. Does not declare unmet speed, AI-share or storage norms achieved.",
+    "scope": "Closing P8 code contour only, not a new experimental stage"
+  },
+  "numerical_acceptance_valid_with_exception": true,
+  "stable_promotion_authorized": true,
+  "deviations_register": "reports/DEVIATIONS.md"
 }

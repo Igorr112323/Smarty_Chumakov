@@ -1,5 +1,8 @@
 # FINAL REPORT — P8, 19 октября 2026
 
+> **Закрывающее решение куратора (19Oct2026): численная official177 приёмка ВАЛИДНА с принятым процессным исключением P8. Stable/latest разрешён и оформляется переносом тех же RC-assets по digest, без пересборки/нового scoring.** Предыдущие RC-решения ниже сохранены как хронология, а не актуальный запрет stable. [Passport](ACCEPTANCE_PASSPORT.md) · [DEVIATIONS](DEVIATIONS.md) · [Curator decision](p8/closure/CURATOR_DECISION.json) · [Stable closing receipts](p8/closure/) · [VERIFICATION](p8/VERIFICATION.json). Факты невыполнения speed/AI-share/footprint норм не повышены.
+
+
 ## Вывод
 
 **Численный официальный quality gate PASS; строгая execution freeze НЕ соблюдена (pre-seal synthetic fit в отменённом CI). Поставка — RC, НЕ latest. Весь договор НЕ выполнен.**

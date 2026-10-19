@@ -1,0 +1,12 @@
+{
+  "run_id": "P8-closing-curator-decision",
+  "date": "2026-10-19",
+  "acceptance_head": "9be619031a6cd0d47e826e7ea63208d87f42315e",
+  "authority": "Explicit curator decision in closing request, recorded verbatim in substance; not a claim of an external signature",
+  "numerical_acceptance": "VALID with documented P8 process exception",
+  "exception": "Early cancelled CI39266027509 fitted synthetic diagnostics in separate job/process/machine. Test/B unused; frozen product bytes unchanged, bundle hash verified, inference workers fit_calls=[]; could not affect measured product. Full disclosure, barrier fixed with regression.",
+  "incident_evidence": "reports/p8/infra-freeze-barrier/incident.json",
+  "stable_promotion_authorized": true,
+  "limits": "No predictive changes, retraining, recalibration, rescoring or rebuilding; transfer identical existing RC files by digest. Does not declare unmet speed, AI-share or storage norms achieved.",
+  "scope": "Closing P8 code contour only, not a new experimental stage"
+}

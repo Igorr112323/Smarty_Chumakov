@@ -193,3 +193,9 @@ Official and B: `reports/p8/run39266451529/`, original per-pair streams in immut
 ## Critical P8 execution-freeze breach
 
 CI39266027509 was cancelled, but always-contract ran a temporary synthetic ParticipationModel.fit before seal (artifact12192328736 created14:12:03Z). [Immutable original run/artifact metadata](p8/infra-freeze-barrier/). No official/B fit data or product change; nevertheless ANY-fit prohibition was violated. Inference-worker fit_calls=[] is process-scoped. Guard now requires successful barrier; no official retry. Numeric joint gate PASS, process freeze NOT achieved, conservative RC NOTlatest. Ordinary CI synthetic diagnostics are regressions, not candidate comparisons; this exceptional incident is explicitly indexed chronologically above.
+
+## P8 — финальное закрытие (НЕ новый измерительный этап)
+
+Финальный official: [39266451529](https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39266451529), commit dd4454b05867495018abe5a2f657fc4d6d0fd9a6 — [official/result.json](p8/run39266451529/official/result.json). B-validation — тот же run,4×250+aggregate, [external/result.json](p8/run39266451529/external/result.json), NOT gate. Publisher [39290438219](https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39290438219) SUCCESS, [immutable original receipt](p8/run39290438219/publication.json). Это ссылки на существующие измерения, НЕ новые запуски.
+
+[Решение куратора](p8/closure/CURATOR_DECISION.json): numerical acceptance VALID with accepted P8 process exception; прежнее консервативное RC disposition superseded этим решением, не исправлением метрик. Stable переносит те же8 assets по digest с acceptance9be6190, не пересобирает архив879cd14. [Stable closing receipts](p8/closure/), [passport](ACCEPTANCE_PASSPORT.md), [deviations](DEVIATIONS.md), [verification](p8/VERIFICATION.json). Исторические таблицы/receipt/run-каталоги выше не переписываются.
