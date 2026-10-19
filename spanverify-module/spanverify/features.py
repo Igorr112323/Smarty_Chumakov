@@ -1553,6 +1553,11 @@ def hf_features_chunked(
             continue
 
     if not chunk_matrices:
+        tokenizer, _ = _load_hf_runtime(model_name, device)
+        if len(tokenizer(answer, add_special_tokens=False)["input_ids"]) > max_length:
+            from .hf_windows import FullAnswerCoverageError
+
+            raise FullAnswerCoverageError("All selected long-answer contexts failed; no policy-changing fallback")
         # Fallback: обычный проход
         result = hf_features(
             answer,

@@ -26,6 +26,7 @@ $model = Join-Path $layout 'model'
 if ($LASTEXITCODE -ne 0) { throw 'external torch preparation failed' }
 & $python -m pip install --target $libs --upgrade 'transformers==5.20.1' 'sentencepiece==0.2.2' 'numpy==2.4.6'
 if ($LASTEXITCODE -ne 0) { throw 'external HF libraries preparation failed' }
+Remove-Item Env:PYTHONHOME -ErrorAction SilentlyContinue
 $env:PYTHONPATH = $libs
 $env:PYTHONNOUSERSITE = '1'
 $env:P7_MODEL = $model
@@ -66,7 +67,7 @@ try {
     $name = 'P7-no-network-' + [guid]::NewGuid().ToString()
     New-NetFirewallRule -DisplayName $name -Direction Outbound -Program $program -Action Block -Profile Any | Out-Null
     $rules += $name
-    if (-not (Get-NetFirewallRule -DisplayName $name).Enabled) { throw 'offline firewall rule not enabled' }
+    if ("$((Get-NetFirewallRule -DisplayName $name).Enabled)" -ne 'True') { throw 'offline firewall rule not enabled' }
   }
   $port = 18765
   foreach ($kind in @('exe','pyz')) {
@@ -111,7 +112,41 @@ try {
   $hashes = @(Get-ChildItem $model -File -Recurse | Where-Object { $_.FullName -notmatch '\.cache' } | ForEach-Object { @{file=$_.FullName.Substring($model.Length+1);bytes=$_.Length;sha256=(Get-FileHash $_.FullName -Algorithm SHA256).Hash.ToLower()} })
   $report = @{status='success';code=$env:GITHUB_SHA;run=$env:GITHUB_RUN_ID;offline=$true;registry_product_keys_unchanged=$true;layout=@{python='python/python.exe';libs='libs/';weights='model/';exe='spanverify.exe';pyz='spanverify.pyz';quality_bundle='frozen-p5.json';runtime='p5-runtime.json'};libs_bytes=(Get-ChildItem $libs -File -Recurse | Measure-Object Length -Sum).Sum;model_files=$hashes;receipts=$receipts}
   $report | ConvertTo-Json -Depth 20 | Set-Content -Encoding utf8 (Join-Path $out 'windows-hf-autonomy.json')
+  Write-Host ('::notice title=P7 Windows model files::'+(@{files=@($hashes | Where-Object { $_.name -match '\.(bin|safetensors)$' })} | ConvertTo-Json -Depth 5 -Compress))
   Write-Host ('::notice title=P7 Windows HF autonomy::'+(@{status='success';code=$env:GITHUB_SHA;offline=$true;exe_HF=$true;pyz_HF=$true;registry_product_keys_unchanged=$true;libs_bytes=$report.libs_bytes} | ConvertTo-Json -Compress))
 } finally {
   foreach ($name in $rules) { Remove-NetFirewallRule -DisplayName $name -ErrorAction SilentlyContinue }
 }
+
+# Publish the actual tested portable layout, without committing large assets.
+$common = @'
+@echo off
+cd /d "%~dp0"
+set "PYTHONPATH=%~dp0libs"
+set "PYTHONNOUSERSITE=1"
+set "PYTHONHOME="
+set "HF_HUB_OFFLINE=1"
+set "TRANSFORMERS_OFFLINE=1"
+set "HF_HOME=%~dp0offline-cache"
+set "TORCH_HOME=%~dp0offline-torch"
+set "SPANVERIFY_HF_MODEL=%~dp0model"
+set "SPANVERIFY_HF_MAX_TOKENS=512"
+'@
+($common+"`r`n"+'"%~dp0spanverify.exe" --mode hf --model "%~dp0model" --weights "%~dp0frozen-p5.json" --runtime-dir "%~dp0libs"') | Set-Content (Join-Path $layout 'Start-HF.exe.cmd') -Encoding ascii
+($common+"`r`n"+'"%~dp0python\python.exe" "%~dp0spanverify.pyz" server --mode hf --weights "%~dp0frozen-p5.json"') | Set-Content (Join-Path $layout 'Start-HF.pyz.cmd') -Encoding ascii
+Copy-Item (Join-Path $out 'windows-hf-autonomy.json') (Join-Path $layout 'AUTONOMY.json')
+@'
+Windows x64 portable HF runtime. Unzip the complete directory.
+Start-HF.exe.cmd: frozen executable. Start-HF.pyz.cmd: bundled Python + zipapp.
+No installation, registry registration, source checkout or internet required.
+Keep model/, libs/, python/, frozen-p5.json and the applications together.
+AUTONOMY.json records the actual offline smoke and hashes.
+This is an RC, not official-test scientific acceptance. AI-share calibration is
+an optional train-only synthetic diagnostic, not real-LLM authorship evidence.
+'@ | Set-Content (Join-Path $layout 'README-HF.txt') -Encoding ascii
+$env:P7_LAYOUT=$layout
+$env:P7_PORTABLE_ZIP=Join-Path $env:RUNNER_TEMP 'p7-hf-portable.zip'
+& $python -c "import os,shutil; print(shutil.make_archive(os.environ['P7_PORTABLE_ZIP'][:-4],'zip',os.environ['P7_LAYOUT']))"
+if ($LASTEXITCODE -ne 0) { throw 'portable HF archive failed' }
+$hash=(Get-FileHash $env:P7_PORTABLE_ZIP -Algorithm SHA256).Hash.ToLower()
+Write-Host "::notice title=P7 portable HF archive::$hash p7-hf-portable.zip"

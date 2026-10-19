@@ -158,8 +158,19 @@ def worker(args):
     profiler = cProfile.Profile()
 
     def interrupted(*_):
+        elapsed_lower_bound = time.perf_counter() - started
         profiler.disable()
         profiler.dump_stats(str(args.out) + ".prof")
+        save(
+            args.out,
+            dict(
+                status="timeout",
+                seconds=None,
+                timed_lower_bound_seconds=elapsed_lower_bound,
+                answer_chars=len(a),
+                context_chars=len(c),
+            ),
+        )
         raise SystemExit(143)
 
     if hasattr(signal, "SIGTERM"):
@@ -258,6 +269,13 @@ def benchmark(args):
                     "limit_seconds": limit,
                     "status": "достигнут" if complete and max(values) <= limit else "не достигнут",
                 }
+                bounds = [
+                    s.get("seconds") if s.get("seconds") is not None else s.get("timed_lower_bound_seconds")
+                    for s in samples
+                ]
+                if not complete and all(b is not None for b in bounds):
+                    row["median_lower_bound_seconds"] = statistics.median(bounds)
+                    row["max_lower_bound_seconds"] = max(bounds)
                 if row["status"] == "не достигнут":
                     # Separate profiling pass; its duration NEVER enters benchmark statistics.
                     profile_path = args.out / f"profile-{args.mode}-{scenario}-{size}-{thermal}.json"
@@ -470,6 +488,7 @@ def main():
     p.add_argument("--scenario", default="document-context")
     p.add_argument("--thermal", default="cold-process")
     args = p.parse_args()
+    args.out = args.out.resolve()
     if args.action != "worker":
         args.out.mkdir(parents=True, exist_ok=True)
     if args.action == "parity":

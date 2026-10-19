@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import statistics
 import sys
@@ -67,6 +68,18 @@ def main(mode, out):
         [r["raw"] for r in rows], [r["fraction"] for r in rows], mode=mode, bundle_sha256=SHA
     )
     save(out / f"ai_share_calibrator_v1.{mode}.json", fit_all.to_dict())
+    artifact = out / f"ai_share_calibrator_v1.{mode}.json"
+    print(
+        "::notice title=P7 calibrator artifact::"
+        + json.dumps(
+            dict(
+                mode=mode,
+                artifact=fit_all.to_dict(),
+                sha256=hashlib.sha256(artifact.read_bytes()).hexdigest(),
+                fold_manifest_sha256=hashlib.sha256((P5 / "fit_receipts.json").read_bytes()).hexdigest(),
+            )
+        )
+    )
     report = dict(
         mode=mode,
         documents=len(docs),

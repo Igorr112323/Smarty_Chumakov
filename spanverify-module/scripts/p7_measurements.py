@@ -43,21 +43,46 @@ def rates(out):
     print("::notice title=P7 benchmark environment::" + json.dumps(summary), flush=True)
     path = out / "benchmark.json"
     rows = json.loads(path.read_text())
+    profiles = []
     for row in rows:
-        n = row.get("chars", row.get("size"))
-        row["seconds_per_1000_chars"] = (
-            row["median_seconds"] * 1000 / n if row.get("median_seconds") is not None else None
+        n = row["chars"]
+        row["seconds_per_1000_chars"] = row["median_seconds"] * 1000 / n if row["median_seconds"] is not None else None
+        row["seconds_per_1000_chars_lower_bound"] = (
+            row["median_lower_bound_seconds"] * 1000 / n if row.get("median_lower_bound_seconds") is not None else None
         )
         if row.get("diagnostic_profile"):
             profile = (out / row["diagnostic_profile"]).with_suffix(".summary.json")
             if profile.exists():
                 row["profile_top"] = [
                     {k: v for k, v in r.items() if k in ("function", "calls", "self_seconds", "cumulative_seconds")}
-                    for r in json.loads(profile.read_text())[:5]
+                    for r in sorted(json.loads(profile.read_text()), key=lambda r: r["self_seconds"], reverse=True)[:5]
                 ]
-        brief = {k: v for k, v in row.items() if k not in ("samples", "repeats")}
+                profiles.append(dict(scenario=row["scenario"], chars=n, thermal=row["thermal"], top=row["profile_top"]))
+    # Actions preserves only ten notices per step: retain all twelve rows.
+    columns = [
+        "scenario",
+        "chars",
+        "thermal",
+        "median_seconds",
+        "max_seconds",
+        "limit_seconds",
+        "status",
+        "seconds_per_1000_chars",
+        "median_lower_bound_seconds",
+        "seconds_per_1000_chars_lower_bound",
+    ]
+    print(
+        "::notice title=P7 benchmark table::"
+        + json.dumps(
+            dict(mode=rows[0]["mode"], columns=columns, rows=[[r.get(k) for k in columns] for r in rows]),
+            ensure_ascii=False,
+        ),
+        flush=True,
+    )
+    for i in range(0, len(profiles), 3):
         print(
-            "::notice title=P7 speed::" + json.dumps(brief, ensure_ascii=False),
+            "::notice title=P7 benchmark profiles::"
+            + json.dumps(dict(mode=rows[0]["mode"], cases=profiles[i : i + 3]), ensure_ascii=False),
             flush=True,
         )
     save(path, rows)

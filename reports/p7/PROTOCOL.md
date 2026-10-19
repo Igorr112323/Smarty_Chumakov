@@ -31,10 +31,14 @@ fresh old/new byte parity; cached181 replay is separately labeled cached compati
 22 long train rows get feature deltas,3 long dev rows get actual output deltas.
 Python3.12 compensated builtin sum is preserved by Python fallback (no false numpy exact claim).
 
-Bounded exact-window memoization: per-request LRU256, key includes complete answer
+Bounded exact-window memoization: per-request LRU4096, key includes complete answer
 window/context strings and every local token text/start/end; same immutable eval
 model/options. Every logical window/token still participates in the same arithmetic.
 Only repeated identical computations are reused. Cache has no train/dev identities.
 Actual full public long output must be byte-identical to accepted uncached P7
 2502a62, excluding ONLY timing/execution counters. This repeated-train benchmark
 is best-case; no claim of universal latency for unrepeated documents.
+
+The capacity is a memory/performance bound, not a quality parameter.256 can thrash
+on repeated train windows when the exact BPE phase/context key cycle exceeds256;
+4096 bounds retained matrices to roughly200MiB, with no change to any arithmetic.

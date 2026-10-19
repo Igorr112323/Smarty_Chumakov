@@ -8,3 +8,4 @@ P7 reject automatic full-answer dispatch after nonzero long train/dev audit
 P7 authorized versioned long-only contract and Python3.12 exact fallback
 P7 enforce authorized long scope and fresh short178/long25 audits
 P7 exact repeated-window reuse; actual long byte golden and all short fresh gates required
+P7 robust path resolution, complete benchmark receipts, bounded repeated-window cache4096

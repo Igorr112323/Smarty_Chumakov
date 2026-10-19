@@ -63,7 +63,11 @@ def test_full_answer_stitches_every_token_once_without_zero_fill(monkeypatch):
         def __call__(self, text, **kwargs):
             return {"offset_mapping": [(i, i + 1) for i in range(len(text))]}
 
+    scorer_calls = 0
+
     def scorer(answer, context, **kwargs):
+        nonlocal scorer_calls
+        scorer_calls += 1
         count = len(kwargs["answer_tokens"])
         assert answer and kwargs["_windowed"]
         return FeatureMatrix(
@@ -73,6 +77,7 @@ def test_full_answer_stitches_every_token_once_without_zero_fill(monkeypatch):
 
     for answer in ["Ё" * 1300, "начало конец " * 150]:
         tokens = tokenize_with_offsets(answer)
+        before_calls = scorer_calls
         result = full_answer_features(
             answer, "контекст " * 100, tokens, Tokenizer(), None, scorer, {"max_length": 512, "model_name": "fixture"}
         )
@@ -80,6 +85,12 @@ def test_full_answer_stitches_every_token_once_without_zero_fill(monkeypatch):
         assert result.meta["answer_last_end"] == tokens[-1].end
         assert result.attention_entropy == [0.75] * len(tokens)
         assert result.meta["answer_windows"] > 1
+        assert result.meta["model_calls"] == scorer_calls - before_calls
+        assert result.meta["identical_window_cache_hits"] > 0
+        assert (
+            result.meta["logical_window_scores"]
+            == result.meta["model_calls"] + result.meta["identical_window_cache_hits"]
+        )
 
     # Cover lazy runtime identity and long-dispatch control flow without fitting
     # a model or silently replacing a requested real HF production backend.
@@ -111,6 +122,21 @@ def test_full_answer_stitches_every_token_once_without_zero_fill(monkeypatch):
         sentinel = FeatureMatrix(attention_entropy=[0.75], meta={"full_answer": True})
         m.setattr(hf_windows, "full_answer_features", lambda *a, **kw: sentinel)
         assert features.hf_features("слово", "", model_name="fixture") is sentinel
+        assert features.hf_features("", "", model_name="fixture").meta["empty"]
+        import pytest
+
+        def failed(*a, **kw):
+            raise RuntimeError("synthetic backend failure")
+
+        m.setattr(features, "hf_features", failed)
+        with pytest.raises(hf_windows.FullAnswerCoverageError):
+            features.hf_features_chunked(
+                "слово",
+                "Контекст содержит документы. " * 100,
+                model_name="fixture",
+                max_tokens_per_chunk=8,
+            )
+
     features._cached_hf_runtime.cache_clear()
 
 

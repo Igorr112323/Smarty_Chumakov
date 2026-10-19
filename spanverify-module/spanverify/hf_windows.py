@@ -99,7 +99,7 @@ def full_answer_features(answer, context, tokens, tokenizer, runtime, scorer, op
                     **options,
                 )
                 cache[key] = part
-                if len(cache) > 256:
+                if len(cache) > 4096:
                     cache.popitem(last=False)
                 calls += 1
             if not part.meta.get("all_answer_tokens_mapped"):
