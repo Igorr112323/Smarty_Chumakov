@@ -644,6 +644,9 @@ jobs:
   final-verification:
     name: Final CI read-only P8 seal
     needs: [p8-freeze-barrier, quality, tests, contract, metrics]
+    # Override GitHub's transitive skip from optional pilot/external ancestors.
+    # Every required direct dependency MUST still be successful; no bypass.
+    if: ${{ !cancelled() && needs.p8-freeze-barrier.result == 'success' && needs.quality.result == 'success' && needs.tests.result == 'success' && needs.contract.result == 'success' && needs.metrics.result == 'success' }}
     runs-on: ubuntu-24.04
     timeout-minutes: 15
     env:
