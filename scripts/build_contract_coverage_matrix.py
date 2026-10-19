@@ -307,6 +307,8 @@ def main():
         if receipt_path.exists():
             payload["stable_publication"] = json.loads(receipt_path.read_text())
             payload["stable_promotion"] = True
+            payload["verification_receipt"] = "reports/p8/VERIFICATION.json"
+            payload["code_contour"] = "closed; numerical acceptance valid with curator-accepted exception; deviations closed as accepted limitations, not factual compliance uplift"
     out = ROOT / "reports/contract"
     (out / "coverage-matrix.json").write_text(
         json.dumps(payload, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
@@ -314,6 +316,9 @@ def main():
     text = "# Appendix3: evidence coverage matrix\n\nAs of 2026-10-19. **Overall: НЕ ДОСТИГНУТ.** Official test177 evaluated once in P8; numeric joint quality gate PASS, execution freeze NOT achieved, conservative RC/not latest; overall contract remains NOT achieved; legacy read and infrastructure incident disclosed.\n\nHistorical/demo artifacts are not current P5 HF acceptance. A dev gate cannot establish speed, delivery or the whole contract.\n\n| Requirement | Status | Scope / limitation | Real evidence |\n|---|---|---|---|\n"
     if curator_path.exists():
         text = text.replace("execution freeze NOT achieved, conservative RC/not latest", "historical execution-freeze violation accepted as curator exception; numerical acceptance VALID; stable authorized")
+        text = text.replace("**Overall: НЕ ДОСТИГНУТ.**", "**Code contour: принят с раскрытыми ограничениями; все нормы фактически НЕ объявлены выполненными.**")
+        if receipt_path.exists():
+            text = text.replace("stable authorized", "stable/latest published, exact RC digests verified")
         text += "Closed dispositions: [DEVIATIONS](../DEVIATIONS.md). Acceptance of limitations is NOT a rise in factual compliance status.\n\n"
     for r in rows:
         links = "; ".join(f"[{e['path'].split('/')[-1]}]({e['url']})" for e in r["evidence"])

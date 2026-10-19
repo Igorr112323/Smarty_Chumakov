@@ -1,6 +1,6 @@
 # FINAL REPORT — P8, 19 октября 2026
 
-> **Закрывающее решение куратора (19Oct2026): численная official177 приёмка ВАЛИДНА с принятым процессным исключением P8. Stable/latest разрешён и оформляется переносом тех же RC-assets по digest, без пересборки/нового scoring.** Предыдущие RC-решения ниже сохранены как хронология, а не актуальный запрет stable. [Passport](ACCEPTANCE_PASSPORT.md) · [DEVIATIONS](DEVIATIONS.md) · [Curator decision](p8/closure/CURATOR_DECISION.json) · [Stable closing receipts](p8/closure/) · [VERIFICATION](p8/VERIFICATION.json). Факты невыполнения speed/AI-share/footprint норм не повышены.
+> **Закрывающее решение куратора (19Oct2026): численная official177 приёмка ВАЛИДНА с принятым процессным исключением P8. [Stable/latest опубликован](https://github.com/Igorr112323/Smarty_Chumakov/releases/tag/p8-stable-20261019) переносом тех же RC-assets по digest, без пересборки/нового scoring.** Предыдущие RC-решения ниже сохранены как хронология, а не актуальный запрет stable. [Passport](ACCEPTANCE_PASSPORT.md) · [DEVIATIONS](DEVIATIONS.md) · [Curator decision](p8/closure/CURATOR_DECISION.json) · [Stable closing receipts](p8/closure/) · [VERIFICATION](p8/VERIFICATION.json). Факты невыполнения speed/AI-share/footprint норм не повышены.
 
 
 ## Вывод
@@ -125,3 +125,11 @@ This SHA matches BOTH runner-computed digest and GitHub asset API digest. [Raw p
 Source39287371656 publication failed **HTTP403 Resource not accessible by integration** when release creation targeted older Windows commit654a48e. [Original raw/sanitized failure tail](p8/run39287371656/), recovered by metadata-only receipt39290438326. Retargeting release to exact accepted GITHUB_SHA succeeded; no bypass of tests, no rebuild/model update, no repeated official/B scoring. Earlier ARM/queue attempts and failures remain indexed; final CI uses pinned x64 Ubuntu24 and Windows with fresh concurrency namespace, all checks retained.
 
 Historical-read guard provenance correction: actual git commit **5ff79f9a7bed33c00c6278f67d68ddff73f8325c**, **2026-10-18T23:34:59+00:00**. Earlier pre-publication prose accidentally concatenated year2026 onto the40-digit SHA; raw archived snapshots are preserved, not silently rewritten. Actual read time remains unknown. [Verified guard metadata](p8/historical-read-guard.json).
+
+## Печать закрытого контура P8
+
+[Stable/latest](https://github.com/Igorr112323/Smarty_Chumakov/releases/latest), tag **p8-stable-20261019** → acceptance 9be619031a6cd0d47e826e7ea63208d87f42315e. Publisher **39303110624 SUCCESS**. [Stable receipt](p8/closure/STABLE_RECEIPT.json) доказывает идентичность всех8 RC-assets по bytes+SHA256/server digest. Архив **65248935B**, hash **58143baac4a39d86aeaa46879c497d5195f0202f58174c91af746d94dfe2f158**; не перепакован и сохраняет embedded source879cd14. EXE8981233B/PYZ232874B неизменны.
+
+[VERIFICATION.json](p8/VERIFICATION.json): **all_true=true,30/30** read-only checks. Receipt фиксирует execution HEAD39ab73e; последующий receipt-only HEAD независимо повторяет единый verify в **Final CI read-only P8 seal**, с новым JSON artifact и строкой `Final CI verify-pass: ALL TRUE HEAD=…`. Это устраняет необходимость рекурсивных self-referential коммитов собственного HEAD/CI результата. Никакого изменения модели/порогов/калибраторов/decoder/filter, нового научного обучения, калибровки, измерения выборок или rebuild. Полный обычный regression suite/CI сохранён, tests_excluded=false.
+
+Численная приёмка ВАЛИДНА с явно принятым процессным исключением. Старые statements RC-only/«не чистая процессная приёмка» выше — историческое решение до куратора, не текущий запрет stable. Факт process breach остаётся; неизменность модели/test/B isolation и принятый disposition закреплены в [решении](p8/closure/CURATOR_DECISION.json) и [DEVIATIONS](DEVIATIONS.md). Остальные статусы соблюдения норм не повышены без evidence. **Контур кода закрыт; любое дальнейшее изменение кода — новый этап/протокол.**

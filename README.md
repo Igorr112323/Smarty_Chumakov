@@ -1,4 +1,4 @@
-> **P8 code-contour closure:** curator accepts official177 numerical PASS with documented process exception. [Expert passport](reports/ACCEPTANCE_PASSPORT.md), [closed deviations](reports/DEVIATIONS.md), [stable/latest](https://github.com/Igorr112323/Smarty_Chumakov/releases/latest), [read-only verification](reports/p8/VERIFICATION.json). Stable is the exact RC bytes, no rebuild/scoring. Historical RC narratives below are retained as chronology.
+> **P8 code-contour closure:** curator accepts official177 numerical PASS with documented process exception. [Expert passport](reports/ACCEPTANCE_PASSPORT.md), [closed deviations](reports/DEVIATIONS.md), [stable/latest](https://github.com/Igorr112323/Smarty_Chumakov/releases/latest), [read-only verification](reports/p8/VERIFICATION.json). Stable **p8-stable-20261019**, publisher39303110624 SUCCESS, is the exact8 RC files; all30 read-only verification checks true, no rebuild/scoring. Historical RC narratives below are retained as chronology.
 
 # SpanVerify — проверка ответа по документу
 

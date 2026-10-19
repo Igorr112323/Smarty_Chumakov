@@ -1,0 +1,143 @@
+{
+  "total_count": 3,
+  "jobs": [
+    {
+      "id": 118233130499,
+      "run_id": 39303110624,
+      "workflow_name": "P7 final acceptance artifact publication",
+      "head_branch": "arena/c5f69767-smarty-chumakov",
+      "run_url": "https://api.github.com/repos/Igorr112323/Smarty_Chumakov/actions/runs/39303110624",
+      "run_attempt": 1,
+      "node_id": "CR_kwDOU5yM7M8AAAAbhz5mAw",
+      "head_sha": "39ab73e630379f57c20bf53df01b5cca94310bc3",
+      "url": "https://api.github.com/repos/Igorr112323/Smarty_Chumakov/actions/jobs/118233130499",
+      "html_url": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39303110624/job/118233130499",
+      "status": "completed",
+      "conclusion": "success",
+      "created_at": "2026-10-19T18:30:44Z",
+      "started_at": "2026-10-19T18:30:47Z",
+      "completed_at": "2026-10-19T18:31:11Z",
+      "name": "p8-close-stable",
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 1,
+          "started_at": "2026-10-19T18:30:47Z",
+          "completed_at": "2026-10-19T18:30:48Z"
+        },
+        {
+          "name": "Run actions/checkout@v4",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 2,
+          "started_at": "2026-10-19T18:30:48Z",
+          "completed_at": "2026-10-19T18:30:51Z"
+        },
+        {
+          "name": "Transfer only original digest-verified RC assets, publish stable and verify",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 3,
+          "started_at": "2026-10-19T18:30:51Z",
+          "completed_at": "2026-10-19T18:31:08Z"
+        },
+        {
+          "name": "Lossless verification receipt, no inference",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 4,
+          "started_at": "2026-10-19T18:31:08Z",
+          "completed_at": "2026-10-19T18:31:08Z"
+        },
+        {
+          "name": "Run actions/upload-artifact@v4",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 5,
+          "started_at": "2026-10-19T18:31:08Z",
+          "completed_at": "2026-10-19T18:31:09Z"
+        },
+        {
+          "name": "Post Run actions/checkout@v4",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 10,
+          "started_at": "2026-10-19T18:31:09Z",
+          "completed_at": "2026-10-19T18:31:09Z"
+        },
+        {
+          "name": "Complete job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 11,
+          "started_at": "2026-10-19T18:31:09Z",
+          "completed_at": "2026-10-19T18:31:09Z"
+        }
+      ],
+      "check_run_url": "https://api.github.com/repos/Igorr112323/Smarty_Chumakov/check-runs/118233130499",
+      "labels": [
+        "ubuntu-24.04"
+      ],
+      "runner_id": 1000005874,
+      "runner_name": "GitHub Actions 1000005874",
+      "runner_group_id": 0,
+      "runner_group_name": "GitHub Actions"
+    },
+    {
+      "id": 118233133413,
+      "run_id": 39303110624,
+      "workflow_name": "P7 final acceptance artifact publication",
+      "head_branch": "arena/c5f69767-smarty-chumakov",
+      "run_url": "https://api.github.com/repos/Igorr112323/Smarty_Chumakov/actions/runs/39303110624",
+      "run_attempt": 1,
+      "node_id": "CR_kwDOU5yM7M8AAAAbhz5xZQ",
+      "head_sha": "39ab73e630379f57c20bf53df01b5cca94310bc3",
+      "url": "https://api.github.com/repos/Igorr112323/Smarty_Chumakov/actions/jobs/118233133413",
+      "html_url": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39303110624/job/118233133413",
+      "status": "completed",
+      "conclusion": "skipped",
+      "created_at": "2026-10-19T18:30:44Z",
+      "started_at": "2026-10-19T18:30:44Z",
+      "completed_at": "2026-10-19T18:30:44Z",
+      "name": "publish",
+      "steps": [],
+      "check_run_url": "https://api.github.com/repos/Igorr112323/Smarty_Chumakov/check-runs/118233133413",
+      "labels": [
+        "ubuntu-24.04"
+      ],
+      "runner_id": null,
+      "runner_name": null,
+      "runner_group_id": null,
+      "runner_group_name": null
+    },
+    {
+      "id": 118233133604,
+      "run_id": 39303110624,
+      "workflow_name": "P7 final acceptance artifact publication",
+      "head_branch": "arena/c5f69767-smarty-chumakov",
+      "run_url": "https://api.github.com/repos/Igorr112323/Smarty_Chumakov/actions/runs/39303110624",
+      "run_attempt": 1,
+      "node_id": "CR_kwDOU5yM7M8AAAAbhz5yJA",
+      "head_sha": "39ab73e630379f57c20bf53df01b5cca94310bc3",
+      "url": "https://api.github.com/repos/Igorr112323/Smarty_Chumakov/actions/jobs/118233133604",
+      "html_url": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39303110624/job/118233133604",
+      "status": "completed",
+      "conclusion": "skipped",
+      "created_at": "2026-10-19T18:30:44Z",
+      "started_at": "2026-10-19T18:30:44Z",
+      "completed_at": "2026-10-19T18:30:44Z",
+      "name": "p8-final",
+      "steps": [],
+      "check_run_url": "https://api.github.com/repos/Igorr112323/Smarty_Chumakov/check-runs/118233133604",
+      "labels": [
+        "ubuntu-24.04"
+      ],
+      "runner_id": null,
+      "runner_name": null,
+      "runner_group_id": null,
+      "runner_group_name": null
+    }
+  ]
+}
