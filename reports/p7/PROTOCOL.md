@@ -42,3 +42,9 @@ is best-case; no claim of universal latency for unrepeated documents.
 The capacity is a memory/performance bound, not a quality parameter.256 can thrash
 on repeated train windows when the exact BPE phase/context key cycle exceeds256;
 4096 bounds retained matrices to roughly200MiB, with no change to any arithmetic.
+
+Windows22ae68c reached offline /health but /v1/verify returned HTTP500.
+No autonomy claim is made from a successful health response. The smoke remains
+mandatory. The next build preserves the server JSON error body, and declares
+setuptools in the isolated external runtime (it is no longer inherited from the
+build interpreter's removed development site-packages).

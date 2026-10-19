@@ -4,7 +4,7 @@ $release = (Resolve-Path $ReleaseDir).Path
 New-Item -ItemType Directory -Force $OutputDir | Out-Null
 $out = (Resolve-Path $OutputDir).Path
 trap {
-  $message = $_.Exception.Message + ' | ' + $_.InvocationInfo.PositionMessage
+  $message = $_.Exception.Message + ' | ' + $_.ErrorDetails.Message + ' | ' + $_.InvocationInfo.PositionMessage
   if ($out -and (Test-Path $out)) {
     foreach ($log in (Get-ChildItem $out -Filter '*stderr.log' -ErrorAction SilentlyContinue)) {
       $message += ' | ' + (Get-Content $log.FullName -Tail 12 -ErrorAction SilentlyContinue | Out-String)
@@ -24,7 +24,7 @@ $libs = Join-Path $layout 'libs'
 $model = Join-Path $layout 'model'
 & $python -m pip install --target $libs 'torch==2.14.1+cpu' --index-url https://download.pytorch.org/whl/cpu
 if ($LASTEXITCODE -ne 0) { throw 'external torch preparation failed' }
-& $python -m pip install --target $libs --upgrade 'transformers==5.20.1' 'sentencepiece==0.2.2' 'numpy==2.4.6'
+& $python -m pip install --target $libs --upgrade 'setuptools==80.9.0' 'transformers==5.20.1' 'sentencepiece==0.2.2' 'numpy==2.4.6'
 if ($LASTEXITCODE -ne 0) { throw 'external HF libraries preparation failed' }
 Remove-Item Env:PYTHONHOME -ErrorAction SilentlyContinue
 $env:PYTHONPATH = $libs
