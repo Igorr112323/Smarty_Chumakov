@@ -1,149 +1,228 @@
-# P7 — инженерный отчёт
+# P7 — измеренный инженерный результат
 
-**Рабочий документ: приёмка ещё не завершена.** Дата: 19.10.2026.
-Baseline: `14a018a1b90b51cc47cd8baf628147ac22e1d8b1`. Текущая проверяемая
-реализация: `7262f09`; измерительная инфраструктура/исправления согласованности: `409d4e6`.
+19.10.2026. **Инженерная работа и измерения выполнены; весь договор не принят.**
+HF50k warm≤1s не достигнут, AI-share-калибровка частичная, официальный test177
+не оценивался. Успех workflows не означает достижения всех численных нормативов.
 
-## Границы изменений
+Baseline `14a018a1b90b51cc47cd8baf628147ac22e1d8b1`.
+Предиктивная реализация после индекса: `7262f09`; проверенная Windows-поставка
+`a85c40a14828141447768d3c78d13aa0ced105eb`. Последующие изменения —
+измерительная/документарная инфраструктура, не признаки/модель качества.
 
-Заморожены P1/P4/span_filter/decoder, признаки, коэффициенты, пороги и исходные
-разбиения. Bundle: **122874 B**, SHA-256
+## Доставка и прямые доказательства
+
+- [Научная приёмка/benchmark39236657451 — SUCCESS](https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39236657451).
+- [Full CI895tests b8aa671 — SUCCESS](https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39239481352).
+- [Второй обычный CI — SUCCESS](https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39239475878).
+- [Windows39236657579 — SUCCESS](https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39236657579).
+- [Same-host before/after39232439363 — SUCCESS](https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39232439363).
+- [Новый RC, prerelease/not latest](https://github.com/Igorr112323/Smarty_Chumakov/releases/tag/v1.3.1-rc.p7.39236657579).
+- [Проверенная полная portable HF поставка](https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39236657579/artifacts/12180458356), artifact-container637051335B.
+- [Исходный архив приёмки](https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39236657451/artifacts/12180029914).
+- [Финальный архив с этим отчётом и committed-квитанциями: отдельная публикация](https://github.com/Igorr112323/Smarty_Chumakov/actions/workflows/p7-publish-acceptance.yml).
+- [Полный diff от baseline](https://github.com/Igorr112323/Smarty_Chumakov/compare/14a018a1b90b51cc47cd8baf628147ac22e1d8b1...arena%2Fc5f69767-smarty-chumakov).
+
+Финальная artifact-only публикация проверяет SUCCESS исходных runs, неизменность
+кода/настроек/train/dev/folds/frozen bundle относительно измеренной реализации,
+SHA исходного ZIP, сохраняет raw evidence и добавляет финальные документы.
+Она не выдаётся за новый benchmark и не заменяет его. ZIP передаётся через
+workflow artifacts, не uploads.github.com release-ZIP. Квитанции: `final-receipts/`.
+Stable/latest проверен отдельно: **v1.3.1**, без продвижения RC.
+
+## 1. Заморожено и изменено
+
+Bundle **122874B**, SHA256
 `e0b13c693a058dfd66ed24a52fc14e9c70964e95885358e7b99cc1f328ad6892`.
-Порог P1: `0.5794392523364486`. Нового обучения модели качества нет.
-Существующие временные synthetic/demo fit в тестах сохранены с разрешения пользователя.
-Единственный новый fit — отдельная train-only PAVA-калибровка доли.
+RC asset digest совпадает, файл скопирован байт-в-байт, не перестроен.
+P1/P4/span_filter/decoder, коэффициенты, порог **0.5794392523364486**,
+исходные folds/корпус/IoU≥.5/greedy/scored predicate/сглаживание неизменны.
+Нового обучения модели качества/подбора конфигурации нет. Существующие временные
+synthetic/demo fit в тестах сохранены по явному разрешению пользователя.
+Единственный новый fit — отдельная train-only PAVA.
 
-Исключение согласовано явно: `window512_full_answer_v1` разрешает изменение
-результатов **только ответов длиннее 512 модельных позиций**. Исторические P5
-артефакты и метрики не переписаны. Политика выбора трёх context chunks не изменена.
-Это не гарантия фактического анализа всего произвольно длинного документа Transformer-моделью.
+Изменения исполнения: индексирование token-position overlaps, кеширование норм,
+устранение sentence-prefix hot spots, сохранение eval HF runtime, точный
+request-local LRU4096 одинаковых окон, индекс интервалов в двух разных
+предикатах (strict overlap / containment начала токена). Ни токены, ни логические
+окна не пропускаются; никаких нулевых хвостов/подмен рисков/ослабления правил.
+Python≥3.12 сохраняет reference summation, без обещания такого же ускорения.
+100000synthetic interval queries совпали с reference; это отдельно от native SLO.
 
-## Что изменено
+Согласованное исключение: **только >512 model-position ответы** получают
+`window512_full_answer_v1` и могут изменить результат. Политика top3context
+не изменена; это не обещание Transformer-проверки каждого факта всего документа.
+Исторические P2/P3/P4/P5 артефакты/метрики не переписаны.
 
-- Индексирование пересечений токенов вместо повторных полных обходов.
-- Устранение повторных вычислений норм и горячих операций сегментации предложений.
-  Для Python ≥3.12 сохранён эталонный путь суммирования, без обещания ускорения.
-- Полная оконная обработка длинного ответа; каждый логический токен сохраняется.
-- Ограниченный точный кеш одинаковых окон/context/token offsets (LRU4096),
-  без пропуска токенов и без привязки к train/dev идентификаторам.
-- Индекс интервалов для двух различных предикатов: strict overlap и containment
-  начальной позиции токена. Предикаты не подменяют друг друга.
-- Windows: расширение путей уже загруженных частичных stdlib packages,
-  локальная поставка MSVC DLL и изолированный внешний HF runtime.
-  Реальная автономность требует успешного `/v1/verify`, одного `/health` недостаточно.
+## 2. Паритет и аудит усечения
 
-## Паритет и длинные ответы
+Byte golden291747B SHA256
+`8e4a06666ef6e854dd6a768d7cc253ec368201cd74ab5485e3693d4955186edd`;
+исключён **только latency_ms**, исходный снимок сохранён.
+Перед каждой предиктивной оптимизацией — golden и saved-dev replay181/13150,
+zero mismatch/P1delta0. Cached replay обозначен cached compatibility,
+**не** свежая проверка feature path.
 
-Стабильный golden исключает только `latency_ms`; первоначальный снимок сохранён.
-SHA-256 стабильного golden:
-`8e4a06666ef6e854dd6a768d7cc253ec368201cd74ab5485e3693d4955186edd`.
-Сохранённый replay181/13150 с нулевой разницей — проверка совместимости,
-**не** доказательство свежего вычисления признаков.
-Свежий old/new HF replay отдельно подтвердил byte parity для 178 коротких dev-ответов.
+Отдельный реальный old/new HF replay подтвердил byte identity **178коротких**
+dev-ответов. Tokenizer audit: train842, длинных22, max1923model positions,
+legacy unmapped7250native tokens; dev181, длинных3, max1046, unmapped479.
+В этих train/dev коротких ответах пропусков нет. Исключение не расширялось на
+иные короткие входы: short path остался legacy-byte-frozen.
 
-Фактический tokenizer audit: train842, длинных22, максимум1923 модельных позиции;
-dev181, длинных3, максимум1046. Legacy терял соответственно7250 и479 native tokens.
-На этих train/dev данных пропусков у коротких ответов не обнаружено.
-
-| Dev ID | Позиций | Legacy score | Новый score | Изменённых token records |
+| Dev ID | Model positions | Legacy score | Full-window score | Changed records |
 |---|---:|---:|---:|---:|
-| corpus-a3-00265 | 529 | 0.5188679245283019 | 0.5794392523364486 | 418 |
-| corpus-a3-00114 | 1046 | 0.3969465648854962 | 0.5794392523364486 | 623 |
-| corpus-a3-01041 | 641 | 0.5188679245283019 | 0.5794392523364486 | 531 |
+| corpus-a3-00265 |529|0.5188679245283019|0.5794392523364486|418|
+| corpus-a3-00114 |1046|0.3969465648854962|0.5794392523364486|623|
+| corpus-a3-01041 |641|0.5188679245283019|0.5794392523364486|531|
 
-Все три gold-positive; при замороженном сравнении `score >= threshold` это FN→TP.
-Исторические P5 answer TP/FP/FN/TN **49/14/47/71** остаются историческими.
-Для явно версионированного long-контракта наблюдаются **52/14/44/71**.
-Это аудит, не новая независимая оценка качества и не основание выбирать порог.
-Подробности: `versioned-long-deltas.json`, `accepted-long-contract-annotations.json`.
+Все3gold-positive; при неизменном `score>=threshold` это FN→TP.
+Исторические P5 answer TP/FP/FN/TN **49/14/47/71** сохраняются.
+Версионированный long-v1 audit даёт **52/14/44/71**, не новую независимую оценку
+качества и не повод выбирать порог. Подробные hashes/deltas:
+`versioned-long-deltas.json`, `accepted-long-contract-annotations.json`,
+новые `final-receipts/acceptance/*annotations.json` и workflow HF-contract artifact.
 
-## Скорость: метод и ограничения
+## 3. Полный HF2M и скорость
 
-Три cold и три warm повтора для каждого размера/роли; sec/1000 chars,
-медиана и максимум. Таймаут — не достигнутый норматив, не успешная медиана.
-Измеряется вызов verifier по фиксированному протоколу P6, без скачивания и
-импорта; это не обещание сетевой задержки браузера/скачивания полного JSON.
-Только train/synthetic входы, без dev/test в подборе скорости.
-
-Модели CPU hosted runners меняются. Исторические P6 результаты не называются
-измерением на той же физической VM. Дополнительный paired workflow запускает
-неизменяемую P6-программу и текущую на **одном runner**, с одинаковым harness,
-зависимостями и тремя cold/warm повторами. Он не подменяет историческую таблицу.
-Исторический HF50k усекался — это не like-for-like baseline полного ответа.
-
-До индекса интервалов полный HF2M занял1738.99458161s без кеша и125.521545277s
-с точным кешем; оба результата не достигли60s. Оба сформировали282830 token records,
-последний end2000000, SHA токенов
+Actual2M UTF8 answer: **2000000chars/3660605B/282830native token records**,
+последний end2000000; все риски finite/bounded, schema/text slices проверены,
+все native tokens отображены.3283логических окна,14model calls,
+3269точных cache hits; ни одного пропуска логического окна.
+SHA всех token records:
 `56c3028861b5ea021310a59f98272fa1bff6e33a43755af6fae0bc00f89655a4`.
-Число model calls уменьшилось3283→14, но логические3283 окна не пропущены.
-Вход повторяет train-текст: высокая повторяемость — best case кеша,
-не гарантия60s на произвольном неповторяющемся тексте.
-Новая фактическая full-HF проверка d4caead: **93.028817239→39.619791618s**
-в одном процессе, полный публичный JSON byte-identical после удаления только
-latency_ms. Все282830 записей, SHA токенов тот же; end2000000.
-Подробности: `full-hf-2M-indexed-public-exact.json`.
-Отдельный same-host paired run39232439363 завершился SUCCESS:
-demo answer2M cold median/max30.243664/30.330630s, warm30.090007/30.202026s;
-HF answer2M cold44.268179/44.333805s, warm39.824549/39.927222s — норматив60s
-достигнут в трёх повторах каждого состояния. HF50k warm7.676519s median,
-7.686873s max — **норматив1s не достигнут**. Полные before/after, контекст,
-sec/1000 chars и профили: `paired/`. Исторический HF50k before был усечён,
-поэтому его3.893606s нельзя выдавать за эквивалентный полный baseline.
 
-## AI-share: отдельная частичная калибровка
+До кеша один functional прогон1738.994582s, после кеша до индекса125.521545s —
+оба **не** достигли60s. На итоговом source реальная SAME-PROCESS проверка
+индекса дала **91.417021→39.301874s**, полный public JSON byte-identical после
+удаления только latency_ms, SHA
+`e86ac2ade7e182d6f6fb03bce53f81680b92f0a3715804bc39d13d833a1ebd35`.
+Это отдельная functional equality проверка, не замена трём native repeats.
 
-265 train-документов,1325 смесей долей0/.25/.5/.75/1, исходные пять document folds;
-fit/held документы не пересекаются. Dev/test не используются. Raw frozen.
+Ниже current native3cold/3warm (median/max), только train/synthetic.
+Latency — вызов verifier по протоколу P6, без download/import, не сеть/браузер
+и не время скачивания огромного JSON. Warm — прогрев модели запросом1k,
+не кеширование измеряемого полного ответа. Timeout75s относится ко всему worker,
+не притворяется успешной медианой. Все24cells/sec1000/limits:
+`final-receipts/native-benchmark.json`.
 
-| Режим | Pooled OOF MAE до | После |
-|---|---:|---:|
-| demo | 0.4497321882850523 | 0.2989009919597126 |
-| HF | 0.4068236540115673 | 0.2565365102059551 |
+| mode | answer chars | cold median/max s | warm median/max s | limit s | статус |
+|---|---:|---:|---:|---:|---|
+|demo|1000|0.024435/0.024529|0.015931/0.016051|0.03|достигнут|
+|demo|50000|0.706259/0.712470|0.703229/0.704727|1.0|достигнут|
+|demo|2000000|29.950421/29.995070|29.876726/30.019292|60.0|достигнут|
+|hf|1000|5.343224/5.413219|0.811025/0.814359|0.03|не достигнут|
+|hf|50000|12.672036/12.702179|8.168092/8.213496|1.0|не достигнут|
+|hf|2000000|42.878149/42.953376|38.769417/38.821635|60.0|достигнут|
 
-PAVA-функция монотонна по raw score, но pooled-кривые по известной доле
-**не монотонны**. Статус — **частично**. Синтетические смеси не доказывают
-калибровку реального LLM-авторства. Артефакт `ai_share_calibrator_v1` отделён
-от модели качества и не изменяет P1.
+Current demo CPU7763, HF9V74;4logical CPUs/16GB-class RAM, Ubuntu24.04,
+Python3.11.17; torch2.14.1+cpu/transformers5.20.1/numpy2.4.6/sentencepiece.2.2,
+OMP/MKL/OpenBLAS2threads. Это не та же физическая VM, что historical P6.
+Поэтому [TIMINGS.md](TIMINGS.md) отдельно публикует48same-host before/after cells:
+P6-программа14a018a и P7f7bb718 на одной VM каждого режима (CPU7763).
+HF-before50k усекался и не является like-for-like полным baseline.
 
-## Инцидент legacy чтения test
+**Достигнуты:** demo answer1k≤.03/50k≤1/2M≤60s, HF answer2M≤60s без timeout;
+demo context нормативы сохранены, HF context2M≤60 и ускорение на paired control.
+**Не достигнуты:** HF answer50k warm≤1s (**8.168092median/8.213496max s**),
+HF малые context/1k нормативы. Demo context небольшие колебания медиан не скрыты:
+2Mwarm+0.42%,50kwarm+.78%,1kcold+.913ms на paired VM. Строгая статистическая
+неухудшенность тремя повторами не доказана; заявляется сохранение нормативов.
 
-На начальном остановленном регрессионном запуске P6 legacy chunking-тест
-`tests/test_chunking.py` сначала разбирал весь unsplit `corpus_a3/pairs.jsonl`,
-а затем брал первые20 записей. Следовательно, зарезервированные строки
-**читались**, хотя их официальные метрики не вычислялись. Точный timestamp
-чтения из имеющихся квитанций не восстановлен. Исправление зафиксировано
-`5ff79f9a7bed33c00c6278f67d68ddff73f8325c`18.10.2026в23:34:59UTC
-(19.10в02:34:59MSK):
-`TestSelectRelevantChunks::test_on_corpus_a3_sample`переведён на train split.
-Этап и исходные строки сохранены в
-`freeze-and-incident.json`. Нет оснований говорить «test никогда не читался».
-Веса/исторические артефакты неизменны; обучения или выбора конфигурации по
-официальному test не было. Текущий guard в conftest и measurement runners
-блокирует unsplit/official reads; регрессия использует train. Новых чтений
-официальных177 в P7 нет. Исторический source-pairs SHA сохранён как provenance:
+Новый failed-norm профиль опубликован (`native-profiles.json` + raw `.prof`
+workflow artifacts). В paired HF50kwarm: torch.addmm3.282463self-s,
+linear1.611283self-s, tree predict_one.746631self-s, cumsum.596300self-s.
+Основной остаток — замороженное dense inference; риски/порог ради1s не менялись.
+Повторяемый train-вход — best case кеша. Универсальные60s на уникальном2M тексте
+не доказаны и не заявлены. Нормативы не переписаны.
+
+## 4. AI-share — отдельный частичный артефакт
+
+[Полные кривые/MAE/метод](CALIBRATION.md), `ai-share-oof-curves.json`.
+265train-documents/1325смесей0/.25/.5/.75/1, исходные5document folds,
+fit/held PAVA-documents disjoint. Raw frozen; dev/test не использованы.
+
+| mode | pooled OOF MAE до | после | pooled curve monotone |
+|---|---:|---:|---|
+|demo|0.4497321882850523|0.2989009919597126|нет/нет|
+|HF|0.4068236540115673|0.2565365102059551|нет/нет|
+
+Функция PAVA монотонна по raw, pooled-кривая по известной доле не монотонна.
+**Статус частично**, не калибровка реального LLM-авторства. Отдельные
+`ai_share_calibrator_v1.demo.json/.hf.json` в `final-receipts/`, их SHA проверены.
+Opt-in через constructor/`SPANVERIFY_AI_SHARE_CALIBRATOR`, default raw сохранён,
+P1 не меняется; несовпадение mode/bundle отвергается. OOF относится к PAVA,
+не новой nested валидации ранее замороженной модели качества.
+
+## 5. Windows, размеры и реальная автономность
+
+Exe **8979956B≤9000000**, pyz **232874B≤600000**. Native exe И pyz выполнили
+реальный `/v1/verify` HTTP200/backendhf в изолированной копии, с внешними libs,
+весами и portable Python, без source checkout/host development site-packages,
+с исходящей firewall-блокировкой. Проверки application registry keys неизменны;
+это не глобальная трассировка каждого системного ключа. Поставка не требует
+пользовательского pip/install/регистрации. Файлы `Start-HF.exe.cmd` /
+`Start-HF.pyz.cmd`, `AUTONOMY.json` и полный layout входят в portable ZIP.
+
+Фактический model `pytorch_model.bin` **551290714B** (~525.75MiB), SHA256
+`0d2a4a387b0430654bb1f6813436bd31f8e10a06e18ea0e5c41b33120b78458e`.
+**libs870588148B** (~830.26MiB), не первоначальная оценка~500MB;
+portable Python и приложения дополнительно. Model+libs уже1421878862B.
+Не выдаём размер tiny exe за полную HF-поставку. Artifact-container637051335B;
+внутренний `p7-hf-portable.zip` SHA256
+`c5cd4a93952b9016b8a00748eef8d1b6f2ce2d23f2d6069f7c91185e1dbb5771`.
+Полный installed-byte total SDK не измерен, конкретная эталонная4GB-машина
+договора не испытывалась — соответствующие строки остаются частичными.
+
+Предыдущие ошибки не скрыты: `/health` был успешным, HF verify500 сначала
+`urllib.error`, затем native `tokenizers` DLL loading. Исправлены search paths
+частично frozen stdlib packages и portable ABI3/MSVC DLL directories; handles
+живут до конца serve. PE Windows-wheel подтвердил зависимость `python3.dll`.
+Lossless PYZ zlib6→9 уменьшил размер без удаления bytecode/assertions.
+Новые реальные HF200, а не один health, закрывают автономность этой поставки.
+
+## 6. Legacy-инцидент чтения test
+
+На начальном остановленном P6 regression legacy
+`tests/test_chunking.py::TestSelectRelevantChunks::test_on_corpus_a3_sample`
+разбирал **весь** unsplit corpus_a3/pairs.jsonl, затем срезал первые20.
+Следовательно, зарезервированные строки **читались**. Точный timestamp чтения
+не восстановлен; исправление5ff79f9a7bed33c00c6278f67d68ddff73f8325c:
+18.10.2026в23:34:59UTC (19.10в02:34:59MSK), переход на train split.
+Нет утверждения «test никогда не читался». Официальных метрик/обучения/выбора
+конфигурации на test не было; frozen bytes/history/replays сохранены.
+Guard conftest + P7 runners блокирует aggregate/official reads. Новых чтений
+официальных177 в P7 нет. Исторический source-pairs SHA (без нового открытия файла):
 `b9a4cf05a9078644dd539470481a1b8079aed2d9201e195c3ecd901276ff7c8e`.
+Доказательство: `freeze-and-incident.json`, source diff5ff79f9.
 
-## Проверки и незакрытые пункты
+## 7. Тесты, устойчивость, оставшиеся ограничения
 
-Нормативы не переписывались. Промежуточный полный прогон7262 завершился с
-одним infrastructure failure: timeout HF-job60 превышал существующий предел40.
-Лимит возвращён40 без исключения/ослабления теста. Новый paired workflow добавил
-пять существующих параметризованных проверок; текущая коллекция888.
-Свежий полный локальный прогон409d4e6: **888 collected, 886 passed, 2 skipped,
-313.31s, exit0** (`full-suite-409d4e6.log/.xml`). Два пропуска — прежние
-отсутствующие optional torch/rouge зависимости, не новые исключения. Финальные
-CI и нативные квитанции ещё ожидаются.
+Текущая коллекция **895**. Полный локальный b8aa671: **893passed/2skipped,
+327.96s, exit0**; skip прежние missing torch/transformers и rouge_score.
+Новых исключений/skip нет, tests_excluded=false. Реальный HF проверен отдельными
+успешными jobs. Black191files/Ruff/golden и все workflow guards сохранены.
+Промежуточные failures тоже сохранены:7262fullsuite rejected60min>40guard;
+4fd81b4fullsuite rejected несинхронизированный workflow registry. Исправлены
+конфигурация/документация, не тесты; последующий полный895прогон успешен.
 
-Windows: прежний `/health` работал, реальный HF verify возвращал500
-(`urllib.error`); это **не автономность**. Исправление stdlib прошло до следующего реального дефекта:
-`tokenizers` DLL load failed. В Windows-wheel подтверждён импорт `python3.dll`;
-добавлен явный portable DLL search path с сохранением loader handles.
-Это пока не автономность: новый exe+pyz smoke ещё ожидается. Lossless PYZ
-compression6→9 сохраняет все bytecode/assertions и строгий размерный gate. Необходимы строгие размеры exe≤9000000B, pyz≤600000B,
-новый prerelease RC/not latest и acceptance archive через workflow artifacts.
-Stable не публикуется до официального test.
+Новый publication workflow добавил5существующих параметризованных checks и
+2ZIP integrity/path-escape regressions:888→895; это inventory, не подмена
+исторических успешных888JUnit. Edge regressions empty/single/Unicode seams/
+long docs, отказ при неполном HF mapping, интервальные границы сохранены.
 
-Robustness: number/contradiction/paraphrase/omission **исследовано и
-задокументировано**, не «качество достигнуто». Исторический P6 dev strict span F1:
-contradiction0.1538, number_attribution0.3333, partial0. Официальный test177
-не оценивался. Матрицы и итоговый статус должны опираться только на новые квитанции.
+Robustness number/contradiction/paraphrase/omission: **исследовано и
+задокументировано, не «качество достигнуто»**. P6 saved OOF/dev mode proxies,
+не новые perturbation tests: strict dev span F1 contradiction.1538,
+number_attribution.3333, partial0; paraphrase не имеет отдельной gold-mode.
+Новых независимых challenge-метрик не выдумываем. Источник:
+`reports/acceptance/robustness.json`. Официальный test177 остаётся неоценённым.
+
+[Матрица P7](coverage-matrix.md), [текущая матрица договора](../contract/coverage-matrix.md).
+Подняты только строки с новыми источниками; quality/history/неисследованная
+hardware/usability/updates приёмка не повышены. Незакрыто: HF50k≤1s и малые
+HF-speed нормы; надёжная authorship-калибровка; соответствие прежней оценке
+libs~500MB/полный установленный SDK footprint; весь официальный quality-contract.
+Это конечный измеренный частичный результат, без обещания отдельной будущей итерации.
+
+Квитанции всех измерений/RC/архивов сохраняются в Git. Финальный documentary HEAD
+проходит обычный полный CI; ссылка на его run проверяется после push и сообщается
+в результате (самоссылочный SHA в собственном коммите не создаётся).

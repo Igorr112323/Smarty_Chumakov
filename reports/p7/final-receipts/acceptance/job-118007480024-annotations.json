@@ -1,0 +1,38 @@
+[
+  {
+    "path": ".github",
+    "blob_href": "https://github.com/Igorr112323/Smarty_Chumakov/blob/a85c40a14828141447768d3c78d13aa0ced105eb/.github",
+    "start_line": 2,
+    "start_column": null,
+    "end_line": 2,
+    "end_column": null,
+    "annotation_level": "warning",
+    "title": "",
+    "message": "Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@v4, actions/setup-python@v5, actions/upload-artifact@v4. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/",
+    "raw_details": ""
+  },
+  {
+    "path": ".github",
+    "blob_href": "https://github.com/Igorr112323/Smarty_Chumakov/blob/a85c40a14828141447768d3c78d13aa0ced105eb/.github",
+    "start_line": 16,
+    "start_column": null,
+    "end_line": 16,
+    "end_column": null,
+    "annotation_level": "notice",
+    "title": "P7 AI-share",
+    "message": "{\"mode\": \"demo\", \"documents\": 265, \"mixtures\": 1325, \"original_document_folds\": true, \"pooled_before\": {\"mae\": 0.4497321882850523, \"mean_curve\": [0.0936904306893239, 0.10222346268431477, 0.11634289217555363, 0.08425647499700699, 0.043514887378350506], \"monotone\": false}, \"pooled_after\": {\"mae\": 0.2989009919597126, \"mean_curve\": [0.4924897062813976, 0.50285623781367, 0.50285623781367, 0.5008409842965045, 0.50285623781367], \"monotone\": false}, \"status\": \"частично\", \"limitation\": \"Synthetic train-only diagnostic, NOT real-LLM authorship calibration; no quality fitting.\"}",
+    "raw_details": ""
+  },
+  {
+    "path": ".github",
+    "blob_href": "https://github.com/Igorr112323/Smarty_Chumakov/blob/a85c40a14828141447768d3c78d13aa0ced105eb/.github",
+    "start_line": 15,
+    "start_column": null,
+    "end_line": 15,
+    "end_column": null,
+    "annotation_level": "notice",
+    "title": "P7 calibrator artifact",
+    "message": "{\"mode\": \"demo\", \"artifact\": {\"ai_share_calibrator_v1\": {\"upper\": [0.0, 0.003125, 0.0033333333333333335, 0.00851245480112495, 0.016617228535434105, 0.41756883369385994], \"values\": [0.0, 0.0, 0.0, 0.0, 0.375, 0.5028560548362528], \"mode\": \"demo\", \"bundle_sha256\": \"e0b13c693a058dfd66ed24a52fc14e9c70964e95885358e7b99cc1f328ad6892\"}}, \"sha256\": \"68ac7c8dcef03bfa6ef0560c57b58abb598a75a5e1c6f08dbe3651d7f6177c92\", \"fold_manifest_sha256\": \"7e76104f811cacfa1f4633f98a1b63d4c3c463d38aea9dc956a5aa5709b7ea34\"}",
+    "raw_details": ""
+  }
+]

@@ -1,0 +1,313 @@
+[
+  {
+    "mode": "hf",
+    "cases": [
+      {
+        "scenario": "answer-text",
+        "chars": 50000,
+        "thermal": "cold-process",
+        "top": [
+          {
+            "function": "<built-in method torch.addmm>",
+            "calls": 672,
+            "self_seconds": 3.74487176,
+            "cumulative_seconds": 3.74487176
+          },
+          {
+            "function": "<built-in method builtins.exec>",
+            "calls": 5745,
+            "self_seconds": 0.31276734,
+            "cumulative_seconds": 5.669521386
+          },
+          {
+            "function": "hf_features",
+            "calls": 15,
+            "self_seconds": 0.14120379,
+            "cumulative_seconds": 11.767475686000001
+          },
+          {
+            "function": "full_answer_features",
+            "calls": 1,
+            "self_seconds": 0.045555641,
+            "cumulative_seconds": 8.189464137
+          },
+          {
+            "function": "<built-in method builtins.hasattr>",
+            "calls": 72306,
+            "self_seconds": 0.029278077000000003,
+            "cumulative_seconds": 2.980420316
+          }
+        ]
+      },
+      {
+        "scenario": "answer-text",
+        "chars": 50000,
+        "thermal": "warm-model",
+        "top": [
+          {
+            "function": "<built-in method torch.addmm>",
+            "calls": 672,
+            "self_seconds": 3.743215986,
+            "cumulative_seconds": 3.743215986
+          },
+          {
+            "function": "<built-in method torch._C._nn.linear>",
+            "calls": 14,
+            "self_seconds": 1.774346795,
+            "cumulative_seconds": 1.774346795
+          },
+          {
+            "function": "predict_one",
+            "calls": 2263360,
+            "self_seconds": 0.7431743670000001,
+            "cumulative_seconds": 0.7431743670000001
+          },
+          {
+            "function": "<method 'cumsum' of 'numpy.ndarray' objects>",
+            "calls": 1927,
+            "self_seconds": 0.6696120170000001,
+            "cumulative_seconds": 0.6696120170000001
+          },
+          {
+            "function": "<built-in method builtins.sum>",
+            "calls": 75304,
+            "self_seconds": 0.22055452800000003,
+            "cumulative_seconds": 0.453095746
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "mode": "hf",
+    "cases": [
+      {
+        "scenario": "document-context",
+        "chars": 50000,
+        "thermal": "warm-model",
+        "top": [
+          {
+            "function": "<built-in method torch.addmm>",
+            "calls": 144,
+            "self_seconds": 0.8343944200000001,
+            "cumulative_seconds": 0.8343944200000001
+          },
+          {
+            "function": "<built-in method torch._C._nn.linear>",
+            "calls": 3,
+            "self_seconds": 0.39783184000000005,
+            "cumulative_seconds": 0.39783184000000005
+          },
+          {
+            "function": "<method 'cumsum' of 'numpy.ndarray' objects>",
+            "calls": 90,
+            "self_seconds": 0.063195307,
+            "cumulative_seconds": 0.063195307
+          },
+          {
+            "function": "<built-in method builtins.sum>",
+            "calls": 1009,
+            "self_seconds": 0.042582182,
+            "cumulative_seconds": 0.09018835900000001
+          },
+          {
+            "function": "forward",
+            "calls": 36,
+            "self_seconds": 0.018019927,
+            "cumulative_seconds": 0.064438538
+          }
+        ]
+      },
+      {
+        "scenario": "answer-text",
+        "chars": 1000,
+        "thermal": "cold-process",
+        "top": [
+          {
+            "function": "<built-in method builtins.exec>",
+            "calls": 5744,
+            "self_seconds": 0.316537736,
+            "cumulative_seconds": 5.755866503
+          },
+          {
+            "function": "create_import_structure_from_path",
+            "calls": 1075,
+            "self_seconds": 0.15150681900000001,
+            "cumulative_seconds": 1.131858242
+          },
+          {
+            "function": "<built-in method builtins.hasattr>",
+            "calls": 71694,
+            "self_seconds": 0.030680095,
+            "cumulative_seconds": 3.012721346
+          },
+          {
+            "function": "hf_features",
+            "calls": 1,
+            "self_seconds": 0.018113808000000002,
+            "cumulative_seconds": 4.423363023
+          },
+          {
+            "function": "_find_and_load",
+            "calls": 5442,
+            "self_seconds": 0.014996239000000001,
+            "cumulative_seconds": 5.764405131
+          }
+        ]
+      },
+      {
+        "scenario": "answer-text",
+        "chars": 1000,
+        "thermal": "warm-model",
+        "top": [
+          {
+            "function": "<built-in method torch.addmm>",
+            "calls": 48,
+            "self_seconds": 0.366980517,
+            "cumulative_seconds": 0.366980517
+          },
+          {
+            "function": "<built-in method torch._C._nn.linear>",
+            "calls": 1,
+            "self_seconds": 0.175725227,
+            "cumulative_seconds": 0.175725227
+          },
+          {
+            "function": "<method 'cumsum' of 'numpy.ndarray' objects>",
+            "calls": 246,
+            "self_seconds": 0.085454709,
+            "cumulative_seconds": 0.085454709
+          },
+          {
+            "function": "<built-in method torch.matmul>",
+            "calls": 24,
+            "self_seconds": 0.029765462000000003,
+            "cumulative_seconds": 0.029765462000000003
+          },
+          {
+            "function": "<built-in method builtins.sum>",
+            "calls": 2057,
+            "self_seconds": 0.023098522,
+            "cumulative_seconds": 0.047338039000000005
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "mode": "hf",
+    "cases": [
+      {
+        "scenario": "document-context",
+        "chars": 1000,
+        "thermal": "cold-process",
+        "top": [
+          {
+            "function": "<built-in method builtins.exec>",
+            "calls": 5744,
+            "self_seconds": 0.311528656,
+            "cumulative_seconds": 5.6125207800000005
+          },
+          {
+            "function": "create_import_structure_from_path",
+            "calls": 1075,
+            "self_seconds": 0.15082621000000002,
+            "cumulative_seconds": 1.128987191
+          },
+          {
+            "function": "<built-in method builtins.hasattr>",
+            "calls": 71693,
+            "self_seconds": 0.027783588,
+            "cumulative_seconds": 2.990415547
+          },
+          {
+            "function": "_find_and_load",
+            "calls": 5442,
+            "self_seconds": 0.014372425000000001,
+            "cumulative_seconds": 5.621102168
+          },
+          {
+            "function": "_find_and_load_unlocked",
+            "calls": 2407,
+            "self_seconds": 0.011453127,
+            "cumulative_seconds": 5.620761066
+          }
+        ]
+      },
+      {
+        "scenario": "document-context",
+        "chars": 1000,
+        "thermal": "warm-model",
+        "top": [
+          {
+            "function": "<built-in method torch.addmm>",
+            "calls": 48,
+            "self_seconds": 0.285959257,
+            "cumulative_seconds": 0.285959257
+          },
+          {
+            "function": "<built-in method torch._C._nn.linear>",
+            "calls": 1,
+            "self_seconds": 0.13538872100000002,
+            "cumulative_seconds": 0.13538872100000002
+          },
+          {
+            "function": "<method 'cumsum' of 'numpy.ndarray' objects>",
+            "calls": 30,
+            "self_seconds": 0.021381111,
+            "cumulative_seconds": 0.021381111
+          },
+          {
+            "function": "<built-in method torch.matmul>",
+            "calls": 24,
+            "self_seconds": 0.017975445,
+            "cumulative_seconds": 0.017975445
+          },
+          {
+            "function": "<built-in method builtins.sum>",
+            "calls": 467,
+            "self_seconds": 0.014504205000000001,
+            "cumulative_seconds": 0.030898858
+          }
+        ]
+      },
+      {
+        "scenario": "document-context",
+        "chars": 50000,
+        "thermal": "cold-process",
+        "top": [
+          {
+            "function": "<built-in method builtins.exec>",
+            "calls": 5744,
+            "self_seconds": 0.31486922900000003,
+            "cumulative_seconds": 5.769000901
+          },
+          {
+            "function": "create_import_structure_from_path",
+            "calls": 1075,
+            "self_seconds": 0.151676998,
+            "cumulative_seconds": 1.129053313
+          },
+          {
+            "function": "<built-in method builtins.hasattr>",
+            "calls": 71763,
+            "self_seconds": 0.030499219,
+            "cumulative_seconds": 3.0271388810000004
+          },
+          {
+            "function": "_find_and_load",
+            "calls": 5442,
+            "self_seconds": 0.01502906,
+            "cumulative_seconds": 5.7777376480000004
+          },
+          {
+            "function": "_find_and_load_unlocked",
+            "calls": 2407,
+            "self_seconds": 0.011920956,
+            "cumulative_seconds": 5.777378548000001
+          }
+        ]
+      }
+    ]
+  }
+]

@@ -134,6 +134,7 @@ def main():
             "acceptance": a.acceptance,
             "windows": a.windows,
             "ci": a.ci,
+            "paired": a.paired,
             "tests_excluded": False,
         },
     )

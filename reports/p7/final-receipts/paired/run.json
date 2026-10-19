@@ -1,0 +1,189 @@
+{
+  "conclusion": "success",
+  "createdAt": "2026-10-19T09:45:22Z",
+  "headSha": "f7bb7181f950e55a67c04003c570093b3e186b7e",
+  "jobs": [
+    {
+      "completedAt": "2026-10-19T09:59:49Z",
+      "conclusion": "success",
+      "databaseId": 117993367143,
+      "name": "paired (hf)",
+      "startedAt": "2026-10-19T09:45:24Z",
+      "status": "completed",
+      "steps": [
+        {
+          "conclusion": "success",
+          "name": "Set up job",
+          "number": 1,
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Run actions/checkout@v4",
+          "number": 2,
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Run actions/setup-python@v5",
+          "number": 3,
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Same pinned P6/P7 HF dependencies and prepared weights",
+          "number": 4,
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Immutable P6 program snapshot, never old tests or fitting",
+          "number": 5,
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Before, original P6 application; three cold/warm repeats",
+          "number": 6,
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Complete before table and hardware receipt",
+          "number": 7,
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "After, current program; three cold/warm repeats on SAME runner",
+          "number": 8,
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Complete after table and hardware receipt",
+          "number": 9,
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Run actions/upload-artifact@v4",
+          "number": 10,
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Post Run actions/setup-python@v5",
+          "number": 19,
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Post Run actions/checkout@v4",
+          "number": 20,
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Complete job",
+          "number": 21,
+          "status": "completed"
+        }
+      ],
+      "url": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39232439363/job/117993367143"
+    },
+    {
+      "completedAt": "2026-10-19T09:59:49Z",
+      "conclusion": "success",
+      "databaseId": 117993367707,
+      "name": "paired (demo)",
+      "startedAt": "2026-10-19T09:45:24Z",
+      "status": "completed",
+      "steps": [
+        {
+          "conclusion": "success",
+          "name": "Set up job",
+          "number": 1,
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Run actions/checkout@v4",
+          "number": 2,
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Run actions/setup-python@v5",
+          "number": 3,
+          "status": "completed"
+        },
+        {
+          "conclusion": "skipped",
+          "name": "Same pinned P6/P7 HF dependencies and prepared weights",
+          "number": 4,
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Immutable P6 program snapshot, never old tests or fitting",
+          "number": 5,
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Before, original P6 application; three cold/warm repeats",
+          "number": 6,
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Complete before table and hardware receipt",
+          "number": 7,
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "After, current program; three cold/warm repeats on SAME runner",
+          "number": 8,
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Complete after table and hardware receipt",
+          "number": 9,
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Run actions/upload-artifact@v4",
+          "number": 10,
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Post Run actions/setup-python@v5",
+          "number": 19,
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Post Run actions/checkout@v4",
+          "number": 20,
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Complete job",
+          "number": 21,
+          "status": "completed"
+        }
+      ],
+      "url": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39232439363/job/117993367707"
+    }
+  ],
+  "name": "P7 paired same-host benchmark",
+  "status": "completed",
+  "updatedAt": "2026-10-19T10:15:04Z",
+  "url": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39232439363"
+}

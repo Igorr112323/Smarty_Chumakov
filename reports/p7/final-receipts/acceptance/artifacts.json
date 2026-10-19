@@ -1,0 +1,165 @@
+{
+  "total_count": 8,
+  "artifacts": [
+    {
+      "id": 12180432017,
+      "node_id": "MDg6QXJ0aWZhY3QxMjE4MDQzMjAxNw==",
+      "name": "p7-calibration-hf",
+      "size_in_bytes": 43720,
+      "url": "https://api.github.com/repos/Igorr112323/Smarty_Chumakov/actions/artifacts/12180432017",
+      "archive_download_url": "https://api.github.com/repos/Igorr112323/Smarty_Chumakov/actions/artifacts/12180432017/zip",
+      "expired": false,
+      "digest": "sha256:b231e6b346fc214154dbe5c0cc47e4f71aec1d7316b439366e25052f1dad979b",
+      "created_at": "2026-10-19T10:39:57Z",
+      "updated_at": "2026-10-19T10:39:57Z",
+      "expires_at": "2027-01-17T10:19:40Z",
+      "workflow_run": {
+        "id": 39236657451,
+        "repository_id": 1402768620,
+        "head_repository_id": 1402768620,
+        "head_branch": "arena/c5f69767-smarty-chumakov",
+        "head_sha": "a85c40a14828141447768d3c78d13aa0ced105eb"
+      }
+    },
+    {
+      "id": 12180087566,
+      "node_id": "MDg6QXJ0aWZhY3QxMjE4MDA4NzU2Ng==",
+      "name": "p7-benchmark-hf",
+      "size_in_bytes": 3970878,
+      "url": "https://api.github.com/repos/Igorr112323/Smarty_Chumakov/actions/artifacts/12180087566",
+      "archive_download_url": "https://api.github.com/repos/Igorr112323/Smarty_Chumakov/actions/artifacts/12180087566/zip",
+      "expired": false,
+      "digest": "sha256:713bcc0040f8ec845d9c1ba1e390220fbfe81341782fb61fb4cb21db7c8b9936",
+      "created_at": "2026-10-19T10:31:22Z",
+      "updated_at": "2026-10-19T10:31:22Z",
+      "expires_at": "2027-01-17T10:19:40Z",
+      "workflow_run": {
+        "id": 39236657451,
+        "repository_id": 1402768620,
+        "head_repository_id": 1402768620,
+        "head_branch": "arena/c5f69767-smarty-chumakov",
+        "head_sha": "a85c40a14828141447768d3c78d13aa0ced105eb"
+      }
+    },
+    {
+      "id": 12180029914,
+      "node_id": "MDg6QXJ0aWZhY3QxMjE4MDAyOTkxNA==",
+      "name": "p7-acceptance-archive",
+      "size_in_bytes": 4618247,
+      "url": "https://api.github.com/repos/Igorr112323/Smarty_Chumakov/actions/artifacts/12180029914",
+      "archive_download_url": "https://api.github.com/repos/Igorr112323/Smarty_Chumakov/actions/artifacts/12180029914/zip",
+      "expired": false,
+      "digest": "sha256:f4c75d374372344cd28d4141c7cc18a404ec6d4695c82a1fa1cf848f9b37597b",
+      "created_at": "2026-10-19T10:48:06Z",
+      "updated_at": "2026-10-19T10:48:06Z",
+      "expires_at": "2027-01-17T10:19:40Z",
+      "workflow_run": {
+        "id": 39236657451,
+        "repository_id": 1402768620,
+        "head_repository_id": 1402768620,
+        "head_branch": "arena/c5f69767-smarty-chumakov",
+        "head_sha": "a85c40a14828141447768d3c78d13aa0ced105eb"
+      }
+    },
+    {
+      "id": 12179919215,
+      "node_id": "MDg6QXJ0aWZhY3QxMjE3OTkxOTIxNQ==",
+      "name": "p7-hf-contract",
+      "size_in_bytes": 44908,
+      "url": "https://api.github.com/repos/Igorr112323/Smarty_Chumakov/actions/artifacts/12179919215",
+      "archive_download_url": "https://api.github.com/repos/Igorr112323/Smarty_Chumakov/actions/artifacts/12179919215/zip",
+      "expired": false,
+      "digest": "sha256:fbe3b0e71ade76f4f62b6b1ee8f79fdf4ca90512d61187c62b7ebb254ed8ca69",
+      "created_at": "2026-10-19T10:40:25Z",
+      "updated_at": "2026-10-19T10:40:25Z",
+      "expires_at": "2027-01-17T10:19:40Z",
+      "workflow_run": {
+        "id": 39236657451,
+        "repository_id": 1402768620,
+        "head_repository_id": 1402768620,
+        "head_branch": "arena/c5f69767-smarty-chumakov",
+        "head_sha": "a85c40a14828141447768d3c78d13aa0ced105eb"
+      }
+    },
+    {
+      "id": 12179687977,
+      "node_id": "MDg6QXJ0aWZhY3QxMjE3OTY4Nzk3Nw==",
+      "name": "p7-full-hf",
+      "size_in_bytes": 2887,
+      "url": "https://api.github.com/repos/Igorr112323/Smarty_Chumakov/actions/artifacts/12179687977",
+      "archive_download_url": "https://api.github.com/repos/Igorr112323/Smarty_Chumakov/actions/artifacts/12179687977/zip",
+      "expired": false,
+      "digest": "sha256:2cefb9aeeaeba66842ce062141cf5423e6727a549fe972ead7f10f4a7c8e6003",
+      "created_at": "2026-10-19T10:23:25Z",
+      "updated_at": "2026-10-19T10:23:25Z",
+      "expires_at": "2027-01-17T10:19:40Z",
+      "workflow_run": {
+        "id": 39236657451,
+        "repository_id": 1402768620,
+        "head_repository_id": 1402768620,
+        "head_branch": "arena/c5f69767-smarty-chumakov",
+        "head_sha": "a85c40a14828141447768d3c78d13aa0ced105eb"
+      }
+    },
+    {
+      "id": 12179632186,
+      "node_id": "MDg6QXJ0aWZhY3QxMjE3OTYzMjE4Ng==",
+      "name": "p7-calibration-demo",
+      "size_in_bytes": 42325,
+      "url": "https://api.github.com/repos/Igorr112323/Smarty_Chumakov/actions/artifacts/12179632186",
+      "archive_download_url": "https://api.github.com/repos/Igorr112323/Smarty_Chumakov/actions/artifacts/12179632186/zip",
+      "expired": false,
+      "digest": "sha256:cbc4aefef7ca6e2cbfd08538244d0849d098daeaf50855af842a631f22a4f93c",
+      "created_at": "2026-10-19T10:20:41Z",
+      "updated_at": "2026-10-19T10:20:41Z",
+      "expires_at": "2027-01-17T10:19:40Z",
+      "workflow_run": {
+        "id": 39236657451,
+        "repository_id": 1402768620,
+        "head_repository_id": 1402768620,
+        "head_branch": "arena/c5f69767-smarty-chumakov",
+        "head_sha": "a85c40a14828141447768d3c78d13aa0ced105eb"
+      }
+    },
+    {
+      "id": 12179497827,
+      "node_id": "MDg6QXJ0aWZhY3QxMjE3OTQ5NzgyNw==",
+      "name": "p7-benchmark-demo",
+      "size_in_bytes": 356160,
+      "url": "https://api.github.com/repos/Igorr112323/Smarty_Chumakov/actions/artifacts/12179497827",
+      "archive_download_url": "https://api.github.com/repos/Igorr112323/Smarty_Chumakov/actions/artifacts/12179497827/zip",
+      "expired": false,
+      "digest": "sha256:f052431300fee17bf76b6fea354b7d52d08d22dccd296219fdaf875763dc4301",
+      "created_at": "2026-10-19T10:23:54Z",
+      "updated_at": "2026-10-19T10:23:54Z",
+      "expires_at": "2027-01-17T10:19:40Z",
+      "workflow_run": {
+        "id": 39236657451,
+        "repository_id": 1402768620,
+        "head_repository_id": 1402768620,
+        "head_branch": "arena/c5f69767-smarty-chumakov",
+        "head_sha": "a85c40a14828141447768d3c78d13aa0ced105eb"
+      }
+    },
+    {
+      "id": 12179106844,
+      "node_id": "MDg6QXJ0aWZhY3QxMjE3OTEwNjg0NA==",
+      "name": "p7-parity",
+      "size_in_bytes": 2120,
+      "url": "https://api.github.com/repos/Igorr112323/Smarty_Chumakov/actions/artifacts/12179106844",
+      "archive_download_url": "https://api.github.com/repos/Igorr112323/Smarty_Chumakov/actions/artifacts/12179106844/zip",
+      "expired": false,
+      "digest": "sha256:e2150f50e5a8965860fbe90fb7e694838450f17ff0ada13cb5cbbb5c20020fb5",
+      "created_at": "2026-10-19T10:20:12Z",
+      "updated_at": "2026-10-19T10:20:12Z",
+      "expires_at": "2027-01-17T10:19:40Z",
+      "workflow_run": {
+        "id": 39236657451,
+        "repository_id": 1402768620,
+        "head_repository_id": 1402768620,
+        "head_branch": "arena/c5f69767-smarty-chumakov",
+        "head_sha": "a85c40a14828141447768d3c78d13aa0ced105eb"
+      }
+    }
+  ]
+}

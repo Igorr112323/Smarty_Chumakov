@@ -1,0 +1,476 @@
+{
+  "run": {
+    "conclusion": "success",
+    "createdAt": "2026-10-19T10:19:40Z",
+    "headSha": "a85c40a14828141447768d3c78d13aa0ced105eb",
+    "jobs": [
+      {
+        "completedAt": "2026-10-19T10:47:58Z",
+        "conclusion": "success",
+        "databaseId": 118010120196,
+        "name": "Тесты (Python 3.10)",
+        "startedAt": "2026-10-19T10:27:58Z",
+        "status": "completed",
+        "steps": [
+          {
+            "conclusion": "success",
+            "name": "Set up job",
+            "number": 1,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Run actions/checkout@v4",
+            "number": 2,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Run actions/setup-python@v5",
+            "number": 3,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Зависимости (пины из requirements.txt)",
+            "number": 4,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Тесты",
+            "number": 5,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Само-проверка конвейера",
+            "number": 6,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Post Run actions/setup-python@v5",
+            "number": 11,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Post Run actions/checkout@v4",
+            "number": 12,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Complete job",
+            "number": 13,
+            "status": "completed"
+          }
+        ],
+        "url": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39236657579/job/118010120196"
+      },
+      {
+        "completedAt": "2026-10-19T10:47:58Z",
+        "conclusion": "success",
+        "databaseId": 118010120543,
+        "name": "Тесты (Python 3.11)",
+        "startedAt": "2026-10-19T10:28:31Z",
+        "status": "completed",
+        "steps": [
+          {
+            "conclusion": "success",
+            "name": "Set up job",
+            "number": 1,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Run actions/checkout@v4",
+            "number": 2,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Run actions/setup-python@v5",
+            "number": 3,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Зависимости (пины из requirements.txt)",
+            "number": 4,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Тесты",
+            "number": 5,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Само-проверка конвейера",
+            "number": 6,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Post Run actions/setup-python@v5",
+            "number": 11,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Post Run actions/checkout@v4",
+            "number": 12,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Complete job",
+            "number": 13,
+            "status": "completed"
+          }
+        ],
+        "url": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39236657579/job/118010120543"
+      },
+      {
+        "completedAt": "2026-10-19T10:47:58Z",
+        "conclusion": "success",
+        "databaseId": 118010120679,
+        "name": "Тесты (Python 3.12)",
+        "startedAt": "2026-10-19T10:29:47Z",
+        "status": "completed",
+        "steps": [
+          {
+            "conclusion": "success",
+            "name": "Set up job",
+            "number": 1,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Run actions/checkout@v4",
+            "number": 2,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Run actions/setup-python@v5",
+            "number": 3,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Зависимости (пины из requirements.txt)",
+            "number": 4,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Тесты",
+            "number": 5,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Само-проверка конвейера",
+            "number": 6,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Post Run actions/setup-python@v5",
+            "number": 11,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Post Run actions/checkout@v4",
+            "number": 12,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Complete job",
+            "number": 13,
+            "status": "completed"
+          }
+        ],
+        "url": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39236657579/job/118010120679"
+      },
+      {
+        "completedAt": "2026-10-19T10:47:58Z",
+        "conclusion": "success",
+        "databaseId": 118015463459,
+        "name": "Сборка и проверка .exe",
+        "startedAt": "2026-10-19T10:40:43Z",
+        "status": "completed",
+        "steps": [
+          {
+            "conclusion": "success",
+            "name": "Set up job",
+            "number": 1,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Run actions/checkout@v4",
+            "number": 2,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Run actions/setup-python@v5",
+            "number": 3,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Зависимости сборки",
+            "number": 4,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Версия пакета совпадает с тегом",
+            "number": 5,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Validate frozen weights; no training fallback",
+            "number": 6,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Сборка onefile spanverify.exe",
+            "number": 7,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Диагностика: сверить Python DLL внутри .exe с исходной",
+            "number": 8,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Сборка onedir (вариант для строгих антивирусов)",
+            "number": 9,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Сборка переносимого zipapp",
+            "number": 10,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Комплектация release/",
+            "number": 11,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Смоук-тест собранного .exe (Приложение Б)",
+            "number": 12,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Проверка автономности .exe (config внутри файла)",
+            "number": 13,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Смоук-тест zipapp (Python-версия)",
+            "number": 14,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Контрольные суммы",
+            "number": 15,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Проверка размеров поставки (ТЗ п. 4.2: ≤ 9 МБ .exe, ≤ 0,6 МБ пакет)",
+            "number": 16,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "P7 Windows HF autonomy, external libraries/weights, firewall offline",
+            "number": 17,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Run actions/upload-artifact@v4",
+            "number": 18,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Run actions/upload-artifact@v4",
+            "number": 19,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Обновить реестр чисел (reports/NUMBERS.json)",
+            "number": 20,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Артефакты сборки",
+            "number": 21,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Публикация релиза (только после успешного смоук-теста)",
+            "number": 22,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Post Run actions/setup-python@v5",
+            "number": 43,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Post Run actions/checkout@v4",
+            "number": 44,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Complete job",
+            "number": 45,
+            "status": "completed"
+          }
+        ],
+        "url": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39236657579/job/118015463459"
+      }
+    ],
+    "name": "build-and-release-exe",
+    "status": "completed",
+    "updatedAt": "2026-10-19T10:47:59Z",
+    "url": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39236657579"
+  },
+  "artifacts": {
+    "total_count": 3,
+    "artifacts": [
+      {
+        "id": 12181281192,
+        "node_id": "MDg6QXJ0aWZhY3QxMjE4MTI4MTE5Mg==",
+        "name": "spanverify-windows-x64",
+        "size_in_bytes": 18161542,
+        "url": "https://api.github.com/repos/Igorr112323/Smarty_Chumakov/actions/artifacts/12181281192",
+        "archive_download_url": "https://api.github.com/repos/Igorr112323/Smarty_Chumakov/actions/artifacts/12181281192/zip",
+        "expired": false,
+        "digest": "sha256:f4ba40be00ad0d0fa2544db6ee7348685bae2087d6cbf2bf6224bb88f1696bfc",
+        "created_at": "2026-10-19T10:47:41Z",
+        "updated_at": "2026-10-19T10:47:41Z",
+        "expires_at": "2027-01-17T10:19:40Z",
+        "workflow_run": {
+          "id": 39236657579,
+          "repository_id": 1402768620,
+          "head_repository_id": 1402768620,
+          "head_branch": "arena/c5f69767-smarty-chumakov",
+          "head_sha": "a85c40a14828141447768d3c78d13aa0ced105eb"
+        }
+      },
+      {
+        "id": 12180632054,
+        "node_id": "MDg6QXJ0aWZhY3QxMjE4MDYzMjA1NA==",
+        "name": "p7-windows-hf-autonomy",
+        "size_in_bytes": 6092,
+        "url": "https://api.github.com/repos/Igorr112323/Smarty_Chumakov/actions/artifacts/12180632054",
+        "archive_download_url": "https://api.github.com/repos/Igorr112323/Smarty_Chumakov/actions/artifacts/12180632054/zip",
+        "expired": false,
+        "digest": "sha256:9bd409b3f120b21e97fb434022aca40d19fb2e0241190745df6f7517b8f88c24",
+        "created_at": "2026-10-19T10:47:30Z",
+        "updated_at": "2026-10-19T10:47:30Z",
+        "expires_at": "2027-01-17T10:19:40Z",
+        "workflow_run": {
+          "id": 39236657579,
+          "repository_id": 1402768620,
+          "head_repository_id": 1402768620,
+          "head_branch": "arena/c5f69767-smarty-chumakov",
+          "head_sha": "a85c40a14828141447768d3c78d13aa0ced105eb"
+        }
+      },
+      {
+        "id": 12180458356,
+        "node_id": "MDg6QXJ0aWZhY3QxMjE4MDQ1ODM1Ng==",
+        "name": "p7-hf-portable-runtime",
+        "size_in_bytes": 637051335,
+        "url": "https://api.github.com/repos/Igorr112323/Smarty_Chumakov/actions/artifacts/12180458356",
+        "archive_download_url": "https://api.github.com/repos/Igorr112323/Smarty_Chumakov/actions/artifacts/12180458356/zip",
+        "expired": false,
+        "digest": "sha256:9f1956f933dc05d1d4738d94f81117e45646264246a9029f3a32c35214a7b2d6",
+        "created_at": "2026-10-19T10:47:38Z",
+        "updated_at": "2026-10-19T10:47:38Z",
+        "expires_at": "2027-01-17T10:19:40Z",
+        "workflow_run": {
+          "id": 39236657579,
+          "repository_id": 1402768620,
+          "head_repository_id": 1402768620,
+          "head_branch": "arena/c5f69767-smarty-chumakov",
+          "head_sha": "a85c40a14828141447768d3c78d13aa0ced105eb"
+        }
+      }
+    ]
+  },
+  "notices": [
+    {
+      "job": "Сборка и проверка .exe",
+      "job_id": 118015463459,
+      "title": "P7 portable HF archive",
+      "data": "c5cd4a93952b9016b8a00748eef8d1b6f2ce2d23f2d6069f7c91185e1dbb5771 p7-hf-portable.zip"
+    },
+    {
+      "job": "Сборка и проверка .exe",
+      "job_id": 118015463459,
+      "title": "P7 Windows HF autonomy",
+      "data": {
+        "offline": true,
+        "exe_HF": true,
+        "status": "success",
+        "registry_product_keys_unchanged": true,
+        "libs_bytes": 870588148.0,
+        "pyz_HF": true,
+        "code": "a85c40a14828141447768d3c78d13aa0ced105eb"
+      }
+    },
+    {
+      "job": "Сборка и проверка .exe",
+      "job_id": 118015463459,
+      "title": "P7 Windows model files",
+      "data": {
+        "files": [
+          {
+            "file": "pytorch_model.bin",
+            "bytes": 551290714,
+            "sha256": "0d2a4a387b0430654bb1f6813436bd31f8e10a06e18ea0e5c41b33120b78458e"
+          }
+        ]
+      }
+    },
+    {
+      "job": "Сборка и проверка .exe",
+      "job_id": 118015463459,
+      "title": "размеры поставки",
+      "data": "exe 8979956 байт (8.98 МБ), pyz 232874 байт (0.2329 МБ)"
+    }
+  ]
+}

@@ -19,9 +19,22 @@ SCIENCE_PATHS = [
     "spanverify-module/scripts",
     "spanverify-module/config",
     "spanverify-module/spanverify.spec",
+    "spanverify-module/reports/experiments/p5_span_filter/run39170981235/combined_bundle.json",
+    "spanverify-module/reports/experiments/p5_span_filter/run39170981235/fit_receipts.json",
+    "spanverify-module/data/corpus_a3/splits/train.jsonl",
+    "spanverify-module/data/corpus_a3/splits/dev.jsonl",
     ".github/workflows/p7-acceptance.yml",
     ".github/workflows/build-and-release-exe.yml",
     ".github/workflows/p7-paired-benchmark.yml",
+]
+
+
+PAIRED_PATHS = [
+    "spanverify-module/spanverify",
+    "spanverify-module/config",
+    "spanverify-module/scripts/p6_acceptance.py",
+    "spanverify-module/scripts/p7_measurements.py",
+    "spanverify-module/scripts/p7_paired_baseline.py",
 ]
 
 
@@ -33,7 +46,7 @@ def validate() -> dict:
         collection["require_success"] is True and collection["tests_excluded"] is False
     )
     runs = {}
-    for role in ("acceptance", "windows", "ci"):
+    for role in ("acceptance", "windows", "ci", "paired"):
         run = json.loads(
             subprocess.check_output(
                 [
@@ -59,7 +72,7 @@ def validate() -> dict:
                 run["headSha"],
                 "HEAD",
                 "--",
-                *SCIENCE_PATHS,
+                *(SCIENCE_PATHS if role != "paired" else PAIRED_PATHS),
             ],
             cwd=ROOT,
             check=True,

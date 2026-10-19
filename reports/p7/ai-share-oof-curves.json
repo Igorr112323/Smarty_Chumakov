@@ -1,0 +1,66 @@
+[
+  {
+    "mode": "demo",
+    "documents": 265,
+    "mixtures": 1325,
+    "original_document_folds": true,
+    "pooled_before": {
+      "mae": 0.4497321882850523,
+      "mean_curve": [
+        0.0936904306893239,
+        0.10222346268431477,
+        0.11634289217555363,
+        0.08425647499700699,
+        0.043514887378350506
+      ],
+      "monotone": false
+    },
+    "pooled_after": {
+      "mae": 0.2989009919597126,
+      "mean_curve": [
+        0.4924897062813976,
+        0.50285623781367,
+        0.50285623781367,
+        0.5008409842965045,
+        0.50285623781367
+      ],
+      "monotone": false
+    },
+    "status": "частично",
+    "limitation": "Synthetic train-only diagnostic, NOT real-LLM authorship calibration; no quality fitting.",
+    "source_job": 118007480024,
+    "source_run": 39236657451
+  },
+  {
+    "mode": "hf",
+    "documents": 265,
+    "mixtures": 1325,
+    "original_document_folds": true,
+    "pooled_before": {
+      "mae": 0.4068236540115673,
+      "mean_curve": [
+        0.08414541805549955,
+        0.15058527091350013,
+        0.15358729458629794,
+        0.17193514628078715,
+        0.07958583422499445
+      ],
+      "monotone": false
+    },
+    "pooled_after": {
+      "mae": 0.2565365102059551,
+      "mean_curve": [
+        0.28030155760444997,
+        0.5531303755272012,
+        0.5583153541379868,
+        0.5522007609117452,
+        0.5583153541379868
+      ],
+      "monotone": false
+    },
+    "status": "частично",
+    "limitation": "Synthetic train-only diagnostic, NOT real-LLM authorship calibration; no quality fitting.",
+    "source_job": 118007480002,
+    "source_run": 39236657451
+  }
+]

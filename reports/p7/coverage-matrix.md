@@ -1,0 +1,26 @@
+# P7: матрица нового доказательства
+
+**Работы измерены; договор в целом не принят.** tests_excluded=false.
+Официальный test177 не оценивался; legacy чтение раскрыто.
+Исторические P5 quality rows не переоценивались.
+
+| Проверка | Статус | Ограничение / новое доказательство |
+|---|---|---|
+| input | достигнут | Real HF2M:282830native records, last end2000000, all finite/bounded and exact slices; version window512_full_answer_v1, unchanged top3context policy. Arbitrary text latency not guaranteed. [run](https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39236657451) |
+| participation | частично | Original5document-fold train-only PAVA: demo OOF MAE.449732→.298901,HF.406824→.256537; pooled curves remain nonmonotone. Separate artifact, raw/P1 frozen. Synthetic diagnostic NOT real-LLM authorship. [run](https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39236657451) |
+| speed_per_1000 | не достигнут | Demo1k cold/warm≤.03s achieved; HF1k exceeds.03s. All sizes/roles sec1000 and censored timeout bounds published; original limits retained. [run](https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39236657451) |
+| speed_50k | не достигнут | Demo50k≤1s achieved; HF answer50k warm median8.168092/max8.213496s>1s. Fresh profile: dense frozen-model inference dominates; no quality/threshold changes. [run](https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39236657451) |
+| speed_2m | достигнут | Three cold/warm repeats, all2M answer/context demo/HF≤60s, no timeout. HF answer cold median42.878149/warm38.769417s; demo29.950421/29.876726s. Repeat-train fixture, not arbitrary unique-text guarantee. [run](https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39236657451) |
+| exe | достигнут | Fresh P7 RC exe8979956B≤9000000B; actual offline isolated HF HTTP200, no demo fallback. External runtime separate. [run](https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39236657579) |
+| package | достигнут | Fresh zipapp232874B≤600000B; actual HF offline HTTP200 using supplied portable Python, no installed development site-packages. [run](https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39236657579) |
+| build | достигнут | Windows sourcea85c40a, all Python jobs/build/HF smoke SUCCESS. RC prerelease/not latest; GitHub asset digests published, frozen JSON digest unchanged e0b13c... No stable promotion. [run](https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39236657579) |
+| no_install | достигнут | Tested isolated portable layout: external weights/libs/Python supplied, no user pip/install/source checkout, exe+pyz HTTP200 with outbound firewall blocks. Application registry-key snapshots unchanged; not global registry tracing. [run](https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39236657579) |
+| portable_copy | достигнут | Actual copied isolated directory tested for exe+pyz HF. Tested layout published as portable-runtime workflow artifact; inner ZIP SHA c5cd4a93952b9016b8a00748eef8d1b6f2ce2d23f2d6069f7c91185e1dbb5771. [run](https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39236657579) |
+| hf_footprint | частично | Actual model551290714B and libs870588148B, PLUS portable Python. Libs exceed preliminary~500MB estimate. Complete portable artifact container637051335B; tiny exe/pyz do not include full footprint. [run](https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39236657579) |
+| storage | частично | Model+libs alone1421878862B; portable Python and applications additional. Published tested compressed runtime artifact637051335B; no invented whole installed-byte total. [run](https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39236657579) |
+| number | исследовано и задокументировано | Not quality achieved. P6 saved OOF/dev mode proxies only, not new perturbation tests: dev strict span F1 contradiction.1538/number_attribution.3333/partial0; paraphrase not separately labelled. No retraining or selection. [run](https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39236657451) |
+| contradiction | исследовано и задокументировано | Not quality achieved. P6 saved OOF/dev mode proxies only, not new perturbation tests: dev strict span F1 contradiction.1538/number_attribution.3333/partial0; paraphrase not separately labelled. No retraining or selection. [run](https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39236657451) |
+| paraphrase | исследовано и задокументировано | Not quality achieved. P6 saved OOF/dev mode proxies only, not new perturbation tests: dev strict span F1 contradiction.1538/number_attribution.3333/partial0; paraphrase not separately labelled. No retraining or selection. [run](https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39236657451) |
+| omission | исследовано и задокументировано | Not quality achieved. P6 saved OOF/dev mode proxies only, not new perturbation tests: dev strict span F1 contradiction.1538/number_attribution.3333/partial0; paraphrase not separately labelled. No retraining or selection. [run](https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39236657451) |
+
+Полные24current native timing cells: `final-receipts/native-benchmark.json`;48same-host before/after cells: `paired/native-benchmark.json`.

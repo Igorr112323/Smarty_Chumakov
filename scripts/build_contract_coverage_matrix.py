@@ -225,6 +225,10 @@ def main():
             r["status"] = "не достигнут"
             r["note"] += " Missing evidence: " + ", ".join(missing)
         r["current_run"] = f"{URL}/actions/runs/{RUN}" if any(e["path"].startswith(P5) for e in r["evidence"]) else None
+    for r in rows:
+        if r["id"] in {"metric_groups", "quality_gate", "dev_tokens_gate", "dev_spans_gate"}:
+            r["scope"] = "historical frozen P5 legacy512; not re-evaluated P7 long-v1 quality"
+            r["note"] += " Historical P5 metric, not a new P7 long-path quality evaluation."
     payload = {
         "as_of": "2026-10-19",
         "source": "User-specified Appendix3 requirements; evidence only, no invented acceptance",

@@ -1,24 +1,31 @@
 {
   "as_of": "2026-10-19",
   "source": "User-specified Appendix3 requirements; evidence only, no invented acceptance",
-  "current_measurement_run": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39170981235",
-  "official_test_read": false,
+  "current_measurement_run": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39236657451",
+  "official_test_read": true,
+  "official_test_evaluated": false,
+  "official_test_read_scope": "legacy P6 chunking-test unsplit read, not new P7 evaluation",
+  "incident_evidence": "reports/p7/freeze-and-incident.json",
   "overall": "не достигнут",
   "no_artifact_rule": "No current proof => not achieved; historical/demo proof cannot establish P5 speed/delivery/official quality",
   "requirements": [
     {
       "id": "input",
       "requirement": "UTF-8 input up to 2,000,000 characters",
-      "status": "частично",
-      "scope": "current P5 candidate; historical evidence is explicitly qualified",
-      "note": "Historical synthetic demo processed 2M chars; no current P5 HF 2M acceptance measurement.",
+      "status": "достигнут",
+      "scope": "P7 measured fixtures only; historical P5 quality metrics retained",
+      "note": "Real HF2M:282830native records, last end2000000, all finite/bounded and exact slices; version window512_full_answer_v1, unchanged top3context policy. Arbitrary text latency not guaranteed.",
       "evidence": [
         {
-          "path": "reports/contract/4.1.1-text-limit.json",
-          "url": "https://github.com/Igorr112323/Smarty_Chumakov/blob/arena/c5f69767-smarty-chumakov/reports/contract/4.1.1-text-limit.json"
+          "path": "reports/p7/final-receipts/acceptance/summary.json",
+          "url": "https://github.com/Igorr112323/Smarty_Chumakov/blob/arena/c5f69767-smarty-chumakov/reports/p7/final-receipts/acceptance/summary.json"
+        },
+        {
+          "path": "reports/p7/full-hf-2M-indexed-public-exact.json",
+          "url": "https://github.com/Igorr112323/Smarty_Chumakov/blob/arena/c5f69767-smarty-chumakov/reports/p7/full-hf-2M-indexed-public-exact.json"
         }
       ],
-      "current_run": null
+      "current_run": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39236657451"
     },
     {
       "id": "risk",
@@ -82,22 +89,30 @@
       "id": "participation",
       "requirement": "AI participation [0,1], calibrated at step 0.25",
       "status": "частично",
-      "scope": "current P5 candidate; historical evidence is explicitly qualified",
-      "note": "Historical 240 synthetic calibration pairs at 0/.25/.5/.75/1, MAE .0352; not proof of P5 real-text acceptance.",
+      "scope": "P7 measured fixtures only; historical P5 quality metrics retained",
+      "note": "Original5document-fold train-only PAVA: demo OOF MAE.449732→.298901,HF.406824→.256537; pooled curves remain nonmonotone. Separate artifact, raw/P1 frozen. Synthetic diagnostic NOT real-LLM authorship.",
       "evidence": [
         {
-          "path": "reports/contract/4.1.4-ai-participation.json",
-          "url": "https://github.com/Igorr112323/Smarty_Chumakov/blob/arena/c5f69767-smarty-chumakov/reports/contract/4.1.4-ai-participation.json"
+          "path": "reports/p7/CALIBRATION.md",
+          "url": "https://github.com/Igorr112323/Smarty_Chumakov/blob/arena/c5f69767-smarty-chumakov/reports/p7/CALIBRATION.md"
+        },
+        {
+          "path": "reports/p7/final-receipts/ai_share_calibrator_v1.hf.json",
+          "url": "https://github.com/Igorr112323/Smarty_Chumakov/blob/arena/c5f69767-smarty-chumakov/reports/p7/final-receipts/ai_share_calibrator_v1.hf.json"
+        },
+        {
+          "path": "reports/p7/final-receipts/ai_share_calibrator_v1.demo.json",
+          "url": "https://github.com/Igorr112323/Smarty_Chumakov/blob/arena/c5f69767-smarty-chumakov/reports/p7/final-receipts/ai_share_calibrator_v1.demo.json"
         }
       ],
-      "current_run": null
+      "current_run": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39236657451"
     },
     {
       "id": "metric_groups",
       "requirement": "Token/answer/span metrics, strict IoU >= 0.5",
       "status": "достигнут",
-      "scope": "current P5 candidate; historical evidence is explicitly qualified",
-      "note": "Real frozen public dev, all families; span FPR remains declared token proxy, not invented TN.",
+      "scope": "historical frozen P5 legacy512; not re-evaluated P7 long-v1 quality",
+      "note": "Real frozen public dev, all families; span FPR remains declared token proxy, not invented TN. Historical P5 metric, not a new P7 long-path quality evaluation.",
       "evidence": [
         {
           "path": "spanverify-module/reports/experiments/p5_span_filter/run39170981235/all_family_metrics.json",
@@ -114,8 +129,8 @@
       "id": "quality_gate",
       "requirement": "F1 >= .50 jointly with FPR <= .40 on document-held-out part of 1200 pairs",
       "status": "частично",
-      "scope": "current P5 candidate; historical evidence is explicitly qualified",
-      "note": "A successful dev gate would still be partial contractual evidence: official test177 remains CLOSED. No status based on FPR alone.",
+      "scope": "historical frozen P5 legacy512; not re-evaluated P7 long-v1 quality",
+      "note": "A successful dev gate would still be partial contractual evidence: official test177 remains CLOSED. No status based on FPR alone. Historical P5 metric, not a new P7 long-path quality evaluation.",
       "evidence": [
         {
           "path": "spanverify-module/reports/experiments/p5_span_filter/run39170981235/all_family_metrics.json",
@@ -132,8 +147,8 @@
       "id": "dev_tokens_gate",
       "requirement": "P5 independent public dev tokens quality gate",
       "status": "достигнут",
-      "scope": "current P5 candidate; historical evidence is explicitly qualified",
-      "note": "Dev only: F1=0.6264274061990214, FPR=0.01744337412132257; strict spans use existing token proxy. This is not official test or whole-contract acceptance.",
+      "scope": "historical frozen P5 legacy512; not re-evaluated P7 long-v1 quality",
+      "note": "Dev only: F1=0.6264274061990214, FPR=0.01744337412132257; strict spans use existing token proxy. This is not official test or whole-contract acceptance. Historical P5 metric, not a new P7 long-path quality evaluation.",
       "evidence": [
         {
           "path": "spanverify-module/reports/experiments/p5_span_filter/run39170981235/all_family_metrics.json",
@@ -150,8 +165,8 @@
       "id": "dev_spans_gate",
       "requirement": "P5 independent public dev spans quality gate",
       "status": "достигнут",
-      "scope": "current P5 candidate; historical evidence is explicitly qualified",
-      "note": "Dev only: F1=0.5287356321839081, FPR=0.01744337412132257; strict spans use existing token proxy. This is not official test or whole-contract acceptance.",
+      "scope": "historical frozen P5 legacy512; not re-evaluated P7 long-v1 quality",
+      "note": "Dev only: F1=0.5287356321839081, FPR=0.01744337412132257; strict spans use existing token proxy. This is not official test or whole-contract acceptance. Historical P5 metric, not a new P7 long-path quality evaluation.",
       "evidence": [
         {
           "path": "spanverify-module/reports/experiments/p5_span_filter/run39170981235/all_family_metrics.json",
@@ -182,55 +197,55 @@
       "id": "speed_per_1000",
       "requirement": "<= .03 seconds per 1000 characters",
       "status": "не достигнут",
-      "scope": "current P5 candidate; historical evidence is explicitly qualified",
-      "note": "Only historical demo timing available; training/replay timings are not product speed benchmarks. No P5 HF acceptance artifact.",
+      "scope": "P7 measured fixtures only; historical P5 quality metrics retained",
+      "note": "Demo1k cold/warm≤.03s achieved; HF1k exceeds.03s. All sizes/roles sec1000 and censored timeout bounds published; original limits retained.",
       "evidence": [
         {
-          "path": "reports/contract/4.1.7-performance.json",
-          "url": "https://github.com/Igorr112323/Smarty_Chumakov/blob/arena/c5f69767-smarty-chumakov/reports/contract/4.1.7-performance.json"
+          "path": "reports/p7/final-receipts/native-benchmark.json",
+          "url": "https://github.com/Igorr112323/Smarty_Chumakov/blob/arena/c5f69767-smarty-chumakov/reports/p7/final-receipts/native-benchmark.json"
         },
         {
-          "path": "spanverify-module/reports/experiments/p5_span_filter/run39170981235/manifest.json",
-          "url": "https://github.com/Igorr112323/Smarty_Chumakov/blob/arena/c5f69767-smarty-chumakov/spanverify-module/reports/experiments/p5_span_filter/run39170981235/manifest.json"
+          "path": "reports/p7/TIMINGS.md",
+          "url": "https://github.com/Igorr112323/Smarty_Chumakov/blob/arena/c5f69767-smarty-chumakov/reports/p7/TIMINGS.md"
         }
       ],
-      "current_run": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39170981235"
+      "current_run": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39236657451"
     },
     {
       "id": "speed_50k",
       "requirement": "50,000 characters <= 1 second",
       "status": "не достигнут",
-      "scope": "current P5 candidate; historical evidence is explicitly qualified",
-      "note": "Only historical demo timing available; training/replay timings are not product speed benchmarks. No P5 HF acceptance artifact.",
+      "scope": "P7 measured fixtures only; historical P5 quality metrics retained",
+      "note": "Demo50k≤1s achieved; HF answer50k warm median8.168092/max8.213496s>1s. Fresh profile: dense frozen-model inference dominates; no quality/threshold changes.",
       "evidence": [
         {
-          "path": "reports/contract/4.1.7-performance.json",
-          "url": "https://github.com/Igorr112323/Smarty_Chumakov/blob/arena/c5f69767-smarty-chumakov/reports/contract/4.1.7-performance.json"
+          "path": "reports/p7/final-receipts/native-benchmark.json",
+          "url": "https://github.com/Igorr112323/Smarty_Chumakov/blob/arena/c5f69767-smarty-chumakov/reports/p7/final-receipts/native-benchmark.json"
         },
         {
-          "path": "spanverify-module/reports/experiments/p5_span_filter/run39170981235/manifest.json",
-          "url": "https://github.com/Igorr112323/Smarty_Chumakov/blob/arena/c5f69767-smarty-chumakov/spanverify-module/reports/experiments/p5_span_filter/run39170981235/manifest.json"
+          "path": "reports/p7/final-receipts/native-profiles.json",
+          "url": "https://github.com/Igorr112323/Smarty_Chumakov/blob/arena/c5f69767-smarty-chumakov/reports/p7/final-receipts/native-profiles.json"
         }
       ],
-      "current_run": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39170981235"
+      "current_run": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39236657451"
     },
     {
       "id": "speed_2m",
       "requirement": "2,000,000 characters <= 60 seconds",
-      "status": "не достигнут",
-      "scope": "current P5 candidate; historical evidence is explicitly qualified",
-      "note": "Only historical demo timing available; training/replay timings are not product speed benchmarks. No P5 HF acceptance artifact.",
+      "status": "достигнут",
+      "scope": "P7 measured fixtures only; historical P5 quality metrics retained",
+      "note": "Three cold/warm repeats, all2M answer/context demo/HF≤60s, no timeout. HF answer cold median42.878149/warm38.769417s; demo29.950421/29.876726s. Repeat-train fixture, not arbitrary unique-text guarantee.",
       "evidence": [
         {
-          "path": "reports/contract/4.1.7-performance.json",
-          "url": "https://github.com/Igorr112323/Smarty_Chumakov/blob/arena/c5f69767-smarty-chumakov/reports/contract/4.1.7-performance.json"
+          "path": "reports/p7/final-receipts/native-benchmark.json",
+          "url": "https://github.com/Igorr112323/Smarty_Chumakov/blob/arena/c5f69767-smarty-chumakov/reports/p7/final-receipts/native-benchmark.json"
         },
         {
-          "path": "spanverify-module/reports/experiments/p5_span_filter/run39170981235/manifest.json",
-          "url": "https://github.com/Igorr112323/Smarty_Chumakov/blob/arena/c5f69767-smarty-chumakov/spanverify-module/reports/experiments/p5_span_filter/run39170981235/manifest.json"
+          "path": "reports/p7/TIMINGS.md",
+          "url": "https://github.com/Igorr112323/Smarty_Chumakov/blob/arena/c5f69767-smarty-chumakov/reports/p7/TIMINGS.md"
         }
       ],
-      "current_run": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39170981235"
+      "current_run": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39236657451"
     },
     {
       "id": "cli",
@@ -277,104 +292,128 @@
     {
       "id": "exe",
       "requirement": "Executable <=9 MB",
-      "status": "частично",
-      "scope": "current P5 candidate; historical evidence is explicitly qualified",
-      "note": "Historical v1.3.1 exe8,969,008B; not a P5 build and not full HF runtime footprint.",
+      "status": "достигнут",
+      "scope": "P7 measured fixtures only; historical P5 quality metrics retained",
+      "note": "Fresh P7 RC exe8979956B≤9000000B; actual offline isolated HF HTTP200, no demo fallback. External runtime separate.",
       "evidence": [
         {
-          "path": "reports/contract/4.1.9-delivery-artifacts.json",
-          "url": "https://github.com/Igorr112323/Smarty_Chumakov/blob/arena/c5f69767-smarty-chumakov/reports/contract/4.1.9-delivery-artifacts.json"
+          "path": "reports/p7/final-receipts/windows/summary.json",
+          "url": "https://github.com/Igorr112323/Smarty_Chumakov/blob/arena/c5f69767-smarty-chumakov/reports/p7/final-receipts/windows/summary.json"
         },
         {
-          "path": "reports/contract/4.2.5-hf-footprint.json",
-          "url": "https://github.com/Igorr112323/Smarty_Chumakov/blob/arena/c5f69767-smarty-chumakov/reports/contract/4.2.5-hf-footprint.json"
+          "path": "reports/p7/final-receipts/rc-release.json",
+          "url": "https://github.com/Igorr112323/Smarty_Chumakov/blob/arena/c5f69767-smarty-chumakov/reports/p7/final-receipts/rc-release.json"
         }
       ],
-      "current_run": null
+      "current_run": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39236657579"
     },
     {
       "id": "package",
       "requirement": "Package <=0.6 MB",
-      "status": "частично",
-      "scope": "current P5 candidate; historical evidence is explicitly qualified",
-      "note": "Historical pyz174,634B; no rebuilt P5 delivery/size measurement.",
+      "status": "достигнут",
+      "scope": "P7 measured fixtures only; historical P5 quality metrics retained",
+      "note": "Fresh zipapp232874B≤600000B; actual HF offline HTTP200 using supplied portable Python, no installed development site-packages.",
       "evidence": [
         {
-          "path": "reports/contract/4.2.1-delivery-size.json",
-          "url": "https://github.com/Igorr112323/Smarty_Chumakov/blob/arena/c5f69767-smarty-chumakov/reports/contract/4.2.1-delivery-size.json"
+          "path": "reports/p7/final-receipts/windows/summary.json",
+          "url": "https://github.com/Igorr112323/Smarty_Chumakov/blob/arena/c5f69767-smarty-chumakov/reports/p7/final-receipts/windows/summary.json"
+        },
+        {
+          "path": "reports/p7/final-receipts/rc-release.json",
+          "url": "https://github.com/Igorr112323/Smarty_Chumakov/blob/arena/c5f69767-smarty-chumakov/reports/p7/final-receipts/rc-release.json"
         }
       ],
-      "current_run": null
+      "current_run": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39236657579"
     },
     {
       "id": "build",
       "requirement": "Automatic source build with SHA-256",
-      "status": "частично",
-      "scope": "current P5 candidate; historical evidence is explicitly qualified",
-      "note": "Historical release workflow38582542536 and published SHA256SUMS; release_checksum_verified=null; no P5 executable checksum acceptance.",
+      "status": "достигнут",
+      "scope": "P7 measured fixtures only; historical P5 quality metrics retained",
+      "note": "Windows sourcea85c40a, all Python jobs/build/HF smoke SUCCESS. RC prerelease/not latest; GitHub asset digests published, frozen JSON digest unchanged e0b13c... No stable promotion.",
       "evidence": [
         {
-          "path": "reports/contract/4.2.4-build-sha256.json",
-          "url": "https://github.com/Igorr112323/Smarty_Chumakov/blob/arena/c5f69767-smarty-chumakov/reports/contract/4.2.4-build-sha256.json"
+          "path": "reports/p7/final-receipts/windows/summary.json",
+          "url": "https://github.com/Igorr112323/Smarty_Chumakov/blob/arena/c5f69767-smarty-chumakov/reports/p7/final-receipts/windows/summary.json"
+        },
+        {
+          "path": "reports/p7/final-receipts/rc-release.json",
+          "url": "https://github.com/Igorr112323/Smarty_Chumakov/blob/arena/c5f69767-smarty-chumakov/reports/p7/final-receipts/rc-release.json"
         }
       ],
-      "current_run": null
+      "current_run": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39236657579"
     },
     {
       "id": "no_install",
       "requirement": "4.2.3 Launch without installation",
-      "status": "частично",
-      "scope": "current P5 candidate; historical evidence is explicitly qualified",
-      "note": "Historical copied demo returned exit1, although no writes outside copy were recorded. P5 no-install acceptance is not established.",
+      "status": "достигнут",
+      "scope": "P7 measured fixtures only; historical P5 quality metrics retained",
+      "note": "Tested isolated portable layout: external weights/libs/Python supplied, no user pip/install/source checkout, exe+pyz HTTP200 with outbound firewall blocks. Application registry-key snapshots unchanged; not global registry tracing.",
       "evidence": [
         {
-          "path": "reports/contract/4.2.3-no-install.json",
-          "url": "https://github.com/Igorr112323/Smarty_Chumakov/blob/arena/c5f69767-smarty-chumakov/reports/contract/4.2.3-no-install.json"
+          "path": "reports/p7/final-receipts/windows/summary.json",
+          "url": "https://github.com/Igorr112323/Smarty_Chumakov/blob/arena/c5f69767-smarty-chumakov/reports/p7/final-receipts/windows/summary.json"
+        },
+        {
+          "path": "reports/p7/final-receipts/windows/artifacts.json",
+          "url": "https://github.com/Igorr112323/Smarty_Chumakov/blob/arena/c5f69767-smarty-chumakov/reports/p7/final-receipts/windows/artifacts.json"
         }
       ],
-      "current_run": null
+      "current_run": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39236657579"
     },
     {
       "id": "hf_footprint",
       "requirement": "4.2.5 HF runtime and separately delivered model footprint",
       "status": "частично",
-      "scope": "current P5 candidate; historical evidence is explicitly qualified",
-      "note": "Historical measured HF runtime libraries1,053,454,603B are NOT the tiny exe/pyz size. P5 does not rebuild or certify that delivery.",
+      "scope": "P7 measured fixtures only; historical P5 quality metrics retained",
+      "note": "Actual model551290714B and libs870588148B, PLUS portable Python. Libs exceed preliminary~500MB estimate. Complete portable artifact container637051335B; tiny exe/pyz do not include full footprint.",
       "evidence": [
         {
-          "path": "reports/contract/4.2.5-hf-footprint.json",
-          "url": "https://github.com/Igorr112323/Smarty_Chumakov/blob/arena/c5f69767-smarty-chumakov/reports/contract/4.2.5-hf-footprint.json"
+          "path": "reports/p7/final-receipts/windows/summary.json",
+          "url": "https://github.com/Igorr112323/Smarty_Chumakov/blob/arena/c5f69767-smarty-chumakov/reports/p7/final-receipts/windows/summary.json"
+        },
+        {
+          "path": "reports/p7/final-receipts/windows/artifacts.json",
+          "url": "https://github.com/Igorr112323/Smarty_Chumakov/blob/arena/c5f69767-smarty-chumakov/reports/p7/final-receipts/windows/artifacts.json"
         }
       ],
-      "current_run": null
+      "current_run": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39236657579"
     },
     {
       "id": "storage",
       "requirement": "4.2.6 Storage requirements",
       "status": "частично",
-      "scope": "current P5 candidate; historical evidence is explicitly qualified",
-      "note": "Historical HF footprint/storage inventory exists; no current P5 installed storage acceptance.",
+      "scope": "P7 measured fixtures only; historical P5 quality metrics retained",
+      "note": "Model+libs alone1421878862B; portable Python and applications additional. Published tested compressed runtime artifact637051335B; no invented whole installed-byte total.",
       "evidence": [
         {
-          "path": "reports/contract/4.2.6-storage.json",
-          "url": "https://github.com/Igorr112323/Smarty_Chumakov/blob/arena/c5f69767-smarty-chumakov/reports/contract/4.2.6-storage.json"
+          "path": "reports/p7/final-receipts/windows/summary.json",
+          "url": "https://github.com/Igorr112323/Smarty_Chumakov/blob/arena/c5f69767-smarty-chumakov/reports/p7/final-receipts/windows/summary.json"
+        },
+        {
+          "path": "reports/p7/final-receipts/windows/artifacts.json",
+          "url": "https://github.com/Igorr112323/Smarty_Chumakov/blob/arena/c5f69767-smarty-chumakov/reports/p7/final-receipts/windows/artifacts.json"
         }
       ],
-      "current_run": null
+      "current_run": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39236657579"
     },
     {
       "id": "portable_copy",
       "requirement": "4.2.7 Portable copying and integrity",
-      "status": "частично",
-      "scope": "current P5 candidate; historical evidence is explicitly qualified",
-      "note": "Historical copied pyz hashes matched, but published release verification was null; no P5 packaged-copy acceptance.",
+      "status": "достигнут",
+      "scope": "P7 measured fixtures only; historical P5 quality metrics retained",
+      "note": "Actual copied isolated directory tested for exe+pyz HF. Tested layout published as portable-runtime workflow artifact; inner ZIP SHA c5cd4a93952b9016b8a00748eef8d1b6f2ce2d23f2d6069f7c91185e1dbb5771.",
       "evidence": [
         {
-          "path": "reports/contract/4.2.7-portable-copy.json",
-          "url": "https://github.com/Igorr112323/Smarty_Chumakov/blob/arena/c5f69767-smarty-chumakov/reports/contract/4.2.7-portable-copy.json"
+          "path": "reports/p7/final-receipts/windows/summary.json",
+          "url": "https://github.com/Igorr112323/Smarty_Chumakov/blob/arena/c5f69767-smarty-chumakov/reports/p7/final-receipts/windows/summary.json"
+        },
+        {
+          "path": "reports/p7/final-receipts/windows/artifacts.json",
+          "url": "https://github.com/Igorr112323/Smarty_Chumakov/blob/arena/c5f69767-smarty-chumakov/reports/p7/final-receipts/windows/artifacts.json"
         }
       ],
-      "current_run": null
+      "current_run": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39236657579"
     },
     {
       "id": "runtime_config",
@@ -421,81 +460,81 @@
     {
       "id": "number",
       "requirement": "Robustness: numeric substitutions",
-      "status": "не достигнут",
-      "scope": "current P5 candidate; historical evidence is explicitly qualified",
-      "note": "Pooled A3 dev metrics are not dedicated robustness acceptance: no separately measured passing P5 challenge/control artifact. Paraphrase is not an explicit A3 mode.",
+      "status": "исследовано и задокументировано",
+      "scope": "P7 measured fixtures only; historical P5 quality metrics retained",
+      "note": "Not quality achieved. P6 saved OOF/dev mode proxies only, not new perturbation tests: dev strict span F1 contradiction.1538/number_attribution.3333/partial0; paraphrase not separately labelled. No retraining or selection.",
       "evidence": [
         {
-          "path": "spanverify-module/data/corpus_a3/manifest.json",
-          "url": "https://github.com/Igorr112323/Smarty_Chumakov/blob/arena/c5f69767-smarty-chumakov/spanverify-module/data/corpus_a3/manifest.json"
+          "path": "reports/acceptance/robustness.json",
+          "url": "https://github.com/Igorr112323/Smarty_Chumakov/blob/arena/c5f69767-smarty-chumakov/reports/acceptance/robustness.json"
         },
         {
-          "path": "spanverify-module/reports/experiments/p5_span_filter/run39170981235/dev_error_decomposition.json",
-          "url": "https://github.com/Igorr112323/Smarty_Chumakov/blob/arena/c5f69767-smarty-chumakov/spanverify-module/reports/experiments/p5_span_filter/run39170981235/dev_error_decomposition.json"
+          "path": "reports/p7/REPORT.md",
+          "url": "https://github.com/Igorr112323/Smarty_Chumakov/blob/arena/c5f69767-smarty-chumakov/reports/p7/REPORT.md"
         }
       ],
-      "current_run": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39170981235"
+      "current_run": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39236657451"
     },
     {
       "id": "contradiction",
       "requirement": "Robustness: contradiction",
-      "status": "не достигнут",
-      "scope": "current P5 candidate; historical evidence is explicitly qualified",
-      "note": "Pooled A3 dev metrics are not dedicated robustness acceptance: no separately measured passing P5 challenge/control artifact. Paraphrase is not an explicit A3 mode.",
+      "status": "исследовано и задокументировано",
+      "scope": "P7 measured fixtures only; historical P5 quality metrics retained",
+      "note": "Not quality achieved. P6 saved OOF/dev mode proxies only, not new perturbation tests: dev strict span F1 contradiction.1538/number_attribution.3333/partial0; paraphrase not separately labelled. No retraining or selection.",
       "evidence": [
         {
-          "path": "spanverify-module/data/corpus_a3/manifest.json",
-          "url": "https://github.com/Igorr112323/Smarty_Chumakov/blob/arena/c5f69767-smarty-chumakov/spanverify-module/data/corpus_a3/manifest.json"
+          "path": "reports/acceptance/robustness.json",
+          "url": "https://github.com/Igorr112323/Smarty_Chumakov/blob/arena/c5f69767-smarty-chumakov/reports/acceptance/robustness.json"
         },
         {
-          "path": "spanverify-module/reports/experiments/p5_span_filter/run39170981235/dev_error_decomposition.json",
-          "url": "https://github.com/Igorr112323/Smarty_Chumakov/blob/arena/c5f69767-smarty-chumakov/spanverify-module/reports/experiments/p5_span_filter/run39170981235/dev_error_decomposition.json"
+          "path": "reports/p7/REPORT.md",
+          "url": "https://github.com/Igorr112323/Smarty_Chumakov/blob/arena/c5f69767-smarty-chumakov/reports/p7/REPORT.md"
         }
       ],
-      "current_run": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39170981235"
+      "current_run": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39236657451"
     },
     {
       "id": "paraphrase",
       "requirement": "Robustness: paraphrase",
-      "status": "не достигнут",
-      "scope": "current P5 candidate; historical evidence is explicitly qualified",
-      "note": "Pooled A3 dev metrics are not dedicated robustness acceptance: no separately measured passing P5 challenge/control artifact. Paraphrase is not an explicit A3 mode.",
+      "status": "исследовано и задокументировано",
+      "scope": "P7 measured fixtures only; historical P5 quality metrics retained",
+      "note": "Not quality achieved. P6 saved OOF/dev mode proxies only, not new perturbation tests: dev strict span F1 contradiction.1538/number_attribution.3333/partial0; paraphrase not separately labelled. No retraining or selection.",
       "evidence": [
         {
-          "path": "spanverify-module/data/corpus_a3/manifest.json",
-          "url": "https://github.com/Igorr112323/Smarty_Chumakov/blob/arena/c5f69767-smarty-chumakov/spanverify-module/data/corpus_a3/manifest.json"
+          "path": "reports/acceptance/robustness.json",
+          "url": "https://github.com/Igorr112323/Smarty_Chumakov/blob/arena/c5f69767-smarty-chumakov/reports/acceptance/robustness.json"
         },
         {
-          "path": "spanverify-module/reports/experiments/p5_span_filter/run39170981235/dev_error_decomposition.json",
-          "url": "https://github.com/Igorr112323/Smarty_Chumakov/blob/arena/c5f69767-smarty-chumakov/spanverify-module/reports/experiments/p5_span_filter/run39170981235/dev_error_decomposition.json"
+          "path": "reports/p7/REPORT.md",
+          "url": "https://github.com/Igorr112323/Smarty_Chumakov/blob/arena/c5f69767-smarty-chumakov/reports/p7/REPORT.md"
         }
       ],
-      "current_run": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39170981235"
+      "current_run": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39236657451"
     },
     {
       "id": "omission",
       "requirement": "Robustness: omission",
-      "status": "не достигнут",
-      "scope": "current P5 candidate; historical evidence is explicitly qualified",
-      "note": "Pooled A3 dev metrics are not dedicated robustness acceptance: no separately measured passing P5 challenge/control artifact. Paraphrase is not an explicit A3 mode.",
+      "status": "исследовано и задокументировано",
+      "scope": "P7 measured fixtures only; historical P5 quality metrics retained",
+      "note": "Not quality achieved. P6 saved OOF/dev mode proxies only, not new perturbation tests: dev strict span F1 contradiction.1538/number_attribution.3333/partial0; paraphrase not separately labelled. No retraining or selection.",
       "evidence": [
         {
-          "path": "spanverify-module/data/corpus_a3/manifest.json",
-          "url": "https://github.com/Igorr112323/Smarty_Chumakov/blob/arena/c5f69767-smarty-chumakov/spanverify-module/data/corpus_a3/manifest.json"
+          "path": "reports/acceptance/robustness.json",
+          "url": "https://github.com/Igorr112323/Smarty_Chumakov/blob/arena/c5f69767-smarty-chumakov/reports/acceptance/robustness.json"
         },
         {
-          "path": "spanverify-module/reports/experiments/p5_span_filter/run39170981235/dev_error_decomposition.json",
-          "url": "https://github.com/Igorr112323/Smarty_Chumakov/blob/arena/c5f69767-smarty-chumakov/spanverify-module/reports/experiments/p5_span_filter/run39170981235/dev_error_decomposition.json"
+          "path": "reports/p7/REPORT.md",
+          "url": "https://github.com/Igorr112323/Smarty_Chumakov/blob/arena/c5f69767-smarty-chumakov/reports/p7/REPORT.md"
         }
       ],
-      "current_run": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39170981235"
+      "current_run": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39236657451"
     },
     {
       "id": "control_sample",
       "requirement": "Control sample / corpus1200 / held-out document split",
       "status": "частично",
       "scope": "current P5 candidate; historical evidence is explicitly qualified",
-      "note": "Frozen A3 manifest1200, train842/dev181. Original fold membership validated; test177 not read, no full official acceptance.",
+      "note": "Frozen A3 manifest1200, train842/dev181. Original folds unchanged; official177 not evaluated. Legacy unsplit read disclosed in reports/p7/freeze-and-incident.json; no new P7 reads.",
       "evidence": [
         {
           "path": "spanverify-module/data/corpus_a3/manifest.json",
@@ -512,5 +551,6 @@
       ],
       "current_run": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/39170981235"
     }
-  ]
+  ],
+  "p7_evidence_overlay": "reports/p7/contract-overlay.json"
 }
