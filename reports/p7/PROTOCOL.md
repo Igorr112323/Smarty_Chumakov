@@ -82,3 +82,9 @@ identical first-train inputs and3cold/warm repeats. New paired P6 controls do NO
 replace historical P6 numbers. HF-before50k was truncated and is explicitly not
 a like-for-like full-answer speedup baseline. Timings remain separate from
 quality/calibration and same-process full-public-byte proofs.
+
+The interim60min HF-contract timeout was rejected by the unchanged40min
+workflow guard. It is reverted to40, not granted an exception or test skip.
+All prior completed fresh HF replay jobs fit40min. The additional paired
+workflow adds5existing parametrized infrastructure tests: current collection888,
+not883. No original test was deleted, relaxed, or newly skipped.

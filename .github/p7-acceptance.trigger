@@ -11,3 +11,4 @@ P7 exact repeated-window reuse; actual long byte golden and all short fresh gate
 P7 robust path resolution, complete benchmark receipts, bounded repeated-window cache4096
 P7 actual legacy combined-token audit and complete acceptance; Windows error body
 P7 exact interval lookup, full2M public golden, native repeat acceptance
+P7 preserve existing40min guard; final full-input and native gates
