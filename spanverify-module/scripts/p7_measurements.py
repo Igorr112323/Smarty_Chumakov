@@ -32,6 +32,7 @@ def rates(out):
         "unknown",
     )
     summary = dict(
+        phase=os.environ.get("P7_MEASUREMENT_PHASE", "after"),
         cpu=cpu,
         logical_cpu=env["cpu_count"],
         ram=ram,
@@ -58,9 +59,20 @@ def rates(out):
             if profile.exists():
                 row["profile_top"] = [
                     {k: v for k, v in r.items() if k in ("function", "calls", "self_seconds", "cumulative_seconds")}
-                    for r in sorted(json.loads(profile.read_text()), key=lambda r: r["self_seconds"], reverse=True)[:5]
+                    for r in sorted(
+                        json.loads(profile.read_text()),
+                        key=lambda r: r["self_seconds"],
+                        reverse=True,
+                    )[:5]
                 ]
-                profiles.append(dict(scenario=row["scenario"], chars=n, thermal=row["thermal"], top=row["profile_top"]))
+                profiles.append(
+                    dict(
+                        scenario=row["scenario"],
+                        chars=n,
+                        thermal=row["thermal"],
+                        top=row["profile_top"],
+                    )
+                )
     # Actions preserves only ten notices per step: retain all twelve rows.
     columns = [
         "scenario",
@@ -77,7 +89,12 @@ def rates(out):
     print(
         "::notice title=P7 benchmark table::"
         + json.dumps(
-            dict(mode=rows[0]["mode"], columns=columns, rows=[[r.get(k) for k in columns] for r in rows]),
+            dict(
+                mode=rows[0]["mode"],
+                phase=os.environ.get("P7_MEASUREMENT_PHASE", "after"),
+                columns=columns,
+                rows=[[r.get(k) for k in columns] for r in rows],
+            ),
             ensure_ascii=False,
         ),
         flush=True,
@@ -85,7 +102,10 @@ def rates(out):
     for i in range(0, len(profiles), 3):
         print(
             "::notice title=P7 benchmark profiles::"
-            + json.dumps(dict(mode=rows[0]["mode"], cases=profiles[i : i + 3]), ensure_ascii=False),
+            + json.dumps(
+                dict(mode=rows[0]["mode"], cases=profiles[i : i + 3]),
+                ensure_ascii=False,
+            ),
             flush=True,
         )
     save(path, rows)
@@ -113,7 +133,8 @@ def functional(mode, out):
             module.__package__ = "spanverify"
             sys.modules[module.__name__] = module
             source = subprocess.check_output(
-                ["git", "show", f"1c3aa13:spanverify-module/spanverify/{name}.py"], text=True
+                ["git", "show", f"1c3aa13:spanverify-module/spanverify/{name}.py"],
+                text=True,
             )
             exec(compile(source, "<accepted-preindex-P7>", "exec"), module.__dict__)
             modules.append(module)
@@ -128,7 +149,9 @@ def functional(mode, out):
             comparison["before_public_sha256"] = public_hash(before)
             del before
         comparison.update(
-            before_source="1c3aa13", thermal="both warm-model; same process", used_for_native_repeats=False
+            before_source="1c3aa13",
+            thermal="both warm-model; same process",
+            used_for_native_repeats=False,
         )
     start = time.perf_counter()
     result = verifier(mode).verify(a, c, with_tokens=True)

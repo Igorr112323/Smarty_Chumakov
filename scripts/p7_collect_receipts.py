@@ -76,7 +76,11 @@ def derived(summary, out):
         data, title = note["data"], note["title"]
         if title == "P7 benchmark table":
             rows = [
-                dict(zip(data["columns"], r, strict=True), mode=data["mode"])
+                dict(
+                    zip(data["columns"], r, strict=True),
+                    mode=data["mode"],
+                    phase=data.get("phase", "after"),
+                )
                 for r in data["rows"]
             ]
             assert len(rows) == 12
@@ -104,6 +108,7 @@ def main():
     p.add_argument("--acceptance", type=int, required=True)
     p.add_argument("--windows", type=int, required=True)
     p.add_argument("--ci", type=int, required=True)
+    p.add_argument("--paired", type=int)
     p.add_argument("--out", type=Path, default=ROOT / "reports/p7/final-receipts")
     p.add_argument(
         "--allow-incomplete",
@@ -119,6 +124,9 @@ def main():
         summary = collect(run_id, a.out / role, not a.allow_incomplete)
         if role == "acceptance":
             derived(summary, a.out)
+    if a.paired:
+        paired = collect(a.paired, a.out / "paired", not a.allow_incomplete)
+        derived(paired, a.out / "paired")
     save(
         a.out / "collection.json",
         {

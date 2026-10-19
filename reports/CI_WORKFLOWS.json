@@ -1,7 +1,7 @@
 {
   "kind": "ci_workflows",
   "runs_considered": 100,
-  "generated_at": "2026-10-19T09:31:33Z",
+  "generated_at": "2026-10-19T09:45:19Z",
   "command": "python scripts/collect_ci_workflows.py",
   "source": ".github/workflows/*.yml + reports/CI_RUNS.json",
   "registry": {
@@ -747,6 +747,32 @@
         }
       ],
       "manual_only": true,
+      "never_runs_by_itself": false
+    },
+    {
+      "file": ".github/workflows/p7-paired-benchmark.yml",
+      "name": "P7 paired same-host benchmark",
+      "triggers": [
+        "push"
+      ],
+      "schedule": [],
+      "push_paths": [
+        ".github/p7-paired.trigger"
+      ],
+      "push_branches": [
+        "arena/c5f69767-smarty-chumakov"
+      ],
+      "push_tags": [],
+      "jobs": [
+        {
+          "name": "paired",
+          "timeout_minutes": 40,
+          "steps": 9,
+          "uploads_artifacts": true,
+          "runs_python": "ubuntu-24.04"
+        }
+      ],
+      "manual_only": false,
       "never_runs_by_itself": false
     },
     {

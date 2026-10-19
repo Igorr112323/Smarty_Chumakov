@@ -72,3 +72,13 @@ The frozen parent urllib package was partial; adding Lib to sys.path alone is
 insufficient. The launcher now extends already-loaded stdlib package search paths
 with the matching portable Lib, and ships app-local VC++ runtime dependencies.
 No install, source checkout, host-Python path or registry edits are introduced.
+
+Hosted-runner CPU models vary (P6demo9V45, a P7demo run9V74). They are never
+presented as the same physical VM. An additional paired benchmark materializes
+ONLY the immutable14a018a application/config snapshot; no old tests or fitting.
+It executes P6-before and P7-after on the SAME current runner with the same
+measurement harness, pinned dependencies,4logical CPUs,16GB class RAM,2threads,
+identical first-train inputs and3cold/warm repeats. New paired P6 controls do NOT
+replace historical P6 numbers. HF-before50k was truncated and is explicitly not
+a like-for-like full-answer speedup baseline. Timings remain separate from
+quality/calibration and same-process full-public-byte proofs.

@@ -70,10 +70,11 @@ def environment():
         "python": sys.version,
         "platform": platform.platform(),
         "cpu_count": os.cpu_count(),
-        "cpuinfo": Path("/proc/cpuinfo").read_text() if Path("/proc/cpuinfo").exists() else platform.processor(),
-        "meminfo": Path("/proc/meminfo").read_text() if Path("/proc/meminfo").exists() else None,
+        "cpuinfo": (Path("/proc/cpuinfo").read_text() if Path("/proc/cpuinfo").exists() else platform.processor()),
+        "meminfo": (Path("/proc/meminfo").read_text() if Path("/proc/meminfo").exists() else None),
         "versions": {d.metadata["Name"]: d.version for d in distributions()},
-        "commit": subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=ROOT, text=True).strip(),
+        "commit": os.getenv("P7_PROGRAM_SOURCE_SHA")
+        or subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=ROOT, text=True).strip(),
         "run_url": f"https://github.com/{os.getenv('GITHUB_REPOSITORY')}/actions/runs/{os.getenv('GITHUB_RUN_ID')}",
         "bundle_sha256": SHA,
         "feature_cache": "action-specific; benchmarks do not supply a feature cache",
@@ -177,7 +178,10 @@ def worker(args):
         signal.signal(signal.SIGTERM, interrupted)
     if args.thermal == "warm-model":
         started = time.perf_counter()
-    save(str(args.out) + ".startup.json", {"timed_start_monotonic": time.monotonic(), "warmup_seconds": warmup_seconds})
+    save(
+        str(args.out) + ".startup.json",
+        {"timed_start_monotonic": time.monotonic(), "warmup_seconds": warmup_seconds},
+    )
     if args.profile:
         profiler.enable()
     result = v.verify(a, c)
@@ -267,10 +271,10 @@ def benchmark(args):
                     "median_seconds": statistics.median(values) if complete else None,
                     "max_seconds": max(values) if complete else None,
                     "limit_seconds": limit,
-                    "status": "достигнут" if complete and max(values) <= limit else "не достигнут",
+                    "status": ("достигнут" if complete and max(values) <= limit else "не достигнут"),
                 }
                 bounds = [
-                    s.get("seconds") if s.get("seconds") is not None else s.get("timed_lower_bound_seconds")
+                    (s.get("seconds") if s.get("seconds") is not None else s.get("timed_lower_bound_seconds"))
                     for s in samples
                 ]
                 if not complete and all(b is not None for b in bounds):
@@ -330,6 +334,8 @@ def benchmark(args):
                 rows.append(row)
                 save(args.out / "benchmark.json", rows)
                 print(args.mode, scenario, size, thermal, row["status"], flush=True)
+                if any(s["status"] == "error" for s in samples):
+                    raise RuntimeError("Benchmark worker error; inspect uncensored worker logs")
 
 
 def shares(args):
@@ -445,7 +451,9 @@ def interfaces(args):
                 assert response.status == 200 and b"<html" in page.lower()
                 (args.out / "web.html").write_bytes(page)
             req = urllib.request.Request(
-                "http://127.0.0.1:8765/v1/verify", json.dumps(request).encode(), {"Content-Type": "application/json"}
+                "http://127.0.0.1:8765/v1/verify",
+                json.dumps(request).encode(),
+                {"Content-Type": "application/json"},
             )
             with urllib.request.urlopen(req, timeout=120) as response:
                 api = json.load(response)
@@ -455,9 +463,19 @@ def interfaces(args):
                 assert 0 <= span["start"] < span["end"] <= len(a)
                 assert a[span["start"] : span["end"]] == span["text"]
                 assert span["label"] and 0 <= span["risk"] <= 1 and 0 <= span["confidence"] <= 1
-            for key in ("score", "threshold", "verdict", "spans", "ai_share", "ai_participation"):
+            for key in (
+                "score",
+                "threshold",
+                "verdict",
+                "spans",
+                "ai_share",
+                "ai_participation",
+            ):
                 assert payload[key] == api[key], key
-            print("::notice title=P6 HTTP response::" + json.dumps(api, ensure_ascii=False), flush=True)
+            print(
+                "::notice title=P6 HTTP response::" + json.dumps(api, ensure_ascii=False),
+                flush=True,
+            )
             save(
                 args.out / "interfaces.json",
                 {
@@ -467,7 +485,13 @@ def interfaces(args):
                     "server_command": command,
                     "web_status": 200,
                     "http_status": 200,
-                    "parity_fields": ["score", "threshold", "verdict", "spans", "ai_share"],
+                    "parity_fields": [
+                        "score",
+                        "threshold",
+                        "verdict",
+                        "spans",
+                        "ai_share",
+                    ],
                     "passed": True,
                     "environment": environment(),
                 },
@@ -483,7 +507,11 @@ def main():
     p.add_argument("--out", type=Path, required=True)
     p.add_argument("--cache", type=Path)
     p.add_argument("--mode", choices=["demo", "hf"], default="hf")
-    p.add_argument("--profile", action="store_true", help="Separate diagnostic run, never a native benchmark sample")
+    p.add_argument(
+        "--profile",
+        action="store_true",
+        help="Separate diagnostic run, never a native benchmark sample",
+    )
     p.add_argument("--size", type=int, default=1000)
     p.add_argument("--scenario", default="document-context")
     p.add_argument("--thermal", default="cold-process")
@@ -494,7 +522,14 @@ def main():
     if args.action == "parity":
         parity(args.cache, args.out)
     else:
-        {"benchmark": benchmark, "worker": worker, "shares": shares, "interfaces": interfaces}[args.action](args)
+        {
+            "benchmark": benchmark,
+            "worker": worker,
+            "shares": shares,
+            "interfaces": interfaces,
+        }[
+            args.action
+        ](args)
 
 
 if __name__ == "__main__":
