@@ -58,3 +58,18 @@ def test_frozen_prediction_files_byte_identical():
     fixture = json.loads((ROOT / "reports/p8/frozen-production-sha256.json").read_text())
     for name, expected in fixture["files"].items():
         assert hashlib.sha256((ROOT / name).read_bytes()).hexdigest() == expected, name
+
+
+def test_ci_collector_only_copies_sealed_a3_receipt():
+    script = ROOT / "spanverify-module/scripts/collect_metrics.py"
+    module_spec = importlib.util.spec_from_file_location("p8_collect_metrics", script)
+    module = importlib.util.module_from_spec(module_spec)
+    module_spec.loader.exec_module(module)
+
+    class ForbiddenEvaluation:
+        def evaluate(self, *args, **kwargs):
+            raise AssertionError("official177 must never be evaluated by ordinary CI")
+
+    block = module._corpus_a3_block(ForbiddenEvaluation())
+    assert "SUPERSEDED" in block["scope"]
+    assert block["pairs"] == 1200

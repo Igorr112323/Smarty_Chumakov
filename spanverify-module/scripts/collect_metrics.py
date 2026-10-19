@@ -294,68 +294,13 @@ def _corpus_a3_block(verifier: Verifier) -> dict:
     результаты проверок A3 из манифеста (контексты дословно в источниках, атрибуция числа,
     пересечение документов между частями, воспроизводимость хешей).
     """
-    manifest_path = ROOT / "data" / "corpus_a3" / "manifest.json"
-    if not manifest_path.is_file():
-        return {
-            "available": False,
-            "note": (
-                "корпус A3 не собран: python scripts/fetch_npa_corpus.py --out data/corpus_a3 "
-                "&& python scripts/build_corpus_a.py --docs data/corpus_a3/sources "
-                "--out data/corpus_a3 --target 1200 --seed 43 --real"
-            ),
-        }
-    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
-    sources_path = ROOT / "data" / "corpus_a3" / "sources" / "sources.json"
-    sources = json.loads(sources_path.read_text(encoding="utf-8")) if sources_path.is_file() else {}
-    block: dict = {
-        "available": True,
-        "dataset_version": manifest["dataset_version"],
-        "real_documents": bool(manifest.get("real_documents")),
-        "pairs": manifest["pairs"],
-        "target": manifest["target"],
-        "balance": manifest["balance"],
-        "splits": manifest["splits"],
-        "shared_groups": manifest["shared_groups"],
-        "documents": {
-            "count": manifest["documents"]["count"],
-            "synthetic": manifest["documents"]["synthetic"],
-            "by_type": sources.get("by_type"),
-            "by_theme": sources.get("by_theme"),
-            "extraction": sources.get("method"),
-        },
-        "sources": sources.get("sources"),
-        "checks": {
-            "spans_checked": manifest.get("spans_checked"),
-            "spans_problems": len(manifest.get("spans_problems", [])),
-            "contexts_checked": manifest.get("contexts_checked"),
-            "contexts_problems": len(manifest.get("contexts_problems", [])),
-            "number_attribution_checked": manifest.get("number_attribution_checked"),
-            "number_attribution_problems": len(manifest.get("number_attribution_problems", [])),
-            "plan_problems": len(manifest.get("plan_problems", [])),
-        },
-        "sha256_pairs": manifest["sha256"]["pairs.jsonl"],
-        "by_split": {},
-        "by_mode": {},
-    }
-    for name in ("dev", "test"):
-        path = ROOT / "data" / "corpus_a3" / "splits" / f"{name}.jsonl"
-        if not path.is_file() or not path.stat().st_size:
-            continue
-        block["by_split"][name] = _metrics_tree(verifier.evaluate(list(read_pairs(path))))
-    test_path = ROOT / "data" / "corpus_a3" / "splits" / "test.jsonl"
-    if test_path.is_file() and test_path.stat().st_size:
-        by_mode: dict[str, list] = {}
-        for pair in read_pairs(test_path):
-            by_mode.setdefault(pair["meta"]["mode"], []).append(pair)
-        for mode, pairs_block in sorted(by_mode.items()):
-            metrics = verifier.evaluate(pairs_block)
-            block["by_mode"][mode] = {
-                "pairs": len(pairs_block),
-                "verdict_recall": metrics["verdicts"]["recall"],
-                "verdict_fpr": metrics["verdicts"]["fpr"],
-                "token_f1": round(metrics["tokens"]["f1"], 4),
-                "span_coverage": round(metrics["spans"]["recall_containment"], 4),
-            }
+    # P8 is a sealed one-shot measurement. CI may COPY receipts, never evaluate177 again.
+    saved = ROOT / "reports" / "METRICS.json"
+    if not saved.is_file():
+        raise RuntimeError("Missing historical A3 receipt; refuse fresh official-test evaluation")
+    block = json.loads(saved.read_text(encoding="utf-8"))["corpus_a3_real"]
+    block["scope"] = "SUPERSEDED historical demo reference only; P8 official metrics are copied separately"
+    block["source"] = "spanverify-module/reports/METRICS.json (immutable payload)"
     return block
 
 
@@ -739,10 +684,23 @@ def main() -> int:
     args = parser.parse_args()
 
     payload = collect(args.dataset, args.seed, Path(args.release_dir), Path(args.coverage_json))
+    payload.update(
+        run_id="P8-compatibility-collection",
+        date="2026-10-19",
+        historical_scope="Legacy blocks are saved historical reference, NOT P8 acceptance; only p8_* receipt slices are P8. Authoritative indices: EXPERIMENTS_INDEX.md and contract/coverage-matrix.json",
+    )
+    for name, role in (("p8_official177", "official"), ("p8_B1000", "external")):
+        receipt = ROOT.parent / "reports/p8/run39266451529" / role / "result.json"
+        if receipt.exists():
+            report = json.loads(receipt.read_text(encoding="utf-8"))
+            values = report["metrics"]
+            values["spans"]["strict_f1_iou_0_5"] = values["spans"]["f1"]
+            values["source"] = str(receipt.relative_to(ROOT.parent))
+            payload.setdefault("hf_external_slices", {}).setdefault("slices", {})[name] = values
     out = Path(args.out)
     out.parent.mkdir(parents=True, exist_ok=True)
     out.write_text(json.dumps(payload, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
-    print(f"METRICS.json: {out}")
+    print(f"CURRENT_METRICS.json compatibility payload: {out}")
     print(f"  версия: {payload['meta']['version']} | коммит: {payload['meta']['commit'][:12]}")
     print(f"  тестов: {payload['tests']['collected']} | покрытие: {payload['tests']['coverage_percent']}")
     demo = payload["demo"]

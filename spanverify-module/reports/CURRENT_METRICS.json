@@ -31,10 +31,10 @@
   },
   "disclaimer": "Демонстрационные метрики получены на синтетическом корпусе и научным результатом не являются. Для подтверждения требуются 1200 пар «вопрос–ответ» с экспертной разметкой на реальных регламентах организации.",
   "tests": {
-    "collected": 909,
+    "collected": 910,
     "coverage_percent": 87.82,
     "coverage_gate_percent": 85,
-    "inventory_note": "P8 full collection: 909, no exclusions; actual result in reports/p8/full-suite.*"
+    "inventory_note": "P8 910 collected; full suite has no exclusions"
   },
   "demo": {
     "split": {

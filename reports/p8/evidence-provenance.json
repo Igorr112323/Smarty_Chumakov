@@ -6,7 +6,7 @@
     {
       "path": "reports/CONTRACT.json",
       "run_id": null,
-      "date": "2026-10-18"
+      "date": "2026-10-19"
     },
     {
       "path": "reports/METRICS.json",
@@ -16,47 +16,47 @@
     {
       "path": "reports/contract/4.1.10-no-network.json",
       "run_id": null,
-      "date": "2026-10-14"
+      "date": "2026-10-19"
     },
     {
       "path": "reports/contract/4.1.4-ai-participation.json",
       "run_id": null,
-      "date": "2026-10-14"
+      "date": "2026-10-19"
     },
     {
       "path": "reports/contract/4.1.5-metric-groups.json",
       "run_id": null,
-      "date": "2026-10-14"
+      "date": "2026-10-19"
     },
     {
       "path": "reports/contract/4.1.6-gate-corpus-a.json",
       "run_id": null,
-      "date": "2026-10-14"
+      "date": "2026-10-19"
     },
     {
       "path": "reports/contract/4.1.6-demo.json",
       "run_id": null,
-      "date": "2026-10-18"
+      "date": "2026-10-19"
     },
     {
       "path": "reports/contract/4.1.6-hf-a3.json",
       "run_id": "37609202780",
-      "date": "2026-10-18"
+      "date": "2026-10-19"
     },
     {
       "path": "reports/contract/4.1.6-hf-gate-a3.json",
       "run_id": "37609202780",
-      "date": "2026-10-18"
+      "date": "2026-10-19"
     },
     {
       "path": "reports/contract/4.1.6-hf-gate.json",
       "run_id": "37609202780",
-      "date": "2026-10-18"
+      "date": "2026-10-19"
     },
     {
       "path": "reports/contract/4.1.6-hf.json",
       "run_id": "37609202780",
-      "date": "2026-10-18"
+      "date": "2026-10-19"
     },
     {
       "path": "reports/contract/coverage-matrix.json",
@@ -71,7 +71,7 @@
     {
       "path": "reports/acceptance/robustness.json",
       "run_id": null,
-      "date": "2026-10-18"
+      "date": "2026-10-19"
     },
     {
       "path": "reports/p7/ai-share-oof-curves.json",
@@ -101,57 +101,57 @@
     {
       "path": "spanverify-module/reports/SIGN_AUDIT.json",
       "run_id": null,
-      "date": "2026-10-14"
+      "date": "2026-10-19"
     },
     {
       "path": "spanverify-module/reports/cross_corpus.json",
       "run_id": null,
-      "date": "2026-10-14"
+      "date": "2026-10-19"
     },
     {
       "path": "spanverify-module/reports/cross_corpus_hf.json",
       "run_id": null,
-      "date": "2026-10-14"
+      "date": "2026-10-19"
     },
     {
       "path": "spanverify-module/reports/ext_ragtruth_data2txt.json",
       "run_id": null,
-      "date": "2026-10-14"
+      "date": "2026-10-19"
     },
     {
       "path": "spanverify-module/reports/ext_ragtruth_qa.json",
       "run_id": null,
-      "date": "2026-10-14"
+      "date": "2026-10-19"
     },
     {
       "path": "spanverify-module/reports/ext_ragtruth_qa_hf.json",
       "run_id": null,
-      "date": "2026-10-14"
+      "date": "2026-10-19"
     },
     {
       "path": "spanverify-module/reports/ext_ragtruth_summary.json",
       "run_id": null,
-      "date": "2026-10-14"
+      "date": "2026-10-19"
     },
     {
       "path": "spanverify-module/reports/ext_rushallu.json",
       "run_id": null,
-      "date": "2026-10-14"
+      "date": "2026-10-19"
     },
     {
       "path": "spanverify-module/reports/external_tests.json",
       "run_id": null,
-      "date": "2026-10-14"
+      "date": "2026-10-19"
     },
     {
       "path": "spanverify-module/reports/rus_hallu_eval.json",
       "run_id": null,
-      "date": "2026-10-14"
+      "date": "2026-10-19"
     },
     {
       "path": "spanverify-module/reports/verdict_calibration.json",
       "run_id": null,
-      "date": "2026-10-14"
+      "date": "2026-10-19"
     },
     {
       "path": "spanverify-module/reports/CURRENT_METRICS.json",
@@ -161,27 +161,27 @@
     {
       "path": "spanverify-module/reports/demo/report.json",
       "run_id": null,
-      "date": "2026-10-14"
+      "date": "2026-10-19"
     },
     {
       "path": "spanverify-module/reports/experiments/experiment.json",
       "run_id": null,
-      "date": "2026-10-14"
+      "date": "2026-10-19"
     },
     {
       "path": "spanverify-module/reports/experiments/hf_a3_run39045874159.json",
       "run_id": "39045874159",
-      "date": "2026-10-18"
+      "date": "2026-10-19"
     },
     {
       "path": "spanverify-module/reports/experiments/a/experiment.json",
       "run_id": "37609202780",
-      "date": "2026-10-14"
+      "date": "2026-10-19"
     },
     {
       "path": "spanverify-module/reports/experiments/a3/experiment.json",
       "run_id": "37609202780",
-      "date": "2026-10-14"
+      "date": "2026-10-19"
     }
   ]
 }
