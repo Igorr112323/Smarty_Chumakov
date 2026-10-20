@@ -9,6 +9,7 @@ SPEED-R1 Phase A — Декомпозиция таймингов HF/Demo
 
 Никакой fit/train, никаких изменений науки. Только измерение.
 """
+
 from __future__ import annotations
 import argparse
 import hashlib
@@ -30,15 +31,24 @@ sys.path.insert(0, str(ROOT / "spanverify-module"))
 
 # Guard: never open test177 or pairs.jsonl via audithook (same as P6)
 P5 = ROOT / "spanverify-module/reports/experiments/p5_span_filter/run39170981235"
-RESERVED = {str((ROOT / f"spanverify-module/data/corpus_a3/{p}").resolve()) for p in ("pairs.jsonl", "splits/test.jsonl")}
+RESERVED = {
+    str((ROOT / f"spanverify-module/data/corpus_a3/{p}").resolve())
+    for p in ("pairs.jsonl", "splits/test.jsonl")
+}
+
+
 def guard(event, args):
     if event == "open" and isinstance(args[0], (str, bytes, os.PathLike)):
         try:
             rp = os.path.realpath(os.fsdecode(args[0]))
             if rp in RESERVED:
-                raise PermissionError("SPEED-R1: test177/pairs.jsonl is reserved — not allowed per §1.3")
+                raise PermissionError(
+                    "SPEED-R1: test177/pairs.jsonl is reserved — not allowed per §1.3"
+                )
         except Exception:
             pass
+
+
 sys.addaudithook(guard)
 
 from spanverify.config import Config
@@ -49,15 +59,20 @@ BUNDLE = P5 / "combined_bundle.json"
 SHA = "e0b13c693a058dfd66ed24a52fc14e9c70964e95885358e7b99cc1f328ad6892"
 MODEL = "ai-forever/rugpt3small_based_on_gpt2"
 
+
 def fingerprint():
     """Machine fingerprint per §2.3"""
-    cpuinfo = Path("/proc/cpuinfo").read_text() if Path("/proc/cpuinfo").exists() else ""
-    meminfo = Path("/proc/meminfo").read_text() if Path("/proc/meminfo").exists() else ""
+    cpuinfo = (
+        Path("/proc/cpuinfo").read_text() if Path("/proc/cpuinfo").exists() else ""
+    )
+    meminfo = (
+        Path("/proc/meminfo").read_text() if Path("/proc/meminfo").exists() else ""
+    )
     # Extract model name
     model_name = "unknown"
     for line in cpuinfo.splitlines():
         if line.startswith("model name"):
-            model_name = line.split(":",1)[1].strip()
+            model_name = line.split(":", 1)[1].strip()
             break
     cpu_count = os.cpu_count()
     # check affinity
@@ -74,11 +89,15 @@ def fingerprint():
     }
     # git SHA
     try:
-        sha = subprocess.check_output(["git","rev-parse","HEAD"], cwd=ROOT, text=True).strip()
+        sha = subprocess.check_output(
+            ["git", "rev-parse", "HEAD"], cwd=ROOT, text=True
+        ).strip()
     except Exception:
         sha = "unknown"
     try:
-        branch = subprocess.check_output(["git","rev-parse","--abbrev-ref","HEAD"], cwd=ROOT, text=True).strip()
+        branch = subprocess.check_output(
+            ["git", "rev-parse", "--abbrev-ref", "HEAD"], cwd=ROOT, text=True
+        ).strip()
     except Exception:
         branch = "unknown"
     return {
@@ -87,7 +106,7 @@ def fingerprint():
         "cpu_affinity": aff_list,
         "meminfo_first_line": meminfo.splitlines()[0] if meminfo else "unknown",
         "os": platform.platform(),
-        "python": sys.version.replace("\n"," "),
+        "python": sys.version.replace("\n", " "),
         "git_sha": sha,
         "git_branch": branch,
         "env_threads": env,
@@ -95,20 +114,27 @@ def fingerprint():
         "model": MODEL,
     }
 
+
 def document(n, scenario):
     """Same as P6/P7 document(): repeat first train context to exact n chars"""
-    p = next(iter(read_pairs(ROOT / "spanverify-module/data/corpus_a3/splits/train.jsonl")))
+    p = next(
+        iter(read_pairs(ROOT / "spanverify-module/data/corpus_a3/splits/train.jsonl"))
+    )
     base = p["context"] + "\n"
     text = (base * (n // len(base) + 1))[:n]
     assert len(text) == n
-    return (p["answer"], text) if scenario == "document-context" else (text, p["context"])
+    return (
+        (p["answer"], text) if scenario == "document-context" else (text, p["context"])
+    )
+
 
 def check_schema(result, answer):
     assert 0 <= result.score <= 1
     for span in result.spans:
         assert 0 <= span.start < span.end <= len(answer)
-        assert answer[span.start:span.end] == span.text
+        assert answer[span.start : span.end] == span.text
         assert span.label and 0 <= span.risk <= 1
+
 
 def percentile(data, p):
     """p in 0..100, linear interpolation like numpy"""
@@ -118,12 +144,13 @@ def percentile(data, p):
     n = len(s)
     if n == 1:
         return s[0]
-    k = (n-1)*p/100
+    k = (n - 1) * p / 100
     f = math.floor(k)
     c = math.ceil(k)
-    if f==c:
+    if f == c:
         return s[int(k)]
-    return s[f]*(c-k) + s[c]*(k-f)
+    return s[f] * (c - k) + s[c] * (k - f)
+
 
 def run_single(mode, size, scenario, thermal, profile=False):
     """Run one verification, return timing decomposition."""
@@ -134,14 +161,23 @@ def run_single(mode, size, scenario, thermal, profile=False):
     t_w_start = time.perf_counter()
     # verify bundle sha
     assert hashlib.sha256(BUNDLE.read_bytes()).hexdigest() == SHA, "bundle mismatch"
-    config = Config.load().with_overrides(backend=mode, hf_model=MODEL, hf_max_tokens=512)
+    config = Config.load().with_overrides(
+        backend=mode, hf_model=MODEL, hf_max_tokens=512
+    )
     bundle = WeightsBundle.load(BUNDLE)
     t_w_end = time.perf_counter()
     weights_load_s = t_w_end - t_w_start
 
     # Verifier init (includes config)
     t_v_start = time.perf_counter()
-    verifier = Verifier(config=config, weights=bundle, mode=mode, model_name=MODEL, features_cache=None, span_expansion="mask")
+    verifier = Verifier(
+        config=config,
+        weights=bundle,
+        mode=mode,
+        model_name=MODEL,
+        features_cache=None,
+        span_expansion="mask",
+    )
     t_v_end = time.perf_counter()
     verifier_init_s = t_v_end - t_v_start
 
@@ -154,15 +190,21 @@ def run_single(mode, size, scenario, thermal, profile=False):
             verifier.verify(aw, cw)
         except Exception as e:
             # HF may fail due to missing model download (network whitelist)
-            return {"status":"warmup_failed","error":str(e), "weights_load_s":weights_load_s, "verifier_init_s":verifier_init_s}
+            return {
+                "status": "warmup_failed",
+                "error": str(e),
+                "weights_load_s": weights_load_s,
+                "verifier_init_s": verifier_init_s,
+            }
         warmup_s = time.perf_counter() - t_warm_start
 
-    a,c = document(size, scenario)
+    a, c = document(size, scenario)
 
     # Detailed stage timing via manual instrumentation
     # We will time tokenization separately, then full verify
     # Tokenization stage
     from spanverify.core import tokenize_with_offsets
+
     t_tok_start = time.perf_counter()
     tokens = tokenize_with_offsets(a)
     t_tok_end = time.perf_counter()
@@ -180,7 +222,7 @@ def run_single(mode, size, scenario, thermal, profile=False):
         if profiler:
             profiler.disable()
         return {
-            "status":"verify_failed",
+            "status": "verify_failed",
             "error": f"{type(e).__name__}: {e}",
             "weights_load_s": weights_load_s,
             "verifier_init_s": verifier_init_s,
@@ -206,20 +248,22 @@ def run_single(mode, size, scenario, thermal, profile=False):
     if profiler:
         s = io.StringIO()
         ps = pstats.Stats(profiler, stream=s)
-        ps.sort_stats('cumulative')
+        ps.sort_stats("cumulative")
         # Get stats dict
         stats = ps.stats
         # sort by self_seconds (index 2)
         sorted_stats = sorted(stats.items(), key=lambda kv: kv[1][2], reverse=True)[:15]
         for (fname, lineno, func), (cc, nc, tt, ct, callers) in sorted_stats:
-            profile_top.append({
-                "file": fname,
-                "line": lineno,
-                "function": func,
-                "calls": nc,
-                "self_seconds": tt,
-                "cumulative_seconds": ct,
-            })
+            profile_top.append(
+                {
+                    "file": fname,
+                    "line": lineno,
+                    "function": func,
+                    "calls": nc,
+                    "self_seconds": tt,
+                    "cumulative_seconds": ct,
+                }
+            )
 
     check_schema(result, a)
 
@@ -229,7 +273,7 @@ def run_single(mode, size, scenario, thermal, profile=False):
     # Estimate breakdown for HF: we can approximate torch time via profile
     # For demo, torch time ~0
     return {
-        "status":"completed",
+        "status": "completed",
         "mode": mode,
         "scenario": scenario,
         "chars": size,
@@ -240,7 +284,11 @@ def run_single(mode, size, scenario, thermal, profile=False):
         "tokenization_s": tokenization_s,
         "verify_s": total_verify_s,
         "serialization_s": serialization_s,
-        "total_s": weights_load_s + verifier_init_s + (warmup_s or 0) + total_verify_s + serialization_s,
+        "total_s": weights_load_s
+        + verifier_init_s
+        + (warmup_s or 0)
+        + total_verify_s
+        + serialization_s,
         "latency_ms_reported": latency_ms,
         "profile_top": profile_top,
         "features_meta": features_meta,
@@ -255,7 +303,9 @@ def run_single(mode, size, scenario, thermal, profile=False):
 def benchmark(mode, sizes, scenarios, thermals, repeats, out_dir, profile=False):
     fp = fingerprint()
     out_dir.mkdir(parents=True, exist_ok=True)
-    (out_dir / "fingerprint.json").write_text(json.dumps(fp, ensure_ascii=False, indent=2), encoding="utf-8")
+    (out_dir / "fingerprint.json").write_text(
+        json.dumps(fp, ensure_ascii=False, indent=2), encoding="utf-8"
+    )
     print(f":: fingerprint {fp}")
 
     # For each combination, run n repeats, collect raw
@@ -269,9 +319,11 @@ def benchmark(mode, sizes, scenarios, thermals, repeats, out_dir, profile=False)
                 row_details = []
                 for rep in range(repeats):
                     print(f"Running {key} rep {rep+1}/{repeats} ...", flush=True)
-                    res = run_single(mode, size, scenario, thermal, profile=(profile and rep==0))
+                    res = run_single(
+                        mode, size, scenario, thermal, profile=(profile and rep == 0)
+                    )
                     row_details.append(res)
-                    if res.get("status")=="completed":
+                    if res.get("status") == "completed":
                         raw.append(res["verify_s"])
                     else:
                         # record failure, keep raw as None
@@ -284,32 +336,40 @@ def benchmark(mode, sizes, scenarios, thermals, repeats, out_dir, profile=False)
                 if vals:
                     med = median(vals)
                     p95 = percentile(vals, 95)
-                    mean_v = sum(vals)/len(vals)
+                    mean_v = sum(vals) / len(vals)
                     mini = min(vals)
                     maxi = max(vals)
                 else:
                     med = p95 = mean_v = mini = maxi = None
-                limit = {1000:0.03, 50000:1.0, 2000000:60.0}[size]
-                status = "FAIL" if med is not None and med>limit else ("PASS" if med is not None else "ERROR")
-                all_rows.append({
-                    "mode": mode,
-                    "scenario": scenario,
-                    "chars": size,
-                    "thermal": thermal,
-                    "repeats": repeats,
-                    "raw_seconds": raw,
-                    "median_s": med,
-                    "p95_s": p95,
-                    "mean_s": mean_v,
-                    "min_s": mini,
-                    "max_s": maxi,
-                    "limit_s": limit,
-                    "pass": status,
-                    "details_first": row_details[0] if row_details else None,
-                })
+                limit = {1000: 0.03, 50000: 1.0, 2000000: 60.0}[size]
+                status = (
+                    "FAIL"
+                    if med is not None and med > limit
+                    else ("PASS" if med is not None else "ERROR")
+                )
+                all_rows.append(
+                    {
+                        "mode": mode,
+                        "scenario": scenario,
+                        "chars": size,
+                        "thermal": thermal,
+                        "repeats": repeats,
+                        "raw_seconds": raw,
+                        "median_s": med,
+                        "p95_s": p95,
+                        "mean_s": mean_v,
+                        "min_s": mini,
+                        "max_s": maxi,
+                        "limit_s": limit,
+                        "pass": status,
+                        "details_first": row_details[0] if row_details else None,
+                    }
+                )
                 raw_collections[key] = raw
                 # save intermediate
-                (out_dir / f"benchmark_{mode}.json").write_text(json.dumps(all_rows, ensure_ascii=False, indent=2), encoding="utf-8")
+                (out_dir / f"benchmark_{mode}.json").write_text(
+                    json.dumps(all_rows, ensure_ascii=False, indent=2), encoding="utf-8"
+                )
 
     # Fixed cost and marginal cost (slope) via linear regression on medians
     # Use only completed medians
@@ -318,42 +378,70 @@ def benchmark(mode, sizes, scenarios, thermals, repeats, out_dir, profile=False)
     summaries = []
     for scenario in scenarios:
         for thermal in thermals:
-            points = [(r["chars"], r["median_s"]) for r in all_rows if r["scenario"]==scenario and r["thermal"]==thermal and r["median_s"] is not None]
-            if len(points)>=2:
+            points = [
+                (r["chars"], r["median_s"])
+                for r in all_rows
+                if r["scenario"] == scenario
+                and r["thermal"] == thermal
+                and r["median_s"] is not None
+            ]
+            if len(points) >= 2:
                 # linear regression: y = a + b*x where x=chars
-                n=len(points)
-                xs=[p[0] for p in points]
-                ys=[p[1] for p in points]
-                mx=sum(xs)/n
-                my=sum(ys)/n
+                n = len(points)
+                xs = [p[0] for p in points]
+                ys = [p[1] for p in points]
+                mx = sum(xs) / n
+                my = sum(ys) / n
                 # slope b = cov/var
-                var=sum((x-mx)**2 for x in xs)
-                cov=sum((x-mx)*(y-my) for x,y in zip(xs,ys))
-                b=cov/var if var else 0
-                a=my - b*mx
+                var = sum((x - mx) ** 2 for x in xs)
+                cov = sum((x - mx) * (y - my) for x, y in zip(xs, ys))
+                b = cov / var if var else 0
+                a = my - b * mx
                 # marginal per 1000
-                marginal_per_1000=b*1000
-                summaries.append({
-                    "scenario": scenario,
-                    "thermal": thermal,
-                    "fixed_cost_s": a,
-                    "marginal_per_1000_s": marginal_per_1000,
-                    "points": points,
-                })
-    (out_dir / f"fixed_marginal_{mode}.json").write_text(json.dumps(summaries, ensure_ascii=False, indent=2), encoding="utf-8")
+                marginal_per_1000 = b * 1000
+                summaries.append(
+                    {
+                        "scenario": scenario,
+                        "thermal": thermal,
+                        "fixed_cost_s": a,
+                        "marginal_per_1000_s": marginal_per_1000,
+                        "points": points,
+                    }
+                )
+    (out_dir / f"fixed_marginal_{mode}.json").write_text(
+        json.dumps(summaries, ensure_ascii=False, indent=2), encoding="utf-8"
+    )
     # Save full
-    (out_dir / f"full_{mode}.json").write_text(json.dumps({"fingerprint":fp, "rows":all_rows, "fixed_marginal":summaries}, ensure_ascii=False, indent=2), encoding="utf-8")
+    (out_dir / f"full_{mode}.json").write_text(
+        json.dumps(
+            {"fingerprint": fp, "rows": all_rows, "fixed_marginal": summaries},
+            ensure_ascii=False,
+            indent=2,
+        ),
+        encoding="utf-8",
+    )
     print(f"Done {mode}: {len(all_rows)} rows")
     return all_rows, summaries, fp
 
+
 if __name__ == "__main__":
-    ap=argparse.ArgumentParser()
-    ap.add_argument("--mode", default="demo", choices=["demo","hf"])
-    ap.add_argument("--sizes", nargs="+", type=int, default=[1000,50000,2000000])
-    ap.add_argument("--scenarios", nargs="+", default=["answer-text","document-context"])
-    ap.add_argument("--thermals", nargs="+", default=["cold-process","warm-model"])
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--mode", default="demo", choices=["demo", "hf"])
+    ap.add_argument("--sizes", nargs="+", type=int, default=[1000, 50000, 2000000])
+    ap.add_argument(
+        "--scenarios", nargs="+", default=["answer-text", "document-context"]
+    )
+    ap.add_argument("--thermals", nargs="+", default=["cold-process", "warm-model"])
     ap.add_argument("--repeats", type=int, default=10)
     ap.add_argument("--out", type=Path, required=True)
     ap.add_argument("--profile", action="store_true")
-    args=ap.parse_args()
-    benchmark(args.mode, args.sizes, args.scenarios, args.thermals, args.repeats, args.out, profile=args.profile)
+    args = ap.parse_args()
+    benchmark(
+        args.mode,
+        args.sizes,
+        args.scenarios,
+        args.thermals,
+        args.repeats,
+        args.out,
+        profile=args.profile,
+    )

@@ -3,10 +3,13 @@
 Storage audit ≤1.5GB для режима с весами
 Учёт: дистрибутив (exe/pyz), каталог модели 554.3MB, библиотеки 870.6MB, служебные
 """
-import json, os
+
+import json
 from pathlib import Path
-ROOT=Path(__file__).resolve().parents[1]
+
+ROOT = Path(__file__).resolve().parents[1]
 import argparse
+
 
 def audit(out):
     # Известные размеры из p8/DATA (authoritative)
@@ -22,7 +25,9 @@ def audit(out):
     total_without_weights = exe_bytes + pyz_bytes + extra_bytes  # ~9.3MB
 
     # Проверка нормы
-    limit_with = 1.5 * 1024**3  # 1.5 GiB = 1610612736 B, но в ТЗ 1.5GB может быть десятичный 1_500_000_000
+    (
+        1.5 * 1024**3
+    )  # 1.5 GiB = 1610612736 B, но в ТЗ 1.5GB может быть десятичный 1_500_000_000
     # В отчётах использовалось ~1.5GB = 1_500_000_000? Проверим оба
     limit_decimal = 1_500_000_000
     limit_gib = 1.5 * (1024**3)
@@ -55,21 +60,27 @@ def audit(out):
             "reports/p8/run39271014161/hf-autonomy/windows-hf-autonomy.json (libs 870588148, model 554277308)",
             "reports/p8/DELIVERY.json",
             "reports/p8/VERIFICATION.json (exe 8981233, pyz 232874)",
-            "reports/acceptance/full-suite.log"
+            "reports/acceptance/full-suite.log",
         ],
         "fingerprint": {
-            "git_sha": open(ROOT/".git/refs/heads/speed/r1").read().strip() if (ROOT/".git/refs/heads/speed/r1").exists() else "unknown",
-            "measured_on": "Phase B storage audit, same SHA as benchmarks"
-        }
+            "git_sha": (
+                open(ROOT / ".git/refs/heads/speed/r1").read().strip()
+                if (ROOT / ".git/refs/heads/speed/r1").exists()
+                else "unknown"
+            ),
+            "measured_on": "Phase B storage audit, same SHA as benchmarks",
+        },
     }
     out.parent.mkdir(parents=True, exist_ok=True)
     out.write_text(json.dumps(result, ensure_ascii=False, indent=2), encoding="utf-8")
     print(json.dumps(result, ensure_ascii=False, indent=2))
     return result
 
-if __name__=="__main__":
+
+if __name__ == "__main__":
     import argparse
-    ap=argparse.ArgumentParser()
+
+    ap = argparse.ArgumentParser()
     ap.add_argument("--out", type=Path, required=True)
-    args=ap.parse_args()
+    args = ap.parse_args()
     audit(args.out)

@@ -69,8 +69,7 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install -q -r spanverify-module/requirements.txt -r spanverify-module/requirements-token-head-tests.txt
-          pip install -q "torch==2.14.1+cpu" --index-url https://download.pytorch.org/whl/cpu
-          pip install -q -r spanverify-module/requirements-hf.txt
+          pip install -q --extra-index-url https://download.pytorch.org/whl/cpu -r spanverify-module/requirements-hf.txt
       - name: Identity gate (dev181 + B)
         env:
           OMP_NUM_THREADS: "1"
@@ -109,8 +108,7 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install -q -r spanverify-module/requirements.txt -r spanverify-module/requirements-token-head-tests.txt
-          pip install -q "torch==2.14.1+cpu" --index-url https://download.pytorch.org/whl/cpu
-          pip install -q -r spanverify-module/requirements-hf.txt
+          pip install -q --extra-index-url https://download.pytorch.org/whl/cpu -r spanverify-module/requirements-hf.txt
       - name: Bench ${{ matrix.thermal }} ${{ matrix.config }}
         run: |
           if [ "${{ matrix.config }}" = "2cores" ]; then
