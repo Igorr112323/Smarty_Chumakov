@@ -2,7 +2,7 @@
 
 **Дата:** 2026-10-20 (UTC)
 **Ветка:** `speed/r1`
-**HEAD SHA (фактический, где собран scheduler и зелёный CI, пришит к файлам):** `a0ae7d5d4295182d78c38fdc99ae166fd91ab4cc` (Phase B scheduler `597e925`, workflow fix `3770b8a`, inventory 915 `55daf26`, hygiene patch `c496fcb`, bench `9fc1811`, final pin `7c8c281` → `a95a504`; после отключений автокоммитов финальный SHA будет обновлён — см. `git log`)
+**HEAD SHA (фактический, где собран scheduler и зелёный CI, пришит к файлам):** `c65e67e8ef2f632d38ac618e59daafb4ca9828eb` (Phase B scheduler `597e925`, workflow fix `3770b8a`, inventory 915 `55daf26`, hygiene patch `c496fcb`, bench `9fc1811`, final pin `7c8c281` → `a95a504`; после отключений автокоммитов финальный SHA будет обновлён — см. `git log`)
 **Предыдущий HEAD Phase A:** `565b4ae4c0e5af96f823672f825b67fcc25d375d` (принят куратором 2026-10-19)
 **Модель / бандл:** `ai-forever/rugpt3small_based_on_gpt2`, P5 bundle `frozen-p5.json` sha256 `e0b13c693a058dfd66ed24a52fc14e9c70964e95885358e7b99cc1f328ad6892`, порог `0.5794392523364486`, контекст k=3/w1, декодер `seed_grow_v1`, окно 512 `window512_full_answer_v1`
 **Наука заморожена:** веса, токенизатор, 5 признаков, context-features, token-head (GBDT), answer-head, span-filter, threshold, decoder, windowing — не менялись (только `tools/speed_r1_accelerated.py` — параллельный планировщик окон, resident, batching, `OMP_NUM_THREADS=1`, детерминизм по индексу окна)
@@ -27,7 +27,7 @@
 - **CPU:** AMD EPYC 9V45/9V74 — CI runner 2c, affinity `[0,1]`, MemTotal 16373452 kB
 - **ОС:** Linux-6.17.0-1022-azure-x86_64-with-glibc2.39 / Linux-6.1.158
 - **Python:** 3.11.17 / 3.11.2
-- **Git SHA:** `a0ae7d5d4295182d78c38fdc99ae166fd91ab4cc` (bench run `39472061036` на `7c8c281`, scheduler `597e925`, bundle `e0b13c69`)
+- **Git SHA:** `c65e67e8ef2f632d38ac618e59daafb4ca9828eb` (bench run `39472061036` на `7c8c281`, scheduler `597e925`, bundle `e0b13c69`)
 - **Env:** `OMP_NUM_THREADS=1`, `workers=2 ≤ cores`, `batch=4`
 - **Команда normative:** `taskset -c 0,1 OMP_NUM_THREADS=1 python tools/speed_r1_phase_b_measure.py --mode hf --thermal warm-model --workers 2 --batch 4 --out reports/speed/r1/bench_hf_warm-model_2cores.json --repeats 10`
 - **JSON fingerprint:** `bench_hf_warm-model_2cores.json:fingerprint {cpu_model AMD EPYC 9V45, affinity [0,1], OMP 1, workers 2, batch 4, bundle e0b13c69, git 7c8c281}`
