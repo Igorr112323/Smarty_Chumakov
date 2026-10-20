@@ -29,14 +29,14 @@
     "reports/acceptance/full-suite.log"
   ],
   "fingerprint": {
-    "git_sha": "9fc1811c5929328965f3a9592ec4144016a959f6",
+    "git_sha": "a95a5045de8857c13ba5964037d5209abf33a39e",
     "measured_on": "Phase B storage audit, same SHA as benchmarks"
   },
-  "run_id": "39464170291",
+  "run_id": "39472061036",
   "date": "2026-10-20",
   "successor": "reports/EXPERIMENTS_INDEX.md",
   "evidence_context": {
-    "run_id": "39464170291",
+    "run_id": "39472061036",
     "date": "2026-10-20",
     "status": "CURRENT",
     "successor": "reports/EXPERIMENTS_INDEX.md",
