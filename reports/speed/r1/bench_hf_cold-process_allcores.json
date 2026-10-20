@@ -1,0 +1,233 @@
+{
+  "fingerprint": {
+    "cpu_model": "AMD EPYC 7763 64-Core Processor",
+    "cpu_logical": 4,
+    "cpu_affinity": [
+      0,
+      1,
+      2,
+      3
+    ],
+    "meminfo_first": "MemTotal:       16367520 kB",
+    "os": "Linux-7.0.0-1017-azure-x86_64-with-glibc2.39",
+    "python": "3.11.17 (main, Oct  1 2026, 14:32:31) [GCC 13.3.0]",
+    "git_sha": "c496fcbc4d19c78b46ff9de19e377954a78f0515",
+    "git_branch": "speed/r1",
+    "env": {
+      "OMP_NUM_THREADS": "1",
+      "OPENBLAS": "unset",
+      "MKL": "unset"
+    },
+    "workers": 4,
+    "batch": 8,
+    "bundle_sha256": "e0b13c693a058dfd66ed24a52fc14e9c70964e95885358e7b99cc1f328ad6892",
+    "model": "ai-forever/rugpt3small_based_on_gpt2",
+    "command": "workers=4 batch=8 thermal=warm"
+  },
+  "rows": [
+    {
+      "mode": "hf",
+      "scenario": "answer-text",
+      "chars": 1000,
+      "thermal": "cold-process",
+      "workers": 4,
+      "batch": 8,
+      "repeats": 10,
+      "raw_seconds": [
+        12.236568422999994,
+        6.5564895819999975,
+        6.444441510999994,
+        6.5449290950000005,
+        6.567353221999994,
+        6.533554138999989,
+        6.62728958400001,
+        6.527397425000004,
+        6.463559284000013,
+        6.44105588299999
+      ],
+      "median_s": 6.539241616999995,
+      "p95_s": 9.712392945450006,
+      "mean_s": 7.094263814799999,
+      "limit_s": 0.03,
+      "status": "FAIL",
+      "throughput_note": null,
+      "fingerprint": {
+        "cpu_model": "AMD EPYC 7763 64-Core Processor",
+        "cpu_logical": 4,
+        "cpu_affinity": [
+          0,
+          1,
+          2,
+          3
+        ],
+        "meminfo_first": "MemTotal:       16367520 kB",
+        "os": "Linux-7.0.0-1017-azure-x86_64-with-glibc2.39",
+        "python": "3.11.17 (main, Oct  1 2026, 14:32:31) [GCC 13.3.0]",
+        "git_sha": "c496fcbc4d19c78b46ff9de19e377954a78f0515",
+        "git_branch": "speed/r1",
+        "env": {
+          "OMP_NUM_THREADS": "1",
+          "OPENBLAS": "unset",
+          "MKL": "unset"
+        },
+        "workers": 4,
+        "batch": 8,
+        "bundle_sha256": "e0b13c693a058dfd66ed24a52fc14e9c70964e95885358e7b99cc1f328ad6892",
+        "model": "ai-forever/rugpt3small_based_on_gpt2",
+        "command": "workers=4 batch=8 thermal=warm"
+      },
+      "details": [
+        {
+          "rep": 0,
+          "secs": 12.236568422999994,
+          "stderr": "Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.\n[transformers] The following generation flags are not valid an"
+        },
+        {
+          "rep": 1,
+          "secs": 6.5564895819999975,
+          "stderr": "[transformers] The following generation flags are not valid and may be ignored: ['output_attentions']. Set `TRANSFORMERS_VERBOSITY=info` for more details.\nWarning: You are sending unauthenticated requ"
+        }
+      ]
+    },
+    {
+      "mode": "hf",
+      "scenario": "answer-text",
+      "chars": 50000,
+      "thermal": "cold-process",
+      "workers": 4,
+      "batch": 8,
+      "repeats": 10,
+      "raw_seconds": [
+        17.26559415899999,
+        17.369652756999983,
+        17.39740784,
+        17.35384345700001,
+        17.33217435200001,
+        17.26934329299999,
+        17.240979345000028,
+        17.344957751000038,
+        17.266403055000012,
+        17.42369346999999
+      ],
+      "median_s": 17.338566051500024,
+      "p95_s": 17.411864936499995,
+      "mean_s": 17.326404947900006,
+      "limit_s": 1.0,
+      "status": "FAIL",
+      "throughput_note": null,
+      "fingerprint": {
+        "cpu_model": "AMD EPYC 7763 64-Core Processor",
+        "cpu_logical": 4,
+        "cpu_affinity": [
+          0,
+          1,
+          2,
+          3
+        ],
+        "meminfo_first": "MemTotal:       16367520 kB",
+        "os": "Linux-7.0.0-1017-azure-x86_64-with-glibc2.39",
+        "python": "3.11.17 (main, Oct  1 2026, 14:32:31) [GCC 13.3.0]",
+        "git_sha": "c496fcbc4d19c78b46ff9de19e377954a78f0515",
+        "git_branch": "speed/r1",
+        "env": {
+          "OMP_NUM_THREADS": "1",
+          "OPENBLAS": "unset",
+          "MKL": "unset"
+        },
+        "workers": 4,
+        "batch": 8,
+        "bundle_sha256": "e0b13c693a058dfd66ed24a52fc14e9c70964e95885358e7b99cc1f328ad6892",
+        "model": "ai-forever/rugpt3small_based_on_gpt2",
+        "command": "workers=4 batch=8 thermal=warm"
+      },
+      "details": [
+        {
+          "rep": 0,
+          "secs": 17.26559415899999,
+          "stderr": "Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.\n[transformers] The following generation flags are not valid an"
+        },
+        {
+          "rep": 1,
+          "secs": 17.369652756999983,
+          "stderr": "Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.\n[transformers] The following generation flags are not valid an"
+        }
+      ]
+    },
+    {
+      "mode": "hf",
+      "scenario": "answer-text",
+      "chars": 2000000,
+      "thermal": "cold-process",
+      "workers": 4,
+      "batch": 8,
+      "repeats": 10,
+      "raw_seconds": [
+        50.56012800299999,
+        50.62517463500001,
+        50.731105593999985,
+        50.368027229000006,
+        50.57882210399998,
+        51.07711045799999,
+        51.036679789000004,
+        51.36612686300009,
+        50.87856173700004,
+        50.437546533000045
+      ],
+      "median_s": 50.678140114499996,
+      "p95_s": 51.23606948075005,
+      "mean_s": 50.765928294500014,
+      "limit_s": 60.0,
+      "status": "PASS",
+      "throughput_note": null,
+      "fingerprint": {
+        "cpu_model": "AMD EPYC 7763 64-Core Processor",
+        "cpu_logical": 4,
+        "cpu_affinity": [
+          0,
+          1,
+          2,
+          3
+        ],
+        "meminfo_first": "MemTotal:       16367520 kB",
+        "os": "Linux-7.0.0-1017-azure-x86_64-with-glibc2.39",
+        "python": "3.11.17 (main, Oct  1 2026, 14:32:31) [GCC 13.3.0]",
+        "git_sha": "c496fcbc4d19c78b46ff9de19e377954a78f0515",
+        "git_branch": "speed/r1",
+        "env": {
+          "OMP_NUM_THREADS": "1",
+          "OPENBLAS": "unset",
+          "MKL": "unset"
+        },
+        "workers": 4,
+        "batch": 8,
+        "bundle_sha256": "e0b13c693a058dfd66ed24a52fc14e9c70964e95885358e7b99cc1f328ad6892",
+        "model": "ai-forever/rugpt3small_based_on_gpt2",
+        "command": "workers=4 batch=8 thermal=warm"
+      },
+      "details": [
+        {
+          "rep": 0,
+          "secs": 50.56012800299999,
+          "stderr": "Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.\n[transformers] The following generation flags are not valid an"
+        },
+        {
+          "rep": 1,
+          "secs": 50.62517463500001,
+          "stderr": "[transformers] The following generation flags are not valid and may be ignored: ['output_attentions']. Set `TRANSFORMERS_VERBOSITY=info` for more details.\n\nLoading weights:   0%|          | 0/149 [00:"
+        }
+      ]
+    }
+  ],
+  "workers": 4,
+  "batch": 8,
+  "mode": "hf",
+  "run_id": "39464170291",
+  "date": "2026-10-20",
+  "successor": "reports/EXPERIMENTS_INDEX.md",
+  "evidence_context": {
+    "run_id": "39464170291",
+    "date": "2026-10-20",
+    "status": "CURRENT",
+    "successor": "reports/EXPERIMENTS_INDEX.md"
+  }
+}
