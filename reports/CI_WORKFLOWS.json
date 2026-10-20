@@ -1,7 +1,7 @@
 {
   "kind": "ci_workflows",
   "runs_considered": 100,
-  "generated_at": "2026-10-19T19:01:55Z",
+  "generated_at": "2026-10-20T06:14:51Z",
   "command": "python scripts/collect_ci_workflows.py",
   "source": ".github/workflows/*.yml + reports/CI_RUNS.json",
   "registry": {
@@ -1019,6 +1019,52 @@
           "steps": 5,
           "uploads_artifacts": true,
           "runs_python": "ubuntu-latest"
+        }
+      ],
+      "manual_only": true,
+      "never_runs_by_itself": false
+    },
+    {
+      "file": ".github/workflows/speed-r1.yml",
+      "name": "speed-r1 phase B",
+      "triggers": [
+        "push",
+        "workflow_dispatch"
+      ],
+      "schedule": [],
+      "push_paths": [],
+      "push_branches": [
+        "speed/r1"
+      ],
+      "push_tags": [],
+      "jobs": [
+        {
+          "name": "Quality + suite green (910 nodes)",
+          "timeout_minutes": 40,
+          "steps": 7,
+          "uploads_artifacts": false,
+          "runs_python": "ubuntu-24.04"
+        },
+        {
+          "name": "Identity gate dev181 + B",
+          "timeout_minutes": 30,
+          "steps": 5,
+          "uploads_artifacts": true,
+          "runs_python": "ubuntu-24.04"
+        },
+        {
+          "name": "HF benchmarks phase B (resident warm + cold, 2c vs allcores)",
+          "timeout_minutes": 90,
+          "steps": 5,
+          "uploads_artifacts": true,
+          "runs_python": "ubuntu-24.04"
+        },
+        {
+          "name": "Storage audit ≤1.5GB",
+          "timeout_minutes": 10,
+          "steps": 3,
+          "uploads_artifacts": true,
+          "runs_python": "ubuntu-24.04"
         }
       ],
       "manual_only": true,

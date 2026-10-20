@@ -5,7 +5,7 @@
 (что оно делало в последний раз). Числа и номера прогонов не вписаны
 руками: их источник — реестр прогонов.
 
-Команда: `python scripts/collect_ci_workflows.py` (запуск: 2026-10-19T19:01:55Z).
+Команда: `python scripts/collect_ci_workflows.py` (запуск: 2026-10-20T06:14:51Z).
 
 | Задание | Запуск | Последний прогон | Артефакты | Числа в реестре |
 | --- | --- | --- | --- | --- |
@@ -37,6 +37,7 @@
 | `P0-2 Ответы` | на пуш, вручную; пуш `.github/postprocess-p0-answer.trigger`; ветки `arena/c5f69767-smarty-chumakov` | прогонов нет | да | — |
 | `Постобработка span_expansion` | на пуш, вручную; пуш `.github/postprocess-span-comparison.trigger`; ветки `arena/c5f69767-smarty-chumakov` | прогонов нет | да | — |
 | `Export existing P1 raw files` | на пуш, вручную; пуш `.github/workflows/recover-p1-results.yml`; ветки `arena/c5f69767-smarty-chumakov` | прогонов нет | да | — |
+| `speed-r1 phase B` | на пуш, вручную; ветки `speed/r1` | прогонов нет | да | — |
 
 Источник колонки «Последний прогон» — `reports/CI_RUNS.json`: последние 100 прогонов репозитория. Поэтому «прогонов нет» означает «нет в этом списке», а не «задание никогда не запускалось»; пересобрать список — `python scripts/collect_ci_runs.py --limit 100`.
 
