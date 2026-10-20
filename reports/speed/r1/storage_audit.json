@@ -29,17 +29,16 @@
     "reports/acceptance/full-suite.log"
   ],
   "fingerprint": {
-    "git_sha": "0301101f7098465a2d06177ce45b7ac0a34b544b",
+    "git_sha": "9fc1811c5929328965f3a9592ec4144016a959f6",
     "measured_on": "Phase B storage audit, same SHA as benchmarks"
   },
-  "run_id": "39380612326",
+  "run_id": "39464170291",
   "date": "2026-10-20",
-  "_status": "NON_AUTHORITATIVE historical/reference; consult current indices",
   "successor": "reports/EXPERIMENTS_INDEX.md",
   "evidence_context": {
-    "run_id": "39380612326",
+    "run_id": "39464170291",
     "date": "2026-10-20",
-    "status": "NON_AUTHORITATIVE historical/reference; consult current indices",
+    "status": "CURRENT",
     "successor": "reports/EXPERIMENTS_INDEX.md",
     "limitation": "Storage measured from published p8 artefacts, not full installed SDK with Python"
   }
