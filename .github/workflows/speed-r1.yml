@@ -44,8 +44,24 @@ jobs:
       - name: Black
         run: python -m black --check .
       - name: Pytest coverage 85%
-        run: python -m pytest --cov=spanverify --cov-report=term --cov-report=json:reports/coverage.json --junitxml=reports/quality-junit.xml
-        # coverage gate disabled for speed-r1 branch (historical 85% on main, but sysmon not available in all envs); full suite green required, coverage reported as info
+        run: |
+          python -m pytest --cov=spanverify --cov-report=term --cov-report=json:reports/coverage.json --junitxml=reports/quality-junit.xml -v --tb=short 2>&1 | tee /tmp/pytest.log
+          status=${PIPESTATUS[0]}
+          echo "pytest exit $status"
+          cat reports/quality-junit.xml 2>&1 | head -n 200
+          # show failures
+          python -m pytest --collect-only -q 2>&1 | tail -n 20
+          exit $status
+      - name: Upload pytest logs on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: pytest-logs-${{ github.run_id }}
+          path: |
+            /tmp/pytest.log
+            spanverify-module/reports/quality-junit.xml
+            spanverify-module/reports/coverage.json
+          retention-days: 7
 
       - name: Reproducibility train
         run: |
