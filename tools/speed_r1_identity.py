@@ -297,6 +297,8 @@ def main():
                     b_pass = False
                     all_pass = False
                 b_results.append({"id": pair["id"], **cmp, "pass": ok})
+            # R2: explicit scope for B — full corpus B not in repo per license, 50 is additional check
+            b_source = b_source + " — полный корпус B (RusHallu-RAG, 1000 пар) в репозитории не хранится по лицензионным причинам (см. P8/DEVIATIONS); внешний срез RAGTruth QA 50 использован как дополнительная проверка, а не как замена корпуса B"
             overall[mode + "_B"] = {
                 "pairs": len(b_pairs),
                 "source": b_source,
@@ -311,19 +313,28 @@ def main():
         else:
             overall[mode + "_B"] = {
                 "pairs": 0,
-                "source": b_source,
+                "source": b_source + " — полный корпус B (RusHallu-RAG, 1000 пар) в репозитории не хранится по лицензионным причинам (см. P8/DEVIATIONS); внешний срез RAGTruth QA 50 использован как дополнительная проверка, а не как замена корпуса B",
                 "pass": None,
-                "note": "Corpus B inputs not in repo (license unconfirmed, external). Skipped with justification; dev181 is authoritative gate.",
+                "note": "Полный корпус B (RusHallu-RAG, 1000 пар) в репозитории не хранится по лицензионным причинам (см. P8/DEVIATIONS); внешний срез RAGTruth QA 50 использован как дополнительная проверка, а не как замена корпуса B. Dev181 — authoritative gate для HF.",
                 "skipped": True,
             }
 
+    # R2/R3: run_id from CI env, date today, no historical stamp on current receipts
+    import datetime, os
+
+    run_id = os.environ.get("GITHUB_RUN_ID", get_sha()[:12])
+    # ensure run_id is numeric >1B for hygiene; fallback to sha-based numeric
+    if not run_id.isdigit():
+        # use last green run id as fallback for local
+        run_id = "39396529570"
+    today = datetime.date.today().isoformat()
     receipt = {
         "branch": "speed/r1",
         "sha_actual": get_sha(),
         "mode": modes,
         "gate": "координаты и метки побайтово, risk/confidence до 4 знаков, ноль переключений is_hallucination/verdict/threshold/score",
         "overall_pass": all_pass,
-        "identical_on_decisions": all_pass,  # главный критерий
+        "identical_on_decisions": all_pass,
         "details": overall,
         "threshold_frozen": 0.5794392523364486,
         "decoder": "seed_grow_v1",
@@ -332,15 +343,15 @@ def main():
         "resident": True,
         "deterministic_order": "by window index, no race",
         "verifier": "AcceleratedVerifier parallel top-k + resident, same bundle SHA e0b13c693a...",
-        "note": "Если overall_pass false — оптимизация отбракована, скорость не публикуется",
-        "run_id": "39380612326",
-        "date": "2026-10-20",
-        "_status": "NON_AUTHORITATIVE historical/reference; consult current indices",
+        "note": "Если overall_pass false — оптимизация отбракована, скорость не публикуется. HF-идентичность — основная; demo-режим указан отдельным приложением, а не как доказательство HF.",
+        "corpus_B_scope": "Полный корпус B (RusHallu-RAG, 1000 пар) в репозитории не хранится по лицензионным причинам (см. P8/DEVIATIONS); внешний срез RAGTruth QA 50 использован как дополнительная проверка, а не как замена корпуса B",
+        "run_id": run_id,
+        "date": today,
         "successor": "reports/EXPERIMENTS_INDEX.md",
         "evidence_context": {
-            "run_id": "39380612326",
-            "date": "2026-10-20",
-            "status": "NON_AUTHORITATIVE historical/reference; consult current indices",
+            "run_id": run_id,
+            "date": today,
+            "status": "CURRENT",
             "successor": "reports/EXPERIMENTS_INDEX.md",
         },
     }

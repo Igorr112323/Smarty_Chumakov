@@ -20,7 +20,7 @@ env:
 
 jobs:
   quality:
-    name: Quality + suite green (910 nodes)
+    name: Quality + suite green
     runs-on: ubuntu-24.04
     timeout-minutes: 40
     env:
@@ -75,8 +75,13 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 30
     needs: quality
+    permissions:
+      contents: write
+      actions: read
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
@@ -101,12 +106,24 @@ jobs:
           name: identity-receipt
           path: reports/speed/r1/IDENTITY_RECEIPT.json
           retention-days: 30
+      - name: Commit identity receipt (HF) to speed/r1
+        if: success()
+        run: |
+          git config user.name "speed-r1-bot"
+          git config user.email "speed-r1-bot@users.noreply.github.com"
+          git add reports/speed/r1/IDENTITY_RECEIPT.json
+          if git diff --cached --quiet; then echo "no changes"; exit 0; fi
+          git commit -m "SPEED-R1 identity: HF dev181+B from CI ${{ github.run_id }} on $(git rev-parse HEAD)"
+          git push origin HEAD:speed/r1
 
   bench:
     name: HF benchmarks phase B (resident warm + cold, 2c vs allcores)
     runs-on: ubuntu-24.04
     timeout-minutes: 40
     needs: identity
+    permissions:
+      contents: write
+      actions: read
     strategy:
       fail-fast: false
       matrix:
@@ -116,6 +133,8 @@ jobs:
       OMP_NUM_THREADS: "1"
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
@@ -126,21 +145,37 @@ jobs:
           python -m pip install --upgrade pip
           pip install -q -r spanverify-module/requirements.txt -r spanverify-module/requirements-token-head-tests.txt
           pip install -q --extra-index-url https://download.pytorch.org/whl/cpu -r spanverify-module/requirements-hf.txt
-      - name: Bench ${{ matrix.thermal }} ${{ matrix.config }}
+      - name: Bench HF ${{ matrix.thermal }} ${{ matrix.config }}
         run: |
           if [ "${{ matrix.config }}" = "2cores" ]; then
-            # normative 2 logical cores, workers=2, OMP=1 already
             taskset -c 0,1 python tools/speed_r1_phase_b_measure.py --mode hf --thermal ${{ matrix.thermal }} --workers 2 --batch 4 --out reports/speed/r1/bench_hf_${{ matrix.thermal }}_${{ matrix.config }}.json --repeats 10
           else
-            # all cores (4 on runner), OMP=1 still per worker but workers=4
             python tools/speed_r1_phase_b_measure.py --mode hf --thermal ${{ matrix.thermal }} --workers 4 --batch 8 --out reports/speed/r1/bench_hf_${{ matrix.thermal }}_${{ matrix.config }}.json --repeats 10
           fi
           cat reports/speed/r1/bench_hf_${{ matrix.thermal }}_${{ matrix.config }}.json
+      - name: Bench demo ${{ matrix.thermal }} ${{ matrix.config }}
+        run: |
+          if [ "${{ matrix.config }}" = "2cores" ]; then
+            taskset -c 0,1 python tools/speed_r1_phase_b_measure.py --mode demo --thermal ${{ matrix.thermal }} --workers 2 --batch 4 --out reports/speed/r1/bench_demo_${{ matrix.thermal }}_${{ matrix.config }}.json --repeats 10
+          else
+            python tools/speed_r1_phase_b_measure.py --mode demo --thermal ${{ matrix.thermal }} --workers 4 --batch 8 --out reports/speed/r1/bench_demo_${{ matrix.thermal }}_${{ matrix.config }}.json --repeats 10
+          fi
+          cat reports/speed/r1/bench_demo_${{ matrix.thermal }}_${{ matrix.config }}.json
       - uses: actions/upload-artifact@v4
         with:
           name: bench-${{ matrix.thermal }}-${{ matrix.config }}
-          path: reports/speed/r1/bench_hf_*.json
+          path: reports/speed/r1/bench_*.json
           retention-days: 30
+      - name: Commit bench results to speed/r1
+        if: success()
+        run: |
+          git config user.name "speed-r1-bot"
+          git config user.email "speed-r1-bot@users.noreply.github.com"
+          git add reports/speed/r1/bench_*.json
+          if git diff --cached --quiet; then echo "no changes"; exit 0; fi
+          git commit -m "SPEED-R1 bench: HF+demo ${{ matrix.thermal }} ${{ matrix.config }} from CI ${{ github.run_id }} on $(git rev-parse HEAD)"
+          # push with retry in case of concurrent matrix pushes
+          for i in 1 2 3 4 5; do git pull --rebase origin speed/r1 && git push origin HEAD:speed/r1 && break || sleep 5; done
 
   storage:
     name: Storage audit ≤1.5GB

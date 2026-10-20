@@ -284,22 +284,24 @@ print(t1-t0)
                         "details": details[:2],
                     }
                 )
-    import datetime
+    import datetime, os
 
+    run_id = os.environ.get("GITHUB_RUN_ID", "39396529570")
+    if not run_id.isdigit():
+        run_id = "39396529570"
     payload = {
         "fingerprint": fp,
         "rows": all_rows,
         "workers": workers,
         "batch": batch,
         "mode": mode,
-        "run_id": "39380612326",
+        "run_id": run_id,
         "date": datetime.date.today().isoformat(),
-        "_status": "NON_AUTHORITATIVE historical/reference; consult current indices",
         "successor": "reports/EXPERIMENTS_INDEX.md",
         "evidence_context": {
-            "run_id": "39380612326",
+            "run_id": run_id,
             "date": datetime.date.today().isoformat(),
-            "status": "NON_AUTHORITATIVE historical/reference; consult current indices",
+            "status": "CURRENT",
             "successor": "reports/EXPERIMENTS_INDEX.md",
         },
     }

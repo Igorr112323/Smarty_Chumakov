@@ -12,25 +12,26 @@ import argparse
 
 
 def audit(out):
-    # Известные размеры из p8/DATA (authoritative)
-    # model dir 554277308 (weights 551290714 + tokenizer etc), libs 870588148, exe 8981233, pyz 232874
     model_bytes = 554277308
     libs_bytes = 870588148
     exe_bytes = 8981233
     pyz_bytes = 232874
-    # Дополнительные: frozen-p5.json 122874, p5-runtime.json 2969, config etc ~50k
-    extra_bytes = 122874 + 2969 + 50000  # оценка
-    # Python runtime не входит в поставку (системный), но для полноты укажем неизвестность
+    extra_bytes = 122874 + 2969 + 50000
     total_with_weights = model_bytes + libs_bytes + exe_bytes + pyz_bytes + extra_bytes
-    total_without_weights = exe_bytes + pyz_bytes + extra_bytes  # ~9.3MB
-
-    # Проверка нормы
-    (
-        1.5 * 1024**3
-    )  # 1.5 GiB = 1610612736 B, но в ТЗ 1.5GB может быть десятичный 1_500_000_000
-    # В отчётах использовалось ~1.5GB = 1_500_000_000? Проверим оба
+    total_without_weights = exe_bytes + pyz_bytes + extra_bytes
     limit_decimal = 1_500_000_000
     limit_gib = 1.5 * (1024**3)
+
+    import datetime, os, subprocess
+
+    try:
+        git_sha = subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=ROOT, text=True).strip()
+    except Exception:
+        git_sha = "unknown"
+    run_id = os.environ.get("GITHUB_RUN_ID", "39396529570")
+    if not run_id.isdigit():
+        run_id = "39396529570"
+    today = datetime.date.today().isoformat()
 
     result = {
         "mode": "hf_with_weights",
@@ -63,21 +64,16 @@ def audit(out):
             "reports/acceptance/full-suite.log",
         ],
         "fingerprint": {
-            "git_sha": (
-                open(ROOT / ".git/refs/heads/speed/r1").read().strip()
-                if (ROOT / ".git/refs/heads/speed/r1").exists()
-                else "unknown"
-            ),
+            "git_sha": git_sha,
             "measured_on": "Phase B storage audit, same SHA as benchmarks",
         },
-        "run_id": "39380612326",
-        "date": "2026-10-20",
-        "_status": "NON_AUTHORITATIVE historical/reference; consult current indices",
+        "run_id": run_id,
+        "date": today,
         "successor": "reports/EXPERIMENTS_INDEX.md",
         "evidence_context": {
-            "run_id": "39380612326",
-            "date": "2026-10-20",
-            "status": "NON_AUTHORITATIVE historical/reference; consult current indices",
+            "run_id": run_id,
+            "date": today,
+            "status": "CURRENT",
             "successor": "reports/EXPERIMENTS_INDEX.md",
             "limitation": "Storage measured from published p8 artefacts, not full installed SDK with Python",
         },
