@@ -1,18 +1,18 @@
 {
   "branch": "speed/r1",
-  "sha_actual": "0301101f7098465a2d06177ce45b7ac0a34b544b",
+  "sha_actual": "c496fcbc4d19c78b46ff9de19e377954a78f0515",
   "mode": [
-    "demo"
+    "hf"
   ],
   "gate": "координаты и метки побайтово, risk/confidence до 4 знаков, ноль переключений is_hallucination/verdict/threshold/score",
   "overall_pass": true,
   "identical_on_decisions": true,
   "details": {
-    "demo_dev181": {
+    "hf_dev181": {
       "pairs": 181,
       "pass": true,
-      "hash_ref_spans": "0b411722b8ac1f7c26534287cddae0495a7550f4a0d89e525f18c383507b2b4c",
-      "hash_acc_spans": "0b411722b8ac1f7c26534287cddae0495a7550f4a0d89e525f18c383507b2b4c",
+      "hash_ref_spans": "552a87b85364debe7c67ed7f95414e90e2d7e35c1587ec06aeb8bf3e01061e6b",
+      "hash_acc_spans": "552a87b85364debe7c67ed7f95414e90e2d7e35c1587ec06aeb8bf3e01061e6b",
       "hashes_equal": true,
       "details": [
         {
@@ -21,12 +21,12 @@
           "risks_identical_4d": true,
           "conf_identical_4d": true,
           "decisions_no_switch": true,
-          "is_hallucination_ref": false,
-          "is_hallucination_acc": false,
-          "verdict_ref": "grounded",
-          "verdict_acc": "grounded",
-          "score_ref": 0.3969,
-          "score_acc": 0.3969,
+          "is_hallucination_ref": true,
+          "is_hallucination_acc": true,
+          "verdict_ref": "likely_hallucination",
+          "verdict_acc": "likely_hallucination",
+          "score_ref": 0.8267,
+          "score_acc": 0.8267,
           "threshold": 0.5794,
           "n_spans_ref": 0,
           "n_spans_acc": 0,
@@ -42,8 +42,8 @@
           "is_hallucination_acc": false,
           "verdict_ref": "grounded",
           "verdict_acc": "grounded",
-          "score_ref": 0.0,
-          "score_acc": 0.0,
+          "score_ref": 0.5189,
+          "score_acc": 0.5189,
           "threshold": 0.5794,
           "n_spans_ref": 0,
           "n_spans_acc": 0,
@@ -59,8 +59,8 @@
           "is_hallucination_acc": false,
           "verdict_ref": "grounded",
           "verdict_acc": "grounded",
-          "score_ref": 0.0,
-          "score_acc": 0.0,
+          "score_ref": 0.5189,
+          "score_acc": 0.5189,
           "threshold": 0.5794,
           "n_spans_ref": 0,
           "n_spans_acc": 0,
@@ -79,8 +79,8 @@
           "score_ref": 0.9706,
           "score_acc": 0.9706,
           "threshold": 0.5794,
-          "n_spans_ref": 0,
-          "n_spans_acc": 0,
+          "n_spans_ref": 1,
+          "n_spans_acc": 1,
           "pass": true
         },
         {
@@ -89,12 +89,12 @@
           "risks_identical_4d": true,
           "conf_identical_4d": true,
           "decisions_no_switch": true,
-          "is_hallucination_ref": false,
-          "is_hallucination_acc": false,
-          "verdict_ref": "doubtful",
-          "verdict_acc": "doubtful",
-          "score_ref": 0.5189,
-          "score_acc": 0.5189,
+          "is_hallucination_ref": true,
+          "is_hallucination_acc": true,
+          "verdict_ref": "likely_hallucination",
+          "verdict_acc": "likely_hallucination",
+          "score_ref": 0.9706,
+          "score_acc": 0.9706,
           "threshold": 0.5794,
           "n_spans_ref": 1,
           "n_spans_acc": 1,
@@ -104,12 +104,12 @@
       "all_details_count": 181,
       "failed_ids": []
     },
-    "demo_B": {
+    "hf_B": {
       "pairs": 50,
-      "source": "fixtures/ragtruth_50 (RAGTruth QA 50)",
+      "source": "fixtures/ragtruth_50 (RAGTruth QA 50) — полный корпус B (RusHallu-RAG, 1000 пар) в репозитории не хранится по лицензионным причинам (см. P8/DEVIATIONS); внешний срез RAGTruth QA 50 использован как дополнительная проверка, а не как замена корпуса B",
       "pass": true,
-      "hash_ref": "68498318ea22c8db88bdca9ddee261d24be29d7ea4a9298d6e3a1b299ba4efeb",
-      "hash_acc": "68498318ea22c8db88bdca9ddee261d24be29d7ea4a9298d6e3a1b299ba4efeb",
+      "hash_ref": "c0db954ea29dea0e157b195dc5ce3288398aa97597b74a0021ff54a35f3ed1cd",
+      "hash_acc": "c0db954ea29dea0e157b195dc5ce3288398aa97597b74a0021ff54a35f3ed1cd",
       "hashes_equal": true,
       "failed_ids": []
     }
@@ -121,15 +121,15 @@
   "resident": true,
   "deterministic_order": "by window index, no race",
   "verifier": "AcceleratedVerifier parallel top-k + resident, same bundle SHA e0b13c693a...",
-  "note": "Если overall_pass false — оптимизация отбракована, скорость не публикуется",
-  "run_id": "39380612326",
+  "note": "Если overall_pass false — оптимизация отбракована, скорость не публикуется. HF-идентичность — основная; demo-режим указан отдельным приложением, а не как доказательство HF.",
+  "corpus_B_scope": "Полный корпус B (RusHallu-RAG, 1000 пар) в репозитории не хранится по лицензионным причинам (см. P8/DEVIATIONS); внешний срез RAGTruth QA 50 использован как дополнительная проверка, а не как замена корпуса B",
+  "run_id": "39464170291",
   "date": "2026-10-20",
-  "_status": "NON_AUTHORITATIVE historical/reference; consult current indices",
   "successor": "reports/EXPERIMENTS_INDEX.md",
   "evidence_context": {
-    "run_id": "39380612326",
+    "run_id": "39464170291",
     "date": "2026-10-20",
-    "status": "NON_AUTHORITATIVE historical/reference; consult current indices",
+    "status": "CURRENT",
     "successor": "reports/EXPERIMENTS_INDEX.md"
   }
 }
