@@ -1,15 +1,15 @@
 {
   "fingerprint": {
-    "cpu_model": "AMD EPYC 9V45 96-Core Processor",
+    "cpu_model": "AMD EPYC 7763 64-Core Processor",
     "cpu_logical": 4,
     "cpu_affinity": [
       0,
       1
     ],
-    "meminfo_first": "MemTotal:       16373452 kB",
-    "os": "Linux-6.17.0-1022-azure-x86_64-with-glibc2.39",
+    "meminfo_first": "MemTotal:       16367524 kB",
+    "os": "Linux-7.0.0-1017-azure-x86_64-with-glibc2.39",
     "python": "3.11.17 (main, Oct  1 2026, 14:32:31) [GCC 13.3.0]",
-    "git_sha": "c496fcbc4d19c78b46ff9de19e377954a78f0515",
+    "git_sha": "7c8c281905172bcd86e78d41e076338cc2bc1232",
     "git_branch": "speed/r1",
     "env": {
       "OMP_NUM_THREADS": "1",
@@ -32,34 +32,34 @@
       "batch": 4,
       "repeats": 10,
       "raw_seconds": [
-        0.009392914000045494,
-        0.0095849399999679,
-        0.01011578100008137,
-        0.009569056999907843,
-        0.010491620000038893,
-        0.009636017000048014,
-        0.009620354000048792,
-        0.009483961000000818,
-        0.00971673699996245,
-        0.00936289100002341
+        0.01698702700002741,
+        0.016908869999952003,
+        0.017228201999955672,
+        0.016717799999923955,
+        0.017032180000001063,
+        0.01673420800000258,
+        0.01658220199999505,
+        0.016707729000017935,
+        0.01674961699995947,
+        0.016704592999985834
       ],
-      "median_s": 0.009602647000008346,
-      "p95_s": 0.010322492450058007,
-      "mean_s": 0.009697427200012498,
+      "median_s": 0.016741912499981026,
+      "p95_s": 0.017139992099976097,
+      "mean_s": 0.016835242799982098,
       "limit_s": 0.03,
       "status": "PASS",
       "throughput_note": null,
       "fingerprint": {
-        "cpu_model": "AMD EPYC 9V45 96-Core Processor",
+        "cpu_model": "AMD EPYC 7763 64-Core Processor",
         "cpu_logical": 4,
         "cpu_affinity": [
           0,
           1
         ],
-        "meminfo_first": "MemTotal:       16373452 kB",
-        "os": "Linux-6.17.0-1022-azure-x86_64-with-glibc2.39",
+        "meminfo_first": "MemTotal:       16367524 kB",
+        "os": "Linux-7.0.0-1017-azure-x86_64-with-glibc2.39",
         "python": "3.11.17 (main, Oct  1 2026, 14:32:31) [GCC 13.3.0]",
-        "git_sha": "c496fcbc4d19c78b46ff9de19e377954a78f0515",
+        "git_sha": "7c8c281905172bcd86e78d41e076338cc2bc1232",
         "git_branch": "speed/r1",
         "env": {
           "OMP_NUM_THREADS": "1",
@@ -75,12 +75,12 @@
       "details": [
         {
           "rep": 0,
-          "secs": 0.009392914000045494,
+          "secs": 0.01698702700002741,
           "stderr": ""
         },
         {
           "rep": 1,
-          "secs": 0.0095849399999679,
+          "secs": 0.016908869999952003,
           "stderr": ""
         }
       ]
@@ -94,34 +94,34 @@
       "batch": 4,
       "repeats": 10,
       "raw_seconds": [
-        0.3990274699999645,
-        0.3924959519999902,
-        0.40230473599990546,
-        0.41919666899991626,
-        0.3936665239999684,
-        0.40109230200005186,
-        0.400726236999958,
-        0.41961438100008763,
-        0.3967567520001012,
-        0.39639899899998454
+        0.718741725999962,
+        0.7163047430000233,
+        0.7160236339999528,
+        0.7170453390000375,
+        0.7158374319999439,
+        0.7170318240000597,
+        0.7241666809999288,
+        0.7225097079999614,
+        0.7224356539999235,
+        0.7154094410000198
       ],
-      "median_s": 0.39987685349996127,
-      "p95_s": 0.4194264106000105,
-      "mean_s": 0.4021280021999928,
+      "median_s": 0.7170385815000486,
+      "p95_s": 0.7234210431499435,
+      "mean_s": 0.7185506181999812,
       "limit_s": 1.0,
       "status": "PASS",
       "throughput_note": null,
       "fingerprint": {
-        "cpu_model": "AMD EPYC 9V45 96-Core Processor",
+        "cpu_model": "AMD EPYC 7763 64-Core Processor",
         "cpu_logical": 4,
         "cpu_affinity": [
           0,
           1
         ],
-        "meminfo_first": "MemTotal:       16373452 kB",
-        "os": "Linux-6.17.0-1022-azure-x86_64-with-glibc2.39",
+        "meminfo_first": "MemTotal:       16367524 kB",
+        "os": "Linux-7.0.0-1017-azure-x86_64-with-glibc2.39",
         "python": "3.11.17 (main, Oct  1 2026, 14:32:31) [GCC 13.3.0]",
-        "git_sha": "c496fcbc4d19c78b46ff9de19e377954a78f0515",
+        "git_sha": "7c8c281905172bcd86e78d41e076338cc2bc1232",
         "git_branch": "speed/r1",
         "env": {
           "OMP_NUM_THREADS": "1",
@@ -137,12 +137,12 @@
       "details": [
         {
           "rep": 0,
-          "secs": 0.3990274699999645,
+          "secs": 0.718741725999962,
           "stderr": ""
         },
         {
           "rep": 1,
-          "secs": 0.3924959519999902,
+          "secs": 0.7163047430000233,
           "stderr": ""
         }
       ]
@@ -156,34 +156,34 @@
       "batch": 4,
       "repeats": 10,
       "raw_seconds": [
-        18.605547985000044,
-        18.105554493,
-        18.07889542299995,
-        18.37499529799993,
-        18.16670689299997,
-        18.427076640999985,
-        17.936373802999924,
-        17.94423834899999,
-        17.972838797999998,
-        18.39413283700003
+        30.456064018000006,
+        30.406137546999958,
+        30.476126594999982,
+        30.337664898999947,
+        30.31374693099997,
+        30.775036694999926,
+        30.619975804000205,
+        30.56944289499984,
+        30.508796106999853,
+        30.34237232700002
       ],
-      "median_s": 18.136130692999984,
-      "p95_s": 18.525235880200015,
-      "mean_s": 18.200636051999982,
+      "median_s": 30.466095306499994,
+      "p95_s": 30.70525929405005,
+      "mean_s": 30.480536381799972,
       "limit_s": 60.0,
       "status": "PASS",
       "throughput_note": null,
       "fingerprint": {
-        "cpu_model": "AMD EPYC 9V45 96-Core Processor",
+        "cpu_model": "AMD EPYC 7763 64-Core Processor",
         "cpu_logical": 4,
         "cpu_affinity": [
           0,
           1
         ],
-        "meminfo_first": "MemTotal:       16373452 kB",
-        "os": "Linux-6.17.0-1022-azure-x86_64-with-glibc2.39",
+        "meminfo_first": "MemTotal:       16367524 kB",
+        "os": "Linux-7.0.0-1017-azure-x86_64-with-glibc2.39",
         "python": "3.11.17 (main, Oct  1 2026, 14:32:31) [GCC 13.3.0]",
-        "git_sha": "c496fcbc4d19c78b46ff9de19e377954a78f0515",
+        "git_sha": "7c8c281905172bcd86e78d41e076338cc2bc1232",
         "git_branch": "speed/r1",
         "env": {
           "OMP_NUM_THREADS": "1",
@@ -199,12 +199,12 @@
       "details": [
         {
           "rep": 0,
-          "secs": 18.605547985000044,
+          "secs": 30.456064018000006,
           "stderr": ""
         },
         {
           "rep": 1,
-          "secs": 18.105554493,
+          "secs": 30.406137546999958,
           "stderr": ""
         }
       ]
@@ -213,11 +213,11 @@
   "workers": 2,
   "batch": 4,
   "mode": "demo",
-  "run_id": "39464170291",
+  "run_id": "39472061036",
   "date": "2026-10-20",
   "successor": "reports/EXPERIMENTS_INDEX.md",
   "evidence_context": {
-    "run_id": "39464170291",
+    "run_id": "39472061036",
     "date": "2026-10-20",
     "status": "CURRENT",
     "successor": "reports/EXPERIMENTS_INDEX.md"
