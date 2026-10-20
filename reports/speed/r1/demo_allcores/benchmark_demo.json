@@ -178,7 +178,9 @@
       "mean_risk": 0.1712,
       "answer_chars": 1000,
       "context_chars": 494
-    }
+    },
+    "run_id": "39396529570",
+    "date": "2026-10-20"
   },
   {
     "mode": "demo",
@@ -359,7 +361,9 @@
       "mean_risk": 0.1712,
       "answer_chars": 1000,
       "context_chars": 494
-    }
+    },
+    "run_id": "39396529570",
+    "date": "2026-10-20"
   },
   {
     "mode": "demo",
@@ -540,7 +544,9 @@
       "mean_risk": 0.1688,
       "answer_chars": 50000,
       "context_chars": 494
-    }
+    },
+    "run_id": "39396529570",
+    "date": "2026-10-20"
   },
   {
     "mode": "demo",
@@ -721,7 +727,9 @@
       "mean_risk": 0.1688,
       "answer_chars": 50000,
       "context_chars": 494
-    }
+    },
+    "run_id": "39396529570",
+    "date": "2026-10-20"
   },
   {
     "mode": "demo",
@@ -902,7 +910,9 @@
       "mean_risk": 0.169,
       "answer_chars": 2000000,
       "context_chars": 494
-    }
+    },
+    "run_id": "39396529570",
+    "date": "2026-10-20"
   },
   {
     "mode": "demo",
@@ -1083,6 +1093,8 @@
       "mean_risk": 0.169,
       "answer_chars": 2000000,
       "context_chars": 494
-    }
+    },
+    "run_id": "39396529570",
+    "date": "2026-10-20"
   }
 ]
