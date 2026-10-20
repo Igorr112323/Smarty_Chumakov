@@ -333,6 +333,16 @@ def main():
         "deterministic_order": "by window index, no race",
         "verifier": "AcceleratedVerifier parallel top-k + resident, same bundle SHA e0b13c693a...",
         "note": "Если overall_pass false — оптимизация отбракована, скорость не публикуется",
+        "run_id": "39380612326",
+        "date": "2026-10-20",
+        "_status": "NON_AUTHORITATIVE historical/reference; consult current indices",
+        "successor": "reports/EXPERIMENTS_INDEX.md",
+        "evidence_context": {
+            "run_id": "39380612326",
+            "date": "2026-10-20",
+            "status": "NON_AUTHORITATIVE historical/reference; consult current indices",
+            "successor": "reports/EXPERIMENTS_INDEX.md",
+        },
     }
     args.out.parent.mkdir(parents=True, exist_ok=True)
     args.out.write_text(

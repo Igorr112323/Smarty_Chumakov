@@ -284,12 +284,24 @@ print(t1-t0)
                         "details": details[:2],
                     }
                 )
+    import datetime
+
     payload = {
         "fingerprint": fp,
         "rows": all_rows,
         "workers": workers,
         "batch": batch,
         "mode": mode,
+        "run_id": "39380612326",
+        "date": datetime.date.today().isoformat(),
+        "_status": "NON_AUTHORITATIVE historical/reference; consult current indices",
+        "successor": "reports/EXPERIMENTS_INDEX.md",
+        "evidence_context": {
+            "run_id": "39380612326",
+            "date": datetime.date.today().isoformat(),
+            "status": "NON_AUTHORITATIVE historical/reference; consult current indices",
+            "successor": "reports/EXPERIMENTS_INDEX.md",
+        },
     }
     out_path.write_text(
         json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8"

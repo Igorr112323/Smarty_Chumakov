@@ -1,6 +1,6 @@
 {
   "branch": "speed/r1",
-  "sha_actual": "565b4ae4c0e5af96f823672f825b67fcc25d375d",
+  "sha_actual": "0301101f7098465a2d06177ce45b7ac0a34b544b",
   "mode": [
     "demo"
   ],
@@ -121,5 +121,15 @@
   "resident": true,
   "deterministic_order": "by window index, no race",
   "verifier": "AcceleratedVerifier parallel top-k + resident, same bundle SHA e0b13c693a...",
-  "note": "Если overall_pass false — оптимизация отбракована, скорость не публикуется"
+  "note": "Если overall_pass false — оптимизация отбракована, скорость не публикуется",
+  "run_id": "39380612326",
+  "date": "2026-10-20",
+  "_status": "NON_AUTHORITATIVE historical/reference; consult current indices",
+  "successor": "reports/EXPERIMENTS_INDEX.md",
+  "evidence_context": {
+    "run_id": "39380612326",
+    "date": "2026-10-20",
+    "status": "NON_AUTHORITATIVE historical/reference; consult current indices",
+    "successor": "reports/EXPERIMENTS_INDEX.md"
+  }
 }
