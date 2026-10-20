@@ -96,7 +96,7 @@ python -m pytest
 | [test_version.py](../spanverify-module/tests/test_version.py) | 1 | Версия пакета и pyproject | Метаданные выпуска не расходятся |
 | [test_workflow_limits.py](../spanverify-module/tests/test_workflow_limits.py) | 148 | YAML, job/step timeouts, quoting, concurrency и push metrics | CI не теряет обязательные проверки и ограничения выполнения |
 
-**Итого: 74 строки-файла, 910 nodes.** Инвентарь сохраняет каждый nodeid, включая классы и параметры; документационный тест сверяет его со всей реально собранной pytest session при полном запуске.
+**Итого: 74 строки-файла, 915 nodes.** Инвентарь сохраняет каждый nodeid, включая классы и параметры; документационный тест сверяет его со всей реально собранной pytest session при полном запуске.
 
 ## Два штатных skip — без новых исключений
 
