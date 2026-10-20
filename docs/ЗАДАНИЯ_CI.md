@@ -5,17 +5,17 @@
 (что оно делало в последний раз). Числа и номера прогонов не вписаны
 руками: их источник — реестр прогонов.
 
-Команда: `python scripts/collect_ci_workflows.py` (запуск: 2026-10-20T06:14:51Z).
+Команда: `python scripts/collect_ci_workflows.py` (запуск: 2026-10-20T09:39:35Z).
 
 | Задание | Запуск | Последний прогон | Артефакты | Числа в реестре |
 | --- | --- | --- | --- | --- |
-| `build-and-release-exe` | вручную, на пуш; пуш `.github/exe-build.trigger`; теги `v*`; ветки `main`, `arena/**` | успех (прогон 38481064209) | да | reports/release_sizes.json (spanverify.exe, spanverify.pyz) |
-| `ci` | на пуш, на pull request, вручную, по расписанию (30 2 * * * UTC); ветки `main`, `arena/**` | успех (прогон 38489996351) | да | reports/CURRENT_METRICS.json, reports/contract/*.json |
+| `build-and-release-exe` | вручную, на пуш; пуш `.github/exe-build.trigger`; теги `v*`; ветки `main`, `arena/**` | успех (прогон 39322905461) | да | reports/release_sizes.json (spanverify.exe, spanverify.pyz) |
+| `ci` | на пуш, на pull request, вручную, по расписанию (30 2 * * * UTC); ветки `main`, `arena/**` | failure (прогон 39389154698) | да | reports/CURRENT_METRICS.json, reports/contract/*.json |
 | `Корпус A3 (реальные акты, срезы)` | вручную, на пуш; пуш `.github/corpus-a3.trigger`; ветки `arena/**` | прогонов нет | да | — |
 | `Разбор ложных пометок по кешу` | вручную, на пуш; пуш `.github/hf-analysis.trigger`; ветки `arena/**` | прогонов нет | да | — |
 | `Свести числа экспериментов hf` | на пуш; пуш `.github/hf-collect.trigger`; ветки `arena/**` | прогонов нет | да | — |
 | `Эксперименты hf (корпуса A3 и A)` | вручную, на пуш; пуш `.github/hf-experiments.trigger`; ветки `arena/**` | прогонов нет | да | — |
-| `hf-footprint` | вручную, на пуш; пуш `.github/hf-footprint.trigger`; ветки `arena/**` | успех (прогон 38438650943) | да | reports/contract/4.2.5-hf-footprint.json, reports/contract/4.2.6-storage.json |
+| `hf-footprint` | вручную, на пуш; пуш `.github/hf-footprint.trigger`; ветки `arena/**` | прогонов нет | да | reports/contract/4.2.5-hf-footprint.json, reports/contract/4.2.6-storage.json |
 | `Пилот hf (признаки, реальная модель)` | вручную, на пуш; пуш `.github/hf-pilot.trigger`; ветки `arena/**` | прогонов нет | да | — |
 | `Пересчёт hf на кеше признаков` | на пуш; пуш `.github/hf-remeasure.trigger`; ветки `arena/**` | прогонов нет | да | — |
 | `Тяжёлые прогоны hf` | вручную, на пуш; пуш `.github/hf-runs.trigger`; ветки `arena/**` | прогонов нет | да | — |
@@ -37,9 +37,9 @@
 | `P0-2 Ответы` | на пуш, вручную; пуш `.github/postprocess-p0-answer.trigger`; ветки `arena/c5f69767-smarty-chumakov` | прогонов нет | да | — |
 | `Постобработка span_expansion` | на пуш, вручную; пуш `.github/postprocess-span-comparison.trigger`; ветки `arena/c5f69767-smarty-chumakov` | прогонов нет | да | — |
 | `Export existing P1 raw files` | на пуш, вручную; пуш `.github/workflows/recover-p1-results.yml`; ветки `arena/c5f69767-smarty-chumakov` | прогонов нет | да | — |
-| `speed-r1 phase B` | на пуш, вручную; ветки `speed/r1` | прогонов нет | да | — |
+| `speed-r1 phase B` | на пуш, вручную; ветки `speed/r1` | успех (прогон 39396529570) | да | в артефакте прогона (в реестр не переносится) |
 
-Источник колонки «Последний прогон» — `reports/CI_RUNS.json`: последние 100 прогонов репозитория. Поэтому «прогонов нет» означает «нет в этом списке», а не «задание никогда не запускалось»; пересобрать список — `python scripts/collect_ci_runs.py --limit 100`.
+Источник колонки «Последний прогон» — `reports/CI_RUNS.json`: последние 20 прогонов репозитория. Поэтому «прогонов нет» означает «нет в этом списке», а не «задание никогда не запускалось»; пересобрать список — `python scripts/collect_ci_runs.py --limit 20`.
 
 ## Что это значит для приёмки
 

@@ -1,7 +1,7 @@
 {
   "kind": "ci_workflows",
-  "runs_considered": 100,
-  "generated_at": "2026-10-20T06:14:51Z",
+  "runs_considered": 20,
+  "generated_at": "2026-10-20T09:39:35Z",
   "command": "python scripts/collect_ci_workflows.py",
   "source": ".github/workflows/*.yml + reports/CI_RUNS.json",
   "registry": {
@@ -1041,8 +1041,8 @@
         {
           "name": "Quality + suite green (910 nodes)",
           "timeout_minutes": 40,
-          "steps": 7,
-          "uploads_artifacts": false,
+          "steps": 8,
+          "uploads_artifacts": true,
           "runs_python": "ubuntu-24.04"
         },
         {
@@ -1054,7 +1054,7 @@
         },
         {
           "name": "HF benchmarks phase B (resident warm + cold, 2c vs allcores)",
-          "timeout_minutes": 90,
+          "timeout_minutes": 40,
           "steps": 5,
           "uploads_artifacts": true,
           "runs_python": "ubuntu-24.04"

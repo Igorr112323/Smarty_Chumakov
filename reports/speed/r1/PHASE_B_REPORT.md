@@ -2,11 +2,11 @@
 
 **Дата:** 2026-10-20 (UTC)  
 **Ветка:** `speed/r1`  
-**HEAD SHA (фактический, где собран scheduler):** `3770b8a172fade97e70e663c6036b96ff8221d42` (workflow fix, scheduler на `597e925`) (+ этот отчёт — следующий SHA)  
-**Предыдущий HEAD Phase A:** `565b4ae4c0e5af96f823672f825b67fcc25d375d` (принят куратором)  
+**HEAD SHA (фактический, где собран scheduler и зелёный CI):** `80e6018307a0208fd299b033f1d8bd5eb89e3f92` (предыдущий Phase A `565b4ae`, workflow fix `3770b8a`, inventory 915 `55daf26`, этот HEAD)  
+**Предыдущий HEAD Phase A:** `565b4ae4c0e5af96f823672f825b67fcc25d375d` (принят куратором 2026-10-19)  
 **Модель / бандл:** `ai-forever/rugpt3small_based_on_gpt2`, P5 bundle `frozen-p5.json` sha256 `e0b13c693a058dfd66ed24a52fc14e9c70964e95885358e7b99cc1f328ad6892`, порог `0.5794392523364486`, контекст k=3/w1, декодер `seed_grow_v1`, окно 512 `window512_full_answer_v1`  
 **Наука заморожена:** веса, токенизатор, 5 признаков, context-features, token-head (GBDT), answer-head, span-filter, threshold, decoder, windowing — не менялись (только `tools/speed_r1_accelerated.py` — параллельный планировщик окон, resident, batching, `OMP_NUM_THREADS=1`, детерминизм по индексу окна)  
-**CI:** `speed-r1 phase B` workflow (push branches `[speed/r1]` + workflow_dispatch, concurrency `speed-r1`, jobs quality/identity/bench/storage, артефакты) — первый прогон `39380080415` in_progress, второй `39380294593` pending (фикс torch install), данный отчёт будет дополнен сырыми JSON из CI-артефактов после зелёного прогона
+**CI:** `speed-r1 phase B` workflow — **зелёный прогон `39396529570` на `80e6018` (2026-10-20T08:52Z, quality 915 nodes success, storage success, identity success, bench 4× success, артефакты `bench-*-2cores`/`bench-*-allcores`/`identity-receipt`/`storage-audit`/`pytest-logs`)** — сырые JSON с `median_s`/`p95_s`/`raw_seconds` в артефактах (скачать: `gh run download 39396529570`), данный отчёт ссылается на них (прогнозные строки помечены `*`, будут заменены на машинные из артефактов при следующем коммите без изменения scheduler)
 
 ## 0. Что изменилось в фазе B (только scheduler, §3)
 
