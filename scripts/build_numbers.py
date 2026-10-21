@@ -558,6 +558,119 @@ MEASURED_SOURCES: list[dict] = [
         "dataset": "synthetic-participation-corpus",
         "mode": "demo",
     },
+    # --- SPEED-R1 канонические (2 ядра, нормативная конфигурация, run 39472061036) ---
+    {
+        "id": "speed.hf.warm.1000.median_s",
+        "source": "reports/speed/r1/bench_hf_warm-model_2cores.json",
+        "path": ["rows", "0", "median_s"],
+        "unit": "с",
+        "dataset": "hf/warm-1000/2c",
+        "mode": "hf",
+    },
+    {
+        "id": "speed.hf.warm.1000.p95_s",
+        "source": "reports/speed/r1/bench_hf_warm-model_2cores.json",
+        "path": ["rows", "0", "p95_s"],
+        "unit": "с",
+        "dataset": "hf/warm-1000/2c",
+        "mode": "hf",
+    },
+    {
+        "id": "speed.hf.cold.1000.median_s",
+        "source": "reports/speed/r1/bench_hf_cold-process_2cores.json",
+        "path": ["rows", "0", "median_s"],
+        "unit": "с",
+        "dataset": "hf/cold-1000/2c",
+        "mode": "hf",
+    },
+    {
+        "id": "speed.hf.cold.1000.p95_s",
+        "source": "reports/speed/r1/bench_hf_cold-process_2cores.json",
+        "path": ["rows", "0", "p95_s"],
+        "unit": "с",
+        "dataset": "hf/cold-1000/2c",
+        "mode": "hf",
+    },
+    {
+        "id": "speed.hf.warm.50000.median_s",
+        "source": "reports/speed/r1/bench_hf_warm-model_2cores.json",
+        "path": ["rows", "1", "median_s"],
+        "unit": "с",
+        "dataset": "hf/warm-50000/2c",
+        "mode": "hf",
+    },
+    {
+        "id": "speed.hf.warm.50000.p95_s",
+        "source": "reports/speed/r1/bench_hf_warm-model_2cores.json",
+        "path": ["rows", "1", "p95_s"],
+        "unit": "с",
+        "dataset": "hf/warm-50000/2c",
+        "mode": "hf",
+    },
+    {
+        "id": "speed.hf.cold.50000.median_s",
+        "source": "reports/speed/r1/bench_hf_cold-process_2cores.json",
+        "path": ["rows", "1", "median_s"],
+        "unit": "с",
+        "dataset": "hf/cold-50000/2c",
+        "mode": "hf",
+    },
+    {
+        "id": "speed.hf.warm.2000000.median_s",
+        "source": "reports/speed/r1/bench_hf_warm-model_2cores.json",
+        "path": ["rows", "2", "median_s"],
+        "unit": "с",
+        "dataset": "hf/warm-2m/2c",
+        "mode": "hf",
+    },
+    {
+        "id": "speed.hf.warm.2000000.p95_s",
+        "source": "reports/speed/r1/bench_hf_warm-model_2cores.json",
+        "path": ["rows", "2", "p95_s"],
+        "unit": "с",
+        "dataset": "hf/warm-2m/2c",
+        "mode": "hf",
+    },
+    {
+        "id": "speed.hf.cold.2000000.median_s",
+        "source": "reports/speed/r1/bench_hf_cold-process_2cores.json",
+        "path": ["rows", "2", "median_s"],
+        "unit": "с",
+        "dataset": "hf/cold-2m/2c",
+        "mode": "hf",
+    },
+    {
+        "id": "speed.demo.warm.1000.median_s",
+        "source": "reports/speed/r1/bench_demo_warm-model_2cores.json",
+        "path": ["rows", "0", "median_s"],
+        "unit": "с",
+        "dataset": "demo/warm-1000/2c",
+        "mode": "demo",
+    },
+    {
+        "id": "speed.demo.cold.1000.median_s",
+        "source": "reports/speed/r1/bench_demo_cold-process_2cores.json",
+        "path": ["rows", "0", "median_s"],
+        "unit": "с",
+        "dataset": "demo/cold-1000/2c",
+        "mode": "demo",
+    },
+    {
+        "id": "speed.storage.total_bytes",
+        "source": "reports/speed/r1/storage_audit.json",
+        "path": ["breakdown", "total_with_weights_bytes"],
+        "unit": "байт",
+        "dataset": "hf_with_weights",
+        "mode": "hf",
+    },
+    {
+        "id": "speed.marginal_ms_per_1000",
+        "source": "reports/speed/r1/bench_hf_warm-model_2cores.json",
+        "path": ["rows", "0", "throughput_note"],
+        "unit": "с/1000",
+        "dataset": "hf/warm-marginal",
+        "mode": "hf",
+    },
 ]
 
 
@@ -577,9 +690,16 @@ def git_commit(where: Path) -> str:
 def dig(payload: object, path: list[str]) -> object | None:
     node: object = payload
     for key in path:
-        if not isinstance(node, dict) or key not in node:
+        if isinstance(node, list) and key.isdigit():
+            idx = int(key)
+            if 0 <= idx < len(node):
+                node = node[idx]
+            else:
+                return None
+        elif isinstance(node, dict) and key in node:
+            node = node[key]
+        else:
             return None
-        node = node[key]
     return node
 
 
