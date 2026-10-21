@@ -1,0 +1,45 @@
+{
+  "mode": "hf_with_weights",
+  "norm": "≤1.5GB с весами (ТЗ 4.2)",
+  "breakdown": {
+    "model_dir_bytes": 554277308,
+    "model_dir_human": "528.6 MB",
+    "model_weights_bytes": 551290714,
+    "tokenizer_bytes": 2986594,
+    "libs_bytes": 870588148,
+    "libs_human": "830.3 MB",
+    "exe_bytes": 8981233,
+    "pyz_bytes": 232874,
+    "extra_frozen_bundle_bytes": 122874,
+    "p5_runtime_bytes": 2969,
+    "total_with_weights_bytes": 1434255406,
+    "total_with_weights_human": "1367.8 MB (1434.3 MB decimal)",
+    "total_without_weights_bytes": 9389950,
+    "limit_bytes_decimal_1_5GB": 1500000000,
+    "limit_bytes_gib": 1610612736
+  },
+  "pass_decimal": true,
+  "pass_gib": true,
+  "status": "PASS",
+  "note": "Полный SDK с Python не измерен (в p8 DELIVERY: total 1.42GB PLUS Python/app/FS, complete SDK unknown). Норма считается по сумме model+libs+exe+pyz (≈1.43GB) — PASS при десятичном 1.5GB, но без Python. Если считать GiB 1.5*1024³, PASS тоже (1.42<1.61). Честный вывод: PASS при опубликованных размерах, но полный installed SDK неизвестен.",
+  "sources": [
+    "reports/p8/run39271014161/hf-autonomy/windows-hf-autonomy.json (libs 870588148, model 554277308)",
+    "reports/p8/DELIVERY.json",
+    "reports/p8/VERIFICATION.json (exe 8981233, pyz 232874)",
+    "reports/acceptance/full-suite.log"
+  ],
+  "fingerprint": {
+    "git_sha": "a95a5045de8857c13ba5964037d5209abf33a39e",
+    "measured_on": "Phase B storage audit, same SHA as benchmarks"
+  },
+  "run_id": "39472061036",
+  "date": "2026-10-20",
+  "successor": "reports/EXPERIMENTS_INDEX.md",
+  "evidence_context": {
+    "run_id": "39472061036",
+    "date": "2026-10-20",
+    "status": "CURRENT",
+    "successor": "reports/EXPERIMENTS_INDEX.md",
+    "limitation": "Storage measured from published p8 artefacts, not full installed SDK with Python"
+  }
+}
