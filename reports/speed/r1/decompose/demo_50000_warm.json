@@ -1,0 +1,36 @@
+{
+  "mode": "demo",
+  "scenario": "answer-text",
+  "chars": 50000,
+  "warm": true,
+  "stages": {
+    "process_startup/import_s": 3.4899994716397487e-07,
+    "weights_load_s": 0.004985920999843074,
+    "verifier_init_s": 0.003517406999890227,
+    "torch_init_s": 0,
+    "tokenization_s": 0.014752726000097027,
+    "features_forward_and_5feat_s": 0.07332820000010543,
+    "candidate_build_span_filter_s": 0.026781511000081082,
+    "shares_aggregation_s": 0.002221107999957894,
+    "verify_total_s": 0.6202407979999407,
+    "serialization_s": 1.3544000012188917e-05,
+    "warmup_s": 0.0042098469998563814,
+    "total_measured_s": 0.6329675169995426,
+    "other_overhead_s": 0.5031572529996993
+  },
+  "features_meta": {
+    "backend": "demo",
+    "token_count": 7073,
+    "context_tokens": 70,
+    "context_numbers": [
+      "1",
+      "12",
+      "2",
+      "2022",
+      "4"
+    ],
+    "k": 5
+  },
+  "token_count": 7073,
+  "spans": 0
+}

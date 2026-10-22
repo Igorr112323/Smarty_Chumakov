@@ -1,0 +1,219 @@
+{
+  "fingerprint": {
+    "cpu_model": "AMD EPYC 7763 64-Core Processor",
+    "cpu_logical": 4,
+    "cpu_affinity": [
+      0,
+      1
+    ],
+    "meminfo_first": "MemTotal:       16373452 kB",
+    "os": "Linux-6.17.0-1022-azure-x86_64-with-glibc2.39",
+    "python": "3.11.17 (main, Oct  1 2026, 14:32:31) [GCC 13.3.0]",
+    "git_sha": "7c8c281905172bcd86e78d41e076338cc2bc1232",
+    "git_branch": "speed/r1",
+    "env": {
+      "OMP_NUM_THREADS": "1",
+      "OPENBLAS": "unset",
+      "MKL": "unset"
+    },
+    "workers": 2,
+    "batch": 4,
+    "bundle_sha256": "e0b13c693a058dfd66ed24a52fc14e9c70964e95885358e7b99cc1f328ad6892",
+    "model": "ai-forever/rugpt3small_based_on_gpt2",
+    "command": "workers=2 batch=4 thermal=warm"
+  },
+  "rows": [
+    {
+      "mode": "hf",
+      "scenario": "answer-text",
+      "chars": 1000,
+      "thermal": "warm-model",
+      "workers": 2,
+      "batch": 4,
+      "repeats": 10,
+      "raw_seconds": [
+        2.1607328319999937,
+        1.2400584589999966,
+        1.2117720530000042,
+        1.2163750030000102,
+        1.22131761899999,
+        1.2278588339999885,
+        1.205537942999996,
+        1.2320501880000023,
+        1.2269279540000042,
+        1.2137168290000062
+      ],
+      "median_s": 1.224122786499997,
+      "p95_s": 1.7464293641499955,
+      "mean_s": 1.3156347713999992,
+      "limit_s": 0.03,
+      "status": "FAIL",
+      "throughput_note": "amortized 1k throughput 1.2185s/1k (820.7 chars/s) vs latency 1.2241",
+      "fingerprint": {
+        "cpu_model": "AMD EPYC 7763 64-Core Processor",
+        "cpu_logical": 4,
+        "cpu_affinity": [
+          0,
+          1
+        ],
+        "meminfo_first": "MemTotal:       16373452 kB",
+        "os": "Linux-6.17.0-1022-azure-x86_64-with-glibc2.39",
+        "python": "3.11.17 (main, Oct  1 2026, 14:32:31) [GCC 13.3.0]",
+        "git_sha": "7c8c281905172bcd86e78d41e076338cc2bc1232",
+        "git_branch": "speed/r1",
+        "env": {
+          "OMP_NUM_THREADS": "1",
+          "OPENBLAS": "unset",
+          "MKL": "unset"
+        },
+        "workers": 2,
+        "batch": 4,
+        "bundle_sha256": "e0b13c693a058dfd66ed24a52fc14e9c70964e95885358e7b99cc1f328ad6892",
+        "model": "ai-forever/rugpt3small_based_on_gpt2",
+        "command": "workers=2 batch=4 thermal=warm"
+      },
+      "details": [
+        {
+          "rep": 0,
+          "secs": 2.1607328319999937
+        },
+        {
+          "rep": 1,
+          "secs": 1.2400584589999966
+        }
+      ]
+    },
+    {
+      "mode": "hf",
+      "scenario": "answer-text",
+      "chars": 50000,
+      "thermal": "warm-model",
+      "workers": 2,
+      "batch": 4,
+      "repeats": 10,
+      "raw_seconds": [
+        12.46630689300001,
+        12.242019233999997,
+        12.452341865999983,
+        12.262341730000003,
+        12.394825959000002,
+        12.30953011599999,
+        12.493194074999991,
+        12.32684512900002,
+        12.442824994000006,
+        12.549971227999976
+      ],
+      "median_s": 12.418825476500004,
+      "p95_s": 12.524421509149981,
+      "mean_s": 12.394020122399997,
+      "limit_s": 1.0,
+      "status": "FAIL",
+      "throughput_note": null,
+      "fingerprint": {
+        "cpu_model": "AMD EPYC 7763 64-Core Processor",
+        "cpu_logical": 4,
+        "cpu_affinity": [
+          0,
+          1
+        ],
+        "meminfo_first": "MemTotal:       16373452 kB",
+        "os": "Linux-6.17.0-1022-azure-x86_64-with-glibc2.39",
+        "python": "3.11.17 (main, Oct  1 2026, 14:32:31) [GCC 13.3.0]",
+        "git_sha": "7c8c281905172bcd86e78d41e076338cc2bc1232",
+        "git_branch": "speed/r1",
+        "env": {
+          "OMP_NUM_THREADS": "1",
+          "OPENBLAS": "unset",
+          "MKL": "unset"
+        },
+        "workers": 2,
+        "batch": 4,
+        "bundle_sha256": "e0b13c693a058dfd66ed24a52fc14e9c70964e95885358e7b99cc1f328ad6892",
+        "model": "ai-forever/rugpt3small_based_on_gpt2",
+        "command": "workers=2 batch=4 thermal=warm"
+      },
+      "details": [
+        {
+          "rep": 0,
+          "secs": 12.46630689300001
+        },
+        {
+          "rep": 1,
+          "secs": 12.242019233999997
+        }
+      ]
+    },
+    {
+      "mode": "hf",
+      "scenario": "answer-text",
+      "chars": 2000000,
+      "thermal": "warm-model",
+      "workers": 2,
+      "batch": 4,
+      "repeats": 10,
+      "raw_seconds": [
+        52.792359489999996,
+        52.65475906400002,
+        52.954107539000006,
+        52.24042609100002,
+        52.39197965000005,
+        52.19099236799991,
+        52.69163683699992,
+        52.44528676499999,
+        53.314638492000086,
+        52.940403275999984
+      ],
+      "median_s": 52.67319795049997,
+      "p95_s": 53.15239956315005,
+      "mean_s": 52.6616589572,
+      "limit_s": 60.0,
+      "status": "PASS",
+      "throughput_note": null,
+      "fingerprint": {
+        "cpu_model": "AMD EPYC 7763 64-Core Processor",
+        "cpu_logical": 4,
+        "cpu_affinity": [
+          0,
+          1
+        ],
+        "meminfo_first": "MemTotal:       16373452 kB",
+        "os": "Linux-6.17.0-1022-azure-x86_64-with-glibc2.39",
+        "python": "3.11.17 (main, Oct  1 2026, 14:32:31) [GCC 13.3.0]",
+        "git_sha": "7c8c281905172bcd86e78d41e076338cc2bc1232",
+        "git_branch": "speed/r1",
+        "env": {
+          "OMP_NUM_THREADS": "1",
+          "OPENBLAS": "unset",
+          "MKL": "unset"
+        },
+        "workers": 2,
+        "batch": 4,
+        "bundle_sha256": "e0b13c693a058dfd66ed24a52fc14e9c70964e95885358e7b99cc1f328ad6892",
+        "model": "ai-forever/rugpt3small_based_on_gpt2",
+        "command": "workers=2 batch=4 thermal=warm"
+      },
+      "details": [
+        {
+          "rep": 0,
+          "secs": 52.792359489999996
+        },
+        {
+          "rep": 1,
+          "secs": 52.65475906400002
+        }
+      ]
+    }
+  ],
+  "workers": 2,
+  "batch": 4,
+  "mode": "hf",
+  "run_id": "39472061036",
+  "date": "2026-10-20",
+  "successor": "reports/EXPERIMENTS_INDEX.md",
+  "evidence_context": {
+    "run_id": "39472061036",
+    "date": "2026-10-20",
+    "status": "CURRENT",
+    "successor": "reports/EXPERIMENTS_INDEX.md"
+  }
+}
