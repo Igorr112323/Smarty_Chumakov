@@ -1,0 +1,241 @@
+{
+  "run_id": "diag-r2-20261023-4fff418-a6ea84b",
+  "branch": "science/r2-diag",
+  "base_commit": "4fff418cfb28cc8fd4dc8471bbc90cc655ad9892",
+  "date": "2026-10-23T15:00:00Z",
+  "provenance": {
+    "frozen_bundle_sha256": "e0b13c693a058dfd66ed24a52fc14e9c70964e95885358e7b99cc1f328ad6892",
+    "official_run_id": "39266451529",
+    "official_commit": "dd4454b05867495018abe5a2f657fc4d6d0fd9a6",
+    "dev_run_id": "39170981235",
+    "calibration_run_id": "39236657451",
+    "external_run_id": "39266451529",
+    "read_only": true,
+    "test177_loaded_for_fit": false
+  },
+  "sealed_metrics": {
+    "tokens": {
+      "precision": 0.5787878787878787,
+      "recall": 0.6797153024911032,
+      "f1": 0.6252045826513911,
+      "fpr": 0.015466785356626237,
+      "tp": 191,
+      "fp": 139,
+      "fn": 90,
+      "tn": 8848,
+      "auc": 0.971716560140052
+    },
+    "spans": {
+      "precision": 0.5529411764705883,
+      "recall": 0.4845360824742268,
+      "f1": 0.5164835164835164,
+      "f1_at_0_7": 0.492571,
+      "f1_at_0_9": 0.458691,
+      "mean_iou": 0.7386,
+      "tp": 47,
+      "fp": 38,
+      "fn": 50,
+      "recall_containment": 0.28865979381443296
+    },
+    "answers": {
+      "f1": 0.6257668711656442,
+      "fpr": 0.1875
+    },
+    "risk": {
+      "correlation_ci": [-0.165, 0.329],
+      "ece": 0.142704,
+      "brier": 0.159283,
+      "auc_risk": 0.708789,
+      "auc_risk_ci": [0.799, 0.971],
+      "windowed_auc": 0.830756,
+      "window_fullnorm_auc_ci": [0.81, 0.963],
+      "window_halfnorm_auc_ci": [0.857, 1.0]
+    },
+    "ai_share": {
+      "mae_hf_after_pava": 0.2565365102059551,
+      "mae_demo_after_pava": 0.2989009919597126,
+      "monotone": false,
+      "curve_hf_after": [0.28030155760444997, 0.5531303755272012, 0.5583153541379868, 0.5522007609117452, 0.5583153541379868],
+      "curve_hf_before": [0.08414541805549955, 0.15058527091350013, 0.15358729458629794, 0.17193514628078715, 0.07958583422499445],
+      "shapes": [0, 25, 50, 75, 100]
+    },
+    "dev_reference": {
+      "tokens_f1": 0.626427,
+      "tokens_fpr": 0.017443,
+      "spans_f1": 0.528736,
+      "spans_tp": 46,
+      "spans_fp": 32,
+      "spans_fn": 50
+    }
+  },
+  "diagnostics": {
+    "a1_token_ceiling": {
+      "token_recall": 0.6797153024911032,
+      "note": "span recall cannot exceed token recall; even ideal span keep cannot exceed 0.71"
+    },
+    "a1_candidate_generator": {
+      "ideal_keep_precision": 1.0,
+      "ideal_keep_recall_cell0": 0.5524625267665952,
+      "ideal_keep_recall_cell1": 0.4689507494646681,
+      "gold_without_candidate_dev": 11,
+      "gold_without_overlap_test_estimate": 47,
+      "conclusion": "generator is bottleneck, not filter"
+    },
+    "a1_error_breakdown_test_estimate": {
+      "fp_clean": 22,
+      "fp_dirty": 10,
+      "no_overlap": 29,
+      "overlap_below_05": 3,
+      "gold_without_overlap": 47,
+      "fn_total": 50,
+      "fp_total": 38
+    },
+    "a1_error_breakdown_dev_posthoc": {
+      "gold_96": {
+        "strict_candidate_coverage": 71,
+        "gold_without_candidate": 11,
+        "fn_without_generator_and_final_overlap": 10,
+        "gold_candidate_but_no_final_overlap": 37,
+        "gold_final_overlap_below_05": 3,
+        "fn_edge_tokens": 70,
+        "fn_interior_tokens": 25
+      }
+    },
+    "a1_length_cascades": {
+      "pairs": 177,
+      "over512": 7,
+      "max_positions": 1266,
+      "estimated_cascades": 59,
+      "note": "59 sentence-split cascades inside 512 window; long docs lose recall via fusion"
+    },
+    "a1_drop_window": {
+      "effect": "remove drop_window => recall 0.44 precision 1.0 F1 down; keep mandatory rules => recall +0.011 precision 0.888 F1 0.689 (dev ideal). Current is near optimum, max-rule may reclaim +0.01-0.02"
+    },
+    "a1_tau_sweep": {
+      "f1_at_0_5": 0.5164835164835164,
+      "f1_at_0_7": 0.492571,
+      "f1_at_0_9": 0.458691,
+      "note": "tau increase monotonically decreases F1, tau=0.5 optimal per protocol, cannot change"
+    },
+    "a2_ai_share_product_bias": {
+      "description": "product of token p_ai underflows to 0/1, PAVA pulls to 0.5, nonmonotone at 75%",
+      "monotonicity_violations": [
+        {"from": 50, "to": 75, "delta": -0.0061145932262416},
+        {"from": 0, "to": 25, "expected_positive": true, "actual_delta": 0.2728288179227512, "but_offset_bias": 0.2803}
+      ]
+    },
+    "a2_aggregates_forecast": {
+      "mean": {"expected_mae": 0.2, "monotone": false},
+      "median": {"expected_mae": 0.18, "monotone": true},
+      "mean_of_fragment_p_ai": {"expected_mae": 0.14, "monotone": true, "note": "isotonic mapping guarantees monotonicity by shape"}
+    }
+  },
+  "hypotheses": [
+    {
+      "id": "H1",
+      "name": "isotonic_fragment_aggregator",
+      "description": "Replace product aggregator with monotone isotonic mapping on mean-of-fragment-p_ai, trained strictly on dev181, seed-free deterministic",
+      "forecast": {
+        "delta_spans_f1": 0.0,
+        "delta_tokens_fpr": 0.0,
+        "delta_brier": 0.0,
+        "delta_mae": -0.11,
+        "mae_after": 0.145,
+        "monotone": true,
+        "monotone_guaranteed_by_shape": true
+      },
+      "prob_pass_b3": 0.65,
+      "risk": "low — only changes share, not tokens",
+      "requires_new_qualification": true
+    },
+    {
+      "id": "H2",
+      "name": "max_fusion",
+      "description": "Window fusion: max over windows instead of mean/drop_window",
+      "forecast": {
+        "delta_spans_f1": 0.015,
+        "delta_tokens_fpr": 0.002,
+        "delta_mae": 0.0,
+        "monotone": true,
+        "range": [0.01, 0.02]
+      },
+      "prob_pass_b3": 0.55,
+      "risk": "medium — may increase FP",
+      "requires_new_qualification": true
+    },
+    {
+      "id": "H3",
+      "name": "dev_calibrated_p_ai",
+      "description": "Calibration of p_ai on dev traces (platt/isotonic) without weight fit",
+      "forecast": {
+        "delta_spans_f1": 0.01,
+        "delta_tokens_fpr": -0.001,
+        "delta_brier": -0.01,
+        "delta_risk_corr": 0.1,
+        "delta_mae": -0.02
+      },
+      "prob_pass_b3": 0.5,
+      "risk": "medium — requires dev calibration",
+      "requires_new_qualification": true
+    },
+    {
+      "id": "H4",
+      "name": "sentence_mix_reweight",
+      "description": "Sentence-mix formula mu_lambda retune lambda on dev",
+      "forecast": {
+        "delta_spans_f1": 0.005,
+        "delta_risk_corr": 0.05,
+        "delta_brier": -0.005
+      },
+      "prob_pass_b3": 0.4,
+      "risk": "low",
+      "requires_new_qualification": true
+    },
+    {
+      "id": "H5",
+      "name": "H1+H2+H3_combined",
+      "description": "Combined candidate H1+H2+H3",
+      "forecast": {
+        "delta_spans_f1": 0.015,
+        "delta_mae": -0.11,
+        "delta_tokens_fpr": 0.001,
+        "delta_brier": -0.01,
+        "mae_after": 0.14,
+        "spans_f1_after": 0.543
+      },
+      "prob_pass_b3": 0.45,
+      "prob_joint_all_four_criteria": 0.38,
+      "risk": "needs ablation",
+      "requires_new_qualification": true
+    },
+    {
+      "id": "H0",
+      "name": "no_change_P8",
+      "description": "Keep P8 sealed",
+      "forecast": {
+        "delta": 0
+      },
+      "prob_pass_b3": 0.0,
+      "note": "FAIL by MAE"
+    }
+  ],
+  "overall_forecast": {
+    "single_candidate_H5_prob_pass_B3": 0.45,
+    "honest_joint_prob_all_four": 0.38,
+    "without_isotonic_prob": 0.0,
+    "conclusion": "Isotonic aggregator is necessary for MAE; without it cannot pass. With it, F1 requirement still strict (~0.40-0.45 joint)."
+  },
+  "constraints_verification": {
+    "reports_p8_unchanged": true,
+    "frozen_p5_sha_unchanged": true,
+    "test177_not_loaded_for_fit": true,
+    "suite_910_preserved": true,
+    "check_numbers_pass": true,
+    "verification_all_true": true
+  },
+  "next_step": "await curator stop/go decision before Phase B",
+  "files": [
+    "reports/science/r2/DIAG.md",
+    "reports/science/r2/diag_metrics.json"
+  ]
+}
