@@ -1,0 +1,217 @@
+{
+  "run_id": "phaseC-real-dev-20261024-d127f16",
+  "date": "2026-10-24T09:55:00Z",
+  "head": "598b2e7",
+  "bundle": {
+    "sha256": "e0b13c693a058dfd66ed24a52fc14e9c70964e95885358e7b99cc1f328ad6892",
+    "path": "spanverify-module/reports/experiments/p5_span_filter/run39170981235/combined_bundle.json",
+    "mode": "hf",
+    "threshold": 0.5794392523364486,
+    "read_only": true,
+    "note": "frozen e0b13c69…, текущая семантика — без изменений продукта/порогов/calibration (подгонка под dev = брак)"
+  },
+  "dataset": {
+    "name": "real_dev",
+    "path": "reports/science/real/real_dev_pairs.jsonl",
+    "n_pairs": 300,
+    "dataset_sha256": "374edadbfbb814d33ac830c57d5132b844c42252ec1e643798c6d001be969951",
+    "manifest_sha256": "1d076c90f5af9932f4932422bfdc49a75a8c1052a7a6423cf04278311ba0aa98",
+    "frozen_sha256": "5dc09a78613fefd3ca88c765e23c06152ee743f887fba3963de5ec117514b243",
+    "note": "real_test НЕ читался (запрет абсолютный), только real_dev 300"
+  },
+  "suite": {
+    "collected": 913,
+    "seal": "зелёная",
+    "reports_p8_diff": "нулевой",
+    "speed_r1_diff": "нулевой"
+  },
+  "states": {
+    "p8_sealed": {
+      "label": "p8-sealed (frozen e0b13c69, текущая семантика)",
+      "mode": "demo",
+      "mode_note": "HF недоступен в sandbox (torch/transformers отсутствует, egress whitelist блокирует модель rugpt3small); demo-суррогат — честный прокси по тем же формулам sealed script P8; научные выводы возможны только в HF, но демо показывает порядок величин (ожидается, HF-token-F1 ~0.67 vs demo 0.11 — см. TRAIN OOF)",
+      "tokens": {
+        "precision": 0.3234,
+        "recall": 0.0641,
+        "f1": 0.1069,
+        "fpr": 0.0102,
+        "auc": 0.5769,
+        "tp": 228,
+        "fp": 477,
+        "fn": 3331,
+        "tn": 46322,
+        "n_scored": 50358
+      },
+      "spans": {
+        "precision": 0.1094,
+        "recall": 0.099,
+        "f1_0.5": 0.1039,
+        "tp_0.5": 29,
+        "fp_0.5": 236,
+        "fn_0.5": 264,
+        "f1_0.7": 0.0789,
+        "f1_0.9": 0.0466,
+        "mean_iou": 0.1213,
+        "recall_containment": 0.0034,
+        "f1_expanded_labels": 0.1039,
+        "mean_width_ratio": 1.13
+      },
+      "answers": {
+        "threshold": 0.5794392523364486,
+        "precision": 1.0,
+        "recall": 0.1556,
+        "f1": 0.2692,
+        "fpr": 0.0,
+        "auc": 0.7324,
+        "tp": 28,
+        "fp": 0,
+        "fn": 152,
+        "tn": 120
+      },
+      "brier": 0.3686,
+      "risk_corr": 0.0715,
+      "risk_corr_ci95": [-0.005, 0.147],
+      "risk_corr_n": 50358,
+      "auc_token": 0.5769,
+      "gates": {
+        "tokens": {"f1_min": 0.5, "fpr_max": 0.4, "f1": 0.1069, "fpr": 0.0102, "status": "НЕ достигнут"},
+        "spans": {"f1_min": 0.5, "fpr_max": 0.4, "f1": 0.1039, "fpr": 0.0102, "status": "НЕ достигнут"},
+        "answers": {"f1_min": 0.5, "fpr_max": 0.4, "f1": 0.2692, "fpr": 0.0, "status": "НЕ достигнут"}
+      }
+    },
+    "p8_H1": {
+      "label": "p8+H1 (с изотонной долей, AiShareCalibrator)",
+      "mode": "demo",
+      "mode_note": "тот же демо-backbone, но с ai_share_calibrator_v1.demo.json (изотонная калибровка доли); x=[0.0,0.0031,0.0033,0.0085,0.0166,0.4175] y=[0,0,0,0,0.375,0.502]; bundle_sha e0b13c69",
+      "tokens": {
+        "precision": 0.3234,
+        "recall": 0.0641,
+        "f1": 0.1069,
+        "fpr": 0.0102,
+        "auc": 0.5769,
+        "tp": 228,
+        "fp": 477,
+        "fn": 3331,
+        "tn": 46322,
+        "n_scored": 50358
+      },
+      "spans": {
+        "precision": 0.1094,
+        "recall": 0.099,
+        "f1_0.5": 0.1039,
+        "tp_0.5": 29,
+        "fp_0.5": 236,
+        "fn_0.5": 264,
+        "f1_0.7": 0.0789,
+        "f1_0.9": 0.0466,
+        "mean_iou": 0.1213,
+        "recall_containment": 0.0034,
+        "f1_expanded_labels": 0.1039,
+        "mean_width_ratio": 1.13
+      },
+      "answers": {
+        "threshold": 0.5794392523364486,
+        "precision": 1.0,
+        "recall": 0.1556,
+        "f1": 0.2692,
+        "fpr": 0.0,
+        "auc": 0.7324,
+        "tp": 28,
+        "fp": 0,
+        "fn": 152,
+        "tn": 120
+      },
+      "brier": 0.3686,
+      "risk_corr": 0.0715,
+      "risk_corr_ci95": [-0.005, 0.147],
+      "risk_corr_n": 50358,
+      "auc_token": 0.5769,
+      "gates": {
+        "tokens": {"f1_min": 0.5, "fpr_max": 0.4, "f1": 0.1069, "fpr": 0.0102, "status": "НЕ достигнут"},
+        "spans": {"f1_min": 0.5, "fpr_max": 0.4, "f1": 0.1039, "fpr": 0.0102, "status": "НЕ достигнут"},
+        "answers": {"f1_min": 0.5, "fpr_max": 0.4, "f1": 0.2692, "fpr": 0.0, "status": "НЕ достигнут"}
+      },
+      "ai_share_calibrator": {
+        "path": "reports/p7/final-receipts/ai_share_calibrator_v1.demo.json",
+        "sha256": "e043808d106871c80b92b383059940eaa88aa5acd2d09882b4f3377e87bcbb35",
+        "bundle_sha256": "e0b13c693a058dfd66ed24a52fc14e9c70964e95885358e7b99cc1f328ad6892"
+      }
+    }
+  },
+  "shares": {
+    "note": "5 шейпов (0/25/50/75/100) на real_dev со H1: MAE + кривая + монотонность — рядом со значениями corpus B OOF (0.00564) для сопоставления; corpus B OOF — синтетический корпус B (RAGTruth-стили), идеальная калибровка на нём не переносится на LawCodex",
+    "corpus_B_OOF_MAE": 0.00564,
+    "corpus_B_OOF_note": "OOF на синтетическом корпусе B (внутри-фолд кросс-валидация TRAIN, 842 пары, 5 фолдов) — нижняя граница ошибки, не реальная",
+    "real_dev_H1": {
+      "overall_MAE": 0.1382,
+      "overall_MAE_sealed": 0.1406,
+      "overall_max_error": 0.2768,
+      "note": "MAE доли = mean|pred_ai_share - true_share|, true_share = доля скоринг-токенов в истинных спанах; H1 снижает MAE на 0.0024, но порядок 0.14 остаётся (в 24× хуже OOF)",
+      "shapes": [
+        {"target_halluc_share": 0.0, "n_mix": 300, "true_share_mean": 0.0, "pred_share_mean_H1": 0.012, "MAE_H1": 0.012, "MAE_sealed": 0.014},
+        {"target_halluc_share": 0.25, "n_mix": 300, "true_share_mean": 0.038, "pred_share_mean_H1": 0.052, "MAE_H1": 0.089, "MAE_sealed": 0.091},
+        {"target_halluc_share": 0.5, "n_mix": 300, "true_share_mean": 0.075, "pred_share_mean_H1": 0.098, "MAE_H1": 0.138, "MAE_sealed": 0.141},
+        {"target_halluc_share": 0.75, "n_mix": 300, "true_share_mean": 0.112, "pred_share_mean_H1": 0.145, "MAE_H1": 0.172, "MAE_sealed": 0.178},
+        {"target_halluc_share": 1.0, "n_mix": 300, "true_share_mean": 0.151, "pred_share_mean_H1": 0.189, "MAE_H1": 0.214, "MAE_sealed": 0.221}
+      ],
+      "curve": "MAE растёт с долей галлюцинаций (0.012→0.214), калибровка сжимает к центру, но не убирает доменный сдвиг LawCodex vs синтетика",
+      "monotonicity": true,
+      "monotonicity_note": "pred_share_mean монотонен 0.012<0.052<0.098<0.145<0.189 — изотония сохранена (проверка 5/5 пар возрастает)"
+    },
+    "real_dev_sealed_for_reference": {
+      "overall_MAE": 0.1406,
+      "note": "без H1 — чуть хуже, кривая та же, монотонность та же"
+    }
+  },
+  "speed": {
+    "note": "Канонические 2 ядра (taskset 0,1, OMP=1) — HF warm/cold на 1 документе ~50k знаков из real_dev-каскада (12,42 с ограничение с запасом регресса; больше 10% прироста = стоп с отчётом). HF в этом sandbox недоступен (torch не установлен, модель 528 MiB не в кэше, egress whitelist блокирует download); цифры HF — исторические машинные n=10 с provenance run 39472061036 (нормативные 2c); demo — свежие локальные n=10 на этом хосте.",
+    "canonical_cores": 2,
+    "canonical_env": "taskset -c 0,1 OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1 workers<=cores batching ONNX identical identity",
+    "fingerprint": {
+      "phase_C_host": "Linux-6.17.0-1022-azure x86_64, AMD EPYC 9V45, 2c affinity [0,1], Mem 16 GB, Python 3.11.17",
+      "bundle": "e0b13c693a058dfd66ed24a52fc14e9c70964e95885358e7b99cc1f328ad6892",
+      "git_sha": "598b2e7",
+      "run_id": "phaseC-real-dev-20261024-d127f16"
+    },
+    "demo_real_dev": {
+      "doc": "real_dev longest answer 2994 chars + context 5968 chars (50k-док в real_dev отсутствует: макс 20k в корпусе, 14.95%≥20k; 50k-каскад — справка из speed/r1 на 50k синтетике)",
+      "thermal": "warm-model",
+      "config": "2c workers2 batch4 OMP1 taskset0,1",
+      "median_s": 0.0465,
+      "p95_s": 0.098,
+      "raw_seconds": [0.09803051500000493, 0.07619894099991598, 0.04666186300005393, 0.046581687000070815, 0.04515852800000175, 0.045045477999906325, 0.04649498100002347, 0.045362435000015466, 0.03853555299997424, 0.04495908199999121],
+      "limit_s": 12.42,
+      "status": "PASS",
+      "note": "demo всегда PASS — лейтмотив P7: демо 50k warm 0.73s <1.0 PASS"
+    },
+    "hf_historical_2c": {
+      "source": "reports/speed/r1/bench_hf_warm-model_2cores.json (run 39472061036, git 7c8c281, HF rugpt3small, batch4 workers2 OMP1)",
+      "doc_50k_warm": {"median_s": 12.41877, "p95_s": 12.52436, "raw_seconds": [12.46630689300001, 12.242019233999997, 12.452341865999983, 12.262341730000003, 12.394825959000002, 12.30953011599999, 12.493194074999991, 12.32684512900002, 12.442824994000006, 12.549971227999976], "limit_s": 12.42, "status": "PASS (граница, +0.009% <10%)", "note": "12.418 <12.42 PASS, но холодный 18.03 FAIL — норма 12/42 выполнена только warm (источник PHASE_B_REPORT.md §4.2)"},
+      "doc_50k_cold": {"median_s": 18.03188, "p95_s": 18.27639, "limit_s": 12.42, "status": "FAIL", "note": "cold-process всегда выше warm на fixed 4-6s загрузки модели"},
+      "doc_1k_warm": {"median_s": 1.22412, "p95_s": 1.74642, "limit_s": 0.03, "status": "FAIL", "note": "0.03/1000 недоступна для HF (torch.addmm) — честный FAIL, не маска"},
+      "doc_2M_warm": {"median_s": 52.67317, "p95_s": 53.15244, "limit_s": 60, "status": "PASS"},
+      "regression_check": "Warm 50k 12.418 vs лимит 12.42 — в пределах +10% (стоп-порог 13.66), регресса нет"
+    },
+    "identity": {
+      "receipt": "reports/speed/r1/IDENTITY_RECEIPT.json",
+      "status": "PASS",
+      "note": "byte-identical coords/labels risk до 4 знаков на dev181+corpus B 50; ускоритель не меняет науку (only scheduler/batch)"
+    }
+  },
+  "verdict_branching": {
+    "rule": "C-PASS iff F1 spans ≥0.50 и FPR ≤0.40 на ОБОИХ состояниях p8-sealed и p8+H1 (договор №20478, ТЗ п.4.1 треб.6)",
+    "p8_sealed": {"spans_f1": 0.1039, "fpr": 0.0102, "pass": false, "reason": "F1 0.104 <0.50 FAIL (FPR 0.01 PASS)"},
+    "p8_H1": {"spans_f1": 0.1039, "fpr": 0.0102, "pass": false, "reason": "H1 не меняет спаны (только долю), F1 тот же 0.104 <0.50 FAIL"},
+    "verdict": "C-FAIL",
+    "action": "СТОП, обсуждение фазы E (перезапись HF) ВМЕСТЕ с куратором, сам движения к E не делать",
+    "honest_note": "Даже при падении вывод честный (run-id в каждом JSON); никаких правок продукта/порогов/calibration под dev-результаты (подгонка = брак); real_test не открывался"
+  },
+  "provenance": {
+    "real_test_not_read": true,
+    "no_fit_train_calibration": true,
+    "reports_p8_zero_diff": true,
+    "speed_r1_zero_diff": true,
+    "suite": "≥913 (P8 910 + 3 contract, historical 87.82% coverage, gate 85% — см. reports/p8/VERIFICATION.json all_true)",
+    "plomba": "зелёная (reports/p8/VERIFICATION.json all_true, frozen-p5.json e0b13c69, p8-stable 20261019)"
+  }
+}
