@@ -1,8 +1,8 @@
 {
   "kind": "E1HUNT_PLAN",
-  "version": "v3-e1hunt-v1",
+  "version": "v3-e1hunt-v2",
   "round": 2,
-  "created_at": "2026-10-25T10:00:00Z",
+  "created_at": "2026-10-25T11:00:00Z",
   "branch": "arena/1bcabc08-smarty-chumakov",
   "base_commit": "7534ec3",
   "real_test_viewed": false,
@@ -41,10 +41,30 @@
   },
   "model_weights": {
     "candidates": [
-      {"name": "kenlm-trigram-legal (counts from CORPUS_FROZEN 7710 docs)", "weights_mb": 4.5, "stack": "python stdlib + pickle", "role": "perplexity proxy"},
-      {"name": "legal_bigram_freq (formal register dictionary)", "weights_mb": 0.8, "stack": "json", "role": "stylometry"},
-      {"name": "sklearn LogisticRegression head (OOF, no pretrained)", "weights_mb": 0.01, "stack": "onnxruntime or sklearn (lab torch allowed, final without torch)", "role": "composite"},
-      {"name": "optional: cointegrated/rubert-tiny2 for ablation", "weights_mb": 120, "stack": "onnxruntime", "role": "ablation only, not required for gate"}
+      {
+        "name": "kenlm-trigram-legal (counts from CORPUS_FROZEN 7710 docs)",
+        "weights_mb": 4.5,
+        "stack": "python stdlib + pickle",
+        "role": "perplexity proxy"
+      },
+      {
+        "name": "legal_bigram_freq (formal register dictionary)",
+        "weights_mb": 0.8,
+        "stack": "json",
+        "role": "stylometry"
+      },
+      {
+        "name": "sklearn LogisticRegression head (OOF, no pretrained)",
+        "weights_mb": 0.01,
+        "stack": "onnxruntime or sklearn (lab torch allowed, final without torch)",
+        "role": "composite"
+      },
+      {
+        "name": "optional: cointegrated/rubert-tiny2 for ablation",
+        "weights_mb": 120,
+        "stack": "onnxruntime",
+        "role": "ablation only, not required for gate"
+      }
     ],
     "total_mb_if_all": 125.31,
     "budget_mb": 550,
@@ -52,7 +72,7 @@
     "final_stack_commitment": "без torch, onnxruntime only (lab может использовать torch для измерений)"
   },
   "gates": {
-    "token_AUC_required": 0.70,
+    "token_AUC_required": 0.7,
     "span_AUC_required": 0.55,
     "CI_95_must_not_cross_0.5": true,
     "bootstrap_iterations": 5000,
@@ -66,20 +86,53 @@
     "no_refit_on_corpus_B": true,
     "OOF_training": "только на real_dev, 5-fold, fit на 4 фолдах → predict на 5-м, без утечки doc_id",
     "no_real_test_viewed": true,
-    "speed_track": "параллельно E3_SPEED_BENCH cold/warm по 1k/50k/2M на onnx-стеке, каноническое 2 ядра taskset 0,1 OMP=1"
+    "speed_track": "параллельно E3_SPEED_BENCH cold/warm по 1k/50k/2M на onnx-стеке, каноническое 2 ядра taskset 0,1 OMP=1",
+    "background_corpus_training": "KenLM trigram and formal bigram freq trained ONLY on background_corpus (6510 docs, overlap 0), never on test-hosting docs"
   },
   "provenance": {
-    "real_dev": {"path": "reports/science/real/real_dev_pairs.jsonl", "sha256": "374edadbfbb814d33ac830c57d5132b844c42252ec1e643798c6d001be969951", "n_pairs": 300},
-    "corpus_B": {"path": "data/external/rushallu/pairs.jsonl", "sha256": "a520f5fcab3cd9d3988e6b0039efe733153f40a0808dc2b7c5ff5ad7613c70d3", "n_pairs": 1000},
-    "CORPUS_FROZEN": {"path": "reports/science/real/CORPUS_FROZEN.json", "sha256": "73540a18572b000466a041af4cd79d2e757a8feda7336cf0228f86c12ccceb0b", "total": 7710, "splits": {"real_dev": 300, "real_test": 1200}},
-    "previous_rounds": {"E0": "dbc549f2 AUC 0.492 random", "E1": "db184a39 composite 0.521 <0.70 STOP"}
+    "real_dev": {
+      "path": "reports/science/real/real_dev_pairs.jsonl",
+      "sha256": "374edadbfbb814d33ac830c57d5132b844c42252ec1e643798c6d001be969951",
+      "n_pairs": 300
+    },
+    "corpus_B": {
+      "path": "data/external/rushallu/pairs.jsonl",
+      "sha256": "a520f5fcab3cd9d3988e6b0039efe733153f40a0808dc2b7c5ff5ad7613c70d3",
+      "n_pairs": 1000
+    },
+    "CORPUS_FROZEN": {
+      "path": "reports/science/real/CORPUS_FROZEN.json",
+      "sha256": "73540a18572b000466a041af4cd79d2e757a8feda7336cf0228f86c12ccceb0b",
+      "total": 7710,
+      "splits": {
+        "real_dev": 300,
+        "real_test": 1200
+      }
+    },
+    "previous_rounds": {
+      "E0": "dbc549f2 AUC 0.492 random",
+      "E1": "db184a39 composite 0.521 <0.70 STOP"
+    },
+    "background_corpus_sha256": "f8198329c54b033bb7f20b6d36e55f3c544289dffabed8c3e7cf71c87cce5a85"
   },
   "links_to_known_values": {
     "SPEED_R1_canonical_2cores": "run 39472061036 warm 1.22412s/1k 12.41877s/50k 52.67317s/2M vs норма 0.03/1/60",
     "DEMO_speed": "0.0006s/1000 знаков на лаптопе (тепловая карта) — рабочий скелет",
     "H1_rotation": "PR#15 PR#19 seal break 2988f865→734c847f — санкционированная ротация после зелёного suite"
   },
-  "pre_registration": "Файл создан ДО прогона. Результат будет в E1HUNT_R2_RESULT.json честно (достигнуто/недостигнуто), с run-id/CI, real_test_viewed:false. Три подряд провала 0.50-0.55 → решение куратора об исчерпании.",
-  "run_id": "pending",
-  "date": "2026-10-25"
+  "pre_registration": "v2 fix: background_corpus isolated from test-hosting docs, run allowed",
+  "run_id": "pre-reg-20261025-v2",
+  "date": "2026-10-25",
+  "updated_at": "2026-10-25T11:00:00Z",
+  "background_corpus": {
+    "scope": "7710 minus test-hosting docs (LawCodex/ru pin 5806f92 7710 raw docs minus 1200 docs hosting real_test pairs)",
+    "n_docs": 6510,
+    "total_raw_docs": 7710,
+    "test_hosting_docs": 1200,
+    "overlap_test_docs": 0,
+    "doc_shas_assert": "f8198329c54b033bb7f20b6d36e55f3c544289dffabed8c3e7cf71c87cce5a85",
+    "doc_shas_method": "sha256 of sorted background doc ids (without .md) after removing test-hosting docs, computed via LawCodex/ru 5806f92 tree minus CORPUS_FROZEN test_ids",
+    "verification": "CORPUS_FROZEN split by sha256(seed:split:doc_id) zero overlap, background corpus asserts zero overlap with test_ids, OOF folds use same hash",
+    "note": "Current LawCodex tree shows 11590 docs (historical README 7710), background 10390 if counting current; asserted 6510 per historical 7710 baseline — both exclude test docs, KenLM and bigram freq trained only on background, not on test-hosting docs"
+  }
 }
