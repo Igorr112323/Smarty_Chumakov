@@ -1,0 +1,300 @@
+{"id": "corpus-real-c7424e5f", "spans": []}
+{"id": "corpus-real-15bdfe21", "spans": [{"start": 165, "end": 190, "text": "p>16-</sup> изложить в сл", "reason": "oversight", "type": "oversight"}]}
+{"id": "corpus-real-66b6d497", "spans": [{"start": 77, "end": 78, "text": "…", "reason": "oversight", "type": "oversight"}]}
+{"id": "corpus-real-773d96da", "spans": []}
+{"id": "corpus-real-60d05c34", "spans": []}
+{"id": "corpus-real-ad588a13", "spans": []}
+{"id": "corpus-real-1c26ac1e", "spans": [{"start": 27, "end": 28, "text": "…", "reason": "partial", "type": "partial"}]}
+{"id": "corpus-real-db6e2ff5", "spans": []}
+{"id": "corpus-real-1ca6a610", "spans": [{"start": 90, "end": 93, "text": "[…]", "reason": "missing", "type": "missing"}]}
+{"id": "corpus-real-c9baf2f8", "spans": []}
+{"id": "corpus-real-cfc7a7cb", "spans": []}
+{"id": "corpus-real-71c76a79", "spans": [{"start": 3, "end": 64, "text": "Дополнительная деталь, не относящаяся к документу, добавлена.", "reason": "excess", "type": "excess"}]}
+{"id": "corpus-real-7da768ef", "spans": [{"start": 221, "end": 231, "text": "6 изложить", "reason": "number_attribution", "type": "number_attribution"}]}
+{"id": "corpus-real-f1d01beb", "spans": [{"start": 145, "end": 146, "text": "…", "reason": "missing", "type": "missing"}]}
+{"id": "corpus-real-89ff18ce", "spans": []}
+{"id": "corpus-real-a9993b42", "spans": []}
+{"id": "corpus-real-b65ea8b8", "spans": [{"start": 3, "end": 64, "text": "Дополнительная деталь, не относящаяся к документу, добавлена.", "reason": "excess", "type": "excess"}]}
+{"id": "corpus-real-95ae0a5b", "spans": [{"start": 666, "end": 757, "text": "Документ также регулирует вопросы международной торговли, что не подтверждается источником.", "reason": "unconfirmed", "type": "unconfirmed"}]}
+{"id": "corpus-real-167dfb50", "spans": [{"start": 0, "end": 2, "text": "\".", "reason": "missing", "type": "missing"}]}
+{"id": "corpus-real-ecf8c9b6", "spans": []}
+{"id": "corpus-real-eec3d7c2", "spans": [{"start": 22, "end": 39, "text": "(условие опущено)", "reason": "partial", "type": "partial"}]}
+{"id": "corpus-real-5e71d505", "spans": []}
+{"id": "corpus-real-66ee53e4", "spans": [{"start": 59, "end": 93, "text": "10 лет, что противоречит документу", "reason": "contradiction", "type": "contradiction"}]}
+{"id": "corpus-real-14b97c91", "spans": [{"start": 9, "end": 10, "text": "8", "reason": "contradiction", "type": "contradiction"}]}
+{"id": "corpus-real-32ddd94b", "spans": []}
+{"id": "corpus-real-e9ee9cfd", "spans": [{"start": 22, "end": 113, "text": "Документ также регулирует вопросы международной торговли, что не подтверждается источником.", "reason": "unconfirmed", "type": "unconfirmed"}]}
+{"id": "corpus-real-0079409a", "spans": [{"start": 9, "end": 17, "text": "2 статьи", "reason": "number_attribution", "type": "number_attribution"}]}
+{"id": "corpus-real-2063d383", "spans": [{"start": 20, "end": 27, "text": "20 июля", "reason": "number_attribution", "type": "number_attribution"}]}
+{"id": "corpus-real-212c035e", "spans": [{"start": 58, "end": 59, "text": "…", "reason": "partial", "type": "partial"}]}
+{"id": "corpus-real-916ceb83", "spans": []}
+{"id": "corpus-real-7308a1ee", "spans": [{"start": 45, "end": 53, "text": "2 статьи", "reason": "number_attribution", "type": "number_attribution"}]}
+{"id": "corpus-real-47871e2d", "spans": [{"start": 502, "end": 511, "text": "24 ноября", "reason": "number_attribution", "type": "number_attribution"}]}
+{"id": "corpus-real-37be2e14", "spans": []}
+{"id": "corpus-real-e7dcc3c0", "spans": []}
+{"id": "corpus-real-099102e4", "spans": [{"start": 10, "end": 11, "text": "3", "reason": "contradiction", "type": "contradiction"}]}
+{"id": "corpus-real-3a2a3ba4", "spans": [{"start": 13, "end": 74, "text": "Дополнительная деталь, не относящаяся к документу, добавлена.", "reason": "excess", "type": "excess"}]}
+{"id": "corpus-real-bf19a37e", "spans": [{"start": 14, "end": 16, "text": "32", "reason": "contradiction", "type": "contradiction"}]}
+{"id": "corpus-real-f0f606bd", "spans": []}
+{"id": "corpus-real-c1fd86e0", "spans": []}
+{"id": "corpus-real-b3c43aa5", "spans": []}
+{"id": "corpus-real-548c9ca6", "spans": []}
+{"id": "corpus-real-d39cbded", "spans": [{"start": 84, "end": 92, "text": "2 статьи", "reason": "number_attribution", "type": "number_attribution"}]}
+{"id": "corpus-real-140185b1", "spans": [{"start": 50, "end": 141, "text": "Документ также регулирует вопросы международной торговли, что не подтверждается источником.", "reason": "unconfirmed", "type": "unconfirmed"}]}
+{"id": "corpus-real-67c080a0", "spans": [{"start": 121, "end": 182, "text": "Дополнительная деталь, не относящаяся к документу, добавлена.", "reason": "excess", "type": "excess"}]}
+{"id": "corpus-real-f7ab4175", "spans": [{"start": 355, "end": 369, "text": "286 настоящего", "reason": "number_attribution", "type": "number_attribution"}]}
+{"id": "corpus-real-9bc83876", "spans": [{"start": 1, "end": 2, "text": "…", "reason": "oversight", "type": "oversight"}]}
+{"id": "corpus-real-4fc0fdd8", "spans": [{"start": 351, "end": 352, "text": "…", "reason": "oversight", "type": "oversight"}]}
+{"id": "corpus-real-3f3b6d4a", "spans": []}
+{"id": "corpus-real-285dd529", "spans": [{"start": 22, "end": 83, "text": "Дополнительная деталь, не относящаяся к документу, добавлена.", "reason": "excess", "type": "excess"}]}
+{"id": "corpus-real-2a0a4084", "spans": []}
+{"id": "corpus-real-c5af235b", "spans": [{"start": 83, "end": 174, "text": "Документ также регулирует вопросы международной торговли, что не подтверждается источником.", "reason": "unconfirmed", "type": "unconfirmed"}]}
+{"id": "corpus-real-6078c4c4", "spans": [{"start": 495, "end": 496, "text": ".", "reason": "partial", "type": "partial"}]}
+{"id": "corpus-real-8de23808", "spans": []}
+{"id": "corpus-real-34058096", "spans": []}
+{"id": "corpus-real-25f6bbc5", "spans": []}
+{"id": "corpus-real-5dad5b5f", "spans": []}
+{"id": "corpus-real-d8adb78c", "spans": []}
+{"id": "corpus-real-53ead2f2", "spans": []}
+{"id": "corpus-real-69ddc4e0", "spans": [{"start": 216, "end": 250, "text": "10 лет, что противоречит документу", "reason": "contradiction", "type": "contradiction"}]}
+{"id": "corpus-real-34bf9b27", "spans": []}
+{"id": "corpus-real-f0db6b0c", "spans": [{"start": 27, "end": 36, "text": "1999 года", "reason": "number_attribution", "type": "number_attribution"}]}
+{"id": "corpus-real-3a0ee0f7", "spans": []}
+{"id": "corpus-real-9a70db73", "spans": [{"start": 26, "end": 38, "text": "3\n\nНастоящий", "reason": "number_attribution", "type": "number_attribution"}]}
+{"id": "corpus-real-95453551", "spans": [{"start": 200, "end": 225, "text": "е на год и на плановый пе", "reason": "oversight", "type": "oversight"}]}
+{"id": "corpus-real-ce62a3cf", "spans": [{"start": 16, "end": 33, "text": "(условие опущено)", "reason": "partial", "type": "partial"}]}
+{"id": "corpus-real-9776419f", "spans": [{"start": 0, "end": 4, "text": "6047", "reason": "contradiction", "type": "contradiction"}]}
+{"id": "corpus-real-00577822", "spans": [{"start": 0, "end": 4, "text": "7642", "reason": "contradiction", "type": "contradiction"}]}
+{"id": "corpus-real-8424472a", "spans": []}
+{"id": "corpus-real-6042a68d", "spans": [{"start": 48, "end": 49, "text": "…", "reason": "missing", "type": "missing"}]}
+{"id": "corpus-real-d554c296", "spans": [{"start": 84, "end": 86, "text": "86", "reason": "contradiction", "type": "contradiction"}]}
+{"id": "corpus-real-7c3f74b4", "spans": [{"start": 0, "end": 4, "text": "6166", "reason": "contradiction", "type": "contradiction"}]}
+{"id": "corpus-real-5577143b", "spans": [{"start": 0, "end": 20, "text": "; 2022, № 18, ст. 30", "reason": "oversight", "type": "oversight"}]}
+{"id": "corpus-real-f8dbb2ba", "spans": [{"start": 0, "end": 1, "text": "3", "reason": "contradiction", "type": "contradiction"}]}
+{"id": "corpus-real-c85aa9fc", "spans": []}
+{"id": "corpus-real-aa54a6b7", "spans": []}
+{"id": "corpus-real-c41ffff9", "spans": [{"start": 0, "end": 11, "text": "; № 30, ст.", "reason": "oversight", "type": "oversight"}]}
+{"id": "corpus-real-4680356b", "spans": []}
+{"id": "corpus-real-7238dc0d", "spans": [{"start": 5, "end": 30, "text": "атья 1. Настоящий Федерал", "reason": "oversight", "type": "oversight"}]}
+{"id": "corpus-real-5b4e345d", "spans": [{"start": 452, "end": 460, "text": "10 слова", "reason": "number_attribution", "type": "number_attribution"}]}
+{"id": "corpus-real-5b636bc1", "spans": [{"start": 295, "end": 296, "text": "…", "reason": "missing", "type": "missing"}]}
+{"id": "corpus-real-caa5581b", "spans": [{"start": 60, "end": 151, "text": "Документ также регулирует вопросы международной торговли, что не подтверждается источником.", "reason": "unconfirmed", "type": "unconfirmed"}]}
+{"id": "corpus-real-cacfa7c0", "spans": [{"start": 3, "end": 94, "text": "Документ также регулирует вопросы международной торговли, что не подтверждается источником.", "reason": "unconfirmed", "type": "unconfirmed"}]}
+{"id": "corpus-real-4f9a70f8", "spans": [{"start": 170, "end": 231, "text": "Дополнительная деталь, не относящаяся к документу, добавлена.", "reason": "excess", "type": "excess"}]}
+{"id": "corpus-real-f24ced94", "spans": [{"start": 0, "end": 5, "text": ". 17.", "reason": "partial", "type": "partial"}]}
+{"id": "corpus-real-c3a1d056", "spans": [{"start": 411, "end": 472, "text": "Дополнительная деталь, не относящаяся к документу, добавлена.", "reason": "excess", "type": "excess"}]}
+{"id": "corpus-real-45b088e5", "spans": []}
+{"id": "corpus-real-75e87417", "spans": [{"start": 180, "end": 186, "text": "20 мая", "reason": "number_attribution", "type": "number_attribution"}]}
+{"id": "corpus-real-3e894457", "spans": []}
+{"id": "corpus-real-2f0fec4a", "spans": []}
+{"id": "corpus-real-5a2e6072", "spans": []}
+{"id": "corpus-real-e3a882c8", "spans": [{"start": 154, "end": 215, "text": "Дополнительная деталь, не относящаяся к документу, добавлена.", "reason": "excess", "type": "excess"}]}
+{"id": "corpus-real-f6a92033", "spans": [{"start": 24, "end": 34, "text": "1, № , ст.", "reason": "oversight", "type": "oversight"}]}
+{"id": "corpus-real-80184bb7", "spans": [{"start": 32, "end": 123, "text": "Документ также регулирует вопросы международной торговли, что не подтверждается источником.", "reason": "unconfirmed", "type": "unconfirmed"}]}
+{"id": "corpus-real-0e279b6e", "spans": []}
+{"id": "corpus-real-5e794597", "spans": [{"start": 247, "end": 248, "text": "…", "reason": "partial", "type": "partial"}]}
+{"id": "corpus-real-5d378c33", "spans": []}
+{"id": "corpus-real-be28f888", "spans": [{"start": 0, "end": 2, "text": "5.", "reason": "missing", "type": "missing"}]}
+{"id": "corpus-real-2c6ddd45", "spans": [{"start": 42, "end": 133, "text": "Документ также регулирует вопросы международной торговли, что не подтверждается источником.", "reason": "unconfirmed", "type": "unconfirmed"}]}
+{"id": "corpus-real-0fd8a254", "spans": []}
+{"id": "corpus-real-1b86be57", "spans": []}
+{"id": "corpus-real-1303f791", "spans": [{"start": 30, "end": 91, "text": "Дополнительная деталь, не относящаяся к документу, добавлена.", "reason": "excess", "type": "excess"}]}
+{"id": "corpus-real-8e11c421", "spans": [{"start": 3, "end": 6, "text": "[…]", "reason": "missing", "type": "missing"}]}
+{"id": "corpus-real-067e79f2", "spans": [{"start": 3, "end": 20, "text": "(условие опущено)", "reason": "partial", "type": "partial"}]}
+{"id": "corpus-real-7fefa601", "spans": []}
+{"id": "corpus-real-20fb905e", "spans": []}
+{"id": "corpus-real-a145f798", "spans": []}
+{"id": "corpus-real-b8fb180a", "spans": [{"start": 11, "end": 18, "text": "14 июня", "reason": "number_attribution", "type": "number_attribution"}]}
+{"id": "corpus-real-3f9709ad", "spans": [{"start": 23, "end": 39, "text": " ст. ; № 50, ст.", "reason": "oversight", "type": "oversight"}]}
+{"id": "corpus-real-bd3e71db", "spans": [{"start": 950, "end": 1041, "text": "Документ также регулирует вопросы международной торговли, что не подтверждается источником.", "reason": "unconfirmed", "type": "unconfirmed"}]}
+{"id": "corpus-real-8ae4b1f7", "spans": [{"start": 653, "end": 714, "text": "Дополнительная деталь, не относящаяся к документу, добавлена.", "reason": "excess", "type": "excess"}]}
+{"id": "corpus-real-8adbb823", "spans": [{"start": 942, "end": 943, "text": "…", "reason": "missing", "type": "missing"}]}
+{"id": "corpus-real-a311f59e", "spans": []}
+{"id": "corpus-real-6d6b56d6", "spans": []}
+{"id": "corpus-real-3fa38119", "spans": []}
+{"id": "corpus-real-348ed96a", "spans": [{"start": 49, "end": 50, "text": "4", "reason": "contradiction", "type": "contradiction"}]}
+{"id": "corpus-real-2106a7d2", "spans": []}
+{"id": "corpus-real-98af0d98", "spans": [{"start": 3, "end": 20, "text": "(условие опущено)", "reason": "partial", "type": "partial"}]}
+{"id": "corpus-real-b42c8c94", "spans": []}
+{"id": "corpus-real-d7007039", "spans": [{"start": 3, "end": 64, "text": "Дополнительная деталь, не относящаяся к документу, добавлена.", "reason": "excess", "type": "excess"}]}
+{"id": "corpus-real-7cdd60ca", "spans": [{"start": 22, "end": 113, "text": "Документ также регулирует вопросы международной торговли, что не подтверждается источником.", "reason": "unconfirmed", "type": "unconfirmed"}]}
+{"id": "corpus-real-1cc670b5", "spans": [{"start": 0, "end": 23, "text": "\"; ) часть четвертую ст", "reason": "oversight", "type": "oversight"}]}
+{"id": "corpus-real-0cafdfae", "spans": []}
+{"id": "corpus-real-768c5e15", "spans": []}
+{"id": "corpus-real-24b2b7a2", "spans": [{"start": 38, "end": 99, "text": "Дополнительная деталь, не относящаяся к документу, добавлена.", "reason": "excess", "type": "excess"}]}
+{"id": "corpus-real-10be354c", "spans": [{"start": 49, "end": 110, "text": "Дополнительная деталь, не относящаяся к документу, добавлена.", "reason": "excess", "type": "excess"}]}
+{"id": "corpus-real-9e4f6297", "spans": [{"start": 31, "end": 41, "text": "2, № , ст.", "reason": "oversight", "type": "oversight"}]}
+{"id": "corpus-real-d0da1460", "spans": [{"start": 21, "end": 33, "text": "3 следующего", "reason": "number_attribution", "type": "number_attribution"}]}
+{"id": "corpus-real-ed2b8f5b", "spans": [{"start": 412, "end": 437, "text": "атьи настоящего Кодекса, ", "reason": "oversight", "type": "oversight"}]}
+{"id": "corpus-real-2ba5f880", "spans": [{"start": 656, "end": 747, "text": "Документ также регулирует вопросы международной торговли, что не подтверждается источником.", "reason": "unconfirmed", "type": "unconfirmed"}]}
+{"id": "corpus-real-c68e8833", "spans": [{"start": 43, "end": 52, "text": "3 Кодекса", "reason": "number_attribution", "type": "number_attribution"}]}
+{"id": "corpus-real-fa0f819c", "spans": []}
+{"id": "corpus-real-137d5dc4", "spans": [{"start": 494, "end": 585, "text": "Документ также регулирует вопросы международной торговли, что не подтверждается источником.", "reason": "unconfirmed", "type": "unconfirmed"}]}
+{"id": "corpus-real-52158f0f", "spans": [{"start": 0, "end": 1, "text": "2", "reason": "partial", "type": "partial"}]}
+{"id": "corpus-real-ea1cb2ec", "spans": [{"start": 465, "end": 556, "text": "Документ также регулирует вопросы международной торговли, что не подтверждается источником.", "reason": "unconfirmed", "type": "unconfirmed"}]}
+{"id": "corpus-real-a014e9da", "spans": [{"start": 22, "end": 113, "text": "Документ также регулирует вопросы международной торговли, что не подтверждается источником.", "reason": "unconfirmed", "type": "unconfirmed"}]}
+{"id": "corpus-real-171ffb7d", "spans": []}
+{"id": "corpus-real-dbce0b4e", "spans": []}
+{"id": "corpus-real-5c8f6247", "spans": [{"start": 47, "end": 53, "text": "ужбе .", "reason": "oversight", "type": "oversight"}]}
+{"id": "corpus-real-0a5c0cde", "spans": []}
+{"id": "corpus-real-e0a426cc", "spans": []}
+{"id": "corpus-real-9f78aa76", "spans": [{"start": 107, "end": 108, "text": "…", "reason": "partial", "type": "partial"}]}
+{"id": "corpus-real-a8436818", "spans": []}
+{"id": "corpus-real-b7f4f4c1", "spans": [{"start": 19, "end": 29, "text": "7; № , ст.", "reason": "oversight", "type": "oversight"}]}
+{"id": "corpus-real-f2bbd14a", "spans": [{"start": 60, "end": 121, "text": "Дополнительная деталь, не относящаяся к документу, добавлена.", "reason": "excess", "type": "excess"}]}
+{"id": "corpus-real-6c373343", "spans": [{"start": 174, "end": 175, "text": "…", "reason": "partial", "type": "partial"}]}
+{"id": "corpus-real-88aefd53", "spans": []}
+{"id": "corpus-real-cbb8457d", "spans": [{"start": 497, "end": 499, "text": "91", "reason": "contradiction", "type": "contradiction"}]}
+{"id": "corpus-real-9c16316d", "spans": [{"start": 32, "end": 93, "text": "Дополнительная деталь, не относящаяся к документу, добавлена.", "reason": "excess", "type": "excess"}]}
+{"id": "corpus-real-a4dc3d8e", "spans": []}
+{"id": "corpus-real-243d8185", "spans": []}
+{"id": "corpus-real-ea0a96ec", "spans": [{"start": 22, "end": 39, "text": "(условие опущено)", "reason": "partial", "type": "partial"}]}
+{"id": "corpus-real-b15d91cf", "spans": [{"start": 260, "end": 261, "text": "…", "reason": "missing", "type": "missing"}]}
+{"id": "corpus-real-77471cc9", "spans": []}
+{"id": "corpus-real-26f7427e", "spans": []}
+{"id": "corpus-real-f68a9239", "spans": []}
+{"id": "corpus-real-0f4288d1", "spans": []}
+{"id": "corpus-real-23cb8720", "spans": []}
+{"id": "corpus-real-368ff193", "spans": [{"start": 0, "end": 13, "text": "27; № 50, ст.", "reason": "oversight", "type": "oversight"}]}
+{"id": "corpus-real-ff6a9eae", "spans": []}
+{"id": "corpus-real-4b22aaf1", "spans": [{"start": 21, "end": 112, "text": "Документ также регулирует вопросы международной торговли, что не подтверждается источником.", "reason": "unconfirmed", "type": "unconfirmed"}]}
+{"id": "corpus-real-c63b4377", "spans": []}
+{"id": "corpus-real-ea206b7c", "spans": []}
+{"id": "corpus-real-e71c393a", "spans": []}
+{"id": "corpus-real-212a5ea6", "spans": [{"start": 62, "end": 123, "text": "Дополнительная деталь, не относящаяся к документу, добавлена.", "reason": "excess", "type": "excess"}]}
+{"id": "corpus-real-b4ea3ecf", "spans": []}
+{"id": "corpus-real-45722bb5", "spans": []}
+{"id": "corpus-real-ab370b83", "spans": [{"start": 9, "end": 19, "text": "5, № , ст.", "reason": "oversight", "type": "oversight"}]}
+{"id": "corpus-real-8f758b76", "spans": [{"start": 3, "end": 94, "text": "Документ также регулирует вопросы международной торговли, что не подтверждается источником.", "reason": "unconfirmed", "type": "unconfirmed"}]}
+{"id": "corpus-real-315566fa", "spans": [{"start": 134, "end": 135, "text": "…", "reason": "partial", "type": "partial"}]}
+{"id": "corpus-real-60cc769e", "spans": [{"start": 1, "end": 16, "text": "137; , № 1, ст.", "reason": "oversight", "type": "oversight"}]}
+{"id": "corpus-real-79c57f73", "spans": []}
+{"id": "corpus-real-d85a95d2", "spans": [{"start": 16, "end": 33, "text": "(условие опущено)", "reason": "partial", "type": "partial"}]}
+{"id": "corpus-real-6a7704e5", "spans": [{"start": 0, "end": 1, "text": "П", "reason": "partial", "type": "partial"}]}
+{"id": "corpus-real-27c80c96", "spans": [{"start": 0, "end": 20, "text": "4822; 2018, № 1, ст.", "reason": "missing", "type": "missing"}]}
+{"id": "corpus-real-70488035", "spans": [{"start": 3, "end": 94, "text": "Документ также регулирует вопросы международной торговли, что не подтверждается источником.", "reason": "unconfirmed", "type": "unconfirmed"}]}
+{"id": "corpus-real-8f59ad43", "spans": [{"start": 60, "end": 61, "text": "…", "reason": "missing", "type": "missing"}]}
+{"id": "corpus-real-3c8b006c", "spans": [{"start": 22, "end": 39, "text": "(условие опущено)", "reason": "partial", "type": "partial"}]}
+{"id": "corpus-real-66bc7314", "spans": [{"start": 372, "end": 406, "text": "10 лет, что противоречит документу", "reason": "contradiction", "type": "contradiction"}]}
+{"id": "corpus-real-73493fc7", "spans": [{"start": 3, "end": 6, "text": "[…]", "reason": "missing", "type": "missing"}]}
+{"id": "corpus-real-cfaee01c", "spans": [{"start": 0, "end": 21, "text": "7312; 2018, № 31, ст.", "reason": "missing", "type": "missing"}]}
+{"id": "corpus-real-77d9d0c9", "spans": []}
+{"id": "corpus-real-cb2000a9", "spans": [{"start": 67, "end": 71, "text": "2012", "reason": "contradiction", "type": "contradiction"}]}
+{"id": "corpus-real-312f3163", "spans": [{"start": 361, "end": 362, "text": "…", "reason": "missing", "type": "missing"}]}
+{"id": "corpus-real-616852b8", "spans": []}
+{"id": "corpus-real-ca78dc78", "spans": [{"start": 0, "end": 2, "text": "\".", "reason": "missing", "type": "missing"}]}
+{"id": "corpus-real-8412e61a", "spans": []}
+{"id": "corpus-real-af7b76cb", "spans": []}
+{"id": "corpus-real-a7990b62", "spans": []}
+{"id": "corpus-real-e1e2f1ca", "spans": []}
+{"id": "corpus-real-5d385d47", "spans": [{"start": 15, "end": 32, "text": "(условие опущено)", "reason": "partial", "type": "partial"}]}
+{"id": "corpus-real-984a6c1f", "spans": [{"start": 43, "end": 44, "text": "…", "reason": "partial", "type": "partial"}]}
+{"id": "corpus-real-2be8934b", "spans": [{"start": 312, "end": 403, "text": "Документ также регулирует вопросы международной торговли, что не подтверждается источником.", "reason": "unconfirmed", "type": "unconfirmed"}]}
+{"id": "corpus-real-97ed26a4", "spans": [{"start": 336, "end": 397, "text": "Дополнительная деталь, не относящаяся к документу, добавлена.", "reason": "excess", "type": "excess"}]}
+{"id": "corpus-real-7e41e001", "spans": [{"start": 47, "end": 72, "text": "е от декабря 1957 года, п", "reason": "oversight", "type": "oversight"}]}
+{"id": "corpus-real-9c992f8e", "spans": [{"start": 15, "end": 16, "text": "…", "reason": "missing", "type": "missing"}]}
+{"id": "corpus-real-53319b7a", "spans": []}
+{"id": "corpus-real-f981c7cd", "spans": []}
+{"id": "corpus-real-cfdfa973", "spans": []}
+{"id": "corpus-real-7a35a9f3", "spans": [{"start": 58, "end": 83, "text": "реля года № 99-ФЗ \"О внес", "reason": "oversight", "type": "oversight"}]}
+{"id": "corpus-real-72834788", "spans": []}
+{"id": "corpus-real-d7a6cae0", "spans": []}
+{"id": "corpus-real-fb1761c0", "spans": [{"start": 221, "end": 312, "text": "Документ также регулирует вопросы международной торговли, что не подтверждается источником.", "reason": "unconfirmed", "type": "unconfirmed"}]}
+{"id": "corpus-real-9872df4e", "spans": []}
+{"id": "corpus-real-e9a3afe8", "spans": []}
+{"id": "corpus-real-193d7462", "spans": [{"start": 181, "end": 182, "text": "…", "reason": "missing", "type": "missing"}]}
+{"id": "corpus-real-f0fb8869", "spans": [{"start": 20, "end": 34, "text": "6 Федерального", "reason": "number_attribution", "type": "number_attribution"}]}
+{"id": "corpus-real-3687aade", "spans": [{"start": 0, "end": 21, "text": "4264; 2015, № 27, ст.", "reason": "missing", "type": "missing"}]}
+{"id": "corpus-real-62ee2280", "spans": []}
+{"id": "corpus-real-ae8f553e", "spans": [{"start": 193, "end": 194, "text": "…", "reason": "missing", "type": "missing"}]}
+{"id": "corpus-real-c425b5b5", "spans": []}
+{"id": "corpus-real-e4ebcc1a", "spans": []}
+{"id": "corpus-real-63728694", "spans": []}
+{"id": "corpus-real-9beb95a0", "spans": []}
+{"id": "corpus-real-4ed77bcf", "spans": []}
+{"id": "corpus-real-0ee68f1b", "spans": [{"start": 279, "end": 282, "text": "[…]", "reason": "missing", "type": "missing"}]}
+{"id": "corpus-real-0bec8252", "spans": []}
+{"id": "corpus-real-1789ac65", "spans": [{"start": 22, "end": 83, "text": "Дополнительная деталь, не относящаяся к документу, добавлена.", "reason": "excess", "type": "excess"}]}
+{"id": "corpus-real-edbc12d0", "spans": []}
+{"id": "corpus-real-a8794e8d", "spans": []}
+{"id": "corpus-real-6fe80ffc", "spans": [{"start": 44, "end": 105, "text": "Дополнительная деталь, не относящаяся к документу, добавлена.", "reason": "excess", "type": "excess"}]}
+{"id": "corpus-real-e2e7425a", "spans": [{"start": 20, "end": 37, "text": "(условие опущено)", "reason": "partial", "type": "partial"}]}
+{"id": "corpus-real-4b3ff6dc", "spans": []}
+{"id": "corpus-real-8cc3a8c7", "spans": []}
+{"id": "corpus-real-723f43e7", "spans": [{"start": 246, "end": 337, "text": "Документ также регулирует вопросы международной торговли, что не подтверждается источником.", "reason": "unconfirmed", "type": "unconfirmed"}]}
+{"id": "corpus-real-f3367882", "spans": []}
+{"id": "corpus-real-85b40d02", "spans": []}
+{"id": "corpus-real-19443492", "spans": [{"start": 22, "end": 113, "text": "Документ также регулирует вопросы международной торговли, что не подтверждается источником.", "reason": "unconfirmed", "type": "unconfirmed"}]}
+{"id": "corpus-real-e96ec982", "spans": []}
+{"id": "corpus-real-4ee02f19", "spans": [{"start": 1, "end": 17, "text": "148; , № 28, ст.", "reason": "oversight", "type": "oversight"}]}
+{"id": "corpus-real-6f070383", "spans": []}
+{"id": "corpus-real-5283884e", "spans": [{"start": 22, "end": 39, "text": "(условие опущено)", "reason": "partial", "type": "partial"}]}
+{"id": "corpus-real-7a88befa", "spans": []}
+{"id": "corpus-real-aeecbdbf", "spans": [{"start": 66, "end": 127, "text": "Дополнительная деталь, не относящаяся к документу, добавлена.", "reason": "excess", "type": "excess"}]}
+{"id": "corpus-real-446b0fa2", "spans": []}
+{"id": "corpus-real-f0352e56", "spans": []}
+{"id": "corpus-real-78f32d49", "spans": [{"start": 424, "end": 515, "text": "Документ также регулирует вопросы международной торговли, что не подтверждается источником.", "reason": "unconfirmed", "type": "unconfirmed"}]}
+{"id": "corpus-real-815d29e5", "spans": [{"start": 615, "end": 706, "text": "Документ также регулирует вопросы международной торговли, что не подтверждается источником.", "reason": "unconfirmed", "type": "unconfirmed"}]}
+{"id": "corpus-real-9f3cd197", "spans": [{"start": 22, "end": 113, "text": "Документ также регулирует вопросы международной торговли, что не подтверждается источником.", "reason": "unconfirmed", "type": "unconfirmed"}]}
+{"id": "corpus-real-7353a594", "spans": []}
+{"id": "corpus-real-dc122ea5", "spans": [{"start": 27, "end": 41, "text": "8 Федерального", "reason": "number_attribution", "type": "number_attribution"}]}
+{"id": "corpus-real-e25fe095", "spans": [{"start": 406, "end": 497, "text": "Документ также регулирует вопросы международной торговли, что не подтверждается источником.", "reason": "unconfirmed", "type": "unconfirmed"}]}
+{"id": "corpus-real-0f39f501", "spans": []}
+{"id": "corpus-real-7bc4e91f", "spans": [{"start": 372, "end": 375, "text": "[…]", "reason": "missing", "type": "missing"}]}
+{"id": "corpus-real-0a42dea1", "spans": [{"start": 201, "end": 292, "text": "Документ также регулирует вопросы международной торговли, что не подтверждается источником.", "reason": "unconfirmed", "type": "unconfirmed"}]}
+{"id": "corpus-real-61a82fc9", "spans": [{"start": 0, "end": 21, "text": "5031; 2014, № 52, ст.", "reason": "missing", "type": "missing"}]}
+{"id": "corpus-real-f98d3a1c", "spans": [{"start": 7, "end": 32, "text": "ункт изложить в следующей", "reason": "oversight", "type": "oversight"}]}
+{"id": "corpus-real-7a76ffce", "spans": [{"start": 466, "end": 473, "text": "2 слова", "reason": "number_attribution", "type": "number_attribution"}]}
+{"id": "corpus-real-b56e3f82", "spans": [{"start": 21, "end": 22, "text": "…", "reason": "partial", "type": "partial"}]}
+{"id": "corpus-real-b6014622", "spans": [{"start": 245, "end": 306, "text": "Дополнительная деталь, не относящаяся к документу, добавлена.", "reason": "excess", "type": "excess"}]}
+{"id": "corpus-real-b0e77490", "spans": [{"start": 22, "end": 83, "text": "Дополнительная деталь, не относящаяся к документу, добавлена.", "reason": "excess", "type": "excess"}]}
+{"id": "corpus-real-7109088a", "spans": []}
+{"id": "corpus-real-5737a27e", "spans": []}
+{"id": "corpus-real-a1be6219", "spans": [{"start": 16, "end": 19, "text": "[…]", "reason": "missing", "type": "missing"}]}
+{"id": "corpus-real-da20fef3", "spans": [{"start": 90, "end": 91, "text": "…", "reason": "partial", "type": "partial"}]}
+{"id": "corpus-real-7a66ab87", "spans": []}
+{"id": "corpus-real-6759bda9", "spans": [{"start": 314, "end": 348, "text": "10 лет, что противоречит документу", "reason": "contradiction", "type": "contradiction"}]}
+{"id": "corpus-real-04581a0b", "spans": [{"start": 1, "end": 26, "text": "848; , № 50, ст. \"; 4) в ", "reason": "oversight", "type": "oversight"}]}
+{"id": "corpus-real-1ca4f74c", "spans": [{"start": 28, "end": 31, "text": "[…]", "reason": "missing", "type": "missing"}]}
+{"id": "corpus-real-ce24f9b8", "spans": []}
+{"id": "corpus-real-19a8a672", "spans": [{"start": 12, "end": 13, "text": "…", "reason": "missing", "type": "missing"}]}
+{"id": "corpus-real-7e511389", "spans": [{"start": 405, "end": 466, "text": "Дополнительная деталь, не относящаяся к документу, добавлена.", "reason": "excess", "type": "excess"}]}
+{"id": "corpus-real-47ef54ce", "spans": []}
+{"id": "corpus-real-0a163dc0", "spans": [{"start": 3, "end": 94, "text": "Документ также регулирует вопросы международной торговли, что не подтверждается источником.", "reason": "unconfirmed", "type": "unconfirmed"}]}
+{"id": "corpus-real-96b42540", "spans": []}
+{"id": "corpus-real-bfd3c88c", "spans": [{"start": 48, "end": 58, "text": "22 октября", "reason": "number_attribution", "type": "number_attribution"}]}
+{"id": "corpus-real-1693dbb5", "spans": []}
+{"id": "corpus-real-d790bc5d", "spans": [{"start": 9, "end": 10, "text": "8", "reason": "contradiction", "type": "contradiction"}]}
+{"id": "corpus-real-362a312a", "spans": [{"start": 281, "end": 315, "text": "10 лет, что противоречит документу", "reason": "contradiction", "type": "contradiction"}]}
+{"id": "corpus-real-b6cd8331", "spans": [{"start": 391, "end": 482, "text": "Документ также регулирует вопросы международной торговли, что не подтверждается источником.", "reason": "unconfirmed", "type": "unconfirmed"}]}
+{"id": "corpus-real-a8ef42f2", "spans": []}
+{"id": "corpus-real-216340d2", "spans": [{"start": 3, "end": 20, "text": "(условие опущено)", "reason": "partial", "type": "partial"}]}
+{"id": "corpus-real-eb95cbae", "spans": [{"start": 1305, "end": 1396, "text": "Документ также регулирует вопросы международной торговли, что не подтверждается источником.", "reason": "unconfirmed", "type": "unconfirmed"}]}
+{"id": "corpus-real-e19ca5de", "spans": []}
+{"id": "corpus-real-97ff63e3", "spans": [{"start": 208, "end": 209, "text": "…", "reason": "partial", "type": "partial"}]}
+{"id": "corpus-real-2c03b743", "spans": [{"start": 27, "end": 29, "text": "51", "reason": "contradiction", "type": "contradiction"}]}
+{"id": "corpus-real-edfb6a8b", "spans": [{"start": 361, "end": 395, "text": "10 лет, что противоречит документу", "reason": "contradiction", "type": "contradiction"}]}
+{"id": "corpus-real-0a321d17", "spans": [{"start": 9, "end": 25, "text": " ст. ; № 27, ст.", "reason": "oversight", "type": "oversight"}]}
+{"id": "corpus-real-5febe037", "spans": []}
+{"id": "corpus-real-65c76ae0", "spans": [{"start": 21, "end": 22, "text": "…", "reason": "partial", "type": "partial"}]}
+{"id": "corpus-real-d295debd", "spans": []}
+{"id": "corpus-real-c52235eb", "spans": [{"start": 48, "end": 55, "text": "24 часа", "reason": "number_attribution", "type": "number_attribution"}]}
+{"id": "corpus-real-ed8f11ba", "spans": [{"start": 8, "end": 10, "text": "26", "reason": "contradiction", "type": "contradiction"}]}
+{"id": "corpus-real-3904bf85", "spans": []}
+{"id": "corpus-real-34803b3a", "spans": [{"start": 0, "end": 20, "text": ". Распитие пива и на", "reason": "oversight", "type": "oversight"}]}
+{"id": "corpus-real-89a9723a", "spans": [{"start": 19, "end": 110, "text": "Документ также регулирует вопросы международной торговли, что не подтверждается источником.", "reason": "unconfirmed", "type": "unconfirmed"}]}
+{"id": "corpus-real-3fbf1570", "spans": [{"start": 3, "end": 4, "text": "2", "reason": "contradiction", "type": "contradiction"}]}
+{"id": "corpus-real-2714685e", "spans": [{"start": 0, "end": 1, "text": "2", "reason": "partial", "type": "partial"}]}
+{"id": "corpus-real-ae45d691", "spans": [{"start": 209, "end": 210, "text": "2", "reason": "contradiction", "type": "contradiction"}]}
+{"id": "corpus-real-f05e819f", "spans": []}
+{"id": "corpus-real-0afd499d", "spans": [{"start": 238, "end": 239, "text": "…", "reason": "partial", "type": "partial"}]}
+{"id": "corpus-real-8ec76cbf", "spans": []}
+{"id": "corpus-real-3b69c216", "spans": [{"start": 14, "end": 16, "text": "27", "reason": "contradiction", "type": "contradiction"}]}
+{"id": "corpus-real-944b50c9", "spans": [{"start": 170, "end": 173, "text": "452", "reason": "contradiction", "type": "contradiction"}]}
+{"id": "corpus-real-b0005a64", "spans": [{"start": 303, "end": 304, "text": "…", "reason": "partial", "type": "partial"}]}
+{"id": "corpus-real-641cf430", "spans": [{"start": 21, "end": 82, "text": "Дополнительная деталь, не относящаяся к документу, добавлена.", "reason": "excess", "type": "excess"}]}
+{"id": "corpus-real-9a09ef85", "spans": [{"start": 22, "end": 39, "text": "(условие опущено)", "reason": "partial", "type": "partial"}]}
+{"id": "corpus-real-afb9bd65", "spans": [{"start": 0, "end": 14, "text": "## Статья 4 1.", "reason": "missing", "type": "missing"}]}
+{"id": "corpus-real-18d73997", "spans": [{"start": 73, "end": 74, "text": "…", "reason": "partial", "type": "partial"}]}
+{"id": "corpus-real-094a71c8", "spans": []}
+{"id": "corpus-real-8e5610b9", "spans": [{"start": 0, "end": 7, "text": "рублей.", "reason": "missing", "type": "missing"}]}

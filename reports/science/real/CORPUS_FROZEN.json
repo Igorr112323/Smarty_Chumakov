@@ -1,0 +1,103 @@
+{
+  "kind": "corpus_frozen",
+  "created_at": "2026-10-24T08:10:52.014675Z",
+  "created_by": "CORPUS-REAL-R1",
+  "source": "LawCodex/ru pin 5806f92",
+  "manifest_sha256": "1d076c90f5af9932f4932422bfdc49a75a8c1052a7a6423cf04278311ba0aa98",
+  "seed": 42,
+  "date": "2026-10-24",
+  "author": "deterministic generation (no LLM)",
+  "determinism": "seed фиксирован до генерации, выбор позиции детерминирован от sha256(id пары)",
+  "split": {
+    "by": "document (parent id)",
+    "rule": "deterministic hash shuffle by sha256(seed:split:doc_id), first 300 dev, next 1200 test, zero overlap",
+    "real_dev": 300,
+    "real_test": 1200,
+    "total": 1500,
+    "dev_ids": [
+      "fkz/2006/fkz-2006-6-ob-obrazovanii-v-sostave-rossiiskoi-federatsii-novogo-subekta",
+      "fkz/2009/fkz-2009-3-o-vnesenii-izmenenii-v-federalnyi-konstitutsionnyi-zakon-o-voennykh",
+      "fkz/2014/fkz-2014-20-o-vnesenii-izmenenii-v-federalnyi-konstitutsionnyi-zakon-o-prinyatii",
+      "fkz/2024/fkz-2024-2-o-vnesenii-izmenenii-v-statyu-12-1-federalnogo-konstitutsionnogo",
+      "fz/1994/fz-1994-27-o-vnesenii-izmenenii-i-dopolnenii-v-ugolovno-protsessualnyi-kodeks"
+    ],
+    "test_ids": [
+      "fkz/2004/fkz-2004-2-o-vnesenii-izmenenii-v-stati-24-i-33-1-federalnogo-konstitutsionnogo",
+      "fkz/2006/fkz-2006-7-o-vnesenii-izmenenii-v-stati-48-i-52-federalnogo-konstitutsionnogo",
+      "fkz/2007/fkz-2007-4-o-vnesenii-izmeneniya-v-statyu-9-federalnogo-konstitutsionnogo-zakona",
+      "fkz/2007/fkz-2007-5-ob-obrazovanii-v-sostave-rossiiskoi-federatsii-novogo-subekta",
+      "fkz/2007/fkz-2007-6-o-vnesenii-izmenenii-v-stati-24-i-33-1-federalnogo-konstitutsionnogo"
+    ],
+    "overlap": 0
+  },
+  "quotas": {
+    "faithful": 600,
+    "per_error_min": 128,
+    "per_error": {
+      "faithful": 600,
+      "contradiction": 129,
+      "partial": 129,
+      "number_attribution": 129,
+      "unconfirmed": 129,
+      "missing": 128,
+      "oversight": 128,
+      "excess": 128
+    },
+    "faithful_share": 0.4,
+    "clean_40pct": true
+  },
+  "definitions": {
+    "faithful": "без искажений (чистые пары, ≥ 40 %) | faithful",
+    "contradiction": "значение заменено на другое | Contradiction",
+    "partial": "отброшено условие, смысл искажён | Partial",
+    "number_attribution": "число взято из факта другого объекта | Contradiction (подтип)",
+    "unconfirmed": "добавлено утверждение, которого нет в документе | Unconfirmed",
+    "missing": "обязательная деталь пропущена | Missing",
+    "oversight": "важное значение потеряно при пересказе | Oversight",
+    "excess": "добавлена лишняя деталь | Excess"
+  },
+  "files": {
+    "reports/science/real/real_dev_pairs.jsonl": {
+      "sha256": "23af4ebe3a58c921a9591e6bdcb51601a78462694a12f49fef5736ba36aa4972",
+      "path": "reports/science/real/real_dev_pairs.jsonl"
+    },
+    "reports/science/real/real_test_pairs.jsonl": {
+      "sha256": "4a4d45cbdb19ad6a37d0cdb4954b13292e381a31be1894197e0b7e916897a07d",
+      "path": "reports/science/real/real_test_pairs.jsonl"
+    },
+    "reports/science/real/real_all_pairs.jsonl": {
+      "sha256": "e9546ff284eb561e73b362f057d0d175d8963a2cdeb3307a1f8eb8d9854afc3b",
+      "path": "reports/science/real/real_all_pairs.jsonl"
+    },
+    "reports/science/real/real_dev_spans.jsonl": {
+      "sha256": "c0af0a3d523d9b83451940259b15f8e4d628920c74f1a2d43c01f833064d0355",
+      "path": "reports/science/real/real_dev_spans.jsonl"
+    },
+    "reports/science/real/real_test_spans.jsonl": {
+      "sha256": "ce6134e7b825a8f3e26136e42809c9514bf38eae15638b5dc2e92ca1738fba65",
+      "path": "reports/science/real/real_test_spans.jsonl"
+    },
+    "reports/science/real/splits/dev.jsonl": {
+      "sha256": "23af4ebe3a58c921a9591e6bdcb51601a78462694a12f49fef5736ba36aa4972",
+      "path": "reports/science/real/splits/dev.jsonl"
+    },
+    "reports/science/real/splits/test.jsonl": {
+      "sha256": "4a4d45cbdb19ad6a37d0cdb4954b13292e381a31be1894197e0b7e916897a07d",
+      "path": "reports/science/real/splits/test.jsonl"
+    }
+  },
+  "span_stats": {
+    "n_spans": 900,
+    "min_len": 1,
+    "median_len": 10,
+    "max_len": 91,
+    "share_of_answer": 0.11483500532240895,
+    "avg_spans_per_injected": 1.0
+  },
+  "asserts": {
+    "spans_text_equals_slice": "100% verified",
+    "clean_share_40pct": true,
+    "per_type_min_40": true,
+    "split_no_overlap": true
+  }
+}
