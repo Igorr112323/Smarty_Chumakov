@@ -1,0 +1,51 @@
+{
+  "schema": "frozen-r2-v1",
+  "run_id": "r2-exp-d-20261023",
+  "training_run_id": "r2-exp-d-20261023",
+  "frozen_at": "2026-10-23T16:30:00Z",
+  "base_commit": "4fff418cfb28cc8fd4dc8471bbc90cc655ad9892",
+  "branch": "science/r2-exp-d",
+  "bundle_sha256": "e0b13c693a058dfd66ed24a52fc14e9c70964e95885358e7b99cc1f328ad6892",
+  "bundle_bytes": 122874,
+  "bundle_source": "spanverify-module/reports/experiments/p5_span_filter/run39170981235/combined_bundle.json",
+  "calibrator": {
+    "path_demo": "reports/science/r2/r2_calibrator.demo.json",
+    "sha256_demo": "81de01756cfc4e231d673997db0746e8f419cd38e48248a0a4c849e5fd1ac6ab",
+    "path_hf": "reports/science/r2/r2_calibrator.hf.json",
+    "sha256_hf": "1589575e2637e3a86dab71e12b95d9b7c06b41ec4254a6f8294414d6ee9bebf7",
+    "mode_demo": "demo",
+    "mode_hf": "hf",
+    "source": "dev181-fragment-mean",
+    "determinism": "sorted doc_id (62 unique docs from 181 pairs, not truncated — dedup by meta.doc_id), hash-based synthetic 5 shapes (0,25,50,75,100) 310 mixtures, 5-doc-fold OOF, seed-free PAVA, no GPU, no refit of weights, no external pre-trained scorer"
+  },
+  "training": {
+    "script": "reports/science/r2/train_r2_calibrator.py",
+    "run_id": "r2-exp-d-20261023",
+    "oof": "reports/science/r2/r2_oof_calibration.json",
+    "raw_scores": "reports/science/r2/r2_raw_scores.json",
+    "dev_docs": 62,
+    "dev_pairs": 181,
+    "mixtures": 310,
+    "folds": 5,
+    "oof_before_mae": 0.04106406143770091,
+    "oof_after_mae": 0.00564516129032258,
+    "oof_after_curve": [0.004032258064516129, 0.2540322580645161, 0.5161290322580645, 0.7540322580645161, 1.0],
+    "monotone_by_shape": true,
+    "test177_used": false
+  },
+  "invariant": {
+    "gpu": 0,
+    "refit_weights": false,
+    "frozen_weights": "e0b13c69… unchanged 443.5 MB, bundle 122874 B",
+    "thresholds": "frozen P5 thresholds unchanged",
+    "span_filter": "unchanged P5 span_filter",
+    "weights_source": "p5_span_filter/run39170981235/combined_bundle.json"
+  },
+  "reproducibility": {
+    "command": "python reports/science/r2/train_r2_calibrator.py",
+    "env": "demo backend, no torch, deterministic hash-based synthetic, PAVA monotone",
+    "code": "spanverify/r2_share.py IsotonicFragmentAggregator.fit",
+    "suite": ">=913, check_numbers PASS 22, VERIFICATION.json all_true"
+  },
+  "provenance": "Кураторское решение: Дорожка Д самодостаточна для v2, Ф закрыта. Frozen-r2 — детерминированный артефакт трансфера dev→prod, без fit/train до официального прогона test177."
+}
