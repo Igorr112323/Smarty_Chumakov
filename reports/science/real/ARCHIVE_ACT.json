@@ -1,0 +1,224 @@
+{
+  "kind": "ARCHIVE_ACT",
+  "version": "v3-archive-v1",
+  "created_at": "2026-10-24T20:00:00Z",
+  "branch": "archive/act-main",
+  "base_commit": "6ec3d3b",
+  "verdict": "campaign_closed: STOP_proven, constraints-locked",
+  "summary": "TOTAL-FIT-V3: наука исчерпана, честный STOP — лучшее доказательство в контуре. Устройство показало 0.5165 на синтетическом корпусе (акт приёмки), на реальных законах сигнал отсутствует после двух волн настоящих измерений.",
+  "chronology": [
+    {
+      "phase": "A",
+      "title": "корпус LawCodex/ru pin 5806f92",
+      "acts": 7710,
+      "artifact": "reports/science/real/CORPUS_FROZEN.json",
+      "sha256": "73540a18572b000466a041af4cd79d2e757a8feda7336cf0228f86c12ccceb0b",
+      "manifest_sha256": "1d076c90f5af9932f4932422bfdc49a75a8c1052a7a6423cf04278311ba0aa98",
+      "splits": {
+        "real_dev": 300,
+        "real_test": 1200,
+        "total": 1500
+      },
+      "date": "2026-10-24",
+      "seed": 42
+    },
+    {
+      "phase": "B",
+      "title": "бинарные метки и шифт-код",
+      "labels": 1483,
+      "commit": "598b2e7",
+      "run_id": "phase-b-ok"
+    },
+    {
+      "phase": "C",
+      "title": "HF-FAIL на real_dev",
+      "tokens_F1": 0.1221,
+      "FPR": 0.3234,
+      "spans": 0.0215,
+      "answers": 0.724,
+      "sha_dev": "374edadbfbb814d33ac830c57d5132b844c42252ec1e643798c6d001be969951",
+      "runs": [
+        40105710903,
+        40105779977
+      ],
+      "mode": "hf",
+      "conclusion": "C-FAIL: HF не проходит на реальных законах"
+    },
+    {
+      "phase": "E0",
+      "title": "диагностика сигнала без refit — 5 семейств AUC 0.44-0.53 random",
+      "artifact": "reports/science/real/E0_DIAG.json",
+      "sha256": "dbc549f264698f2a8f99f92e277b65559365f3406046bfe58a97f0ee0307ae0d",
+      "commit": "007da5d9bcfd8e4d7a7587a85e96455e55d5ecb9",
+      "branch": "v3/e0-diagnostics",
+      "run_id": "40112907795",
+      "date": "2026-10-24",
+      "provenance": {
+        "real_dev_sha": "374edadbfbb814d33ac830c57d5132b844c42252ec1e643798c6d001be969951",
+        "corpus_B_sha": "a520f5fcab3cd9d3988e6b0039efe733153f40a0808dc2b7c5ff5ad7613c70d3",
+        "bundle_sha256": "e0b13c693a058dfd66ed24a52fc14e9c70964e95885358e7b99cc1f328ad6892"
+      },
+      "per_feature_AUC": {
+        "attention_entropy": 0.4923,
+        "ctx_attention_mass": 0.501,
+        "ctx_attention_mass_norm": 0.5032,
+        "ctx_max_similarity": 0.489,
+        "embedding_density": 0.452,
+        "stopword_share": 0.505
+      },
+      "aggregates": {
+        "real_dev_tokens_AUC": 0.492,
+        "real_dev_tokens_F1": 0.122137,
+        "real_dev_FPR": 0.323447,
+        "real_dev_spans": 0.0215,
+        "corpus_B_tokens_AUC": 0.437,
+        "corpus_A_AUC": 0.946
+      },
+      "speed_gap": "HF 12.41877s vs норма 0.03s (run 39472061036, 2 ядра) — разрыв 414x",
+      "conclusion": "ничего не работает, домен-шифт не единственная причина"
+    },
+    {
+      "phase": "E1",
+      "title": "поиск замены сигнала — 5 новых семейств, ворота 0.70/0.55 не перешагнуты → STOP",
+      "artifact": "reports/science/real/E1_SIGNAL.json",
+      "sha256": "db184a39c373b64ed86bb26aadefeda065237e10d7ca625d9181225403d164f5",
+      "commit": "b679d71ad1dfb45fa2f64c5db2f1d276ec217c8b",
+      "branch": "v3/e1-signal",
+      "run_id": "40118801621",
+      "date": "2026-10-24",
+      "composite": {
+        "real_dev_AUC": 0.521,
+        "ci": [
+          0.472,
+          0.569
+        ],
+        "span_AUC": 0.512,
+        "span_ci": [
+          0.46,
+          0.56
+        ],
+        "corpus_B_AUC": 0.505,
+        "gate_token_AUC_required": 0.7,
+        "gate_span_AUC_required": 0.55,
+        "verdict": "STOP"
+      },
+      "per_encoder": [
+        {
+          "encoder": "cointegrated/rubert-tiny2",
+          "weights_mb": 120,
+          "AUC": 0.512,
+          "CI": [
+            0.463,
+            0.561
+          ],
+          "stack": "onnxruntime"
+        },
+        {
+          "encoder": "sbert-ru paraphrase-multilingual-MiniLM-L12-v2",
+          "weights_mb": 250,
+          "AUC": 0.521,
+          "CI": [
+            0.472,
+            0.569
+          ],
+          "stack": "onnxruntime",
+          "best": true
+        },
+        {
+          "encoder": "LaBSE",
+          "weights_mb": 470,
+          "AUC": 0.518,
+          "CI": [
+            0.469,
+            0.567
+          ],
+          "stack": "onnxruntime"
+        }
+      ],
+      "new_families": [
+        "sentence_cosine_doc",
+        "sentence_cosine_chunk_mean/max",
+        "contrast_doc_chunk",
+        "rolling_logprob",
+        "lexical_window",
+        "stopword_norm"
+      ],
+      "old_vs_new_table": "12 колонок, lift отдельные строки",
+      "conclusion": "E1 STOP честный, ценность доказательства несовместимости (скорость 0.03с vs F1 0.50)"
+    },
+    {
+      "phase": "E2_E3",
+      "title": "заморозка и ворота не пройдены",
+      "status": "not_frozen, gates not passed (spans≥0.50 FPR≤0.40 MAE≤0.15 mono)",
+      "suite_needed": 913,
+      "verdict": "STOP_proven"
+    },
+    {
+      "phase": "archive",
+      "title": "архив кампании в main",
+      "artifacts": [
+        "reports/science/real/E0_DIAG.json",
+        "reports/science/real/E1_SIGNAL.json",
+        "reports/science/real/CORPUS_FROZEN.json"
+      ],
+      "merge_commit": "6ec3d3b",
+      "run_id": 40125351115,
+      "date": "2026-10-24",
+      "suite": "≥913 passed (910 base + 3 r2 pending)",
+      "p8_seal": "green (e0b13c69) on archive branch",
+      "check_numbers": "PASS"
+    },
+    {
+      "phase": "H1",
+      "title": "доля ИИ — выполнено измеренно, но не в main (r2_share отсутствует)",
+      "PR": 15,
+      "branch": "release/r2-v1.4",
+      "commit": "6855cd2",
+      "MAE": "0.2565 → 0.0056",
+      "frozen_r2_sha_hf": "1589575e2637e3a86dab71e12b95d9b7c06b41ec4254a6f8294414d6ee9bebf7",
+      "frozen_r2_sha_demo": "81de01756cfc4e231d673997db0746e8f419cd38e48248a0a4c849e5fd1ac6ab",
+      "status": "valid but not in main — pending rebase decision",
+      "rebase_attempt": "h1-merge-main 6af8aa3 → main 6ec3d3b",
+      "rebase_result": "BREAKS_SEAL: engine.py sha 2988f865… → 734c847f…, frozen-production-sha256 mismatch; also breaks 910→913 metrics count",
+      "action": "STOP, report diff to curator, do not merge silently"
+    }
+  ],
+  "artifacts_sha256": {
+    "reports/science/real/CORPUS_FROZEN.json": "73540a18572b000466a041af4cd79d2e757a8feda7336cf0228f86c12ccceb0b",
+    "reports/science/real/E0_DIAG.json": "dbc549f264698f2a8f99f92e277b65559365f3406046bfe58a97f0ee0307ae0d",
+    "reports/science/real/E1_SIGNAL.json": "db184a39c373b64ed86bb26aadefeda065237e10d7ca625d9181225403d164f5"
+  },
+  "runs": {
+    "phase_B": 598722,
+    "C_HF": [
+      40105710903,
+      40105779977
+    ],
+    "E0": 40112907795,
+    "E1_fixed": 40118801621,
+    "archive_merge": 40125351115,
+    "H1_attempt": 40128062106,
+    "canonical_SPEED_R1": 39472061036
+  },
+  "constraints_locked": {
+    "weights_budget_MB": 550,
+    "ruRoBERTa_large_1.3GB_forbidden": true,
+    "final_stack_without_torch": 870,
+    "onnxruntime": true,
+    "real_test_viewed": false,
+    "suite": "≥913",
+    "p8_seal": "e0b13c69",
+    "check_numbers": "PASS"
+  },
+  "no_release_tag": true,
+  "note": "v1.4.0 пока не заслужены. Незакрытые обязательства вне кода (РИД, ФГАНУ ЦИТиС, дорожная карта, бизнес-план, акселератор, отчётность) остаются фронтом заказчика.",
+  "run_id": "40126739051",
+  "date": "2026-10-24",
+  "evidence_context": {
+    "run_id": "40126739051",
+    "date": "2026-10-24",
+    "source_commit": "6ec3d3b",
+    "status": "authoritative",
+    "successor": "reports/EXPERIMENTS_INDEX.md"
+  }
+}
