@@ -1,0 +1,270 @@
+{
+  "fingerprint": {
+    "cpu_model": "Intel(R) Xeon(R) Processor @ 2.60GHz",
+    "cpu_logical": 2,
+    "cpu_affinity": [
+      0,
+      1
+    ],
+    "meminfo_first_line": "MemTotal:        4034452 kB",
+    "os": "Linux-6.1.158+-x86_64-with-glibc2.36",
+    "python": "3.11.2 (main, Apr  8 2026, 01:58:00) [GCC 12.2.0]",
+    "git_sha": "4fff418cfb28cc8fd4dc8471bbc90cc655ad9892",
+    "git_branch": "science/r2-exp-d",
+    "env_threads": {
+      "OMP_NUM_THREADS": "unset",
+      "OPENBLAS_NUM_THREADS": "unset",
+      "MKL_NUM_THREADS": "unset"
+    },
+    "bundle_sha256": "e0b13c693a058dfd66ed24a52fc14e9c70964e95885358e7b99cc1f328ad6892",
+    "model": "ai-forever/rugpt3small_based_on_gpt2"
+  },
+  "rows": [
+    {
+      "mode": "demo",
+      "scenario": "answer-text",
+      "chars": 1000,
+      "thermal": "warm-model",
+      "repeats": 3,
+      "raw_seconds": [
+        0.01794215000006716,
+        0.014303539000025012,
+        0.014460177000046315
+      ],
+      "median_s": 0.014460177000046315,
+      "p95_s": 0.01759395270006507,
+      "mean_s": 0.015568622000046162,
+      "min_s": 0.014303539000025012,
+      "max_s": 0.01794215000006716,
+      "limit_s": 0.03,
+      "pass": "PASS",
+      "details_first": {
+        "status": "completed",
+        "mode": "demo",
+        "scenario": "answer-text",
+        "chars": 1000,
+        "thermal": "warm-model",
+        "weights_load_s": 0.006694139000046562,
+        "verifier_init_s": 0.004713538000032713,
+        "warmup_s": 0.0063995230000273295,
+        "tokenization_s": 0.0003923029998986749,
+        "verify_s": 0.01794215000006716,
+        "serialization_s": 5.856000029780262e-06,
+        "total_s": 0.03575520600020354,
+        "latency_ms_reported": 17.86549600001308,
+        "profile_top": [],
+        "features_meta": {
+          "backend": "demo",
+          "token_count": 144,
+          "context_tokens": 70,
+          "context_numbers": [
+            "1",
+            "12",
+            "2",
+            "2022",
+            "4"
+          ],
+          "k": 5
+        },
+        "spans": 0,
+        "token_count": 144,
+        "mean_risk": 0.1712,
+        "answer_chars": 1000,
+        "context_chars": 494
+      }
+    },
+    {
+      "mode": "demo",
+      "scenario": "answer-text",
+      "chars": 1000,
+      "thermal": "cold-process",
+      "repeats": 3,
+      "raw_seconds": [
+        0.014450751000026685,
+        0.014628236000021388,
+        0.014294350000000122
+      ],
+      "median_s": 0.014450751000026685,
+      "p95_s": 0.014610487500021918,
+      "mean_s": 0.014457779000016066,
+      "min_s": 0.014294350000000122,
+      "max_s": 0.014628236000021388,
+      "limit_s": 0.03,
+      "pass": "PASS",
+      "details_first": {
+        "status": "completed",
+        "mode": "demo",
+        "scenario": "answer-text",
+        "chars": 1000,
+        "thermal": "cold-process",
+        "weights_load_s": 0.0022940910000670556,
+        "verifier_init_s": 0.0013727660000313335,
+        "warmup_s": null,
+        "tokenization_s": 0.0002505950000113444,
+        "verify_s": 0.014450751000026685,
+        "serialization_s": 6.741999982295965e-06,
+        "total_s": 0.01812435000010737,
+        "latency_ms_reported": 14.36411599991061,
+        "profile_top": [],
+        "features_meta": {
+          "backend": "demo",
+          "token_count": 144,
+          "context_tokens": 70,
+          "context_numbers": [
+            "1",
+            "12",
+            "2",
+            "2022",
+            "4"
+          ],
+          "k": 5
+        },
+        "spans": 0,
+        "token_count": 144,
+        "mean_risk": 0.1712,
+        "answer_chars": 1000,
+        "context_chars": 494
+      }
+    },
+    {
+      "mode": "demo",
+      "scenario": "answer-text",
+      "chars": 50000,
+      "thermal": "warm-model",
+      "repeats": 3,
+      "raw_seconds": [
+        0.643496798000001,
+        0.6228078090000508,
+        0.6469018799999731
+      ],
+      "median_s": 0.643496798000001,
+      "p95_s": 0.6465613717999759,
+      "mean_s": 0.637735495666675,
+      "min_s": 0.6228078090000508,
+      "max_s": 0.6469018799999731,
+      "limit_s": 1.0,
+      "pass": "PASS",
+      "details_first": {
+        "status": "completed",
+        "mode": "demo",
+        "scenario": "answer-text",
+        "chars": 50000,
+        "thermal": "warm-model",
+        "weights_load_s": 0.001866387999939434,
+        "verifier_init_s": 0.0015038399999411922,
+        "warmup_s": 0.003184390000001258,
+        "tokenization_s": 0.013286778999940907,
+        "verify_s": 0.643496798000001,
+        "serialization_s": 2.2575000002689194e-05,
+        "total_s": 0.6500739909998856,
+        "latency_ms_reported": 639.4897720000472,
+        "profile_top": [],
+        "features_meta": {
+          "backend": "demo",
+          "token_count": 7073,
+          "context_tokens": 70,
+          "context_numbers": [
+            "1",
+            "12",
+            "2",
+            "2022",
+            "4"
+          ],
+          "k": 5
+        },
+        "spans": 0,
+        "token_count": 7073,
+        "mean_risk": 0.1688,
+        "answer_chars": 50000,
+        "context_chars": 494
+      }
+    },
+    {
+      "mode": "demo",
+      "scenario": "answer-text",
+      "chars": 50000,
+      "thermal": "cold-process",
+      "repeats": 3,
+      "raw_seconds": [
+        0.6715838000000076,
+        0.6270919779999531,
+        0.7198259049999933
+      ],
+      "median_s": 0.6715838000000076,
+      "p95_s": 0.7150016944999947,
+      "mean_s": 0.672833894333318,
+      "min_s": 0.6270919779999531,
+      "max_s": 0.7198259049999933,
+      "limit_s": 1.0,
+      "pass": "PASS",
+      "details_first": {
+        "status": "completed",
+        "mode": "demo",
+        "scenario": "answer-text",
+        "chars": 50000,
+        "thermal": "cold-process",
+        "weights_load_s": 0.0017874669999855541,
+        "verifier_init_s": 0.002198619000068902,
+        "warmup_s": null,
+        "tokenization_s": 0.02094634299999143,
+        "verify_s": 0.6715838000000076,
+        "serialization_s": 1.7400000047018693e-05,
+        "total_s": 0.6755872860001091,
+        "latency_ms_reported": 667.9431309999018,
+        "profile_top": [],
+        "features_meta": {
+          "backend": "demo",
+          "token_count": 7073,
+          "context_tokens": 70,
+          "context_numbers": [
+            "1",
+            "12",
+            "2",
+            "2022",
+            "4"
+          ],
+          "k": 5
+        },
+        "spans": 0,
+        "token_count": 7073,
+        "mean_risk": 0.1688,
+        "answer_chars": 50000,
+        "context_chars": 494
+      }
+    }
+  ],
+  "fixed_marginal": [
+    {
+      "scenario": "answer-text",
+      "thermal": "warm-model",
+      "fixed_cost_s": 0.0016226949388227219,
+      "marginal_per_1000_s": 0.012837482061223567,
+      "points": [
+        [
+          1000,
+          0.014460177000046315
+        ],
+        [
+          50000,
+          0.643496798000001
+        ]
+      ]
+    },
+    {
+      "scenario": "answer-text",
+      "thermal": "cold-process",
+      "fixed_cost_s": 0.0010398724490066624,
+      "marginal_per_1000_s": 0.01341087855102002,
+      "points": [
+        [
+          1000,
+          0.014450751000026685
+        ],
+        [
+          50000,
+          0.6715838000000076
+        ]
+      ]
+    }
+  ]
+}

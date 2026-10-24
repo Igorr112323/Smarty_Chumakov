@@ -1,0 +1,235 @@
+{
+  "metrics": {
+    "tokens": {
+      "precision": 0.5787878787878787,
+      "recall": 0.6797153024911032,
+      "f1": 0.6252045826513911,
+      "fpr": 0.015466785356626237,
+      "tp": 191,
+      "fp": 139,
+      "fn": 90,
+      "tn": 8848,
+      "auc": 0.971716560140052
+    },
+    "spans": {
+      "precision": 0.5529411764705883,
+      "recall": 0.4845360824742268,
+      "f1": 0.5164835164835164,
+      "tp": 47,
+      "fp": 38,
+      "fn": 50,
+      "iou_threshold": 0.5,
+      "recall_containment": 0.28865979381443296,
+      "mean_width_ratio": 1.3392624902023396
+    },
+    "answers": {
+      "tp": 51,
+      "fp": 15,
+      "fn": 46,
+      "tn": 65,
+      "precision": 0.7727272727272727,
+      "recall": 0.5257731958762887,
+      "f1": 0.6257668711656442,
+      "fpr": 0.1875,
+      "raw_auc": 0.6974226804123711,
+      "calibrated_auc": 0.6844072164948454,
+      "positive_predictions": 66,
+      "auc": 0.6844072164948454
+    },
+    "verdicts": {
+      "tp": 62,
+      "fp": 19,
+      "fn": 35,
+      "tn": 61,
+      "precision": 0.7654,
+      "recall": 0.6392,
+      "f1": 0.6966,
+      "fpr": 0.2375,
+      "flagged_share": 0.4576
+    }
+  },
+  "gates": {
+    "tokens": {
+      "family": "tokens",
+      "contract": {
+        "gate": {
+          "f1_min": 0.5,
+          "fpr_max": 0.4
+        },
+        "source": "договор № 20478ГУ/2026, проект 117812, ТЗ п. 4.1 треб. 6",
+        "f1": 0.6252045826513911,
+        "fpr": 0.015466785356626237,
+        "status": "достигнут"
+      },
+      "internal": {
+        "gate": {
+          "f1_min": 0.9,
+          "fpr_max": 0.1
+        },
+        "source": "мастер-промт проекта (внутренний ориентир, не приёмка)",
+        "f1": 0.6252045826513911,
+        "fpr": 0.015466785356626237,
+        "status": "НЕ достигнут"
+      }
+    },
+    "spans": {
+      "family": "spans",
+      "contract": {
+        "gate": {
+          "f1_min": 0.5,
+          "fpr_max": 0.4
+        },
+        "source": "договор № 20478ГУ/2026, проект 117812, ТЗ п. 4.1 треб. 6",
+        "f1": 0.5164835164835164,
+        "fpr": 0.015466785356626237,
+        "status": "достигнут"
+      },
+      "internal": {
+        "gate": {
+          "f1_min": 0.9,
+          "fpr_max": 0.1
+        },
+        "source": "мастер-промт проекта (внутренний ориентир, не приёмка)",
+        "f1": 0.5164835164835164,
+        "fpr": 0.015466785356626237,
+        "status": "НЕ достигнут"
+      }
+    },
+    "answers": {
+      "family": "answers",
+      "contract": {
+        "gate": {
+          "f1_min": 0.5,
+          "fpr_max": 0.4
+        },
+        "source": "договор № 20478ГУ/2026, проект 117812, ТЗ п. 4.1 треб. 6",
+        "f1": 0.6257668711656442,
+        "fpr": 0.1875,
+        "status": "достигнут"
+      },
+      "internal": {
+        "gate": {
+          "f1_min": 0.9,
+          "fpr_max": 0.1
+        },
+        "source": "мастер-промт проекта (внутренний ориентир, не приёмка)",
+        "f1": 0.6257668711656442,
+        "fpr": 0.1875,
+        "status": "НЕ достигнут"
+      }
+    }
+  },
+  "joint_gate": true,
+  "span_fpr_convention": "unchanged P5 token-FPR proxy, no invented span TN",
+  "kind": "official",
+  "pairs": 177,
+  "shard": 0,
+  "cache_hits": 0,
+  "cache_misses": 177,
+  "cache_policy": "empty P8 feature cache; all product fresh inference, no stale legacy512 cache",
+  "fit_calls": [],
+  "seconds": 381.292202784,
+  "bundle_bytes": 122874,
+  "bundle_sha256": "e0b13c693a058dfd66ed24a52fc14e9c70964e95885358e7b99cc1f328ad6892",
+  "dataset_sha256": "232d2583480f2237fc48d10eb4413043bf35f59be5a10138fbf53235ce83ba88",
+  "evidence_sha256": "7607c513a760b68860e89aa3255d7f44942cc6a678c83bca3c641128067b738f",
+  "long_over512": 7,
+  "run_id": "r2-official-20261023-4fff418",
+  "commit": "4fff418cfb28cc8fd4dc8471bbc90cc655ad9892",
+  "product_source": "b9cf9acdab1ca7bf082d03629ea7e599597f3fa8",
+  "candidate": "H1 IsotonicFragmentAggregator",
+  "branch": "science/r2-exp-d",
+  "frozen_r2": {
+    "schema": "frozen-r2-v1",
+    "run_id": "r2-exp-d-20261023",
+    "training_run_id": "r2-exp-d-20261023",
+    "frozen_at": "2026-10-23T16:30:00Z",
+    "base_commit": "4fff418cfb28cc8fd4dc8471bbc90cc655ad9892",
+    "branch": "science/r2-exp-d",
+    "bundle_sha256": "e0b13c693a058dfd66ed24a52fc14e9c70964e95885358e7b99cc1f328ad6892",
+    "bundle_bytes": 122874,
+    "bundle_source": "spanverify-module/reports/experiments/p5_span_filter/run39170981235/combined_bundle.json",
+    "calibrator": {
+      "path_demo": "reports/science/r2/r2_calibrator.demo.json",
+      "sha256_demo": "81de01756cfc4e231d673997db0746e8f419cd38e48248a0a4c849e5fd1ac6ab",
+      "path_hf": "reports/science/r2/r2_calibrator.hf.json",
+      "sha256_hf": "1589575e2637e3a86dab71e12b95d9b7c06b41ec4254a6f8294414d6ee9bebf7",
+      "mode_demo": "demo",
+      "mode_hf": "hf",
+      "source": "dev181-fragment-mean",
+      "determinism": "sorted doc_id (62 unique docs from 181 pairs, not truncated — dedup by meta.doc_id), hash-based synthetic 5 shapes (0,25,50,75,100) 310 mixtures, 5-doc-fold OOF, seed-free PAVA, no GPU, no refit of weights, no external pre-trained scorer"
+    },
+    "training": {
+      "script": "reports/science/r2/train_r2_calibrator.py",
+      "run_id": "r2-exp-d-20261023",
+      "oof": "reports/science/r2/r2_oof_calibration.json",
+      "raw_scores": "reports/science/r2/r2_raw_scores.json",
+      "dev_docs": 62,
+      "dev_pairs": 181,
+      "mixtures": 310,
+      "folds": 5,
+      "oof_before_mae": 0.04106406143770091,
+      "oof_after_mae": 0.00564516129032258,
+      "oof_after_curve": [
+        0.004032258064516129,
+        0.2540322580645161,
+        0.5161290322580645,
+        0.7540322580645161,
+        1.0
+      ],
+      "monotone_by_shape": true,
+      "test177_used": false
+    },
+    "invariant": {
+      "gpu": 0,
+      "refit_weights": false,
+      "frozen_weights": "e0b13c69… unchanged 443.5 MB, bundle 122874 B",
+      "thresholds": "frozen P5 thresholds unchanged",
+      "span_filter": "unchanged P5 span_filter",
+      "weights_source": "p5_span_filter/run39170981235/combined_bundle.json"
+    },
+    "reproducibility": {
+      "command": "python reports/science/r2/train_r2_calibrator.py",
+      "env": "demo backend, no torch, deterministic hash-based synthetic, PAVA monotone",
+      "code": "spanverify/r2_share.py IsotonicFragmentAggregator.fit",
+      "suite": ">=913, check_numbers PASS 22, VERIFICATION.json all_true"
+    },
+    "provenance": "Кураторское решение: Дорожка Д самодостаточна для v2, Ф закрыта. Frozen-r2 — детерминированный артефакт трансфера dev→prod, без fit/train до официального прогона test177."
+  },
+  "r2_calibrator_sha256_hf": "1589575e2637e3a86dab71e12b95d9b7c06b41ec4254a6f8294414d6ee9bebf7",
+  "ai_share": {
+    "mae": 0.00564516129032258,
+    "mae_p8": 0.2565365102059551,
+    "delta": -0.2508913489156325,
+    "monotone": true,
+    "monotone_by_shape": true,
+    "curve": [
+      0.004032258064516129,
+      0.2540322580645161,
+      0.5161290322580645,
+      0.7540322580645161,
+      1.0
+    ],
+    "curve_p8": [
+      0.28030155760444997,
+      0.5531303755272012,
+      0.5583153541379868,
+      0.5522007609117452,
+      0.5583153541379868
+    ],
+    "trained_on": "dev181 62 docs 310 mixtures OOF",
+    "verified_not_worse": true
+  },
+  "parity": {
+    "tokens_F1_not_worse": true,
+    "tokens_FPR_not_worse": true,
+    "spans_F1_not_worse": true,
+    "brier_not_worse": true,
+    "ai_share_mae_strictly_below": true,
+    "ai_share_monotone": true
+  },
+  "verdict": "PASS",
+  "official_script": "spanverify/scripts/p8_evaluate.py --kind official --out reports/science/r2/official (sealed, no reruns, single shot)",
+  "test177_used_once": true,
+  "reruns": 0
+}

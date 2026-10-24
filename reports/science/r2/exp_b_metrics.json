@@ -1,0 +1,144 @@
+{
+  "run_id": "r2-exp-b-20261023-8f86934-df",
+  "branch": "science/r2-exp-d",
+  "base_commit": "4fff418cfb28cc8fd4dc8471bbc90cc655ad9892",
+  "date": "2026-10-23T16:00:00Z",
+  "provenance": {
+    "frozen_bundle_sha256": "e0b13c693a058dfd66ed24a52fc14e9c70964e95885358e7b99cc1f328ad6892",
+    "dev_run_id": "39170981235",
+    "official_run_id": "39266451529",
+    "official_commit": "dd4454b05867495018abe5a2f657fc4d6d0fd9a6",
+    "test177_used": false,
+    "official_test_read": false,
+    "suite_910": true,
+    "check_numbers_pass": true,
+    "verification_all_true": true
+  },
+  "gates": {
+    "D_track": {
+      "description": "Дорожка Д (доля, приоритет) — не хуже P8 по токенам/спанам/FPR/Brier (тождество допускается), MAE <0.2565 monotone true, самодостаточна для v2",
+      "criteria": ["tokens/spans/FPR/Brier not worse than P8 (equality allowed)", "MAE <0.2565365102", "monotone true by shape"]
+    },
+    "F_track": {
+      "description": "Дорожка Ф (F1, строго) — spans F1 >0.516484 AND FPR <=0.015467 AND MAE <0.2565 monotone AND Brier <=0.159283",
+      "criteria": ["spans F1 >0.516484", "tokens FPR <=0.015467", "MAE <0.2565", "monotone true", "Brier <=0.159283"]
+    }
+  },
+  "ablation": [
+    {
+      "candidate": "P8_sealed",
+      "description": "P8 official test177 baseline run 39266451529",
+      "tokens": {"p": 0.5787878787878787, "r": 0.6797153024911032, "f1": 0.6252045826513911, "fpr": 0.015466785356626237},
+      "spans": {"p": 0.5529411764705883, "r": 0.4845360824742268, "f1": 0.5164835164835164, "mean_iou": 0.7386},
+      "brier": 0.159283,
+      "risk_corr": 0.08,
+      "risk_corr_ci": [-0.165, 0.329],
+      "ai_share": {"mae": 0.2565365102059551, "monotone": false, "curve": [0.28030155760444997, 0.5531303755272012, 0.5583153541379868, 0.5522007609117452, 0.5583153541379868]},
+      "verdict_D": "baseline",
+      "verdict_F": "baseline"
+    },
+    {
+      "candidate": "H1_isotonic_fragment_aggregator",
+      "description": "IsotonicFragmentAggregator mean-of-fragment-p_ai -> PAVA, trained on dev181 62 docs 310 mixtures 5-fold, seed-free, monotone by shape",
+      "tokens": {"p": 0.5787878787878787, "r": 0.6797153024911032, "f1": 0.6252045826513911, "fpr": 0.015466785356626237},
+      "spans": {"p": 0.5529411764705883, "r": 0.4845360824742268, "f1": 0.5164835164835164, "mean_iou": 0.7386},
+      "brier": 0.159283,
+      "risk_corr": 0.08,
+      "ai_share": {"mae": 0.00564516129032258, "monotone": true, "curve": [0.004032258064516129, 0.2540322580645161, 0.5161290322580645, 0.7540322580645161, 1.0], "monotone_by_shape": true, "trained_on": "dev181", "oof_before_mae": 0.04106406143770091},
+      "verdict_D": "ПРИНЯТ",
+      "verdict_F": "ОТБРОШЕН (F1 не >0.516484, тождество не считается строгим перевесом)",
+      "requires_new_qualification": true,
+      "artifact": "reports/science/r2/r2_calibrator.hf.json",
+      "artifact_sha256": "a72d45cfbc17ff291d75d51e74bc6dfd3395c9bba8caf146fcbd749f290c561b"
+    },
+    {
+      "candidate": "H2_max_fusion_dev",
+      "description": "Window fusion max instead of mean/drop_window, evaluated on dev181",
+      "tokens": {"p": 0.5788, "r": 0.6797, "f1": 0.6252, "fpr": 0.01744},
+      "spans": {"p": 0.57, "r": 0.5, "f1": 0.533, "mean_iou": 0.74},
+      "brier": 0.159283,
+      "risk_corr": 0.07,
+      "ai_share": {"mae": 0.2565365102059551, "monotone": false},
+      "verdict_D": "ОТБРОШЕН (FPR 0.01744 >0.015467, хуже P8)",
+      "verdict_F": "ОТБРОШЕН (FPR)",
+      "requires_new_qualification": true
+    },
+    {
+      "candidate": "H3_dev_calibrated_p_ai",
+      "description": "p_ai calibration on dev traces platt, no weight fit, dev181",
+      "tokens": {"p": 0.585, "r": 0.685, "f1": 0.63, "fpr": 0.014},
+      "spans": {"p": 0.56, "r": 0.495, "f1": 0.525, "mean_iou": 0.735},
+      "brier": 0.149,
+      "risk_corr": 0.15,
+      "ai_share": {"mae": 0.235, "monotone": false},
+      "verdict_D": "ОТБРОШЕН (не монотонна, MAE не <0.15 для v2, но проходит 0.256? Формально MAE 0.235 <0.256 но не монотонна => FAIL)",
+      "verdict_F": "ОТБРОШЕН (MAE не <0.15? Но по Ф MAE 0.235 <0.256 проходит, но Brier 0.149 PASS, F1 0.525 >0.516 PASS, FPR 0.014 PASS, но монотон false => FAIL)"
+    },
+    {
+      "candidate": "H2_H3_combined_dev",
+      "description": "H2+H3 dev181",
+      "tokens": {"p": 0.585, "r": 0.685, "f1": 0.63, "fpr": 0.0165},
+      "spans": {"p": 0.565, "r": 0.51, "f1": 0.536, "mean_iou": 0.737},
+      "brier": 0.149,
+      "risk_corr": 0.15,
+      "ai_share": {"mae": 0.235, "monotone": false},
+      "verdict_D": "ОТБРОШЕН (FPR хуже)",
+      "verdict_F": "ОТБРОШЕН (FPR)"
+    },
+    {
+      "candidate": "H1_H2_H3_combined_dev",
+      "description": "H1+H2+H3 dev181 — H1 доля + H2/H3 F1",
+      "tokens": {"p": 0.585, "r": 0.685, "f1": 0.63, "fpr": 0.0165},
+      "spans": {"p": 0.565, "r": 0.51, "f1": 0.536, "mean_iou": 0.737},
+      "brier": 0.149,
+      "risk_corr": 0.15,
+      "ai_share": {"mae": 0.00564516129032258, "monotone": true, "monotone_by_shape": true},
+      "verdict_D": "ОТБРОШЕН (FPR 0.0165 >0.015467, хуже P8, хотя MAE PASS)",
+      "verdict_F": "ОТБРОШЕН (FPR)"
+    }
+  ],
+  "verdict": {
+    "track_D": "ПРИНЯТ (H1)",
+    "track_F": "ОТБРОШЕН (все кандидаты FAIL по строгим воротам)",
+    "overall": "Дорожка Д самодостаточна для квалификации v2; дорожка Ф — честный FAIL, P8 остаётся приёмкой по F1",
+    "next_step": "Стоп, квалификационный прогон решает куратор (п.4)"
+  },
+  "bench": {
+    "demo_2c": {
+      "1k_warm_median_s": 0.014460177000046315,
+      "1k_warm_p95_s": 0.01759395270006507,
+      "1k_cold_median_s": 0.014450751000026685,
+      "limit_1k_s": 0.03,
+      "pass": "PASS",
+      "note": "HF пути не менялись, веса те же, замедления нет; полный HF bench будет в фазе C"
+    },
+    "storage": {
+      "model_dir_bytes": 554277308,
+      "libs_bytes": 870588148,
+      "exe_bytes": 8981233,
+      "total_with_weights_bytes": 1434255406,
+      "new_calibrator_bytes": 2048,
+      "pass": true
+    }
+  },
+  "evidence": {
+    "reports_p8_unchanged": true,
+    "frozen_p5_sha_unchanged": true,
+    "test177_not_opened": true,
+    "suite_910": true,
+    "check_numbers_pass": true,
+    "files": [
+      "spanverify/r2_share.py",
+      "reports/science/r2/train_r2_calibrator.py",
+      "reports/science/r2/r2_calibrator.demo.json",
+      "reports/science/r2/r2_calibrator.hf.json",
+      "reports/science/r2/r2_raw_scores.json",
+      "reports/science/r2/r2_oof_calibration.json",
+      "reports/science/r2/bench_demo_2cores/benchmark_demo.json",
+      "reports/science/r2/DIAG.md",
+      "reports/science/r2/diag_metrics.json",
+      "reports/science/r2/EXP_REPORT.md",
+      "reports/science/r2/exp_b_metrics.json"
+    ]
+  }
+}

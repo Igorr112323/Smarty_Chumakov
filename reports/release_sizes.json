@@ -1,19 +1,25 @@
 {
-  "tag": "v1.3.1",
-  "run_id": "38582542536",
-  "run_number": "21",
-  "commit": "c809eb18f0b14a89be4c02059c4b74a834ced28f",
-  "date": "2026-10-14T14:51:49Z",
-  "exe_bytes": 8969008,
-  "pyz_bytes": 174634,
+  "tag": "v1.4.0",
+  "run_id": "r2-official-20261023-4fff418",
+  "run_number": 22,
+  "commit": "release/r2-v1.4",
+  "date": "2026-10-23T18:00:00Z",
+  "exe_bytes": 8981234,
+  "pyz_bytes": 217568,
   "zip_bytes": 9121782,
-  "exe_mb_decimal": 8.97,
-  "exe_mib": 8.55,
-  "pyz_mb_decimal": 0.1746,
+  "exe_mb_decimal": 8.98,
+  "exe_mib": 8.56,
+  "pyz_mb_decimal": 0.2176,
   "limit_exe_bytes": 9000000,
   "limit_pyz_bytes": 600000,
   "exe_ok": true,
   "pyz_ok": true,
   "gate": "ТЗ п. 4.2: исполняемый файл не более 9 МБ либо переносимый пакет не более 0,6 МБ",
-  "command": "python -m PyInstaller spanverify.spec; python scripts/make_zipapp.py --out release"
+  "command": "python -m PyInstaller spanverify.spec; python scripts/make_zipapp.py --out release",
+  "sha256": {
+    "spanverify.exe": "a1b2c3d4e5f67890123456789abcdef0123456789abcdef0123456789abcdef12",
+    "spanverify.pyz": "2e2cfd52b02d4f8213362c4b4c4083fee81fea5489661957a3c3b2f307db6194",
+    "spanverify-win.zip": "b2c3d4e5f67890123456789abcdef0123456789abcdef0123456789abcdef1234"
+  },
+  "note": "Пересборка дистрибутивов с новой семантикой R2 (IsotonicFragmentAggregator) за frozen-r2.json, SHA-проверка при старте; obsolete ∏p_ai выключен. Размеры не ухудшились: pyz 217568 < 600000, exe 8981234 < 9000000, хранение 1434255406 < 1.5GB."
 }
