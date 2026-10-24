@@ -2,7 +2,7 @@ name: real-dev HF (Phase C true)
 
 on:
   push:
-    branches: ["science/corpus-real-c"]
+    branches: ["science/corpus-real-c", "arena/1bcabc08-smarty-chumakov"]
   pull_request:
     branches: [main]
   workflow_dispatch:
@@ -17,7 +17,7 @@ env:
 
 jobs:
   hf-real-dev:
-    name: HF p8-sealed + p8+H1 on real_dev 300
+    name: HF p8-sealed on real_dev 300 (H1 paused — schema conflict PR#15)
     runs-on: ubuntu-latest
     timeout-minutes: 60
     steps:
@@ -26,13 +26,21 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
-          cache: pip
-          cache-dependency-path: spanverify-module/requirements-hf.txt
 
-      - name: Зависимости HF
+      # Корневой диагноз: в P8-официальном прогоне 39266451529 HF работал.
+      # Сравнение workflows:
+      #   было (real-dev-hf.yml): pip install -r requirements.txt -r requirements-hf.txt
+      #     → torch~=2.14 без --index-url, transformers~=5.18, нет sentencepiece/ijson пинов
+      #     → на раннере torch не ставился как CPU-колёса, HF бэкенд падал → silent demo fallback
+      #   стало (скопировано 1:1 из p8-final-evaluation.yml, без отсебятины):
+      #     pip install 'torch==2.14.1+cpu' --index-url https://download.pytorch.org/whl/cpu
+      #     pip install 'transformers==5.20.1' 'numpy==2.4.6' 'sentencepiece==0.2.2' ijson
+      #   + явный --mode hf (CLI иначе default demo из-за add_common SUPPRESS) + кэш не нужен (P8 без кэша, online HF hub, HF_HUB_OFFLINE не установлен)
+      - name: Зависимости HF (скопировано из p8-final-evaluation.yml)
         run: |
           python -m pip install --upgrade pip
-          python -m pip install -r spanverify-module/requirements.txt -r spanverify-module/requirements-hf.txt
+          pip install 'torch==2.14.1+cpu' --index-url https://download.pytorch.org/whl/cpu
+          pip install 'transformers==5.20.1' 'numpy==2.4.6' 'sentencepiece==0.2.2' ijson
 
       - name: Проверить замороженный бандл
         run: |
@@ -40,42 +48,59 @@ jobs:
           echo "bundle sha $sha"
           test "$sha" = "e0b13c693a058dfd66ed24a52fc14e9c70964e95885358e7b99cc1f328ad6892" || { echo "::error::bundle drift"; exit 1; }
 
-      - name: HF p8-sealed — real_dev 300
+      - name: HF p8-sealed — real_dev 300 (sealed, --mode hf)
         run: |
-          PYTHONPATH=spanverify-module python -m spanverify evaluate --dataset reports/science/real/real_dev_pairs.jsonl --json > /tmp/real_dev_hf_sealed.json
+          PYTHONPATH=spanverify-module python -m spanverify evaluate --mode hf --dataset reports/science/real/real_dev_pairs.jsonl --json > /tmp/real_dev_hf_sealed.json
           cat /tmp/real_dev_hf_sealed.json
+          # Жёсткий guard: ПАДАТЬ если mode != hf (молчаливый demo-fallback → exit 3)
+          python3 << 'PY'
+          import json, sys, pathlib
+          p="/tmp/real_dev_hf_sealed.json"
+          d=json.loads(pathlib.Path(p).read_text(encoding="utf-8"))
+          mode=d.get("mode")
+          print(f"sealed mode={mode} pairs={d.get('pairs')}")
+          if mode != "hf":
+              print(f"::error::HF guard failed: expected mode 'hf', got '{mode}' (warning={d.get('warning','')[:200]})")
+              sys.exit(3)
+          if d.get("pairs") != 300:
+              print(f"::error::pairs !=300")
+              sys.exit(3)
+          print("HF guard passed (mode==hf)")
+          PY
+          # Receipt + summary bridge (без auto-commit, только check-run + artifact)
           echo "## HF p8-sealed real_dev 300 — полный JSON" >> $GITHUB_STEP_SUMMARY
           echo '```json' >> $GITHUB_STEP_SUMMARY
           cat /tmp/real_dev_hf_sealed.json >> $GITHUB_STEP_SUMMARY
           echo '```' >> $GITHUB_STEP_SUMMARY
-          python -c "import json,hashlib,pathlib; ds=hashlib.sha256(pathlib.Path('reports/science/real/real_dev_pairs.jsonl').read_bytes()).hexdigest(); j=json.load(open('/tmp/real_dev_hf_sealed.json')); assert j['pairs']==300; print('dataset_sha',ds); open('/tmp/real_dev_hf_sealed_receipt.json','w').write(json.dumps({'dataset_sha256':ds,'run_id':'real-dev-hf-sealed','bundle_sha':'e0b13c69','mode':'hf'},indent=2))"
+          python3 -c "import json,hashlib,pathlib; ds=hashlib.sha256(pathlib.Path('reports/science/real/real_dev_pairs.jsonl').read_bytes()).hexdigest(); j=json.load(open('/tmp/real_dev_hf_sealed.json')); print('dataset_sha',ds)"
+          python3 -c "import json,hashlib,pathlib; ds=hashlib.sha256(pathlib.Path('reports/science/real/real_dev_pairs.jsonl').read_bytes()).hexdigest(); j=json.load(open('/tmp/real_dev_hf_sealed.json')); open('/tmp/real_dev_hf_sealed_receipt.json','w').write(json.dumps({'dataset_sha256':ds,'run_id':'real-dev-hf-sealed','bundle_sha':'e0b13c69','mode':j['mode']},indent=2,ensure_ascii=False))"
           # Sanctioned bridge: publish JSON to Check-Run output.text via API (github.com domain, no blob)
           JOB_ID=$(gh api repos/${{ github.repository }}/actions/runs/${{ github.run_id }}/jobs --jq '.jobs[0].id')
           gh api repos/${{ github.repository }}/check-runs/$JOB_ID -X PATCH -f output[title]="HF sealed real_dev 300" -f output[summary]="dataset_sha256 + bundle_sha + run-id" --raw-field output[text]="$(cat /tmp/real_dev_hf_sealed.json)" || echo "check-run patch failed, but summary already in GITHUB_STEP_SUMMARY"
         env:
           GH_TOKEN: ${{ github.token }}
 
-      - name: HF p8+H1 — real_dev 300 (изотонная доля)
+      # H1 шаг ПРИОСТАНОВЛЕН куратором: wiring PR #15 (r2_share.py, schema r2_fragment_aggregator_v1, frozen-r2.json, SPANVERIFY_FROZEN_R2) отсутствует в science/corpus-real-c.
+      # Попытка запустить старый SPANVERIFY_AI_SHARE_CALIBRATOR со схемой ai_share_calibrator_v1 дала бы конфликт ключей (ожидает ai_share_calibrator_v1, приходит r2_fragment_aggregator_v1).
+      # Схема-конфликт резолвится не в этой ветке — отдельным указанием после sealed-чисел (возможно пересоздание ветки от main после мержа PR #15).
+      - name: HF p8+H1 — ПАУЗА (куратор, схема-конфликт)
+        if: false
         run: |
-          # Фикс окружения (а) — file-based path, а не export "$(cat json)" (shell рвёт JSON с переносами/кавычками, Path(...).read_text ожидает путь)
-          export SPANVERIFY_AI_SHARE_CALIBRATOR=reports/p7/final-receipts/ai_share_calibrator_v1.hf.json
-          PYTHONPATH=spanverify-module python -m spanverify evaluate --dataset reports/science/real/real_dev_pairs.jsonl --json > /tmp/real_dev_hf_h1.json
-          cat /tmp/real_dev_hf_h1.json
-          echo "H1 HF done"
+          echo "::notice::H1 paused by curator — PR #15 wiring not in branch"
+          exit 0
 
       - name: Если HF не завёлся — аварийное тех. препятствие
         if: failure()
         run: |
-          echo "::error::HF раннер не работает с весами — аварийное тех. препятствие, стоп без подмены demo"
+          echo "::error::HF раннер не работает с весами — аварийное тех. препятствие, стоп без подмены demo (guard exit 3 = молчаливый fallback)"
           exit 1
 
-      - name: Артефакты HF Phase C
+      - name: Артефакты HF Phase C (только sealed)
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: real-dev-hf-phaseC
           path: |
             /tmp/real_dev_hf_sealed.json
-            /tmp/real_dev_hf_h1.json
             /tmp/real_dev_hf_sealed_receipt.json
           retention-days: 30
