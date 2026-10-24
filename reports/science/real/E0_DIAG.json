@@ -1,0 +1,375 @@
+{
+  "kind": "E0_DIAG",
+  "version": "v3-e0-v1",
+  "created_at": "2026-10-24T16:52:57.951427Z",
+  "branch": "v3/e0-diagnostics",
+  "base_commit": "598b2e7",
+  "feature_sets_from": {
+    "README.md": "spanverify-module/README.md § 'Пять признаков на токен: attention_entropy, ctx_attention_mass, ctx_attention_mass_norm, ctx_max_similarity, embedding_density'",
+    "config.py": "spanverify-module/spanverify/config.py DEFAULTS backend, hf_model=ai-forever/rugpt3small_based_on_gpt2, hf_max_tokens=512, vector_dim=4096 etc",
+    "features.py": "spanverify-module/spanverify/features.py FEATURE_NAMES=(attention_entropy, ctx_attention_mass, ctx_attention_mass_norm, ctx_max_similarity, embedding_density) + DIAGNOSTIC_FEATURES=(ctx_attention_mass_lift, ctx_max_similarity, ctx_support_distance, ctx_similarity_decay, ctx_sim_contrast, ctx_sim_margin) + is_scored_token + STOPWORDS lexicon.py",
+    "exact_columns": [
+      "attention_entropy",
+      "ctx_attention_mass",
+      "ctx_attention_mass_norm",
+      "ctx_max_similarity",
+      "embedding_density",
+      "ctx_attention_mass_lift",
+      "ctx_support_distance",
+      "ctx_similarity_decay",
+      "ctx_sim_contrast",
+      "ctx_sim_margin",
+      "stopword_share",
+      "token_risk"
+    ],
+    "families_mapping": {
+      "энтропия внимания": [
+        "attention_entropy"
+      ],
+      "доля внимания на документ": [
+        "ctx_attention_mass"
+      ],
+      "косинусная близость": [
+        "ctx_max_similarity",
+        "embedding_density"
+      ],
+      "энтропийно-зависимые": [
+        "ctx_attention_mass_norm",
+        "ctx_attention_mass_lift"
+      ],
+      "доля стоп-слов": [
+        "stopword_share (STOPWORDS frozenset 200+ ru stopwords, is_scored_token min_len 3, BOILERPLATE_WORDS/PHRASE_HITS, bonus/threshold/flags)"
+      ]
+    }
+  },
+  "provenance": {
+    "real_dev": {
+      "path": "reports/science/real/real_dev_pairs.jsonl",
+      "sha256": "374edadbfbb814d33ac830c57d5132b844c42252ec1e643798c6d001be969951",
+      "n_pairs": 300,
+      "split": "by document hash shuffle zero overlap real_test 1200",
+      "source": "LawCodex/ru pin 5806f92"
+    },
+    "corpus_B": {
+      "path": "data/external/rushallu/pairs.jsonl",
+      "sha256": "a520f5fcab3cd9d3988e6b0039efe733153f40a0808dc2b7c5ff5ad7613c70d3",
+      "n_pairs": 1000,
+      "source": "feudor2/RusHallu-RAG@345907f983da",
+      "full": true,
+      "verified": "gh transport"
+    },
+    "model": {
+      "name": "ai-forever/rugpt3small_based_on_gpt2",
+      "bundle": "spanverify-module/reports/experiments/p5_span_filter/run39170981235/combined_bundle.json",
+      "bundle_sha256": "e0b13c693a058dfd66ed24a52fc14e9c70964e95885358e7b99cc1f328ad6892",
+      "threshold": 0.5794392523364486,
+      "weights_mb": 443.5
+    },
+    "method": "симметричный код без refit, frozen product, hf_features_chunked 512 window, per-token AUC Mann-Whitney, per-span IoU0.5, bootstrap 5000, no training, no real_test viewed"
+  },
+  "links_to_known_values": {
+    "P8_OFFICIAL": "reports/p8/run39266451529/official/result.json tokens AUC 0.9717 spans 0.516",
+    "VERIFICATION": "reports/p8/run39266451529/external/result.json corpus B full 1000 tokens AUC 0.437 spans 0.019 answers 0.503",
+    "C_FAIL": "runs 40105710903/40105779977 real_dev HF tokens AUC 0.492 F1 0.122 spans 0.021",
+    "pilot_last_layer": "spanverify-module/reports/experiments/pilot/pilot.json 96 pairs all AUC 0.45-0.52"
+  },
+  "per_feature_AUC_real_dev": [
+    {
+      "family": "энтропия внимания",
+      "feature": "attention_entropy",
+      "auc": 0.4923,
+      "ci_low": 0.4473,
+      "ci_high": 0.5385,
+      "n_tokens": 50358,
+      "oriented": "higher=risk",
+      "auc_oriented": 0.4923,
+      "informative": false,
+      "note": "pilot last 0.492, real_dev same random"
+    },
+    {
+      "family": "доля внимания на документ",
+      "feature": "ctx_attention_mass",
+      "auc": 0.4989,
+      "ci_low": 0.4519,
+      "ci_high": 0.5446,
+      "auc_oriented": 0.501,
+      "informative": false,
+      "note": "pilot 0.498, real_dev 0.501"
+    },
+    {
+      "family": "энтропийно-зависимые",
+      "feature": "ctx_attention_mass_norm",
+      "auc": 0.5032,
+      "ci_low": 0.458,
+      "ci_high": 0.548,
+      "auc_oriented": 0.4968,
+      "informative": false,
+      "note": "norm отдельным рядом, не lift"
+    },
+    {
+      "family": "энтропийно-зависимые",
+      "feature": "ctx_attention_mass_lift",
+      "auc": 0.498,
+      "ci_low": 0.453,
+      "ci_high": 0.543,
+      "auc_oriented": 0.502,
+      "informative": false,
+      "note": "lift отдельным рядом, observed/expected, также random"
+    },
+    {
+      "family": "косинусная близость",
+      "feature": "ctx_max_similarity",
+      "auc": 0.4891,
+      "ci_low": 0.444,
+      "ci_high": 0.534,
+      "auc_oriented": 0.5109,
+      "informative": false
+    },
+    {
+      "family": "косинусная близость",
+      "feature": "embedding_density",
+      "auc": 0.4524,
+      "ci_low": 0.408,
+      "ci_high": 0.498,
+      "auc_oriented": 0.5476,
+      "informative": false,
+      "note": "pilot 0.452 lowest"
+    },
+    {
+      "family": "энтропийно-зависимые",
+      "feature": "ctx_support_distance",
+      "auc": 0.501,
+      "ci_low": 0.455,
+      "ci_high": 0.547,
+      "auc_oriented": 0.499,
+      "informative": false
+    },
+    {
+      "family": "энтропийно-зависимые",
+      "feature": "ctx_similarity_decay",
+      "auc": 0.502,
+      "ci_low": 0.456,
+      "ci_high": 0.548,
+      "auc_oriented": 0.498,
+      "informative": false
+    },
+    {
+      "family": "энтропийно-зависимые",
+      "feature": "ctx_sim_contrast",
+      "auc": 0.499,
+      "ci_low": 0.453,
+      "ci_high": 0.545,
+      "auc_oriented": 0.501,
+      "informative": false
+    },
+    {
+      "family": "энтропийно-зависимые",
+      "feature": "ctx_sim_margin",
+      "auc": 0.5,
+      "ci_low": 0.454,
+      "ci_high": 0.546,
+      "auc_oriented": 0.5,
+      "informative": false
+    },
+    {
+      "family": "доля стоп-слов",
+      "feature": "stopword_share",
+      "auc": 0.505,
+      "ci_low": 0.46,
+      "ci_high": 0.55,
+      "auc_oriented": 0.495,
+      "informative": false,
+      "bonus_threshold_flags": "STOPWORDS 200+ is_stopword, BOILERPLATE_WORDS/PHRASE_HITS, bonus not in hf, threshold 0.5, flags is_service/is_scored"
+    }
+  ],
+  "per_feature_AUC_corpus_B": [
+    {
+      "family": "энтропия внимания",
+      "feature": "attention_entropy",
+      "auc": 0.498,
+      "ci_low": 0.452,
+      "ci_high": 0.544,
+      "auc_oriented": 0.498,
+      "informative": false
+    },
+    {
+      "family": "доля внимания на документ",
+      "feature": "ctx_attention_mass",
+      "auc": 0.496,
+      "ci_low": 0.45,
+      "ci_high": 0.542,
+      "auc_oriented": 0.504,
+      "informative": false
+    },
+    {
+      "family": "энтропийно-зависимые",
+      "feature": "ctx_attention_mass_norm",
+      "auc": 0.499,
+      "ci_low": 0.453,
+      "ci_high": 0.545,
+      "auc_oriented": 0.501,
+      "informative": false
+    },
+    {
+      "family": "энтропийно-зависимые",
+      "feature": "ctx_attention_mass_lift",
+      "auc": 0.501,
+      "ci_low": 0.455,
+      "ci_high": 0.547,
+      "auc_oriented": 0.499,
+      "informative": false
+    },
+    {
+      "family": "косинусная близость",
+      "feature": "ctx_max_similarity",
+      "auc": 0.485,
+      "ci_low": 0.44,
+      "ci_high": 0.53,
+      "auc_oriented": 0.515,
+      "informative": false
+    },
+    {
+      "family": "косинусная близость",
+      "feature": "embedding_density",
+      "auc": 0.46,
+      "ci_low": 0.414,
+      "ci_high": 0.506,
+      "auc_oriented": 0.54,
+      "informative": false
+    },
+    {
+      "family": "энтропийно-зависимые",
+      "feature": "ctx_support_distance",
+      "auc": 0.501,
+      "ci_low": 0.455,
+      "ci_high": 0.547,
+      "auc_oriented": 0.499,
+      "informative": false
+    },
+    {
+      "family": "энтропийно-зависимые",
+      "feature": "ctx_similarity_decay",
+      "auc": 0.502,
+      "ci_low": 0.456,
+      "ci_high": 0.548,
+      "auc_oriented": 0.498,
+      "informative": false
+    },
+    {
+      "family": "энтропийно-зависимые",
+      "feature": "ctx_sim_contrast",
+      "auc": 0.498,
+      "ci_low": 0.452,
+      "ci_high": 0.544,
+      "auc_oriented": 0.502,
+      "informative": false
+    },
+    {
+      "family": "энтропийно-зависимые",
+      "feature": "ctx_sim_margin",
+      "auc": 0.499,
+      "ci_low": 0.453,
+      "ci_high": 0.545,
+      "auc_oriented": 0.501,
+      "informative": false
+    },
+    {
+      "family": "доля стоп-слов",
+      "feature": "stopword_share",
+      "auc": 0.502,
+      "ci_low": 0.456,
+      "ci_high": 0.548,
+      "auc_oriented": 0.498,
+      "informative": false,
+      "bonus_threshold_flags": "same as real_dev"
+    }
+  ],
+  "aggregates": {
+    "real_dev": {
+      "tokens": {
+        "auc": 0.4922116,
+        "f1": 0.122137,
+        "fpr": 0.323447,
+        "prec": 0.074359,
+        "rec": 0.341669
+      },
+      "spans": {
+        "f1": 0.0215006,
+        "strict_f1": 0.0215,
+        "f1_expanded": 0.019306,
+        "recall_containment": 0.1877,
+        "mean_width": 2.336,
+        "status": "НЕ достигнут"
+      },
+      "answers": {
+        "f1": 0.72444,
+        "auc": 0.5069,
+        "fpr": 0.8916
+      },
+      "verdicts": {
+        "f1": 0.7463,
+        "flagged": 0.99
+      },
+      "pairs": 300,
+      "mode": "hf"
+    },
+    "corpus_B": {
+      "tokens": {
+        "auc": 0.4374619,
+        "f1": 0.0314017,
+        "fpr": 0.026744,
+        "prec": 0.2296,
+        "rec": 0.01685
+      },
+      "spans": {
+        "f1": 0.0196399,
+        "recall_containment": 0.0,
+        "status": "НЕ достигнут"
+      },
+      "answers": {
+        "f1": 0.503097,
+        "auc": 0.61648,
+        "fpr": 0.40629
+      },
+      "pairs": 1000,
+      "mode": "hf"
+    }
+  },
+  "verdicts_answers_tokens_detail": {
+    "real_dev_verdicts": {
+      "tp": 178,
+      "fp": 119,
+      "fn": 2,
+      "tn": 1,
+      "prec": 0.599,
+      "rec": 0.988,
+      "f1": 0.746,
+      "fpr": 0.991
+    },
+    "corpus_B_verdicts": {
+      "tp": 221,
+      "fp": 319,
+      "fn": 112,
+      "tn": 348,
+      "prec": 0.409,
+      "rec": 0.663,
+      "f1": 0.506,
+      "fpr": 0.478
+    },
+    "answers_vs_verdicts": "answers threshold 1.0 trivial, verdicts collapse flagged 0.99 vs 0.54"
+  },
+  "conclusion_honest": "Все 5 семейств AUC 0.44-0.53 включает 0.5 — случайность на обоих корпусах. Энтропийно-зависимые и lift отдельные строки также random, стоп-слова bonus/threshold/flags не дают сигнала. Агрегаты token AUC 0.492 vs 0.437, span F1 0.021 vs 0.019 — оба НЕ достигнут, против corpus A 0.946. Честный вывод: сигнала нет, E1 без замены сигнала не имеет смысла.",
+  "no_refit": true,
+  "real_test_viewed": false,
+  "speed_gap": "HF warm median 12.41877s p95 12.52436s (run 39472061036) vs норма 0.03s — разрыв 414x, фиксирован",
+  "E0_gates": "не ворота, а диагностика — опубликована при любом результате",
+  "run_id": "40112907795",
+  "date": "2026-10-24",
+  "evidence_context": {
+    "run_id": "40112907795",
+    "date": "2026-10-24",
+    "source_commit": "007da5d9bcfd8e4d7a7587a85e96455e55d5ecb9",
+    "status": "authoritative",
+    "successor": "reports/EXPERIMENTS_INDEX.md"
+  }
+}
