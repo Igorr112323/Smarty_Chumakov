@@ -47,7 +47,8 @@ jobs:
 
       - name: HF p8+H1 — real_dev 300 (изотонная доля)
         run: |
-          export SPANVERIFY_AI_SHARE_CALIBRATOR="$(cat reports/p7/final-receipts/ai_share_calibrator_v1.hf.json)"
+          # Фикс окружения (а) — file-based path, а не export "$(cat json)" (shell рвёт JSON с переносами/кавычками, Path(...).read_text ожидает путь)
+          export SPANVERIFY_AI_SHARE_CALIBRATOR=reports/p7/final-receipts/ai_share_calibrator_v1.hf.json
           PYTHONPATH=spanverify-module python -m spanverify evaluate --dataset reports/science/real/real_dev_pairs.jsonl --json > /tmp/real_dev_hf_h1.json
           cat /tmp/real_dev_hf_h1.json
           echo "H1 HF done"
