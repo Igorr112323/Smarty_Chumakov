@@ -43,6 +43,10 @@ jobs:
         run: |
           PYTHONPATH=spanverify-module python -m spanverify evaluate --dataset reports/science/real/real_dev_pairs.jsonl --json > /tmp/real_dev_hf_sealed.json
           cat /tmp/real_dev_hf_sealed.json
+          echo "## HF p8-sealed real_dev 300 — полный JSON" >> $GITHUB_STEP_SUMMARY
+          echo '```json' >> $GITHUB_STEP_SUMMARY
+          cat /tmp/real_dev_hf_sealed.json >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
           python -c "import json,hashlib,pathlib; ds=hashlib.sha256(pathlib.Path('reports/science/real/real_dev_pairs.jsonl').read_bytes()).hexdigest(); j=json.load(open('/tmp/real_dev_hf_sealed.json')); assert j['pairs']==300; print('dataset_sha',ds); open('/tmp/real_dev_hf_sealed_receipt.json','w').write(json.dumps({'dataset_sha256':ds,'run_id':'real-dev-hf-sealed','bundle_sha':'e0b13c69','mode':'hf'},indent=2))"
 
       - name: HF p8+H1 — real_dev 300 (изотонная доля)
