@@ -1,0 +1,9 @@
+{
+  "kind": "corpus_manifest_template",
+  "status": "awaiting_dump",
+  "note": "Ожидается дамп ≥1600 документов pravo.gov.ru от куратора (ветка science/corpus-real-a от main 4fff418)",
+  "required": "Каждый документ: url, act_name, date, sha256, size; общий sha256 манифеста; дедуп по hash; 2-50k знаков, 10% ≥20k",
+  "license": "Госакты не являются объектами авторских прав (ст.1259 ГК РФ) — зафиксировано",
+  "base_commit": "4fff418cfb28cc8fd4dc8471bbc90cc655ad9892",
+  "branch": "science/corpus-real-a"
+}
