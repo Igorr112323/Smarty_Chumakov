@@ -1,0 +1,85 @@
+{
+  "kind": "E1HUNT_PLAN",
+  "version": "v3-e1hunt-v1",
+  "round": 2,
+  "created_at": "2026-10-25T10:00:00Z",
+  "branch": "arena/1bcabc08-smarty-chumakov",
+  "base_commit": "7534ec3",
+  "real_test_viewed": false,
+  "hypothesis": {
+    "title": "Фактографическая подмена и смена регистра как сигнал на законах",
+    "text": "E0/E1 показали, что семантическая близость (attention, embedding_density, sentence cosine) на юридических текстах случайна (AUC 0.44-0.53). На законах галлюцинация — это не смысловой дрейф, а изобретение фактографии: чисел, дат, статей, пунктов, сроков, которых нет в источнике, и смена формального канцелярского регистра на более разговорный. Поэтому сигнал должен быть в покрытии фактографических токенов и стилометрии, а не в косинусах.",
+    "why_may_work": "Юридический документ — плотный перечень норм с числами/датами/ссылками. Ответ, поддерживаемый документом, обязан дословно повторять их; неподдерживаемый — генерирует правдоподобные но отсутствующие числа/даты. Стилометрия формального регистра (длина слова, пунктуация, канцелярские биграммы, boilerplate) отличает выписку из закона от свободного перефраза. N-gram перекрытие ловит дословность. Это проверялось на корпусе A (синтетическом) и давало часть сигнала, но не тестировалось на реальных законах честно.",
+    "why_previous_failed": "E0 — только внимание/энтропия/близость эмбеддингов, без проверки фактографии. E1 — sentence cosine doc/chunk, contrast doc↔chunk, rolling logprob от rugpt3small, lexical число/объект, stopword norm — но без прямого покрытия чисел/дат/цитат и без канцелярской стилометрии. Оба игнорировали самую юридически специфичную черту: числа решают норму.",
+    "falsifiable_prediction": "Если гипотеза верна, то number_token_coverage, date_coverage и citation_coverage дадут token-AUC >>0.5, а formal_bigram_density и avg_token_len — значимый отрыв. Если нет — снова 0.50-0.55 и раунд фиксируется как провал, запускается R3."
+  },
+  "new_features_methods": {
+    "lexical_coverage": [
+      "number_token_coverage — доля числовых токенов ответа, имеющих точное совпадение в документе (regex \\d+[\\.,]?\\d*). higher=поддерживаемый",
+      "date_coverage — доля дат (\\d{1,2}[\\./]\\d{1,2}[\\./]\\d{2,4} | \\d{4} год | января..декабря) найденных в документе",
+      "citation_coverage — доля токенов шаблонов 'статья N', 'пункт N', 'часть N', 'глава N' совпадающих с документом",
+      "entity_ngram_coverage — word-bigram coverage именованных сущностей (простая эвристика: Title Case биграммы)"
+    ],
+    "stylometric_register": [
+      "avg_token_len — средняя длина токена ответа (канцелярский текст длиннее)",
+      "type_token_ratio — TTR ответа vs документ",
+      "punctuation_density — доля ; : ( ) — в законах выше",
+      "sentence_len_cv — коэффициент вариации длин предложений",
+      "formal_bigram_logfreq — средняя лог-частота биграмм ответа по частотному словарю законов (предподсчитан на CORPUS_FROZEN 7710 актов, ~2М токенов, хранение <1 МБ)",
+      "boilerplate_hit_rate — доля boilerplate фраз из spanverify-module/spanverify/lexicon.py"
+    ],
+    "ngram_overlap": [
+      "char_3gram_jaccard — Jaccard 3-грамм символов ответ ↔ документ",
+      "char_5gram_jaccard — аналогично 5-грамм",
+      "word_bigram_overlap — доля биграмм слов ответа, присутствующих в документе",
+      "lcs_ratio — longest common subsequence / len(answer)"
+    ],
+    "lm_perplexity_proxy": [
+      "kenlm_trigram_logprob — средняя лог-вероятность токена по триграммной KenLM-подобной модели, обученной на CORPUS_FROZEN (сглаживание Kneser-Ney, размер <5 МБ)",
+      "perplexity_delta — разность logprob при условии документа (контекст как префикс) vs безусловной, эмулируемая через частотный LM (дешёвый прокси нейронной perplexity без GPU)"
+    ]
+  },
+  "model_weights": {
+    "candidates": [
+      {"name": "kenlm-trigram-legal (counts from CORPUS_FROZEN 7710 docs)", "weights_mb": 4.5, "stack": "python stdlib + pickle", "role": "perplexity proxy"},
+      {"name": "legal_bigram_freq (formal register dictionary)", "weights_mb": 0.8, "stack": "json", "role": "stylometry"},
+      {"name": "sklearn LogisticRegression head (OOF, no pretrained)", "weights_mb": 0.01, "stack": "onnxruntime or sklearn (lab torch allowed, final without torch)", "role": "composite"},
+      {"name": "optional: cointegrated/rubert-tiny2 for ablation", "weights_mb": 120, "stack": "onnxruntime", "role": "ablation only, not required for gate"}
+    ],
+    "total_mb_if_all": 125.31,
+    "budget_mb": 550,
+    "within_budget": true,
+    "final_stack_commitment": "без torch, onnxruntime only (lab может использовать torch для измерений)"
+  },
+  "gates": {
+    "token_AUC_required": 0.70,
+    "span_AUC_required": 0.55,
+    "CI_95_must_not_cross_0.5": true,
+    "bootstrap_iterations": 5000,
+    "OOF": "5-fold по sha256(doc_id) из CORPUS_FROZEN.json (детерминированная шафл-группировка, zero overlap real_test 1200)",
+    "decision_rule": "любой раунд достигает token-AUC ≥0.70 И span-AUC ≥0.55 с CI не ниже 0.5 → переход к E-freeze и далее к E3 воротам + один официальный прогон 1200 по шифт-коду. Иначе — честный неуспех, запуск R3."
+  },
+  "method": {
+    "per_token_scoring": "каждый токен ответа получает вектор из 4 семейств; метки токенов — из real_dev_pairs.jsonl (labels по спанам); AUC — Mann-Whitney ориентированный higher=risk или lower=risk с bootstrap CI 5000",
+    "per_span_scoring": "IoU 0.5, span-level AUC поверх агрегированных спанами токенов",
+    "corpus_B_control": "симметрично на feudor2/RusHallu-RAG@345907f 1000 пар (sha a520f5fc) для проверки генерализации",
+    "no_refit_on_corpus_B": true,
+    "OOF_training": "только на real_dev, 5-fold, fit на 4 фолдах → predict на 5-м, без утечки doc_id",
+    "no_real_test_viewed": true,
+    "speed_track": "параллельно E3_SPEED_BENCH cold/warm по 1k/50k/2M на onnx-стеке, каноническое 2 ядра taskset 0,1 OMP=1"
+  },
+  "provenance": {
+    "real_dev": {"path": "reports/science/real/real_dev_pairs.jsonl", "sha256": "374edadbfbb814d33ac830c57d5132b844c42252ec1e643798c6d001be969951", "n_pairs": 300},
+    "corpus_B": {"path": "data/external/rushallu/pairs.jsonl", "sha256": "a520f5fcab3cd9d3988e6b0039efe733153f40a0808dc2b7c5ff5ad7613c70d3", "n_pairs": 1000},
+    "CORPUS_FROZEN": {"path": "reports/science/real/CORPUS_FROZEN.json", "sha256": "73540a18572b000466a041af4cd79d2e757a8feda7336cf0228f86c12ccceb0b", "total": 7710, "splits": {"real_dev": 300, "real_test": 1200}},
+    "previous_rounds": {"E0": "dbc549f2 AUC 0.492 random", "E1": "db184a39 composite 0.521 <0.70 STOP"}
+  },
+  "links_to_known_values": {
+    "SPEED_R1_canonical_2cores": "run 39472061036 warm 1.22412s/1k 12.41877s/50k 52.67317s/2M vs норма 0.03/1/60",
+    "DEMO_speed": "0.0006s/1000 знаков на лаптопе (тепловая карта) — рабочий скелет",
+    "H1_rotation": "PR#15 PR#19 seal break 2988f865→734c847f — санкционированная ротация после зелёного suite"
+  },
+  "pre_registration": "Файл создан ДО прогона. Результат будет в E1HUNT_R2_RESULT.json честно (достигнуто/недостигнуто), с run-id/CI, real_test_viewed:false. Три подряд провала 0.50-0.55 → решение куратора об исчерпании.",
+  "run_id": "pending",
+  "date": "2026-10-25"
+}

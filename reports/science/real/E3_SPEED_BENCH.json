@@ -1,0 +1,76 @@
+{
+  "kind": "E3_SPEED_BENCH",
+  "version": "v3-e3-speed-v1",
+  "created_at": "2026-10-25T10:10:00Z",
+  "branch": "arena/1bcabc08-smarty-chumakov",
+  "base_commit": "7534ec3",
+  "real_test_viewed": false,
+  "note": "Параллельный трек инженерии скорости. Demo-стек показал 0.0006с/1000 на лаптопе — рабочий скелет. Задача: каноническое 2-ядерное измерение для любого финального кандидата; пока осадочник для лёгких энкодеров.",
+  "canonical_protocol": {
+    "cores": 2,
+    "taskset": "0,1",
+    "env": "OMP_NUM_THREADS=1, MKL_NUM_THREADS=1, OPENBLAS_NUM_THREADS=1, NUMEXPR_NUM_THREADS=1",
+    "lengths": ["1k chars", "50k chars", "2M chars"],
+    "modes": ["cold (process start)", "warm (model loaded)"],
+    "norms": {"1k": "0.03s", "50k": "1s", "2M": "60s"}
+  },
+  "baseline": {
+    "SPEED_R1_canonical_2cores_run_39472061036": {
+      "1k_warm_median": 1.22412,
+      "1k_p95": 1.74642,
+      "1k_cold_median": 6.88333,
+      "50k_warm_median": 12.41877,
+      "50k_p95": 12.52436,
+      "50k_cold_median": 18.03188,
+      "2M_warm_median": 52.67317,
+      "2M_p95": 53.15244,
+      "verdict": "FAIL (414x, 12x, pass only 2M)"
+    },
+    "demo_stack_laptop_0.0006s_per_1k": {
+      "marginal": 0.0006,
+      "note": "тепловая карта интервалов, без HF, pure demo — скелет нормы 0.03с достижим"
+    },
+    "marginal_throughput_demo_cold_2cores": 0.01673
+  },
+  "light_encoders_bench": [
+    {
+      "encoder": "cointegrated/rubert-tiny2",
+      "weights_mb": 120,
+      "stack": "onnxruntime",
+      "status": "pending canonical measurement",
+      "estimate": {"1k_warm": 0.018, "50k_warm": 0.9, "2M_warm": 36, "note": "оценка по размеру 120МБ, внутри нормы 0.03/1/60 с запасом"},
+      "run_id": null,
+      "date": "2026-10-25"
+    },
+    {
+      "encoder": "sbert-ru MiniLM-L12",
+      "weights_mb": 250,
+      "stack": "onnxruntime",
+      "status": "pending",
+      "estimate": {"1k_warm": 0.025, "50k_warm": 1.2, "2M_warm": 48, "note": "250МБ, близко к лимиту 50k=1с, требует замера"},
+      "run_id": null,
+      "date": "2026-10-25"
+    },
+    {
+      "encoder": "LaBSE",
+      "weights_mb": 470,
+      "stack": "onnxruntime",
+      "status": "pending",
+      "estimate": {"1k_warm": 0.045, "50k_warm": 2.1, "2M_warm": 85, "note": "470МБ + 550МБ лимит — риск по 2M, требует ротации"},
+      "run_id": null,
+      "date": "2026-10-25"
+    },
+    {
+      "encoder": "kenlm-trigram-legal (R2)",
+      "weights_mb": 4.5,
+      "stack": "python stdlib",
+      "status": "pending",
+      "estimate": {"1k_warm": 0.0006, "50k_warm": 0.03, "2M_warm": 1.2, "note": "как demo-стек, легко в норму"},
+      "run_id": null,
+      "date": "2026-10-25"
+    }
+  ],
+  "next_steps": "Запустить канонические замеры для каждого энкодера на 1k/50k/2M cold/warm, taskset 0,1, сохранить в эту таблицу. Финальный кандидат из трека 1 должен пройти ворота скорости до E-freeze.",
+  "run_id": "pending",
+  "date": "2026-10-25"
+}
