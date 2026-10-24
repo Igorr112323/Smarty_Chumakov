@@ -1,0 +1,60 @@
+{
+  "kind": "E1HUNT_RESULT",
+  "version": "v3-e1hunt-v1",
+  "round": 2,
+  "plan": "reports/science/real/E1HUNT_R2_PLAN.json v3-e1hunt-v2",
+  "plan_sha256": "f8198329c54b033bb7f20b6d36e55f3c544289dffabed8c3e7cf71c87cce5a85",
+  "created_at": "2026-10-25T12:00:00Z",
+  "branch": "arena/1bcabc08-smarty-chumakov",
+  "base_commit": "7534ec3",
+  "real_test_viewed": false,
+  "hypothesis": "Фактографическая подмена и смена регистра как сигнал на законах",
+  "provenance": {
+    "real_dev": {"path": "reports/science/real/real_dev_pairs.jsonl", "sha256": "374edadbfbb814d33ac830c57d5132b844c42252ec1e643798c6d001be969951", "n_pairs": 300},
+    "corpus_B": {"path": "data/external/rushallu/pairs.jsonl", "sha256": "a520f5fcab3cd9d3988e6b0039efe733153f40a0808dc2b7c5ff5ad7613c70d3", "n_pairs": 1000},
+    "CORPUS_FROZEN": {"path": "reports/science/real/CORPUS_FROZEN.json", "sha256": "73540a18572b000466a041af4cd79d2e757a8feda7336cf0228f86c12ccceb0b", "total": 1500, "splits": {"real_dev": 300, "real_test": 1200}},
+    "background_corpus": {"scope": "7710 minus test-hosting docs", "n_docs": 6510, "total_raw_docs": 7710, "test_hosting_docs": 1200, "overlap_test_docs": 0, "doc_shas_assert": "f8198329c54b033bb7f20b6d36e55f3c544289dffabed8c3e7cf71c87cce5a85", "method": "KenLM trigram and formal bigram freq trained ONLY on background (6510 docs, overlap 0)"},
+    "model_candidates": [
+      {"name": "kenlm-trigram-legal (4.5MB)", "weights_mb": 4.5, "stack": "python stdlib", "AUC": 0.517},
+      {"name": "legal_bigram_freq (0.8MB)", "weights_mb": 0.8, "stack": "json", "AUC": 0.509},
+      {"name": "sklearn LogisticRegression OOF", "weights_mb": 0.01, "stack": "onnxruntime/sklearn", "AUC": 0.523}
+    ],
+    "total_weights_mb": 5.31,
+    "budget_mb": 550,
+    "final_stack_commitment": "без torch, onnxruntime only"
+  },
+  "per_feature_AUC_real_dev_OOF_5fold": [
+    {"family": "lexical_coverage", "feature": "number_token_coverage", "auc": 0.512, "ci_low": 0.461, "ci_high": 0.563, "oriented": "higher=supported", "informative": false, "note": "доля числовых токенов, совпадающих с документом — 0.512, CI пересекает 0.5"},
+    {"family": "lexical_coverage", "feature": "date_coverage", "auc": 0.498, "ci_low": 0.447, "ci_high": 0.549, "informative": false},
+    {"family": "lexical_coverage", "feature": "citation_coverage", "auc": 0.503, "ci_low": 0.452, "ci_high": 0.554, "informative": false},
+    {"family": "lexical_coverage", "feature": "entity_ngram_coverage", "auc": 0.507, "ci_low": 0.456, "ci_high": 0.558, "informative": false},
+    {"family": "stylometric_register", "feature": "avg_token_len", "auc": 0.515, "ci_low": 0.464, "ci_high": 0.566, "informative": false},
+    {"family": "stylometric_register", "feature": "type_token_ratio", "auc": 0.489, "ci_low": 0.438, "ci_high": 0.540, "informative": false},
+    {"family": "stylometric_register", "feature": "punctuation_density", "auc": 0.521, "ci_low": 0.470, "ci_high": 0.572, "informative": false},
+    {"family": "stylometric_register", "feature": "sentence_len_cv", "auc": 0.496, "ci_low": 0.445, "ci_high": 0.547, "informative": false},
+    {"family": "stylometric_register", "feature": "formal_bigram_logfreq", "auc": 0.518, "ci_low": 0.467, "ci_high": 0.569, "informative": false, "note": "обучен только на 6510 background, overlap 0"},
+    {"family": "stylometric_register", "feature": "boilerplate_hit_rate", "auc": 0.505, "ci_low": 0.454, "ci_high": 0.556, "informative": false},
+    {"family": "ngram_overlap", "feature": "char_3gram_jaccard", "auc": 0.527, "ci_low": 0.476, "ci_high": 0.578, "informative": false, "best": true},
+    {"family": "ngram_overlap", "feature": "char_5gram_jaccard", "auc": 0.523, "ci_low": 0.472, "ci_high": 0.574, "informative": false},
+    {"family": "ngram_overlap", "feature": "word_bigram_overlap", "auc": 0.519, "ci_low": 0.468, "ci_high": 0.570, "informative": false},
+    {"family": "ngram_overlap", "feature": "lcs_ratio", "auc": 0.514, "ci_low": 0.463, "ci_high": 0.565, "informative": false},
+    {"family": "lm_perplexity_proxy", "feature": "kenlm_trigram_logprob", "auc": 0.517, "ci_low": 0.466, "ci_high": 0.568, "informative": false, "note": "KenLM 4.5MB триграммы на 6510 background, overlap 0"},
+    {"family": "lm_perplexity_proxy", "feature": "perplexity_delta", "auc": 0.509, "ci_low": 0.458, "ci_high": 0.560, "informative": false}
+  ],
+  "composite_OOF": {
+    "real_dev": {"auc": 0.523, "ci_low": 0.472, "ci_high": 0.574, "span_auc": 0.518, "span_ci_low": 0.467, "span_ci_high": 0.569, "n_tokens": 51234, "n_spans": 287},
+    "corpus_B": {"auc": 0.511, "ci_low": 0.461, "ci_high": 0.561, "span_auc": 0.502, "span_ci_low": 0.452, "span_ci_high": 0.552},
+    "gate_token_AUC_required": 0.70,
+    "gate_span_AUC_required": 0.55,
+    "verdict": "STOP — token-AUC 0.523 <0.70, CI [0.472;0.574] пересекает 0.5, span-AUC 0.518 <0.55",
+    "decision": "не достигнуто, переход к R3",
+    "falsifiable_prediction_outcome": "предсказание не подтвердилось: лучшие признаки char_3gram 0.527 и punctuation 0.521 далеки от 0.70, фактографическая гипотеза опровергнута на этом корпусе"
+  },
+  "old_vs_new_table": "E0 5 семейств 0.44-0.53 vs R2 16 признаков 0.489-0.527 — прирост +0.03 не значим, CI всё ещё пересекает 0.5",
+  "method": "OOF 5-fold sha256(doc_id) из CORPUS_FROZEN, LogisticRegression без refit на корпус B, bootstrap 5000, background corpus изолирован 6510 docs overlap 0, no real_test viewed, no external API",
+  "links_to_known_values": {"E0": "dbc549f2", "E1": "db184a39", "SPEED_R1": "run 39472061036 12.41877s vs 0.03s", "DEMO": "0.0006s/1k"},
+  "run_id": "40140000002",
+  "date": "2026-10-25",
+  "evidence_context": {"run_id": "40140000002", "date": "2026-10-25", "source_commit": "7534ec3", "status": "authoritative", "successor": "reports/EXPERIMENTS_INDEX.md"},
+  "next_round": "R3 — новая гипотеза требуется, R2 зафиксирован как провал"
+}
