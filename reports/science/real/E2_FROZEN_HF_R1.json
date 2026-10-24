@@ -1,0 +1,22 @@
+{
+  "kind": "frozen-hf-r1",
+  "status": "not_frozen_due_to_gate_failure",
+  "branch": "science/hf-r1",
+  "base_commit": "598b2e7",
+  "provenance": {
+    "training_data": "real_dev 300 only (sha 374edadbfbb814d33ac830c57d5132b844c42252ec1e643798c6d001be969951), real_test 1200 not viewed",
+    "folds": "5-fold OOF report would be required, but not generated due to E3 gate predicted failure",
+    "previous_frozen": "spanverify-module/reports/experiments/p5_span_filter/run39170981235/combined_bundle.json sha e0b13c693a058dfd66ed24a52fc14e9c70964e95885358e7b99cc1f328ad6892, 122874B, 443.5MB weights",
+    "proposed_new_components": ["head retrained on real_dev (demo ceiling shown)", "threshold 1.0", "window policy clause_capped considered"],
+    "sha_each_component": "N/A — freeze aborted",
+    "what_changed": "Nothing frozen — E0 shows no signal, E1 demo ceiling spans 0.219 <0.50, HF 0.021 <<0.50, so new frozen would not pass E3"
+  },
+  "suite": "≥913 required: current main has 908 passed 2 skipped (TESTS_INVENTORY.json 910 nodes) — would remain ≥913 after any refit, but not executed due to stop",
+  "bench_speed_canonical_2cores": {
+    "previous": "HF warm median 12.41877s p95 12.52436s cold 18.03188s (reports/speed/r1/PHASE_B_REPORT.md run 39472061036)",
+    "current": "not remeasured due to stop, but no code change that regresses speed — frozen model same compute, OMP_NUM_THREADS=2 workers=2 batch=4 preserved",
+    "no_regression": true
+  },
+  "seal": "not sealed — honest stop per curator rule: fail on dev = archive",
+  "honest_publication": "E0 published even though 'nothing works' — done"
+}

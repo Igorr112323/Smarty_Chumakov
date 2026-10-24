@@ -1,0 +1,29 @@
+{
+  "kind": "E3_gates",
+  "required_gates": {
+    "spans": "F1 ≥0.50 (strict IoU 0.5)",
+    "tokens": "FPR ≤0.40",
+    "ai_share": "MAE ≤0.15 monotone"
+  },
+  "real_dev_observed_HF_frozen": {
+    "spans_F1": 0.02150065818341378,
+    "spans_F1_expanded": 0.0193067,
+    "tokens_F1": 0.1221374045801527,
+    "tokens_FPR": 0.32344708220261115,
+    "tokens_AUC": 0.4922116121949638,
+    "ai_share_MAE": 0.2565365102,
+    "ai_share_monotone": false,
+    "source": "runs 40105710903/40105779977, sha 374edadb…",
+    "status": "C-FAIL"
+  },
+  "real_dev_demo_refit_ceiling": {
+    "spans_F1": 0.219,
+    "tokens_F1": 0.944,
+    "tokens_FPR": 0.011,
+    "status": "spans still <0.50 even with overfit demo"
+  },
+  "gate_verdict": "НЕ достигнут — E3 not passed, shift-code for real_test not granted",
+  "curator_action": "Провал E на dev — честный стоп и архив (per rules)",
+  "real_test_viewed": false,
+  "real_test_attempt": "not attempted, locked"
+}
