@@ -1,0 +1,143 @@
+{
+  "kind": "corpus_frozen",
+  "created_at": "2026-10-24T08:42:48.817829Z",
+  "created_by": "CORPUS-REAL-R1",
+  "source": "LawCodex/ru pin 5806f92",
+  "manifest_sha256": "1d076c90f5af9932f4932422bfdc49a75a8c1052a7a6423cf04278311ba0aa98",
+  "seed": 42,
+  "date": "2026-10-24",
+  "author": "deterministic generation (no LLM)",
+  "determinism": "seed фиксирован до генерации, выбор позиции детерминирован от sha256(id пары)",
+  "split": {
+    "by": "document (parent id)",
+    "rule": "deterministic hash shuffle by sha256(seed:split:doc_id), first 300 dev, next 1200 test, zero overlap",
+    "real_dev": 300,
+    "real_test": 1200,
+    "total": 1500,
+    "dev_ids": [
+      "fkz/2006/fkz-2006-6-ob-obrazovanii-v-sostave-rossiiskoi-federatsii-novogo-subekta",
+      "fkz/2009/fkz-2009-3-o-vnesenii-izmenenii-v-federalnyi-konstitutsionnyi-zakon-o-voennykh",
+      "fkz/2014/fkz-2014-20-o-vnesenii-izmenenii-v-federalnyi-konstitutsionnyi-zakon-o-prinyatii",
+      "fkz/2024/fkz-2024-2-o-vnesenii-izmenenii-v-statyu-12-1-federalnogo-konstitutsionnogo",
+      "fz/1994/fz-1994-27-o-vnesenii-izmenenii-i-dopolnenii-v-ugolovno-protsessualnyi-kodeks"
+    ],
+    "test_ids": [
+      "fkz/2004/fkz-2004-2-o-vnesenii-izmenenii-v-stati-24-i-33-1-federalnogo-konstitutsionnogo",
+      "fkz/2006/fkz-2006-7-o-vnesenii-izmenenii-v-stati-48-i-52-federalnogo-konstitutsionnogo",
+      "fkz/2007/fkz-2007-4-o-vnesenii-izmeneniya-v-statyu-9-federalnogo-konstitutsionnogo-zakona",
+      "fkz/2007/fkz-2007-5-ob-obrazovanii-v-sostave-rossiiskoi-federatsii-novogo-subekta",
+      "fkz/2007/fkz-2007-6-o-vnesenii-izmenenii-v-stati-24-i-33-1-federalnogo-konstitutsionnogo"
+    ],
+    "overlap": 0
+  },
+  "quotas": {
+    "faithful": 600,
+    "per_error_min": 128,
+    "per_error": {
+      "faithful": 600,
+      "contradiction": 129,
+      "partial": 129,
+      "number_attribution": 129,
+      "unconfirmed": 129,
+      "missing": 128,
+      "oversight": 128,
+      "excess": 128
+    },
+    "faithful_share": 0.4,
+    "clean_40pct": true
+  },
+  "definitions": {
+    "faithful": "без искажений (чистые пары, ≥ 40 %) | faithful",
+    "contradiction": "значение заменено на другое | Contradiction",
+    "partial": "отброшено условие, смысл искажён | Partial",
+    "number_attribution": "число взято из факта другого объекта | Contradiction (подтип)",
+    "unconfirmed": "добавлено утверждение, которого нет в документе | Unconfirmed",
+    "missing": "обязательная деталь пропущена | Missing",
+    "oversight": "важное значение потеряно при пересказе | Oversight",
+    "excess": "добавлена лишняя деталь | Excess"
+  },
+  "files": {
+    "reports/science/real/real_dev_pairs.jsonl": {
+      "sha256": "374edadbfbb814d33ac830c57d5132b844c42252ec1e643798c6d001be969951",
+      "path": "reports/science/real/real_dev_pairs.jsonl"
+    },
+    "reports/science/real/real_test_pairs.jsonl": {
+      "sha256": "f40c737cf20db6730666620174982de5a7be1bda2a4f7fb359e376dc18324420",
+      "path": "reports/science/real/real_test_pairs.jsonl"
+    },
+    "reports/science/real/real_all_pairs.jsonl": {
+      "sha256": "5dc09a78613fefd3ca88c765e23c06152ee743f887fba3963de5ec117514b243",
+      "path": "reports/science/real/real_all_pairs.jsonl"
+    },
+    "reports/science/real/real_dev_spans.jsonl": {
+      "sha256": "8d108de58c4b8afb7fb508801cff8d50bca550f0476f16bc7dfce3ec010855e8",
+      "path": "reports/science/real/real_dev_spans.jsonl"
+    },
+    "reports/science/real/real_test_spans.jsonl": {
+      "sha256": "9c929522557c41db075ad4ae1c95eab5b3a3f9376cc18b3e2669cf3be349d163",
+      "path": "reports/science/real/real_test_spans.jsonl"
+    },
+    "reports/science/real/splits/dev.jsonl": {
+      "sha256": "374edadbfbb814d33ac830c57d5132b844c42252ec1e643798c6d001be969951",
+      "path": "reports/science/real/splits/dev.jsonl"
+    },
+    "reports/science/real/splits/test.jsonl": {
+      "sha256": "f40c737cf20db6730666620174982de5a7be1bda2a4f7fb359e376dc18324420",
+      "path": "reports/science/real/splits/test.jsonl"
+    },
+    "reports/science/real/real_splits/dev.jsonl": {
+      "sha256": "374edadbfbb814d33ac830c57d5132b844c42252ec1e643798c6d001be969951",
+      "path": "reports/science/real/real_splits/dev.jsonl"
+    },
+    "reports/science/real/real_splits/test.jsonl": {
+      "sha256": "f40c737cf20db6730666620174982de5a7be1bda2a4f7fb359e376dc18324420",
+      "path": "reports/science/real/real_splits/test.jsonl"
+    },
+    "reports/science/real/CORPUS_MANIFEST.json": {
+      "sha256": "9490444edc2e23131e45a2705e8ed9efdd8a66e17b90398db27f778eb44f0507",
+      "path": "reports/science/real/CORPUS_MANIFEST.json"
+    }
+  },
+  "span_stats": {
+    "n_spans": 1483,
+    "min_len": 49,
+    "p25": 66,
+    "median_len": 87,
+    "p75": 254,
+    "max_len": 300,
+    "share_of_answer": 0.157135431383719,
+    "avg_spans_per_injected": 1.6477777777777778,
+    "share_under_20": 0.0,
+    "total_labels": 1483
+  },
+  "answer_stats": {
+    "min": 307,
+    "p25": 1111,
+    "median": 1393,
+    "p75": 1750,
+    "max": 3000,
+    "share_under_300": 0.0
+  },
+  "asserts": {
+    "spans_text_equals_slice": "100% verified",
+    "clean_share_40pct": true,
+    "per_type_min_40": true,
+    "split_no_overlap": true,
+    "answer_min_300": true,
+    "span_min_20": true,
+    "labels_spans_equal_by_start_end": "100% equals by set(start,end)",
+    "labels_binary_contract": "third element ∈ {1}, equals spans set"
+  },
+  "span_rule": "1–3 спанов на инъецированную пару, доли 50% 1 /30% 2 /20% 3 детерминированно от sha256(doc_id:nspans), исключительно полные предложения/смысловые токены, без односимвольных",
+  "code_index": {
+    "faithful": 0,
+    "contradiction": 1,
+    "partial": 2,
+    "number_attribution": 3,
+    "unconfirmed": 4,
+    "missing": 5,
+    "oversight": 6,
+    "excess": 7
+  },
+  "frozen_notes": "binary labels по контракту p8_evaluate.py:174; 8-код разметки — в spans.jsonl+code_index"
+}
