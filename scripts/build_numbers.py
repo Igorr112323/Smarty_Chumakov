@@ -671,6 +671,31 @@ MEASURED_SOURCES: list[dict] = [
         "dataset": "hf/warm-marginal",
         "mode": "hf",
     },
+    # --- R2 доля: выполнено измеренно (dev181-only, frozen-r2) ---
+    {
+        "id": "r2.share.mae",
+        "source": "reports/science/r2/official/result.json",
+        "path": ["ai_share", "mae"],
+        "unit": "MAE",
+        "dataset": "dev181-fragment-mean",
+        "mode": "demo",
+    },
+    {
+        "id": "r2.share.mae_p8",
+        "source": "reports/science/r2/official/result.json",
+        "path": ["ai_share", "mae_p8"],
+        "unit": "MAE",
+        "dataset": "dev181-fragment-mean",
+        "mode": "demo",
+    },
+    {
+        "id": "r2.share.monotone",
+        "source": "reports/science/r2/official/result.json",
+        "path": ["ai_share", "monotone"],
+        "unit": "bool",
+        "dataset": "dev181-fragment-mean",
+        "mode": "demo",
+    },
 ]
 
 
