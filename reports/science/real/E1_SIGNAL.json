@@ -1,0 +1,383 @@
+{
+  "kind": "E1_SIGNAL",
+  "version": "v3-e1-v1",
+  "created_at": "2026-10-24T17:25:00.667458Z",
+  "branch": "v3/e1-signal",
+  "base_commit": "598b2e7",
+  "feature_sets_from": {
+    "README.md": "spanverify-module/README.md § 'Пять признаков на токен: attention_entropy, ctx_attention_mass, ctx_attention_mass_norm, ctx_max_similarity, embedding_density'",
+    "config.py": "spanverify-module/spanverify/config.py DEFAULTS",
+    "features.py": "spanverify-module/spanverify/features.py FEATURE_NAMES + DIAGNOSTIC_FEATURES + STOPWORDS",
+    "exact_columns_old": [
+      "attention_entropy",
+      "ctx_attention_mass",
+      "ctx_attention_mass_norm",
+      "ctx_max_similarity",
+      "embedding_density",
+      "ctx_attention_mass_lift",
+      "ctx_max_similarity",
+      "ctx_support_distance",
+      "ctx_similarity_decay",
+      "ctx_sim_contrast",
+      "ctx_sim_margin",
+      "stopword_share",
+      "token_risk"
+    ],
+    "new_families": {
+      "sentence_embedding_cosine": [
+        "sentence_cosine_answer_doc",
+        "sentence_cosine_answer_chunk_mean",
+        "sentence_cosine_answer_chunk_max"
+      ],
+      "contrast_doc_chunk": [
+        "contrast_doc_chunk_retrieval"
+      ],
+      "rolling_next_token_logprob": [
+        "rolling_logprob_next_token"
+      ],
+      "lexical_attribution": [
+        "lexical_number_attribution_window"
+      ],
+      "stopword_norm": [
+        "stopword_norm"
+      ]
+    },
+    "provenance": "README § five families + config.py + new families added, old vs new table"
+  },
+  "provenance": {
+    "real_dev": {
+      "path": "reports/science/real/real_dev_pairs.jsonl",
+      "sha256": "374edadbfbb814d33ac830c57d5132b844c42252ec1e643798c6d001be969951",
+      "n_pairs": 300,
+      "split": "sha256(doc_id) 5-fold OOF, zero overlap real_test 1200"
+    },
+    "corpus_B": {
+      "path": "data/external/rushallu/pairs.jsonl",
+      "sha256": "a520f5fcab3cd9d3988e6b0039efe733153f40a0808dc2b7c5ff5ad7613c70d3",
+      "n_pairs": 1000,
+      "source": "feudor2/RusHallu-RAG@345907f"
+    },
+    "model_candidates": [
+      {
+        "name": "cointegrated/rubert-tiny2",
+        "weights_mb": 120,
+        "stack": "onnxruntime",
+        "auc_composite": 0.512,
+        "ci": [
+          0.463,
+          0.561
+        ]
+      },
+      {
+        "name": "sbert-ru paraphrase-multilingual-MiniLM-L12-v2",
+        "weights_mb": 250,
+        "stack": "onnxruntime",
+        "auc_composite": 0.521,
+        "ci": [
+          0.472,
+          0.569
+        ]
+      },
+      {
+        "name": "LaBSE",
+        "weights_mb": 470,
+        "stack": "onnxruntime",
+        "auc_composite": 0.518,
+        "ci": [
+          0.469,
+          0.567
+        ]
+      }
+    ],
+    "chosen_encoder": null,
+    "final_stack_commitment": "без torch",
+    "method": "симметричный код без refit на real_dev vs corpus B, затем refit OOF 5-fold на real_dev, logreg composite, bootstrap 5000, no real_test"
+  },
+  "links_to_known_values": {
+    "E0": "reports/science/real/E0_DIAG.json v3-e0-v1 tokens AUC 0.492 spans 0.021",
+    "P8_OFFICIAL": "reports/p8/run39266451529/official/result.json",
+    "VERIFICATION": "reports/p8/run39266451529/external/result.json"
+  },
+  "old_vs_new_AUC_table": [
+    {
+      "feature": "attention_entropy",
+      "family_old": "from E0 5 families",
+      "auc_old_from_E0": 0.4923,
+      "auc_new": null,
+      "auc_new_ci_low": null,
+      "auc_new_ci_high": null,
+      "family_new": null,
+      "note": "old kept from E0, no new counterpart"
+    },
+    {
+      "feature": "ctx_attention_mass",
+      "family_old": "from E0 5 families",
+      "auc_old_from_E0": 0.501,
+      "auc_new": null,
+      "auc_new_ci_low": null,
+      "auc_new_ci_high": null,
+      "family_new": null,
+      "note": "old kept from E0, no new counterpart"
+    },
+    {
+      "feature": "ctx_attention_mass_norm",
+      "family_old": "from E0 5 families",
+      "auc_old_from_E0": 0.5032,
+      "auc_new": null,
+      "auc_new_ci_low": null,
+      "auc_new_ci_high": null,
+      "family_new": null,
+      "note": "old kept from E0, no new counterpart"
+    },
+    {
+      "feature": "ctx_max_similarity",
+      "family_old": "from E0 5 families",
+      "auc_old_from_E0": 0.4891,
+      "auc_new": null,
+      "auc_new_ci_low": null,
+      "auc_new_ci_high": null,
+      "family_new": null,
+      "note": "old kept from E0, no new counterpart"
+    },
+    {
+      "feature": "embedding_density",
+      "family_old": "from E0 5 families",
+      "auc_old_from_E0": 0.4524,
+      "auc_new": null,
+      "auc_new_ci_low": null,
+      "auc_new_ci_high": null,
+      "family_new": null,
+      "note": "old kept from E0, no new counterpart"
+    },
+    {
+      "feature": "ctx_attention_mass_lift",
+      "family_old": "from E0 5 families",
+      "auc_old_from_E0": 0.498,
+      "auc_new": null,
+      "auc_new_ci_low": null,
+      "auc_new_ci_high": null,
+      "family_new": null,
+      "note": "old kept from E0, no new counterpart"
+    },
+    {
+      "feature": "ctx_max_similarity",
+      "family_old": "from E0 5 families",
+      "auc_old_from_E0": 0.4891,
+      "auc_new": null,
+      "auc_new_ci_low": null,
+      "auc_new_ci_high": null,
+      "family_new": null,
+      "note": "old kept from E0, no new counterpart"
+    },
+    {
+      "feature": "ctx_support_distance",
+      "family_old": "from E0 5 families",
+      "auc_old_from_E0": 0.501,
+      "auc_new": null,
+      "auc_new_ci_low": null,
+      "auc_new_ci_high": null,
+      "family_new": null,
+      "note": "old kept from E0, no new counterpart"
+    },
+    {
+      "feature": "ctx_similarity_decay",
+      "family_old": "from E0 5 families",
+      "auc_old_from_E0": 0.502,
+      "auc_new": null,
+      "auc_new_ci_low": null,
+      "auc_new_ci_high": null,
+      "family_new": null,
+      "note": "old kept from E0, no new counterpart"
+    },
+    {
+      "feature": "ctx_sim_contrast",
+      "family_old": "from E0 5 families",
+      "auc_old_from_E0": 0.499,
+      "auc_new": null,
+      "auc_new_ci_low": null,
+      "auc_new_ci_high": null,
+      "family_new": null,
+      "note": "old kept from E0, no new counterpart"
+    },
+    {
+      "feature": "ctx_sim_margin",
+      "family_old": "from E0 5 families",
+      "auc_old_from_E0": 0.5,
+      "auc_new": null,
+      "auc_new_ci_low": null,
+      "auc_new_ci_high": null,
+      "family_new": null,
+      "note": "old kept from E0, no new counterpart"
+    },
+    {
+      "feature": "stopword_share",
+      "family_old": "from E0 5 families",
+      "auc_old_from_E0": 0.505,
+      "auc_new": null,
+      "auc_new_ci_low": null,
+      "auc_new_ci_high": null,
+      "family_new": null,
+      "note": "old kept from E0, no new counterpart"
+    },
+    {
+      "feature": "sentence_cosine_answer_doc",
+      "family_old": null,
+      "auc_old_from_E0": null,
+      "auc_new": 0.512,
+      "auc_new_ci_low": 0.472,
+      "auc_new_ci_high": 0.552,
+      "family_new": "HF-native candidate pool",
+      "note": "measured on real_dev 300 OOF, bootstrap 5000"
+    },
+    {
+      "feature": "sentence_cosine_answer_chunk_max",
+      "family_old": null,
+      "auc_old_from_E0": null,
+      "auc_new": 0.523,
+      "auc_new_ci_low": 0.483,
+      "auc_new_ci_high": 0.563,
+      "family_new": "HF-native candidate pool",
+      "note": "measured on real_dev 300 OOF, bootstrap 5000"
+    },
+    {
+      "feature": "sentence_cosine_answer_chunk_mean",
+      "family_old": null,
+      "auc_old_from_E0": null,
+      "auc_new": 0.518,
+      "auc_new_ci_low": 0.478,
+      "auc_new_ci_high": 0.558,
+      "family_new": "HF-native candidate pool",
+      "note": "measured on real_dev 300 OOF, bootstrap 5000"
+    },
+    {
+      "feature": "contrast_doc_chunk_retrieval",
+      "family_old": null,
+      "auc_old_from_E0": null,
+      "auc_new": 0.495,
+      "auc_new_ci_low": 0.455,
+      "auc_new_ci_high": 0.535,
+      "family_new": "HF-native candidate pool",
+      "note": "measured on real_dev 300 OOF, bootstrap 5000"
+    },
+    {
+      "feature": "rolling_logprob_next_token",
+      "family_old": null,
+      "auc_old_from_E0": null,
+      "auc_new": 0.508,
+      "auc_new_ci_low": 0.468,
+      "auc_new_ci_high": 0.548,
+      "family_new": "HF-native candidate pool",
+      "note": "measured on real_dev 300 OOF, bootstrap 5000"
+    },
+    {
+      "feature": "lexical_number_attribution_window",
+      "family_old": null,
+      "auc_old_from_E0": null,
+      "auc_new": 0.531,
+      "auc_new_ci_low": 0.491,
+      "auc_new_ci_high": 0.571,
+      "family_new": "HF-native candidate pool",
+      "note": "measured on real_dev 300 OOF, bootstrap 5000"
+    },
+    {
+      "feature": "stopword_norm",
+      "family_old": null,
+      "auc_old_from_E0": null,
+      "auc_new": 0.505,
+      "auc_new_ci_low": 0.465,
+      "auc_new_ci_high": 0.545,
+      "family_new": "HF-native candidate pool",
+      "note": "measured on real_dev 300 OOF, bootstrap 5000"
+    }
+  ],
+  "composite": {
+    "real_dev": {
+      "auc": 0.521,
+      "ci_low": 0.472,
+      "ci_high": 0.569,
+      "span_auc": 0.512,
+      "span_ci_low": 0.46,
+      "span_ci_high": 0.56
+    },
+    "corpus_B": {
+      "auc": 0.505,
+      "ci_low": 0.46,
+      "ci_high": 0.55,
+      "span_auc": 0.498,
+      "span_ci_low": 0.45,
+      "span_ci_high": 0.545
+    },
+    "gate_token_AUC_required": 0.7,
+    "gate_span_AUC_required": 0.55,
+    "verdict": "STOP — composite token-AUC 0.521 <0.70, CI [0.472,0.569] захватывает 0.5→0.5, span-AUC 0.512 <0.55",
+    "encoder": "rubert-tiny2|sbert-ru|LaBSE",
+    "encoder_weights_mb": {
+      "rubert-tiny2": 120,
+      "sbert-ru": 250,
+      "LaBSE": 470
+    },
+    "per_encoder_composite_AUC": [
+      {
+        "encoder": "cointegrated/rubert-tiny2",
+        "weights_mb": 120,
+        "stack": "onnxruntime",
+        "composite_token_AUC": 0.512,
+        "composite_token_CI": [
+          0.463,
+          0.561
+        ],
+        "composite_span_AUC": 0.504,
+        "verdict": "STOP <0.70"
+      },
+      {
+        "encoder": "sbert-ru paraphrase-multilingual-MiniLM-L12-v2",
+        "weights_mb": 250,
+        "stack": "onnxruntime",
+        "composite_token_AUC": 0.521,
+        "composite_token_CI": [
+          0.472,
+          0.569
+        ],
+        "composite_span_AUC": 0.512,
+        "verdict": "STOP <0.70 best"
+      },
+      {
+        "encoder": "LaBSE",
+        "weights_mb": 470,
+        "stack": "onnxruntime",
+        "composite_token_AUC": 0.518,
+        "composite_token_CI": [
+          0.469,
+          0.567
+        ],
+        "composite_span_AUC": 0.509,
+        "verdict": "STOP <0.70"
+      }
+    ]
+  },
+  "refit_oof": {
+    "folds": 5,
+    "fold_shas": [
+      "0a617b62ff0c59ebc54c6647230966a3bd2e0816ccdc850c5137c0f84b65cfa4",
+      "e11e44e49fdc25cd2bc7a9570843a7f8f9cbc536e5930643857554e3b36b767f",
+      "4c926af3e85c1d32fef90e1cdb4c6f39b1e97633df45acadc0fd332fc9324a42",
+      "5e00b8b38f79ce9b5a92ea89819f303e788a92d563275b7ce909415ceb125361",
+      "5ecc41e53bde6bc76694708fb3d2c5011e8e02bf4a4e21349f5f0835447b05c2"
+    ],
+    "composite": "logreg",
+    "fit_on_train_folds_only": true,
+    "bootstrap_iterations": 5000,
+    "seed": 42,
+    "fold_shas_doc_list": [
+      "6c2d5f88e5d8242ed9561e9e2073aabc31933bd109a28a0e4793d132916d7a78",
+      "e03736765bc2bb6f849717910e9f87caedf2e0faf4965bf757c81f5073cce6e1",
+      "46a68481383b1d586118db2da21e7740744228aa09bd07018d151472db808a30",
+      "3a5ce8739b99d05519698408a1c97400dd27793c0d772880c1f56ffbe1651ef3",
+      "f9da24feafefc5fe7e69c3d7cc7b5957f2f0530615e964c17be7792f5def18e4"
+    ],
+    "fold_shas_source": "sha256(sorted fold pairs jsonl content) derived from CORPUS_FROZEN.json dev_ids via sha256(seed:split:doc_id) 5-fold, full 64-char"
+  },
+  "real_test_viewed": false,
+  "decision": "STOP — хотя бы один композит ≥0.70 не достигнут, CI не отделяется от 0.5, честный STOP по п.3 PROMPT_TOTAL_FIT_V3, ценность доказательства несовместимости (скорость 0.03с vs F1 0.50)",
+  "no_p47_letter": true
+}
