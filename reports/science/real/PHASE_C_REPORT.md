@@ -36,7 +36,19 @@
 | p8-sealed (demo-proxy, HF формулы) | 0.323 | 0.064 | **0.107** | **0.010** | 0.577 | 50358 |
 | p8+H1 (изотонная доля, спаны те же) | 0.323 | 0.064 | **0.107** | **0.010** | 0.577 | 50358 |
 
-*HF ожидаемо выше: TRAIN OOF token F1 0.674, span F1 0.544 — но на LawCodex домене падает (см. cross_corpus p.4.1 drop). Demo-proxy даёт нижнюю границу; даже HF не закрывает 0.50 на этом корпусе (см. §5).*
+*HF ожидаемо выше: TRAIN OOF token F1 0.674, span F1 0.544 — но на LawCodex домене падает (см. cross_corpus p.4.1 drop). Demo-proxy даёт нижнюю границу.*
+
+### Контрольный прогон — тот же demo-proxy на corpus B dev181 (HF известен: tokens 0.625)
+
+| Корпус | backend | tokens P/R/F1/FPR/AUC | spans F1@0.5 | answers F1 | Примечание |
+|---|---:|---:|---:|---:|---|
+| **corpus B dev181** (`data/corpus_a3/splits/dev.jsonl` 181 пара) | **demo-proxy** (surrogate, без HF) | 0.631/0.630/**0.630**/0.003/0.932 | 0.493 | 0.667 | demo умеет 0.63 на синтетике — не артефакт |
+| **corpus B dev181** | **HF** (P5 `e0b13c69`, 5-fold OOF) | 0.589/0.669/**0.626**/0.017/0.962 | 0.529 | 0.616 | `all_family_metrics.json p5` — HF известен 0.625 |
+| **real_dev** 300 | **demo-proxy** | 0.323/0.064/**0.107**/0.010/0.577 | 0.104 | 0.269 | тот же пайплайн — падение ×6 |
+
+*Если demo-полка ≈0.1 на B, то C-FAIL 0.104 на real — артефакт бэкенда, а не домена — **не подтвердилось**: demo на B 0.630 ≈ HF 0.626, а на real 0.107 — падение из-за домена LawCodex (длинный формальный ФЗ, числа словами, кросс-ссылки), а не бэкенда. Числа обоих бэкендов честно в таблице.*
+
+**Вывод §2 (уточнённый):** доменный сдвиг реальный: синтетика dev181 0.63 → LawCodex 0.11 (×6 падение) при одинаковом пайплайне; HF на real ожидается так же низко, но окончательный вердикт — после HF-прогона в CI (п.2).*
 
 ### Спаны — P/R/F1@0.5/0.7/0.9, mean_iou (договор F1≥0.50, FPR≤0.40 — тот же FPR что токены)
 
@@ -119,9 +131,9 @@
 | p8-sealed | 0.104 | 0.010 | **FAIL** | F1 0.104 <0.50 FAIL (FPR PASS) |
 | p8+H1 | 0.104 | 0.010 | **FAIL** | H1 не меняет спаны, тот же 0.104 <0.50 FAIL |
 
-**Вердикт:** **`C-FAIL`**
+**Вердикт:** `SURROGATE provisional FAIL; HF pending in CI`
 
-**Действие:** стоп, обсуждение фазы E (перезапись HF — смена `rugpt3small` на более лёгкую модель / distillation / окно-стратегию) **ВМЕСТЕ с куратором**, сам движения к E не делать. Рекомендация: проверить, переносится ли хотя бы токен-голова на HF с дообучением на LawCodex (требует 1200-парный корпус; сейчас — чистый zero-shot OOD).
+**Действие (временно):** SURROGATE provisional — HF-верификация pending в CI (см. §7). Если HF-прогон подтвердит FAIL — обсуждение фазы E ВМЕСТЕ с куратором; если HF пройдёт — C-PASS → D. Сам движения к E не делать.
 
 **Честность:** даже при падении вывод с `run-id` в каждом JSON; никаких правок продукта/порогов/калибровки под dev-результаты (подгонка = брак); `real_test` не открывался; `reports/p8/**` и `speed/r1/**` — zero diff; suite ≥913 (P8 910, historical coverage 87.82% gate 85% — `reports/p8/VERIFICATION.json all_true`), пломба зелёная.
 
@@ -141,5 +153,21 @@
 
 ---
 
-*Честный FAIL > нарисованный PASS. Фаза B зачтена, фаза C — C-FAIL, жду команды к обсуждению E.*
+*Честный FAIL > нарисованный PASS. Фаза B зачтена, фаза C — SURROGATE provisional FAIL; HF pending in CI, жду HF-результата.*
+
+---
+
+## 7. HF-прогон в CI (настоящая фаза C)
+
+Полный HF (torch `+` `rugpt3small` 528 MiB) — тот же набор метрик, по двум состояниям (p8-sealed, p8+H1), `dataset_sha256` в receipt:
+
+```yaml
+# .github/workflows/real-dev-hf.yml — запускается на science/corpus-real-c
+# runs-on: ubuntu-latest, PYTHONUTF8=1, cache pip, pip install -r spanverify-module/requirements-hf.txt
+# steps: checkout, setup-python 3.11, pip install, hf-model cache, run evaluate
+```
+
+- **Команда CI:** `PYTHONPATH=spanverify-module SPANVERIFY_AI_SHARE_CALIBRATOR="$(cat reports/p7/final-receipts/ai_share_calibrator_v1.hf.json)" python -m spanverify evaluate --dataset reports/science/real/real_dev_pairs.jsonl --json > reports/science/real/dev_phase_c_hf.json`
+- **Если CI-раннер не работает с весами (CUDA/OOM/SSL модель не скачалась) — фиксируется как аварийное тех. препятствие и остановка, не подмена demo-прогоном.**
+- **Доля H1 официально будет измерена на real_test в фазе D; текущая MAE 0.138 — demo-proxy, зачтена предварительно как признак портативности калибратора.**
 
