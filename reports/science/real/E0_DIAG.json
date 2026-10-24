@@ -362,5 +362,14 @@
   "no_refit": true,
   "real_test_viewed": false,
   "speed_gap": "HF warm median 12.41877s p95 12.52436s (run 39472061036) vs норма 0.03s — разрыв 414x, фиксирован",
-  "E0_gates": "не ворота, а диагностика — опубликована при любом результате"
+  "E0_gates": "не ворота, а диагностика — опубликована при любом результате",
+  "run_id": "40112907795",
+  "date": "2026-10-24",
+  "evidence_context": {
+    "run_id": "40112907795",
+    "date": "2026-10-24",
+    "source_commit": "007da5d9bcfd8e4d7a7587a85e96455e55d5ecb9",
+    "status": "authoritative",
+    "successor": "reports/EXPERIMENTS_INDEX.md"
+  }
 }

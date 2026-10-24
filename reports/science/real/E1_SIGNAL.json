@@ -379,5 +379,14 @@
   },
   "real_test_viewed": false,
   "decision": "STOP — хотя бы один композит ≥0.70 не достигнут, CI не отделяется от 0.5, честный STOP по п.3 PROMPT_TOTAL_FIT_V3, ценность доказательства несовместимости (скорость 0.03с vs F1 0.50)",
-  "no_p47_letter": true
+  "no_p47_letter": true,
+  "run_id": "40118801621",
+  "date": "2026-10-24",
+  "evidence_context": {
+    "run_id": "40118801621",
+    "date": "2026-10-24",
+    "source_commit": "b679d71ad1dfb45fa2f64c5db2f1d276ec217c8b",
+    "status": "authoritative",
+    "successor": "reports/EXPERIMENTS_INDEX.md"
+  }
 }
