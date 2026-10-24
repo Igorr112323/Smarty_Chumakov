@@ -9,6 +9,7 @@ on:
 
 permissions:
   contents: read
+  checks: write
 
 env:
   PYTHONUTF8: "1"
@@ -48,6 +49,11 @@ jobs:
           cat /tmp/real_dev_hf_sealed.json >> $GITHUB_STEP_SUMMARY
           echo '```' >> $GITHUB_STEP_SUMMARY
           python -c "import json,hashlib,pathlib; ds=hashlib.sha256(pathlib.Path('reports/science/real/real_dev_pairs.jsonl').read_bytes()).hexdigest(); j=json.load(open('/tmp/real_dev_hf_sealed.json')); assert j['pairs']==300; print('dataset_sha',ds); open('/tmp/real_dev_hf_sealed_receipt.json','w').write(json.dumps({'dataset_sha256':ds,'run_id':'real-dev-hf-sealed','bundle_sha':'e0b13c69','mode':'hf'},indent=2))"
+          # Sanctioned bridge: publish JSON to Check-Run output.text via API (github.com domain, no blob)
+          JOB_ID=$(gh api repos/${{ github.repository }}/actions/runs/${{ github.run_id }}/jobs --jq '.jobs[0].id')
+          gh api repos/${{ github.repository }}/check-runs/$JOB_ID -X PATCH -f output[title]="HF sealed real_dev 300" -f output[summary]="dataset_sha256 + bundle_sha + run-id" --raw-field output[text]="$(cat /tmp/real_dev_hf_sealed.json)" || echo "check-run patch failed, but summary already in GITHUB_STEP_SUMMARY"
+        env:
+          GH_TOKEN: ${{ github.token }}
 
       - name: HF p8+H1 — real_dev 300 (изотонная доля)
         run: |
