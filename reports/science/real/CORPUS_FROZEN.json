@@ -58,15 +58,15 @@
   },
   "files": {
     "reports/science/real/real_dev_pairs.jsonl": {
-      "sha256": "ca40b17036c64168ef6c88d8b3df459fcbb07901ea88631a96f8c26c33bda162",
+      "sha256": "5487d54c36b477712065a34552ec9fc7a7316cd508f52470b12e06a46f033e97",
       "path": "reports/science/real/real_dev_pairs.jsonl"
     },
     "reports/science/real/real_test_pairs.jsonl": {
-      "sha256": "01eb76cd3571cf8ef14131287667f478e4d33ebea810de462dc0403fd5fbd64f",
+      "sha256": "5e9b05626466a2edeb42f379686c20644ad295ad802630013958e73fe7e648a4",
       "path": "reports/science/real/real_test_pairs.jsonl"
     },
     "reports/science/real/real_all_pairs.jsonl": {
-      "sha256": "087e2a72682e82948f19aece5c5b62b25fd2b957b82901a5444166cc826ecc5e",
+      "sha256": "0494038285737b7c5ed4935eb4570efa5e3432856a2a8688982e56aa449b44fb",
       "path": "reports/science/real/real_all_pairs.jsonl"
     },
     "reports/science/real/real_dev_spans.jsonl": {
@@ -78,11 +78,11 @@
       "path": "reports/science/real/real_test_spans.jsonl"
     },
     "reports/science/real/splits/dev.jsonl": {
-      "sha256": "ca40b17036c64168ef6c88d8b3df459fcbb07901ea88631a96f8c26c33bda162",
+      "sha256": "5487d54c36b477712065a34552ec9fc7a7316cd508f52470b12e06a46f033e97",
       "path": "reports/science/real/splits/dev.jsonl"
     },
     "reports/science/real/splits/test.jsonl": {
-      "sha256": "01eb76cd3571cf8ef14131287667f478e4d33ebea810de462dc0403fd5fbd64f",
+      "sha256": "5e9b05626466a2edeb42f379686c20644ad295ad802630013958e73fe7e648a4",
       "path": "reports/science/real/splits/test.jsonl"
     }
   },
@@ -111,7 +111,19 @@
     "per_type_min_40": true,
     "split_no_overlap": true,
     "answer_min_300": true,
-    "span_min_20": true
+    "span_min_20": true,
+    "labels_spans_equal_by_start_end": "100% equals by set(start,end)"
   },
-  "span_rule": "1–3 спанов на инъецированную пару, доли 50% 1 /30% 2 /20% 3 детерминированно от sha256(doc_id:nspans), исключительно полные предложения/смысловые токены, без односимвольных"
+  "span_rule": "1–3 спанов на инъецированную пару, доли 50% 1 /30% 2 /20% 3 детерминированно от sha256(doc_id:nspans), исключительно полные предложения/смысловые токены, без односимвольных",
+  "code_index": {
+    "faithful": 0,
+    "contradiction": 1,
+    "partial": 2,
+    "number_attribution": 3,
+    "unconfirmed": 4,
+    "missing": 5,
+    "oversight": 6,
+    "excess": 7
+  },
+  "frozen_notes": "labels-only change: contexts/answers/spans unchanged (same seed 42 generation), only pairs labels updated to full list per span with code_index; otherwise new corpus would be new chance"
 }
