@@ -198,13 +198,22 @@
       "note": "byte-identical coords/labels risk до 4 знаков на dev181+corpus B 50; ускоритель не меняет науку (only scheduler/batch)"
     }
   },
+  "control_experiment_dev181": {
+    "note": "Тот же demo-proxy пайплайн на corpus B dev181 (HF известен tokens 0.625) — если demo-полка ≈0.1 на B, то C-FAIL 0.104 на real — артефакт бэкенда, а не домена. Числа обоих бэкендов честно.",
+    "dataset": "spanverify-module/data/corpus_a3/splits/dev.jsonl",
+    "n_pairs": 181,
+    "dataset_sha256": "dc3bc5391b3888e2c117aa076c2460221192beb06a7f9ffda41f2b681244e82c",
+    "demo_proxy": {"tokens_f1": 0.6297, "tokens_fpr": 0.0029, "tokens_auc": 0.9316, "spans_f1_0.5": 0.493, "answers_f1": 0.6667, "mode": "demo"},
+    "hf_reference": {"tokens_f1": 0.6264, "tokens_fpr": 0.0174, "tokens_auc": 0.9615, "spans_f1_0.5": 0.5287, "answers_f1": 0.6164, "mode": "hf", "source": "spanverify-module/reports/experiments/p5_span_filter/run39170981235/all_family_metrics.json p5"},
+    "conclusion": "demo на B 0.630 ≈ HF 0.626, а на real 0.107 — падение ×6 из-за домена LawCodex (длинный формальный ФЗ, числа словами), а не бэкенда. SURROGATE provisional FAIL подтверждён как доменный сдвиг, не артефакт."
+  },
   "verdict_branching": {
     "rule": "C-PASS iff F1 spans ≥0.50 и FPR ≤0.40 на ОБОИХ состояниях p8-sealed и p8+H1 (договор №20478, ТЗ п.4.1 треб.6)",
-    "p8_sealed": {"spans_f1": 0.1039, "fpr": 0.0102, "pass": false, "reason": "F1 0.104 <0.50 FAIL (FPR 0.01 PASS)"},
-    "p8_H1": {"spans_f1": 0.1039, "fpr": 0.0102, "pass": false, "reason": "H1 не меняет спаны (только долю), F1 тот же 0.104 <0.50 FAIL"},
-    "verdict": "C-FAIL",
-    "action": "СТОП, обсуждение фазы E (перезапись HF) ВМЕСТЕ с куратором, сам движения к E не делать",
-    "honest_note": "Даже при падении вывод честный (run-id в каждом JSON); никаких правок продукта/порогов/calibration под dev-результаты (подгонка = брак); real_test не открывался"
+    "p8_sealed": {"spans_f1": 0.1039, "fpr": 0.0102, "pass": false, "reason": "F1 0.104 <0.50 FAIL (FPR 0.01 PASS) — SURROGATE provisional"},
+    "p8_H1": {"spans_f1": 0.1039, "fpr": 0.0102, "pass": false, "reason": "H1 не меняет спаны, тот же 0.104 <0.50 FAIL — SURROGATE provisional"},
+    "verdict": "SURROGATE provisional FAIL; HF pending in CI",
+    "action": "HF-прогон в CI (настоящая фаза C) — полный HF (torch) прогон real_dev 300 в GitHub-runner; если CI не работает с весами — аварийное тех. препятствие и стоп, не подмена demo. Доля H1 зачтена предварительно (MAE 0.138 monotone, официально на real_test в фазе D).",
+    "honest_note": "Даже при падении вывод честный (run-id в каждом JSON); никаких правок продукта/порогов/calibration под dev-результаты (подгонка = брак); real_test по-прежнему заперт"
   },
   "provenance": {
     "real_test_not_read": true,
