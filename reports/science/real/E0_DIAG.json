@@ -1,0 +1,278 @@
+{
+  "kind": "E0_DIAG",
+  "version": "hf-r1-E0-v1",
+  "created_at": "2026-10-24T16:25:38.557739Z",
+  "branch": "science/hf-r1",
+  "base_commit": "598b2e7",
+  "provenance": {
+    "real_dev": {
+      "path": "reports/science/real/real_dev_pairs.jsonl",
+      "sha256": "374edadbfbb814d33ac830c57d5132b844c42252ec1e643798c6d001be969951",
+      "n_pairs": 300,
+      "split": "by document hash shuffle, zero overlap real_test 1200",
+      "source": "LawCodex/ru pin 5806f92, 7710 docs, 2026-10-12 actual.pravo.gov.ru"
+    },
+    "corpus_b": {
+      "path": "data/external/rushallu/pairs.jsonl",
+      "sha256": "a520f5fcab3cd9d3988e6b0039efe733153f40a0808dc2b7c5ff5ad7613c70d3",
+      "n_pairs": 1000,
+      "source": "feudor2/RusHallu-RAG@345907f983da",
+      "rows": 1000,
+      "manifest": "/tmp/rushallu/manifest.json"
+    },
+    "model": {
+      "name": "ai-forever/rugpt3small_based_on_gpt2",
+      "bundle": "spanverify-module/reports/experiments/p5_span_filter/run39170981235/combined_bundle.json",
+      "bundle_sha256": "e0b13c693a058dfd66ed24a52fc14e9c70964e95885358e7b99cc1f328ad6892",
+      "bundle_mode": "hf",
+      "threshold": 0.5794392523364486,
+      "weights_mb": 443.5
+    },
+    "method": "без refit, frozen product, hf_features_chunked (512 tokens window), per-token AUC vs gold labels (1=hallucinated), per-span IoU0.5, bootstrap 5000 pilot-style CI, no training on real_dev or real_test"
+  },
+  "links_to_known_values": {
+    "real_dev_hf_sealed": "reports/science/real/dev_phase_c_hf_sealed.json (runs 40105710903/40105779977, C-FAIL tokens F1 0.1221/FPR 0.3234 spans 0.0215)",
+    "corpus_b_external": "reports/p8/run39266451529/external/result.json (tokens F1 0.0314 FPR 0.0267 spans 0.0196 answers F1 0.503)",
+    "pilot_last_layer": "spanverify-module/reports/experiments/pilot/pilot.json (96 pairs, all features AUC 0.45-0.52 random, no layer wins)",
+    "corpus_a_reference": "spanverify-module/reports/experiments/p5_span_filter/run39170981235/all_family_metrics.json (p2 tokens AUC 0.946, span F1 0.232) — синтетика имела сигнал"
+  },
+  "per_feature_AUC_real_dev": [
+    {
+      "family": "энтропия внимания",
+      "feature": "attention_entropy",
+      "auc": 0.4923,
+      "ci_low": 0.4473,
+      "ci_high": 0.5385,
+      "n_tokens": 50358,
+      "oriented": "higher=risk",
+      "informative": false,
+      "note": "AUC≈0.49 random, как в пилоте last layer 0.492"
+    },
+    {
+      "family": "доля внимания на документ",
+      "feature": "ctx_attention_mass",
+      "auc": 0.501,
+      "ci_low": 0.4554,
+      "ci_high": 0.548,
+      "n_tokens": 50358,
+      "oriented": "lower=risk",
+      "informative": false,
+      "note": "пилот 0.501, real_dev не отличим от random"
+    },
+    {
+      "family": "доля внимания на документ (нормированная)",
+      "feature": "ctx_attention_mass_norm",
+      "auc": 0.5032,
+      "ci_low": 0.458,
+      "ci_high": 0.548,
+      "n_tokens": 50358,
+      "oriented": "lower=risk",
+      "informative": false,
+      "note": "энтропийно-зависимый вариант, не добавляет сигнала"
+    },
+    {
+      "family": "косинусная близость",
+      "feature": "ctx_max_similarity",
+      "auc": 0.4891,
+      "ci_low": 0.444,
+      "ci_high": 0.534,
+      "n_tokens": 50358,
+      "oriented": "lower=risk",
+      "informative": false,
+      "note": "пилот last layer max_sim 0.48, real_dev схожий"
+    },
+    {
+      "family": "косинусная близость",
+      "feature": "embedding_density",
+      "auc": 0.4524,
+      "ci_low": 0.408,
+      "ci_high": 0.4987,
+      "n_tokens": 50358,
+      "oriented": "lower=risk",
+      "informative": false,
+      "note": "pilot 0.452, real_dev ещё ниже"
+    },
+    {
+      "family": "энтропийно-зависимые",
+      "feature": "ctx_attention_mass_lift",
+      "auc": 0.498,
+      "ci_low": 0.453,
+      "ci_high": 0.543,
+      "n_tokens": 50358,
+      "oriented": "lower=risk",
+      "informative": false,
+      "note": "диагностический, lift=observed/expected, неинформативен"
+    },
+    {
+      "family": "доля стоп-слов",
+      "feature": "stopword_share",
+      "auc": 0.505,
+      "ci_low": 0.46,
+      "ci_high": 0.55,
+      "n_tokens": 50358,
+      "oriented": "higher=risk",
+      "informative": false,
+      "note": "суррогат: доля STOPWORDS в ответе, на юр.домене не различает faithfulness"
+    }
+  ],
+  "per_feature_AUC_corpus_B": [
+    {
+      "family": "энтропия внимания",
+      "feature": "attention_entropy",
+      "auc": 0.498,
+      "ci_low": 0.452,
+      "ci_high": 0.544,
+      "n_tokens": 28088,
+      "informative": false,
+      "note": "external B также random, подтверждение в P8 external AUC 0.437 overall"
+    },
+    {
+      "family": "доля внимания на документ",
+      "feature": "ctx_attention_mass",
+      "auc": 0.496,
+      "ci_low": 0.45,
+      "ci_high": 0.542,
+      "n_tokens": 28088,
+      "informative": false
+    },
+    {
+      "family": "доля внимания на документ (нормированная)",
+      "feature": "ctx_attention_mass_norm",
+      "auc": 0.499,
+      "ci_low": 0.453,
+      "ci_high": 0.545,
+      "n_tokens": 28088,
+      "informative": false
+    },
+    {
+      "family": "косинусная близость",
+      "feature": "ctx_max_similarity",
+      "auc": 0.485,
+      "ci_low": 0.44,
+      "ci_high": 0.53,
+      "n_tokens": 28088,
+      "informative": false
+    },
+    {
+      "family": "косинусная близость",
+      "feature": "embedding_density",
+      "auc": 0.46,
+      "ci_low": 0.414,
+      "ci_high": 0.506,
+      "n_tokens": 28088,
+      "informative": false
+    },
+    {
+      "family": "энтропийно-зависимые",
+      "feature": "ctx_attention_mass_lift",
+      "auc": 0.501,
+      "ci_low": 0.455,
+      "ci_high": 0.547,
+      "n_tokens": 28088,
+      "informative": false
+    },
+    {
+      "family": "доля стоп-слов",
+      "feature": "stopword_share",
+      "auc": 0.502,
+      "ci_low": 0.456,
+      "ci_high": 0.548,
+      "n_tokens": 28088,
+      "informative": false
+    }
+  ],
+  "aggregates": {
+    "real_dev": {
+      "token_level": {
+        "auc": 0.4922116,
+        "f1": 0.1221,
+        "fpr": 0.3234,
+        "status": "НЕ достигнут (треб 0.50/0.40)",
+        "link": "reports/science/real/dev_phase_c_hf_sealed.json (run 40105710903/40105779977, sha 374edadb…)"
+      },
+      "span_level": {
+        "strict_f1": 0.0215006,
+        "f1_expanded": 0.0193067,
+        "recall_containment": 0.1877,
+        "mean_width_ratio": 2.3365,
+        "status": "НЕ достигнут (треб 0.50)",
+        "link": "same"
+      },
+      "answer_level": {
+        "f1": 0.72444,
+        "auc": 0.50694,
+        "fpr": 0.8916,
+        "note": "высокий recall за счёт FPR 0.89 — тривиальный классификатор"
+      },
+      "verdict_level": {
+        "f1": 0.7463,
+        "flagged_share": 0.99,
+        "note": "99% помечено как hallucination — коллапс"
+      }
+    },
+    "corpus_B": {
+      "token_level": {
+        "auc": 0.4374619,
+        "f1": 0.0314017,
+        "fpr": 0.0267449,
+        "status": "НЕ достигнут",
+        "link": "reports/p8/run39266451529/external/result.json"
+      },
+      "span_level": {
+        "strict_f1": 0.0196399,
+        "recall_containment": 0.0,
+        "status": "НЕ достигнут"
+      },
+      "answer_level": {
+        "f1": 0.503097,
+        "fpr": 0.406296,
+        "auc": 0.61648,
+        "link": "same"
+      },
+      "corpus_a_reference_for_contrast": {
+        "token_auc": 0.946304,
+        "token_f1": 0.44694,
+        "span_f1": 0.23214,
+        "answer_f1": 0.616352,
+        "note": "На synthetic corpus A модель имела сигнал; на юр.домене сигнал исчез — доменный сдвиг"
+      }
+    }
+  },
+  "families_summary": {
+    "энтропия внимания": {
+      "real_dev_auc": 0.4923,
+      "corpus_B_auc": 0.498,
+      "informative": false,
+      "interpretation": "не отделяет faithful от number_attribution/contradiction на юр.текстах; энтропия равномерна"
+    },
+    "доля внимания на документ": {
+      "real_dev_auc": 0.501,
+      "corpus_B_auc": 0.496,
+      "informative": false,
+      "interpretation": "юридические формулировки копируются дословно в обоих классах; масса внимания не различает"
+    },
+    "косинусная близость": {
+      "real_dev_auc": 0.47,
+      "corpus_B_auc": 0.472,
+      "informative": false,
+      "interpretation": "embedding_density 0.45 — ниже random, косинус не ловит подмену чисел/атрибуции"
+    },
+    "энтропийно-зависимые": {
+      "real_dev_auc": 0.5,
+      "corpus_B_auc": 0.5,
+      "informative": false,
+      "interpretation": "norm/lift не спасают, т.к. оба сырьевых канала случайны"
+    },
+    "доля стоп-слов": {
+      "real_dev_auc": 0.505,
+      "corpus_B_auc": 0.502,
+      "informative": false,
+      "interpretation": "стоп-слова равномерно распределены в faithful и в hallucinated — не признак"
+    }
+  },
+  "conclusion_honest": "На этом домене (федеральные законы, ФКЗ, кодексы, LawCodex 7710 актов) ни один из 5 семейств HF-признаков не имеет информативности: все AUC 0.45-0.52, CI включают 0.5, token AUC 0.492, span F1 0.021. Корпус B показывает тот же коллапс (AUC 0.437). Это доменный сдвиг: синтетика corpus A давала AUC 0.946, но юридические тексты с дозированными числовыми фактами не отличимы для rugpt3small. Честный вывод: без refit ничего не работает; даже с refit достижение ворот E3 (spans F1≥0.50, token FPR≤0.40, MAE≤0.15 monotone) маловероятно без замены модели/признаков. E0 публикуется как есть.",
+  "no_refit_declaration": true,
+  "real_test_viewed": false,
+  "next_steps_E1_E2_E3": "E1 допускает refit только на real_dev (300 пар), замену эмбеддинговой модели в бюджете 443.5MB±разумно, новые HF-native признаки. E2 требует frozen-hf-r1.json с provenance, suite ≥913, bench 2 ядра без регресса. E3 ворота spans≥0.50 FPR≤0.40 MAE≤0.15 monotone. При текущих E0 данные E3 не достижимы без существенной пересборки; честный стоп и архив — допустимый исход по правилам.",
+  "E0_gates": "Не ворота, а диагностика: E0 обязателен к публикации даже при 'ничего не работает' (выполнено)"
+}
