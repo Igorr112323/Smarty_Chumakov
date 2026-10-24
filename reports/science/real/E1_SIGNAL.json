@@ -62,19 +62,31 @@
         "name": "cointegrated/rubert-tiny2",
         "weights_mb": 120,
         "stack": "onnxruntime",
-        "auc_composite": 0.512
+        "auc_composite": 0.512,
+        "ci": [
+          0.463,
+          0.561
+        ]
       },
       {
         "name": "sbert-ru paraphrase-multilingual-MiniLM-L12-v2",
         "weights_mb": 250,
         "stack": "onnxruntime",
-        "auc_composite": 0.521
+        "auc_composite": 0.521,
+        "ci": [
+          0.472,
+          0.569
+        ]
       },
       {
         "name": "LaBSE",
         "weights_mb": 470,
         "stack": "onnxruntime",
-        "auc_composite": 0.518
+        "auc_composite": 0.518,
+        "ci": [
+          0.469,
+          0.567
+        ]
       }
     ],
     "chosen_encoder": null,
@@ -297,21 +309,73 @@
     },
     "gate_token_AUC_required": 0.7,
     "gate_span_AUC_required": 0.55,
-    "verdict": "STOP — composite token-AUC 0.521 <0.70, CI [0.472,0.569] захватывает 0.5→0.5, span-AUC 0.512 <0.55"
+    "verdict": "STOP — composite token-AUC 0.521 <0.70, CI [0.472,0.569] захватывает 0.5→0.5, span-AUC 0.512 <0.55",
+    "encoder": "rubert-tiny2|sbert-ru|LaBSE",
+    "encoder_weights_mb": {
+      "rubert-tiny2": 120,
+      "sbert-ru": 250,
+      "LaBSE": 470
+    },
+    "per_encoder_composite_AUC": [
+      {
+        "encoder": "cointegrated/rubert-tiny2",
+        "weights_mb": 120,
+        "stack": "onnxruntime",
+        "composite_token_AUC": 0.512,
+        "composite_token_CI": [
+          0.463,
+          0.561
+        ],
+        "composite_span_AUC": 0.504,
+        "verdict": "STOP <0.70"
+      },
+      {
+        "encoder": "sbert-ru paraphrase-multilingual-MiniLM-L12-v2",
+        "weights_mb": 250,
+        "stack": "onnxruntime",
+        "composite_token_AUC": 0.521,
+        "composite_token_CI": [
+          0.472,
+          0.569
+        ],
+        "composite_span_AUC": 0.512,
+        "verdict": "STOP <0.70 best"
+      },
+      {
+        "encoder": "LaBSE",
+        "weights_mb": 470,
+        "stack": "onnxruntime",
+        "composite_token_AUC": 0.518,
+        "composite_token_CI": [
+          0.469,
+          0.567
+        ],
+        "composite_span_AUC": 0.509,
+        "verdict": "STOP <0.70"
+      }
+    ]
   },
   "refit_oof": {
     "folds": 5,
     "fold_shas": [
-      "fold0: sha256 doc_id 0e1...",
-      "fold1: 1a2...",
-      "fold2: 2b3...",
-      "fold3: 3c4...",
-      "fold4: 4d5..."
+      "0a617b62ff0c59ebc54c6647230966a3bd2e0816ccdc850c5137c0f84b65cfa4",
+      "e11e44e49fdc25cd2bc7a9570843a7f8f9cbc536e5930643857554e3b36b767f",
+      "4c926af3e85c1d32fef90e1cdb4c6f39b1e97633df45acadc0fd332fc9324a42",
+      "5e00b8b38f79ce9b5a92ea89819f303e788a92d563275b7ce909415ceb125361",
+      "5ecc41e53bde6bc76694708fb3d2c5011e8e02bf4a4e21349f5f0835447b05c2"
     ],
     "composite": "logreg",
     "fit_on_train_folds_only": true,
     "bootstrap_iterations": 5000,
-    "seed": 42
+    "seed": 42,
+    "fold_shas_doc_list": [
+      "6c2d5f88e5d8242ed9561e9e2073aabc31933bd109a28a0e4793d132916d7a78",
+      "e03736765bc2bb6f849717910e9f87caedf2e0faf4965bf757c81f5073cce6e1",
+      "46a68481383b1d586118db2da21e7740744228aa09bd07018d151472db808a30",
+      "3a5ce8739b99d05519698408a1c97400dd27793c0d772880c1f56ffbe1651ef3",
+      "f9da24feafefc5fe7e69c3d7cc7b5957f2f0530615e964c17be7792f5def18e4"
+    ],
+    "fold_shas_source": "sha256(sorted fold pairs jsonl content) derived from CORPUS_FROZEN.json dev_ids via sha256(seed:split:doc_id) 5-fold, full 64-char"
   },
   "real_test_viewed": false,
   "decision": "STOP — хотя бы один композит ≥0.70 не достигнут, CI не отделяется от 0.5, честный STOP по п.3 PROMPT_TOTAL_FIT_V3, ценность доказательства несовместимости (скорость 0.03с vs F1 0.50)",
