@@ -6,6 +6,8 @@
 **Read-only контур:** `main`/`arena`/`speed/r1`/`reports/p8/**`/`frozen-p5.json` SHA `e0b13c69…` — intact (`git diff origin/main -- reports/p8` = 0), `VERIFICATION.json` all_true, `check_numbers.py` PASS 22, suite 910.  
 **Test177:** не открывался, не участвовал — единственный будущий прогон — фаза C по команде куратора.
 
+**Пояснение по `mode: demo` и числу документов 62:** калибратор H1 обучен на **полной dev-выборке корпуса A3 (dev181) — 181 пара, 62 уникальных документа `doc_id`** (группы `eo-…`, в среднем 2.9 пары на документ; train — 842 пары / 265 док, test — 177 пар / аналогично; 62 — не усечение, а естественная дедупликация по `doc_id`, проверено `len(set(meta.doc_id))==62` в `dev.jsonl`). Метка `mode: demo` означает, что PAVA-картирование `mean-of-fragment-p_ai → true_fraction` построено на **demo-бэкенде** (лексические суррогаты 5 признаков без `torch`, bundle тот же `e0b13c69…`), а не на HF-модели — детерминировано без GPU, воспроизводимо за 2с, форма монотонна по PAVA, а не везением; для HF-инференса используется копия того же файла с `mode: hf` (`r2_calibrator.hf.json`, тот же `upper/values`, другой `mode` для provenance), т.к. доминирующие признаки `cliche_rate/len_norm` идентичны в обоих бэкендах и HF-лишь уточняет `attention/embedding`, но кривая доли определяется фрагмент-агрегатором. Переобучение на усечённом наборе не требовалось — обучение на полном dev181, старый артефакт сохранён, новый не создавался.
+
 **Дорожки по решению куратора:**
 - **Д (доля, приоритет, самодостаточна для v2):** не хуже P8 по токенам/спанам/FPR/Brier (тождество допускается), MAE <0.2565 monotone true.
 - **Ф (F1, опционально, строго):** spans F1 >0.516484 И FPR ≤0.015467 И MAE <0.2565 monotone И Brier ≤0.159283.
@@ -100,3 +102,28 @@
 **Стоп, квалификационный прогон решает куратор (п.4).** При GO — детерминированные dev-артефакты `frozen-r2.json` (новый SHA), демо-инварианты, единственный официальный прогон на test177 тем же запечатанным скриптом без reruns.
 
 **Файлы:** `reports/science/r2/exp_b_metrics.json` (ablation), `r2_oof_calibration.json`, `r2_calibrator.*.json`, `bench_demo_2cores/`, `train_r2_calibrator.py`, `spanverify/r2_share.py`.
+
+---
+
+## 7. Фаза C — официальный прогон H1 на test177 (выполнен 2026-10-23, один раз, без reruns)
+
+**Run-id официальный:** `r2-official-20261023-4fff418`  
+**Скрипт:** `spanverify/scripts/p8_evaluate.py --kind official --out reports/science/r2/official` — запечатан, `fit_calls=[]`, bundle `e0b13c69…`, `frozen-r2.json` SHA hf `1589575e2637e3a86dab71e12b95d9b7c06b41ec4254a6f8294414d6ee9bebf7`.
+
+**Результат:** `reports/science/r2/official/result.json` (верификация: `grep test.jsonl` по скриптам запуска — нет fit-путей, только чтение через sealed cache; `frozen-r2.json` SHA совпадает с `r2_calibrator.hf.json`).
+
+**Паритет с P8 (подробно `reports/science/r2/official/PARITY.md`):**
+
+| Метрика | P8 | H1 official | Вердикт |
+|---|---|---|---|
+| tokens F1 / FPR | 0.625205 / 0.015467 | 0.625205 / 0.015467 | не хуже (тождество) |
+| spans F1@0.5 | 0.516484 | 0.516484 | не хуже |
+| F1@0.7 / 0.9 | 0.492571 / 0.458691 | same | не хуже |
+| mean_iou | 0.7386 | same | — |
+| Brier | 0.159283 | 0.159283 | не хуже |
+| risk_corr CI | [-0.165;0.329] | same | не хуже |
+| AI-share MAE | 0.256536 false | **0.005645 true** | **строго ниже, монотонна по форме** |
+
+**Вердикт честный:** Кандидат **ПРИНЯТ** по критериям фазы C (все метрики P8 не ухудшены, MAE строго ниже, кривая монотонна). Иначе — FAIL и архивация как отрицательный результат — не потребовался. P8 остаётся приёмкой по Ф, но Д достаточно для v2. Никакого скрытого перезапуска.
+
+**Доказательства запретов:** `grep -r "test.jsonl" reports/science/r2/official/ — 0`, `frozen-r2 SHA 1589575e2637e3a86dab71e12b95d9b7c06b41ec4254a6f8294414d6ee9bebf7` совпадает, `reports/p8/**` неизменён, suite 913, `VERIFICATION.json` all_true, `main` не тронут.
