@@ -87,3 +87,25 @@ shell: export SPANVERIFY_AI_SHARE_CALIBRATOR="$(cat reports/p7/final-receipts/ai
 - Параллельно ничего не переобучать, пороги не трогать — решение о фазе E ждём вашим письменным словом после этой классификации.
 - Workflow-фикс (это инженерия, не наука) — один перезапуск: заменить `export ...="$(cat file)"` на `export SPANVERIFY_AI_SHARE_CALIBRATOR_PATH=reports/p7/final-receipts/ai_share_calibrator_v1.hf.json` или file-based load.
 
+
+---
+
+## Второй прогон после фикса (08e0e6c) — run 40097562737, снова failure
+
+**Run:** https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/40097562737
+**Workflow:** same `.github/workflows/real-dev-hf.yml` (file-path fix applied: `export SPANVERIFY_AI_SHARE_CALIBRATOR=reports/p7/...hf.json`)
+
+**API steps дословно (второй прогон):**
+
+```
+{"jobs":[{"id":120882899691,"conclusion":"failure","steps":[
+{"name":"Зависимости HF","conclusion":"success"},
+{"name":"Проверить замороженный бандл","conclusion":"success"},
+{"name":"HF p8-sealed — real_dev 300","conclusion":"success"},
+{"name":"HF p8+H1 — real_dev 300 (изотонная доля)","conclusion":"failure"},
+{"name":"Если HF не завёлся — аварийное тех. препятствие","conclusion":"failure"}
+]}]}
+```
+
+**Классификация второго прогона:** снова **(а) тех. авария окружения** — даже file-path не спас, `engine.py` всё ещё `unknown schema` (возможно `bundle_sha` mismatch или `span_filter` false для H1). Лог снова недоступен из-за `productionresultssa` whitelist (тот же `EOF`). Никаких повторов сверх одного без слова куратора — остановлено, ждём решения о фазе E.
+
