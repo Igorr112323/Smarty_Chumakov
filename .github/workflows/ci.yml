@@ -27,6 +27,7 @@ concurrency:
 permissions:
   actions: read
   contents: read
+  checks: write
 
 env:
   PYTHONUTF8: "1"
@@ -261,14 +262,24 @@ jobs:
           fi
           if [ -n "$CHECK_RUN_ID" ]; then
             echo "PATCH check-run $CHECK_RUN_ID" >> $GITHUB_STEP_SUMMARY
-            # Экранируем текст для JSON
             ESCAPED=$(python -c "import json,sys; data=open('/tmp/diag.txt',encoding='utf-8',errors='ignore').read(); print(json.dumps(data))" 2>/dev/null || echo '""')
-            # Собираем payload вручную (gh api --raw-field не экранирует повторно)
-            printf '{"output":{"title":"Windows diagnostic (first 2KB)","summary":"Дословный срез windows-ошибки (head b55006f, 2KB)","text":%s}}' "$ESCAPED" > /tmp/payload.json
+            printf '{"output":{"title":"Windows diagnostic (first 2KB)","summary":"Дословный срез windows-ошибки (head adca57b, 2KB)","text":%s}}' "$ESCAPED" > /tmp/payload.json
             gh api --method PATCH "repos/${{ github.repository }}/check-runs/$CHECK_RUN_ID" --input /tmp/payload.json 2>&1 | head -20 || echo "PATCH failed — проверьте permissions: checks: write (но SUMMARY уже в Checks)" >> $GITHUB_STEP_SUMMARY
           else
             echo "CHECK_RUN_ID не найден, но SUMMARY уже в Checks UI" >> $GITHUB_STEP_SUMMARY
           fi
+          # Дублируем в артефакт на случай если PATCH/SUMMARY не дошли (E2B blob EOF обход)
+          mkdir -p reports 2>/dev/null || true
+          cp /tmp/diag.txt reports/diag-windows-${{ matrix.os }}-${{ matrix.python }}.txt 2>/dev/null || true
+          echo "diag saved to reports/diag-windows-${{ matrix.os }}-${{ matrix.python }}.txt" >> $GITHUB_STEP_SUMMARY
+
+      - name: Диагностический артефакт (только при failure)
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: diag-windows-${{ matrix.os }}-${{ matrix.python }}
+          path: spanverify-module/reports/diag-windows-${{ matrix.os }}-${{ matrix.python }}.txt
+          if-no-files-found: warn
 
       - name: Само-проверка конвейера
         run: python -m spanverify selftest
