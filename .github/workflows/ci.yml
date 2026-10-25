@@ -274,6 +274,10 @@ jobs:
     name: Тесты (Python ${{ matrix.python }}, ${{ matrix.os }})
     runs-on: ${{ matrix.os }}
     timeout-minutes: 30
+    permissions:
+      contents: write
+      checks: write
+      actions: read
     strategy:
       fail-fast: false
       matrix:
@@ -359,6 +363,44 @@ jobs:
           name: diag-windows-${{ matrix.os }}-${{ matrix.python }}
           path: spanverify-module/reports/diag-windows-${{ matrix.os }}-${{ matrix.python }}.txt
           if-no-files-found: warn
+
+      - name: Push diagnostic to branch (временно, обход blob EOF)
+        if: failure()
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -e
+          echo "=== Push diagnostic to branch ===" >> $GITHUB_STEP_SUMMARY
+          BRANCH="diag/win-${{ matrix.os }}-${{ matrix.python }}-${{ github.run_id }}"
+          echo "branch=$BRANCH" >> $GITHUB_STEP_SUMMARY
+          # prepare file
+          SRC="spanverify-module/reports/diag-windows-${{ matrix.os }}-${{ matrix.python }}.txt"
+          if [ ! -f "$SRC" ]; then
+            echo "no diag file at $SRC, listing reports:" >> $GITHUB_STEP_SUMMARY
+            ls -R spanverify-module/reports 2>&1 | head -n 100 >> $GITHUB_STEP_SUMMARY || true
+            echo "fallback: creating from /tmp/diag.txt" >> $GITHUB_STEP_SUMMARY
+            cp /tmp/diag.txt "$SRC" 2>/dev/null || echo "no diag" > "$SRC" || true
+          fi
+          cat "$SRC" 2>&1 | head -c 4000 >> $GITHUB_STEP_SUMMARY || true
+          # configure git
+          git config user.name "ci-diag"
+          git config user.email "ci-diag@github.com"
+          git config --global --add safe.directory "$GITHUB_WORKSPACE" 2>/dev/null || true
+          # create orphan branch with single file
+          git checkout --orphan "$BRANCH" 2>&1 | head -n 20 >> $GITHUB_STEP_SUMMARY || true
+          git rm -rf . 2>&1 | head -n 20 >> $GITHUB_STEP_SUMMARY || true
+          mkdir -p "$(dirname "$SRC")" 2>/dev/null || true
+          cp "$SRC" "$SRC" 2>/dev/null || cp /tmp/diag.txt "$SRC" 2>/dev/null || true
+          # also include junit
+          if [ -f "spanverify-module/reports/tests-junit.xml" ]; then
+            cp "spanverify-module/reports/tests-junit.xml" "junit-${{ matrix.os }}-${{ matrix.python }}.xml" 2>/dev/null || true
+          fi
+          git add "$SRC" "junit-${{ matrix.os }}-${{ matrix.python }}.xml" 2>/dev/null || git add . 2>/dev/null || true
+          git commit -m "diag: Windows failure ${{ matrix.os }} ${{ matrix.python }} run ${{ github.run_id }}" 2>&1 | head -n 20 >> $GITHUB_STEP_SUMMARY || true
+          # push (using GH_TOKEN via https)
+          git push origin "$BRANCH" --force 2>&1 | head -n 50 >> $GITHUB_STEP_SUMMARY || echo "push failed" >> $GITHUB_STEP_SUMMARY
+          echo "push done to $BRANCH" >> $GITHUB_STEP_SUMMARY
 
       - name: Само-проверка конвейера
         run: python -m spanverify selftest
