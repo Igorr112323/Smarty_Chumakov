@@ -1,0 +1,54 @@
+{
+  "r3_id": "E1HUNT-R3-20261025-54b25b9",
+  "status": "started",
+  "head_sha": "54b25b9a70eea588ff2455fd5431f176b1dbeed0",
+  "head_short": "54b25b9",
+  "branch": "h1-rotation",
+  "run_id": "40236420384",
+  "run_url": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/40236420384",
+  "independent_from_H1": true,
+  "description": "R3 — независимое измерение E1-архитектуры на токенах (SPEED-R1 каноника 2 ядра, заперт исторический). Не ждёт H1, не зависит от engine IsotonicFragmentAggregator.",
+  "curator_note": "Куратор #4: R3 затормозили без нужды (ждёт зелёный H1 — нехарактерная связность). Старт R3 в этом же цикле.",
+  "measurements": {
+    "mode": "token-level",
+    "engine": "none — R3 измеряет токен-признаки, не агрегацию фрагментов",
+    "speed_r1_canonical": "2 cores, заперт исторический (reports/speed/r1/PHASE_B_REPORT.md)",
+    "reference_only": ["P8_OFFICIAL/VERIFICATION.json только референс, без refit"],
+    "budget_weights_MB": 550,
+    "budget_notes": "443.5 +30% ≤550МБ (E1 любой энкодер ONNX после E0)",
+    "constraints": {
+      "no_gpu": true,
+      "no_network": true,
+      "no_external_api": true,
+      "no_real_test": true,
+      "no_llm": true,
+      "cpu_only": true,
+      "local_no_ci_evidence": true
+    }
+  },
+  "h1_green_head": {
+    "sha": "54b25b9a70eea588ff2455fd5431f176b1dbeed0",
+    "checks": 14,
+    "success": 11,
+    "skipped": 3,
+    "ubuntu": "3/3 success",
+    "windows": "3/3 success (CRLF fix r2_share.py -text)",
+    "lint_coverage": "success (ruff All checks passed, black 196 unchanged, coverage ≥85% sysmon)",
+    "contract": "success",
+    "metrics": "success",
+    "p8_seal": "success"
+  },
+  "next_steps": [
+    "E0 диагностика AUC 5 семейств + агрегаты real_dev 300 vs corpus B полный 1000 симметрично",
+    "E1 охота за архитектурой ONNX (любой энкодер, бюджет ≤550МБ)",
+    "E2 заморозка frozen-v3.json sha provenance OOF diff vs P8 suite≥913",
+    "E3 ворота spans≥0.50 FPR≤0.40 доля≤0.15 монотонно + скорость каноника",
+    "D официальный 1200 по шифт-коду"
+  ],
+  "timestamp": "2026-10-25T21:56:32Z",
+  "provenance": {
+    "audit": "local-no-ci-evidence",
+    "run_id_audit": "40236420384",
+    "source_commit": "54b25b9a70eea588ff2455fd5431f176b1dbeed0"
+  }
+}
