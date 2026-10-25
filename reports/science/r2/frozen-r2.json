@@ -10,9 +10,9 @@
   "bundle_source": "spanverify-module/reports/experiments/p5_span_filter/run39170981235/combined_bundle.json",
   "calibrator": {
     "path_demo": "reports/science/r2/r2_calibrator.demo.json",
-    "sha256_demo": "81de01756cfc4e231d673997db0746e8f419cd38e48248a0a4c849e5fd1ac6ab",
+    "sha256_demo": "16a450fe1fc5ec5db33f2249900141e2feac8a25b298726379a3207d116455bf",
     "path_hf": "reports/science/r2/r2_calibrator.hf.json",
-    "sha256_hf": "1589575e2637e3a86dab71e12b95d9b7c06b41ec4254a6f8294414d6ee9bebf7",
+    "sha256_hf": "83bc459466c191dcfee214623d1f52db178eb4756bc75e6b36aeea95b219eb3b",
     "mode_demo": "demo",
     "mode_hf": "hf",
     "source": "dev181-fragment-mean",
