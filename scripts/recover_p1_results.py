@@ -31,10 +31,10 @@ def save_json(path: Path, data: dict[str, Any]) -> None:
 
 def compute_confusion(labels: list[int], predictions: list[int]) -> dict[str, int]:
     """Вычислить confusion matrix."""
-    tp = sum(1 for p, l in zip(predictions, labels) if p == 1 and l == 1)
-    fp = sum(1 for p, l in zip(predictions, labels) if p == 1 and l == 0)
-    fn = sum(1 for p, l in zip(predictions, labels) if p == 0 and l == 1)
-    tn = sum(1 for p, l in zip(predictions, labels) if p == 0 and l == 0)
+    tp = sum(1 for p, lbl in zip(predictions, labels, strict=True) if p == 1 and lbl == 1)
+    fp = sum(1 for p, lbl in zip(predictions, labels, strict=True) if p == 1 and lbl == 0)
+    fn = sum(1 for p, lbl in zip(predictions, labels, strict=True) if p == 0 and lbl == 1)
+    tn = sum(1 for p, lbl in zip(predictions, labels, strict=True) if p == 0 and lbl == 0)
     return {"tp": tp, "fp": fp, "fn": fn, "tn": tn}
 
 
@@ -64,7 +64,7 @@ def compute_auc(labels: list[int], scores: list[float]) -> float:
         return 0.0
 
     # Сортируем по scores
-    paired = sorted(zip(scores, labels), reverse=True)
+    paired = sorted(zip(scores, labels, strict=True), reverse=True)
 
     tp = 0
     fp = 0
@@ -78,7 +78,7 @@ def compute_auc(labels: list[int], scores: list[float]) -> float:
     prev_fpr = 0.0
     prev_tpr = 0.0
 
-    for score, label in paired:
+    for _, label in paired:  # noqa: B007
         if label == 1:
             tp += 1
         else:
@@ -201,7 +201,7 @@ def main() -> int:
 
     # Загружаем артефакты
     comparison_dir = artifacts_dir / "p1-comparison"
-    logs_dir = artifacts_dir / "p1-measurement-logs"
+    _logs_dir = artifacts_dir / "p1-measurement-logs"  # noqa: F841
 
     if not comparison_dir.exists():
         print(f"ERROR: comparison artifacts not found at {comparison_dir}")
@@ -213,7 +213,7 @@ def main() -> int:
     dev_file = None
     evidence_file = None
 
-    for root, dirs, files in os.walk(comparison_dir):
+    for root, _dirs, files in os.walk(comparison_dir):  # noqa: B007
         for fname in files:
             fpath = Path(root) / fname
             if fname == "p1_comparison.json":

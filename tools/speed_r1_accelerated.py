@@ -37,8 +37,8 @@ def guard(event, args):
 
 sys.addaudithook(guard)
 
-from spanverify.config import Config
-from spanverify.engine import Verifier, WeightsBundle
+from spanverify.config import Config  # noqa: E402
+from spanverify.engine import Verifier, WeightsBundle  # noqa: E402
 
 P5 = ROOT / "spanverify-module/reports/experiments/p5_span_filter/run39170981235"
 BUNDLE = P5 / "combined_bundle.json"
@@ -46,7 +46,7 @@ SHA = "e0b13c693a058dfd66ed24a52fc14e9c70964e95885358e7b99cc1f328ad6892"
 MODEL = "ai-forever/rugpt3small_based_on_gpt2"
 
 # Keep original function for reference
-from spanverify import hf_windows as hw
+from spanverify import hf_windows as hw  # noqa: E402
 
 _orig_full_answer_features = hw.full_answer_features
 _orig_hf_features = None
@@ -54,7 +54,7 @@ try:
     from spanverify.features import hf_features as _hf_features
 
     _orig_hf_features = _hf_features
-except:
+except Exception:  # noqa: E722
     pass
 
 

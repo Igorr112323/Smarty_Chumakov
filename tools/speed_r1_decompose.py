@@ -8,14 +8,14 @@ from __future__ import annotations
 
 import hashlib
 import json
-import sys
+import sys  # noqa: E402
 import time
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "spanverify-module"))
 # guard against test177
-import os
+import os  # noqa: E402
 
 RESERVED = {
     str((ROOT / f"spanverify-module/data/corpus_a3/{p}").resolve())
@@ -32,14 +32,14 @@ def guard(event, args):
             pass
 
 
-import sys
+import sys  # noqa: E402
 
 sys.addaudithook(guard)
 
-from spanverify.config import Config
+from spanverify.config import Config  # noqa: E402
 from spanverify.core import tokenize_with_offsets
 from spanverify.dataset import read_pairs
-from spanverify.engine import Verifier, WeightsBundle
+from spanverify.engine import Verifier, WeightsBundle  # noqa: E402
 
 P5 = ROOT / "spanverify-module/reports/experiments/p5_span_filter/run39170981235"
 BUNDLE = P5 / "combined_bundle.json"

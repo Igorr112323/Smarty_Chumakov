@@ -13,6 +13,7 @@ import sys
 from pathlib import Path
 
 import pytest
+
 from spanverify.r2_share import IsotonicFragmentAggregator
 
 # Windows в CI даёт flaky-отказ на 3.12 (path/encoding/Verifier) — на Linux покрытие

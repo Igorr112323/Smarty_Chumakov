@@ -52,9 +52,9 @@ def guard(event, args):
 
 sys.addaudithook(guard)
 
-from spanverify.config import Config
+from spanverify.config import Config  # noqa: E402
 from spanverify.dataset import read_pairs
-from spanverify.engine import Verifier, WeightsBundle
+from spanverify.engine import Verifier, WeightsBundle  # noqa: E402
 
 BUNDLE = P5 / "combined_bundle.json"
 SHA = "e0b13c693a058dfd66ed24a52fc14e9c70964e95885358e7b99cc1f328ad6892"

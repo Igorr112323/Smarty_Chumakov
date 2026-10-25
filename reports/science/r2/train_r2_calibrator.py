@@ -13,6 +13,8 @@ sys.path.insert(
     0, str(ROOT / "spanverify-module/reports/experiments/p5_span_filter/run39170981235")
 )
 
+import itertools
+
 from spanverify.config import Config
 from spanverify.engine import Verifier, WeightsBundle
 from spanverify.r2_share import IsotonicFragmentAggregator
@@ -113,9 +115,9 @@ def main():
         context = pair["context"]
         for q in (0.0, 0.25, 0.5, 0.75, 1.0):
             total = 5
-            ai_count = int(round(q * total))
+            ai_count = round(q * total)
             # deterministic pick by doc_id hash
-            rng = random.Random(hash((doc_id, q)) & 0xFFFFFFFF)
+            random.Random(hash((doc_id, q)) & 0xFFFFFFFF)
             # Use fixed pools for determinism: take first ai_count AI sentences and rest HUMAN
             parts = []
             for i in range(ai_count):
@@ -128,15 +130,15 @@ def main():
             raw = fragment_raw(verifier, text, context, participation_model)
             # clamp
             raw = max(0.0, min(1.0, raw))
-            rows.append(dict(document=doc_id, fraction=q, raw=raw))
+            rows.append({"document": doc_id, "fraction": q, "raw": raw})
     print(f"Rows: {len(rows)}")
     # Save raw
     OUT.mkdir(parents=True, exist_ok=True)
     (OUT / "r2_raw_scores.json").write_text(
         json.dumps(
-            dict(
-                mode=MODE, rows=rows, bundle_sha256=SHA, source="dev181-fragment-mean"
-            ),
+            {
+                "mode": MODE, "rows": rows, "bundle_sha256": SHA, "source": "dev181-fragment-mean"
+            },
             ensure_ascii=False,
             indent=2,
         ),
@@ -167,21 +169,21 @@ def main():
         )
         for r in val_rows:
             predictions.append(
-                dict(
-                    document=r["document"],
-                    fraction=r["fraction"],
-                    raw=r["raw"],
-                    calibrated=cal.transform(r["raw"]),
-                    fold=idx,
-                )
+                {
+                    "document": r["document"],
+                    "fraction": r["fraction"],
+                    "raw": r["raw"],
+                    "calibrated": cal.transform(r["raw"]),
+                    "fold": idx,
+                }
             )
         receipts.append(
-            dict(
-                fold=idx,
-                fit_documents=sorted(fit_docs),
-                held_documents=sorted(held_docs),
-                calibrator=cal.to_dict(),
-            )
+            {
+                "fold": idx,
+                "fit_documents": sorted(fit_docs),
+                "held_documents": sorted(held_docs),
+                "calibrator": cal.to_dict(),
+            }
         )
 
     def metrics(key):
@@ -192,8 +194,8 @@ def main():
             for q in (0.0, 0.25, 0.5, 0.75, 1.0)
         ]
         mae = statistics.mean(abs(r[key] - r["fraction"]) for r in predictions)
-        monotone = all(a <= b for a, b in zip(curve, curve[1:]))
-        return dict(mae=mae, mean_curve=curve, monotone=monotone)
+        monotone = all(a <= b for a, b in itertools.pairwise(curve))
+        return {"mae": mae, "mean_curve": curve, "monotone": monotone}
 
     pooled_before = metrics("raw")
     pooled_after = metrics("calibrated")
@@ -219,26 +221,26 @@ def main():
     artifact_sha = hashlib.sha256(
         (OUT / f"r2_calibrator.{MODE}.json").read_bytes()
     ).hexdigest()
-    report = dict(
-        run_id="r2-exp-d-20261023",
-        mode=MODE,
-        documents=len(docs),
-        mixtures=len(rows),
-        dev181_folds=5,
-        determinism="sorted doc_id, hash-based synthetic, seed-free PAVA",
-        test177_used=False,
-        pooled_before=pooled_before,
-        pooled_after=pooled_after,
-        fold_receipts=receipts,
-        bundle_sha256=SHA,
-        artifact_sha256=artifact_sha,
-        status=(
+    report = {
+        "run_id": "r2-exp-d-20261023",
+        "mode": MODE,
+        "documents": len(docs),
+        "mixtures": len(rows),
+        "dev181_folds": 5,
+        "determinism": "sorted doc_id, hash-based synthetic, seed-free PAVA",
+        "test177_used": False,
+        "pooled_before": pooled_before,
+        "pooled_after": pooled_after,
+        "fold_receipts": receipts,
+        "bundle_sha256": SHA,
+        "artifact_sha256": artifact_sha,
+        "status": (
             "PASS"
             if pooled_after["mae"] < 0.2565 and pooled_after["monotone"]
             else "FAIL"
         ),
-        monotone_by_shape=True,
-    )
+        "monotone_by_shape": True,
+    }
     (OUT / "r2_oof_calibration.json").write_text(
         json.dumps(report, ensure_ascii=False, indent=2), encoding="utf-8"
     )
