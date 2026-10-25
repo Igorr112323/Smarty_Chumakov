@@ -245,11 +245,20 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          echo "=== Диагностика Windows: первые 2КБ pytest (windows-специфика, не локальная репродукция) ===" >> $GITHUB_STEP_SUMMARY
-          # Прогоняем три подозрительных теста с подробным traceback, берём первые ~2КБ
-          pytest -x -q --tb=long tests/test_ci_workflows.py tests/test_p8_evidence_hygiene.py tests/test_r2_share.py 2>&1 | head -c 2048 | tee /tmp/diag.txt || true
+          echo "=== Диагностика Windows: первые 4КБ pytest (windows-специфика, не локальная репродукция) ===" >> $GITHUB_STEP_SUMMARY
+          # Сначала показываем существующий junit (уже сгенерирован основным шагом Тесты) — там есть <failure>
+          echo "--- junit failures (from Тесты step) ---" >> $GITHUB_STEP_SUMMARY
+          grep -a "failure\|testcase" reports/tests-junit.xml 2>/dev/null | head -n 80 | head -c 2048 | tee /tmp/diag_junit.txt || true
+          cat /tmp/diag_junit.txt >> $GITHUB_STEP_SUMMARY || true
+          echo "" >> $GITHUB_STEP_SUMMARY
+          # Затем полный прогон всех тестов с коротким traceback для точного среза (не только 3 файла — предыдущая узкая выборка дала пусто)
+          echo "--- full pytest -q --tb=short (first 4KB) ---" >> $GITHUB_STEP_SUMMARY
+          pytest -q --tb=line --maxfail=5 2>&1 | head -c 4096 | tee /tmp/diag.txt || true
           echo "" >> $GITHUB_STEP_SUMMARY
           cat /tmp/diag.txt >> $GITHUB_STEP_SUMMARY || true
+          # Склеиваем оба источника для PATCH (junit + diag)
+          cat /tmp/diag_junit.txt /tmp/diag.txt 2>/dev/null | head -c 2048 > /tmp/diag_combined.txt || cp /tmp/diag.txt /tmp/diag_combined.txt 2>/dev/null || true
+          cp /tmp/diag_combined.txt /tmp/diag.txt 2>/dev/null || true
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "--- patch check-run output.text (мост GITHUB_STEP_SUMMARY→Check-Runs) ---" >> $GITHUB_STEP_SUMMARY
           # Попытка PATCH check-run (если есть checks:write, иначе только SUMMARY — уже видим в Checks UI)
