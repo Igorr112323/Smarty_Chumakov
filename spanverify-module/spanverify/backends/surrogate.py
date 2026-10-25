@@ -112,10 +112,7 @@ class SurrogateBackend(Backend):
             else:
                 nxt = normal[i + 1] if i + 1 < n else ""
                 prv = normal[i - 1] if i > 0 else ""
-                if (norm, nxt) in BOILERPLATE_BIGRAMS or (
-                    prv,
-                    norm,
-                ) in BOILERPLATE_BIGRAMS:
+                if (norm, nxt) in BOILERPLATE_BIGRAMS or (prv, norm) in BOILERPLATE_BIGRAMS:
                     boilerplate = 0.8
 
             # 3. Шаблонные обороты: вхождение токена и плотность в окне.
