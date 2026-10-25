@@ -248,16 +248,25 @@ jobs:
           echo "=== Диагностика Windows: первые 4КБ pytest (windows-специфика, не локальная репродукция) ===" >> $GITHUB_STEP_SUMMARY
           # Сначала показываем существующий junit (уже сгенерирован основным шагом Тесты) — там есть <failure>
           echo "--- junit failures (from Тесты step) ---" >> $GITHUB_STEP_SUMMARY
-          grep -a "failure\|testcase" reports/tests-junit.xml 2>/dev/null | head -n 80 | head -c 2048 | tee /tmp/diag_junit.txt || true
-          cat /tmp/diag_junit.txt >> $GITHUB_STEP_SUMMARY || true
+          if [ -f reports/tests-junit.xml ]; then
+            echo "junit found, size=$(wc -c < reports/tests-junit.xml) bytes" >> $GITHUB_STEP_SUMMARY
+            # Покажем первые failure-теги и их сообщения (без grep -a проблем на Windows)
+            python -c "import pathlib, re; t=pathlib.Path('reports/tests-junit.xml').read_text(encoding='utf-8',errors='ignore'); lines=[l for l in t.splitlines() if 'failure' in l.lower() or 'testcase' in l.lower()]; print('\n'.join(lines[:80]))" 2>&1 | head -c 2048 | tee /tmp/diag_junit.txt || true
+            cat /tmp/diag_junit.txt >> $GITHUB_STEP_SUMMARY || true
+            # Также полный junit head для PATCH (если grep отфильтровал слишком много)
+            head -c 2048 reports/tests-junit.xml > /tmp/diag_junit_raw.txt 2>/dev/null || true
+          else
+            echo "no junit file at reports/tests-junit.xml" >> $GITHUB_STEP_SUMMARY
+            ls -R reports 2>&1 | head -n 50 >> $GITHUB_STEP_SUMMARY || true
+            : > /tmp/diag_junit.txt
+          fi
           echo "" >> $GITHUB_STEP_SUMMARY
-          # Затем полный прогон всех тестов с коротким traceback для точного среза (не только 3 файла — предыдущая узкая выборка дала пусто)
-          echo "--- full pytest -q --tb=short (first 4KB) ---" >> $GITHUB_STEP_SUMMARY
-          pytest -q --tb=line --maxfail=5 2>&1 | head -c 4096 | tee /tmp/diag.txt || true
+          echo "--- full python -m pytest -q --tb=line (first 4KB) ---" >> $GITHUB_STEP_SUMMARY
+          python -m pytest -q --tb=line --maxfail=5 2>&1 | head -c 4096 | tee /tmp/diag.txt || true
           echo "" >> $GITHUB_STEP_SUMMARY
           cat /tmp/diag.txt >> $GITHUB_STEP_SUMMARY || true
-          # Склеиваем оба источника для PATCH (junit + diag)
-          cat /tmp/diag_junit.txt /tmp/diag.txt 2>/dev/null | head -c 2048 > /tmp/diag_combined.txt || cp /tmp/diag.txt /tmp/diag_combined.txt 2>/dev/null || true
+          # Склеиваем оба источника для PATCH (junit + diag) — берём первые 2КБ из обоих
+          cat /tmp/diag_junit.txt /tmp/diag_junit_raw.txt /tmp/diag.txt 2>/dev/null | head -c 2048 > /tmp/diag_combined.txt || cp /tmp/diag.txt /tmp/diag_combined.txt 2>/dev/null || true
           cp /tmp/diag_combined.txt /tmp/diag.txt 2>/dev/null || true
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "--- patch check-run output.text (мост GITHUB_STEP_SUMMARY→Check-Runs) ---" >> $GITHUB_STEP_SUMMARY
@@ -272,7 +281,7 @@ jobs:
           if [ -n "$CHECK_RUN_ID" ]; then
             echo "PATCH check-run $CHECK_RUN_ID" >> $GITHUB_STEP_SUMMARY
             ESCAPED=$(python -c "import json,sys; data=open('/tmp/diag.txt',encoding='utf-8',errors='ignore').read(); print(json.dumps(data))" 2>/dev/null || echo '""')
-            printf '{"output":{"title":"Windows diagnostic (first 2KB)","summary":"Дословный срез windows-ошибки (head adca57b, 2KB)","text":%s}}' "$ESCAPED" > /tmp/payload.json
+            printf '{"output":{"title":"Windows diagnostic (first 2KB)","summary":"Дословный срез windows-ошибки (head 68fa4d6+fix, 2KB)","text":%s}}' "$ESCAPED" > /tmp/payload.json
             gh api --method PATCH "repos/${{ github.repository }}/check-runs/$CHECK_RUN_ID" --input /tmp/payload.json 2>&1 | head -20 || echo "PATCH failed — проверьте permissions: checks: write (но SUMMARY уже в Checks)" >> $GITHUB_STEP_SUMMARY
           else
             echo "CHECK_RUN_ID не найден, но SUMMARY уже в Checks UI" >> $GITHUB_STEP_SUMMARY
