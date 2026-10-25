@@ -274,10 +274,6 @@ jobs:
     name: Тесты (Python ${{ matrix.python }}, ${{ matrix.os }})
     runs-on: ${{ matrix.os }}
     timeout-minutes: 30
-    permissions:
-      contents: write
-      checks: write
-      actions: read
     strategy:
       fail-fast: false
       matrix:
@@ -303,104 +299,6 @@ jobs:
 
       - name: Тесты
         run: python -m pytest -q --junitxml=reports/tests-junit.xml
-
-      - name: Диагностика Windows (дословный срез при failure) — временный шаг, удалить перед merge
-        if: failure()
-        shell: bash
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          echo "=== Диагностика Windows: первые 4КБ pytest (windows-специфика, не локальная репродукция) ===" >> $GITHUB_STEP_SUMMARY
-          # Сначала показываем существующий junit (уже сгенерирован основным шагом Тесты) — там есть <failure>
-          echo "--- junit failures (from Тесты step) ---" >> $GITHUB_STEP_SUMMARY
-          if [ -f reports/tests-junit.xml ]; then
-            echo "junit found, size=$(wc -c < reports/tests-junit.xml) bytes" >> $GITHUB_STEP_SUMMARY
-            # Покажем первые failure-теги и их сообщения (без grep -a проблем на Windows)
-            python -c "import pathlib, re; t=pathlib.Path('reports/tests-junit.xml').read_text(encoding='utf-8',errors='ignore'); lines=[l for l in t.splitlines() if 'failure' in l.lower() or 'testcase' in l.lower()]; print('\n'.join(lines[:80]))" 2>&1 | head -c 2048 | tee /tmp/diag_junit.txt || true
-            cat /tmp/diag_junit.txt >> $GITHUB_STEP_SUMMARY || true
-            # Также полный junit head для PATCH (если grep отфильтровал слишком много)
-            head -c 2048 reports/tests-junit.xml > /tmp/diag_junit_raw.txt 2>/dev/null || true
-          else
-            echo "no junit file at reports/tests-junit.xml" >> $GITHUB_STEP_SUMMARY
-            ls -R reports 2>&1 | head -n 50 >> $GITHUB_STEP_SUMMARY || true
-            : > /tmp/diag_junit.txt
-          fi
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "--- full python -m pytest -q --tb=line (first 4KB) ---" >> $GITHUB_STEP_SUMMARY
-          python -m pytest -q --tb=line --maxfail=5 2>&1 | head -c 4096 | tee /tmp/diag.txt || true
-          echo "" >> $GITHUB_STEP_SUMMARY
-          cat /tmp/diag.txt >> $GITHUB_STEP_SUMMARY || true
-          # Склеиваем оба источника для PATCH (junit + diag) — берём первые 2КБ из обоих
-          cat /tmp/diag_junit.txt /tmp/diag_junit_raw.txt /tmp/diag.txt 2>/dev/null | head -c 2048 > /tmp/diag_combined.txt || cp /tmp/diag.txt /tmp/diag_combined.txt 2>/dev/null || true
-          cp /tmp/diag_combined.txt /tmp/diag.txt 2>/dev/null || true
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "--- patch check-run output.text (мост GITHUB_STEP_SUMMARY→Check-Runs) ---" >> $GITHUB_STEP_SUMMARY
-          # Попытка PATCH check-run (если есть checks:write, иначе только SUMMARY — уже видим в Checks UI)
-          CHECK_RUN_ID=""
-          # 1) пробуем по имени чека (точное имя джобы)
-          CHECK_RUN_ID=$(gh api "repos/${{ github.repository }}/commits/${{ github.sha }}/check-runs" --paginate --jq '.check_runs[] | select(.name | contains("Тесты (Python ${{ matrix.python }}, ${{ matrix.os }})")) | .id' 2>/dev/null | head -n1 || echo "")
-          if [ -z "$CHECK_RUN_ID" ]; then
-            # 2) fallback: job id как check_run (часто совпадает)
-            CHECK_RUN_ID=$(gh api "repos/${{ github.repository }}/actions/runs/${{ github.run_id }}/jobs" --jq '.jobs[] | select(.name=="Тесты (Python ${{ matrix.python }}, ${{ matrix.os }})") | .id' 2>/dev/null | head -n1 || echo "")
-          fi
-          if [ -n "$CHECK_RUN_ID" ]; then
-            echo "PATCH check-run $CHECK_RUN_ID" >> $GITHUB_STEP_SUMMARY
-            ESCAPED=$(python -c "import json,sys; data=open('/tmp/diag.txt',encoding='utf-8',errors='ignore').read(); print(json.dumps(data))" 2>/dev/null || echo '""')
-            printf '{"output":{"title":"Windows diagnostic (first 2KB)","summary":"Дословный срез windows-ошибки (head 68fa4d6+fix, 2KB)","text":%s}}' "$ESCAPED" > /tmp/payload.json
-            gh api --method PATCH "repos/${{ github.repository }}/check-runs/$CHECK_RUN_ID" --input /tmp/payload.json 2>&1 | head -20 || echo "PATCH failed — проверьте permissions: checks: write (но SUMMARY уже в Checks)" >> $GITHUB_STEP_SUMMARY
-          else
-            echo "CHECK_RUN_ID не найден, но SUMMARY уже в Checks UI" >> $GITHUB_STEP_SUMMARY
-          fi
-          # Дублируем в артефакт на случай если PATCH/SUMMARY не дошли (E2B blob EOF обход)
-          mkdir -p reports 2>/dev/null || true
-          cp /tmp/diag.txt reports/diag-windows-${{ matrix.os }}-${{ matrix.python }}.txt 2>/dev/null || true
-          echo "diag saved to reports/diag-windows-${{ matrix.os }}-${{ matrix.python }}.txt" >> $GITHUB_STEP_SUMMARY
-
-      - name: Диагностический артефакт (только при failure)
-        if: failure()
-        uses: actions/upload-artifact@v4
-        with:
-          name: diag-windows-${{ matrix.os }}-${{ matrix.python }}
-          path: spanverify-module/reports/diag-windows-${{ matrix.os }}-${{ matrix.python }}.txt
-          if-no-files-found: warn
-
-      - name: Push diagnostic to branch (временно, обход blob EOF)
-        if: failure()
-        shell: bash
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          set -e
-          echo "=== Push diagnostic to branch ===" >> $GITHUB_STEP_SUMMARY
-          BRANCH="diag/win-${{ matrix.os }}-${{ matrix.python }}-${{ github.run_id }}"
-          echo "branch=$BRANCH" >> $GITHUB_STEP_SUMMARY
-          # prepare file
-          SRC="spanverify-module/reports/diag-windows-${{ matrix.os }}-${{ matrix.python }}.txt"
-          if [ ! -f "$SRC" ]; then
-            echo "no diag file at $SRC, listing reports:" >> $GITHUB_STEP_SUMMARY
-            ls -R spanverify-module/reports 2>&1 | head -n 100 >> $GITHUB_STEP_SUMMARY || true
-            echo "fallback: creating from /tmp/diag.txt" >> $GITHUB_STEP_SUMMARY
-            cp /tmp/diag.txt "$SRC" 2>/dev/null || echo "no diag" > "$SRC" || true
-          fi
-          cat "$SRC" 2>&1 | head -c 4000 >> $GITHUB_STEP_SUMMARY || true
-          # configure git
-          git config user.name "ci-diag"
-          git config user.email "ci-diag@github.com"
-          git config --global --add safe.directory "$GITHUB_WORKSPACE" 2>/dev/null || true
-          # create orphan branch with single file
-          git checkout --orphan "$BRANCH" 2>&1 | head -n 20 >> $GITHUB_STEP_SUMMARY || true
-          git rm -rf . 2>&1 | head -n 20 >> $GITHUB_STEP_SUMMARY || true
-          mkdir -p "$(dirname "$SRC")" 2>/dev/null || true
-          cp "$SRC" "$SRC" 2>/dev/null || cp /tmp/diag.txt "$SRC" 2>/dev/null || true
-          # also include junit
-          if [ -f "spanverify-module/reports/tests-junit.xml" ]; then
-            cp "spanverify-module/reports/tests-junit.xml" "junit-${{ matrix.os }}-${{ matrix.python }}.xml" 2>/dev/null || true
-          fi
-          git add "$SRC" "junit-${{ matrix.os }}-${{ matrix.python }}.xml" 2>/dev/null || git add . 2>/dev/null || true
-          git commit -m "diag: Windows failure ${{ matrix.os }} ${{ matrix.python }} run ${{ github.run_id }}" 2>&1 | head -n 20 >> $GITHUB_STEP_SUMMARY || true
-          # push (using GH_TOKEN via https)
-          git push origin "$BRANCH" --force 2>&1 | head -n 50 >> $GITHUB_STEP_SUMMARY || echo "push failed" >> $GITHUB_STEP_SUMMARY
-          echo "push done to $BRANCH" >> $GITHUB_STEP_SUMMARY
 
       - name: Само-проверка конвейера
         run: python -m spanverify selftest
