@@ -45,8 +45,7 @@ class IsotonicFragmentAggregator:
         """PAVA, детерминированно, без seed."""
         rows = sorted(zip(scores, targets, strict=True))
         if not rows or any(
-            not math.isfinite(x) or not math.isfinite(y) or not 0 <= x <= 1 or not 0 <= y <= 1
-            for x, y in rows
+            not math.isfinite(x) or not math.isfinite(y) or not 0 <= x <= 1 or not 0 <= y <= 1 for x, y in rows
         ):
             raise ValueError("calibration requires finite unit-interval observations")
         # групповая агрегация по одинаковым x
@@ -90,6 +89,7 @@ class IsotonicFragmentAggregator:
         # mean-of-fragment по предложениям (как в обучении)
         try:
             from .text import sentences as _sentences
+
             bounds = _sentences(text) if text else []
         except Exception:
             bounds = []
@@ -98,11 +98,7 @@ class IsotonicFragmentAggregator:
         else:
             frag_means: list[float] = []
             for s, e in bounds:
-                inside = [
-                    token_scores[i]
-                    for i, tok in enumerate(tokens)
-                    if s <= tok.start < e
-                ]
+                inside = [token_scores[i] for i, tok in enumerate(tokens) if s <= tok.start < e]
                 if inside:
                     frag_means.append(sum(inside) / len(inside))
             if not frag_means:

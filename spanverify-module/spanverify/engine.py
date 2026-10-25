@@ -429,7 +429,9 @@ class Verifier:
                     if calib_path and calib_path.exists():
                         actual_sha = hashlib.sha256(calib_path.read_bytes()).hexdigest()
                         if actual_sha != expected_sha:
-                            raise ValueError(f"R2 calibrator SHA mismatch {actual_sha} != {expected_sha} at {calib_path}")
+                            raise ValueError(
+                                f"R2 calibrator SHA mismatch {actual_sha} != {expected_sha} at {calib_path}"
+                            )
                         data = json.loads(calib_path.read_text(encoding="utf-8"))
                         agg = IsotonicFragmentAggregator.from_dict(data)
                         if agg.bundle_sha256 != "e0b13c693a058dfd66ed24a52fc14e9c70964e95885358e7b99cc1f328ad6892":
@@ -438,7 +440,7 @@ class Verifier:
                             # HF копия допускает mode==hf, demo==demo; иначе mismatch
                             raise ValueError(f"R2 aggregator mode {agg.mode} != engine mode {mode_key}")
                         self._r2_aggregator = agg
-            except Exception as e:
+            except Exception:
                 # fail-closed в прод: без калибратора не стартуем, но для тестов — мягко
                 if os.environ.get("SPANVERIFY_STRICT_R2") == "1":
                     raise
