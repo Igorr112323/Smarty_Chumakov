@@ -124,6 +124,37 @@ jobs:
       - name: Тесты с порогом покрытия 85 %
         run: python -m pytest --cov=spanverify --cov-report=term --cov-report=json:reports/coverage.json --cov-fail-under=85 --junitxml=reports/quality-junit.xml
 
+      - name: Диагностика покрытия (дословный срез при failure)
+        if: failure()
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          echo "=== coverage failure (first 4KB) ===" >> $GITHUB_STEP_SUMMARY
+          cat reports/coverage.json 2>&1 | head -c 4096 | tee /tmp/cov.txt || true
+          cat /tmp/cov.txt >> $GITHUB_STEP_SUMMARY || true
+          echo "" >> $GITHUB_STEP_SUMMARY
+          python -m pytest --cov=spanverify --cov-report=term 2>&1 | tail -n 50 | head -c 4096 | tee /tmp/cov_term.txt || true
+          cat /tmp/cov_term.txt >> $GITHUB_STEP_SUMMARY || true
+          cat /tmp/cov.txt /tmp/cov_term.txt 2>/dev/null | head -c 2048 > /tmp/diag_cov.txt || true
+          CHECK_RUN_ID=$(gh api "repos/${{ github.repository }}/commits/${{ github.sha }}/check-runs" --paginate --jq '.check_runs[] | select(.name | contains("Линтер, форматирование")) | .id' 2>/dev/null | head -n1 || echo "")
+          if [ -z "$CHECK_RUN_ID" ]; then CHECK_RUN_ID=$(gh api "repos/${{ github.repository }}/actions/runs/${{ github.run_id }}/jobs" --jq '.jobs[] | select(.name | contains("Линтер")) | .id' 2>/dev/null | head -n1 || echo ""); fi
+          if [ -n "$CHECK_RUN_ID" ]; then
+            ESCAPED=$(python -c "import json; data=open('/tmp/diag_cov.txt',encoding='utf-8',errors='ignore').read(); print(json.dumps(data))" 2>/dev/null || echo '""')
+            printf '{"output":{"title":"Coverage diagnostic (first 2KB)","summary":"Дословный срез coverage-ошибки (head b82b85b+, 2KB)","text":%s}}' "$ESCAPED" > /tmp/payload.json
+            gh api --method PATCH "repos/${{ github.repository }}/check-runs/$CHECK_RUN_ID" --input /tmp/payload.json 2>&1 | head -20 || true
+          fi
+          mkdir -p reports 2>/dev/null || true
+          cp /tmp/diag_cov.txt reports/diag-coverage.txt 2>/dev/null || true
+
+      - name: Диагностический артефакт покрытия
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: diag-coverage
+          path: spanverify-module/reports/diag-coverage.txt
+          if-no-files-found: warn
+
       - name: Воспроизводимость обучения (один seed → один результат)
         run: |
           python -m spanverify train --dataset data/demo_pairs.jsonl --out /tmp/run1/train/weights.json --seed 42 --folds 5 > /tmp/train1.log
