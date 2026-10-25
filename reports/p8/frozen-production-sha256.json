@@ -64,7 +64,7 @@
     "spanverify-module/spanverify/dataset.py": "37335f29df56ca6b7fa5b7bf6088dc08e276a706b27197d87ba31b354c08b256",
     "spanverify-module/spanverify/demo_data.py": "2514ed5bcf3e3a15ae8e1873b0755011a850fbb33b75a71dc1ec7cba114f4759",
     "spanverify-module/spanverify/detector.py": "e40fbe67d867e99b7bf3ff69ba55cac720049263f1dd0e3fdbae91385e9637cd",
-    "spanverify-module/spanverify/engine.py": "734c847fa9c747a714a3ba6cf45c32782ceeec437949f05310c924d2d7ae843c",
+    "spanverify-module/spanverify/engine.py": "3d8d29c2f27f16cb0aa873349c7ef6536bbb871efe09e139818e70531188fc48",
     "spanverify-module/spanverify/external_datasets.py": "27ad5fdeadff91d030b022fee075714affbabfa88d46b13f3d32291175f732f8",
     "spanverify-module/spanverify/features.py": "b50c51badbffc81cf75a91ca00196371b449d53938b4d6e20799b4960fd6ba7a",
     "spanverify-module/spanverify/gates.py": "94eeb4c804b3105058ab8ce3e71e742ffb622c0b93cf60596193aeb1d805663d",
@@ -86,7 +86,7 @@
     "spanverify-module/spanverify/training.py": "d8b865a60683babf56f200ce2917174a64adb86fd7e85324be2557efbcc8a7a0",
     "spanverify-module/spanverify/vectors.py": "43fde9ba0f4de00a7e131f13e40f7285364627651a1d8096d63a34ee5cb12374",
     "spanverify-module/spanverify/webui.py": "8bb925f7699d4b2a1648e3b4c46c22fa0a57ae09d6e9631e757f4e33161e71e7",
-    "spanverify-module/spanverify/r2_share.py": "7faa6a6f6b2aa3da821f757a588745fd0d86808391a2d52dc5f40ab71a89af4c"
+    "spanverify-module/spanverify/r2_share.py": "33e1ad6fd4132c51a81ae573f69d6d6b96af0abcd1238bdace66ff5c26d09205"
   },
   "audit": {
     "fake_previous": "40141000001",

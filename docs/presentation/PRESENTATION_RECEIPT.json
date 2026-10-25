@@ -6,7 +6,7 @@
   "prompt_removal_commit": "ce68caf72c0294630039e6874fd24ef6e53e4c49",
   "presentation_changes": [
     "README.md rewritten in Russian",
-    "docs/TESTS.md: 74 real file rows, 913 collected nodes; exact inventory JSON",
+    "docs/TESTS.md: 75 real file rows, 913 collected nodes; exact inventory JSON",
     "docs/presentation/HF_RUNTIME.md: external HF dependencies and existing layout",
     "docs/presentation/README_TOP_GITHUB.png + renderer provenance",
     "Existing test_document_lists_every_workflow extended only: prior assertions retained, download/evidence/internal links and full-session inventory added; no new test nodes"
@@ -21,7 +21,7 @@
     "git_diff_check": "PASS",
     "actual_collection": {
       "source_head": "ce68caf72c0294630039e6874fd24ef6e53e4c49",
-      "files": 74,
+      "files": 75,
       "nodes": 913,
       "inventory": "docs/presentation/TESTS_INVENTORY.json"
     },
