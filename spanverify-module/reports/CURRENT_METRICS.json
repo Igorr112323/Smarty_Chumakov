@@ -11,8 +11,8 @@
   },
   "meta": {
     "version": "1.3.1",
-    "commit": "50c6d586611fb7257b810d5f33627c02ac004632",
-    "generated_at": "2026-10-14T14:02:18Z",
+    "commit": "7534ec34967099e88df99186145d59fc59e5a962",
+    "generated_at": "2026-10-25T16:00:00Z",
     "seed": 42,
     "dataset": "data/demo_pairs.jsonl",
     "refresh": {
@@ -31,10 +31,10 @@
   },
   "disclaimer": "Демонстрационные метрики получены на синтетическом корпусе и научным результатом не являются. Для подтверждения требуются 1200 пар «вопрос–ответ» с экспертной разметкой на реальных регламентах организации.",
   "tests": {
-    "collected": 910,
+    "collected": 913,
     "coverage_percent": 87.82,
     "coverage_gate_percent": 85,
-    "inventory_note": "P8 910 collected; full suite has no exclusions",
+    "inventory_note": "P8 913 collected after H1 r2_share (+3); previous 910, H1 v1.4",
     "coverage_scope": "87.82 is historical P7 reference; current coverage and unchanged85% gate are in exact-head ordinary CI quality artifacts"
   },
   "demo": {
@@ -2650,5 +2650,15 @@
     "source_commit": null,
     "limitation": null
   },
-  "historical_scope": "All legacy dataset blocks are historical reference, not P8 current acceptance. Only p8_* slices below refer to P8; authoritative indices are EXPERIMENTS_INDEX and contract/coverage-matrix."
+  "historical_scope": "All legacy dataset blocks are historical reference, not P8 current acceptance. Only p8_* slices below refer to P8; authoritative indices are EXPERIMENTS_INDEX and contract/coverage-matrix.",
+  "hygiene": {
+    "h1_rotation": {
+      "run_id": "40141000001",
+      "date": "2026-10-25",
+      "old": 910,
+      "new": 913,
+      "engine_old": "2988f865395702b827b4e32ee324178b1936b7752b6dea1958df3684235b7ffc",
+      "engine_new": "734c847fa9c747a714a3ba6cf45c32782ceeec437949f05310c924d2d7ae843c"
+    }
+  }
 }

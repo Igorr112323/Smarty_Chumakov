@@ -1,0 +1,44 @@
+{
+  "kind": "rotation_h1",
+  "version": "h1-v1",
+  "run_id": "40141000001",
+  "date": "2026-10-25",
+  "reason": "H1 интеграция r2_share IsotonicFragmentAggregator в main (v1.4.0) — одномоментная ротация пломбы и тестов, rebase на 6ec3d3b, без изменения P8 контура",
+  "source_commit": "7534ec34967099e88df99186145d59fc59e5a962",
+  "files_rotated": [
+    {
+      "path": "spanverify-module/spanverify/engine.py",
+      "old_sha256": "2988f865395702b827b4e32ee324178b1936b7752b6dea1958df3684235b7ffc",
+      "new_sha256": "734c847fa9c747a714a3ba6cf45c32782ceeec437949f05310c924d2d7ae843c",
+      "change": "Добавлен дефолтный IsotonicFragmentAggregator (mean-of-fragment→PAVA) для доли AI, загрузка по r2_calibrator.json с SHA-проверкой; P8 веса/пороги неизменны, product заменён"
+    },
+    {
+      "path": "spanverify-module/spanverify/r2_share.py",
+      "old_sha256": null,
+      "new_sha256": "7faa6a6f6b2aa3da821f757a588745fd0d86808391a2d52dc5f40ab71a89af4c",
+      "change": "Новый модуль IsotonicFragmentAggregator: PAVA-картирование mean фрагмента p_ai -> true_fraction, обучение только на dev181, seed-free детерминировано, monotone по форме"
+    }
+  ],
+  "tests": {
+    "old_collected": 910,
+    "new_collected": 913,
+    "delta": "+3 test_r2_share.py (monotone, estimate, PAVA identity)",
+    "previous_frozen": "2988f865395702b827b4e32ee324178b1936b7752b6dea1958df3684235b7ffc",
+    "new_frozen": "734c847fa9c747a714a3ba6cf45c32782ceeec437949f05310c924d2d7ae843c"
+  },
+  "hygiene": {
+    "reports_p8_diff": "только frozen-production-sha256.json и новый rotation_h1.json",
+    "real_test_viewed": false,
+    "r2_reports_added": "reports/science/r2/*.json + EXP_REPORT.md (calibrator H1, не меняет P8)",
+    "evidence_context": "run_id 40141000001 date 2026-10-25"
+  },
+  "approver": "curator H1 paused PR#15 -> release/r2-v1.4",
+  "provenance": {
+    "h1_branch": "h1-merge-main 6af8aa3",
+    "train_script": "reports/science/r2/train_r2_calibrator.py",
+    "calibrator_demo": "reports/science/r2/r2_calibrator.demo.json",
+    "calibrator_hf": "reports/science/r2/r2_calibrator.hf.json",
+    "frozen_r2": "reports/science/r2/frozen-r2.json",
+    "oof": "reports/science/r2/r2_oof_calibration.json"
+  }
+}

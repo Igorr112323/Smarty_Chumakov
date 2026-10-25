@@ -3,7 +3,7 @@
   "baseline": "725824030f24862830c277d9e537c5f05727d8b0",
   "collection_source_head": "ce68caf72c0294630039e6874fd24ef6e53e4c49",
   "command": "cd spanverify-module && python -m pytest --collect-only -q",
-  "total": 910,
+  "total": 913,
   "files": [
     {
       "path": "spanverify-module/tests/test_answer_head.py",
