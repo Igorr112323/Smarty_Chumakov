@@ -101,7 +101,7 @@ def main():
     # [1/9] Загружаем бандл
     print("\n[1/9] Загрузка бандла...")
     baseline_path = Path(args.baseline_experiment)
-    exp = json.loads(baseline_path.read_text())
+    exp = json.loads(baseline_path.read_text(encoding="utf-8"))
     bundle = WeightsBundle.from_dict(exp["bundle"])
     print("✓ Бандл загружен")
 
@@ -650,8 +650,8 @@ def main():
         print(f"  ✓ {fname} ({fpath.stat().st_size} bytes)")
 
     # Проверка числа строк
-    oof_line_count = len(oof_jsonl_path.read_text().strip().split("\n"))
-    dev_line_count = len(dev_jsonl_path.read_text().strip().split("\n"))
+    oof_line_count = len(oof_jsonl_path.read_text(encoding="utf-8").strip().split("\n"))
+    dev_line_count = len(dev_jsonl_path.read_text(encoding="utf-8").strip().split("\n"))
     assert oof_line_count == len(train_pairs), f"OOF lines: {oof_line_count} != {len(train_pairs)}"
     assert dev_line_count == len(dev_pairs), f"Dev lines: {dev_line_count} != {len(dev_pairs)}"
     print(f"  ✓ OOF JSONL: {oof_line_count} строк")

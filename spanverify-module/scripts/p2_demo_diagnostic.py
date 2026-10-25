@@ -28,7 +28,7 @@ from spanverify.token_head import DecisionTree, TokenGBDTModel
 def load_pairs(path: Path) -> list[dict]:
     """Загрузить пары из JSONL."""
     pairs = []
-    with open(path) as f:
+    with open(path, encoding="utf-8") as f:
         for line in f:
             pairs.append(json.loads(line))
     return pairs
@@ -160,7 +160,7 @@ def main():
     }
 
     report_path = args.output / "experiment_report.json"
-    with open(report_path, "w") as f:
+    with open(report_path, "w", encoding="utf-8") as f:
         json.dump(report, f, indent=2, ensure_ascii=False)
     print(f"✅ Отчёт сохранён: {report_path}")
 

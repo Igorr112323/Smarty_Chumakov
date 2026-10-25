@@ -19,7 +19,7 @@ def main(mode, out):
     docs = {}
     for pair in read_pairs(ROOT / "data/corpus_a3/splits/train.jsonl"):
         docs.setdefault(str(pair["meta"]["doc_id"]), pair)
-    folds = json.loads((P5 / "fit_receipts.json").read_text())
+    folds = json.loads((P5 / "fit_receipts.json").read_text(encoding="utf-8"))
     held = [str(d) for f in folds for d in f["held_documents"]]
     assert len(held) == len(set(held)) and set(held) == set(docs)
     v = verifier(mode)

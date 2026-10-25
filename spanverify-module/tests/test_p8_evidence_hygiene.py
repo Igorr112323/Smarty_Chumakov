@@ -26,7 +26,7 @@ def test_all_non_run_metric_documents_have_provenance():
     assert found >= 20
     for name in ("reports/FINAL_REPORT.md", "reports/p8/RELEASE_NOTES.md"):
         # Catch SHA/year concatenation without altering immutable raw snapshots.
-        assert not re.search(r"(?<![0-9a-f])[0-9a-f]{41,63}(?![0-9a-f])", (ROOT / name).read_text()), name
+        assert not re.search(r"(?<![0-9a-f])[0-9a-f]{41,63}(?![0-9a-f])", (ROOT / name).read_text(encoding="utf-8")), name
     path = Path("arbitrary-new-name.json")
     assert hygiene.metric_file(path, {"auc": 0.75})
     assert hygiene.metric_file(Path("model_metrics.json"), {"auc": 0.75})
@@ -40,9 +40,9 @@ def test_all_non_run_metric_documents_have_provenance():
 
 
 def test_legacy_numbers_immutable_and_superseded():
-    fixture = json.loads((ROOT / "reports/p8/legacy-payload-hashes.json").read_text())
+    fixture = json.loads((ROOT / "reports/p8/legacy-payload-hashes.json").read_text(encoding="utf-8"))
     for name, record in fixture["files"].items():
-        data = json.loads((ROOT / name).read_text())
+        data = json.loads((ROOT / name).read_text(encoding="utf-8"))
         assert next(iter(data)) == "_status"
         assert data["_status"].startswith("SUPERSEDED")
         assert data["successor"] == "reports/EXPERIMENTS_INDEX.md"
@@ -52,8 +52,8 @@ def test_legacy_numbers_immutable_and_superseded():
 
 
 def test_index_covers_latest_run_in_every_family():
-    inventory = json.loads((ROOT / "reports/p8/measurement-inventory.json").read_text())
-    text = (ROOT / "reports/EXPERIMENTS_INDEX.md").read_text()
+    inventory = json.loads((ROOT / "reports/p8/measurement-inventory.json").read_text(encoding="utf-8"))
+    text = (ROOT / "reports/EXPERIMENTS_INDEX.md").read_text(encoding="utf-8")
     assert set(inventory["latest_by_family"]) == {f"P{i}" for i in range(9)}
     for family, run in inventory["latest_by_family"].items():
         records = [r for r in inventory["runs"] if r["family"] == family and r["record_kind"] == "measurement/delivery"]
@@ -63,7 +63,7 @@ def test_index_covers_latest_run_in_every_family():
 
 
 def test_frozen_prediction_files_byte_identical():
-    fixture = json.loads((ROOT / "reports/p8/frozen-production-sha256.json").read_text())
+    fixture = json.loads((ROOT / "reports/p8/frozen-production-sha256.json").read_text(encoding="utf-8"))
     for name, expected in fixture["files"].items():
         assert hashlib.sha256((ROOT / name).read_bytes()).hexdigest() == expected, name
 
@@ -80,7 +80,7 @@ def test_ci_collector_only_copies_sealed_a3_receipt():
 
     import yaml
 
-    workflow = yaml.safe_load((ROOT / ".github/workflows/ci.yml").read_text())
+    workflow = yaml.safe_load((ROOT / ".github/workflows/ci.yml").read_text(encoding="utf-8"))
     assert workflow["jobs"]["contract"]["if"] == "always() && needs.p8-freeze-barrier.result == 'success'"
     block = module._corpus_a3_block(ForbiddenEvaluation())
     assert "SUPERSEDED" in block["scope"]

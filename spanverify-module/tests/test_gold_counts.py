@@ -19,7 +19,7 @@ def test_gold_counts():
     # Проверяем train
     train_path = data_dir / "train.jsonl"
     if train_path.exists():
-        train_pairs = [json.loads(line) for line in train_path.read_text().splitlines() if line.strip()]
+        train_pairs = [json.loads(line) for line in train_path.read_text(encoding="utf-8").splitlines() if line.strip()]
         train_positive = sum(1 for p in train_pairs if answer_label(p) == 1)
         train_negative = len(train_pairs) - train_positive
 
@@ -32,7 +32,7 @@ def test_gold_counts():
     # Проверяем dev
     dev_path = data_dir / "dev.jsonl"
     if dev_path.exists():
-        dev_pairs = [json.loads(line) for line in dev_path.read_text().splitlines() if line.strip()]
+        dev_pairs = [json.loads(line) for line in dev_path.read_text(encoding="utf-8").splitlines() if line.strip()]
         dev_positive = sum(1 for p in dev_pairs if answer_label(p) == 1)
         dev_negative = len(dev_pairs) - dev_positive
 
@@ -54,7 +54,7 @@ def test_specific_pairs():
     train_path = data_dir / "train.jsonl"
 
     if train_path.exists():
-        train_pairs = [json.loads(line) for line in train_path.read_text().splitlines() if line.strip()]
+        train_pairs = [json.loads(line) for line in train_path.read_text(encoding="utf-8").splitlines() if line.strip()]
 
         # Ищем конкретные пары
         pair_473 = next((p for p in train_pairs if p.get("id") == "corpus-a3-00473"), None)

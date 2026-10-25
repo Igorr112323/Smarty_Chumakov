@@ -37,7 +37,7 @@ def save(path, value):
 def frozen_metrics(evidence, corpus, answers):
     source = ROOT / "scripts/p4_context_head.py"
     node = next(
-        n for n in ast.parse(source.read_text()).body if isinstance(n, ast.FunctionDef) and n.name == "evidence_metrics"
+        n for n in ast.parse(source.read_text(encoding="utf-8")).body if isinstance(n, ast.FunctionDef) and n.name == "evidence_metrics"
     )
     scope = dict(
         tokenize_with_offsets=tokenize_with_offsets, is_scored_token=is_scored_token, metrics=metrics, engine=engine
@@ -81,10 +81,10 @@ def main(args):
     if args.kind == "aggregate":
         dataset = ROOT / "data/external/rushallu/pairs.jsonl"
     if args.kind == "aggregate":
-        pairs = [json.loads(line) for line in dataset.read_text().splitlines() if line.strip()]
+        pairs = [json.loads(line) for line in dataset.read_text(encoding="utf-8").splitlines() if line.strip()]
         records = []
         for file in Path(args.inputs).rglob("evidence.jsonl"):
-            records.extend(json.loads(line) for line in file.read_text().splitlines() if line.strip())
+            records.extend(json.loads(line) for line in file.read_text(encoding="utf-8").splitlines() if line.strip())
         assert len(records) == 1000 and len({r["id"] for r in records}) == 1000
         corpus = {p["id"]: p for p in pairs}
         report = summarise([r["evidence"] for r in records], corpus, [r["answer_metrics"] for r in records])
@@ -139,7 +139,7 @@ def main(args):
     )
     save(out / "pre-label-long-audit.json", audit)
     print("::notice title=P8 long audit::" + json.dumps({k: v for k, v in audit.items() if k != "rows"}), flush=True)
-    pairs = [json.loads(line) for line in dataset.read_text().splitlines() if line.strip()]
+    pairs = [json.loads(line) for line in dataset.read_text(encoding="utf-8").splitlines() if line.strip()]
     if args.kind == "external":
         pairs = [p for i, p in enumerate(pairs) if i % 4 == args.shard]
     fit_calls = []

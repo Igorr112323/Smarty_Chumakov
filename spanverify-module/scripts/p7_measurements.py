@@ -18,7 +18,7 @@ from p6_acceptance import check_schema, document, environment, save, verifier
 
 
 def rates(out):
-    env = json.loads((out / "environment.json").read_text())
+    env = json.loads((out / "environment.json").read_text(encoding="utf-8"))
     cpu = next(
         (
             line.split(":", 1)[1].strip()
@@ -46,7 +46,7 @@ def rates(out):
     )
     print("::notice title=P7 benchmark environment::" + json.dumps(summary), flush=True)
     path = out / "benchmark.json"
-    rows = json.loads(path.read_text())
+    rows = json.loads(path.read_text(encoding="utf-8"))
     profiles = []
     for row in rows:
         n = row["chars"]
@@ -60,7 +60,7 @@ def rates(out):
                 row["profile_top"] = [
                     {k: v for k, v in r.items() if k in ("function", "calls", "self_seconds", "cumulative_seconds")}
                     for r in sorted(
-                        json.loads(profile.read_text()),
+                        json.loads(profile.read_text(encoding="utf-8")),
                         key=lambda r: r["self_seconds"],
                         reverse=True,
                     )[:5]

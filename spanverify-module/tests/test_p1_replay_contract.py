@@ -45,7 +45,7 @@ def test_real_frozen_candidate_cli_and_calibration_schema(tmp_path):
     assert bundle.isotonic is not None
     assert bundle.isotonic.thresholds == reference["thresholds"]
     assert bundle.isotonic.values == reference["values"]
-    assert bundle.threshold == json.loads((source / "thresholds.json").read_text())["p1"]
+    assert bundle.threshold == json.loads((source / "thresholds.json").read_text(encoding="utf-8"))["p1"]
     for name, expected in builder.EXPECTED_HASHES.items():
         assert hashlib.sha256((source / name).read_bytes().replace(b"\r\n", b"\n")).hexdigest() == expected
 
@@ -214,10 +214,10 @@ def test_cached_hf_fixture_full_replay_no_backend(tmp_path):
     output = tmp_path / "output"
     candidate = builder.build_candidate(source, output, expected_hashes=checks)
     assert replay.run_replay(source, candidate, output / "runtime_config.json", cache, dev, output) == 0
-    parity = json.loads((output / "score_parity_report.json").read_text())
+    parity = json.loads((output / "score_parity_report.json").read_text(encoding="utf-8"))
     assert parity["reference_parity"]["matched"] is True
     assert parity["roundtrip_parity"]["matched"] is True
-    manifest = json.loads((output / "runtime_manifest.json").read_text())
+    manifest = json.loads((output / "runtime_manifest.json").read_text(encoding="utf-8"))
     assert manifest["cache_misses"] == 0
     assert manifest["fresh_hf_inference"] is False
     assert (output / "all_family_metrics.json").is_file()

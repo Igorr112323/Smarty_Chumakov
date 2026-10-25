@@ -214,7 +214,7 @@ class TestTokenGBDTModel:
             model.save(path)
 
             # Проверяем что файл валидный JSON
-            data = json.loads(path.read_text())
+            data = json.loads(path.read_text(encoding="utf-8"))
             assert data["type"] == "token_gbdt"
             assert data["schema_version"] == TOKEN_HEAD_SCHEMA_VERSION
             assert data["n_features"] == 8

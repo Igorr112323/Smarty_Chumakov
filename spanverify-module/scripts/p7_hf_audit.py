@@ -112,7 +112,7 @@ def main(out):
 
     if os.getenv("P7_FULL_DEV_REPLAY") == "1":
         short, changed = [], []
-        reference = {r["pair_id"]: r for r in json.loads((P5 / "dev_answers.json").read_text())}
+        reference = {r["pair_id"]: r for r in json.loads((P5 / "dev_answers.json").read_text(encoding="utf-8"))}
         legacy, current = verifier("hf"), verifier("hf")
         legacy._features = lambda answer, context, tokens: old.hf_features_chunked(
             answer, context, model_name=MODEL, answer_tokens=tokens, max_length=512

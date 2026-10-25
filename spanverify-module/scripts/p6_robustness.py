@@ -70,7 +70,7 @@ def main(out):
     for row in gz(P5 / "candidate_pool.jsonl.gz"):
         if row["cell"] == 218:
             pools[row["pair_id"]].append(row)
-    train = {p["id"]: p for p in map(json.loads, (ROOT / "data/corpus_a3/splits/train.jsonl").read_text().splitlines())}
+    train = {p["id"]: p for p in map(json.loads, (ROOT / "data/corpus_a3/splits/train.jsonl").read_text(encoding="utf-8").splitlines())}
     risks = {r["id"]: r["smoothed"] for r in gz(P4 / "k3_w1_oof.jsonl.gz")}
     rows = []
     for state in gz(P4 / "source_oof_states.jsonl.gz"):
@@ -106,8 +106,8 @@ def main(out):
     oof = summarize(rows)
     assert [oof["ALL"]["tokens"][k] for k in ("tp", "fp", "fn", "tn")] == [919, 422, 465, 44801]
     assert [oof["ALL"]["spans"][k] for k in ("tp", "fp", "fn")] == [214, 105, 253]
-    dev = {p["id"]: p for p in map(json.loads, (ROOT / "data/corpus_a3/splits/dev.jsonl").read_text().splitlines())}
-    answers = {a["pair_id"]: a for a in json.loads((P5 / "dev_answers.json").read_text())}
+    dev = {p["id"]: p for p in map(json.loads, (ROOT / "data/corpus_a3/splits/dev.jsonl").read_text(encoding="utf-8").splitlines())}
+    answers = {a["pair_id"]: a for a in json.loads((P5 / "dev_answers.json").read_text(encoding="utf-8"))}
     rows = []
     for ref in gz(P5 / "dev_evidence.jsonl.gz"):
         p = dev[ref["id"]]
