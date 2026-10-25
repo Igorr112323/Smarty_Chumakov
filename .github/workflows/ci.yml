@@ -360,6 +360,44 @@ jobs:
           path: spanverify-module/reports/diag-windows-${{ matrix.os }}-${{ matrix.python }}.txt
           if-no-files-found: warn
 
+      - name: Publish Windows diagnostic to gist (temporary, remove before merge)
+        if: failure()
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          echo "=== Windows diagnostic gist publish ===" >> $GITHUB_STEP_SUMMARY
+          mkdir -p /tmp
+          echo "=== junit failures ===" > /tmp/gist.txt
+          if [ -f reports/tests-junit.xml ]; then
+            python -c "import pathlib, re; t=pathlib.Path('reports/tests-junit.xml').read_text(encoding='utf-8',errors='ignore'); lines=[l for l in t.splitlines() if 'failure' in l.lower()]; print('\n'.join(lines[:100]))" >> /tmp/gist.txt 2>&1 || true
+            echo "--- raw junit head 2KB ---" >> /tmp/gist.txt
+            head -c 2048 reports/tests-junit.xml >> /tmp/gist.txt 2>&1 || true
+          else
+            echo "no junit" >> /tmp/gist.txt
+            ls -R reports 2>&1 | head -n 50 >> /tmp/gist.txt || true
+          fi
+          echo "" >> /tmp/gist.txt
+          echo "=== pytest tb line (maxfail 5) ===" >> /tmp/gist.txt
+          python -m pytest -q --tb=line --maxfail=5 2>&1 | head -c 6000 >> /tmp/gist.txt || true
+          echo "" >> /tmp/gist.txt
+          echo "=== pytest tb long (maxfail 1) ===" >> /tmp/gist.txt
+          python -m pytest -q --tb=long --maxfail=1 2>&1 | head -c 8000 >> /tmp/gist.txt || true
+          cat /tmp/gist.txt >> $GITHUB_STEP_SUMMARY || true
+          # create gist via gh api (allowed host api.github.com)
+          GIST_URL=$(gh api --method POST gists --raw-field description="Windows diag 2fbcd2e ${{ matrix.os }} ${{ matrix.python }} $(date -u +%s)" --raw-field public=false --input <(python -c "import json, pathlib; c=pathlib.Path('/tmp/gist.txt').read_text(encoding='utf-8',errors='ignore'); print(json.dumps({'description':'Windows diag','public': False,'files':{'diag.txt':{'content': c}}}))" --jq .html_url 2>&1 | head -n1 || echo "")
+          echo "Gist URL: $GIST_URL" >> $GITHUB_STEP_SUMMARY || true
+          echo "$GIST_URL" | tee /tmp/gist_url.txt || true
+          # also try gh gist create fallback
+          if [ -z "$GIST_URL" ] || [ "$GIST_URL" = "null" ]; then
+            gh gist create /tmp/gist.txt --public --desc "Windows diag fallback ${{ matrix.os }} ${{ matrix.python }}" 2>&1 | tee -a /tmp/gist_url.txt || true
+            cat /tmp/gist_url.txt >> $GITHUB_STEP_SUMMARY || true
+          fi
+          # save gist url as artifact too
+          mkdir -p reports 2>/dev/null || true
+          cp /tmp/gist.txt reports/diag-windows-${{ matrix.os }}-${{ matrix.python }}.txt 2>/dev/null || true
+          echo "$GIST_URL" > reports/gist-url-${{ matrix.os }}-${{ matrix.python }}.txt 2>/dev/null || true
+
       - name: Само-проверка конвейера
         run: python -m spanverify selftest
 
