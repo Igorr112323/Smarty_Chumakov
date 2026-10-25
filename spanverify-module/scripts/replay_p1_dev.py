@@ -17,7 +17,7 @@ sys.path.insert(0, str(PACKAGE_ROOT))
 from spanverify.config import Config  # noqa: E402
 from spanverify.dataset import read_pairs  # noqa: E402
 from spanverify.engine import Verifier, WeightsBundle  # noqa: E402
-from spanverify.features import (
+from spanverify.features import (  # noqa: E402
     feature_cache_key,
     load_feature_cache,
     set_feature_cache,

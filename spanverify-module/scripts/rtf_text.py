@@ -30,7 +30,7 @@ _MODULE_ROOT = Path(__file__).resolve().parents[1]
 if str(_MODULE_ROOT) not in _sys.path:
     _sys.path.insert(0, str(_MODULE_ROOT))
 
-from scripts.corpus_real import (
+from scripts.corpus_real import (  # noqa: E402
     normalize_text,
 )  # noqa: E402 - импорт после правки sys.path
 

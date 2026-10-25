@@ -24,7 +24,7 @@ ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
-from scripts.fetch_external_tests import (
+from scripts.fetch_external_tests import (  # noqa: E402
     EXCLUDED,
     OPTIONAL,
     RAGTRUTH,

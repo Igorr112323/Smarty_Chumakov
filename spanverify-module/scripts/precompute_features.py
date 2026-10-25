@@ -49,7 +49,7 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 from spanverify.dataset import read_pairs  # noqa: E402
-from spanverify.features import (
+from spanverify.features import (  # noqa: E402
     FEATURE_NAMES,
     HF_MODEL_DEFAULT,
     extract_features,

@@ -38,7 +38,7 @@ ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
-from spanverify.dataset import (
+from spanverify.dataset import (  # noqa: E402
     corpus_statistics,
     generate_pairs,
     read_pairs,
