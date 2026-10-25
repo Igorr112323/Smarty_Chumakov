@@ -238,6 +238,38 @@ jobs:
       - name: Тесты
         run: python -m pytest -q --junitxml=reports/tests-junit.xml
 
+      - name: Диагностика Windows (дословный срез при failure) — временный шаг, удалить перед merge
+        if: failure()
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          echo "=== Диагностика Windows: первые 2КБ pytest (windows-специфика, не локальная репродукция) ===" >> $GITHUB_STEP_SUMMARY
+          # Прогоняем три подозрительных теста с подробным traceback, берём первые ~2КБ
+          pytest -x -q --tb=long tests/test_ci_workflows.py tests/test_p8_evidence_hygiene.py tests/test_r2_share.py 2>&1 | head -c 2048 | tee /tmp/diag.txt || true
+          echo "" >> $GITHUB_STEP_SUMMARY
+          cat /tmp/diag.txt >> $GITHUB_STEP_SUMMARY || true
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "--- patch check-run output.text (мост GITHUB_STEP_SUMMARY→Check-Runs) ---" >> $GITHUB_STEP_SUMMARY
+          # Попытка PATCH check-run (если есть checks:write, иначе только SUMMARY — уже видим в Checks UI)
+          CHECK_RUN_ID=""
+          # 1) пробуем по имени чека (точное имя джобы)
+          CHECK_RUN_ID=$(gh api "repos/${{ github.repository }}/commits/${{ github.sha }}/check-runs" --paginate --jq '.check_runs[] | select(.name | contains("Тесты (Python ${{ matrix.python }}, ${{ matrix.os }})")) | .id' 2>/dev/null | head -n1 || echo "")
+          if [ -z "$CHECK_RUN_ID" ]; then
+            # 2) fallback: job id как check_run (часто совпадает)
+            CHECK_RUN_ID=$(gh api "repos/${{ github.repository }}/actions/runs/${{ github.run_id }}/jobs" --jq '.jobs[] | select(.name=="Тесты (Python ${{ matrix.python }}, ${{ matrix.os }})") | .id' 2>/dev/null | head -n1 || echo "")
+          fi
+          if [ -n "$CHECK_RUN_ID" ]; then
+            echo "PATCH check-run $CHECK_RUN_ID" >> $GITHUB_STEP_SUMMARY
+            # Экранируем текст для JSON
+            ESCAPED=$(python -c "import json,sys; data=open('/tmp/diag.txt',encoding='utf-8',errors='ignore').read(); print(json.dumps(data))" 2>/dev/null || echo '""')
+            # Собираем payload вручную (gh api --raw-field не экранирует повторно)
+            printf '{"output":{"title":"Windows diagnostic (first 2KB)","summary":"Дословный срез windows-ошибки (head b55006f, 2KB)","text":%s}}' "$ESCAPED" > /tmp/payload.json
+            gh api --method PATCH "repos/${{ github.repository }}/check-runs/$CHECK_RUN_ID" --input /tmp/payload.json 2>&1 | head -20 || echo "PATCH failed — проверьте permissions: checks: write (но SUMMARY уже в Checks)" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "CHECK_RUN_ID не найден, но SUMMARY уже в Checks UI" >> $GITHUB_STEP_SUMMARY
+          fi
+
       - name: Само-проверка конвейера
         run: python -m spanverify selftest
 
