@@ -61,7 +61,11 @@ def _git_commit() -> str:
     """Текущий коммит (для трассировки чисел к состоянию кода)."""
     try:
         result = subprocess.run(
-            ["git", "rev-parse", "HEAD"], capture_output=True, text=True, cwd=str(REPO_ROOT), timeout=20
+            ["git", "rev-parse", "HEAD"],
+            capture_output=True,
+            text=True,
+            cwd=str(REPO_ROOT),
+            timeout=20,
         )
         return result.stdout.strip() if result.returncode == 0 else ""
     except (OSError, subprocess.SubprocessError):
@@ -111,7 +115,12 @@ def _sha256(path: Path) -> str:
 def _release_info(release_dir: Path) -> dict | None:
     """Размеры и контрольные суммы артефактов релиза, если они собраны рядом."""
     artifacts = []
-    for name in ("spanverify.exe", "spanverify-win.zip", "spanverify.pyz", "SHA256SUMS.txt"):
+    for name in (
+        "spanverify.exe",
+        "spanverify-win.zip",
+        "spanverify.pyz",
+        "SHA256SUMS.txt",
+    ):
         path = release_dir / name
         if path.is_file():
             artifacts.append(
@@ -179,7 +188,10 @@ def _dataset_validation_block() -> dict:
     )
     # Вывод команды глушим: он нужен как код возврата, а не как шум в консоли.
     with contextlib.redirect_stdout(io.StringIO()):
-        checks["valid"] = {"rejected": False, "returncode": main(["evaluate", "--dataset", str(valid)])}
+        checks["valid"] = {
+            "rejected": False,
+            "returncode": main(["evaluate", "--dataset", str(valid)]),
+        }
     return {
         "schema_required": ["context", "answer"],
         "schema_optional": ["id", "labels", "meta"],
@@ -212,7 +224,7 @@ def _metrics_tree(metrics: dict) -> dict:
             "recall": round(answers["recall"], 4),
             "f1": round(answers["f1"], 4),
             "fpr": round(answers["fpr"], 4),
-            "auc": round(answers["auc"], 4) if answers["auc"] == answers["auc"] else None,
+            "auc": (round(answers["auc"], 4) if answers["auc"] == answers["auc"] else None),
             "threshold": round(answers["threshold"], 4),
         },
         # Вердикт уровня ответа: сюда попадает и текстовое правило привязки числа
@@ -369,7 +381,14 @@ def _external_tests_block() -> dict:
             "spans": spans,
             "their": {
                 name: theirs.get(name)
-                for name in ("accuracy", "jaccard_score", "hamming_loss", "rouge1", "rouge2", "rougeL")
+                for name in (
+                    "accuracy",
+                    "jaccard_score",
+                    "hamming_loss",
+                    "rouge1",
+                    "rouge2",
+                    "rougeL",
+                )
             },
             "baseline_extracted": bool(run["baseline"]["extracted"]),
         }
@@ -417,7 +436,17 @@ def _experiment_block(payload: dict) -> dict:
         },
         "verdicts": {
             key: metrics.get("verdicts", {}).get(key)
-            for key in ("tp", "fp", "fn", "tn", "precision", "recall", "f1", "fpr", "flagged_share")
+            for key in (
+                "tp",
+                "fp",
+                "fn",
+                "tn",
+                "precision",
+                "recall",
+                "f1",
+                "fpr",
+                "flagged_share",
+            )
         },
         "bundle": {
             "threshold": bundle.get("threshold"),
@@ -662,9 +691,15 @@ def collect(dataset: str, seed: int, release_dir: Path, coverage_json: Path) -> 
                         "auc_oriented": values.get("auc_oriented"),
                         "ci": [values.get("ci_low"), values.get("ci_high")],
                         "auc_fact_oriented": values.get("auc_fact_oriented"),
-                        "fact_ci": [values.get("ci_fact_low"), values.get("ci_fact_high")],
+                        "fact_ci": [
+                            values.get("ci_fact_low"),
+                            values.get("ci_fact_high"),
+                        ],
                         "delta_mean": values.get("delta_mean"),
-                        "delta_ci": [values.get("delta_ci_low"), values.get("delta_ci_high")],
+                        "delta_ci": [
+                            values.get("delta_ci_low"),
+                            values.get("delta_ci_high"),
+                        ],
                         "delta_significant": values.get("delta_significant"),
                     }
                     for feature, values in (layer_values or {}).items()

@@ -21,7 +21,12 @@ from spanverify.training import train_calibrator
 def calibrator_config():
     """Герметичная калибровка на небольшом синтетическом корпусе."""
     config = Config(backend="surrogate", calibration_path="config/__tests_absent.json")
-    report = train_calibrator(Detector(config), generate_dataset(80, seed=2024), config=config, dataset_name="tests")
+    report = train_calibrator(
+        Detector(config),
+        generate_dataset(80, seed=2024),
+        config=config,
+        dataset_name="tests",
+    )
     return config.with_overrides(threshold=report.threshold), report.calibrator
 
 

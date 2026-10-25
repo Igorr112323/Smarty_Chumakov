@@ -21,7 +21,11 @@ def main(out):
     for split in ("train", "dev"):
         pairs = list(read_pairs(ROOT / f"data/corpus_a3/splits/{split}.jsonl"))
         counts = [len(tokenizer(p["answer"], add_special_tokens=False)["input_ids"]) for p in pairs]
-        from spanverify.chunking import chunk_document, estimate_tokens, select_relevant_chunks
+        from spanverify.chunking import (
+            chunk_document,
+            estimate_tokens,
+            select_relevant_chunks,
+        )
         from spanverify.core import tokenize_with_offsets
 
         coverage_rows = []
@@ -94,7 +98,10 @@ def main(out):
         after = dataclasses.asdict(features.hf_features(pair["answer"], pair["context"], model_name=MODEL))
         assert json.dumps(before, sort_keys=True) == json.dumps(after, sort_keys=True), pair["id"]
         rows.append(dict(id=pair["id"], before=before, after=after))
-    save(out / "hf-short-golden.json", dict(passed=True, rows=rows, environment=environment()))
+    save(
+        out / "hf-short-golden.json",
+        dict(passed=True, rows=rows, environment=environment()),
+    )
     save(
         out / "truncation-audit.json",
         dict(
@@ -125,8 +132,14 @@ def main(out):
                 # Reuse the identical eval weights in the baseline replay only;
                 # this is not a timing trial and does not alter its arithmetic.
                 with (
-                    patch("transformers.AutoTokenizer.from_pretrained", return_value=tokenizer),
-                    patch("transformers.AutoModelForCausalLM.from_pretrained", return_value=_model),
+                    patch(
+                        "transformers.AutoTokenizer.from_pretrained",
+                        return_value=tokenizer,
+                    ),
+                    patch(
+                        "transformers.AutoModelForCausalLM.from_pretrained",
+                        return_value=_model,
+                    ),
                 ):
                     if split == "dev":
                         before_result = legacy.verify(pair["answer"], pair["context"], with_tokens=True)
@@ -138,11 +151,27 @@ def main(out):
                         after = after_result.to_dict(with_tokens=True)
                         before.pop("latency_ms", None)
                         after.pop("latency_ms", None)
-                        a = json.dumps(before, ensure_ascii=False, sort_keys=True, separators=(",", ":")).encode()
-                        b = json.dumps(after, ensure_ascii=False, sort_keys=True, separators=(",", ":")).encode()
+                        a = json.dumps(
+                            before,
+                            ensure_ascii=False,
+                            sort_keys=True,
+                            separators=(",", ":"),
+                        ).encode()
+                        b = json.dumps(
+                            after,
+                            ensure_ascii=False,
+                            sort_keys=True,
+                            separators=(",", ":"),
+                        ).encode()
                         if length <= 512:
                             assert a == b, pair["id"]
-                            short.append(dict(id=pair["id"], sha256=hashlib.sha256(a).hexdigest(), equal=True))
+                            short.append(
+                                dict(
+                                    id=pair["id"],
+                                    sha256=hashlib.sha256(a).hexdigest(),
+                                    equal=True,
+                                )
+                            )
                         else:
                             changed.append(
                                 dict(
@@ -155,7 +184,12 @@ def main(out):
                                     new_score=after_result.score,
                                     saved_P5_score=reference[pair["id"]]["calibrated_score"],
                                     changed_token_records=sum(
-                                        x != y for x, y in zip(before["tokens"], after["tokens"], strict=True)
+                                        x != y
+                                        for x, y in zip(
+                                            before["tokens"],
+                                            after["tokens"],
+                                            strict=True,
+                                        )
                                     ),
                                 )
                             )
@@ -164,12 +198,26 @@ def main(out):
                         after = features.hf_features_chunked(pair["answer"], pair["context"], model_name=MODEL)
                         deltas = {
                             name: max(
-                                (abs(a - b) for a, b in zip(getattr(before, name), getattr(after, name), strict=True)),
+                                (
+                                    abs(a - b)
+                                    for a, b in zip(
+                                        getattr(before, name),
+                                        getattr(after, name),
+                                        strict=True,
+                                    )
+                                ),
                                 default=0.0,
                             )
                             for name in features.FEATURE_NAMES
                         }
-                        changed.append(dict(split=split, id=pair["id"], model_tokens=length, max_feature_deltas=deltas))
+                        changed.append(
+                            dict(
+                                split=split,
+                                id=pair["id"],
+                                model_tokens=length,
+                                max_feature_deltas=deltas,
+                            )
+                        )
                 save(
                     out / "fresh-feature-contract.json",
                     dict(
@@ -208,7 +256,10 @@ def main(out):
     previous = types.ModuleType("spanverify._p7_uncached_windows")
     previous.__package__ = "spanverify"
     sys.modules[previous.__name__] = previous
-    exec(compile(previous_source, "<accepted-uncached-P7-window-contract>", "exec"), previous.__dict__)
+    exec(
+        compile(previous_source, "<accepted-uncached-P7-window-contract>", "exec"),
+        previous.__dict__,
+    )
     from spanverify import hf_windows
 
     long_text = "Срок хранения первичных документов десять лет. " * 120
@@ -218,7 +269,11 @@ def main(out):
     optimized = verifier("hf").verify(long_text, context, with_tokens=True).to_dict(with_tokens=True)
     for result in (baseline, optimized):
         result.pop("latency_ms", None)
-        for key in ("model_calls", "identical_window_cache_hits", "logical_window_scores"):
+        for key in (
+            "model_calls",
+            "identical_window_cache_hits",
+            "logical_window_scores",
+        ):
             result["stats"]["features"].pop(key, None)
     left = json.dumps(baseline, ensure_ascii=False, sort_keys=True, separators=(",", ":")).encode()
     right = json.dumps(optimized, ensure_ascii=False, sort_keys=True, separators=(",", ":")).encode()
@@ -247,7 +302,12 @@ def main(out):
     assert matrix.meta["full_answer"] and matrix.meta["all_answer_tokens_mapped"]
     save(
         out / "hf-long-answer.json",
-        dict(chars=len(text), meta=matrix.meta, token_features=dataclasses.asdict(matrix), environment=environment()),
+        dict(
+            chars=len(text),
+            meta=matrix.meta,
+            token_features=dataclasses.asdict(matrix),
+            environment=environment(),
+        ),
     )
 
 

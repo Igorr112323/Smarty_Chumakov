@@ -58,7 +58,10 @@ def fetch(url: str, timeout: int = 120, read_limit: int = 3_000_000) -> dict:
     """Запрос к ИПС (cp1251) с сохранением тела."""
     request = urllib.request.Request(
         url,
-        headers={"User-Agent": USER_AGENT, "Accept": "text/html, application/javascript, */*"},
+        headers={
+            "User-Agent": USER_AGENT,
+            "Accept": "text/html, application/javascript, */*",
+        },
     )
     try:
         with urllib.request.urlopen(request, timeout=timeout) as response:  # noqa: S310 - официальный публичный сайт

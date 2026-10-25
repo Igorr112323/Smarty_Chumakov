@@ -156,7 +156,7 @@ def main():
         "p1_invariant": p1_invariant,
         "drift_count": drift_count,
         "p2_influences_token_risk": risks_changed,
-        "status": "✅ P2 интеграция работает" if (p1_invariant and risks_changed) else "❌ P2 интеграция сломана",
+        "status": ("✅ P2 интеграция работает" if (p1_invariant and risks_changed) else "❌ P2 интеграция сломана"),
     }
 
     report_path = args.output / "experiment_report.json"

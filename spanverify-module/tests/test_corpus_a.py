@@ -55,7 +55,14 @@ def test_target_and_balance_are_met(corpus: dict) -> None:
 def test_taxonomy_types_are_all_present(corpus: dict) -> None:
     """Покрыты все шесть типов таксономии бенчмарка, включая подтип «атрибуция числа»."""
     taxonomy = {pair["meta"]["taxonomy"] for pair in corpus["pairs"]}
-    assert {"Contradiction", "Unconfirmed", "Missing", "Oversight", "Partial", "Excess"} <= taxonomy
+    assert {
+        "Contradiction",
+        "Unconfirmed",
+        "Missing",
+        "Oversight",
+        "Partial",
+        "Excess",
+    } <= taxonomy
     attribution = [pair for pair in corpus["pairs"] if pair["meta"]["mode"] == "number_attribution"]
     assert len(attribution) >= 40
 

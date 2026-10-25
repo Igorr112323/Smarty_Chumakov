@@ -26,7 +26,13 @@ def payload():
     supports = []
     products = []
     v = verifier("demo")
-    for answer in ["", "Один", "Один, два! 10 лет.", "ёжик ёлка\nдва десять — 123.", "Срок хранения 10 лет. " * 100]:
+    for answer in [
+        "",
+        "Один",
+        "Один, два! 10 лет.",
+        "ёжик ёлка\nдва десять — 123.",
+        "Срок хранения 10 лет. " * 100,
+    ]:
         tokens = tokenize_with_offsets(answer)
         supports.append(_normalised_support([rng.random() for _ in tokens], tokens))
         products.append(
@@ -51,4 +57,12 @@ if __name__ == "__main__":
         path.write_bytes(actual)
     else:
         assert actual == path.read_bytes(), "Golden I/O drift"
-    print(json.dumps(dict(bytes=len(actual), sha256=hashlib.sha256(actual).hexdigest(), passed=True)))
+    print(
+        json.dumps(
+            dict(
+                bytes=len(actual),
+                sha256=hashlib.sha256(actual).hexdigest(),
+                passed=True,
+            )
+        )
+    )

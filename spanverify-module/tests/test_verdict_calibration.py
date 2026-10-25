@@ -100,7 +100,15 @@ def test_frozen_config_matches_calibration_report() -> None:
     assert report["params"] == config["params"], "конфиг и отчёт разошлись"
     assert report["target_fpr"] == config["target_fpr"]
     assert report["chosen_on"] == config["chosen_on"]
-    for key in ("dataset", "dataset_sha256", "seed", "mode", "commit", "generated_at", "command"):
+    for key in (
+        "dataset",
+        "dataset_sha256",
+        "seed",
+        "mode",
+        "commit",
+        "generated_at",
+        "command",
+    ):
         assert report.get(key), f"в отчёте нет поля {key}: число без происхождения не число"
     assert len(report["dataset_sha256"]) == 64, "хеш корпуса должен быть SHA-256"
 
@@ -192,7 +200,12 @@ def test_corroborated_respects_flagged_share() -> None:
 def test_text_rule_decisive_switch_controls_attribution() -> None:
     """Решающая роль текстовых правил — параметр, а не жёстко зашитое поведение."""
     spans = [_span(1, "attribution", chars=10)]
-    strict = {"min_mask_tokens": 2, "min_fragment_chars": 20, "min_flagged_share": 0.0, "text_rule_decisive": True}
+    strict = {
+        "min_mask_tokens": 2,
+        "min_fragment_chars": 20,
+        "min_flagged_share": 0.0,
+        "text_rule_decisive": True,
+    }
     soft = dict(strict, text_rule_decisive=False)
     assert _verdict(0.1, 0.5, spans, VERDICT_CORROBORATED, strict) == "doubtful"
     assert _verdict(0.1, 0.5, spans, VERDICT_CORROBORATED, soft) == "grounded"
@@ -245,12 +258,24 @@ def test_apply_rule_and_metrics_over_evidence_table() -> None:
     """Правило считается по таблице свидетельств и воспроизводится вне прогона."""
     module = importlib.import_module("scripts.calibrate_verdict")
     rows = [
-        _row(id="tp", y=1, mask_tokens=3, max_fragment_chars=30, flagged_share=0.03, text_sources=["attribution"]),
+        _row(
+            id="tp",
+            y=1,
+            mask_tokens=3,
+            max_fragment_chars=30,
+            flagged_share=0.03,
+            text_sources=["attribution"],
+        ),
         _row(id="fp", y=0, mask_tokens=3, max_fragment_chars=30, flagged_share=0.03),
         _row(id="fn", y=1, mask_tokens=1, max_fragment_chars=30, flagged_share=0.01),
         _row(id="tn", y=0),
     ]
-    params = {"min_mask_tokens": 2, "min_fragment_chars": 20, "min_flagged_share": 0.0, "text_rule_decisive": True}
+    params = {
+        "min_mask_tokens": 2,
+        "min_fragment_chars": 20,
+        "min_flagged_share": 0.0,
+        "text_rule_decisive": True,
+    }
     flags = module.apply_rule(rows, params)
     assert flags == [True, True, False, False]
     report = module.metrics(rows, flags)
@@ -269,7 +294,12 @@ def test_choose_respects_target_and_never_takes_test() -> None:
     ]
     params, frontier, selection = module.choose(rows, target_fpr=0.0)
     assert frontier, "фронт решений не должен быть пустым"
-    assert set(params) == {"min_mask_tokens", "min_fragment_chars", "min_flagged_share", "text_rule_decisive"}
+    assert set(params) == {
+        "min_mask_tokens",
+        "min_fragment_chars",
+        "min_flagged_share",
+        "text_rule_decisive",
+    }
     assert selection["target_fpr"] == 0.0
     assert "тест в выборе не участвует" in selection["rule"].lower()
     flagged = module.metrics(rows, module.apply_rule(rows, params))

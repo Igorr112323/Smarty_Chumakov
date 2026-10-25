@@ -38,7 +38,12 @@ ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
-from spanverify.dataset import corpus_statistics, generate_pairs, read_pairs, write_pairs  # noqa: E402
+from spanverify.dataset import (
+    corpus_statistics,
+    generate_pairs,
+    read_pairs,
+    write_pairs,
+)  # noqa: E402
 from spanverify.engine import VERDICT_ANY_SPAN, Verifier, WeightsBundle  # noqa: E402
 from spanverify.features import (  # noqa: E402
     DEFAULT_WEIGHTS,
@@ -206,10 +211,21 @@ def _metrics_block(metrics: dict) -> dict:
             "recall": round(answers["recall"], 4),
             "f1": round(answers["f1"], 4),
             "fpr": round(answers["fpr"], 4),
-            "auc": round(answers["auc"], 4) if answers["auc"] == answers["auc"] else None,
+            "auc": (round(answers["auc"], 4) if answers["auc"] == answers["auc"] else None),
         },
         "verdicts": {
-            key: verdicts[key] for key in ("tp", "fp", "fn", "tn", "precision", "recall", "f1", "fpr", "flagged_share")
+            key: verdicts[key]
+            for key in (
+                "tp",
+                "fp",
+                "fn",
+                "tn",
+                "precision",
+                "recall",
+                "f1",
+                "fpr",
+                "flagged_share",
+            )
         },
     }
 
@@ -352,7 +368,11 @@ def main(argv: list[str] | None = None) -> int:
             "0 — сравнение выключено; порог не подбирается по тесту"
         ),
     )
-    parser.add_argument("--no-test", action="store_true", help="Never read or evaluate the official test split")
+    parser.add_argument(
+        "--no-test",
+        action="store_true",
+        help="Never read or evaluate the official test split",
+    )
     args = parser.parse_args(argv)
 
     dataset = Path(args.dataset)
@@ -371,7 +391,10 @@ def main(argv: list[str] | None = None) -> int:
     cache = load_feature_cache(args.features_cache, counting=True) if args.features_cache else None
     set_feature_cache(cache)
     if cache:
-        print(f"кеш признаков: {len(cache)} ключей из {len(args.features_cache)} пути(ей)", flush=True)
+        print(
+            f"кеш признаков: {len(cache)} ключей из {len(args.features_cache)} пути(ей)",
+            flush=True,
+        )
         if args.require_cache:
             missing = []
             for record in records:
@@ -479,7 +502,10 @@ def main(argv: list[str] | None = None) -> int:
                 span_filter_min_chars=span_filter_chars,
             )
             filtered_scan = _mask_scan(verifier_filtered_scan, splits["train"], bundle, args.target_fpr)
-            print("вариант с фильтром коротких фрагментов: " + filtered_scan["statement"], flush=True)
+            print(
+                "вариант с фильтром коротких фрагментов: " + filtered_scan["statement"],
+                flush=True,
+            )
             baseline_best = mask_scan["best_within_target"]
             filtered_best = filtered_scan["best_within_target"]
 
@@ -576,13 +602,36 @@ def main(argv: list[str] | None = None) -> int:
                 "test_pairs": len(test_pairs),
                 "rule_any_span": {
                     key: legacy_metrics["verdicts"][key]
-                    for key in ("tp", "fp", "fn", "tn", "precision", "recall", "f1", "fpr", "flagged_share")
+                    for key in (
+                        "tp",
+                        "fp",
+                        "fn",
+                        "tn",
+                        "precision",
+                        "recall",
+                        "f1",
+                        "fpr",
+                        "flagged_share",
+                    )
                 },
                 "rule_min_two_tokens": {
                     key: test_metrics["verdicts"][key]
-                    for key in ("tp", "fp", "fn", "tn", "precision", "recall", "f1", "fpr", "flagged_share")
+                    for key in (
+                        "tp",
+                        "fp",
+                        "fn",
+                        "tn",
+                        "precision",
+                        "recall",
+                        "f1",
+                        "fpr",
+                        "flagged_share",
+                    )
                 },
-                "flagged_answers": {"any_span": legacy_flagged, "min_two_tokens": new_flagged},
+                "flagged_answers": {
+                    "any_span": legacy_flagged,
+                    "min_two_tokens": new_flagged,
+                },
                 "tokens_identical": (
                     legacy_metrics["tokens"]["tp"] == test_metrics["tokens"]["tp"]
                     and legacy_metrics["tokens"]["fp"] == test_metrics["tokens"]["fp"]
@@ -737,7 +786,7 @@ def main(argv: list[str] | None = None) -> int:
         "bundle": bundle.to_dict(),
         "folds": report.folds,
         "gate": gate,
-        "gate_test_official": _gate({"tokens": test_block["tokens"]}) if test_block else None,
+        "gate_test_official": (_gate({"tokens": test_block["tokens"]}) if test_block else None),
         "head_inline": head_inline,
         "artifacts": {name: str(path) for name, path in written.items()},
     }

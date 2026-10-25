@@ -35,7 +35,9 @@ def gh_json(args: list[str]) -> object:
         check=False,
     )
     if proc.returncode != 0:
-        raise RuntimeError(proc.stderr.strip() or f"gh api {args} завершился кодом {proc.returncode}")
+        raise RuntimeError(
+            proc.stderr.strip() or f"gh api {args} завершился кодом {proc.returncode}"
+        )
     return json.loads(proc.stdout)
 
 
@@ -52,7 +54,11 @@ def collect(repo: str, limit: int, branch: str | None) -> dict:
     data = gh_json([query])
     runs = []
     for run in data.get("workflow_runs", []):
-        if branch and run.get("head_branch") != branch and run.get("name") != "build-and-release-exe":
+        if (
+            branch
+            and run.get("head_branch") != branch
+            and run.get("name") != "build-and-release-exe"
+        ):
             continue
         runs.append(
             {
@@ -85,7 +91,9 @@ def main() -> int:
     parser = argparse.ArgumentParser(description="Собрать номера прогонов CI")
     parser.add_argument("--repo", default=DEFAULT_REPO)
     parser.add_argument("--limit", type=int, default=30)
-    parser.add_argument("--branch", default=None, help="оставить только прогоны этой ветки")
+    parser.add_argument(
+        "--branch", default=None, help="оставить только прогоны этой ветки"
+    )
     parser.add_argument("--out", default=str(OUT.relative_to(ROOT)))
     args = parser.parse_args()
     try:
@@ -95,7 +103,9 @@ def main() -> int:
         return 1
     path = ROOT / args.out
     path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(json.dumps(payload, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    path.write_text(
+        json.dumps(payload, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
+    )
     print(f"{path}: прогонов {len(payload['runs'])}")
     return 0
 

@@ -928,7 +928,9 @@ def _stems(words: Sequence[str]) -> set[str]:
     return set(_stems_cached(tuple(words)))
 
 
-def _distinctive_measurements(measurements: Sequence[Measurement]) -> list[tuple[str, ...]]:
+def _distinctive_measurements(
+    measurements: Sequence[Measurement],
+) -> list[tuple[str, ...]]:
     """Субъекты без слов, общих для всех измерений (общие слова не различают объекты).
 
     Если после удаления общих слов не остаётся ничего, возвращаются полные субъекты.
@@ -1043,7 +1045,10 @@ def _attribute_tokens(tokens: Sequence[Token], measurements: Sequence[Measuremen
 
 
 def _apply_number_attribution(
-    tokens: Sequence[Token], answer: str, context: str | Sequence[str] | None, mass: list[float]
+    tokens: Sequence[Token],
+    answer: str,
+    context: str | Sequence[str] | None,
+    mass: list[float],
 ) -> None:
     """Число, взятое из другого объекта документа, не может считаться подтверждённым.
 
@@ -1261,7 +1266,13 @@ def hf_features(
                 tokenizer,
                 (tokenizer, model),
                 hf_features,
-                dict(model_name=model_name, k=k, device=device, max_length=max_length, layer=layer),
+                dict(
+                    model_name=model_name,
+                    k=k,
+                    device=device,
+                    max_length=max_length,
+                    layer=layer,
+                ),
             )
     encoded = tokenizer(prompt, return_tensors="pt", truncation=not _windowed, max_length=max_length)
     if _windowed and encoded["input_ids"].shape[-1] > max_length:
@@ -1280,9 +1291,12 @@ def hf_features(
     # Разные версии transformers отдают смещения то как тензор/`BatchEncoding`
     # (с методом ``tolist``), то как обычный список списков — приводим к списку
     # кортежей, иначе на свежих версиях падало бы AttributeError.
-    raw_offsets = tokenizer(prompt, return_offsets_mapping=True, truncation=not _windowed, max_length=max_length)[
-        "offset_mapping"
-    ]
+    raw_offsets = tokenizer(
+        prompt,
+        return_offsets_mapping=True,
+        truncation=not _windowed,
+        max_length=max_length,
+    )["offset_mapping"]
     if hasattr(raw_offsets, "tolist"):
         raw_offsets = raw_offsets.tolist()
     offsets = list(raw_offsets)
@@ -1474,7 +1488,11 @@ def hf_features_chunked(
     """
     from .backends.base import BackendUnavailable  # noqa: PLC0415
     from .backends.hf import HFBackend  # noqa: PLC0415
-    from .chunking import chunk_document, estimate_tokens, select_relevant_chunks  # noqa: PLC0415
+    from .chunking import (
+        chunk_document,
+        estimate_tokens,
+        select_relevant_chunks,
+    )  # noqa: PLC0415
     from .core import tokenize_with_offsets  # noqa: PLC0415
 
     ok, reason = HFBackend.dependencies()

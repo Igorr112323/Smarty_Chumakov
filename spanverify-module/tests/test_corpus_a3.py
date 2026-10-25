@@ -87,7 +87,8 @@ def _write_sources(docs_dir: Path, count: int = 8) -> None:
             "extraction": "ocr-tesseract-rus",
         }
     (docs_dir / "sources.json").write_text(
-        json.dumps({"documents": documents}, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
+        json.dumps({"documents": documents}, ensure_ascii=False, indent=2) + "\n",
+        encoding="utf-8",
     )
 
 
@@ -105,7 +106,13 @@ def corpus(tmp_path_factory: pytest.TempPathFactory) -> dict:
         path = out / "splits" / f"{name}.jsonl"
         splits[name] = list(read_pairs(path)) if path.exists() and path.stat().st_size else []
 
-    return {"manifest": manifest, "pairs": pairs, "splits": splits, "docs": docs, "out": out}
+    return {
+        "manifest": manifest,
+        "pairs": pairs,
+        "splits": splits,
+        "docs": docs,
+        "out": out,
+    }
 
 
 def test_plan_reserves_clean_pairs_and_min_per_mode() -> None:

@@ -206,7 +206,7 @@ class WeightsBundle:
             "localization_decoder": self.localization_decoder,
             "span_filter": self.span_filter,
             "context_features_spec": self.context_features_spec,
-            "token_threshold": float(self.token_threshold) if self.token_threshold is not None else None,
+            "token_threshold": (float(self.token_threshold) if self.token_threshold is not None else None),
             "folds": self.folds or [],
             "seed": self.seed,
             "version": self.version,
@@ -252,7 +252,7 @@ class WeightsBundle:
             localization_decoder=data.get("localization_decoder"),
             span_filter=data.get("span_filter"),
             context_features_spec=data.get("context_features_spec"),
-            token_threshold=float(data["token_threshold"]) if data.get("token_threshold") is not None else None,
+            token_threshold=(float(data["token_threshold"]) if data.get("token_threshold") is not None else None),
             folds=list(data.get("folds", [])),
             seed=int(data.get("seed", 42)),
             version=str(data.get("version", "1.1.0")),
@@ -416,7 +416,11 @@ class Verifier:
                 if expected_sha and calib_rel:
                     # путь калибратора относительно repo root
                     calib_path = None
-                    for base in [Path(__file__).resolve().parents[2], Path.cwd(), Path(".").resolve()]:
+                    for base in [
+                        Path(__file__).resolve().parents[2],
+                        Path.cwd(),
+                        Path(".").resolve(),
+                    ]:
                         cand2 = base / calib_rel
                         if cand2.exists():
                             calib_path = cand2
@@ -596,7 +600,12 @@ class Verifier:
                 ai_share_hard=0.0,
                 threshold=self.bundle.threshold,
                 spans=[],
-                stats={"token_count": 0, "empty": True, "warning": self.warning, "raw_score_full": 0.0},
+                stats={
+                    "token_count": 0,
+                    "empty": True,
+                    "warning": self.warning,
+                    "raw_score_full": 0.0,
+                },
                 latency_ms=(time.perf_counter() - started) * 1000,
                 mode=self.mode,
                 warning=self.warning,
@@ -638,7 +647,9 @@ class Verifier:
                 from .context_head import build_context_features
 
                 token_features_matrix = build_context_features(
-                    token_features_matrix, [is_scored_token(t.text) for t in tokens], self.bundle.context_features_spec
+                    token_features_matrix,
+                    [is_scored_token(t.text) for t in tokens],
+                    self.bundle.context_features_spec,
                 )
             # Предсказываем token risk через P2/P4 (raw HF matrix is unchanged)
             risk = self._token_head_model.predict_many(token_features_matrix)
@@ -697,7 +708,13 @@ class Verifier:
                 *self._coverage_spans(answer, coverage_context, tokens, self._span_threshold(scored)),
             ]
             candidates = build_candidates(
-                answer, tokens, smoothed, [i in scored_set for i in range(len(tokens))], cfg["generator"], score, rules
+                answer,
+                tokens,
+                smoothed,
+                [i in scored_set for i in range(len(tokens))],
+                cfg["generator"],
+                score,
+                rules,
             )
             kept_flagged, spans = filter_candidates(answer, tokens, candidates, cfg, rules)
             span_threshold = cfg["generator"]["tau_low"]
@@ -708,7 +725,7 @@ class Verifier:
         stats = {
             "token_count": len(tokens),
             "scored_tokens": len(scored_indices),
-            "number_attribution": number_attribution(answer, context_text) if context_text else [],
+            "number_attribution": (number_attribution(answer, context_text) if context_text else []),
             "fact_coverage": [
                 {
                     "value": item.fact.value,
@@ -776,7 +793,7 @@ class Verifier:
                         "mode": self.mode,
                         "bundle_sha256": self._r2_aggregator.bundle_sha256,
                         "source": getattr(self._r2_aggregator, "source", "dev181-fragment-mean"),
-                        "frozen_path": str(self._r2_frozen_path) if getattr(self, "_r2_frozen_path", None) else None,
+                        "frozen_path": (str(self._r2_frozen_path) if getattr(self, "_r2_frozen_path", None) else None),
                         "monotone": True,
                         "run_id": "r2-official-20261023-4fff418",
                     }
@@ -798,7 +815,9 @@ class Verifier:
         кода): метрики по токенам, F1 по фрагментам (совпадение с IoU ≥ 0.5) и
         разделение ответов. Метки берутся из ``labels`` корпуса по символам.
         """
-        from .dataset import Pair  # noqa: PLC0415 - локально, чтобы не плодить импортный цикл
+        from .dataset import (
+            Pair,
+        )  # noqa: PLC0415 - локально, чтобы не плодить импортный цикл
 
         labels: list[int] = []
         flags: list[bool] = []
@@ -850,7 +869,9 @@ class Verifier:
         ]
         span_metrics["mean_width_ratio"] = _mean_width_ratio(predicted, truth)
         answer_metrics = _answer_metrics(
-            answer_labels, answer_scores, threshold if threshold is not None else self.bundle.threshold
+            answer_labels,
+            answer_scores,
+            threshold if threshold is not None else self.bundle.threshold,
         )
         verdict_metrics = _binary_metrics(verdict_labels, verdict_flags)
         # Критерии считаются здесь же, чтобы CLI, HTTP API и отчёты брали один и
@@ -877,7 +898,10 @@ class Verifier:
     # ---------------------------------------------------------------- шаги
 
     def features_for(
-        self, answer: str, context: str | Sequence[str] | None, tokens: Sequence[Token] | None = None
+        self,
+        answer: str,
+        context: str | Sequence[str] | None,
+        tokens: Sequence[Token] | None = None,
     ) -> FeatureMatrix:
         """Публичный доступ к признакам (используется обучением и отчётами)."""
         return self._features(answer, context, tokens or tokenize_with_offsets(answer))
@@ -1057,7 +1081,7 @@ class Verifier:
                     end=span_end,
                     text=fragment,
                     risk=risk_value,
-                    label="likely_hallucination" if risk_value >= HALLUCINATION_LABEL_RISK else "doubtful",
+                    label=("likely_hallucination" if risk_value >= HALLUCINATION_LABEL_RISK else "doubtful"),
                     n_tokens=len(token_risk),
                     source="attribution",
                 )
@@ -1114,7 +1138,7 @@ class Verifier:
                     end=end,
                     text=fragment,
                     risk=risk_value,
-                    label="likely_hallucination" if risk_value >= HALLUCINATION_LABEL_RISK else "doubtful",
+                    label=("likely_hallucination" if risk_value >= HALLUCINATION_LABEL_RISK else "doubtful"),
                     n_tokens=len(fragment.split()),
                     source="coverage",
                 )
@@ -1246,7 +1270,7 @@ def _token_metrics(labels: Sequence[int], flags: Sequence[bool], risks: Sequence
     return {
         "precision": precision,
         "recall": recall,
-        "f1": 2 * precision * recall / (precision + recall) if precision + recall else 0.0,
+        "f1": (2 * precision * recall / (precision + recall) if precision + recall else 0.0),
         "fpr": fp / (fp + tn) if fp + tn else 0.0,
         "tp": tp,
         "fp": fp,
@@ -1291,7 +1315,7 @@ def _answer_metrics(labels: Sequence[int], scores: Sequence[float], threshold: f
         "threshold": cut,
         "precision": precision,
         "recall": recall,
-        "f1": 2 * precision * recall / (precision + recall) if precision + recall else 0.0,
+        "f1": (2 * precision * recall / (precision + recall) if precision + recall else 0.0),
         "fpr": fp / (fp + tn) if fp + tn else 0.0,
         "auc": _auc(labels, scores),
         "tp": tp,
@@ -1359,7 +1383,7 @@ def _span_f1(
     return {
         "precision": precision,
         "recall": recall,
-        "f1": 2 * precision * recall / (precision + recall) if precision + recall else 0.0,
+        "f1": (2 * precision * recall / (precision + recall) if precision + recall else 0.0),
         "tp": tp,
         "fp": fp,
         "fn": fn,
@@ -1612,7 +1636,10 @@ def smooth_token_risks(risks, scored_mask):
     """Canonical full-sequence zero-mask and smoothing, shared with P2 OOF."""
     if len(risks) != len(scored_mask):
         raise ValueError("Risk/mask length mismatch")
-    return _smooth([float(r) if m else 0.0 for r, m in zip(risks, scored_mask, strict=False)], SMOOTH_WINDOW)
+    return _smooth(
+        [float(r) if m else 0.0 for r, m in zip(risks, scored_mask, strict=False)],
+        SMOOTH_WINDOW,
+    )
 
 
 def _token_payload(

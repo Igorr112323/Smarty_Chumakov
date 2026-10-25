@@ -328,7 +328,10 @@ class ParticipationModel:
         """Сохранить модель в JSON (ключ ``config/participation.json``)."""
         target = Path(path)
         target.parent.mkdir(parents=True, exist_ok=True)
-        target.write_text(json.dumps(self.to_dict(), ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+        target.write_text(
+            json.dumps(self.to_dict(), ensure_ascii=False, indent=2) + "\n",
+            encoding="utf-8",
+        )
         return target
 
     @classmethod
@@ -337,7 +340,12 @@ class ParticipationModel:
         return cls.from_dict(json.loads(Path(path).read_text(encoding="utf-8")))
 
 
-def _out_of_fold_auc(rows: Sequence[Sequence[float]], labels: Sequence[int], folds: int = 5, seed: int = 42) -> float:
+def _out_of_fold_auc(
+    rows: Sequence[Sequence[float]],
+    labels: Sequence[int],
+    folds: int = 5,
+    seed: int = 42,
+) -> float:
     """Честная AUC: кросс-валидация по строкам, без обучения на проверяемых."""
     if not rows or len(set(labels)) < 2:
         return 0.0
@@ -357,7 +365,11 @@ def _out_of_fold_auc(rows: Sequence[Sequence[float]], labels: Sequence[int], fol
         if not train_idx or not test_idx:
             continue
         model = train_logreg([normalized[i] for i in train_idx], [labels[i] for i in train_idx])
-        for index, probability in zip(test_idx, probabilities(model, [normalized[i] for i in test_idx]), strict=False):
+        for index, probability in zip(
+            test_idx,
+            probabilities(model, [normalized[i] for i in test_idx]),
+            strict=False,
+        ):
             scores[index] = probability
     return _auc(labels, scores)
 

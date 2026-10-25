@@ -71,7 +71,11 @@ def test_span_boundaries_are_valid() -> None:
     answer = "Срок хранения первичных документов составляет 3 года, а вторичных — 5 лет."
     result = Verifier().verify(answer, context)
     for span in result.spans:
-        assert 0 <= span.start < span.end <= len(answer), (span.start, span.end, len(answer))
+        assert 0 <= span.start < span.end <= len(answer), (
+            span.start,
+            span.end,
+            len(answer),
+        )
         assert span.text == answer[span.start : span.end].strip() or span.text in answer
 
 

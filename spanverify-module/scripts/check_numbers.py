@@ -44,7 +44,13 @@ HISTORY_DOCS = {
 NUMBERS_PATH = "reports/NUMBERS.json"
 
 # Единица измерения → вид числа, который проверяют шаблоны документов.
-NUMBERS_UNIT_KIND = {"F1": "token_f1", "FPR": "fpr", "AUC": "auc", "тестов": "tests", "%": "coverage"}
+NUMBERS_UNIT_KIND = {
+    "F1": "token_f1",
+    "FPR": "fpr",
+    "AUC": "auc",
+    "тестов": "tests",
+    "%": "coverage",
+}
 
 # Корень репозитория считаем от файла скрипта: запускать проверку можно из любого
 # каталога, и пути к документам всё равно указывают на репозиторий.
@@ -94,7 +100,10 @@ NUMBER_PATTERNS = (
 )
 
 TOLERANT_PATTERNS = (
-    (re.compile(r"покрыти\w*[^0-9\n]{0,25}(\d{1,3}(?:[.,]\d+)?)\s*%", re.IGNORECASE), "coverage"),
+    (
+        re.compile(r"покрыти\w*[^0-9\n]{0,25}(\d{1,3}(?:[.,]\d+)?)\s*%", re.IGNORECASE),
+        "coverage",
+    ),
     (re.compile(r"(\d{2,4})\s*(?:тест|кейс)"), "tests"),
     (re.compile(r"(\d+)\s+токен"), "tokens"),
 )
@@ -108,7 +117,8 @@ CI_MARKER = "аннотаци"
 # Числа рядом с этими словами — критерии и пороги, а не измерения: их сверять
 # с METRICS.json нельзя (например «token F1 ≥ 0.90 при FPR ≤ 0.10»).
 GUARD = re.compile(
-    r"[≥≤<>]|критери|порог|цель|минимум|максимум|не менее|не более|не меньше|не ниже|не выше", re.IGNORECASE
+    r"[≥≤<>]|критери|порог|цель|минимум|максимум|не менее|не более|не меньше|не ниже|не выше",
+    re.IGNORECASE,
 )
 
 
@@ -174,7 +184,14 @@ def _allowed(metrics: dict) -> dict[str, set[str]]:
                 if isinstance(spans.get(key), (int, float)):
                     f1_values.append(float(spans[key]))
             their = run.get("their") or {}
-            for key in ("accuracy", "jaccard_score", "hamming_loss", "rouge1", "rouge2", "rougeL"):
+            for key in (
+                "accuracy",
+                "jaccard_score",
+                "hamming_loss",
+                "rouge1",
+                "rouge2",
+                "rougeL",
+            ):
                 if isinstance(their.get(key), (int, float)):
                     f1_values.append(float(their[key]))
 
@@ -183,14 +200,22 @@ def _allowed(metrics: dict) -> dict[str, set[str]]:
         for block in corpus_a.get("by_split", {}).values():
             tokens = block.get("tokens") or {}
             verdicts = block.get("verdicts") or {}
-            for value in (tokens.get("f1"), tokens.get("precision"), tokens.get("recall")):
+            for value in (
+                tokens.get("f1"),
+                tokens.get("precision"),
+                tokens.get("recall"),
+            ):
                 if isinstance(value, (int, float)):
                     f1_values.append(float(value))
             if isinstance(tokens.get("fpr"), (int, float)):
                 fpr_values.append(float(tokens["fpr"]))
             if isinstance(tokens.get("auc"), (int, float)):
                 auc_values.append(float(tokens["auc"]))
-            for value in (verdicts.get("f1"), verdicts.get("precision"), verdicts.get("recall")):
+            for value in (
+                verdicts.get("f1"),
+                verdicts.get("precision"),
+                verdicts.get("recall"),
+            ):
                 if isinstance(value, (int, float)):
                     f1_values.append(float(value))
             if isinstance(verdicts.get("fpr"), (int, float)):
@@ -213,14 +238,22 @@ def _allowed(metrics: dict) -> dict[str, set[str]]:
         for block in corpus_a3.get("by_split", {}).values():
             tokens = block.get("tokens") or {}
             verdicts = block.get("verdicts") or {}
-            for value in (tokens.get("f1"), tokens.get("precision"), tokens.get("recall")):
+            for value in (
+                tokens.get("f1"),
+                tokens.get("precision"),
+                tokens.get("recall"),
+            ):
                 if isinstance(value, (int, float)):
                     f1_values.append(float(value))
             if isinstance(tokens.get("fpr"), (int, float)):
                 fpr_values.append(float(tokens["fpr"]))
             if isinstance(tokens.get("auc"), (int, float)):
                 auc_values.append(float(tokens["auc"]))
-            for value in (verdicts.get("f1"), verdicts.get("precision"), verdicts.get("recall")):
+            for value in (
+                verdicts.get("f1"),
+                verdicts.get("precision"),
+                verdicts.get("recall"),
+            ):
                 if isinstance(value, (int, float)):
                     f1_values.append(float(value))
             if isinstance(verdicts.get("fpr"), (int, float)):
@@ -246,10 +279,21 @@ def _allowed(metrics: dict) -> dict[str, set[str]]:
             if isinstance(block.get("auc"), (int, float)):
                 auc_values.append(float(block["auc"]))
         spans = ours.get("spans") or {}
-        for value in (spans.get("strict_f1_iou_0_5"), spans.get("coverage"), spans.get("soft_f1_expanded")):
+        for value in (
+            spans.get("strict_f1_iou_0_5"),
+            spans.get("coverage"),
+            spans.get("soft_f1_expanded"),
+        ):
             if isinstance(value, (int, float)):
                 f1_values.append(float(value))
-        for key in ("rouge1", "rouge2", "rougeL", "accuracy", "jaccard_score", "hamming_loss"):
+        for key in (
+            "rouge1",
+            "rouge2",
+            "rougeL",
+            "accuracy",
+            "jaccard_score",
+            "hamming_loss",
+        ):
             if isinstance(theirs.get(key), (int, float)):
                 f1_values.append(float(theirs[key]))
 
@@ -286,7 +330,13 @@ def _allowed(metrics: dict) -> dict[str, set[str]]:
                 if isinstance(spans.get(key), (int, float)):
                     f1_values.append(float(spans[key]))
         for row in (run.get("by_type_test") or {}).values():
-            for key in ("token_precision", "token_recall", "token_f1", "span_coverage", "verdict_recall"):
+            for key in (
+                "token_precision",
+                "token_recall",
+                "token_f1",
+                "span_coverage",
+                "verdict_recall",
+            ):
                 if isinstance(row.get(key), (int, float)):
                     f1_values.append(float(row[key]))
             if isinstance(row.get("verdict_fpr"), (int, float)):
@@ -328,7 +378,14 @@ def _allowed(metrics: dict) -> dict[str, set[str]]:
             if isinstance(spans.get(key), (int, float)):
                 f1_values.append(float(spans[key]))
         their = item.get("their") or {}
-        for key in ("accuracy", "jaccard_score", "hamming_loss", "rouge1", "rouge2", "rougeL"):
+        for key in (
+            "accuracy",
+            "jaccard_score",
+            "hamming_loss",
+            "rouge1",
+            "rouge2",
+            "rougeL",
+        ):
             if isinstance(their.get(key), (int, float)):
                 f1_values.append(float(their[key]))
 
@@ -342,7 +399,11 @@ def _allowed(metrics: dict) -> dict[str, set[str]]:
     }
     coverage = metrics.get("tests", {}).get("coverage_percent")
     if isinstance(coverage, (int, float)):
-        allowed["coverage"] = {f"{int(round(coverage))}", f"{round(coverage, 1):g}", f"{round(coverage, 2):g}"}
+        allowed["coverage"] = {
+            f"{int(round(coverage))}",
+            f"{round(coverage, 1):g}",
+            f"{round(coverage, 2):g}",
+        }
     tests = metrics.get("tests", {}).get("collected")
     if tests:
         allowed["tests"] = {str(tests)}
@@ -374,7 +435,11 @@ def _merge_numbers_registry(allowed: dict[str, set[str]], path: Path) -> int:
         if kind == "tests":
             allowed[kind].add(str(int(value)))
         elif kind == "coverage":
-            allowed[kind] |= {f"{int(round(value))}", f"{round(value, 1):g}", f"{round(value, 2):g}"}
+            allowed[kind] |= {
+                f"{int(round(value))}",
+                f"{round(value, 1):g}",
+                f"{round(value, 2):g}",
+            }
         else:
             allowed[kind] |= _roundings(float(value))
         merged += 1
@@ -507,7 +572,10 @@ def main() -> int:
     if not metrics_path.is_absolute():
         metrics_path = Path(__file__).resolve().parent.parent / metrics_path
     if not metrics_path.is_file():
-        print(f"нет файла чисел {metrics_path}: сначала запустите scripts/collect_metrics.py", file=sys.stderr)
+        print(
+            f"нет файла чисел {metrics_path}: сначала запустите scripts/collect_metrics.py",
+            file=sys.stderr,
+        )
         return 2
     metrics = json.loads(metrics_path.read_text(encoding="utf-8"))
 
@@ -517,7 +585,14 @@ def main() -> int:
         # Путь задаётся либо от текущего каталога, либо от корня репозитория:
         # скрипт запускают и из модуля, и из корня.
         numbers_path = repo_root / numbers_path
-    probe = {"token_f1": set(), "fpr": set(), "auc": set(), "coverage": set(), "tests": set(), "tokens": set()}
+    probe = {
+        "token_f1": set(),
+        "fpr": set(),
+        "auc": set(),
+        "coverage": set(),
+        "tests": set(),
+        "tokens": set(),
+    }
     merged = _merge_numbers_registry(probe, numbers_path)
     problems = check_docs(docs, metrics, repo_root=repo_root, numbers_path=numbers_path)
     if problems:

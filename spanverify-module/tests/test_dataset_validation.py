@@ -179,7 +179,12 @@ def test_zipapp_propagates_exit_codes(tmp_path: Path) -> None:
     )
 
     def run(*args: str) -> int:
-        return subprocess.run([sys.executable, str(pyz), *args], capture_output=True, text=True, timeout=120).returncode
+        return subprocess.run(
+            [sys.executable, str(pyz), *args],
+            capture_output=True,
+            text=True,
+            timeout=120,
+        ).returncode
 
     assert run("evaluate", "--dataset", str(foreign)) == EXIT_ERROR
     assert run("verify", "--answer", doubtful, "--context", context) == 1

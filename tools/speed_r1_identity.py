@@ -298,7 +298,10 @@ def main():
                     all_pass = False
                 b_results.append({"id": pair["id"], **cmp, "pass": ok})
             # R2: explicit scope for B — full corpus B not in repo per license, 50 is additional check
-            b_source = b_source + " — полный корпус B (RusHallu-RAG, 1000 пар) в репозитории не хранится по лицензионным причинам (см. P8/DEVIATIONS); внешний срез RAGTruth QA 50 использован как дополнительная проверка, а не как замена корпуса B"
+            b_source = (
+                b_source
+                + " — полный корпус B (RusHallu-RAG, 1000 пар) в репозитории не хранится по лицензионным причинам (см. P8/DEVIATIONS); внешний срез RAGTruth QA 50 использован как дополнительная проверка, а не как замена корпуса B"
+            )
             overall[mode + "_B"] = {
                 "pairs": len(b_pairs),
                 "source": b_source,
@@ -313,14 +316,16 @@ def main():
         else:
             overall[mode + "_B"] = {
                 "pairs": 0,
-                "source": b_source + " — полный корпус B (RusHallu-RAG, 1000 пар) в репозитории не хранится по лицензионным причинам (см. P8/DEVIATIONS); внешний срез RAGTruth QA 50 использован как дополнительная проверка, а не как замена корпуса B",
+                "source": b_source
+                + " — полный корпус B (RusHallu-RAG, 1000 пар) в репозитории не хранится по лицензионным причинам (см. P8/DEVIATIONS); внешний срез RAGTruth QA 50 использован как дополнительная проверка, а не как замена корпуса B",
                 "pass": None,
                 "note": "Полный корпус B (RusHallu-RAG, 1000 пар) в репозитории не хранится по лицензионным причинам (см. P8/DEVIATIONS); внешний срез RAGTruth QA 50 использован как дополнительная проверка, а не как замена корпуса B. Dev181 — authoritative gate для HF.",
                 "skipped": True,
             }
 
     # R2/R3: run_id from CI env, date today, no historical stamp on current receipts
-    import datetime, os
+    import datetime
+    import os
 
     run_id = os.environ.get("GITHUB_RUN_ID", get_sha()[:12])
     # ensure run_id is numeric >1B for hygiene; fallback to sha-based numeric

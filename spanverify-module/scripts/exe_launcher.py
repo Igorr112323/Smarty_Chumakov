@@ -42,7 +42,11 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--mode", choices=["demo", "hf"], default="demo")
     parser.add_argument("--weights", default="config/weights.json")
     parser.add_argument("--model", default=None)
-    parser.add_argument("--runtime-dir", default=None, help="Portable external Python libraries directory (HF only)")
+    parser.add_argument(
+        "--runtime-dir",
+        default=None,
+        help="Portable external Python libraries directory (HF only)",
+    )
     parser.add_argument("--no-browser", action="store_true")
     parser.add_argument("--quiet", action="store_true")
     parser.add_argument(
@@ -59,7 +63,11 @@ def main(argv: list[str] | None = None) -> int:
         # HF's external runtime includes optional stdlib modules deliberately
         # absent from the small frozen demo executable (e.g. unittest/pydoc).
         # These come from the portable matching Python, never host registry.
-        for path in (libraries.parent / "python" / "DLLs", libraries.parent / "python" / "Lib", libraries):
+        for path in (
+            libraries.parent / "python" / "DLLs",
+            libraries.parent / "python" / "Lib",
+            libraries,
+        ):
             if path.is_dir():
                 sys.path.insert(0, str(path))
         # Native abi3 extensions (tokenizers) need portable python3.dll/MSVC,
@@ -96,7 +104,14 @@ def main(argv: list[str] | None = None) -> int:
             webbrowser.open(f"http://127.0.0.1:{port}")
         except Exception:  # noqa: BLE001 - в среде без браузера это не ошибка
             pass
-    serve(host=args.host, port=port, mode=args.mode, weights_path=args.weights, model_name=args.model, quiet=args.quiet)
+    serve(
+        host=args.host,
+        port=port,
+        mode=args.mode,
+        weights_path=args.weights,
+        model_name=args.model,
+        quiet=args.quiet,
+    )
     return 0
 
 

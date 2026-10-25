@@ -195,7 +195,9 @@ def test_metrics_file_is_not_behind_the_suite(request: pytest.FixtureRequest) ->
     )
 
 
-def test_document_test_claims_match_this_session(request: pytest.FixtureRequest) -> None:
+def test_document_test_claims_match_this_session(
+    request: pytest.FixtureRequest,
+) -> None:
     """Заявленное в документах число тестов совпадает с собранным в этом прогоне.
 
     Документы (README, ИТОГ, отчёт о НИР, руководство) называют число тестов
@@ -243,7 +245,12 @@ def _make_fake_metrics() -> dict:
         "meta": {"version": "1.2.0"},
         "tests": {"collected": 226, "coverage_percent": 86.0},
         "demo": {
-            "split": {"grouped": True, "shared_groups": 0, "train_pairs": 168, "test_pairs": 72},
+            "split": {
+                "grouped": True,
+                "shared_groups": 0,
+                "train_pairs": 168,
+                "test_pairs": 72,
+            },
             "in_corpus": {
                 "tokens": {"f1": 0.953, "fpr": 0.002, "auc": 0.996, "n": 594},
                 "spans": {"strict_f1": 0.28, "soft_f1": 1.0, "coverage": 1.0},
@@ -257,7 +264,11 @@ def _make_fake_metrics() -> dict:
             "validation": {"f1": 0.953, "fpr": 0.002, "auc": 0.996},
             "participation": {"auc_out_of_fold": 1.0, "rows": 8179},
         },
-        "cross_corpus": {"in_corpus_f1": 0.953, "cross_corpus_f1": 0.731, "cross_fpr": 0.144},
+        "cross_corpus": {
+            "in_corpus_f1": 0.953,
+            "cross_corpus_f1": 0.731,
+            "cross_fpr": 0.144,
+        },
         "pilot": None,
     }
 

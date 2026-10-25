@@ -56,7 +56,12 @@ def test_document_lists_every_workflow(request: pytest.FixtureRequest) -> None:
     links = re.findall(r"\]\(([^\s)]+)\)", readme)
     downloads = {
         f"https://github.com/Igorr112323/Smarty_Chumakov/releases/latest/download/{asset}"
-        for asset in ("spanverify.exe", "spanverify.pyz", "spanverify-win.zip", "SHA256SUMS.txt")
+        for asset in (
+            "spanverify.exe",
+            "spanverify.pyz",
+            "spanverify-win.zip",
+            "SHA256SUMS.txt",
+        )
     }
     assert downloads <= set(links), "README: отсутствует стабильная ссылка скачивания"
     assert readme.index("## Скачать для Windows") < len(readme) // 3
@@ -153,7 +158,9 @@ def test_windows_rc_keeps_strict_size_and_frozen_packaging_contract() -> None:
     assert 'if ((-not $sizes["exe_ok"]) -or (-not $sizes["pyz_ok"]))' in build
     assert "spanverify train" not in build and "git push" not in build
     assert "--prerelease" in build and "--latest=false" in build
-    assert "spanverify-module/reports/experiments/** -text" in (REPO_ROOT / ".gitattributes").read_text(encoding="utf-8")
+    assert "spanverify-module/reports/experiments/** -text" in (REPO_ROOT / ".gitattributes").read_text(
+        encoding="utf-8"
+    )
     spec = (MODULE_ROOT / "spanverify.spec").read_text(encoding="utf-8")
     assert 'ROOT / "data"' not in spec  # Server never needs embedded training corpora.
     assert '--add-data "data/' not in build

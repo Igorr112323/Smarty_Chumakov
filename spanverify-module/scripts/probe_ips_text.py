@@ -48,7 +48,10 @@ def fetch(url: str, timeout: int = 90, read_limit: int = 800_000) -> dict:
     """Запрос к cp1251-сайту ИПС с декодированием."""
     request = urllib.request.Request(
         url,
-        headers={"User-Agent": USER_AGENT, "Accept": "text/html, application/json, */*"},
+        headers={
+            "User-Agent": USER_AGENT,
+            "Accept": "text/html, application/json, */*",
+        },
     )
     try:
         with urllib.request.urlopen(request, timeout=timeout) as response:  # noqa: S310 - официальный публичный сайт
@@ -60,7 +63,14 @@ def fetch(url: str, timeout: int = 90, read_limit: int = 800_000) -> dict:
         status = int(error.code)
         content_type = error.headers.get("Content-Type", "") if error.headers else ""
     except (urllib.error.URLError, TimeoutError, OSError) as error:
-        return {"url": url, "status": None, "content_type": "", "bytes": 0, "html": "", "error": str(error)[:140]}
+        return {
+            "url": url,
+            "status": None,
+            "content_type": "",
+            "bytes": 0,
+            "html": "",
+            "error": str(error)[:140],
+        }
     html_text = raw.decode("cp1251", "replace")
     return {
         "url": url,
@@ -149,7 +159,10 @@ def main() -> int:
         ("searchres-a0", f"{PRAVO}/proxy/ips/?searchres=1&a0={query}"),
         ("a0-only", f"{PRAVO}/proxy/ips/?a0={query}"),
         ("searchres-a0-a1", f"{PRAVO}/proxy/ips/?searchres=1&a0={query}&a1=1"),
-        ("searchres-a0-a16", f"{PRAVO}/proxy/ips/?searchres=1&a0={query}&a16=1&a16type=1&a16value={query}"),
+        (
+            "searchres-a0-a16",
+            f"{PRAVO}/proxy/ips/?searchres=1&a0={query}&a16=1&a16type=1&a16value={query}",
+        ),
     ):
         result = fetch(url)
         text = visible_text(result["html"])

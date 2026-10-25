@@ -10,7 +10,13 @@ import pytest
 from spanverify.core import SpanResult, tokenize_with_offsets
 from spanverify.engine import Verifier, WeightsBundle
 from spanverify.features import FEATURE_NAMES, FeatureMatrix, is_scored_token
-from spanverify.span_filter import FEATURES, build_candidates, feature_vector, filter_candidates, validate_filter
+from spanverify.span_filter import (
+    FEATURES,
+    build_candidates,
+    feature_vector,
+    filter_candidates,
+    validate_filter,
+)
 
 
 def config(bridge=1, seed=1, threshold=0):
@@ -29,7 +35,10 @@ def config(bridge=1, seed=1, threshold=0):
     )
 
 
-@pytest.mark.parametrize("text,risks", [("", []), ("слово", [0.9]), ("слово", [0.1]), ("слово, тест", [0.8, 0.0, 0.7])])
+@pytest.mark.parametrize(
+    "text,risks",
+    [("", []), ("слово", [0.9]), ("слово", [0.1]), ("слово, тест", [0.8, 0.0, 0.7])],
+)
 @pytest.mark.parametrize("bridge", [0, 1, 2])
 def test_candidate_edges_finite_deterministic(text, risks, bridge):
     ts = tokenize_with_offsets(text)
@@ -74,7 +83,13 @@ def test_empty_is_authoritative_and_rules_unfiltered():
     candidates = build_candidates(text, ts, [0.9], [True], c["generator"], 0.5)
     assert filter_candidates(text, ts, candidates, c) == (set(), [])
     rule = SpanResult(
-        start=0, end=5, text=text, risk=0.9, label="doubtful", source="attribution", sources=("attribution",)
+        start=0,
+        end=5,
+        text=text,
+        risk=0.9,
+        label="doubtful",
+        source="attribution",
+        sources=("attribution",),
     )
     flags, spans = filter_candidates(text, ts, candidates, c, [rule])
     assert flags == {0} and spans[0].source == "attribution"

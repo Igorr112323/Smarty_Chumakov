@@ -47,7 +47,8 @@ def adapted_dir(tmp_path_factory: pytest.TempPathFactory) -> Path:
     ]
     pairs, _stats = ragtruth_pairs(responses, sources, task="QA", split="test")
     (adapted / "ragtruth_qa_test.jsonl").write_text(
-        "".join(json.dumps(pair, ensure_ascii=False) + "\n" for pair in pairs), encoding="utf-8"
+        "".join(json.dumps(pair, ensure_ascii=False) + "\n" for pair in pairs),
+        encoding="utf-8",
     )
     return out
 
@@ -80,7 +81,13 @@ def test_registry_contains_control_numbers() -> None:
 def test_registry_records_excluded_datasets_with_reasons() -> None:
     """Отказ от наборов зафиксирован в коде с причиной, а не остался в переписке."""
     excluded = fetcher.EXCLUDED
-    for name in ("HaDes", "HDM-Bench", "FAVA", "AlsKozlov/legalbench-ru", "Roflmax/Ru-Legal-QA-v1"):
+    for name in (
+        "HaDes",
+        "HDM-Bench",
+        "FAVA",
+        "AlsKozlov/legalbench-ru",
+        "Roflmax/Ru-Legal-QA-v1",
+    ):
         assert name in excluded and excluded[name]
     assert "reference-free" in excluded["HaDes"]
     assert "некоммерческая" in excluded["HDM-Bench"]
@@ -278,12 +285,22 @@ def test_annotation_prints_control_numbers_and_metrics(tmp_path: Path, capsys: p
                     "ragtruth": {
                         "revision": "c103204b9ce2",
                         "files": {"response.jsonl": {"verified": True}},
-                        "totals": {"responses": 17790, "sources": 2965, "spans": 14289, "verified_spans": 14289},
+                        "totals": {
+                            "responses": 17790,
+                            "sources": 2965,
+                            "spans": 14289,
+                            "verified_spans": 14289,
+                        },
                     },
                     "rushallu": {
                         "revision": "345907f983da",
                         "files": {"sberquad-rag.csv": {"verified": True}},
-                        "totals": {"responses": 1000, "clean": 667, "with_hallucination": 333, "spans": 423},
+                        "totals": {
+                            "responses": 1000,
+                            "clean": 667,
+                            "with_hallucination": 333,
+                            "spans": 423,
+                        },
                     },
                 }
             },

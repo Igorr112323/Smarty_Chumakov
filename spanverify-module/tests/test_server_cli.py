@@ -71,7 +71,11 @@ def post(url: str, payload: dict) -> tuple[int, dict, dict]:
         method="POST",
     )
     with urllib.request.urlopen(request, timeout=20) as response:
-        return response.status, json.loads(response.read().decode("utf-8")), dict(response.headers)
+        return (
+            response.status,
+            json.loads(response.read().decode("utf-8")),
+            dict(response.headers),
+        )
 
 
 # ------------------------------------------------------------------ сервис
@@ -90,7 +94,15 @@ def test_service_health_reports_mode_and_version(service):
 def test_service_config_exposes_weights_schema(service):
     """Конфигурация отдаёт схему весов контракта и источник параметров."""
     config = service.config()
-    assert set(config) >= {"weights", "threshold", "target_fpr", "isotonic", "head", "seed", "version"}
+    assert set(config) >= {
+        "weights",
+        "threshold",
+        "target_fpr",
+        "isotonic",
+        "head",
+        "seed",
+        "version",
+    }
     assert config["runtime"]["mode"] == "demo"
     assert config["runtime"]["weights_source"] in {"disk", "embedded", "defaults"}
 
@@ -272,7 +284,16 @@ def test_cli_verify_accepts_files(tmp_path, capsys):
     context_file = tmp_path / "context.txt"
     answer_file.write_text(ANSWER_FALSE, encoding="utf-8")
     context_file.write_text(CONTEXT, encoding="utf-8")
-    code = main(["verify", "--answer-file", str(answer_file), "--context-file", str(context_file), "--json"])
+    code = main(
+        [
+            "verify",
+            "--answer-file",
+            str(answer_file),
+            "--context-file",
+            str(context_file),
+            "--json",
+        ]
+    )
     assert code == EXIT_ISSUES
     assert json.loads(capsys.readouterr().out)["spans"]
 
@@ -355,7 +376,17 @@ def test_cli_train_without_dataset_is_error(tmp_path, capsys):
 
 def test_cli_demo_runs_end_to_end(tmp_path, capsys):
     """CLI: демонстрационный прогон обучается и печатает итог."""
-    code = main(["demo", "--pairs", "50", "--dataset", str(tmp_path / "demo.jsonl"), "--folds", "2"])
+    code = main(
+        [
+            "demo",
+            "--pairs",
+            "50",
+            "--dataset",
+            str(tmp_path / "demo.jsonl"),
+            "--folds",
+            "2",
+        ]
+    )
     output = capsys.readouterr().out
     assert code == EXIT_OK
     assert "демо-числа" in output.lower() or "Демо-числа" in output

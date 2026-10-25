@@ -49,7 +49,10 @@ def fetch(url: str, timeout: int = 90, read_limit: int = 400_000) -> dict:
     """Запрос с сохранением тела и статуса."""
     request = urllib.request.Request(
         url,
-        headers={"User-Agent": USER_AGENT, "Accept": "application/json, text/html, image/svg+xml, */*"},
+        headers={
+            "User-Agent": USER_AGENT,
+            "Accept": "application/json, text/html, image/svg+xml, */*",
+        },
     )
     try:
         with urllib.request.urlopen(request, timeout=timeout) as response:  # noqa: S310 - официальный публичный сайт
@@ -67,13 +70,20 @@ def fetch(url: str, timeout: int = 90, read_limit: int = 400_000) -> dict:
         return {
             "url": url,
             "status": int(error.code),
-            "content_type": error.headers.get("Content-Type", "") if error.headers else "",
+            "content_type": (error.headers.get("Content-Type", "") if error.headers else ""),
             "bytes": len(raw),
             "error": f"HTTP {error.code}",
             "raw": raw,
         }
     except (urllib.error.URLError, TimeoutError, OSError) as error:
-        return {"url": url, "status": None, "content_type": "", "bytes": 0, "error": str(error)[:140], "raw": b""}
+        return {
+            "url": url,
+            "status": None,
+            "content_type": "",
+            "bytes": 0,
+            "error": str(error)[:140],
+            "raw": b"",
+        }
 
 
 def svg_stats(raw: bytes) -> dict:
@@ -94,13 +104,30 @@ def ocr_pdf(raw: bytes, pages: int = 2, dpi: int = 200) -> dict:
     """Распознать первые страницы PDF через pdftoppm + tesseract (русский)."""
     tools = {name: shutil.which(name) for name in ("pdftoppm", "tesseract")}
     if not all(tools.values()):
-        return {"available": False, "tools": tools, "chars": None, "seconds": None, "text_head": ""}
+        return {
+            "available": False,
+            "tools": tools,
+            "chars": None,
+            "seconds": None,
+            "text_head": "",
+        }
     with tempfile.TemporaryDirectory() as tmp:
         pdf_path = Path(tmp) / "doc.pdf"
         pdf_path.write_bytes(raw)
         started = time.perf_counter()
         subprocess.run(  # noqa: S603 - фиксированные аргументы, входной файл наш
-            ["pdftoppm", "-r", str(dpi), "-png", "-f", "1", "-l", str(pages), str(pdf_path), str(Path(tmp) / "page")],
+            [
+                "pdftoppm",
+                "-r",
+                str(dpi),
+                "-png",
+                "-f",
+                "1",
+                "-l",
+                str(pages),
+                str(pdf_path),
+                str(Path(tmp) / "page"),
+            ],
             check=False,
             capture_output=True,
         )
@@ -128,7 +155,12 @@ def main() -> int:
     parser = argparse.ArgumentParser(description="Разведка текстовых версий (SVG, ИПС, OCR)")
     parser.add_argument("--out", type=Path, default=ROOT / "reports" / "npa_svg_probe.json")
     parser.add_argument("--pause", type=float, default=PAUSE_SECONDS)
-    parser.add_argument("--pages", type=int, default=6, help="сколько страниц выдачи просмотреть на hasSvg")
+    parser.add_argument(
+        "--pages",
+        type=int,
+        default=6,
+        help="сколько страниц выдачи просмотреть на hasSvg",
+    )
     args = parser.parse_args()
 
     # 1. Доля документов с hasSvg и первый такой документ.
@@ -148,7 +180,15 @@ def main() -> int:
                     svg_true.append(
                         {
                             k: item.get(k)
-                            for k in ("eoNumber", "id", "name", "number", "documentDate", "pagesCount", "hasSvg")
+                            for k in (
+                                "eoNumber",
+                                "id",
+                                "name",
+                                "number",
+                                "documentDate",
+                                "pagesCount",
+                                "hasSvg",
+                            )
                         }
                     )
                 counters["has_svg_true"] += 1
@@ -162,7 +202,11 @@ def main() -> int:
         view = fetch(f"{BASE}/document/{eo}")
         links = re.findall(r'href="([^"]+)"', view["raw"].decode("utf-8", "replace"))
         marker = [href for href in links if re.search(r"(?i)svg|file|pdf", href)]
-        svg_probe["view_page"] = {"eoNumber": eo, "status": view["status"], "marker_links": marker[:15]}
+        svg_probe["view_page"] = {
+            "eoNumber": eo,
+            "status": view["status"],
+            "marker_links": marker[:15],
+        }
         print(f"view {eo}: ссылки {marker[:5]}")
         time.sleep(max(0.0, args.pause))
         for name, url in (

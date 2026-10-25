@@ -36,7 +36,12 @@ class AiShareCalibrator:
             while len(blocks) > 1 and blocks[-2][1] / blocks[-2][2] > blocks[-1][1] / blocks[-1][2]:
                 b, a = blocks.pop(), blocks.pop()
                 blocks.append([b[0], a[1] + b[1], a[2] + b[2]])
-        return cls(tuple(b[0] for b in blocks), tuple(b[1] / b[2] for b in blocks), mode, bundle_sha256)
+        return cls(
+            tuple(b[0] for b in blocks),
+            tuple(b[1] / b[2] for b in blocks),
+            mode,
+            bundle_sha256,
+        )
 
     def transform(self, score):
         if not math.isfinite(score) or not 0 <= score <= 1:
@@ -46,7 +51,10 @@ class AiShareCalibrator:
     def to_dict(self):
         return {
             self.schema: dict(
-                upper=list(self.upper), values=list(self.values), mode=self.mode, bundle_sha256=self.bundle_sha256
+                upper=list(self.upper),
+                values=list(self.values),
+                mode=self.mode,
+                bundle_sha256=self.bundle_sha256,
             )
         }
 

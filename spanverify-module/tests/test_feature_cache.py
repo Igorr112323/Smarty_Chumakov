@@ -59,7 +59,10 @@ def test_list_context_matches_joined_string() -> None:
 
 def test_cache_hit_returns_the_cached_matrix() -> None:
     """Попадание в кеш отдаёт ровно то, что туда положили, без пересчёта."""
-    answer, context = "Срок хранения — пять лет", "Приказ № 1. Срок хранения первичных документов — пять лет."
+    answer, context = (
+        "Срок хранения — пять лет",
+        "Приказ № 1. Срок хранения первичных документов — пять лет.",
+    )
     key = feature_cache_key(answer, context, "demo", "")
     planted = FeatureMatrix(
         attention_entropy=[0.1, 0.2],
@@ -101,10 +104,19 @@ def test_global_cache_registry_round_trip() -> None:
 
 def test_global_cache_is_used_without_explicit_argument() -> None:
     """Явный параметр недоступен из train(), поэтому работает реестр."""
-    answer, context = "Срок хранения — пять лет", "Приказ № 1. Срок хранения — пять лет."
+    answer, context = (
+        "Срок хранения — пять лет",
+        "Приказ № 1. Срок хранения — пять лет.",
+    )
     key = feature_cache_key(answer, context, "demo", "")
     set_feature_cache(
-        {key: FeatureMatrix(attention_entropy=[0.42], ctx_attention_mass=[0.42], embedding_density=[0.42])}
+        {
+            key: FeatureMatrix(
+                attention_entropy=[0.42],
+                ctx_attention_mass=[0.42],
+                embedding_density=[0.42],
+            )
+        }
     )
     result = extract_features(answer, context, mode="demo")
     assert result.attention_entropy == [0.42]
@@ -136,7 +148,10 @@ def test_load_feature_cache_merges_shards(tmp_path) -> None:
 def test_load_feature_cache_ignores_blank_lines_and_missing(tmp_path) -> None:
     """Пустые строки и отсутствующие пути не роняют загрузку."""
     shard = tmp_path / "features_all.jsonl"
-    shard.write_text('{"key": "k1", "ctx_attention_mass": [0.5]}\n\n{"key": "k2"}\n', encoding="utf-8")
+    shard.write_text(
+        '{"key": "k1", "ctx_attention_mass": [0.5]}\n\n{"key": "k2"}\n',
+        encoding="utf-8",
+    )
     cache = load_feature_cache([str(shard), str(tmp_path / "нет такого.jsonl")])
     assert sorted(cache) == ["k1", "k2"]
     assert cache["k2"].ctx_attention_mass == []

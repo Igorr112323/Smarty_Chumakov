@@ -75,7 +75,8 @@ def _workflow(name: str, path: Path) -> dict:
                 "timeout_minutes": job.get("timeout-minutes"),
                 "steps": len(steps),
                 "uploads_artifacts": any(
-                    str(step.get("uses") or "").startswith("actions/upload-artifact") for step in steps
+                    str(step.get("uses") or "").startswith("actions/upload-artifact")
+                    for step in steps
                 ),
                 "runs_python": str(job.get("runs-on") or ""),
             }
@@ -90,8 +91,11 @@ def _workflow(name: str, path: Path) -> dict:
         "push_branches": push_branches,
         "push_tags": push_tags,
         "jobs": jobs,
-        "manual_only": triggers == ["workflow_dispatch"] or set(triggers) == {"push", "workflow_dispatch"},
-        "never_runs_by_itself": "schedule" not in triggers and "push" not in triggers and "pull_request" not in triggers,
+        "manual_only": triggers == ["workflow_dispatch"]
+        or set(triggers) == {"push", "workflow_dispatch"},
+        "never_runs_by_itself": "schedule" not in triggers
+        and "push" not in triggers
+        and "pull_request" not in triggers,
     }
 
 
@@ -139,7 +143,9 @@ def render_doc(payload: dict, last_runs: dict[str, dict]) -> str:
     ]
     registry = payload["registry"]
     for item in payload["workflows"]:
-        how = ", ".join(SCHEDULE_WORDS.get(trigger, trigger) for trigger in item["triggers"])
+        how = ", ".join(
+            SCHEDULE_WORDS.get(trigger, trigger) for trigger in item["triggers"]
+        )
         if item["schedule"]:
             how += " (" + ", ".join(item["schedule"]) + " UTC)"
         if item["push_paths"]:
@@ -147,8 +153,12 @@ def render_doc(payload: dict, last_runs: dict[str, dict]) -> str:
         if item["push_tags"]:
             how += "; теги " + ", ".join(f"`{tag}`" for tag in item["push_tags"])
         if item["push_branches"]:
-            how += "; ветки " + ", ".join(f"`{branch}`" for branch in item["push_branches"])
-        artifacts = "да" if any(job["uploads_artifacts"] for job in item["jobs"]) else "нет"
+            how += "; ветки " + ", ".join(
+                f"`{branch}`" for branch in item["push_branches"]
+            )
+        artifacts = (
+            "да" if any(job["uploads_artifacts"] for job in item["jobs"]) else "нет"
+        )
         run = last_runs.get(item["name"])
         if item["name"] in registry:
             numbers = registry[item["name"]]
@@ -209,9 +219,11 @@ def main() -> int:
     runs = _last_runs()
     payload = {
         "kind": "ci_workflows",
-        "runs_considered": len(json.loads(RUNS.read_text(encoding="utf-8")).get("runs") or [])
-        if RUNS.is_file()
-        else 0,
+        "runs_considered": (
+            len(json.loads(RUNS.read_text(encoding="utf-8")).get("runs") or [])
+            if RUNS.is_file()
+            else 0
+        ),
         "generated_at": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
         "command": "python scripts/collect_ci_workflows.py",
         "source": ".github/workflows/*.yml + reports/CI_RUNS.json",
@@ -226,7 +238,9 @@ def main() -> int:
     }
     out_json = ROOT / args.out_json
     out_json.parent.mkdir(parents=True, exist_ok=True)
-    out_json.write_text(json.dumps(payload, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    out_json.write_text(
+        json.dumps(payload, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
+    )
 
     doc = render_doc(payload, runs)
     out_doc = ROOT / args.out_doc

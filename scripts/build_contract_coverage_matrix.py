@@ -23,7 +23,10 @@ def main():
                 "status": status,
                 "scope": "current P5 candidate; historical evidence is explicitly qualified",
                 "note": note,
-                "evidence": [{"path": f, "url": f"{URL}/blob/arena/c5f69767-smarty-chumakov/{f}"} for f in files],
+                "evidence": [
+                    {"path": f, "url": f"{URL}/blob/arena/c5f69767-smarty-chumakov/{f}"}
+                    for f in files
+                ],
             }
         )
 
@@ -120,7 +123,11 @@ def main():
             "reports/contract/4.1.7-performance.json",
             P5 + "/manifest.json",
         )
-    for id_, text in [("cli", "CLI interface"), ("web", "Web interface on port8765"), ("http", "HTTP API")]:
+    for id_, text in [
+        ("cli", "CLI interface"),
+        ("web", "Web interface on port8765"),
+        ("http", "HTTP API"),
+    ]:
         row(
             id_,
             text,
@@ -194,7 +201,9 @@ def main():
             "Historical guide sections checked; no P5 end-user usability acceptance artifact.",
         ),
     ]:
-        row(id_, requirement, "частично", note, "reports/contract/" + artifact + ".json")
+        row(
+            id_, requirement, "частично", note, "reports/contract/" + artifact + ".json"
+        )
     for id_, text in [
         ("number", "Robustness: numeric substitutions"),
         ("contradiction", "Robustness: contradiction"),
@@ -224,11 +233,24 @@ def main():
         if missing:
             r["status"] = "не достигнут"
             r["note"] += " Missing evidence: " + ", ".join(missing)
-        r["current_run"] = f"{URL}/actions/runs/{RUN}" if any(e["path"].startswith(P5) for e in r["evidence"]) else None
+        r["current_run"] = (
+            f"{URL}/actions/runs/{RUN}"
+            if any(e["path"].startswith(P5) for e in r["evidence"])
+            else None
+        )
     for r in rows:
-        if r["id"] in {"metric_groups", "quality_gate", "dev_tokens_gate", "dev_spans_gate"}:
-            r["scope"] = "historical frozen P5 legacy512; not re-evaluated P7 long-v1 quality"
-            r["note"] += " Historical P5 metric, not a new P7 long-path quality evaluation."
+        if r["id"] in {
+            "metric_groups",
+            "quality_gate",
+            "dev_tokens_gate",
+            "dev_spans_gate",
+        }:
+            r["scope"] = (
+                "historical frozen P5 legacy512; not re-evaluated P7 long-v1 quality"
+            )
+            r[
+                "note"
+            ] += " Historical P5 metric, not a new P7 long-path quality evaluation."
     payload = {
         "as_of": "2026-10-19",
         "source": "User-specified Appendix3 requirements; evidence only, no invented acceptance",
@@ -247,7 +269,9 @@ def main():
     if overlay_path.exists():
         overlay = json.loads(overlay_path.read_text(encoding="utf-8"))
         known = {r["id"]: r for r in rows}
-        assert len({r["id"] for r in overlay["requirements"]}) == len(overlay["requirements"])
+        assert len({r["id"] for r in overlay["requirements"]}) == len(
+            overlay["requirements"]
+        )
         for update in overlay["requirements"]:
             assert update["id"] in known
             assert update["evidence"] and update["note"] and update["current_run"]
@@ -267,26 +291,129 @@ def main():
             "control_sample": "A3 1200 pairs: immutable train842/dev181/test177 document split; official177 now evaluated. Historical unsplit fixture-read incident and train-only guard retained; no claim test was never exposed.",
             "spans": "Official strict kept-spans+rules:47TP38FP50FN, IoU>=.5 unchanged, containment .2886597938, mean contained width1.33926249.",
         }.items():
-            known[id_].update(status="достигнут" if official["joint_gate"] else "не достигнут",scope="P8 official held-out measurement; frozen P7 product",note=note,evidence=[dict(path=evidence_path,url=f"{URL}/blob/arena/c5f69767-smarty-chumakov/{evidence_path}"),dict(path="reports/FINAL_REPORT.md",url=f"{URL}/blob/arena/c5f69767-smarty-chumakov/reports/FINAL_REPORT.md")],current_run=run_url)
-        payload.update(run_id="39266451529",date="2026-10-19",current_measurement_run=run_url,official_test_evaluated=True,official_test_read_scope="P8 authorized final evaluation177; prior legacy read and zero-output infrastructure abort explicitly retained",tests_excluded=False,p8_official_metrics=official["metrics"],p8_joint_gate=official["joint_gate"],current_indices=["reports/EXPERIMENTS_INDEX.md","reports/contract/coverage-matrix.json"])
+            known[id_].update(
+                status="достигнут" if official["joint_gate"] else "не достигнут",
+                scope="P8 official held-out measurement; frozen P7 product",
+                note=note,
+                evidence=[
+                    dict(
+                        path=evidence_path,
+                        url=f"{URL}/blob/arena/c5f69767-smarty-chumakov/{evidence_path}",
+                    ),
+                    dict(
+                        path="reports/FINAL_REPORT.md",
+                        url=f"{URL}/blob/arena/c5f69767-smarty-chumakov/reports/FINAL_REPORT.md",
+                    ),
+                ],
+                current_run=run_url,
+            )
+        payload.update(
+            run_id="39266451529",
+            date="2026-10-19",
+            current_measurement_run=run_url,
+            official_test_evaluated=True,
+            official_test_read_scope="P8 authorized final evaluation177; prior legacy read and zero-output infrastructure abort explicitly retained",
+            tests_excluded=False,
+            p8_official_metrics=official["metrics"],
+            p8_joint_gate=official["joint_gate"],
+            current_indices=[
+                "reports/EXPERIMENTS_INDEX.md",
+                "reports/contract/coverage-matrix.json",
+            ],
+        )
         external = ROOT / "reports/p8/run39266451529/external/result.json"
         if external.exists():
-            payload["external_validation"] = dict(pairs=1000,contract_gate=False,metrics=json.loads(external.read_text())["metrics"],evidence=str(external.relative_to(ROOT)),limitation="423 human exact spans/333positive answers; one first-match ambiguity; raw license unconfirmed; severe transfer drop published")
+            payload["external_validation"] = dict(
+                pairs=1000,
+                contract_gate=False,
+                metrics=json.loads(external.read_text())["metrics"],
+                evidence=str(external.relative_to(ROOT)),
+                limitation="423 human exact spans/333positive answers; one first-match ambiguity; raw license unconfirmed; severe transfer drop published",
+            )
         delivery = ROOT / "reports/p8/DELIVERY.json"
         if delivery.exists():
             payload["delivery"] = json.loads(delivery.read_text())
             delivery_info = payload["delivery"]
             if delivery_info.get("publication_conclusion") == "success":
-                payload["publication"] = dict(run=delivery_info["publication_run"],status="success",release=delivery_info["release_url"],prerelease=True,latest=False,archive_sha256=delivery_info["archive_sha256"],archive_bytes=delivery_info["archive_bytes"],evidence=delivery_info["publication_evidence"])
-                known["control_sample"].update(scope="P8 actual official177 and external human B1000, NOT a B quality gate",note="Immutable A3 train842/dev181/test177, official177 measured once. External B1000 unique human pairs,333positive answers/423exact spans, all supported families measured; severe token/span transfer drop published. No B selection/training; one ambiguous first match/license unconfirmed. Historical official-file exposure disclosed.",evidence=[dict(path="reports/p8/run39266451529/external/result.json",url=f"{URL}/blob/arena/c5f69767-smarty-chumakov/reports/p8/run39266451529/external/result.json"),dict(path="reports/p8/run39266451529/external/aggregation-integrity.json",url=f"{URL}/blob/arena/c5f69767-smarty-chumakov/reports/p8/run39266451529/external/aggregation-integrity.json")])
-            payload["execution_freeze_status"] = delivery_info.get("execution_freeze_status", "unrecorded")
+                payload["publication"] = dict(
+                    run=delivery_info["publication_run"],
+                    status="success",
+                    release=delivery_info["release_url"],
+                    prerelease=True,
+                    latest=False,
+                    archive_sha256=delivery_info["archive_sha256"],
+                    archive_bytes=delivery_info["archive_bytes"],
+                    evidence=delivery_info["publication_evidence"],
+                )
+                known["control_sample"].update(
+                    scope="P8 actual official177 and external human B1000, NOT a B quality gate",
+                    note="Immutable A3 train842/dev181/test177, official177 measured once. External B1000 unique human pairs,333positive answers/423exact spans, all supported families measured; severe token/span transfer drop published. No B selection/training; one ambiguous first match/license unconfirmed. Historical official-file exposure disclosed.",
+                    evidence=[
+                        dict(
+                            path="reports/p8/run39266451529/external/result.json",
+                            url=f"{URL}/blob/arena/c5f69767-smarty-chumakov/reports/p8/run39266451529/external/result.json",
+                        ),
+                        dict(
+                            path="reports/p8/run39266451529/external/aggregation-integrity.json",
+                            url=f"{URL}/blob/arena/c5f69767-smarty-chumakov/reports/p8/run39266451529/external/aggregation-integrity.json",
+                        ),
+                    ],
+                )
+            payload["execution_freeze_status"] = delivery_info.get(
+                "execution_freeze_status", "unrecorded"
+            )
             payload["stable_promotion"] = delivery_info.get("stable_promotion", False)
-            rows.append(dict(id="execution_freeze",requirement="P8 no ANY fit before official seal",status="не достигнут",scope="P8 execution-process violation, separate from numeric official joint PASS",note="Early cancelled CI39266027509 always-contract bypass; artifact14:12:03 before official job14:26:51. Temporary synthetic ParticipationModel.fit, no official/B data or product changes. No official retry; guard corrected; conservative RC/latest unchanged.",evidence=[dict(path="reports/p8/infra-freeze-barrier/incident.json",url=f"{URL}/blob/arena/c5f69767-smarty-chumakov/reports/p8/infra-freeze-barrier/incident.json")],current_run=f"{URL}/actions/runs/39266027509"))
+            rows.append(
+                dict(
+                    id="execution_freeze",
+                    requirement="P8 no ANY fit before official seal",
+                    status="не достигнут",
+                    scope="P8 execution-process violation, separate from numeric official joint PASS",
+                    note="Early cancelled CI39266027509 always-contract bypass; artifact14:12:03 before official job14:26:51. Temporary synthetic ParticipationModel.fit, no official/B data or product changes. No official retry; guard corrected; conservative RC/latest unchanged.",
+                    evidence=[
+                        dict(
+                            path="reports/p8/infra-freeze-barrier/incident.json",
+                            url=f"{URL}/blob/arena/c5f69767-smarty-chumakov/reports/p8/infra-freeze-barrier/incident.json",
+                        )
+                    ],
+                    current_run=f"{URL}/actions/runs/39266027509",
+                )
+            )
             for id_ in ("exe", "package", "build", "no_install", "portable_copy"):
-                known[id_].update(scope="P8 actual Windows build artifacts; publication-only source failure preserved",note=f"P8 build39271014161/source654a48e: exe8981233B, pyz232874B, strict gates PASS; three complete suites and smoke/offline validations PASS. Original workflow publication-only FAIL; recovery reuses exact checksummed artifacts, no rebuild/scoring. {delivery_info.get('publication_recovery', '')}",evidence=[dict(path="reports/p8/DELIVERY.json",url=f"{URL}/blob/arena/c5f69767-smarty-chumakov/reports/p8/DELIVERY.json"),dict(path="reports/p8/run39271014161/windows/release/SHA256SUMS.txt",url=f"{URL}/blob/arena/c5f69767-smarty-chumakov/reports/p8/run39271014161/windows/release/SHA256SUMS.txt")],current_run=f"{URL}/actions/runs/39271014161")
+                known[id_].update(
+                    scope="P8 actual Windows build artifacts; publication-only source failure preserved",
+                    note=f"P8 build39271014161/source654a48e: exe8981233B, pyz232874B, strict gates PASS; three complete suites and smoke/offline validations PASS. Original workflow publication-only FAIL; recovery reuses exact checksummed artifacts, no rebuild/scoring. {delivery_info.get('publication_recovery', '')}",
+                    evidence=[
+                        dict(
+                            path="reports/p8/DELIVERY.json",
+                            url=f"{URL}/blob/arena/c5f69767-smarty-chumakov/reports/p8/DELIVERY.json",
+                        ),
+                        dict(
+                            path="reports/p8/run39271014161/windows/release/SHA256SUMS.txt",
+                            url=f"{URL}/blob/arena/c5f69767-smarty-chumakov/reports/p8/run39271014161/windows/release/SHA256SUMS.txt",
+                        ),
+                    ],
+                    current_run=f"{URL}/actions/runs/39271014161",
+                )
             for id_ in ("hf_footprint", "storage"):
-                known[id_].update(status="частично",scope="P8 measured directory/file footprint, not complete installed SDK",note="Actual weight file551290714B; full model/tokenizer directory554277308B; libs870588148B; directory+libs1424865456B PLUS Python/app/filesystem overhead. Complete installed SDK total unmeasured; compressed portable637048763B is not installed storage.",evidence=[dict(path="reports/p8/run39271014161/hf-autonomy/windows-hf-autonomy.json",url=f"{URL}/blob/arena/c5f69767-smarty-chumakov/reports/p8/run39271014161/hf-autonomy/windows-hf-autonomy.json")],current_run=f"{URL}/actions/runs/39271014161")
-        payload["evidence_context"] = dict(run_id="39266451529",date="2026-10-19",status="CURRENT authoritative requirements index",successor="reports/EXPERIMENTS_INDEX.md")
+                known[id_].update(
+                    status="частично",
+                    scope="P8 measured directory/file footprint, not complete installed SDK",
+                    note="Actual weight file551290714B; full model/tokenizer directory554277308B; libs870588148B; directory+libs1424865456B PLUS Python/app/filesystem overhead. Complete installed SDK total unmeasured; compressed portable637048763B is not installed storage.",
+                    evidence=[
+                        dict(
+                            path="reports/p8/run39271014161/hf-autonomy/windows-hf-autonomy.json",
+                            url=f"{URL}/blob/arena/c5f69767-smarty-chumakov/reports/p8/run39271014161/hf-autonomy/windows-hf-autonomy.json",
+                        )
+                    ],
+                    current_run=f"{URL}/actions/runs/39271014161",
+                )
+        payload["evidence_context"] = dict(
+            run_id="39266451529",
+            date="2026-10-19",
+            status="CURRENT authoritative requirements index",
+            successor="reports/EXPERIMENTS_INDEX.md",
+        )
     curator_path = ROOT / "reports/p8/closure/CURATOR_DECISION.json"
     if curator_path.exists():
         payload["curator_decision"] = json.loads(curator_path.read_text())
@@ -296,32 +423,57 @@ def main():
         known = {r["id"]: r for r in rows}
         for key in ("official_test", "control_sample"):
             known[key]["status"] = "достигнут"
-            official_link = dict(path="reports/p8/run39266451529/official/result.json", url=f"{URL}/blob/arena/c5f69767-smarty-chumakov/reports/p8/run39266451529/official/result.json")
+            official_link = dict(
+                path="reports/p8/run39266451529/official/result.json",
+                url=f"{URL}/blob/arena/c5f69767-smarty-chumakov/reports/p8/run39266451529/official/result.json",
+            )
             if official_link not in known[key]["evidence"]:
                 known[key]["evidence"].append(official_link)
             known[key]["current_run"] = f"{URL}/actions/runs/39266451529"
-        known["execution_freeze"]["disposition"] = "задокументировано/принято как процессное исключение куратором"
-        known["execution_freeze"]["note"] += " Curator accepts numerical validity: separate synthetic job/process/machine, test/B unused, frozen bytes unchanged; historical violation NOT erased, does not block authorized stable."
-        known["execution_freeze"]["evidence"].append(dict(path=str(curator_path.relative_to(ROOT)),url=f"{URL}/blob/arena/c5f69767-smarty-chumakov/{curator_path.relative_to(ROOT)}"))
+        known["execution_freeze"][
+            "disposition"
+        ] = "задокументировано/принято как процессное исключение куратором"
+        known["execution_freeze"][
+            "note"
+        ] += " Curator accepts numerical validity: separate synthetic job/process/machine, test/B unused, frozen bytes unchanged; historical violation NOT erased, does not block authorized stable."
+        known["execution_freeze"]["evidence"].append(
+            dict(
+                path=str(curator_path.relative_to(ROOT)),
+                url=f"{URL}/blob/arena/c5f69767-smarty-chumakov/{curator_path.relative_to(ROOT)}",
+            )
+        )
         receipt_path = ROOT / "reports/p8/closure/STABLE_RECEIPT.json"
         if receipt_path.exists():
             payload["stable_publication"] = json.loads(receipt_path.read_text())
             payload["stable_promotion"] = True
             payload["verification_receipt"] = "reports/p8/VERIFICATION.json"
-            payload["code_contour"] = "closed; numerical acceptance valid with curator-accepted exception; deviations closed as accepted limitations, not factual compliance uplift"
+            payload["code_contour"] = (
+                "closed; numerical acceptance valid with curator-accepted exception; deviations closed as accepted limitations, not factual compliance uplift"
+            )
     out = ROOT / "reports/contract"
     (out / "coverage-matrix.json").write_text(
         json.dumps(payload, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
     )
     text = "# Appendix3: evidence coverage matrix\n\nAs of 2026-10-19. **Overall: НЕ ДОСТИГНУТ.** Official test177 evaluated once in P8; numeric joint quality gate PASS, execution freeze NOT achieved, conservative RC/not latest; overall contract remains NOT achieved; legacy read and infrastructure incident disclosed.\n\nHistorical/demo artifacts are not current P5 HF acceptance. A dev gate cannot establish speed, delivery or the whole contract.\n\n| Requirement | Status | Scope / limitation | Real evidence |\n|---|---|---|---|\n"
     if curator_path.exists():
-        text = text.replace("execution freeze NOT achieved, conservative RC/not latest", "historical execution-freeze violation accepted as curator exception; numerical acceptance VALID; stable authorized")
-        text = text.replace("**Overall: НЕ ДОСТИГНУТ.**", "**Code contour: принят с раскрытыми ограничениями; все нормы фактически НЕ объявлены выполненными.**")
+        text = text.replace(
+            "execution freeze NOT achieved, conservative RC/not latest",
+            "historical execution-freeze violation accepted as curator exception; numerical acceptance VALID; stable authorized",
+        )
+        text = text.replace(
+            "**Overall: НЕ ДОСТИГНУТ.**",
+            "**Code contour: принят с раскрытыми ограничениями; все нормы фактически НЕ объявлены выполненными.**",
+        )
         if receipt_path.exists():
-            text = text.replace("stable authorized", "stable/latest published, exact RC digests verified")
+            text = text.replace(
+                "stable authorized",
+                "stable/latest published, exact RC digests verified",
+            )
         text += "Closed dispositions: [DEVIATIONS](../DEVIATIONS.md). Acceptance of limitations is NOT a rise in factual compliance status.\n\n"
     for r in rows:
-        links = "; ".join(f"[{e['path'].split('/')[-1]}]({e['url']})" for e in r["evidence"])
+        links = "; ".join(
+            f"[{e['path'].split('/')[-1]}]({e['url']})" for e in r["evidence"]
+        )
         text += f"| {r['requirement']} | {r['status']} | {r['note']} | {links} |\n"
     (out / "coverage-matrix.md").write_text(text, encoding="utf-8")
 

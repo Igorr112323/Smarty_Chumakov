@@ -30,8 +30,19 @@ from sklearn.model_selection import KFold
 import spanverify.engine as engine_module
 from spanverify.core import tokenize_with_offsets
 from spanverify.dataset import read_pairs
-from spanverify.engine import WeightsBundle, _binary_metrics, _span_f1, smooth_token_risks
-from spanverify.features import FEATURE_NAMES, feature_cache_key, is_scored_token, load_feature_cache, set_feature_cache
+from spanverify.engine import (
+    WeightsBundle,
+    _binary_metrics,
+    _span_f1,
+    smooth_token_risks,
+)
+from spanverify.features import (
+    FEATURE_NAMES,
+    feature_cache_key,
+    is_scored_token,
+    load_feature_cache,
+    set_feature_cache,
+)
 from spanverify.token_head import extract_token_features, train_token_gbdt
 
 BASE = Path("reports/experiments/p1_public_replay/run39144872719")
@@ -83,7 +94,12 @@ def selection(verifier, states, tau):
         fpr=fp / (fp + tn) if fp + tn else 0.0,
     )
     sm = _span_f1(predicted, truth, iou_threshold=0.5)
-    return {"tau": float(tau), "tokens": tm, "spans": sm, "objective": min(tm["f1"], sm["f1"])}
+    return {
+        "tau": float(tau),
+        "tokens": tm,
+        "spans": sm,
+        "objective": min(tm["f1"], sm["f1"]),
+    }
 
 
 def run(cache_dir, out):
@@ -106,10 +122,20 @@ def run(cache_dir, out):
     set_feature_cache(cache)
     missing = []
     for p in train + dev:
-        key = feature_cache_key(p["answer"], p["context"], "hf", runtime["model_name"], chunking=True, max_length=512)
+        key = feature_cache_key(
+            p["answer"],
+            p["context"],
+            "hf",
+            runtime["model_name"],
+            chunking=True,
+            max_length=512,
+        )
         if key not in cache:
             missing.append(p["id"])
-    write_json(out / "cache_coverage.json", {"keys": len(cache), "pairs": 1023, "missing": missing})
+    write_json(
+        out / "cache_coverage.json",
+        {"keys": len(cache), "pairs": 1023, "missing": missing},
+    )
     if missing:
         raise ValueError("Missing compatible cache; fresh inference forbidden")
     v = make_verifier(baseline, runtime, cache)
@@ -133,7 +159,12 @@ def run(cache_dir, out):
                 "scored": [is_scored_token(t.text) for t in tokens],
                 "gold": [int(any(t.start < b and t.end > a for a, b in truth)) for t in tokens],
                 "X": [
-                    extract_token_features(i, len(tokens), t.text, {n: getattr(f, n)[i] for n in FEATURE_NAMES})
+                    extract_token_features(
+                        i,
+                        len(tokens),
+                        t.text,
+                        {n: getattr(f, n)[i] for n in FEATURE_NAMES},
+                    )
                     for i, t in enumerate(tokens)
                 ],
             }
@@ -167,10 +198,19 @@ def run(cache_dir, out):
         write_json(out / "fold_receipts.json", receipts)
         print("Completed fold", fold, counts, flush=True)
     assert all("fold" in s for s in states)
-    write_jsonl(out / "oof_states.jsonl", [{k: v for k, v in s.items() if k != "X"} for s in states])
+    write_jsonl(
+        out / "oof_states.jsonl",
+        [{k: v for k, v in s.items() if k != "X"} for s in states],
+    )
     risks = [r for s in states for r, m in zip(s["smoothed"], s["scored"], strict=False) if m]
     candidates = sorted(
-        set([0.0, float(np.nextafter(max(risks), np.inf)), *map(float, np.quantile(risks, np.linspace(0, 1, 500)))])
+        set(
+            [
+                0.0,
+                float(np.nextafter(max(risks), np.inf)),
+                *map(float, np.quantile(risks, np.linspace(0, 1, 500))),
+            ]
+        )
     )
     p2runtime = {**runtime, "span_expansion": "mask"}
     selector = make_verifier(baseline, p2runtime, cache)
@@ -205,7 +245,10 @@ def run(cache_dir, out):
     before = collect_public_rows(pv, dev)
     after = collect_public_rows(reloadv, dev)
     reference = read_jsonl(BASE / "public_replay.jsonl")
-    parity = {"reference": compare_records(before, reference), "reload": compare_records(after, before)}
+    parity = {
+        "reference": compare_records(before, reference),
+        "reload": compare_records(after, before),
+    }
     write_jsonl(out / "dev_answers.jsonl", before)
     write_json(out / "p1_invariance.json", parity)
     answer = metrics(before)
@@ -219,7 +262,12 @@ def run(cache_dir, out):
         for span in result.spans:
             assert span.text == p["answer"][span.start : span.end]
         evidence.append(
-            {"id": p["id"], "gold": p["labels"], "tokens": result.tokens, "spans": [asdict(s) for s in result.spans]}
+            {
+                "id": p["id"],
+                "gold": p["labels"],
+                "tokens": result.tokens,
+                "spans": [asdict(s) for s in result.spans],
+            }
         )
     write_jsonl(out / "dev_evidence.jsonl", evidence)
     allmetrics = {"baseline": v.evaluate(dev), "p2": pv.evaluate(dev)}
@@ -248,7 +296,10 @@ def run(cache_dir, out):
             "official_test": False,
         },
     )
-    print(json.dumps({"tau": chosen, "metrics": allmetrics, "parity": parity}, ensure_ascii=False), flush=True)
+    print(
+        json.dumps({"tau": chosen, "metrics": allmetrics, "parity": parity}, ensure_ascii=False),
+        flush=True,
+    )
 
 
 if __name__ == "__main__":

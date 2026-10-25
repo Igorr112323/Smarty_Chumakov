@@ -76,7 +76,10 @@ _MODULE_ROOT = Path(__file__).resolve().parents[1]
 if str(_MODULE_ROOT) not in sys.path:
     sys.path.insert(0, str(_MODULE_ROOT))
 
-from scripts.corpus_real import extract_facts, normalize_text  # noqa: E402 - импорт после правки sys.path
+from scripts.corpus_real import (
+    extract_facts,
+    normalize_text,
+)  # noqa: E402 - импорт после правки sys.path
 
 ROOT = _MODULE_ROOT
 
@@ -100,13 +103,22 @@ WHITELIST = (
 # Темы приоритета: (название темы, регулярное выражение по названию акта).
 THEMES = (
     ("сроки хранения документов", r"хранен|архивн|номенклатур|архив"),
-    ("персональные данные", r"персональн(?:ых|ые|ыми|ой) данных|обработк[аи] персональных"),
+    (
+        "персональные данные",
+        r"персональн(?:ых|ые|ыми|ой) данных|обработк[аи] персональных",
+    ),
     (
         "защита информации",
         r"защит[аеы] информации|информационн(?:ой|ая|ые) безопасн|государственн(?:ой|ой) тайн|коммерческ(?:ой|ая) тайн",
     ),
-    ("охрана труда", r"охран[аеы] труда|инструкц[ии] по охране|аттестац[ии] рабочих мест|специальн(?:ой|ая) оценк"),
-    ("кадровый учёт", r"кадров|персонал|трудов(?:ых|ые) отношени|служебн(?:ой|ая) контракт"),
+    (
+        "охрана труда",
+        r"охран[аеы] труда|инструкц[ии] по охране|аттестац[ии] рабочих мест|специальн(?:ой|ая) оценк",
+    ),
+    (
+        "кадровый учёт",
+        r"кадров|персонал|трудов(?:ых|ые) отношени|служебн(?:ой|ая) контракт",
+    ),
 )
 
 TYPES = (
@@ -123,7 +135,10 @@ def fetch(url: str, timeout: int = 120, read_limit: int = 12_000_000) -> dict:
     """Запрос с сохранением тела и факта ошибки (без интерпретаций)."""
     request = urllib.request.Request(
         url,
-        headers={"User-Agent": USER_AGENT, "Accept": "application/json, application/pdf, text/plain, */*"},
+        headers={
+            "User-Agent": USER_AGENT,
+            "Accept": "application/json, application/pdf, text/plain, */*",
+        },
     )
     try:
         with urllib.request.urlopen(request, timeout=timeout) as response:  # noqa: S310 - официальные публичные адреса
@@ -141,13 +156,20 @@ def fetch(url: str, timeout: int = 120, read_limit: int = 12_000_000) -> dict:
         return {
             "url": url,
             "status": int(error.code),
-            "content_type": error.headers.get("Content-Type", "") if error.headers else "",
+            "content_type": (error.headers.get("Content-Type", "") if error.headers else ""),
             "bytes": len(raw),
             "raw": raw,
             "error": f"HTTP {error.code}",
         }
     except (urllib.error.URLError, TimeoutError, OSError) as error:
-        return {"url": url, "status": None, "content_type": "", "bytes": 0, "raw": b"", "error": str(error)[:140]}
+        return {
+            "url": url,
+            "status": None,
+            "content_type": "",
+            "bytes": 0,
+            "raw": b"",
+            "error": str(error)[:140],
+        }
 
 
 # ---------------------------------------------------------------------------
@@ -326,11 +348,27 @@ def ocr_pdf(path: Path, dpi: int = 200, max_pages: int = 20, psm: int = 6, oem: 
     """
     tools = ocr_available()
     if not all(tools.values()):
-        return {"text": "", "pages": 0, "seconds": None, "error": f"нет инструментов OCR: {tools}"}
+        return {
+            "text": "",
+            "pages": 0,
+            "seconds": None,
+            "error": f"нет инструментов OCR: {tools}",
+        }
     with tempfile.TemporaryDirectory() as tmp:
         started = time.perf_counter()
         rendered = subprocess.run(  # noqa: S603 - фиксированные аргументы, входной файл наш
-            ["pdftoppm", "-r", str(dpi), "-png", "-f", "1", "-l", str(max_pages), str(path), str(Path(tmp) / "page")],
+            [
+                "pdftoppm",
+                "-r",
+                str(dpi),
+                "-png",
+                "-f",
+                "1",
+                "-l",
+                str(max_pages),
+                str(path),
+                str(Path(tmp) / "page"),
+            ],
             check=False,
             capture_output=True,
         )
@@ -344,7 +382,17 @@ def ocr_pdf(path: Path, dpi: int = 200, max_pages: int = 20, psm: int = 6, oem: 
         pieces: list[str] = []
         for image in sorted(Path(tmp).glob("page*.png")):
             result = subprocess.run(  # noqa: S603 - фиксированные аргументы
-                ["tesseract", str(image), "stdout", "-l", "rus", "--psm", str(psm), "--oem", str(oem)],
+                [
+                    "tesseract",
+                    str(image),
+                    "stdout",
+                    "-l",
+                    "rus",
+                    "--psm",
+                    str(psm),
+                    "--oem",
+                    str(oem),
+                ],
                 check=False,
                 capture_output=True,
             )
@@ -493,7 +541,11 @@ def verify_sources(sources_dir: Path) -> dict:
         checked += 1
         if actual != meta.get("text_sha256"):
             mismatches.append(f"{doc_id}: sha256 текста {actual} != {meta.get('text_sha256')}")
-    return {"checked": checked, "mismatches": mismatches, "documents": len(manifest.get("documents", {}))}
+    return {
+        "checked": checked,
+        "mismatches": mismatches,
+        "documents": len(manifest.get("documents", {})),
+    }
 
 
 def plan_downloads(
@@ -531,17 +583,36 @@ def plan_downloads(
 def main() -> int:
     parser = argparse.ArgumentParser(description="Загрузка текстов реальных актов для корпуса A3")
     parser.add_argument("--out", type=Path, default=ROOT / "data" / "corpus_a3")
-    parser.add_argument("--target-docs", type=int, default=130, help="сколько документов с текстом нужно")
     parser.add_argument(
-        "--max-pages-per-type", type=int, default=10, help="сколько страниц выдачи смотреть по виду акта"
+        "--target-docs",
+        type=int,
+        default=130,
+        help="сколько документов с текстом нужно",
     )
     parser.add_argument(
-        "--min-facts", type=int, default=6, help="минимум фактов (предложений со значениями) в документе"
+        "--max-pages-per-type",
+        type=int,
+        default=10,
+        help="сколько страниц выдачи смотреть по виду акта",
     )
     parser.add_argument(
-        "--pause", type=float, default=PAUSE_SECONDS, help="пауза между запросами, секунд (не меньше 1)"
+        "--min-facts",
+        type=int,
+        default=6,
+        help="минимум фактов (предложений со значениями) в документе",
     )
-    parser.add_argument("--workers", type=int, default=4, help="сколько распознаваний запускать параллельно")
+    parser.add_argument(
+        "--pause",
+        type=float,
+        default=PAUSE_SECONDS,
+        help="пауза между запросами, секунд (не меньше 1)",
+    )
+    parser.add_argument(
+        "--workers",
+        type=int,
+        default=4,
+        help="сколько распознаваний запускать параллельно",
+    )
     parser.add_argument(
         "--max-pages",
         type=int,
@@ -549,9 +620,22 @@ def main() -> int:
         help="сколько первых страниц документа распознавать (длинные акты распознаются частично, признак — text_truncated)",
     )
     parser.add_argument("--dpi", type=int, default=200)
-    parser.add_argument("--buffer", type=int, default=40, help="сколько кандидатов взять сверх цели (на брак)")
-    parser.add_argument("--force", action="store_true", help="скачивать, даже если документов уже достаточно")
-    parser.add_argument("--verify", action="store_true", help="только проверить хеши уже скачанных источников")
+    parser.add_argument(
+        "--buffer",
+        type=int,
+        default=40,
+        help="сколько кандидатов взять сверх цели (на брак)",
+    )
+    parser.add_argument(
+        "--force",
+        action="store_true",
+        help="скачивать, даже если документов уже достаточно",
+    )
+    parser.add_argument(
+        "--verify",
+        action="store_true",
+        help="только проверить хеши уже скачанных источников",
+    )
     parser.add_argument(
         "--types",
         default="",
@@ -563,7 +647,12 @@ def main() -> int:
         help="брать только акты, в названии которых есть это регулярное выражение (срез по региону)",
     )
     parser.add_argument("--page-from", type=int, default=1, help="с какой страницы выдачи начинать срез")
-    parser.add_argument("--page-to", type=int, default=None, help="какой страницей выдачи закончить срез")
+    parser.add_argument(
+        "--page-to",
+        type=int,
+        default=None,
+        help="какой страницей выдачи закончить срез",
+    )
     parser.add_argument("--psm", type=int, default=6, help="режим разбиения страницы tesseract (--psm)")
     parser.add_argument("--oem", type=int, default=1, help="движок tesseract (--oem)")
     args = parser.parse_args()
@@ -588,7 +677,10 @@ def main() -> int:
         print(f"цель достигнута: {len(existing)} документов, хеши проверены: {report['checked']}")
         print(f"::notice title=A3 пропуск::документов {len(existing)}, расхождений хешей {len(report['mismatches'])}")
         if report["mismatches"]:
-            print(f"ВНИМАНИЕ: расхождения хешей: {report['mismatches'][:3]}", file=sys.stderr)
+            print(
+                f"ВНИМАНИЕ: расхождения хешей: {report['mismatches'][:3]}",
+                file=sys.stderr,
+            )
             return 2
         return 0
 
@@ -611,7 +703,10 @@ def main() -> int:
         wanted = {name.strip() for name in args.types.split(",") if name.strip()}
         unknown = sorted(wanted - set(TYPES))
         if unknown:
-            print(f"ВНИМАНИЕ: неизвестные виды актов: {unknown}; доступные: {list(TYPES)}", file=sys.stderr)
+            print(
+                f"ВНИМАНИЕ: неизвестные виды актов: {unknown}; доступные: {list(TYPES)}",
+                file=sys.stderr,
+            )
         type_ids = {name: tid for name, tid in type_ids.items() if name in wanted}
     title_pattern = re.compile(args.title_filter, re.IGNORECASE) if args.title_filter else None
     print(f"видов актов доступно: {sorted(type_ids)}")
@@ -664,7 +759,12 @@ def main() -> int:
             pdf_url = f"http://publication.pravo.gov.ru/file/pdf?eoNumber={candidate['eo_number']}"
             candidate["pdf_url"] = pdf_url
             if not is_allowed(pdf_url, rules):
-                skipped.append({"doc_id": candidate["doc_id"], "reason": "путь запрещён robots.txt"})
+                skipped.append(
+                    {
+                        "doc_id": candidate["doc_id"],
+                        "reason": "путь запрещён robots.txt",
+                    }
+                )
                 continue
             fetched = fetch(pdf_url)
             time.sleep(max(0.0, pause))
@@ -689,7 +789,14 @@ def main() -> int:
 
         with concurrent.futures.ThreadPoolExecutor(max_workers=max(1, args.workers)) as pool:
             futures = {
-                pool.submit(extract_text, Path(item["_pdf_path"]), args.dpi, args.max_pages, args.psm, args.oem): item
+                pool.submit(
+                    extract_text,
+                    Path(item["_pdf_path"]),
+                    args.dpi,
+                    args.max_pages,
+                    args.psm,
+                    args.oem,
+                ): item
                 for item in downloaded
             }
             for future in concurrent.futures.as_completed(futures):
@@ -717,13 +824,22 @@ def main() -> int:
                 item["facts_found"] = len(facts)
                 item["text"] = text
                 if len(facts) < args.min_facts:
-                    skipped.append({"doc_id": item["doc_id"], "reason": f"фактов {len(facts)} < {args.min_facts}"})
+                    skipped.append(
+                        {
+                            "doc_id": item["doc_id"],
+                            "reason": f"фактов {len(facts)} < {args.min_facts}",
+                        }
+                    )
                     continue
                 new_documents.append(item)
                 if len(new_documents) % 3 == 0:
                     # Пишем прогресс на диск: если прогон оборвётся (таймаут CI), уже
                     # распознанные документы не придётся распознавать заново.
-                    write_sources(out_dir, sorted(existing + new_documents, key=lambda doc: doc["doc_id"]), manifest)
+                    write_sources(
+                        out_dir,
+                        sorted(existing + new_documents, key=lambda doc: doc["doc_id"]),
+                        manifest,
+                    )
                     print(f"текстов готово: {len(new_documents)} (фактов ≥ {args.min_facts}), записано на диск")
                     print(f"::notice title=A3 извлечение::текстов готово {len(new_documents)}")
 
@@ -782,7 +898,15 @@ def main() -> int:
     sources = []
     for host in WHITELIST:
         item = dict(
-            default_sources.get(host, {"host": host, "documents_downloaded": 0, "documents_with_text": 0, "note": ""})
+            default_sources.get(
+                host,
+                {
+                    "host": host,
+                    "documents_downloaded": 0,
+                    "documents_with_text": 0,
+                    "note": "",
+                },
+            )
         )
         previous = previous_sources.get(host) or {}
         if host == "publication.pravo.gov.ru":
@@ -824,7 +948,10 @@ def main() -> int:
     print(f"источников с текстом: {len(documents)} (по темам: {by_theme}; по видам: {by_type}; способ: {methods})")
     print(f"::notice title=A3 итог::документов с текстом {len(documents)}; по темам {by_theme}")
     if len(documents) < args.target_docs:
-        print(f"ВНИМАНИЕ: получено {len(documents)} документов вместо {args.target_docs}", file=sys.stderr)
+        print(
+            f"ВНИМАНИЕ: получено {len(documents)} документов вместо {args.target_docs}",
+            file=sys.stderr,
+        )
     print(f"Источники: {out_dir / 'sources'}")
     return 0
 

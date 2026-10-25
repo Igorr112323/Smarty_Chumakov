@@ -90,7 +90,12 @@ def their_metrics(pairs: list[dict], predicted: list[list[str]]) -> dict:
 
 def compact_metrics(metrics: dict) -> dict:
     """Сжать дерево метрик ``evaluate`` до чисел, которые попадают в отчёт."""
-    tokens, spans, answers, verdicts = metrics["tokens"], metrics["spans"], metrics["answers"], metrics["verdicts"]
+    tokens, spans, answers, verdicts = (
+        metrics["tokens"],
+        metrics["spans"],
+        metrics["answers"],
+        metrics["verdicts"],
+    )
     return {
         "tokens": {
             key: round(tokens[key], 4) if tokens[key] == tokens[key] else None
@@ -153,8 +158,11 @@ def run(
         "unverified_spans": summary["unverified_spans"],
         "our_metrics": compact_metrics(metrics),
         "their_metrics": their_metrics(pairs, predicted),
-        "baseline": {"extracted": False, "note": BASELINE_NOTES.get(dataset, "числа статьи не извлечены")},
-        "disclaimer": DEMO_DISCLAIMER if mode == "demo" else "Режим hf: признаки считаются на весах языковой модели.",
+        "baseline": {
+            "extracted": False,
+            "note": BASELINE_NOTES.get(dataset, "числа статьи не извлечены"),
+        },
+        "disclaimer": (DEMO_DISCLAIMER if mode == "demo" else "Режим hf: признаки считаются на весах языковой модели."),
     }
     if limit:
         report["note"] = (
@@ -165,7 +173,10 @@ def run(
 
 def merge_into_combined(report: dict, combined_path: Path) -> dict:
     """Дописать результат в общий файл ``external_tests.json`` (по наборам и задачам)."""
-    combined: dict = {"runs": {}, "rule": "внешние наборы — только тест; калибровка на корпусе A"}
+    combined: dict = {
+        "runs": {},
+        "rule": "внешние наборы — только тест; калибровка на корпусе A",
+    }
     if combined_path.is_file():
         try:
             combined = json.loads(combined_path.read_text(encoding="utf-8"))
@@ -206,7 +217,15 @@ def main() -> int:
     args = parser.parse_args()
 
     try:
-        report = run(args.dataset, args.task, args.split, args.mode, args.model, args.limit, args.out)
+        report = run(
+            args.dataset,
+            args.task,
+            args.split,
+            args.mode,
+            args.model,
+            args.limit,
+            args.out,
+        )
     except (FileNotFoundError, OSError) as error:
         print(f"ошибка: {error}", file=sys.stderr)
         return 2

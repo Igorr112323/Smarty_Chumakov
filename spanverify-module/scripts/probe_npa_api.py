@@ -174,7 +174,11 @@ def main() -> int:
 
     args.out.parent.mkdir(parents=True, exist_ok=True)
     args.out.write_text(
-        json.dumps({"base": BASE, "results": results, "document_id_probe": document_id}, ensure_ascii=False, indent=2)
+        json.dumps(
+            {"base": BASE, "results": results, "document_id_probe": document_id},
+            ensure_ascii=False,
+            indent=2,
+        )
         + "\n",
         encoding="utf-8",
     )

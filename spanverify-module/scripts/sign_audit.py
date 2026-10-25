@@ -32,20 +32,32 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from spanverify.dataset import read_pairs  # noqa: E402
 from spanverify.engine import Verifier  # noqa: E402
-from spanverify.features import DEFAULT_WEIGHTS, FEATURE_NAMES, scale_robust  # noqa: E402
+from spanverify.features import (
+    DEFAULT_WEIGHTS,
+    FEATURE_NAMES,
+    scale_robust,
+)  # noqa: E402
 from spanverify.train import auc_score, collect_samples  # noqa: E402
 
 ROOT = Path(__file__).resolve().parents[1]
 
 #: Веса «до исправления знака» — те, с которыми считались числа прежних
 #: релизов (масса 0.9, плотность 0.0/0.1). Нужны только для сравнения формул.
-LEGACY_WEIGHTS = {"attention_entropy": 0.1, "ctx_attention_mass": 0.9, "embedding_density": 0.0}
+LEGACY_WEIGHTS = {
+    "attention_entropy": 0.1,
+    "ctx_attention_mass": 0.9,
+    "embedding_density": 0.0,
+}
 
 
 def git_commit() -> str:
     try:
         return subprocess.run(
-            ["git", "rev-parse", "HEAD"], cwd=ROOT, capture_output=True, text=True, check=True
+            ["git", "rev-parse", "HEAD"],
+            cwd=ROOT,
+            capture_output=True,
+            text=True,
+            check=True,
         ).stdout.strip()
     except (subprocess.CalledProcessError, FileNotFoundError):  # pragma: no cover
         return "unknown"

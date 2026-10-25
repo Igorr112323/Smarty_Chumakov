@@ -128,7 +128,7 @@ def evaluate(data_dir: Path, mode: str, limit: int | None = None) -> dict:
     return {
         "dataset": "RusHallu-RAG (SberQuAD-RAG + ruSciBench-RAG)",
         "dataset_dir": str(data_dir),
-        "dataset_version": pairs[0].get("meta", {}).get("dataset_version") if pairs else None,
+        "dataset_version": (pairs[0].get("meta", {}).get("dataset_version") if pairs else None),
         "citation": pairs[0].get("meta", {}).get("citation") if pairs else None,
         "mode": mode,
         "pairs": len(pairs),

@@ -38,7 +38,10 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--out", default="data/my_pairs.jsonl")
     parser.add_argument("--count", type=int, default=30)
     parser.add_argument(
-        "--with-examples", action="store_true", default=True, help="оставить одну заполненную пару как образец"
+        "--with-examples",
+        action="store_true",
+        default=True,
+        help="оставить одну заполненную пару как образец",
     )
     args = parser.parse_args(argv)
 
@@ -67,7 +70,10 @@ def main(argv: list[str] | None = None) -> int:
                         "context": "",
                         "answer": "",
                         "labels": [],
-                        "meta": {"source": "заполните", "document": f"документ-{index // 5 + 1}"},
+                        "meta": {
+                            "source": "заполните",
+                            "document": f"документ-{index // 5 + 1}",
+                        },
                     },
                     ensure_ascii=False,
                 )

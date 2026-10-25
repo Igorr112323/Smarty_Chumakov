@@ -37,12 +37,22 @@ def save(path, value):
 def frozen_metrics(evidence, corpus, answers):
     source = ROOT / "scripts/p4_context_head.py"
     node = next(
-        n for n in ast.parse(source.read_text(encoding="utf-8")).body if isinstance(n, ast.FunctionDef) and n.name == "evidence_metrics"
+        n
+        for n in ast.parse(source.read_text(encoding="utf-8")).body
+        if isinstance(n, ast.FunctionDef) and n.name == "evidence_metrics"
     )
     scope = dict(
-        tokenize_with_offsets=tokenize_with_offsets, is_scored_token=is_scored_token, metrics=metrics, engine=engine
+        tokenize_with_offsets=tokenize_with_offsets,
+        is_scored_token=is_scored_token,
+        metrics=metrics,
+        engine=engine,
     )
-    for name in ("_token_metrics", "_span_f1", "_containment_recall", "_mean_width_ratio"):
+    for name in (
+        "_token_metrics",
+        "_span_f1",
+        "_containment_recall",
+        "_mean_width_ratio",
+    ):
         scope[name] = getattr(engine, name)
     exec(compile(ast.Module(body=[node], type_ignores=[]), str(source), "exec"), scope)
     result = scope["evidence_metrics"](evidence, corpus, answers, None)
@@ -87,7 +97,11 @@ def main(args):
             records.extend(json.loads(line) for line in file.read_text(encoding="utf-8").splitlines() if line.strip())
         assert len(records) == 1000 and len({r["id"] for r in records}) == 1000
         corpus = {p["id"]: p for p in pairs}
-        report = summarise([r["evidence"] for r in records], corpus, [r["answer_metrics"] for r in records])
+        report = summarise(
+            [r["evidence"] for r in records],
+            corpus,
+            [r["answer_metrics"] for r in records],
+        )
         report.update(
             kind="external validation, NOT contractual gate",
             pairs=1000,
@@ -124,7 +138,10 @@ def main(args):
                 current[prefix] = value
             if prefix == "" and event == "end_map":
                 audit_rows.append(
-                    dict(id=current["id"], model_positions=len(tokenizer(current["answer"])["input_ids"]))
+                    dict(
+                        id=current["id"],
+                        model_positions=len(tokenizer(current["answer"])["input_ids"]),
+                    )
                 )
                 current = {}
     expected = 177 if args.kind == "official" else 1000
@@ -138,14 +155,21 @@ def main(args):
         rows=audit_rows,
     )
     save(out / "pre-label-long-audit.json", audit)
-    print("::notice title=P8 long audit::" + json.dumps({k: v for k, v in audit.items() if k != "rows"}), flush=True)
+    print(
+        "::notice title=P8 long audit::" + json.dumps({k: v for k, v in audit.items() if k != "rows"}),
+        flush=True,
+    )
     pairs = [json.loads(line) for line in dataset.read_text(encoding="utf-8").splitlines() if line.strip()]
     if args.kind == "external":
         pairs = [p for i, p in enumerate(pairs) if i % 4 == args.shard]
     fit_calls = []
 
     def no_fit(frame, event, arg):
-        if event == "call" and frame.f_code.co_name in ("fit", "fit_transform", "train"):
+        if event == "call" and frame.f_code.co_name in (
+            "fit",
+            "fit_transform",
+            "train",
+        ):
             if (
                 frame.f_code.co_name == "train"
                 and frame.f_globals.get("__name__", "").startswith(("torch.", "transformers."))
@@ -168,7 +192,12 @@ def main(args):
             result = verifier.verify(p["answer"], p["context"], with_tokens=True)
             elapsed = time.perf_counter() - tick
             public = result.to_dict(with_tokens=True)
-            ev = dict(id=p["id"], spans=[asdict(s) for s in result.spans], tokens=result.tokens, verdict=result.verdict)
+            ev = dict(
+                id=p["id"],
+                spans=[asdict(s) for s in result.spans],
+                tokens=result.tokens,
+                verdict=result.verdict,
+            )
             answer = dict(
                 pair_id=p["id"],
                 gold=int(any(int(x[2]) == 1 for x in p["labels"])),

@@ -33,13 +33,34 @@ FEATURES = (
     "relative_end",
     "p1_calibrated_score",
 )
-KEEP_QUANTILES = (0, 0.05, 0.10, 0.20, 0.30, 0.40, 0.50, 0.60, 0.70, 0.80, 0.90, 0.95, 0.975, 0.99, 1)
+KEEP_QUANTILES = (
+    0,
+    0.05,
+    0.10,
+    0.20,
+    0.30,
+    0.40,
+    0.50,
+    0.60,
+    0.70,
+    0.80,
+    0.90,
+    0.95,
+    0.975,
+    0.99,
+    1,
+)
 LOW_QUANTILES = (0.50, 0.60, 0.70, 0.75, 0.80, 0.85, 0.90)
 HIGH_QUANTILES = (0.90, 0.94, 0.96, 0.975, 0.985)
 
 
 def validate_generator(c):
-    if not isinstance(c, dict) or set(c) != {"tau_low", "tau_high", "bridge", "min_seed"}:
+    if not isinstance(c, dict) or set(c) != {
+        "tau_low",
+        "tau_high",
+        "bridge",
+        "min_seed",
+    }:
         raise ValueError("Malformed P5 generator")
     if any(
         type(c[k]) not in (int, float) or not math.isfinite(c[k]) or not 0 <= c[k] <= 1 for k in ("tau_low", "tau_high")

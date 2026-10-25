@@ -98,7 +98,8 @@ def best_rouge_for(reference: str, candidates: Sequence[str]) -> dict[str, float
 
 
 def calculate_rouge_scores(
-    first_batch_list: Sequence[Sequence[str]], second_batch_list: Sequence[Sequence[str]]
+    first_batch_list: Sequence[Sequence[str]],
+    second_batch_list: Sequence[Sequence[str]],
 ) -> dict:
     """ROUGE по образцу их функции ``calculate_rouge_scores``.
 

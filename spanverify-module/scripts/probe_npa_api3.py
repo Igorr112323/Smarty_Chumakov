@@ -46,7 +46,10 @@ def fetch(url: str, timeout: int = 60) -> dict:
     """Запрос с сохранением тела ответа (включая тело ошибки)."""
     request = urllib.request.Request(
         url,
-        headers={"User-Agent": USER_AGENT, "Accept": "application/json, text/html, text/plain, */*"},
+        headers={
+            "User-Agent": USER_AGENT,
+            "Accept": "application/json, text/html, text/plain, */*",
+        },
     )
     started = time.perf_counter()
     try:
@@ -90,9 +93,9 @@ def fetch(url: str, timeout: int = 60) -> dict:
         "content_type": content_type,
         "bytes": len(raw),
         "json": parsed if (parsed is not None and len(raw) <= 200_000) else None,
-        "items_count": len(items) if isinstance(items, list) else (len(parsed) if isinstance(parsed, list) else None),
-        "items_per_page": parsed.get("itemsPerPage") if isinstance(parsed, dict) else None,
-        "items_total_count": parsed.get("itemsTotalCount") if isinstance(parsed, dict) else None,
+        "items_count": (len(items) if isinstance(items, list) else (len(parsed) if isinstance(parsed, list) else None)),
+        "items_per_page": (parsed.get("itemsPerPage") if isinstance(parsed, dict) else None),
+        "items_total_count": (parsed.get("itemsTotalCount") if isinstance(parsed, dict) else None),
         "current_page": parsed.get("currentPage") if isinstance(parsed, dict) else None,
         "first_eo_number": (
             items[0].get("eoNumber") if isinstance(items, list) and items and isinstance(items[0], dict) else None
@@ -157,7 +160,10 @@ def main() -> int:
         ("documents-size-100", f"{BASE}/api/Documents?pageSize=100&index=1"),
         ("documents-page2-size10", f"{BASE}/api/Documents?pageSize=10&index=2"),
         ("documents-pascal", f"{BASE}/api/Documents?PageSize=10&Index=1"),
-        ("documents-type-full-guid", f"{BASE}/api/Documents?pageSize=10&index=1&documentTypes={fz_id}"),
+        (
+            "documents-type-full-guid",
+            f"{BASE}/api/Documents?pageSize=10&index=1&documentTypes={fz_id}",
+        ),
         ("sitemap", f"{BASE}/sitemap.xml"),
     ]
     if first_eo:

@@ -5,7 +5,11 @@ Wraps Verifier.verify with timing hooks without modifying science code.
 """
 
 from __future__ import annotations
-import time, json, sys, hashlib
+
+import hashlib
+import json
+import sys
+import time
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -33,9 +37,9 @@ import sys
 sys.addaudithook(guard)
 
 from spanverify.config import Config
-from spanverify.engine import Verifier, WeightsBundle
 from spanverify.core import tokenize_with_offsets
 from spanverify.dataset import read_pairs
+from spanverify.engine import Verifier, WeightsBundle
 
 P5 = ROOT / "spanverify-module/reports/experiments/p5_span_filter/run39170981235"
 BUNDLE = P5 / "combined_bundle.json"
@@ -150,12 +154,8 @@ def timed_stages(mode="demo", size=1000, scenario="answer-text", warm=False):
     # For now, we do coarse breakdown: _features vs _localize vs _shares vs aggregation vs serialization
 
     # Patch to capture
-    import spanverify.features as feat_mod
     import spanverify.engine as eng_mod
-    import spanverify.token_head as th_mod
-    import spanverify.context_head as ch_mod
-    import spanverify.span_filter as sf_mod
-    import spanverify.localization as loc_mod
+    import spanverify.features as feat_mod
 
     # Keep originals
     orig_features = v._features

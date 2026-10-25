@@ -23,9 +23,11 @@ def test_tau_changes_public_mask_and_roundtrip(tmp_path):
     assert a.spans != b.spans
     assert a.stats["span_threshold"] == 0.1 and b.stats["span_threshold"] == 0.95
     high.save(tmp_path / "bundle.json")
-    c = Verifier(weights=WeightsBundle.load(tmp_path / "bundle.json"), mode="demo", span_expansion="mask").verify(
-        "Альфа бета.", "Альфа бета.", with_tokens=True
-    )
+    c = Verifier(
+        weights=WeightsBundle.load(tmp_path / "bundle.json"),
+        mode="demo",
+        span_expansion="mask",
+    ).verify("Альфа бета.", "Альфа бета.", with_tokens=True)
     assert b.tokens == c.tokens and b.spans == c.spans
     assert c.stats["span_threshold"] == 0.95
 
@@ -71,7 +73,12 @@ def test_fit_receipt_uses_only_requested_documents(monkeypatch):
     calls = []
     monkeypatch.setattr(exp, "train_token_gbdt", lambda X, y: calls.append((X, y)) or "model")
     states = [
-        {"doc": "fit", "X": [[1] * 8, [2] * 8], "gold": [1, 0], "scored": [True, False]},
+        {
+            "doc": "fit",
+            "X": [[1] * 8, [2] * 8],
+            "gold": [1, 0],
+            "scored": [True, False],
+        },
         {"doc": "held", "X": [[9] * 8], "gold": [0], "scored": [True]},
     ]
     model, receipt = exp.fit_documents(states, {"fit"})

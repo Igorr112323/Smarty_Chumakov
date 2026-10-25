@@ -77,7 +77,10 @@ def test_similarities_match_brute_force() -> None:
     index = ContextWords(pairs)
     for word in ANSWER_WORDS + ["архивный", "регистр", "сторонний"]:
         for k in (1, 3, 5, 8):
-            assert index.similarities(word, k) == _brute_similarities(word, pairs, k), (word, k)
+            assert index.similarities(word, k) == _brute_similarities(word, pairs, k), (
+                word,
+                k,
+            )
 
 
 def test_index_keeps_duplicate_words() -> None:

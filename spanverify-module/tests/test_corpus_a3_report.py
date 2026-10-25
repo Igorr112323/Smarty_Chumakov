@@ -13,7 +13,12 @@ from pathlib import Path
 
 from scripts.build_corpus_a import build
 from scripts.fetch_npa_corpus import write_sources
-from scripts.make_corpus_a3_report import END_MARKER, START_MARKER, build_report, update_summary
+from scripts.make_corpus_a3_report import (
+    END_MARKER,
+    START_MARKER,
+    build_report,
+    update_summary,
+)
 
 TEXTS = {
     "eo-1": (

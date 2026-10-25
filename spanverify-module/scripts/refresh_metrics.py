@@ -40,7 +40,14 @@ METRICS = ROOT / "reports" / "CURRENT_METRICS.json"
 
 #: Блоки, которые на локальной машине без весов модели и без артефактов CI
 #: пересобрать нельзя. Для них сохраняется прежнее значение.
-PRESERVABLE = ("pilot", "hf_experiments", "hf_external_slices", "external_tests", "release", "defects")
+PRESERVABLE = (
+    "pilot",
+    "hf_experiments",
+    "hf_external_slices",
+    "external_tests",
+    "release",
+    "defects",
+)
 
 
 def _empty(value: Any) -> bool:

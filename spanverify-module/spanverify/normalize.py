@@ -222,7 +222,11 @@ _UNIT_RE = re.compile(
             None,
             [
                 r"\b(" + "|".join(re.escape(word) for word in _UNIT_WORDS_LETTERS) + r")\b",
-                r"(" + "|".join(re.escape(word) for word in _UNIT_WORDS_SYMBOLS) + r")" if _UNIT_WORDS_SYMBOLS else "",
+                (
+                    r"(" + "|".join(re.escape(word) for word in _UNIT_WORDS_SYMBOLS) + r")"
+                    if _UNIT_WORDS_SYMBOLS
+                    else ""
+                ),
             ],
         )
     ),

@@ -55,7 +55,11 @@ def convert(md_path: Path, docx_path: Path) -> None:
         if not table_buffer:
             in_table = False
             return
-        rows = [r for r in table_buffer if not re.match(r"^\s*\|[\s\-:|]+\|\s*$", r[0])] if False else table_buffer
+        rows = (
+            [r for r in table_buffer if not re.match(r"^\s*\|[\s\-:|]+\|\s*$", r[0])]
+            if False
+            else table_buffer
+        )
         header = rows[0]
         body = rows[1:]
         table = doc.add_table(rows=1, cols=len(header))

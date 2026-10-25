@@ -28,7 +28,9 @@ def main():
     print("\n[2/5] Загрузка бандла...")
     import json
 
-    exp = json.loads(Path("reports/experiments/p0_span/run39060670054/clause_capped/experiment.json").read_text(encoding="utf-8"))
+    exp = json.loads(
+        Path("reports/experiments/p0_span/run39060670054/clause_capped/experiment.json").read_text(encoding="utf-8")
+    )
     bundle = WeightsBundle.from_dict(exp["bundle"])
     print("✓ Бандл загружен")
 

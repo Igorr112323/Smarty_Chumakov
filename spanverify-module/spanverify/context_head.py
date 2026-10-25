@@ -25,7 +25,10 @@ def feature_spec(k):
             "sequence": "scored_within_pair",
             "unscored": "self_only_then_zero_mask",
             "base_order": list(BASE_NAMES),
-            "feature_order": [*BASE_NAMES, *[f"{f}:{op}" for f in BASE_NAMES for op in OPS]],
+            "feature_order": [
+                *BASE_NAMES,
+                *[f"{f}:{op}" for f in BASE_NAMES for op in OPS],
+            ],
             "n_features": 56,
         }
     )
@@ -41,7 +44,10 @@ def validate_spec(spec):
         "sequence": "scored_within_pair",
         "unscored": "self_only_then_zero_mask",
         "base_order": list(BASE_NAMES),
-        "feature_order": [*BASE_NAMES, *[f"{f}:{op}" for f in BASE_NAMES for op in OPS]],
+        "feature_order": [
+            *BASE_NAMES,
+            *[f"{f}:{op}" for f in BASE_NAMES for op in OPS],
+        ],
         "n_features": 56,
     }
     if spec != expected:
@@ -101,7 +107,9 @@ class ContextGBDTModel(TokenGBDTModel):
         validate_spec(self.context_features)
         data = super().to_dict()
         data.update(
-            type="context_token_gbdt", schema_version="context_token_gbdt_v1", context_features=self.context_features
+            type="context_token_gbdt",
+            schema_version="context_token_gbdt_v1",
+            context_features=self.context_features,
         )
         return data
 

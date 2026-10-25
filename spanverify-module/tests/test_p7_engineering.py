@@ -5,7 +5,12 @@ from __future__ import annotations
 import random
 
 from spanverify.core import tokenize_with_offsets
-from spanverify.features import _is_content, _normalised_support, _span_overlap, map_token_positions
+from spanverify.features import (
+    _is_content,
+    _normalised_support,
+    _span_overlap,
+    map_token_positions,
+)
 
 
 def test_interval_index_and_membership_match_legacy_byte_exact():
@@ -46,7 +51,7 @@ def test_interval_index_and_membership_match_legacy_byte_exact():
         background = sum(mass[i] for i in content) / len(content) if content else 0
         expected = (
             [
-                min(1.0, max(0.0, v / max(background, 1e-9))) if i in content else min(1.0, max(0.0, v))
+                (min(1.0, max(0.0, v / max(background, 1e-9))) if i in content else min(1.0, max(0.0, v)))
                 for i, v in enumerate(mass)
             ]
             if content
@@ -93,7 +98,13 @@ def test_full_answer_stitches_every_token_once_without_zero_fill(monkeypatch, tm
         tokens = tokenize_with_offsets(answer)
         before_calls = scorer_calls
         result = full_answer_features(
-            answer, "контекст " * 100, tokens, Tokenizer(), None, scorer, {"max_length": 512, "model_name": "fixture"}
+            answer,
+            "контекст " * 100,
+            tokens,
+            Tokenizer(),
+            None,
+            scorer,
+            {"max_length": 512, "model_name": "fixture"},
         )
         assert result.meta["scored_answer_tokens"] == len(tokens)
         assert result.meta["answer_last_end"] == tokens[-1].end
@@ -177,7 +188,12 @@ def test_full_answer_stitches_every_token_once_without_zero_fill(monkeypatch, tm
         m.setattr(launcher, "configure_stdio", lambda: None)
         m.setattr(launcher, "free_port", lambda port: 18779)
         dll_paths = []
-        m.setattr(launcher.os, "add_dll_directory", lambda path: dll_paths.append(path) or object(), raising=False)
+        m.setattr(
+            launcher.os,
+            "add_dll_directory",
+            lambda path: dll_paths.append(path) or object(),
+            raising=False,
+        )
         m.setattr(launcher, "serve", lambda **kwargs: None)
         assert launcher.main(["--runtime-dir", str(libs), "--quiet", "--no-browser"]) == 0
         assert {
@@ -191,11 +207,19 @@ def test_full_answer_stitches_every_token_once_without_zero_fill(monkeypatch, tm
 
 
 def test_cached_cosine_norms_are_float_exact():
-    from spanverify.features import _cosine_dense, _cosine_dense_normed, _dense_cosine_scores_exact
+    from spanverify.features import (
+        _cosine_dense,
+        _cosine_dense_normed,
+        _dense_cosine_scores_exact,
+    )
 
     rng = random.Random(19)
     for a, b in [([], []), ([0.0], [0.0]), ([1.0], [-1.0])] + [
-        ([rng.random() - 0.5 for _ in range(768)], [rng.random() - 0.5 for _ in range(768)]) for _ in range(50)
+        (
+            [rng.random() - 0.5 for _ in range(768)],
+            [rng.random() - 0.5 for _ in range(768)],
+        )
+        for _ in range(50)
     ]:
         na, nb = sum(x * x for x in a) ** 0.5, sum(x * x for x in b) ** 0.5
         assert _cosine_dense(a, b).hex() == _cosine_dense_normed(a, b, na, nb).hex()
@@ -212,13 +236,30 @@ def test_sentence_index_matches_prefix_reference_and_style_rows():
     import re
 
     from spanverify.features import FeatureMatrix, is_scored_token
-    from spanverify.participation import _cliche_rate, _len_norm, _sentence_bounds, _sentence_of, token_rows
+    from spanverify.participation import (
+        _cliche_rate,
+        _len_norm,
+        _sentence_bounds,
+        _sentence_of,
+        token_rows,
+    )
     from spanverify.text import _SENT_BOUNDARY, ABBREV, sentences
 
     rng = random.Random(251)
     for _ in range(100):
         text = "".join(
-            rng.choice(["А. ", "ст. 15. ", "г. Москва. ", "Десять лет!\n", "«ёлка». ", " \t", "\u00a0", "Один? "])
+            rng.choice(
+                [
+                    "А. ",
+                    "ст. 15. ",
+                    "г. Москва. ",
+                    "Десять лет!\n",
+                    "«ёлка». ",
+                    " \t",
+                    "\u00a0",
+                    "Один? ",
+                ]
+            )
             for _ in range(20)
         )
         cuts = []
@@ -256,7 +297,12 @@ def test_share_calibration_is_monotone_versioned_and_quality_invariant(monkeypat
     from spanverify.share_calibration import AiShareCalibrator
 
     sha = "e0b13c693a058dfd66ed24a52fc14e9c70964e95885358e7b99cc1f328ad6892"
-    c = AiShareCalibrator.fit([0.1, 0.1, 0.3, 0.5, 0.8], [1.0, 0.0, 0.9, 0.2, 0.4], mode="demo", bundle_sha256=sha)
+    c = AiShareCalibrator.fit(
+        [0.1, 0.1, 0.3, 0.5, 0.8],
+        [1.0, 0.0, 0.9, 0.2, 0.4],
+        mode="demo",
+        bundle_sha256=sha,
+    )
     clone = AiShareCalibrator.from_dict(c.to_dict())
     assert [clone.transform(x / 100) for x in range(101)] == sorted(clone.transform(x / 100) for x in range(101))
     for bad in [float("nan"), -1.0, 2.0]:
@@ -279,7 +325,12 @@ def test_share_calibration_is_monotone_versioned_and_quality_invariant(monkeypat
     raw = Verifier(mode="demo", weights=bundle, span_expansion="mask").verify(
         "Срок 10 лет.", "Срок 5 лет.", with_tokens=True
     )
-    v = Verifier(mode="demo", weights=bundle, span_expansion="mask", ai_share_calibrator=c.to_dict())
+    v = Verifier(
+        mode="demo",
+        weights=bundle,
+        span_expansion="mask",
+        ai_share_calibrator=c.to_dict(),
+    )
     after = v.verify("Срок 10 лет.", "Срок 5 лет.", with_tokens=True)
     assert json.dumps(raw.tokens, sort_keys=True) == json.dumps(after.tokens, sort_keys=True)
     assert raw.score == after.score and raw.spans == after.spans and raw.verdict == after.verdict

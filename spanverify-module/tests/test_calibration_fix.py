@@ -23,7 +23,12 @@ def test_transform_one_basic():
 
     # PAVA creates blocks: [0.1]→0.0, [0.2, 0.3]→0.5, [0.4]→1.0
     # Transform should return [0.0, 0.5, 0.5, 1.0]
-    assert result == [0.0, 0.5, 0.5, 1.0], f"Expected [0.0, 0.5, 0.5, 1.0], got {result}"
+    assert result == [
+        0.0,
+        0.5,
+        0.5,
+        1.0,
+    ], f"Expected [0.0, 0.5, 0.5, 1.0], got {result}"
 
 
 def test_transform_one_compression():
@@ -63,7 +68,14 @@ def test_transform_boundary_values():
     # score <= 0.1 → 0.0
     # 0.1 < score <= 0.4 → 1.0
     # score > 0.4 → 1.0
-    assert result == [0.0, 0.0, 1.0, 1.0, 1.0, 1.0], f"Expected [0.0, 0.0, 1.0, 1.0, 1.0, 1.0], got {result}"
+    assert result == [
+        0.0,
+        0.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+    ], f"Expected [0.0, 0.0, 1.0, 1.0, 1.0, 1.0], got {result}"
 
 
 def test_pava_same_x():
@@ -132,7 +144,12 @@ def test_pava_counterexample():
     # - 0.1 and 0.2 should be merged into one block with mean (1+0)/2 = 0.5
     # - 0.3 (two observations) has mean (0+1)/2 = 0.5
     # - Both blocks have value 0.5, so all scores map to 0.5
-    assert result == [0.5, 0.5, 0.5, 0.5], f"Expected [0.5, 0.5, 0.5, 0.5], got {result}"
+    assert result == [
+        0.5,
+        0.5,
+        0.5,
+        0.5,
+    ], f"Expected [0.5, 0.5, 0.5, 0.5], got {result}"
 
 
 def test_serialization_roundtrip():

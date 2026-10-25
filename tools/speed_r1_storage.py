@@ -22,10 +22,14 @@ def audit(out):
     limit_decimal = 1_500_000_000
     limit_gib = 1.5 * (1024**3)
 
-    import datetime, os, subprocess
+    import datetime
+    import os
+    import subprocess
 
     try:
-        git_sha = subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=ROOT, text=True).strip()
+        git_sha = subprocess.check_output(
+            ["git", "rev-parse", "HEAD"], cwd=ROOT, text=True
+        ).strip()
     except Exception:
         git_sha = "unknown"
     run_id = os.environ.get("GITHUB_RUN_ID", "39396529570")

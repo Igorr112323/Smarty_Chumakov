@@ -2,7 +2,11 @@
 
 import pytest
 
-from spanverify.answer_head import ANSWER_FEATURE_SCHEMA_VERSION, N_ANSWER_FEATURES, AnswerHeadModel
+from spanverify.answer_head import (
+    ANSWER_FEATURE_SCHEMA_VERSION,
+    N_ANSWER_FEATURES,
+    AnswerHeadModel,
+)
 from spanverify.engine import Verifier, WeightsBundle
 from spanverify.features import FEATURE_NAMES
 

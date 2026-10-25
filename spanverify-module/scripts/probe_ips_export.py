@@ -54,7 +54,10 @@ def fetch(url: str, timeout: int = 120, read_limit: int = 3_000_000) -> dict:
     """Запрос к ИПС (cp1251) с сохранением тела."""
     request = urllib.request.Request(
         url,
-        headers={"User-Agent": USER_AGENT, "Accept": "text/html, application/rtf, text/rtf, */*"},
+        headers={
+            "User-Agent": USER_AGENT,
+            "Accept": "text/html, application/rtf, text/rtf, */*",
+        },
     )
     try:
         with urllib.request.urlopen(request, timeout=timeout) as response:  # noqa: S310 - официальный публичный сайт
@@ -66,7 +69,14 @@ def fetch(url: str, timeout: int = 120, read_limit: int = 3_000_000) -> dict:
         status = int(error.code)
         content_type = error.headers.get("Content-Type", "") if error.headers else ""
     except (urllib.error.URLError, TimeoutError, OSError) as error:
-        return {"url": url, "status": None, "content_type": "", "bytes": 0, "raw": b"", "error": str(error)[:140]}
+        return {
+            "url": url,
+            "status": None,
+            "content_type": "",
+            "bytes": 0,
+            "raw": b"",
+            "error": str(error)[:140],
+        }
     return {
         "url": url,
         "status": status,
@@ -176,7 +186,13 @@ def main() -> int:
     args.out.parent.mkdir(parents=True, exist_ok=True)
     args.out.write_text(
         json.dumps(
-            {"base": PRAVO, "queries": list(QUERIES), "searches": searches, "exports": exports, "cards": cards},
+            {
+                "base": PRAVO,
+                "queries": list(QUERIES),
+                "searches": searches,
+                "exports": exports,
+                "cards": cards,
+            },
             ensure_ascii=False,
             indent=2,
         )

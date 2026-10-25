@@ -26,7 +26,15 @@ DATA = Path(__file__).resolve().parents[1] / "data" / "demo_pairs.jsonl"
 
 
 def _span(n_tokens: int, source: str, risk: float = 0.5) -> SpanResult:
-    return SpanResult(start=0, end=10, text="фрагмент", risk=risk, label="doubtful", n_tokens=n_tokens, source=source)
+    return SpanResult(
+        start=0,
+        end=10,
+        text="фрагмент",
+        risk=risk,
+        label="doubtful",
+        n_tokens=n_tokens,
+        source=source,
+    )
 
 
 def test_single_mask_token_does_not_flip_verdict() -> None:

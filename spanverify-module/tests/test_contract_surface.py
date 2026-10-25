@@ -23,9 +23,19 @@ import pytest
 from spanverify.cli import main
 from spanverify.core import SpanResult
 from spanverify.engine import Verifier
-from spanverify.features import DEMO_DENSITY_REFERENCE, FEATURE_NAMES, combine, feature_vectors
+from spanverify.features import (
+    DEMO_DENSITY_REFERENCE,
+    FEATURE_NAMES,
+    combine,
+    feature_vectors,
+)
 from spanverify.gates import CONTRACT_GATE, INTERNAL_TARGET, gate_report
-from spanverify.limits import MAX_REQUEST_BYTES, MAX_TEXT_CHARS, TextTooLongError, check_text_length
+from spanverify.limits import (
+    MAX_REQUEST_BYTES,
+    MAX_TEXT_CHARS,
+    TextTooLongError,
+    check_text_length,
+)
 from spanverify.server import MAX_BODY, Service, make_handler
 
 ANSWER = "Срок хранения первичных документов составляет 3 года."

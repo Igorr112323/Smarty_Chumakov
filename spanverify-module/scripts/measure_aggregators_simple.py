@@ -177,10 +177,19 @@ def main():
         "cache_source_run_id": args.cache_source_run_id,
         "timestamp": datetime.utcnow().isoformat() + "Z",
         "aggregators": {
-            "current": {"name": "current", "raw_auc": raw_auc, "num_pairs": len(dev_pairs), "status": "success"}
+            "current": {
+                "name": "current",
+                "raw_auc": raw_auc,
+                "num_pairs": len(dev_pairs),
+                "status": "success",
+            }
         },
         "best_aggregator": "current",
-        "summary": {"best_aggregator": "current", "best_raw_auc": raw_auc, "num_aggregators_tested": 1},
+        "summary": {
+            "best_aggregator": "current",
+            "best_raw_auc": raw_auc,
+            "num_aggregators_tested": 1,
+        },
     }
 
     # Сохранить результаты

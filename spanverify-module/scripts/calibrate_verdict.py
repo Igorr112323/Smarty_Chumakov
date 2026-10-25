@@ -278,9 +278,16 @@ def choose(
         within = evaluated
         stage = f"ни одна точка сетки не уложилась в FPR ≤ {min(1.0, 2 * target_fpr)}: взят максимум F1 по сетке"
 
-    def key(item: tuple[dict[str, Any], dict[str, Any]]) -> tuple[float, float, int, int]:
+    def key(
+        item: tuple[dict[str, Any], dict[str, Any]],
+    ) -> tuple[float, float, int, int]:
         params, result = item
-        return (result["f1"], -result["fpr"], int(params["min_mask_tokens"]), int(params["min_fragment_chars"]))
+        return (
+            result["f1"],
+            -result["fpr"],
+            int(params["min_mask_tokens"]),
+            int(params["min_fragment_chars"]),
+        )
 
     within.sort(key=key, reverse=True)
     best_params = within[0][0]
@@ -302,7 +309,11 @@ def choose(
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description="Калибровка агрегации вердикта на dev, тест — один раз")
     parser.add_argument("--dataset", default="data/corpus_a3/pairs.jsonl")
-    parser.add_argument("--splits", default=None, help="каталог официальных разбиений (по умолчанию рядом с корпусом)")
+    parser.add_argument(
+        "--splits",
+        default=None,
+        help="каталог официальных разбиений (по умолчанию рядом с корпусом)",
+    )
     parser.add_argument("--mode", choices=["demo", "hf"], default="demo")
     parser.add_argument("--model", default=None)
     parser.add_argument("--seed", type=int, default=42)
@@ -315,14 +326,22 @@ def main(argv: list[str] | None = None) -> int:
         default="data/corpus_a/pairs.jsonl",
         help="второй корпус для контроля: замороженное правило применяется как есть ('' — не проверять)",
     )
-    parser.add_argument("--no-train", action="store_true", help="взять существующий бандл (для проверки правила)")
+    parser.add_argument(
+        "--no-train",
+        action="store_true",
+        help="взять существующий бандл (для проверки правила)",
+    )
     parser.add_argument("--bundle", default="config/weights.json", help="бандл для --no-train")
     parser.add_argument(
         "--evidence-dir",
         default=None,
         help="каталог для таблиц свидетельств (dev/test) — позволяет пересчитывать правила без обучения",
     )
-    parser.add_argument("--save-bundle", default=None, help="сохранить обученный бандл по указанному пути")
+    parser.add_argument(
+        "--save-bundle",
+        default=None,
+        help="сохранить обученный бандл по указанному пути",
+    )
     args = parser.parse_args(argv)
 
     dataset = Path(args.dataset)
@@ -336,7 +355,10 @@ def main(argv: list[str] | None = None) -> int:
             print(f"нет официального разбиения {path}", file=sys.stderr)
             return 2
         splits[name] = list(read_pairs(path))
-    print("разбиения: " + ", ".join(f"{name} {len(part)}" for name, part in splits.items()), flush=True)
+    print(
+        "разбиения: " + ", ".join(f"{name} {len(part)}" for name, part in splits.items()),
+        flush=True,
+    )
 
     if args.no_train:
         verifier = Verifier(mode=args.mode, model_name=args.model, weights_path=args.bundle)
@@ -385,13 +407,19 @@ def main(argv: list[str] | None = None) -> int:
     print("правило выбора: " + selection["stage"], flush=True)
 
     dev_rules = rules_report(dev_rows, params)
-    print("dev, три правила на одной таблице: " + json.dumps(dev_rules, ensure_ascii=False), flush=True)
+    print(
+        "dev, три правила на одной таблице: " + json.dumps(dev_rules, ensure_ascii=False),
+        flush=True,
+    )
 
     # Тест — один раз и уже замороженным правилом.
     test_rows = evidence(verifier, splits["test"])
     dump_evidence("test", test_rows)
     test_rules = rules_report(test_rows, params)
-    print("test (один прогон, правило заморожено): " + json.dumps(test_rules, ensure_ascii=False), flush=True)
+    print(
+        "test (один прогон, правило заморожено): " + json.dumps(test_rules, ensure_ascii=False),
+        flush=True,
+    )
 
     # Контроль на втором корпусе: замороженное правило применяется как есть,
     # ничего не подбирается. Нужно, чтобы видеть перенос правила на другой корпус.
@@ -411,7 +439,10 @@ def main(argv: list[str] | None = None) -> int:
                     "dataset": str(also),
                     "rules_by_split": {name: rules_report(rows, params) for name, rows in control_rows.items()},
                 }
-                print("контроль на втором корпусе: " + json.dumps(control, ensure_ascii=False), flush=True)
+                print(
+                    "контроль на втором корпусе: " + json.dumps(control, ensure_ascii=False),
+                    flush=True,
+                )
         else:
             print(f"контрольный корпус не найден: {also}", flush=True)
 
@@ -451,7 +482,12 @@ def main(argv: list[str] | None = None) -> int:
         freeze_path = Path(args.freeze)
         freeze_path.parent.mkdir(parents=True, exist_ok=True)
         freeze_path.write_text(
-            json.dumps({k: v for k, v in frozen.items() if k != "dev_metrics"}, ensure_ascii=False, indent=2) + "\n",
+            json.dumps(
+                {k: v for k, v in frozen.items() if k != "dev_metrics"},
+                ensure_ascii=False,
+                indent=2,
+            )
+            + "\n",
             encoding="utf-8",
         )
         print(f"заморожено: {freeze_path}", flush=True)

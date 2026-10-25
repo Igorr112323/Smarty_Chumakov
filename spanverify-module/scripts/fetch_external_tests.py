@@ -85,7 +85,13 @@ RAGTRUTH = {
         "by_task": {"QA": 989, "Summary": 943, "Data2txt": 1033},
         "by_split": {"train": 15090, "test": 2700},
         "by_quality": {"good": 17617, "incorrect_refusal": 144, "truncated": 29},
-        "test_qa_good": {"responses": 875, "with_hallucination": 160, "clean": 715, "spans": 235, "sources": 150},
+        "test_qa_good": {
+            "responses": 875,
+            "with_hallucination": 160,
+            "clean": 715,
+            "spans": 235,
+            "sources": 150,
+        },
     },
 }
 
@@ -166,7 +172,13 @@ def _download_http(url: str, dest: Path) -> None:
 def _download_gh(repo: str, revision: str, path: str, dest: Path) -> None:
     """Скачать файл через GitHub API (работает там, где raw.githubusercontent закрыт)."""
     result = subprocess.run(
-        ["gh", "api", "-H", "Accept: application/vnd.github.raw", f"repos/{repo}/contents/{path}?ref={revision}"],
+        [
+            "gh",
+            "api",
+            "-H",
+            "Accept: application/vnd.github.raw",
+            f"repos/{repo}/contents/{path}?ref={revision}",
+        ],
         capture_output=True,
         check=False,
         timeout=1800,
@@ -291,7 +303,11 @@ def fetch_rushallu(out_dir: Path, transport: str, verify: bool) -> dict:
             name: {"sha256": info["sha256"], "verified": info["verified"], "size": None}
             for name, info in report["files"].items()
         },
-        "totals": {**actual, "ambiguous_offsets": summary["ambiguous_offsets"], "by_type": summary["types"]},
+        "totals": {
+            **actual,
+            "ambiguous_offsets": summary["ambiguous_offsets"],
+            "by_type": summary["types"],
+        },
         "controls_ok": ok,
     }
 
@@ -317,7 +333,10 @@ def write_adapted(out_dir: Path, datasets: list[str], transport: str) -> dict:
         for task in ("QA", "Summary", "Data2txt"):
             pairs, stats = ragtruth_pairs(responses, sources, task=task, split="test")
             path = adapted_dir / f"ragtruth_{task.lower()}_test.jsonl"
-            path.write_text("".join(json.dumps(pair, ensure_ascii=False) + "\n" for pair in pairs), encoding="utf-8")
+            path.write_text(
+                "".join(json.dumps(pair, ensure_ascii=False) + "\n" for pair in pairs),
+                encoding="utf-8",
+            )
             written[path.name] = {
                 "dataset": "ragtruth",
                 "task": task,
@@ -331,7 +350,10 @@ def write_adapted(out_dir: Path, datasets: list[str], transport: str) -> dict:
             }
         all_pairs, all_stats = ragtruth_pairs(responses, sources, split="test")
         path = adapted_dir / "ragtruth_test.jsonl"
-        path.write_text("".join(json.dumps(pair, ensure_ascii=False) + "\n" for pair in all_pairs), encoding="utf-8")
+        path.write_text(
+            "".join(json.dumps(pair, ensure_ascii=False) + "\n" for pair in all_pairs),
+            encoding="utf-8",
+        )
         written[path.name] = {
             "dataset": "ragtruth",
             "task": "all",
@@ -363,7 +385,10 @@ def write_adapted(out_dir: Path, datasets: list[str], transport: str) -> dict:
                 else:
                     stats[key] = stats.get(key, 0) + value
         path = adapted_dir / "rushallu.jsonl"
-        path.write_text("".join(json.dumps(pair, ensure_ascii=False) + "\n" for pair in pairs), encoding="utf-8")
+        path.write_text(
+            "".join(json.dumps(pair, ensure_ascii=False) + "\n" for pair in pairs),
+            encoding="utf-8",
+        )
         written[path.name] = {
             "dataset": "rushallu",
             "task": "rag",
@@ -410,7 +435,11 @@ def main() -> int:
     parser.add_argument("--out", type=Path, default=ROOT / "data" / "external")
     parser.add_argument("--dataset", action="append", choices=["ragtruth", "rushallu"], default=None)
     parser.add_argument("--all", action="store_true", help="все наборы, которые берём")
-    parser.add_argument("--verify", action="store_true", help="падать при расхождении хешей и контрольных чисел")
+    parser.add_argument(
+        "--verify",
+        action="store_true",
+        help="падать при расхождении хешей и контрольных чисел",
+    )
     parser.add_argument("--adapt", action="store_true", help="собрать файлы в нашем контракте")
     parser.add_argument("--transport", choices=["auto", "http", "gh"], default="auto")
     parser.add_argument("--registry", action="store_true", help="показать реестр и выйти")

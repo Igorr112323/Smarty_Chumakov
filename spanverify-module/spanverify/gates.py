@@ -92,6 +92,6 @@ def gate_report(metrics: Mapping[str, Any], family: str = "tokens") -> dict[str,
             "source": INTERNAL_TARGET_SOURCE,
             "f1": f1,
             "fpr": fpr,
-            "status": gate_status(measured, INTERNAL_TARGET) if usable else "не измерено",
+            "status": (gate_status(measured, INTERNAL_TARGET) if usable else "не измерено"),
         },
     }

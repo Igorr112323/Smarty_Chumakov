@@ -110,7 +110,14 @@ def _train_model_on_subset(
 
     head_payload = {
         "type": "logreg",
-        "features": ["attention_entropy", "ctx_attention_mass", "embedding_density", "risk", "position", "length"],
+        "features": [
+            "attention_entropy",
+            "ctx_attention_mass",
+            "embedding_density",
+            "risk",
+            "position",
+            "length",
+        ],
         "scaler": {"means": means, "scales": scales},
         "model": model,
     }
@@ -456,7 +463,10 @@ def compute_oof_risks(
             pair_id = str(train_pairs[idx].get("id", idx))
             test_samples.extend(samples_by_pair.get(pair_id, []))
 
-        print(f"      Вычисление рисков на {len(test_samples)} test samples...", file=sys.stderr)
+        print(
+            f"      Вычисление рисков на {len(test_samples)} test samples...",
+            file=sys.stderr,
+        )
         sys.stderr.flush()
         test_risks = _get_risks_with_head(test_samples, weights, head, entropy_quantile=verifier.entropy_quantile)
 
@@ -493,7 +503,10 @@ def compute_oof_risks(
             pair_doc_ids.append(doc_id)
             pair_folds.append(fold_idx)
 
-        print(f"      ✓ Фолд {fold_idx + 1} завершен, обработано {len(test_samples_by_pair)} пар", file=sys.stderr)
+        print(
+            f"      ✓ Фолд {fold_idx + 1} завершен, обработано {len(test_samples_by_pair)} пар",
+            file=sys.stderr,
+        )
         sys.stderr.flush()
 
     return risks_by_pair, pair_ids, labels, pair_doc_ids, pair_folds
@@ -571,7 +584,12 @@ def compute_dev_answer_scores(
     dev_samples, _ = collect_samples(verifier, dev_pairs)
 
     # Получаем риски с головой
-    dev_risks = _get_risks_with_head(dev_samples, final_weights, final_head, entropy_quantile=verifier.entropy_quantile)
+    dev_risks = _get_risks_with_head(
+        dev_samples,
+        final_weights,
+        final_head,
+        entropy_quantile=verifier.entropy_quantile,
+    )
 
     # Группируем по парам и применяем сглаживание
     dev_samples_by_pair: dict[str, list[TokenSample]] = {}

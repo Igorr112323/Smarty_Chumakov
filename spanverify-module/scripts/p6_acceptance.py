@@ -70,7 +70,11 @@ def environment():
         "python": sys.version,
         "platform": platform.platform(),
         "cpu_count": os.cpu_count(),
-        "cpuinfo": (Path("/proc/cpuinfo").read_text(encoding="utf-8") if Path("/proc/cpuinfo").exists() else platform.processor()),
+        "cpuinfo": (
+            Path("/proc/cpuinfo").read_text(encoding="utf-8")
+            if Path("/proc/cpuinfo").exists()
+            else platform.processor()
+        ),
         "meminfo": (Path("/proc/meminfo").read_text(encoding="utf-8") if Path("/proc/meminfo").exists() else None),
         "versions": {d.metadata["Name"]: d.version for d in distributions()},
         "commit": os.getenv("P7_PROGRAM_SOURCE_SHA")

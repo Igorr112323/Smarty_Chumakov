@@ -26,7 +26,14 @@ import numpy as np
 import sklearn
 from p3_postprocess import OLD_TAU, distribution, validate_states
 from p4_context_head import evidence_metrics, fold_partition, readgz
-from replay_p1_dev import compare_records, make_verifier, metrics, read_json, read_jsonl, write_json
+from replay_p1_dev import (
+    compare_records,
+    make_verifier,
+    metrics,
+    read_json,
+    read_jsonl,
+    write_json,
+)
 from sklearn.linear_model import LogisticRegression
 from sklearn.preprocessing import StandardScaler
 
@@ -35,7 +42,12 @@ from spanverify.answer_head import extract_answer_features
 from spanverify.core import tokenize_with_offsets
 from spanverify.dataset import read_pairs
 from spanverify.engine import WeightsBundle, _iou, _span_f1
-from spanverify.features import FEATURE_NAMES, feature_cache_key, load_feature_cache, set_feature_cache
+from spanverify.features import (
+    FEATURE_NAMES,
+    feature_cache_key,
+    load_feature_cache,
+    set_feature_cache,
+)
 from spanverify.localization import merge_localized_spans
 from spanverify.span_filter import (
     FEATURES,
@@ -51,7 +63,15 @@ from spanverify.span_filter import (
 P4 = Path("reports/experiments/p4_context_head/run39164044941")
 P3 = Path("reports/experiments/p3_postprocess/run39160817890")
 P2 = Path("reports/experiments/p2_hf/run39155368906")
-RECIPE = dict(C=1.0, penalty="l2", class_weight="balanced", solver="lbfgs", max_iter=1000, tol=1e-6, random_state=42)
+RECIPE = dict(
+    C=1.0,
+    penalty="l2",
+    class_weight="balanced",
+    solver="lbfgs",
+    max_iter=1000,
+    tol=1e-6,
+    random_state=42,
+)
 
 
 def sha(p):
@@ -126,7 +146,12 @@ def score_cell(states, items, config, probs):
     pred = []
     for state, (candidates, ids) in zip(states, items, strict=True):
         flags, spans = filter_candidates(
-            state["answer"], state["_tokens"], candidates, config, state["_rules"], probs[ids].tolist()
+            state["answer"],
+            state["_tokens"],
+            candidates,
+            config,
+            state["_rules"],
+            probs[ids].tolist(),
         )
         for i, (gold, scored) in enumerate(zip(state["gold"], state["scored"], strict=True)):
             if not scored:
@@ -160,7 +185,12 @@ def run(cache_dir, out):
     )
     write_json(out / "preregistered_protocol.json", protocol)
     inv = read_json(P4 / "published_files_sha256.json")["files"]
-    names = ["combined_bundle.json", "k3_w1_oof.jsonl.gz", "source_oof_states.jsonl.gz", "source_dev_evidence.jsonl.gz"]
+    names = [
+        "combined_bundle.json",
+        "k3_w1_oof.jsonl.gz",
+        "source_oof_states.jsonl.gz",
+        "source_dev_evidence.jsonl.gz",
+    ]
     hashes = {n: sha(P4 / n) for n in names}
     if (
         any(hashes[n] != inv[n]["sha256"] for n in names)
@@ -175,7 +205,10 @@ def run(cache_dir, out):
         raise ValueError("Corpus declaration")
     train = list(read_pairs(train_path))
     states = readgz(P4 / "source_oof_states.jsonl.gz")
-    write_json(out / "oof_validation.json", validate_states(states, train, read_json(P2 / "fold_receipts.json")))
+    write_json(
+        out / "oof_validation.json",
+        validate_states(states, train, read_json(P2 / "fold_receipts.json")),
+    )
     risks = readgz(P4 / "k3_w1_oof.jsonl.gz")
     if len(risks) != 842 or {x["id"] for x in risks} != {s["id"] for s in states}:
         raise ValueError("P4 OOF identity")
@@ -202,7 +235,14 @@ def run(cache_dir, out):
     engine.number_attribution = lru_cache(maxsize=2048)(engine.number_attribution)
     for s in states:
         if (
-            feature_cache_key(s["answer"], s["context"], "hf", runtime["model_name"], chunking=True, max_length=512)
+            feature_cache_key(
+                s["answer"],
+                s["context"],
+                "hf",
+                runtime["model_name"],
+                chunking=True,
+                max_length=512,
+            )
             not in cache
         ):
             raise ValueError("TRAIN miss")
@@ -214,8 +254,22 @@ def run(cache_dir, out):
             *v._coverage_spans(s["answer"], s["context"], s["_tokens"], OLD_TAU),
         ]
     values = [r for s in states for r, m in zip(s["smoothed"], s["scored"], strict=True) if m]
-    lows = sorted(set([*np.quantile(values, LOW_QUANTILES).tolist(), frozen.localization_decoder["tau_low"]]))
-    highs = sorted(set([*np.quantile(values, HIGH_QUANTILES).tolist(), frozen.localization_decoder["tau_high"]]))
+    lows = sorted(
+        set(
+            [
+                *np.quantile(values, LOW_QUANTILES).tolist(),
+                frozen.localization_decoder["tau_low"],
+            ]
+        )
+    )
+    highs = sorted(
+        set(
+            [
+                *np.quantile(values, HIGH_QUANTILES).tolist(),
+                frozen.localization_decoder["tau_high"],
+            ]
+        )
+    )
     generators = [
         dict(tau_low=lo, tau_high=hi, bridge=b, min_seed=m)
         for lo in lows
@@ -241,7 +295,13 @@ def run(cache_dir, out):
             oracle_rules = []
             for s in states:
                 candidates = build_candidates(
-                    s["answer"], s["_tokens"], s["smoothed"], s["scored"], g, s["_p1"], s["_rules"]
+                    s["answer"],
+                    s["_tokens"],
+                    s["smoothed"],
+                    s["scored"],
+                    g,
+                    s["_p1"],
+                    s["_rules"],
                 )
                 labels = label_candidates(candidates, s["truth"])
                 ids = []
@@ -347,7 +407,15 @@ def run(cache_dir, out):
     with gzip.open(out / "oof_span_probabilities.jsonl.gz", "wt") as f:
         for i, p in enumerate(probs):
             f.write(json.dumps(dict(index=i, p=float(p))) + "\n")
-    cuts = sorted(set([0.0, math.nextafter(1.0, 2.0), *np.quantile(probs, KEEP_QUANTILES).tolist()]))
+    cuts = sorted(
+        set(
+            [
+                0.0,
+                math.nextafter(1.0, 2.0),
+                *np.quantile(probs, KEEP_QUANTILES).tolist(),
+            ]
+        )
+    )
     write_json(out / "keep_thresholds.json", cuts)
     dummy = receipts[0]["head"]
     best = None
@@ -358,7 +426,12 @@ def run(cache_dir, out):
             for threshold in cuts:
                 config = cfg(g, dummy, threshold)
                 score = score_cell(states, items, config, probs)
-                row = dict(cell=cell, head="pooled_logreg_C1", keep_threshold=threshold, **score)
+                row = dict(
+                    cell=cell,
+                    head="pooled_logreg_C1",
+                    keep_threshold=threshold,
+                    **score,
+                )
                 grid.write(json.dumps(row) + "\n")
                 grid_count += 1
                 key = (score["objective"], -score["tokens"]["fpr"])
@@ -391,7 +464,11 @@ def run(cache_dir, out):
         raise ValueError("OOF risk mutated")
     write_json(
         out / "freeze_receipt.json",
-        dict(bundle_sha256=sha(out / "combined_bundle.json"), dev_opened=False, seconds=time.perf_counter() - started),
+        dict(
+            bundle_sha256=sha(out / "combined_bundle.json"),
+            dev_opened=False,
+            seconds=time.perf_counter() - started,
+        ),
     )
     # FIRST dev row parse occurs below, after all choices and final model frozen.
     dev_path = Path("data/corpus_a3/splits/dev.jsonl")
@@ -404,7 +481,14 @@ def run(cache_dir, out):
     reference = {r["id"]: r for r in readgz(P4 / "dev_evidence.jsonl.gz")}
     for p in dev:
         if (
-            feature_cache_key(p["answer"], p["context"], "hf", runtime["model_name"], chunking=True, max_length=512)
+            feature_cache_key(
+                p["answer"],
+                p["context"],
+                "hf",
+                runtime["model_name"],
+                chunking=True,
+                max_length=512,
+            )
             not in cache
         ):
             raise ValueError("DEV miss")
@@ -424,7 +508,8 @@ def run(cache_dir, out):
         if len(expected) != len(result.tokens):
             raise ValueError("Full risk length drift")
         delta = max(
-            delta, max(abs(a["raw_risk"] - b["raw_risk"]) for a, b in zip(result.tokens, expected, strict=True))
+            delta,
+            max(abs(a["raw_risk"] - b["raw_risk"]) for a, b in zip(result.tokens, expected, strict=True)),
         )
         risk_count += len(expected)
         if any(not math.isfinite(t["raw_risk"]) for t in result.tokens):
@@ -443,7 +528,12 @@ def run(cache_dir, out):
         if any(s.text != p["answer"][s.start : s.end] for s in result.spans):
             errors.append([p["id"], "slice"])
         evidence.append(
-            dict(id=p["id"], spans=[asdict(s) for s in result.spans], tokens=result.tokens, verdict=result.verdict)
+            dict(
+                id=p["id"],
+                spans=[asdict(s) for s in result.spans],
+                tokens=result.tokens,
+                verdict=result.verdict,
+            )
         )
         answers.append(
             dict(
@@ -567,7 +657,11 @@ if __name__ == "__main__":
     except Exception as exc:
         write_json(
             args.output / "failure.json",
-            dict(error=str(exc), traceback=traceback.format_exc(), official_test_read=False),
+            dict(
+                error=str(exc),
+                traceback=traceback.format_exc(),
+                official_test_read=False,
+            ),
         )
         raise
     finally:

@@ -119,7 +119,11 @@ def main() -> int:
     if args.json:
         args.json.parent.mkdir(parents=True, exist_ok=True)
         args.json.write_text(
-            json.dumps({"results": results, "available": available, "blocked": blocked}, ensure_ascii=False, indent=2)
+            json.dumps(
+                {"results": results, "available": available, "blocked": blocked},
+                ensure_ascii=False,
+                indent=2,
+            )
             + "\n",
             encoding="utf-8",
         )
