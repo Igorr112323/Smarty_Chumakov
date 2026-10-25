@@ -1,10 +1,10 @@
 {
   "kind": "rotation_h1",
   "version": "h1-v1",
-  "run_id": "40141000001",
+  "run_id": 40175323603,
   "date": "2026-10-25",
   "reason": "H1 интеграция r2_share IsotonicFragmentAggregator в main (v1.4.0) — одномоментная ротация пломбы и тестов, rebase на 6ec3d3b, без изменения P8 контура",
-  "source_commit": "7534ec34967099e88df99186145d59fc59e5a962",
+  "source_commit": "64bc40b5393e4fb20dd41f8b60d4ffabdfb71df6",
   "files_rotated": [
     {
       "path": "spanverify-module/spanverify/engine.py",
@@ -40,5 +40,15 @@
     "calibrator_hf": "reports/science/r2/r2_calibrator.hf.json",
     "frozen_r2": "reports/science/r2/frozen-r2.json",
     "oof": "reports/science/r2/r2_oof_calibration.json"
+  },
+  "audit": {
+    "status": "replaced fake 40141000001",
+    "fake_run_id": "40141000001",
+    "replacement": 40175323603,
+    "links": [
+      "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/40175323603",
+      "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/40172785427"
+    ],
+    "audit_doc": "reports/science/real/RUN_ID_AUDIT.json on arena branch"
   }
 }

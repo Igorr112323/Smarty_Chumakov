@@ -1,7 +1,7 @@
 {
-  "run_id": "40141000001",
+  "run_id": "40175323603",
   "date": "2026-10-25",
-  "source_commit": "7534ec34967099e88df99186145d59fc59e5a962",
+  "source_commit": "64bc40b5393e4fb20dd41f8b60d4ffabdfb71df6",
   "files": {
     "spanverify-module/config/calibration.json": "c1dd3a06b41af29034f07ea8d5a6ca405afda68b078b0c0da5408a132f81d1b1",
     "spanverify-module/config/config.json": "8160214ddb623502fd63094e0d89994bd56c1b80acf54195f36200378be8689b",
@@ -87,5 +87,10 @@
     "spanverify-module/spanverify/vectors.py": "43fde9ba0f4de00a7e131f13e40f7285364627651a1d8096d63a34ee5cb12374",
     "spanverify-module/spanverify/webui.py": "8bb925f7699d4b2a1648e3b4c46c22fa0a57ae09d6e9631e757f4e33161e71e7",
     "spanverify-module/spanverify/r2_share.py": "7faa6a6f6b2aa3da821f757a588745fd0d86808391a2d52dc5f40ab71a89af4c"
+  },
+  "audit": {
+    "fake_previous": "40141000001",
+    "real": 40175323603,
+    "link": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/40175323603"
   }
 }
