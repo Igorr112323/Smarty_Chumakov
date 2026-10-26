@@ -1,19 +1,30 @@
-"""REALGEN-R1: заморозка фазы A не должна расшатываться последующими правками.
+"""REALGEN-R1 freeze assertions that do not open sealed evaluation inputs.
 
-Тесты читают только разрешённые файлы: REALGEN_FROZEN.json, REALGEN_PHASE_A.json,
-REALGEN_BACKGROUND.json, REALGEN_SPLITS.json и реальные данные, перечисленные в
-заморозке. Запертый real_test_pairs.jsonl не открывается НИ ОДНИМ тестом.
+Ordinary CI must never read test_realgen answers, test labels/spans, or their
+answer-context rows. Their committed hashes remain metadata in the freeze
+manifest; byte-level verification happens only inside the authorized run.
+The permanently locked real_test split is never opened by these tests.
 """
 
 from __future__ import annotations
 
 import hashlib
 import json
+import os
+import subprocess
+import sys
 from pathlib import Path
 
 MODULE_ROOT = Path(__file__).resolve().parents[1]
 REPO_ROOT = MODULE_ROOT.parent
 REAL = REPO_ROOT / "reports" / "science" / "real"
+SEALED_CONTENT_FILES = {
+    "reports/science/real/REALGEN_ANSWERS.jsonl",
+    "reports/science/real/REALGEN_ANSWERS_TEST_REALGEN.jsonl",
+    "reports/science/real/REALGEN_LABELS.jsonl",
+    "reports/science/real/REALGEN_SPANS.jsonl",
+    "reports/science/real/REALGEN_DOCS.jsonl",
+}
 
 
 def _sha256(path: Path) -> str:
@@ -29,7 +40,7 @@ def _load(name: str) -> dict:
 
 
 def test_frozen_quotas_and_sealed_split_are_preserved() -> None:
-    """400+ ответов, ≥40% ошибочных, 300 dev, test_realgen запечатан."""
+    """400+ answers, ≥40% erroneous, 300 dev, test_realgen sealed."""
     phase_a = _load("REALGEN_PHASE_A.json")
     frozen = _load("REALGEN_FROZEN.json")
     assert phase_a["quotas"]["n_answers"] >= 400
@@ -43,18 +54,26 @@ def test_frozen_quotas_and_sealed_split_are_preserved() -> None:
     assert frozen["rule_c_mode"] in ("any_window", "best_window")
 
 
-def test_frozen_file_hashes_match_the_committed_bytes() -> None:
-    """SHA-карта заморозки побайтно соответствует выложенным файлам."""
+def test_dev_inputs_match_the_freeze_without_reading_sealed_files() -> None:
+    """Verify only dev/code bytes; sealed input hashes are metadata-only here."""
     frozen = _load("REALGEN_FROZEN.json")
-    for relative, info in frozen["files"].items():
+    dev_path = REAL / "REALGEN_ANSWERS_DEV.jsonl"
+    assert _sha256(dev_path) == frozen["files"][str(dev_path.relative_to(REPO_ROOT))]["sha256"]
+
+    for relative in SEALED_CONTENT_FILES:
+        info = frozen["files"][relative]
         path = REPO_ROOT / relative
-        assert path.is_file(), f"нет файла из заморозки: {relative}"
-        assert _sha256(path) == info["sha256"], f"изменился файл заморозки: {relative}"
-    assert _sha256(REAL / "REALGEN_ANSWERS_TEST_REALGEN.jsonl") == frozen["splits"]["test_realgen"]["sha256"]
+        assert path.is_file(), f"нет sealed-файла из заморозки: {relative}"
+        # stat() inspects filesystem metadata only; it never opens the file.
+        assert path.stat().st_size == info["bytes"]
+    assert (
+        frozen["splits"]["test_realgen"]["sha256"]
+        == frozen["files"]["reports/science/real/REALGEN_ANSWERS_TEST_REALGEN.jsonl"]["sha256"]
+    )
 
 
 def test_background_has_zero_overlap_with_test_hosting_docs() -> None:
-    """Фон ровно 6510 документов и не содержит 1200 test-hosting doc_id."""
+    """Background contains 6510 documents and no 1200 test-hosting doc_id."""
     background = _load("REALGEN_BACKGROUND.json")
     manifest = _load("CORPUS_MANIFEST.json")
     ids = [entry["id"] for entry in manifest["entries"]]
@@ -69,19 +88,21 @@ def test_background_has_zero_overlap_with_test_hosting_docs() -> None:
 
 
 def test_dev_and_test_realgen_splits_do_not_intersect() -> None:
-    """Сплит по документам: 300 dev / остальное test_realgen, пересечений нет."""
+    """The dev payload is checked directly; sealed counts come from metadata."""
     splits = _load("REALGEN_SPLITS.json")
+    frozen = _load("REALGEN_FROZEN.json")
     assert splits["dev_answers"] == 300
     assert splits["overlap"] == 0
     assert splits["test_realgen_sealed"] is True
     assert not set(splits["dev_docs"]) & set(splits["test_realgen_docs"])
-    rows = [(json.loads(line))["split"] for line in (REAL / "REALGEN_ANSWERS.jsonl").open(encoding="utf-8")]
-    assert rows.count("dev") == 300
-    assert rows.count("test_realgen") == splits["test_realgen_answers"]
+    rows = [json.loads(line) for line in (REAL / "REALGEN_ANSWERS_DEV.jsonl").open(encoding="utf-8") if line.strip()]
+    assert len(rows) == 300
+    assert all(row["split"] == "dev" for row in rows)
+    assert frozen["splits"]["test_realgen"]["n_answers"] == splits["test_realgen_answers"]
 
 
 def test_phase_b_reports_only_dev_and_honest_gates() -> None:
-    """Фаза B: 300 dev, real_test не читался, ворота и CI на месте."""
+    """Phase B records 300 dev answers and never claims test data access."""
     phase_b = _load("REALGEN_PHASE_B.json")
     assert phase_b["data"]["dev_answers"] == 300
     assert phase_b["data"]["smoke_test"] is False
@@ -100,7 +121,7 @@ def test_phase_b_reports_only_dev_and_honest_gates() -> None:
 
 
 def test_phase_b_oof_rows_never_touch_test_realgen_docs() -> None:
-    """OOF-строки фазы B не содержат ни одного test_realgen документа."""
+    """OOF rows are dev-only and cover all five fixed folds."""
     splits = _load("REALGEN_SPLITS.json")
     test_docs = set(splits["test_realgen_docs"])
     seen, folds, labels = 0, set(), set()
@@ -116,8 +137,24 @@ def test_phase_b_oof_rows_never_touch_test_realgen_docs() -> None:
     assert labels <= {0, 1}
 
 
+def test_official_evaluator_refuses_without_run_now_before_opening_inputs() -> None:
+    """Default invocation exits at the control gate, before any split is opened."""
+    script = REAL / "realgen_test_official.py"
+    result = subprocess.run(
+        [sys.executable, str(script)],
+        cwd=REPO_ROOT,
+        capture_output=True,
+        text=True,
+        check=False,
+        env={key: value for key, value in os.environ.items() if key != "REALGEN_SHIFT_CODE"},
+    )
+    assert result.returncode == 2
+    assert "--run-now is required" in result.stderr
+    assert "REALGEN_ANSWERS_TEST_REALGEN" not in result.stdout + result.stderr
+
+
 def test_phase_a_reports_run_id_provenance() -> None:
-    """Честный provenance: ref-прогон генерации + local-no-ci-evidence разметки."""
+    """Generation provenance contains a verified Actions run ID."""
     phase_a = _load("REALGEN_PHASE_A.json")
     audit = _load("RUN_ID_AUDIT.json")
     assert phase_a["provenance"]["real_test_viewed"] is False

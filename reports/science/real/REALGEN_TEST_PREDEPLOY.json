@@ -1,0 +1,176 @@
+{
+  "kind": "REALGEN_TEST_PREDEPLOY",
+  "version": "v1",
+  "campaign": "REALGEN-R1",
+  "created_date": "2026-10-26",
+  "status": "BLOCKED_MODEL_ARTIFACTS_NOT_FROZEN",
+  "purpose": "Pre-registration for one official test_realgen evaluation; this file contains no official test metrics.",
+  "official_run_authorized": false,
+  "single_use": true,
+  "run_policy": {
+    "entrypoint": "reports/science/real/realgen_test_official.py",
+    "required_mode": "--run-now",
+    "required_shift_code": "FIRE-REALGEN-1",
+    "execution": "one workflow_dispatch on main only",
+    "reruns": "prohibited; workflow refuses if any earlier official dispatch exists",
+    "workflow": ".github/workflows/realgen-test-official.yml",
+    "workflow_timeout_minutes": 40,
+    "workflow_auto_commit": false,
+    "result_bridge": "GITHUB_STEP_SUMMARY and check-runs output.text; raw result artifact retained 90 days",
+    "run_id": "must be actual GITHUB_RUN_ID; no synthetic run IDs"
+  },
+  "scripts": {
+    "realgen_test_official.py": {
+      "path": "reports/science/real/realgen_test_official.py",
+      "sha256": "421a8c675c85e9dd670d5659cddfe8df352a4e0991f021279bc49c3f89821fb5"
+    },
+    "realgen_test_official_workflow.yml": {
+      "path": ".github/workflows/realgen-test-official.yml",
+      "sha256": "6343fd53cd813f93334019c9eb1355d2405f208c8f41cead8de361c437b22eb7"
+    },
+    "freeze_guard_tests.py": {
+      "path": "spanverify-module/tests/test_realgen_freeze.py",
+      "sha256": "6cc3847b8c45c67c808f61fa1bff47871dbd99fefdc4e1f0ea358314196d0ca8"
+    }
+  },
+  "inputs": {
+    "dev_and_protocol": {
+      "reports/science/real/REALGEN_FROZEN.json": {
+        "sha256": "372ff6b8820441f48150d23d36f528d188aa6edf0b876f859bbd4be188dd0c6d",
+        "source": "existing REALGEN-R1 freeze/phase-B artifacts; dev-only or metadata"
+      },
+      "reports/science/real/REALGEN_ANSWERS_DEV.jsonl": {
+        "sha256": "cd902ac8c33dee30e4b823052d00d8124f7b4bcf2d4c3cfb35f0179d90ba3341",
+        "source": "existing REALGEN-R1 freeze/phase-B artifacts; dev-only or metadata"
+      },
+      "reports/science/real/REALGEN_PHASE_A.json": {
+        "sha256": "3e5872e2cd43956684da36aed0c0eacb86898dd2b9f4bbb22c90e36a84aabc1f",
+        "source": "existing REALGEN-R1 freeze/phase-B artifacts; dev-only or metadata"
+      },
+      "reports/science/real/REALGEN_PHASE_B.json": {
+        "sha256": "35ff350f9be2daf735af750358d6527c7a18cb20709dac603444170da3fbbca4",
+        "source": "existing REALGEN-R1 freeze/phase-B artifacts; dev-only or metadata"
+      },
+      "reports/science/real/REALGEN_PHASE_B_OOF.jsonl": {
+        "sha256": "5f445aeb8c11bed5f571ac0802cc8f9f8fe91bcfc7008f8fc2d995a073cd6968",
+        "source": "existing REALGEN-R1 freeze/phase-B artifacts; dev-only or metadata"
+      }
+    },
+    "test_realgen_answers": {
+      "path": "reports/science/real/REALGEN_ANSWERS_TEST_REALGEN.jsonl",
+      "sha256": "8aac288649bdb3cc6715f0918c0b83928f4462ccdbaf24ebf591c2c3d12cf111",
+      "source": "copied from existing REALGEN_FROZEN.json metadata; file not opened during preparation",
+      "read_before_authorized_run": false
+    },
+    "test_realgen_labels_and_spans": {
+      "path": "reports/science/real/REALGEN_SPANS.jsonl",
+      "sha256": "e431a15386367f987dad6b9c9e7e90a03de33a6c436ac708342b1a2d5c65c0cd",
+      "source": "copied from existing REALGEN_FROZEN.json metadata; file not opened during preparation",
+      "read_before_authorized_run": false
+    },
+    "test_answer_context_source": {
+      "path": "reports/science/real/REALGEN_DOCS.jsonl",
+      "sha256": "809b1375b4f5ad7b2dc4acd26c3764f32a3bf31e273161f0145196f5a7a09c63",
+      "source": "copied from existing REALGEN_FROZEN.json metadata; file not opened during preparation",
+      "read_before_authorized_run": false
+    }
+  },
+  "models": {
+    "composite": {
+      "definition": "LogisticRegression(class_weight=balanced,max_iter=1000) with StandardScaler; fixed existing 27-feature order."
+    },
+    "rubert_tiny2_ft": {
+      "base": "cointegrated/rubert-tiny2",
+      "fixed_training_protocol": {
+        "batch_size": 8,
+        "learning_rate": 2e-05,
+        "epochs": 3,
+        "max_length": 96,
+        "seed": 42,
+        "token_to_word": "mean subtoken probability"
+      }
+    },
+    "r2_only": {
+      "definition": "LogisticRegression(class_weight=balanced,max_iter=1000) with StandardScaler on the fixed 16 R2 features only; excludes E1 and old5."
+    },
+    "calibration": "No post-hoc fit or calibration on test; raw frozen predict_proba/softmax scores are reported. No test-based fitting, threshold tuning, or model updates."
+  },
+  "model_bundle": {
+    "status": "MISSING",
+    "sha256": null,
+    "actions_run_id": null,
+    "artifact_name": null,
+    "required_before_ready": "A complete full-dev frozen bundle for all three named models, including inference backend and pinned upstream model revisions, with SHA256 and real Actions provenance.",
+    "blocking_finding": "Phase B persisted five-fold OOF scores and summary only; it did not persist a full-dev composite estimator, R2-only estimator, or fine-tuned rubert-tiny2 deployment weights. These cannot be represented as frozen model artifacts. Official run is refused until a separate dev-only freeze step produces and registers them."
+  },
+  "policies": {
+    "token_threshold": 0.5,
+    "span_aggregation": "Word-token probabilities are means of overlapping subtokens. Thresholded adjacent token intervals with a gap of at most one character are merged into character spans. One-to-one greedy IoU matching; hit iff IoU >= 0.5.",
+    "answer_aggregation": "Maximum word-token risk probability; threshold 0.5.",
+    "span_iou_threshold": 0.5,
+    "brier": "Mean squared probability error at token and answer levels.",
+    "ece": "10 equal-width probability bins, [0,1], last bin closed at 1.",
+    "fpr": "FP/(FP+TN) at fixed threshold 0.5.",
+    "auc": "Mann-Whitney ROC AUC with average ranks for ties.",
+    "bootstrap": {
+      "replicates": 5000,
+      "unit": "resample 100 answer/document clusters with replacement",
+      "seed": 20261026,
+      "interval": "percentile 95% CI"
+    }
+  },
+  "reported_metrics": {
+    "each_model_separately": [
+      "composite",
+      "rubert_tiny2_ft",
+      "r2_only"
+    ],
+    "token": [
+      "precision",
+      "recall",
+      "F1",
+      "FPR",
+      "ROC-AUC",
+      "Brier",
+      "ECE"
+    ],
+    "span": [
+      "precision",
+      "recall",
+      "F1 at IoU 0.5"
+    ],
+    "answer": [
+      "precision",
+      "recall",
+      "F1",
+      "FPR",
+      "ROC-AUC",
+      "Brier",
+      "ECE"
+    ],
+    "official_test_values": null
+  },
+  "suite_green_confirmation": {
+    "main_commit": "76125077bbab075014c431ddeebaada65caf99d0",
+    "first_post_merge_push_run_id": "40354903059",
+    "run_url": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/40354903059",
+    "conclusion": "success",
+    "suite_collected": 967,
+    "coverage_gate": ">=85%; successful quality job",
+    "test_matrix": "Ubuntu Python 3.11 and Windows Python 3.12 passed; full suite includes test_realgen_freeze.py and test_frozen_prediction_files_byte_identical.",
+    "read_only_p8_seal": "success"
+  },
+  "risk_disclosure": [
+    "REALGEN labels are generated by deterministic number/citation rules; lexical feature/label circularity can inflate scores.",
+    "A single synthetic generator and 100 held-out responses do not establish transfer to free-form/external generation.",
+    "R2-only baseline excludes E1 and old5 by construction.",
+    "The existing Phase B OOF scores do not constitute deployable frozen estimators; model bundle remains a hard block.",
+    "The permanent real_test 1200 split is not read or used in any role."
+  ],
+  "preparation_access_audit": {
+    "test_realgen_answers_opened": false,
+    "test_realgen_labels_or_spans_opened": false,
+    "test_specific_context_rows_opened": false,
+    "official_workflow_dispatched": false
+  }
+}
