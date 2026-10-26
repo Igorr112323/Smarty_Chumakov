@@ -55,7 +55,7 @@ def test_dev_inputs_match_the_freeze_without_reading_sealed_files() -> None:
     """Verify only dev/code bytes; sealed input hashes are metadata-only here."""
     frozen = _load("REALGEN_FROZEN.json")
     dev_path = REAL / "REALGEN_ANSWERS_DEV.jsonl"
-    assert _sha256(dev_path) == frozen["files"][str(dev_path.relative_to(REPO_ROOT))]["sha256"]
+    assert _sha256(dev_path) == frozen["files"][dev_path.relative_to(REPO_ROOT).as_posix()]["sha256"]
 
     assert SEALED_CONTENT_FILES <= set(frozen["files"])
     assert (

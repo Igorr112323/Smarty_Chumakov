@@ -30,7 +30,7 @@
     },
     "freeze_guard_tests.py": {
       "path": "spanverify-module/tests/test_realgen_freeze.py",
-      "sha256": "90d6a1612b305539a31a846e00f8320bbd04f7dfd474c54e2c874f80a8537795"
+      "sha256": "af9e81707488c3248a98d931e91c0d9b88e06c3d520f30ca1a9f57c53ea09cca"
     }
   },
   "inputs": {
