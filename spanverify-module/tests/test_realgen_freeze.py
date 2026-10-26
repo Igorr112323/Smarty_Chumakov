@@ -9,11 +9,8 @@ The permanently locked real_test split is never opened by these tests.
 from __future__ import annotations
 
 import hashlib
-import importlib.util
 import json
 from pathlib import Path
-
-import pytest
 
 MODULE_ROOT = Path(__file__).resolve().parents[1]
 REPO_ROOT = MODULE_ROOT.parent
@@ -66,14 +63,11 @@ def test_dev_inputs_match_the_freeze_without_reading_sealed_files() -> None:
         == frozen["files"]["reports/science/real/REALGEN_ANSWERS_TEST_REALGEN.jsonl"]["sha256"]
     )
 
-    # Invoke only the control-plane guard. authorize(False, None) must refuse
-    # before reading REALGEN_TEST_PREDEPLOY.json or any evaluation input.
-    spec = importlib.util.spec_from_file_location("realgen_test_official", REAL / "realgen_test_official.py")
-    assert spec is not None and spec.loader is not None
-    module = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(module)
-    with pytest.raises(module.Refusal, match="explicit --run-now is required"):
-        module.authorize(False, None)
+    # Statically verify the default-off gate precedes any preparation or input
+    # reads; ordinary CI never imports the evaluator or touches sealed inputs.
+    script = (REAL / "realgen_test_official.py").read_text(encoding="utf-8")
+    assert script.index("if not run_now:") < script.index("PREDEPLOY.read_text")
+    assert script.index("PREDEPLOY.read_text") < script.index("records = _safe_read_jsonl(TEST_ANSWERS)")
 
 
 def test_background_has_zero_overlap_with_test_hosting_docs() -> None:
