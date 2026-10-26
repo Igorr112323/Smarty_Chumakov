@@ -1,7 +1,7 @@
 {
   "kind": "ci_workflows",
   "runs_considered": 100,
-  "generated_at": "2026-10-26T09:14:26Z",
+  "generated_at": "2026-10-26T17:19:08Z",
   "command": "python scripts/collect_ci_workflows.py",
   "source": ".github/workflows/*.yml + reports/CI_RUNS.json",
   "registry": {
@@ -1050,6 +1050,28 @@
       ],
       "manual_only": true,
       "never_runs_by_itself": false
+    },
+    {
+      "file": ".github/workflows/realgen-test-official.yml",
+      "name": "REALGEN official test evaluation",
+      "triggers": [
+        "workflow_dispatch"
+      ],
+      "schedule": [],
+      "push_paths": [],
+      "push_branches": [],
+      "push_tags": [],
+      "jobs": [
+        {
+          "name": "REALGEN-Test official one-shot",
+          "timeout_minutes": 40,
+          "steps": 8,
+          "uploads_artifacts": true,
+          "runs_python": "ubuntu-24.04"
+        }
+      ],
+      "manual_only": true,
+      "never_runs_by_itself": true
     },
     {
       "file": ".github/workflows/recover-p1-results.yml",
