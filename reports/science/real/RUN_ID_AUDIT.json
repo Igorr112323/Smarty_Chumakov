@@ -152,6 +152,26 @@
         "model_bundle_status": "missing; official evaluator fail-closed"
       },
       "extraction": "manual preregistration; hashes for sealed test inputs copied only from REALGEN_FROZEN.json metadata; no model fit, test read, or official measurement"
+    },
+    {
+      "seq": 11,
+      "date": "2026-10-26",
+      "kind": "verified-actions-run",
+      "run_id": "40396111324",
+      "workflow": "ci (pull_request #25)",
+      "head_sha": "8e0063374f3dd3a6fae8528b0765641160c58da2",
+      "status": "completed/success (full test matrix 6/6; quality/coverage, contract, metrics, P8 barrier passed)",
+      "url": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/40396111324",
+      "what": "suite-green confirmation after fixing Windows path normalization in the freeze-manifest test; 972 collected nodes; no official measurement",
+      "extraction": "manual: Actions run/check-run status and bounded failure-test identifier annotation; no traceback, sealed payload, or official metrics accessed",
+      "provenance": {
+        "test_realgen_answers_opened": false,
+        "test_realgen_gold_spans_opened": false,
+        "test_specific_context_rows_opened": false,
+        "real_test_1200_read": false,
+        "official_workflow_dispatched": false,
+        "model_bundle_status": "missing; official evaluator remains fail-closed"
+      }
     }
   ]
 }
