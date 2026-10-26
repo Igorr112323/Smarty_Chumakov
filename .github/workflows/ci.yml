@@ -323,6 +323,9 @@ jobs:
               lines = ["## Test failures (identifiers only)", "", f"Failure/error cases: {len(failed)}", ""]
               lines.extend(f"- `{name}`" for name in failed)
               summary.write_text("\n".join(lines) + "\n", encoding="utf-8")
+              for name in failed:
+                  safe_name = name.replace("%", "%25").replace("\r", "%0D").replace("\n", "%0A")
+                  print(f"::error title=Pytest failure ID::{safe_name}")
           PY
 
       - name: Само-проверка конвейера
