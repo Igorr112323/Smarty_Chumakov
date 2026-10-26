@@ -52,3 +52,9 @@ spanverify-module/spanverify/training.py -text
 spanverify-module/spanverify/vectors.py -text
 spanverify-module/spanverify/webui.py -text
 spanverify-module/spanverify/r2_share.py -text
+
+# REALGEN-R1: frozen science artifacts are hashed byte-for-byte by tests.
+# Windows checkout must not convert LF to CRLF (see test_realgen_freeze.py).
+reports/science/real/REALGEN_* -text
+reports/science/real/RUN_ID_AUDIT.json -text
+reports/science/real/realgen_*.py -text
