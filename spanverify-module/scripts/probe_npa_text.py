@@ -49,7 +49,10 @@ def fetch(url: str, timeout: int = 60, read_limit: int = MAX_READ) -> dict:
     """Запрос с сохранением тела (в том числе у ошибок)."""
     request = urllib.request.Request(
         url,
-        headers={"User-Agent": USER_AGENT, "Accept": "application/json, text/html, text/plain, */*"},
+        headers={
+            "User-Agent": USER_AGENT,
+            "Accept": "application/json, text/html, text/plain, */*",
+        },
     )
     try:
         with urllib.request.urlopen(request, timeout=timeout) as response:  # noqa: S310 - официальный публичный API
@@ -90,7 +93,16 @@ def strip_tags(markup: str) -> str:
 def title_words(name: str) -> list[str]:
     """Значимые слова названия акта (для проверки, что текст документа на странице есть)."""
     words = re.findall(r"[А-Яа-яЁё]{6,}", name or "")
-    stop = {"которым", "которые", "которого", "разрешается", "утверждении", "изменений", "внесении", "отдельные"}
+    stop = {
+        "которым",
+        "которые",
+        "которого",
+        "разрешается",
+        "утверждении",
+        "изменений",
+        "внесении",
+        "отдельные",
+    }
     return [w for w in words if w.lower() not in stop][:6]
 
 
@@ -225,7 +237,12 @@ def main() -> int:
     args.out.parent.mkdir(parents=True, exist_ok=True)
     args.out.write_text(
         json.dumps(
-            {"base": BASE, "sample": sample, "view_pages": view_pages, "candidates": candidates},
+            {
+                "base": BASE,
+                "sample": sample,
+                "view_pages": view_pages,
+                "candidates": candidates,
+            },
             ensure_ascii=False,
             indent=2,
         )

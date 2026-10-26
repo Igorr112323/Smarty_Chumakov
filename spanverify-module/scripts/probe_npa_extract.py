@@ -73,7 +73,10 @@ def fetch(url: str, timeout: int = 90, read_limit: int = MAX_PDF_BYTES) -> dict:
     """Запрос с сохранением тела и факта ошибки."""
     request = urllib.request.Request(
         url,
-        headers={"User-Agent": USER_AGENT, "Accept": "application/json, application/pdf, text/html, */*"},
+        headers={
+            "User-Agent": USER_AGENT,
+            "Accept": "application/json, application/pdf, text/html, */*",
+        },
     )
     try:
         with urllib.request.urlopen(request, timeout=timeout) as response:  # noqa: S310 - официальный публичный API
@@ -91,13 +94,20 @@ def fetch(url: str, timeout: int = 90, read_limit: int = MAX_PDF_BYTES) -> dict:
         return {
             "url": url,
             "status": int(error.code),
-            "content_type": error.headers.get("Content-Type", "") if error.headers else "",
+            "content_type": (error.headers.get("Content-Type", "") if error.headers else ""),
             "bytes": len(raw),
             "error": f"HTTP {error.code}",
             "raw": raw,
         }
     except (urllib.error.URLError, TimeoutError, OSError) as error:
-        return {"url": url, "status": None, "content_type": "", "bytes": 0, "error": str(error)[:140], "raw": b""}
+        return {
+            "url": url,
+            "status": None,
+            "content_type": "",
+            "bytes": 0,
+            "error": str(error)[:140],
+            "raw": b"",
+        }
 
 
 def pdf_text(raw: bytes) -> dict:
@@ -107,7 +117,13 @@ def pdf_text(raw: bytes) -> dict:
     try:
         from pypdf import PdfReader
     except ImportError as error:  # pragma: no cover - в CI pypdf установлен
-        return {"pages": None, "chars": None, "chars_per_page": None, "text_head": "", "error": f"нет pypdf: {error}"}
+        return {
+            "pages": None,
+            "chars": None,
+            "chars_per_page": None,
+            "text_head": "",
+            "error": f"нет pypdf: {error}",
+        }
 
     try:
         reader = PdfReader(BytesIO(raw))
@@ -138,7 +154,12 @@ def main() -> int:
     parser = argparse.ArgumentParser(description="Разведка извлечения текста из PDF публикации")
     parser.add_argument("--out", type=Path, default=ROOT / "reports" / "npa_extract_probe.json")
     parser.add_argument("--pause", type=float, default=PAUSE_SECONDS)
-    parser.add_argument("--per-type", type=int, default=1, help="сколько документов каждого типа разобрать")
+    parser.add_argument(
+        "--per-type",
+        type=int,
+        default=1,
+        help="сколько документов каждого типа разобрать",
+    )
     args = parser.parse_args()
 
     types_result = fetch(f"{BASE}/api/DocumentTypes")
@@ -178,7 +199,10 @@ def main() -> int:
     # 2. Извлекается ли текст из PDF: по одному документу каждого типа.
     documents: list[dict] = []
     for type_name, type_id in sorted(type_ids.items()):
-        listing = fetch(f"{BASE}/api/Documents?pageSize=10&index=1&documentTypes={type_id}", read_limit=200_000)
+        listing = fetch(
+            f"{BASE}/api/Documents?pageSize=10&index=1&documentTypes={type_id}",
+            read_limit=200_000,
+        )
         try:
             items = json.loads(listing["raw"].decode("utf-8")).get("items", [])
         except json.JSONDecodeError:

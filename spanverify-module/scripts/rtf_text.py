@@ -30,7 +30,9 @@ _MODULE_ROOT = Path(__file__).resolve().parents[1]
 if str(_MODULE_ROOT) not in _sys.path:
     _sys.path.insert(0, str(_MODULE_ROOT))
 
-from scripts.corpus_real import normalize_text  # noqa: E402 - импорт после правки sys.path
+from scripts.corpus_real import (  # noqa: E402
+    normalize_text,
+)  # noqa: E402 - импорт после правки sys.path
 
 # Управляющие слова RTF, которые в тексте акта должны стать переносом строки.
 _PARAGRAPH_TAGS = {"par", "line", "pard", "sect", "page"}
@@ -112,7 +114,10 @@ def rtf_to_text(raw: bytes) -> str:
 
     text = text.replace("\r\n", "\n").replace("\r", "\n")
     text = _drop_destination_groups(text)
-    text = _HEX_ESCAPE.sub(lambda match: bytes([int(match.group("hex"), 16)]).decode("cp1251", "replace"), text)
+    text = _HEX_ESCAPE.sub(
+        lambda match: bytes([int(match.group("hex"), 16)]).decode("cp1251", "replace"),
+        text,
+    )
 
     def control(match: re.Match[str]) -> str:
         """Заменить управляющее слово на текст (перенос строки, пробел или ничего)."""

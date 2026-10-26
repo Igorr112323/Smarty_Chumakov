@@ -2819,7 +2819,9 @@ PROJECT_TARGET_ROWS: tuple[dict[str, Any], ...] = (
         "unit": "",
         "source": "spanverify-module/reports/CURRENT_METRICS.json (tests.collected)",
         "value": lambda payload: (
-            _json_artifact("spanverify-module", "reports", "CURRENT_METRICS.json").get("tests")
+            _json_artifact("spanverify-module", "reports", "CURRENT_METRICS.json").get(
+                "tests"
+            )
             or {}
         ).get("collected"),
     },
@@ -2830,7 +2832,9 @@ PROJECT_TARGET_ROWS: tuple[dict[str, Any], ...] = (
         "unit": "%",
         "source": "spanverify-module/reports/CURRENT_METRICS.json (tests.coverage_percent)",
         "value": lambda payload: (
-            _json_artifact("spanverify-module", "reports", "CURRENT_METRICS.json").get("tests")
+            _json_artifact("spanverify-module", "reports", "CURRENT_METRICS.json").get(
+                "tests"
+            )
             or {}
         ).get("coverage_percent"),
     },

@@ -56,7 +56,10 @@ def build_report(corpus_dir: Path) -> tuple[str, dict]:
     docs_in_pairs = len({pair["meta"].get("doc_id") for pair in pairs})
     by_mode = manifest.get("balance", {}).get("counts", {})
     checks = {
-        "контекст дословно в источнике": (manifest.get("contexts_checked"), manifest.get("contexts_problems", [])),
+        "контекст дословно в источнике": (
+            manifest.get("contexts_checked"),
+            manifest.get("contexts_problems", []),
+        ),
         "срез ответа по метке совпадает с размеченным фрагментом": (
             manifest.get("spans_checked"),
             manifest.get("spans_problems", []),
@@ -307,7 +310,11 @@ def build_report(corpus_dir: Path) -> tuple[str, dict]:
         "pairs_per_doc_min": min(pairs_per_doc.values()) if pairs_per_doc else 0,
         "pairs_per_doc_max": max(pairs_per_doc.values()) if pairs_per_doc else 0,
         "sources": [
-            (item.get("host"), item.get("documents_downloaded"), item.get("documents_with_text"))
+            (
+                item.get("host"),
+                item.get("documents_downloaded"),
+                item.get("documents_with_text"),
+            )
             for item in sources.get("sources", [])
         ],
     }

@@ -161,7 +161,15 @@ def chunk_document(
     if not paragraph_bounds:
         return DocumentChunks(
             original_text=text,
-            chunks=[Chunk(text=text, start=0, end=len(text), sentences=(text,), sentence_indices=(0,))],
+            chunks=[
+                Chunk(
+                    text=text,
+                    start=0,
+                    end=len(text),
+                    sentences=(text,),
+                    sentence_indices=(0,),
+                )
+            ],
         )
 
     # Шаг 2: Внутри каждого абзаца — предложения
@@ -200,7 +208,15 @@ def chunk_document(
     if not all_sentences:
         return DocumentChunks(
             original_text=text,
-            chunks=[Chunk(text=text, start=0, end=len(text), sentences=(text,), sentence_indices=(0,))],
+            chunks=[
+                Chunk(
+                    text=text,
+                    start=0,
+                    end=len(text),
+                    sentences=(text,),
+                    sentence_indices=(0,),
+                )
+            ],
         )
 
     # Шаг 3: Группировать в чанки по max_tokens_per_chunk

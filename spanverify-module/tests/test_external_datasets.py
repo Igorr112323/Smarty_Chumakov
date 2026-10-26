@@ -127,9 +127,21 @@ def test_label_out_of_bounds_goes_to_unverified() -> None:
         "split": "test",
         "quality": "good",
         "response": "короткий ответ",
-        "labels": [{"start": 0, "end": 900, "text": "длинный кусок", "label_type": "Subtle Conflict"}],
+        "labels": [
+            {
+                "start": 0,
+                "end": 900,
+                "text": "длинный кусок",
+                "label_type": "Subtle Conflict",
+            }
+        ],
     }
-    source = {"source_id": "11", "task_type": "QA", "source": "MARCO", "source_info": "текст"}
+    source = {
+        "source_id": "11",
+        "task_type": "QA",
+        "source": "MARCO",
+        "source_info": "текст",
+    }
     pair = adapt_ragtruth(row, source)
     assert pair["labels"] == []
     assert pair["meta"]["unverified"][0]["end"] == 900
@@ -206,7 +218,10 @@ def test_rushallu_spans_reports_unverified_instead_of_repair() -> None:
     """Спан, которого нет в ответе дословно, отмечается как непроверенный."""
     answer = "Срок хранения — десять лет."
     annotation = json.dumps(
-        [{"type": "Contradiction", "span": "десять лет"}, {"type": "Missing", "span": "нет такого"}]
+        [
+            {"type": "Contradiction", "span": "десять лет"},
+            {"type": "Missing", "span": "нет такого"},
+        ]
     )
     labels, types, ambiguous, unverified = rushallu_spans(answer, annotation)
     assert labels == [[16, 26, 1]]

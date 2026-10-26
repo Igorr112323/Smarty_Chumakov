@@ -117,7 +117,10 @@ def make_sample(source: Path, queue: Path, share: float, seed: int) -> int:
     random.Random(seed).shuffle(pairs)
     count = max(1, round(len(pairs) * share))
     queue.parent.mkdir(parents=True, exist_ok=True)
-    queue.write_text("".join(json.dumps(pair, ensure_ascii=False) + "\n" for pair in pairs[:count]), encoding="utf-8")
+    queue.write_text(
+        "".join(json.dumps(pair, ensure_ascii=False) + "\n" for pair in pairs[:count]),
+        encoding="utf-8",
+    )
     return count
 
 
@@ -173,7 +176,12 @@ def make_handler(queue_path: Path, out_path: Path):  # noqa: ANN201 - фабри
             """Не засорять вывод: каждая отдача страницы — это reload браузера."""
             return
 
-        def _send(self, body: str, status: int = 200, content_type: str = "text/html; charset=utf-8") -> None:
+        def _send(
+            self,
+            body: str,
+            status: int = 200,
+            content_type: str = "text/html; charset=utf-8",
+        ) -> None:
             payload = body.encode("utf-8")
             self.send_response(status)
             self.send_header("Content-Type", content_type)
@@ -182,7 +190,11 @@ def make_handler(queue_path: Path, out_path: Path):  # noqa: ANN201 - фабри
             self.wfile.write(payload)
 
         def _json(self, payload: dict, status: int = 200) -> None:
-            self._send(json.dumps(payload, ensure_ascii=False), status, "application/json; charset=utf-8")
+            self._send(
+                json.dumps(payload, ensure_ascii=False),
+                status,
+                "application/json; charset=utf-8",
+            )
 
         def do_GET(self) -> None:  # noqa: N802 - имя задано базовым классом
             """Отдать страницу проверки, одну пару или статистику."""
@@ -199,7 +211,7 @@ def make_handler(queue_path: Path, out_path: Path):  # noqa: ANN201 - фабри
                 card = (
                     render_card(pending[0])
                     if pending
-                    else '<div class="done">Очередь проверена: непроверенных пар нет.</div>' if queue else ""
+                    else ('<div class="done">Очередь проверена: непроверенных пар нет.</div>' if queue else "")
                 )
                 self._send(PAGE.format(progress=html.escape(progress), card=card))
                 return
@@ -244,10 +256,17 @@ def make_handler(queue_path: Path, out_path: Path):  # noqa: ANN201 - фабри
                 self._json({"error": "неизвестный id", "id": item_id}, status=400)
                 return
             if verdict not in VERDICTS:
-                self._json({"error": f"вердикт должен быть одним из {sorted(VERDICTS)}"}, status=400)
+                self._json(
+                    {"error": f"вердикт должен быть одним из {sorted(VERDICTS)}"},
+                    status=400,
+                )
                 return
             out_path.parent.mkdir(parents=True, exist_ok=True)
-            record = {"id": item_id, "verdict": verdict, "comment": str(payload.get("comment") or "")}
+            record = {
+                "id": item_id,
+                "verdict": verdict,
+                "comment": str(payload.get("comment") or ""),
+            }
             with out_path.open("a", encoding="utf-8") as handle:
                 handle.write(json.dumps(record, ensure_ascii=False) + "\n")
             self._json({"saved": record, "left": len(known) - len(decisions_index(out_path))})
@@ -272,12 +291,24 @@ def serve(queue: Path, out: Path, host: str, port: int) -> None:
 
 def main() -> int:
     parser = argparse.ArgumentParser(description="Сервер ручной проверки корпуса")
-    parser.add_argument("--queue", type=Path, default=ROOT / "data" / "review_queue" / "corpus_a_10pct.jsonl")
+    parser.add_argument(
+        "--queue",
+        type=Path,
+        default=ROOT / "data" / "review_queue" / "corpus_a_10pct.jsonl",
+    )
     parser.add_argument("--out", type=Path, default=ROOT / "data" / "review_queue" / "decisions.jsonl")
     parser.add_argument("--host", default="127.0.0.1")
     parser.add_argument("--port", type=int, default=8770)
-    parser.add_argument("--make-sample", action="store_true", help="создать очередь из источника и выйти")
-    parser.add_argument("--source", type=Path, default=ROOT / "data" / "corpus_a" / "splits" / "test.jsonl")
+    parser.add_argument(
+        "--make-sample",
+        action="store_true",
+        help="создать очередь из источника и выйти",
+    )
+    parser.add_argument(
+        "--source",
+        type=Path,
+        default=ROOT / "data" / "corpus_a" / "splits" / "test.jsonl",
+    )
     parser.add_argument("--share", type=float, default=0.10)
     parser.add_argument("--seed", type=int, default=42)
     args = parser.parse_args()

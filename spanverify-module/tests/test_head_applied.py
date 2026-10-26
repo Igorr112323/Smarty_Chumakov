@@ -58,7 +58,12 @@ def test_file_head_is_still_loaded_when_model_is_absent(monkeypatch) -> None:
 
     monkeypatch.setattr("spanverify.config.read_runtime_text", fake_read)
     features = FeatureMatrix(attention_entropy=[0.1], ctx_attention_mass=[0.2], embedding_density=[0.3])
-    probabilities = _head_risk({"type": "logreg", "file": "config/head.json"}, features, [0.4], [Token("акт", 0, 3)])
+    probabilities = _head_risk(
+        {"type": "logreg", "file": "config/head.json"},
+        features,
+        [0.4],
+        [Token("акт", 0, 3)],
+    )
     assert probabilities == [pytest.approx(1.0 / (1.0 + math.exp(2.0)))]
 
 

@@ -34,7 +34,10 @@ def test_hf_missing_dependencies_raise_clear_error() -> None:
     from spanverify.backends.base import BackendUnavailable
 
     with pytest.raises(BackendUnavailable) as caught:
-        hf_features("Срок хранения составляет 5 лет.", "Регламент: срок хранения составляет 10 лет.")
+        hf_features(
+            "Срок хранения составляет 5 лет.",
+            "Регламент: срок хранения составляет 10 лет.",
+        )
     message = str(caught.value)
     assert "hf" in message
     assert "requirements-hf.txt" in message, "сообщение обязано указывать, что установить"
@@ -49,7 +52,10 @@ def test_verifier_in_hf_mode_does_not_fall_back_to_demo() -> None:
     verifier = Verifier(mode="hf")
     assert verifier.mode == "hf"
     with pytest.raises(BackendUnavailable):
-        verifier.verify("Срок хранения составляет 5 лет.", "Регламент: срок хранения составляет 10 лет.")
+        verifier.verify(
+            "Срок хранения составляет 5 лет.",
+            "Регламент: срок хранения составляет 10 лет.",
+        )
 
 
 def test_demo_mode_is_reported_honestly() -> None:

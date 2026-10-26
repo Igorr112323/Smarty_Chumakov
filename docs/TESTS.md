@@ -11,7 +11,7 @@ python -m pytest --collect-only -q
 python -m pytest
 ```
 
-**910 собранных nodes в 74 файлах**, включая параметризованные случаи. Это не число функций: например, YAML-проверки разворачиваются для каждого workflow. Полный список nodeid и количество по каждому файлу сохранены в [TESTS_INVENTORY.json](presentation/TESTS_INVENTORY.json). Названия в таблице — реальные файлы `spanverify-module/tests/`, а не примеры будущих тестов.
+**950 собранных nodes в 76 файлах**, включая параметризованные случаи. Это не число функций: например, YAML-проверки разворачиваются для каждого workflow. Полный список nodeid и количество по каждому файлу сохранены в [TESTS_INVENTORY.json](presentation/TESTS_INVENTORY.json). Названия в таблице — реальные файлы `spanverify-module/tests/`, а не примеры будущих тестов.
 
 Базовое полное выполнение: **908 passed, 2 skipped, 0 failed, 0 errors**, tests_excluded=false. Машинное доказательство: [committed JUnit](../reports/p8/closure/local-suite.xml), [LOCAL_SUITE](../reports/p8/closure/LOCAL_SUITE.json); окончательные CI-проверки презентационного HEAD указываются в квитанции/финальном ответе, а не выдаются за этот исторический запуск.
 
@@ -79,6 +79,8 @@ python -m pytest
 | [test_p8_evidence_hygiene.py](../spanverify-module/tests/test_p8_evidence_hygiene.py) | 5 | Provenance, immutable legacy, индекс, frozen hashes, sealed receipt copy | Исторические числа и predictive-файлы не переписываются |
 | [test_participation.py](../spanverify-module/tests/test_participation.py) | 7 | Границы/доступность ai_participation, fixture смеси, round-trip, CLI/UI | Поле участия присутствует; fixture не объявляется доказательством авторства |
 | [test_review_server.py](../spanverify-module/tests/test_review_server.py) | 7 | Решения ручной проверки, статистика, invalid IDs, deterministic sample | Ручная проверка сохраняет решения без тихой потери |
+| [test_r2_share.py](../spanverify-module/tests/test_r2_share.py) | 3 | Изотонный агрегатор доли (дорожка Д, IsotonicFragmentAggregator, monotone PAVA) | Доля AI монотонна по форме, не везением |
+| [test_r2_coverage_extra.py](../spanverify-module/tests/test_r2_coverage_extra.py) | 37 | Покрытие H1: r2_share агрегативные пути + engine-интеграция (isolated/isotonic) | Новые ветки R2 (PAVA, transform, estimate/legacy, save/load) и R2-интеграция Verifier покрыты |
 | [test_rus_hallu_eval.py](../spanverify-module/tests/test_rus_hallu_eval.py) | 5 | Точные подстроки, две группы метрик, clean pairs, missing data | Внешняя оценка не выдумывает baseline или отсутствующий набор |
 | [test_rushallu_metrics.py](../spanverify-module/tests/test_rushallu_metrics.py) | 8 | Character-tokenization, repeated ngrams, LCS, empty reference, optional ROUGE parity | Stdlib-метрики совпадают с формулами и при доступности с библиотекой |
 | [test_server_cli.py](../spanverify-module/tests/test_server_cli.py) | 33 | HTTP endpoints/ошибки/CORS, CLI exit codes/files/JSON, fixtures train/calibrate | Публичные HTTP/CLI контракты проверяются реальными локальными запросами |
@@ -96,7 +98,7 @@ python -m pytest
 | [test_version.py](../spanverify-module/tests/test_version.py) | 1 | Версия пакета и pyproject | Метаданные выпуска не расходятся |
 | [test_workflow_limits.py](../spanverify-module/tests/test_workflow_limits.py) | 143 | YAML, job/step timeouts, quoting, concurrency и push metrics | CI не теряет обязательные проверки и ограничения выполнения |
 
-**Итого: 74 строки-файла, 910 nodes.** Инвентарь сохраняет каждый nodeid, включая классы и параметры; документационный тест сверяет его со всей реально собранной pytest session при полном запуске.
+**Итого: 76 строки-файла, 950 nodes.** Инвентарь сохраняет каждый nodeid, включая классы и параметры; документационный тест сверяет его со всей реально собранной pytest session при полном запуске.
 
 ## Два штатных skip — без новых исключений
 

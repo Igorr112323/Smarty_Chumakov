@@ -41,7 +41,10 @@ PAIRS = [
 def server(tmp_path: Path):
     """Поднять сервер проверки в отдельном потоке на свободном порту."""
     queue = tmp_path / "queue.jsonl"
-    queue.write_text("".join(json.dumps(pair, ensure_ascii=False) + "\n" for pair in PAIRS), encoding="utf-8")
+    queue.write_text(
+        "".join(json.dumps(pair, ensure_ascii=False) + "\n" for pair in PAIRS),
+        encoding="utf-8",
+    )
     out = tmp_path / "decisions.jsonl"
     httpd = ThreadingHTTPServer(("127.0.0.1", 0), make_handler(queue, out))
     thread = threading.Thread(target=httpd.serve_forever, daemon=True)
@@ -79,7 +82,10 @@ def test_page_shows_first_pending_pair(server) -> None:
 def test_decision_is_appended_and_next_pair_shown(server) -> None:
     """После решения пара уходит из очереди, а решение сохраняется в файл."""
     base, out = server
-    saved = _post(f"{base}/decision", {"id": "corpus-a-00001", "verdict": "ok", "comment": "метка верна"})
+    saved = _post(
+        f"{base}/decision",
+        {"id": "corpus-a-00001", "verdict": "ok", "comment": "метка верна"},
+    )
     assert saved["saved"]["verdict"] == "ok"
     assert saved["left"] == 1
     assert decisions_index(out)["corpus-a-00001"]["comment"] == "метка верна"
@@ -95,7 +101,12 @@ def test_stats_count_decisions(server) -> None:
     _post(f"{base}/decision", {"id": "corpus-a-00002", "verdict": "skip"})
     with urllib.request.urlopen(f"{base}/api/stats", timeout=10) as response:  # noqa: S310
         stats = json.loads(response.read().decode("utf-8"))
-    assert stats == {"queue": 2, "checked": 2, "left": 0, "decisions": {"wrong": 1, "skip": 1}}
+    assert stats == {
+        "queue": 2,
+        "checked": 2,
+        "left": 0,
+        "decisions": {"wrong": 1, "skip": 1},
+    }
 
 
 def test_unknown_id_and_bad_verdict_are_rejected(server) -> None:
@@ -113,7 +124,10 @@ def test_unknown_id_and_bad_verdict_are_rejected(server) -> None:
 def test_second_decision_overwrites_in_index(tmp_path: Path) -> None:
     """Перепроверка пары заменяет прежнее решение, а не удваивает его."""
     path = tmp_path / "decisions.jsonl"
-    path.write_text('{"id": "p1", "verdict": "ok"}\n{"id": "p1", "verdict": "wrong"}\n', encoding="utf-8")
+    path.write_text(
+        '{"id": "p1", "verdict": "ok"}\n{"id": "p1", "verdict": "wrong"}\n',
+        encoding="utf-8",
+    )
     index = decisions_index(path)
     assert len(index) == 1
     assert index["p1"]["verdict"] == "wrong"

@@ -13,7 +13,13 @@ import time
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from p6_acceptance import check_schema, document, environment, save, verifier  # noqa: E402
+from p6_acceptance import (
+    check_schema,
+    document,
+    environment,
+    save,
+    verifier,
+)  # noqa: E402
 
 
 def main(out):

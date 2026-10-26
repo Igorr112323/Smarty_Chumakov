@@ -15,7 +15,12 @@ from spanverify.answer_head import AnswerHeadModel, extract_answer_features
 from spanverify.calibration import IsotonicCalibrator
 from spanverify.core import tokenize_with_offsets
 from spanverify.engine import Verifier, WeightsBundle
-from spanverify.features import DEFAULT_WEIGHTS, FEATURE_NAMES, feature_cache_key, is_scored_token
+from spanverify.features import (
+    DEFAULT_WEIGHTS,
+    FEATURE_NAMES,
+    feature_cache_key,
+    is_scored_token,
+)
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -37,7 +42,13 @@ def test_real_frozen_candidate_cli_and_calibration_schema(tmp_path):
     env = dict(os.environ)
     env.pop("PYTHONPATH", None)
     out = tmp_path / "candidate"
-    command = [sys.executable, str(ROOT / "scripts/build_p1_candidate.py"), str(source), "--output-dir", str(out)]
+    command = [
+        sys.executable,
+        str(ROOT / "scripts/build_p1_candidate.py"),
+        str(source),
+        "--output-dir",
+        str(out),
+    ]
     run = subprocess.run(command, cwd=tmp_path, env=env, text=True, capture_output=True)
     assert run.returncode == 0, run.stdout + run.stderr
     bundle = WeightsBundle.load(out / "p1_candidate_bundle.json")
@@ -45,7 +56,7 @@ def test_real_frozen_candidate_cli_and_calibration_schema(tmp_path):
     assert bundle.isotonic is not None
     assert bundle.isotonic.thresholds == reference["thresholds"]
     assert bundle.isotonic.values == reference["values"]
-    assert bundle.threshold == json.loads((source / "thresholds.json").read_text())["p1"]
+    assert bundle.threshold == json.loads((source / "thresholds.json").read_text(encoding="utf-8"))["p1"]
     for name, expected in builder.EXPECTED_HASHES.items():
         assert hashlib.sha256((source / name).read_bytes().replace(b"\r\n", b"\n")).hexdigest() == expected
 
@@ -122,17 +133,35 @@ def test_whole_bundle_near_threshold_decision_roundtrip(tmp_path):
 
 
 def test_present_corrupted_p1_does_not_fall_back_to_legacy():
-    bundle = WeightsBundle(weights=dict(DEFAULT_WEIGHTS), threshold=0.5, answer_head={"schema_version": "unsupported"})
+    bundle = WeightsBundle(
+        weights=dict(DEFAULT_WEIGHTS),
+        threshold=0.5,
+        answer_head={"schema_version": "unsupported"},
+    )
     with pytest.raises(ValueError, match="Invalid P1 answer_head"):
         Verifier(weights=bundle)
 
 
 @pytest.mark.parametrize(
-    "field,value", [("raw_score", 0.2), ("calibrated_score", 0.2), ("prediction", 0), ("gold", 0), ("threshold", 0.8)]
+    "field,value",
+    [
+        ("raw_score", 0.2),
+        ("calibrated_score", 0.2),
+        ("prediction", 0),
+        ("gold", 0),
+        ("threshold", 0.8),
+    ],
 )
 def test_parity_detects_per_id_errors(field, value):
     expected = [
-        {"pair_id": "a", "gold": 1, "prediction": 1, "raw_score": 0.4, "calibrated_score": 0.6, "threshold": 0.5}
+        {
+            "pair_id": "a",
+            "gold": 1,
+            "prediction": 1,
+            "raw_score": 0.4,
+            "calibrated_score": 0.6,
+            "threshold": 0.5,
+        }
     ]
     actual = copy.deepcopy(expected)
     actual[0][field] = value
@@ -140,7 +169,14 @@ def test_parity_detects_per_id_errors(field, value):
 
 
 def test_parity_rejects_duplicate_ids():
-    row = {"pair_id": "a", "gold": 0, "prediction": 0, "raw_score": 0.1, "calibrated_score": 0.1, "threshold": 0.5}
+    row = {
+        "pair_id": "a",
+        "gold": 0,
+        "prediction": 0,
+        "raw_score": 0.1,
+        "calibrated_score": 0.1,
+        "threshold": 0.5,
+    }
     with pytest.raises(ValueError, match="Duplicate"):
         replay.compare_records([row, row], [row, row])
 
@@ -154,14 +190,22 @@ def test_cached_hf_fixture_full_replay_no_backend(tmp_path):
     source = tmp_path / "fixture-source"
     source.mkdir()
     model = AnswerHeadModel(
-        scaler_means=[0.0] * 37, scaler_scales=[1.0] * 37, weights=[0.01 * ((i % 3) - 1) for i in range(37)], bias=0.1
+        scaler_means=[0.0] * 37,
+        scaler_scales=[1.0] * 37,
+        weights=[0.01 * ((i % 3) - 1) for i in range(37)],
+        bias=0.1,
     )
     calibrator = IsotonicCalibrator([0.2, 0.4, 0.6, 1.0], [0.1, 0.3, 0.7, 0.9])
     threshold = 0.5
     pairs = []
     reference = []
     cache_rows = []
-    texts = ["Альфа бета.", "Пример документа: 25 рублей.", "Ответ с числом 2б.", "Третий вариант утверждения."]
+    texts = [
+        "Альфа бета.",
+        "Пример документа: 25 рублей.",
+        "Ответ с числом 2б.",
+        "Третий вариант утверждения.",
+    ]
     for i, text in enumerate(texts):
         label = i % 2
         pair = {
@@ -188,7 +232,14 @@ def test_cached_hf_fixture_full_replay_no_backend(tmp_path):
                 "p1_prediction": int(calibrated >= threshold),
             }
         )
-        key = feature_cache_key(text, text, "hf", "ai-forever/rugpt3small_based_on_gpt2", chunking=True, max_length=512)
+        key = feature_cache_key(
+            text,
+            text,
+            "hf",
+            "ai-forever/rugpt3small_based_on_gpt2",
+            chunking=True,
+            max_length=512,
+        )
         cache_rows.append({"key": key, "pair_id": pair["id"], **columns})
     base = WeightsBundle(weights=dict(DEFAULT_WEIGHTS), threshold=0.5, mode="hf").to_dict()
     data = {
@@ -214,10 +265,10 @@ def test_cached_hf_fixture_full_replay_no_backend(tmp_path):
     output = tmp_path / "output"
     candidate = builder.build_candidate(source, output, expected_hashes=checks)
     assert replay.run_replay(source, candidate, output / "runtime_config.json", cache, dev, output) == 0
-    parity = json.loads((output / "score_parity_report.json").read_text())
+    parity = json.loads((output / "score_parity_report.json").read_text(encoding="utf-8"))
     assert parity["reference_parity"]["matched"] is True
     assert parity["roundtrip_parity"]["matched"] is True
-    manifest = json.loads((output / "runtime_manifest.json").read_text())
+    manifest = json.loads((output / "runtime_manifest.json").read_text(encoding="utf-8"))
     assert manifest["cache_misses"] == 0
     assert manifest["fresh_hf_inference"] is False
     assert (output / "all_family_metrics.json").is_file()

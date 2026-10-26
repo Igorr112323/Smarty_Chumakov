@@ -42,7 +42,11 @@ from sklearn.ensemble import GradientBoostingClassifier
 from sklearn.utils.class_weight import compute_sample_weight
 
 import spanverify.engine as engine
-from spanverify.context_head import build_context_features, export_context_gbdt, feature_spec
+from spanverify.context_head import (
+    build_context_features,
+    export_context_gbdt,
+    feature_spec,
+)
 from spanverify.core import tokenize_with_offsets
 from spanverify.dataset import read_pairs
 from spanverify.engine import (
@@ -53,7 +57,13 @@ from spanverify.engine import (
     _token_metrics,
     smooth_token_risks,
 )
-from spanverify.features import FEATURE_NAMES, feature_cache_key, is_scored_token, load_feature_cache, set_feature_cache
+from spanverify.features import (
+    FEATURE_NAMES,
+    feature_cache_key,
+    is_scored_token,
+    load_feature_cache,
+    set_feature_cache,
+)
 from spanverify.localization import localize_state
 from spanverify.token_head import extract_token_features, train_token_gbdt
 
@@ -168,7 +178,7 @@ def context_diagnostics(states):
             category = (
                 "TP"
                 if gold and pred
-                else "FN" if gold else ("FP_dirty" if s["truth"] else "FP_clean") if pred else None
+                else ("FN" if gold else ("FP_dirty" if s["truth"] else "FP_clean") if pred else None)
             )
             if category is None:
                 continue
@@ -292,7 +302,11 @@ def run(source, cache_dir, out):
         if sha(raw) != expected:
             raise ValueError("Source gzip hash drift")
         (out / name).write_bytes(file.read_bytes())
-        provenance["sources"][name] = {"raw_sha256": sha(raw), "gzip_sha256": sha(file.read_bytes()), "bytes": len(raw)}
+        provenance["sources"][name] = {
+            "raw_sha256": sha(raw),
+            "gzip_sha256": sha(file.read_bytes()),
+            "bytes": len(raw),
+        }
     write_json(out / "source_provenance.json", provenance)
     if (
         sha((P2 / "p2_token_head.json").read_bytes()) != MODEL_HASH
@@ -307,7 +321,10 @@ def run(source, cache_dir, out):
         raise ValueError("Train hash mismatch")
     train = list(read_pairs(train_path))
     states = readgz(source / "source_oof_states.jsonl.gz")
-    write_json(out / "oof_validation.json", validate_states(states, train, read_json(P2 / "fold_receipts.json")))
+    write_json(
+        out / "oof_validation.json",
+        validate_states(states, train, read_json(P2 / "fold_receipts.json")),
+    )
     shards = list(cache_dir.rglob("features_*.jsonl"))
     if len(shards) != 8 or len({sha(p.read_bytes()) for p in shards}) != 8:
         raise ValueError("Need 8 distinct cache shards")
@@ -319,14 +336,26 @@ def run(source, cache_dir, out):
     engine.cover_facts = lru_cache(maxsize=2048)(engine.cover_facts)
     engine.number_attribution = lru_cache(maxsize=2048)(engine.number_attribution)
     for s in states:
-        key = feature_cache_key(s["answer"], s["context"], "hf", runtime["model_name"], chunking=True, max_length=512)
+        key = feature_cache_key(
+            s["answer"],
+            s["context"],
+            "hf",
+            runtime["model_name"],
+            chunking=True,
+            max_length=512,
+        )
         if key not in cache:
             raise ValueError("Missing TRAIN cache " + s["id"])
         f = v._features(s["answer"], s["context"], s["_tokens"])
         if any(len(getattr(f, n)) != len(s["_tokens"]) for n in FEATURE_NAMES):
             raise ValueError("Incomplete HF token sequence")
         s["_base"] = [
-            extract_token_features(i, len(s["_tokens"]), t.text, {n: getattr(f, n)[i] for n in FEATURE_NAMES})
+            extract_token_features(
+                i,
+                len(s["_tokens"]),
+                t.text,
+                {n: getattr(f, n)[i] for n in FEATURE_NAMES},
+            )
             for i, t in enumerate(s["_tokens"])
         ]
         s["_attr"] = v._attribution_spans(s["answer"], s["context"], s["_tokens"], s["smoothed"], OLD_TAU)
@@ -382,7 +411,9 @@ def run(source, cache_dir, out):
         if k is None:
             delta = max(abs(a - b) for s in states for a, b in zip(s["smoothed"], original_risks[s["id"]], strict=True))
             p2v = make_verifier(
-                WeightsBundle.load(P2 / "combined_bundle.json"), read_json(P2 / "runtime_config.json"), cache
+                WeightsBundle.load(P2 / "combined_bundle.json"),
+                read_json(P2 / "runtime_config.json"),
+                cache,
             )
             from p2_experiment import selection
 
@@ -395,7 +426,12 @@ def run(source, cache_dir, out):
             checks["span_f1"] = abs(control["spans"]["f1"] - expected["spans"]["f1"]) <= 1e-12
             write_json(
                 out / "p2_control_parity.json",
-                {"max_risk_delta": delta, "checks": checks, "actual": control, "expected": expected},
+                {
+                    "max_risk_delta": delta,
+                    "checks": checks,
+                    "actual": control,
+                    "expected": expected,
+                },
             )
             if delta > 1e-12 or not all(checks.values()):
                 raise ValueError("P2 control mismatch: stop, no retuning")
@@ -404,7 +440,15 @@ def run(source, cache_dir, out):
         scores.append(score)
         gzrows(
             out / (name + "_oof.jsonl.gz"),
-            [{"id": s["id"], "doc": s["doc"], "fold": s["fold"], "smoothed": s["smoothed"]} for s in states],
+            [
+                {
+                    "id": s["id"],
+                    "doc": s["doc"],
+                    "fold": s["fold"],
+                    "smoothed": s["smoothed"],
+                }
+                for s in states
+            ],
         )
         write_json(out / "model_grid_scores.json", scores)
         if score["tokens"]["fpr"] <= 0.30 and (
@@ -438,7 +482,11 @@ def run(source, cache_dir, out):
         localization_decoder=config,
     )
     candidate.save(out / "combined_bundle.json")
-    p4runtime = {**runtime, "localization_decoder": config, "context_features_spec": candidate.context_features_spec}
+    p4runtime = {
+        **runtime,
+        "localization_decoder": config,
+        "context_features_spec": candidate.context_features_spec,
+    }
     write_json(out / "runtime_config.json", p4runtime)
     orig = p3bundle.to_dict()
     changed = candidate.to_dict()
@@ -455,7 +503,14 @@ def run(source, cache_dir, out):
         raise ValueError("Need 181 unique dev pairs")
     for p in dev:
         if (
-            feature_cache_key(p["answer"], p["context"], "hf", runtime["model_name"], chunking=True, max_length=512)
+            feature_cache_key(
+                p["answer"],
+                p["context"],
+                "hf",
+                runtime["model_name"],
+                chunking=True,
+                max_length=512,
+            )
             not in cache
         ):
             raise ValueError("Missing DEV cache " + p["id"])
@@ -498,7 +553,11 @@ def run(source, cache_dir, out):
                     errors.append([family, field])
         if abs(calc["answers"]["calibrated_auc"] - source_metrics["answers"]["auc"]) > 1e-12:
             errors.append(["answers", "auc"])
-        historical[label] = {"matched": not errors, "mismatches": errors, "metrics": calc}
+        historical[label] = {
+            "matched": not errors,
+            "mismatches": errors,
+            "metrics": calc,
+        }
     write_json(out / "historical_evidence_parity.json", historical)
     if any(not h["matched"] for h in historical.values()):
         raise ValueError("Historical metric regression")
@@ -509,7 +568,8 @@ def run(source, cache_dir, out):
     after = collect_public_rows(rv, dev)
     parity = {
         "p1": compare_records(
-            before, read_jsonl(Path("reports/experiments/p1_public_replay/run39144872719/public_replay.jsonl"))
+            before,
+            read_jsonl(Path("reports/experiments/p1_public_replay/run39144872719/public_replay.jsonl")),
         ),
         "reload": compare_records(after, before),
     }
@@ -576,7 +636,13 @@ def run(source, cache_dir, out):
         {
             "pairs": 181,
             "mismatches": errors,
-            "checks": ["reload", "pure context builder", "pure decoder", "finite raw risks", "span slices"],
+            "checks": [
+                "reload",
+                "pure context builder",
+                "pure decoder",
+                "finite raw risks",
+                "span slices",
+            ],
         },
     )
     if errors:
@@ -632,7 +698,14 @@ def run(source, cache_dir, out):
         },
     )
     print(
-        json.dumps({"selected_model": best, "selected_decoder": selected_decoder, "dev": metrics4}, ensure_ascii=False),
+        json.dumps(
+            {
+                "selected_model": best,
+                "selected_decoder": selected_decoder,
+                "dev": metrics4,
+            },
+            ensure_ascii=False,
+        ),
         flush=True,
     )
 

@@ -44,7 +44,11 @@ ROOT = Path(__file__).resolve().parents[1]
 def git_commit() -> str:
     try:
         return subprocess.run(
-            ["git", "rev-parse", "HEAD"], cwd=ROOT, capture_output=True, text=True, check=True
+            ["git", "rev-parse", "HEAD"],
+            cwd=ROOT,
+            capture_output=True,
+            text=True,
+            check=True,
         ).stdout.strip()
     except (subprocess.CalledProcessError, FileNotFoundError):  # pragma: no cover
         return "unknown"
@@ -75,10 +79,10 @@ def measure(dataset: str, limit: int = 0) -> dict:
         "tokens_scored": tokens,
         "supported_tokens": len(supported),
         "unsupported_tokens": len(unsupported),
-        "supported_median": round(statistics.median(supported), 4) if supported else None,
+        "supported_median": (round(statistics.median(supported), 4) if supported else None),
         "supported_mean": round(statistics.fmean(supported), 4) if supported else None,
-        "unsupported_median": round(statistics.median(unsupported), 4) if unsupported else None,
-        "unsupported_mean": round(statistics.fmean(unsupported), 4) if unsupported else None,
+        "unsupported_median": (round(statistics.median(unsupported), 4) if unsupported else None),
+        "unsupported_mean": (round(statistics.fmean(unsupported), 4) if unsupported else None),
         "constant_in_code": DEMO_DENSITY_REFERENCE,
     }
 
@@ -88,7 +92,12 @@ def main() -> int:
     parser.add_argument("--dataset", default="data/corpus_a/splits/train.jsonl")
     parser.add_argument("--out", default="reports/DENSITY_REFERENCE.json")
     parser.add_argument("--seed", type=int, default=42)
-    parser.add_argument("--limit", type=int, default=0, help="ограничить число пар (для быстрых прогонов)")
+    parser.add_argument(
+        "--limit",
+        type=int,
+        default=0,
+        help="ограничить число пар (для быстрых прогонов)",
+    )
     args = parser.parse_args()
 
     started = time.time()

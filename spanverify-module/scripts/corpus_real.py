@@ -66,16 +66,25 @@ _MEASURES = (
 
 # Порядок важен: более специфичные образцы проверяются раньше общих.
 VALUE_PATTERNS: tuple[tuple[str, str], ...] = (
-    ("date_day_month_year", rf"\d{{1,2}}\s+(?:{_MONTHS})\s+\d{{4}}(?:\s*г(?:ода)?\.?)?"),
+    (
+        "date_day_month_year",
+        rf"\d{{1,2}}\s+(?:{_MONTHS})\s+\d{{4}}(?:\s*г(?:ода)?\.?)?",
+    ),
     ("date_numeric", r"\d{1,2}\.\d{1,2}\.\d{2,4}"),
     ("date_month_year", rf"(?:{_MONTHS})\s+\d{{4}}(?:\s*г(?:ода)?\.?)?"),
     ("year", r"\d{4}\s*(?:год|года|году|г\.)"),
-    ("money", r"\d[\d\s]*(?:,\d+)?\s*(?:руб(?:лей|ля|\.)?|тыс\.?\s*руб(?:\.|лей)?|млн\s*руб(?:\.|лей)?)"),
+    (
+        "money",
+        r"\d[\d\s]*(?:,\d+)?\s*(?:руб(?:лей|ля|\.)?|тыс\.?\s*руб(?:\.|лей)?|млн\s*руб(?:\.|лей)?)",
+    ),
     ("percent", r"\d+(?:[,.]\d+)?\s*(?:процент(?:ов|а)?|%)"),
     ("word_term", rf"(?:{_WORD_NUMBERS})\s+(?:{_UNITS})"),
     ("digit_term", rf"\d[\d\s]*\s*(?:{_UNITS})"),
     ("digit_measure", rf"\d[\d\s]*(?:,\d+)?\s+(?:{_MEASURES})"),
-    ("word_count", rf"(?:{_WORD_NUMBERS})\s+(?:документов|документа|человек|сотрудников|дней|раза|раз)"),
+    (
+        "word_count",
+        rf"(?:{_WORD_NUMBERS})\s+(?:документов|документа|человек|сотрудников|дней|раза|раз)",
+    ),
     ("count", r"\d[\d\s]{0,12}\d"),
     ("single_number", r"\d"),
 )
@@ -250,7 +259,10 @@ def build_context(text: str, fact: RealFact, neighbours: int = 1, max_chars: int
     файле источника; ограничение ``max_chars`` не даёт контекстам разрастаться.
     """
     sentences = split_sentences(text)
-    position = next((index for index, item in enumerate(sentences) if item[0] == fact.fact_start), None)
+    position = next(
+        (index for index, item in enumerate(sentences) if item[0] == fact.fact_start),
+        None,
+    )
     if position is None:
         return fact.sentence
     first = max(0, position - neighbours)
@@ -356,7 +368,11 @@ def build_real_variant(
             return None
         replacement = rng.choice(candidates)
         answer = fact.sentence_without(replacement)
-        return {"answer": answer, "labels": [_mark(answer, replacement)], "spans_text": [replacement]}
+        return {
+            "answer": answer,
+            "labels": [_mark(answer, replacement)],
+            "spans_text": [replacement],
+        }
 
     if mode == "number_attribution":
         candidates = [value for value in other_place_donors if value and value not in fact.sentence]
@@ -364,7 +380,11 @@ def build_real_variant(
             return None
         replacement = rng.choice(candidates)
         answer = fact.sentence_without(replacement)
-        return {"answer": answer, "labels": [_mark(answer, replacement)], "spans_text": [replacement]}
+        return {
+            "answer": answer,
+            "labels": [_mark(answer, replacement)],
+            "spans_text": [replacement],
+        }
 
     if mode == "partial":
         clause = _condition_clause(fact.sentence)
@@ -377,31 +397,51 @@ def build_real_variant(
         if fact.value not in answer:
             # Условие оказалось раньше значения — тогда отбрасывать нечего.
             return None
-        return {"answer": answer, "labels": [_mark(answer, fact.value)], "spans_text": [fact.value]}
+        return {
+            "answer": answer,
+            "labels": [_mark(answer, fact.value)],
+            "spans_text": [fact.value],
+        }
 
     if mode == "unconfirmed":
         detail = f"Также требуется {rng.choice(EXTRA_DETAILS)}."
         answer = f"{fact.sentence} {detail}"
-        return {"answer": answer, "labels": [_mark(answer, detail)], "spans_text": [detail]}
+        return {
+            "answer": answer,
+            "labels": [_mark(answer, detail)],
+            "spans_text": [detail],
+        }
 
     if mode == "excess":
         detail = f"а также требуется {rng.choice(EXTRA_DETAILS)}"
         answer = fact.sentence.rstrip(".") + f", {detail}."
-        return {"answer": answer, "labels": [_mark(answer, detail)], "spans_text": [detail]}
+        return {
+            "answer": answer,
+            "labels": [_mark(answer, detail)],
+            "spans_text": [detail],
+        }
 
     if mode == "missing":
         prefix = _subject_prefix(fact.sentence, fact.value_start)
         if prefix is None:
             return None
         answer = f"{prefix} — {MISSING_CLAIM}."
-        return {"answer": answer, "labels": [_mark(answer, MISSING_CLAIM)], "spans_text": [MISSING_CLAIM]}
+        return {
+            "answer": answer,
+            "labels": [_mark(answer, MISSING_CLAIM)],
+            "spans_text": [MISSING_CLAIM],
+        }
 
     if mode == "oversight":
         prefix = _subject_prefix(fact.sentence, fact.value_start)
         if prefix is None:
             return None
         answer = f"{prefix} — {OVERSIGHT_CLAIM}."
-        return {"answer": answer, "labels": [_mark(answer, OVERSIGHT_CLAIM)], "spans_text": [OVERSIGHT_CLAIM]}
+        return {
+            "answer": answer,
+            "labels": [_mark(answer, OVERSIGHT_CLAIM)],
+            "spans_text": [OVERSIGHT_CLAIM],
+        }
 
     raise ValueError(f"неизвестный режим: {mode}")
 

@@ -475,7 +475,12 @@ def build_parser() -> argparse.ArgumentParser:
         # default=SUPPRESS: если флаг не указан у подкоманды, значение глобального
         # флага не затирается (иначе «--backend hf analyze …» терял бы режим).
         sub.add_argument("--mode", choices=["demo", "surrogate", "hf"], default=argparse.SUPPRESS)
-        sub.add_argument("--backend", choices=BACKENDS, default=argparse.SUPPRESS, help="историческое имя режима")
+        sub.add_argument(
+            "--backend",
+            choices=BACKENDS,
+            default=argparse.SUPPRESS,
+            help="историческое имя режима",
+        )
         sub.add_argument("--weights", default=WEIGHTS_FILENAME)
 
     verify = subparsers.add_parser("verify", help="проверить ответ относительно контекста")
@@ -491,7 +496,12 @@ def build_parser() -> argparse.ArgumentParser:
     train_parser = subparsers.add_parser("train", help="обучить веса, порог, голову и калибровку")
     train_parser.add_argument("--dataset", default=DEFAULT_DATASET)
     train_parser.add_argument("--out", default=WEIGHTS_FILENAME)
-    train_parser.add_argument("--make-dataset", type=int, default=240, help="сгенерировать корпус, если файла нет")
+    train_parser.add_argument(
+        "--make-dataset",
+        type=int,
+        default=240,
+        help="сгенерировать корпус, если файла нет",
+    )
     train_parser.add_argument("--seed", type=int, default=42)
     train_parser.add_argument("--folds", type=int, default=5)
     train_parser.add_argument("--test-size", type=float, default=0.3)
@@ -563,7 +573,12 @@ def build_parser() -> argparse.ArgumentParser:
     # работают обе исторические формы записи («analyze "текст"» и
     # «analyze --text "текст"»). default=SUPPRESS, чтобы необъявленный флаг не
     # затирал значение позиционного аргумента.
-    analyze.add_argument("--text", dest="text", default=argparse.SUPPRESS, help="текст (историческое имя)")
+    analyze.add_argument(
+        "--text",
+        dest="text",
+        default=argparse.SUPPRESS,
+        help="текст (историческое имя)",
+    )
     analyze.add_argument("--text-file", default=None)
     analyze.add_argument("--threshold", type=float, default=None)
     analyze.add_argument("--mode", choices=["demo", "surrogate", "hf"], default=argparse.SUPPRESS)

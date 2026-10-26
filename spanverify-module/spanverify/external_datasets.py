@@ -111,7 +111,14 @@ def adapt_ragtruth(response_row: dict, source_row: dict) -> dict:
         start, end = int(label.get("start", -1)), int(label.get("end", -1))
         matches = 0 <= start < end <= len(answer) and fragment and answer[start:end] == fragment
         if not matches:
-            unverified.append({"start": start, "end": end, "text": fragment, "label_type": label.get("label_type")})
+            unverified.append(
+                {
+                    "start": start,
+                    "end": end,
+                    "text": fragment,
+                    "label_type": label.get("label_type"),
+                }
+            )
             continue
         ambiguous += 1 if count_ambiguous_spans(answer, fragment) > 1 else 0
         labels.append([start, end, 1])
@@ -191,7 +198,14 @@ def ragtruth_pairs(
             stats["clean"] += 1
         task_name = str(source.get("task_type"))
         block = stats["by_task"].setdefault(
-            task_name, {"responses": 0, "clean": 0, "with_hallucination": 0, "spans": 0, "_sources": set()}
+            task_name,
+            {
+                "responses": 0,
+                "clean": 0,
+                "with_hallucination": 0,
+                "spans": 0,
+                "_sources": set(),
+            },
         )
         block["responses"] += 1
         block["_sources"].add(str(row.get("source_id")))

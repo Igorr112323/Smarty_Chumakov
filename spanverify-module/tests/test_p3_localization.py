@@ -9,13 +9,23 @@ import pytest
 from spanverify.core import SpanResult, Token, tokenize_with_offsets
 from spanverify.engine import Verifier, WeightsBundle
 from spanverify.features import FEATURE_NAMES, FeatureMatrix, is_scored_token
-from spanverify.localization import decoder_config, localize_state, merge_localized_spans
+from spanverify.localization import (
+    decoder_config,
+    localize_state,
+    merge_localized_spans,
+)
 
 
 def state(risks, scored=None, config=None):
     text = " ".join(chr(65 + i) for i in range(len(risks)))
     tokens = [Token(text=text[i * 2 : i * 2 + 1], start=i * 2, end=i * 2 + 1) for i in range(len(risks))]
-    return localize_state(text, tokens, risks, scored or [True] * len(risks), config or decoder_config(0.4, 0.8))
+    return localize_state(
+        text,
+        tokens,
+        risks,
+        scored or [True] * len(risks),
+        config or decoder_config(0.4, 0.8),
+    )
 
 
 def test_growth_and_weak_component():
@@ -28,14 +38,40 @@ def test_growth_and_weak_component():
 
 def test_support_count():
     assert state([0.5, 0.9, 0.6], config=decoder_config(0.4, 0.8, seeds=2))[0] == set()
-    assert state([0.9, 0.85, 0.6], config=decoder_config(0.4, 0.8, seeds=2))[0] == {0, 1, 2}
+    assert state([0.9, 0.85, 0.6], config=decoder_config(0.4, 0.8, seeds=2))[0] == {
+        0,
+        1,
+        2,
+    }
 
 
 def test_bridge_unscored_not_scored_gap():
-    assert state([0.9, 0.0, 0.5], scored=[True, False, True], config=decoder_config(0.4, 0.8, bridge=1))[0] == {0, 2}
-    assert state([0.9, 0.0, 0.5], scored=[True, False, True], config=decoder_config(0.4, 0.8, bridge=0))[0] == {0}
-    assert state([0.9, 0.0, 0.5], scored=[True, True, True], config=decoder_config(0.4, 0.8, bridge=1))[0] == {0}
-    assert state([0.9, 0.0, 0.0, 0.5], scored=[True, False, False, True], config=decoder_config(0.4, 0.8, bridge=1))[
+    assert state(
+        [0.9, 0.0, 0.5],
+        scored=[True, False, True],
+        config=decoder_config(0.4, 0.8, bridge=1),
+    )[
+        0
+    ] == {0, 2}
+    assert state(
+        [0.9, 0.0, 0.5],
+        scored=[True, False, True],
+        config=decoder_config(0.4, 0.8, bridge=0),
+    )[
+        0
+    ] == {0}
+    assert state(
+        [0.9, 0.0, 0.5],
+        scored=[True, True, True],
+        config=decoder_config(0.4, 0.8, bridge=1),
+    )[
+        0
+    ] == {0}
+    assert state(
+        [0.9, 0.0, 0.0, 0.5],
+        scored=[True, False, False, True],
+        config=decoder_config(0.4, 0.8, bridge=1),
+    )[
         0
     ] == {0}
 
@@ -101,7 +137,11 @@ def test_anchor_exact_and_merge_metadata(monkeypatch):
     tokens = tokenize_with_offsets(answer)
     risk = [0.6] * len(tokens)
     v = Verifier(weights=b, mode="hf", span_expansion="mask")
-    p = Verifier(weights=replace(b, localization_decoder=decoder_config(0.4, 0.8)), mode="hf", span_expansion="mask")
+    p = Verifier(
+        weights=replace(b, localization_decoder=decoder_config(0.4, 0.8)),
+        mode="hf",
+        span_expansion="mask",
+    )
     old = v._attribution_spans(answer, "context", tokens, risk, b.token_threshold)
     new = p._attribution_spans(answer, "context", tokens, risk, b.token_threshold)
     assert (new[0].start, new[0].end) == (start, end)
@@ -109,7 +149,13 @@ def test_anchor_exact_and_merge_metadata(monkeypatch):
     assert new[0].risk == old[0].risk
     masks = [
         SpanResult(
-            start, end + 6, answer[start : end + 6], 0.9, "likely_hallucination", source="mask", token_indices=(3,)
+            start,
+            end + 6,
+            answer[start : end + 6],
+            0.9,
+            "likely_hallucination",
+            source="mask",
+            token_indices=(3,),
         )
     ]
     merged = merge_localized_spans(answer, tokens, [*masks, *new])
@@ -136,7 +182,11 @@ def test_public_pure_invariance_roundtrip_empty_mask(monkeypatch, tmp_path):
         v = Verifier(weights=bundle, mode="hf", span_expansion="mask")
         monkeypatch.setattr(v, "_features", lambda a, c, t: matrix)
         # Controlled tree-output unit fixture, shared unchanged by P2 and P3.
-        monkeypatch.setattr(v._token_head_model, "predict_many", lambda X: [0.8] + [0.4] * (len(X) - 2) + [0.0])
+        monkeypatch.setattr(
+            v._token_head_model,
+            "predict_many",
+            lambda X: [0.8] + [0.4] * (len(X) - 2) + [0.0],
+        )
         r = v.verify(answer, "context", with_tokens=True)
         return v, r
 

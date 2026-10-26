@@ -92,8 +92,8 @@ def _pair_rows(verifier: Verifier, pairs: list[dict], mode: str, model: str) -> 
                 "spans": spans,
                 "span_chars_total": sum(span["chars"] for span in spans),
                 "max_span_chars": max((span["chars"] for span in spans), default=0),
-                "mean_attention_entropy": round(sum(attention) / len(attention), 4) if attention else None,
-                "mean_ctx_attention_mass": round(sum(mass) / len(mass), 4) if mass else None,
+                "mean_attention_entropy": (round(sum(attention) / len(attention), 4) if attention else None),
+                "mean_ctx_attention_mass": (round(sum(mass) / len(mass), 4) if mass else None),
                 "flagged_by_legacy_rule": bool(legacy_flag),
             }
         )
@@ -122,8 +122,8 @@ def _summary(rows: list[dict]) -> dict:
         "legacy_share": round(len(legacy_flagged) / total, 4) if total else 0.0,
         "max_span_chars_median": widths[len(widths) // 2] if widths else 0,
         "max_span_chars_max": widths[-1] if widths else 0,
-        "mean_attention_entropy_of_flagged": round(sum(entropy) / len(entropy), 4) if entropy else None,
-        "mean_ctx_attention_mass_of_flagged": round(sum(mass) / len(mass), 4) if mass else None,
+        "mean_attention_entropy_of_flagged": (round(sum(entropy) / len(entropy), 4) if entropy else None),
+        "mean_ctx_attention_mass_of_flagged": (round(sum(mass) / len(mass), 4) if mass else None),
     }
 
 
@@ -211,13 +211,19 @@ def main(argv: list[str] | None = None) -> int:
             return 2
         cache = load_feature_cache(args.features_cache, counting=True)
         set_feature_cache(cache)
-        print(f"кеш признаков: {len(cache)} ключей из {len(args.features_cache)} пути(ей)", flush=True)
+        print(
+            f"кеш признаков: {len(cache)} ключей из {len(args.features_cache)} пути(ей)",
+            flush=True,
+        )
     verifier = Verifier(mode=args.mode, model_name=args.model, weights=bundle, features_cache=cache)
 
     started = time.time()
     rows = _pair_rows(verifier, pairs, args.mode, args.model)
     if cache is not None and getattr(cache, "misses", 0):
-        print(f"кеш неполон: промахов {cache.misses} — запуск без модели невозможен", file=sys.stderr)
+        print(
+            f"кеш неполон: промахов {cache.misses} — запуск без модели невозможен",
+            file=sys.stderr,
+        )
         return 2
     payload = {
         "dataset": args.dataset,

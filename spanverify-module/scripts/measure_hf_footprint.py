@@ -203,7 +203,12 @@ def dir_bytes_unique(path: Path) -> dict[str, int]:
                 continue
             seen_content.add(digest)
         unique_content += size
-    return {"unique": unique, "unique_content": unique_content, "naive": naive, "files": count}
+    return {
+        "unique": unique,
+        "unique_content": unique_content,
+        "naive": naive,
+        "files": count,
+    }
 
 
 #: Форматы файлов весов модели: в одном репозитории может лежать несколько форм
@@ -396,7 +401,10 @@ def runtime_modules(model: str) -> tuple[list[str], str]:
     verdict = str(payload.get("verdict") or "")
     note = f"режим {mode}, вердикт {verdict}"
     if mode != "hf":
-        return [], f"проба поднялась не в режиме hf ({note}) — объём библиотек не измерен"
+        return (
+            [],
+            f"проба поднялась не в режиме hf ({note}) — объём библиотек не измерен",
+        )
     return [str(item) for item in payload.get("modules") or []], note
 
 

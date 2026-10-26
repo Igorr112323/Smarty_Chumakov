@@ -141,7 +141,11 @@ class IsotonicCalibrator:
     # ---------- сериализация ----------
 
     def to_dict(self) -> dict[str, Any]:
-        return {"thresholds": self.thresholds, "values": self.values, "meta": self.meta or {}}
+        return {
+            "thresholds": self.thresholds,
+            "values": self.values,
+            "meta": self.meta or {},
+        }
 
     @classmethod
     def from_dict(cls, data: dict[str, Any]) -> IsotonicCalibrator:

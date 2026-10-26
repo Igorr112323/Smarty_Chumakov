@@ -44,7 +44,7 @@ def main():
     # Загружаем бандл
     print("\n[1/6] Загрузка бандла...")
     baseline_path = Path(args.baseline_experiment)
-    exp = json.loads(baseline_path.read_text())
+    exp = json.loads(baseline_path.read_text(encoding="utf-8"))
     bundle = WeightsBundle.from_dict(exp["bundle"])
     print("✓ Бандл загружен")
 

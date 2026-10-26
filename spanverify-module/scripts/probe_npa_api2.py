@@ -55,9 +55,18 @@ def base_candidates(fz_type_id: str | None) -> list[tuple[str, str]]:
         ("documents-limit-offset", f"{BASE}/api/Documents?limit=10&offset=0"),
         ("documents-count", f"{BASE}/api/Documents?count=10"),
         ("documents-year-param", f"{BASE}/api/Documents?year=2024&pageSize=10&index=1"),
-        ("documents-search-endpoint", f"{BASE}/api/Documents/Search?pageSize=5&index=1&searchTerm={_quote(QUERY)}"),
-        ("documents-searchterm", f"{BASE}/api/Documents?searchTerm={_quote(QUERY)}&pageSize=5"),
-        ("documents-type-filter", f"{BASE}/api/Documents?documentTypes={fz}&pageSize=5"),
+        (
+            "documents-search-endpoint",
+            f"{BASE}/api/Documents/Search?pageSize=5&index=1&searchTerm={_quote(QUERY)}",
+        ),
+        (
+            "documents-searchterm",
+            f"{BASE}/api/Documents?searchTerm={_quote(QUERY)}&pageSize=5",
+        ),
+        (
+            "documents-type-filter",
+            f"{BASE}/api/Documents?documentTypes={fz}&pageSize=5",
+        ),
         ("document-types", f"{BASE}/api/DocumentTypes"),
         ("api-description", f"{BASE}/api/Description"),
         ("api-help", f"{BASE}/api/Help"),
@@ -70,7 +79,10 @@ def fetch(url: str, timeout: int = 60) -> dict:
     """Один запрос; тело ответа (в том числе у ошибок) усекается, а не отбрасывается."""
     request = urllib.request.Request(
         url,
-        headers={"User-Agent": USER_AGENT, "Accept": "application/json, text/html, text/plain, */*"},
+        headers={
+            "User-Agent": USER_AGENT,
+            "Accept": "application/json, text/html, text/plain, */*",
+        },
     )
     started = time.perf_counter()
     try:

@@ -5,13 +5,17 @@ Wraps Verifier.verify with timing hooks without modifying science code.
 """
 
 from __future__ import annotations
-import time, json, sys, hashlib
+
+import hashlib
+import json
+import sys  # noqa: E402
+import time
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "spanverify-module"))
 # guard against test177
-import os
+import os  # noqa: E402
 
 RESERVED = {
     str((ROOT / f"spanverify-module/data/corpus_a3/{p}").resolve())
@@ -28,14 +32,14 @@ def guard(event, args):
             pass
 
 
-import sys
+import sys  # noqa: E402
 
 sys.addaudithook(guard)
 
-from spanverify.config import Config
-from spanverify.engine import Verifier, WeightsBundle
+from spanverify.config import Config  # noqa: E402
 from spanverify.core import tokenize_with_offsets
 from spanverify.dataset import read_pairs
+from spanverify.engine import Verifier, WeightsBundle  # noqa: E402
 
 P5 = ROOT / "spanverify-module/reports/experiments/p5_span_filter/run39170981235"
 BUNDLE = P5 / "combined_bundle.json"
@@ -150,12 +154,8 @@ def timed_stages(mode="demo", size=1000, scenario="answer-text", warm=False):
     # For now, we do coarse breakdown: _features vs _localize vs _shares vs aggregation vs serialization
 
     # Patch to capture
-    import spanverify.features as feat_mod
     import spanverify.engine as eng_mod
-    import spanverify.token_head as th_mod
-    import spanverify.context_head as ch_mod
-    import spanverify.span_filter as sf_mod
-    import spanverify.localization as loc_mod
+    import spanverify.features as feat_mod
 
     # Keep originals
     orig_features = v._features

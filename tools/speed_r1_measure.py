@@ -11,20 +11,21 @@ SPEED-R1 Phase A — Декомпозиция таймингов HF/Demo
 """
 
 from __future__ import annotations
+
 import argparse
+import cProfile
 import hashlib
+import io
 import json
+import math
 import os
 import platform
+import pstats
 import subprocess
 import sys
 import time
-import cProfile
-import pstats
-import io
 from pathlib import Path
-from statistics import median, quantiles
-import math
+from statistics import median
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "spanverify-module"))
@@ -51,9 +52,9 @@ def guard(event, args):
 
 sys.addaudithook(guard)
 
-from spanverify.config import Config
-from spanverify.engine import Verifier, WeightsBundle
+from spanverify.config import Config  # noqa: E402
 from spanverify.dataset import read_pairs
+from spanverify.engine import Verifier, WeightsBundle  # noqa: E402
 
 BUNDLE = P5 / "combined_bundle.json"
 SHA = "e0b13c693a058dfd66ed24a52fc14e9c70964e95885358e7b99cc1f328ad6892"

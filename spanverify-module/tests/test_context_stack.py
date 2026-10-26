@@ -206,7 +206,12 @@ def test_combine_uses_absolute_mass_not_relative():
 
 def test_combine_weights_are_normalised():
     """Сумма весов приводится к единице: риск остаётся в [0, 1]."""
-    risk = combine([1.0], [0.0], [1.0], {"attention_entropy": 2, "ctx_attention_mass": 2, "embedding_density": 2})
+    risk = combine(
+        [1.0],
+        [0.0],
+        [1.0],
+        {"attention_entropy": 2, "ctx_attention_mass": 2, "embedding_density": 2},
+    )
     assert 0.0 <= risk[0] <= 1.0
 
 
@@ -271,7 +276,10 @@ def test_demo_features_matrix_has_one_row_per_token():
     matrix = demo_features(ANSWER_TRUE, CONTEXT, tokens)
     assert len(matrix) == len(tokens)
     row = FeatureMatrix(
-        attention_entropy=[0.1], ctx_attention_mass=[0.2], embedding_density=[0.3], token_risk=[0.4]
+        attention_entropy=[0.1],
+        ctx_attention_mass=[0.2],
+        embedding_density=[0.3],
+        token_risk=[0.4],
     ).as_rows()[0]
     # Состав строки — ровно пять рабочих признаков (ТЗ п. 4.1 треб. 3) и риск.
     assert set(row) == set(FEATURE_NAMES) | {"risk"}
@@ -394,7 +402,11 @@ def test_verifier_keeps_passed_bundle(monkeypatch, tmp_path):
     path.write_text(
         json.dumps(
             {
-                "weights": {"attention_entropy": 1.0, "ctx_attention_mass": 0.0, "embedding_density": 0.0},
+                "weights": {
+                    "attention_entropy": 1.0,
+                    "ctx_attention_mass": 0.0,
+                    "embedding_density": 0.0,
+                },
                 "threshold": 0.9,
             }
         ),
@@ -705,11 +717,21 @@ def test_logreg_learns_order():
             index,
             2,
             "слово",
-            {"attention_entropy": 0.0, "ctx_attention_mass": 0.0, "embedding_density": 0.0, "risk": risk},
+            {
+                "attention_entropy": 0.0,
+                "ctx_attention_mass": 0.0,
+                "embedding_density": 0.0,
+                "risk": risk,
+            },
             label,
         )
 
-    samples = [sample(0, -2.0, 0), sample(1, -1.0, 0), sample(2, 1.0, 1), sample(3, 2.0, 1)]
+    samples = [
+        sample(0, -2.0, 0),
+        sample(1, -1.0, 0),
+        sample(2, 1.0, 1),
+        sample(3, 2.0, 1),
+    ]
     rows, labels = _head_rows(samples, [-2.0, -1.0, 1.0, 2.0])
     scaled, means, scales = _standardize(rows)
     model = _train_logreg(scaled, labels, epochs=300)
@@ -728,11 +750,19 @@ def test_head_scores_rejects_wrong_dimensionality():
             0,
             1,
             "слово",
-            {"attention_entropy": 0.0, "ctx_attention_mass": 0.0, "embedding_density": 0.0, "risk": 0.3},
+            {
+                "attention_entropy": 0.0,
+                "ctx_attention_mass": 0.0,
+                "embedding_density": 0.0,
+                "risk": 0.3,
+            },
             1,
         )
     ]
-    payload = {"model": {"weights": [1.0], "bias": 0.0}, "scaler": {"means": [0.0], "scales": [1.0]}}
+    payload = {
+        "model": {"weights": [1.0], "bias": 0.0},
+        "scaler": {"means": [0.0], "scales": [1.0]},
+    }
     assert _head_scores(samples, payload, [0.3]) == [0.3]
 
 
@@ -744,7 +774,12 @@ def test_head_scores_falls_back_without_model():
             0,
             1,
             "слово",
-            {"attention_entropy": 0.0, "ctx_attention_mass": 0.0, "embedding_density": 0.0, "risk": 0.3},
+            {
+                "attention_entropy": 0.0,
+                "ctx_attention_mass": 0.0,
+                "embedding_density": 0.0,
+                "risk": 0.3,
+            },
             1,
         )
     ]
@@ -775,7 +810,16 @@ def test_train_reports_validation_and_selection():
     """Отчёт содержит метрики валидации и объяснение выбора сигнала."""
     report = train(tiny_pairs(80, seed=6), mode="demo", seed=42)
     validation = report.validation
-    assert {"tokens", "f1", "fpr", "auc", "span_f1", "answer_auc", "end_to_end", "selection"} <= set(validation)
+    assert {
+        "tokens",
+        "f1",
+        "fpr",
+        "auc",
+        "span_f1",
+        "answer_auc",
+        "end_to_end",
+        "selection",
+    } <= set(validation)
     assert validation["selection"]["signal"] in {"rule", "logreg"}
     assert validation["end_to_end"]["tokens"]["f1"] >= 0.0
 
@@ -801,7 +845,16 @@ def test_save_training_artifacts_writes_weights(tmp_path):
     written = save_training_artifacts(report, tmp_path / "config" / "weights.json", root=tmp_path)
     assert written["weights"].is_file()
     payload = json.loads(written["weights"].read_text(encoding="utf-8"))
-    assert set(payload) >= {"weights", "threshold", "target_fpr", "folds", "isotonic", "head", "seed", "version"}
+    assert set(payload) >= {
+        "weights",
+        "threshold",
+        "target_fpr",
+        "folds",
+        "isotonic",
+        "head",
+        "seed",
+        "version",
+    }
     assert set(payload["isotonic"]) == {"x", "y"}
     assert payload["seed"] == 42
 

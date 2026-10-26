@@ -284,7 +284,8 @@ print(t1-t0)
                         "details": details[:2],
                     }
                 )
-    import datetime, os
+    import datetime
+    import os
 
     run_id = os.environ.get("GITHUB_RUN_ID", "39396529570")
     if not run_id.isdigit():

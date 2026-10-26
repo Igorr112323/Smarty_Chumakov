@@ -27,6 +27,7 @@ concurrency:
 permissions:
   actions: read
   contents: read
+  checks: write
 
 env:
   PYTHONUTF8: "1"
@@ -87,11 +88,72 @@ jobs:
       - name: Линтер (ruff)
         run: python -m ruff check .
 
+      - name: Диагностика линтера (дословный срез при failure)
+        if: failure()
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          echo "=== ruff check . (first 4KB) ===" >> $GITHUB_STEP_SUMMARY
+          python -m ruff check . 2>&1 | head -c 4096 | tee /tmp/ruff.txt || true
+          cat /tmp/ruff.txt >> $GITHUB_STEP_SUMMARY || true
+          echo "=== black --check . (first 4KB) ===" >> $GITHUB_STEP_SUMMARY
+          python -m black --check . 2>&1 | head -c 4096 | tee /tmp/black.txt || true
+          cat /tmp/black.txt >> $GITHUB_STEP_SUMMARY || true
+          cat /tmp/ruff.txt /tmp/black.txt 2>/dev/null | head -c 2048 > /tmp/diag_lint.txt || true
+          CHECK_RUN_ID=$(gh api "repos/${{ github.repository }}/commits/${{ github.sha }}/check-runs" --paginate --jq '.check_runs[] | select(.name | contains("Линтер, форматирование")) | .id' 2>/dev/null | head -n1 || echo "")
+          if [ -n "$CHECK_RUN_ID" ]; then
+            ESCAPED=$(python -c "import json; data=open('/tmp/diag_lint.txt',encoding='utf-8',errors='ignore').read(); print(json.dumps(data))" 2>/dev/null || echo '""')
+            printf '{"output":{"title":"Lint diagnostic (first 2KB)","summary":"Дословный срез lint-ошибки (head 1f226ed+, 2KB)","text":%s}}' "$ESCAPED" > /tmp/payload.json
+            gh api --method PATCH "repos/${{ github.repository }}/check-runs/$CHECK_RUN_ID" --input /tmp/payload.json 2>&1 | head -20 || true
+          fi
+          mkdir -p reports 2>/dev/null || true
+          cp /tmp/diag_lint.txt reports/diag-lint.txt 2>/dev/null || true
+
+      - name: Диагностический артефакт линтера
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: diag-lint
+          path: spanverify-module/reports/diag-lint.txt
+          if-no-files-found: warn
+
       - name: Форматирование (black --check)
         run: python -m black --check .
 
       - name: Тесты с порогом покрытия 85 %
         run: python -m pytest --cov=spanverify --cov-report=term --cov-report=json:reports/coverage.json --cov-fail-under=85 --junitxml=reports/quality-junit.xml
+
+      - name: Диагностика покрытия (дословный срез при failure)
+        if: failure()
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          echo "=== coverage failure (first 4KB) ===" >> $GITHUB_STEP_SUMMARY
+          cat reports/coverage.json 2>&1 | head -c 4096 | tee /tmp/cov.txt || true
+          cat /tmp/cov.txt >> $GITHUB_STEP_SUMMARY || true
+          echo "" >> $GITHUB_STEP_SUMMARY
+          python -m pytest --cov=spanverify --cov-report=term 2>&1 | tail -n 50 | head -c 4096 | tee /tmp/cov_term.txt || true
+          cat /tmp/cov_term.txt >> $GITHUB_STEP_SUMMARY || true
+          cat /tmp/cov.txt /tmp/cov_term.txt 2>/dev/null | head -c 2048 > /tmp/diag_cov.txt || true
+          CHECK_RUN_ID=$(gh api "repos/${{ github.repository }}/commits/${{ github.sha }}/check-runs" --paginate --jq '.check_runs[] | select(.name | contains("Линтер, форматирование")) | .id' 2>/dev/null | head -n1 || echo "")
+          if [ -z "$CHECK_RUN_ID" ]; then CHECK_RUN_ID=$(gh api "repos/${{ github.repository }}/actions/runs/${{ github.run_id }}/jobs" --jq '.jobs[] | select(.name | contains("Линтер")) | .id' 2>/dev/null | head -n1 || echo ""); fi
+          if [ -n "$CHECK_RUN_ID" ]; then
+            ESCAPED=$(python -c "import json; data=open('/tmp/diag_cov.txt',encoding='utf-8',errors='ignore').read(); print(json.dumps(data))" 2>/dev/null || echo '""')
+            printf '{"output":{"title":"Coverage diagnostic (first 2KB)","summary":"Дословный срез coverage-ошибки (head b82b85b+, 2KB)","text":%s}}' "$ESCAPED" > /tmp/payload.json
+            gh api --method PATCH "repos/${{ github.repository }}/check-runs/$CHECK_RUN_ID" --input /tmp/payload.json 2>&1 | head -20 || true
+          fi
+          mkdir -p reports 2>/dev/null || true
+          cp /tmp/diag_cov.txt reports/diag-coverage.txt 2>/dev/null || true
+
+      - name: Диагностический артефакт покрытия
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: diag-coverage
+          path: spanverify-module/reports/diag-coverage.txt
+          if-no-files-found: warn
 
       - name: Воспроизводимость обучения (один seed → один результат)
         run: |

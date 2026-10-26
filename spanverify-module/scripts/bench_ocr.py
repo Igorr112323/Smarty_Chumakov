@@ -87,7 +87,12 @@ def pick_sample_pdf(pause: float) -> Path | None:
 def main() -> int:
     parser = argparse.ArgumentParser(description="Замер скорости OCR на реальном акте")
     parser.add_argument("--out", type=Path, default=ROOT / "reports" / "OCR_BENCH.json")
-    parser.add_argument("--pdf", type=Path, default=None, help="готовый PDF; если не задан — скачать один акт")
+    parser.add_argument(
+        "--pdf",
+        type=Path,
+        default=None,
+        help="готовый PDF; если не задан — скачать один акт",
+    )
     parser.add_argument("--pages", type=int, default=3, help="сколько страниц распознавать в замере")
     parser.add_argument("--pause", type=float, default=1.5, help="пауза между запросами, секунд")
     args = parser.parse_args()

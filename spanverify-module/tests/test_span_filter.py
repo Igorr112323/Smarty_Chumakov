@@ -20,7 +20,11 @@ from spanverify.train import TokenSample, _filter_short_flagged_groups, _score_p
 def _bundle() -> WeightsBundle:
     """Бандл, в котором риск даёт только энтропия внимания."""
     return WeightsBundle(
-        weights={"attention_entropy": 1.0, "ctx_attention_mass": 0.0, "embedding_density": 0.0},
+        weights={
+            "attention_entropy": 1.0,
+            "ctx_attention_mass": 0.0,
+            "embedding_density": 0.0,
+        },
         threshold=0.9,
         span_z=0.0,
         span_floor=0.3,

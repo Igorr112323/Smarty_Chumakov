@@ -50,7 +50,11 @@ from .logreg import (
     train_logreg as _train_logreg,
 )
 from .normalize import contains_number_date_or_amount
-from .participation import ParticipationModel, build_participation_corpus, corpus_rows_and_labels
+from .participation import (
+    ParticipationModel,
+    build_participation_corpus,
+    corpus_rows_and_labels,
+)
 
 __all__ = [
     "TrainReport",
@@ -69,7 +73,14 @@ Z_GRID = (0.0, 0.5, 1.0, 1.5, 2.0, 2.5, 3.0)
 # и AUC 0,851. Сетка не могла выбрать порог ниже пола, поэтому детектор молчал.
 FLOOR_GRID = (0.05, 0.10, 0.15, 0.20, 0.25, 0.3, 0.35, 0.4, 0.45, 0.5)
 CAP_GRID = (0.5, 0.55, 0.6, 0.7, 0.8)
-HEAD_FEATURES = ("attention_entropy", "ctx_attention_mass", "embedding_density", "risk", "position", "length")
+HEAD_FEATURES = (
+    "attention_entropy",
+    "ctx_attention_mass",
+    "embedding_density",
+    "risk",
+    "position",
+    "length",
+)
 
 
 @dataclass
@@ -564,7 +575,11 @@ def _select_mask(
                     continue
                 key = (metrics["f1"], -metrics["fpr"], metrics["recall"])
                 if best_key is None or key > best_key:
-                    best_key, best_params, best_metrics = key, (span_z, floor, cap), metrics
+                    best_key, best_params, best_metrics = (
+                        key,
+                        (span_z, floor, cap),
+                        metrics,
+                    )
     return best_params, best_metrics
 
 
@@ -675,7 +690,8 @@ def train(
 ) -> TrainReport:
     """Обучить веса, пороги, голову и калибровку; вернуть отчёт."""
     verifier = verifier or Verifier(
-        mode=mode, weights=WeightsBundle(weights=dict(DEFAULT_WEIGHTS), threshold=0.5, mode=mode)
+        mode=mode,
+        weights=WeightsBundle(weights=dict(DEFAULT_WEIGHTS), threshold=0.5, mode=mode),
     )
     train_pairs, test_pairs = _split_pairs(pairs, test_size=test_size, seed=seed, group=group_split)
 
@@ -773,7 +789,11 @@ def train(
         )
 
     validation = _score_pairs(verifier, test_pairs, risk_fn, best_span, test_by_pair)
-    validation_at = metrics_at(calibrator.transform(validation["raw_scores"]), validation["answer_labels"], threshold)
+    validation_at = metrics_at(
+        calibrator.transform(validation["raw_scores"]),
+        validation["answer_labels"],
+        threshold,
+    )
 
     # Модель встраивается в бандл, а не только путь к файлу. Иначе оценка
     # читает config/head.json из поставки (демо-голова) и применяет её к
@@ -946,7 +966,9 @@ def _train_and_compare_head(
             continue
         model = _train_logreg([train_scaled[i] for i in train_idx], [train_labels[i] for i in train_idx])
         for index, probability in zip(
-            test_idx, _head_probabilities(model, [train_scaled[i] for i in test_idx]), strict=False
+            test_idx,
+            _head_probabilities(model, [train_scaled[i] for i in test_idx]),
+            strict=False,
         ):
             out_of_fold[index] = probability
         fold_reports.append(
@@ -954,7 +976,10 @@ def _train_and_compare_head(
                 "fold": fold,
                 "n_train": len(train_idx),
                 "n_test": len(test_idx),
-                "auc": auc_score([train_labels[i] for i in test_idx], [out_of_fold[i] for i in test_idx]),
+                "auc": auc_score(
+                    [train_labels[i] for i in test_idx],
+                    [out_of_fold[i] for i in test_idx],
+                ),
             }
         )
 
@@ -1004,7 +1029,12 @@ def _fit_participation(verifier: Verifier, seed: int, version: str) -> dict[str,
     samples = build_participation_corpus(count=240, seed=seed + 1985)
     rows, labels = corpus_rows_and_labels(verifier, samples)
     if not rows or len(set(labels)) < 2:
-        return {"type": "none", "payload": None, "auc_out_of_fold": 0.0, "calibrated_on": ""}
+        return {
+            "type": "none",
+            "payload": None,
+            "auc_out_of_fold": 0.0,
+            "calibrated_on": "",
+        }
     model = ParticipationModel.fit(rows, labels, seed=seed, version=version)
     return {
         "type": "participation-logreg",
@@ -1041,7 +1071,10 @@ def save_training_artifacts(report: TrainReport, weights_path: str | Path, root:
             "version": report.bundle.version,
             "seed": report.seed,
         }
-        part_path.write_text(json.dumps(part_payload, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+        part_path.write_text(
+            json.dumps(part_payload, ensure_ascii=False, indent=2) + "\n",
+            encoding="utf-8",
+        )
         written["participation"] = part_path
     return written
 

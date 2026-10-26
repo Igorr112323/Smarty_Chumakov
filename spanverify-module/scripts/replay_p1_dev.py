@@ -17,7 +17,11 @@ sys.path.insert(0, str(PACKAGE_ROOT))
 from spanverify.config import Config  # noqa: E402
 from spanverify.dataset import read_pairs  # noqa: E402
 from spanverify.engine import Verifier, WeightsBundle  # noqa: E402
-from spanverify.features import feature_cache_key, load_feature_cache, set_feature_cache  # noqa: E402
+from spanverify.features import (  # noqa: E402
+    feature_cache_key,
+    load_feature_cache,
+    set_feature_cache,
+)  # noqa: E402
 
 TOLERANCE = 1e-12
 
@@ -35,7 +39,10 @@ def write_json(path, obj):
 
 
 def write_jsonl(path, rows):
-    Path(path).write_text("".join(json.dumps(row, ensure_ascii=False) + "\n" for row in rows), encoding="utf-8")
+    Path(path).write_text(
+        "".join(json.dumps(row, ensure_ascii=False) + "\n" for row in rows),
+        encoding="utf-8",
+    )
 
 
 def compute_auc(labels, scores):
@@ -84,7 +91,14 @@ def compare_records(actual, expected):
         ref = reference[row["pair_id"]]
         for key in ("gold", "prediction"):
             if row[key] != ref[key]:
-                errors.append({"pair_id": row["pair_id"], "field": key, "actual": row[key], "expected": ref[key]})
+                errors.append(
+                    {
+                        "pair_id": row["pair_id"],
+                        "field": key,
+                        "actual": row[key],
+                        "expected": ref[key],
+                    }
+                )
         for key in max_delta:
             value, target = float(row[key]), float(ref[key])
             if not math.isfinite(value) or not math.isfinite(target):
@@ -92,13 +106,27 @@ def compare_records(actual, expected):
             delta = abs(value - target)
             max_delta[key] = max(max_delta[key], delta)
             if delta > TOLERANCE:
-                errors.append({"pair_id": row["pair_id"], "field": key, "actual": value, "expected": target})
-    return {"matched": not errors, "mismatches": errors, "max_abs_delta": max_delta, "pairs": len(actual)}
+                errors.append(
+                    {
+                        "pair_id": row["pair_id"],
+                        "field": key,
+                        "actual": value,
+                        "expected": target,
+                    }
+                )
+    return {
+        "matched": not errors,
+        "mismatches": errors,
+        "max_abs_delta": max_delta,
+        "pairs": len(actual),
+    }
 
 
 def make_verifier(bundle, runtime, cache):
     config = Config.load().with_overrides(
-        backend="hf", hf_model=runtime["model_name"], hf_max_tokens=int(runtime["hf_max_tokens"])
+        backend="hf",
+        hf_model=runtime["model_name"],
+        hf_max_tokens=int(runtime["hf_max_tokens"]),
     )
     result = Verifier(
         config=config,
@@ -264,7 +292,12 @@ def main():
     candidate = args.candidate or args.source_dir / "p1_candidate_bundle.json"
     runtime = args.runtime_config or candidate.parent / "runtime_config.json"
     return run_replay(
-        args.source_dir, candidate, runtime, args.features_cache, args.dev, args.output_dir or candidate.parent
+        args.source_dir,
+        candidate,
+        runtime,
+        args.features_cache,
+        args.dev,
+        args.output_dir or candidate.parent,
     )
 
 

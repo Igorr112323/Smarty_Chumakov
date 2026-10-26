@@ -75,7 +75,10 @@ def test_folds_use_source_membership_and_leakage_guard():
     sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "scripts"))
     from p4_context_head import fold_partition
 
-    states = [{"id": "a", "doc": "one", "fold": 4}, {"id": "b", "doc": "two", "fold": 1}]
+    states = [
+        {"id": "a", "doc": "one", "fold": 4},
+        {"id": "b", "doc": "two", "fold": 1},
+    ]
     fit, held, r = fold_partition(states, 4)
     assert fit == [states[1]] and held == [states[0]] and r["shared_documents"] == 0
     with pytest.raises(ValueError):
@@ -89,7 +92,13 @@ def test_export_runtime_same_sklearn_object(tmp_path):
     X = rng.rand(100, 56)
     y = (X[:, 20] > 0.5).astype(int)
     clf = GradientBoostingClassifier(
-        n_estimators=80, learning_rate=0.05, max_depth=3, min_samples_leaf=20, subsample=1, init="zero", random_state=42
+        n_estimators=80,
+        learning_rate=0.05,
+        max_depth=3,
+        min_samples_leaf=20,
+        subsample=1,
+        init="zero",
+        random_state=42,
     ).fit(X, y)
     model = export_context_gbdt(clf, feature_spec(2))
     assert (
@@ -104,7 +113,12 @@ def test_export_runtime_same_sklearn_object(tmp_path):
     with pytest.raises(ValueError):
         ContextGBDTModel.from_dict(bad)
     bad = model.to_dict()
-    bad["trees"][0] = {"feature": 56, "threshold": 0.2, "left": {"value": 0}, "right": {"value": 1}}
+    bad["trees"][0] = {
+        "feature": 56,
+        "threshold": 0.2,
+        "left": {"value": 0},
+        "right": {"value": 1},
+    }
     with pytest.raises(ValueError):
         ContextGBDTModel.from_dict(bad)
 
@@ -123,10 +137,14 @@ def test_public_context_roundtrip_p1_and_unmodified_matrix(monkeypatch, tmp_path
     X = rng.rand(100, 56)
     y = (X[:, 15] > 0.5).astype(int)
     m = export_context_gbdt(
-        GradientBoostingClassifier(n_estimators=3, init="zero", random_state=42).fit(X, y), feature_spec(1)
+        GradientBoostingClassifier(n_estimators=3, init="zero", random_state=42).fit(X, y),
+        feature_spec(1),
     )
     candidate = replace(
-        b, token_head=m.to_dict(), context_features_spec=feature_spec(1), localization_decoder=decoder_config(0.2, 0.5)
+        b,
+        token_head=m.to_dict(),
+        context_features_spec=feature_spec(1),
+        localization_decoder=decoder_config(0.2, 0.5),
     )
     candidate.save(tmp_path / "bundle.json")
     loaded = WeightsBundle.load(tmp_path / "bundle.json")

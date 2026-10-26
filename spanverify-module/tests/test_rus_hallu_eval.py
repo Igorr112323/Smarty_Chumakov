@@ -24,7 +24,11 @@ def _write_pairs(path: Path) -> Path:
             "context": "Согласно регламенту, срок хранения первичных документов составляет пять лет.",
             "answer": answer,
             "labels": [[start, start + len("десять лет"), 1]],
-            "meta": {"dataset_version": "test", "citation": "тест", "types": ["Contradiction"]},
+            "meta": {
+                "dataset_version": "test",
+                "citation": "тест",
+                "types": ["Contradiction"],
+            },
         },
         {
             "id": "rushallu-sberquad-2",
@@ -34,7 +38,10 @@ def _write_pairs(path: Path) -> Path:
             "meta": {"dataset_version": "test", "citation": "тест", "types": []},
         },
     ]
-    path.write_text("".join(json.dumps(pair, ensure_ascii=False) + "\n" for pair in pairs), encoding="utf-8")
+    path.write_text(
+        "".join(json.dumps(pair, ensure_ascii=False) + "\n" for pair in pairs),
+        encoding="utf-8",
+    )
     return path
 
 
@@ -54,7 +61,13 @@ def test_evaluate_reports_both_metric_groups(tmp_path: Path) -> None:
     report = evaluate(tmp_path, mode="demo")
     assert report["pairs"] == 2
     assert set(report["our_metrics"]) == {"tokens", "spans", "answers"}
-    assert set(report["their_metrics"]) >= {"rouge1", "rougeL", "accuracy", "jaccard_score", "hamming_loss"}
+    assert set(report["their_metrics"]) >= {
+        "rouge1",
+        "rougeL",
+        "accuracy",
+        "jaccard_score",
+        "hamming_loss",
+    }
     assert report["their_metrics"]["pairs"] == 2
     assert "научным результатом не являются" in report["disclaimer"]
 

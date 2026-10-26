@@ -54,7 +54,11 @@ def _build_corpus(tmp_path: Path) -> Path:
                 handle.write(json.dumps(pair, ensure_ascii=False) + "\n")
         return len(part)
 
-    counts = {"train": dump("train", train_keys), "dev": dump("dev", dev_keys), "test": dump("test", test_keys)}
+    counts = {
+        "train": dump("train", train_keys),
+        "dev": dump("dev", dev_keys),
+        "test": dump("test", test_keys),
+    }
     assert counts["train"] and counts["test"], "сплиты обязаны быть непустыми"
     return dataset
 
@@ -109,7 +113,20 @@ def test_no_splits_flag_ignores_official_splits(tmp_path: Path) -> None:
     runner = _load_script("run_experiments")
     dataset = _build_corpus(tmp_path)
     out = tmp_path / "out"
-    assert runner.main(["--dataset", str(dataset), "--mode", "demo", "--out", str(out), "--no-splits"]) == 0
+    assert (
+        runner.main(
+            [
+                "--dataset",
+                str(dataset),
+                "--mode",
+                "demo",
+                "--out",
+                str(out),
+                "--no-splits",
+            ]
+        )
+        == 0
+    )
     payload = json.loads((out / "experiment.json").read_text(encoding="utf-8"))
     assert payload["splits"] is None
     assert payload["test_official"] is None

@@ -48,7 +48,10 @@ def fetch(url: str, timeout: int = 90, read_limit: int = 600_000) -> dict:
     """Запрос с декодированием cp1251 (кодировка сайта ИПС)."""
     request = urllib.request.Request(
         url,
-        headers={"User-Agent": USER_AGENT, "Accept": "text/html, application/json, */*"},
+        headers={
+            "User-Agent": USER_AGENT,
+            "Accept": "text/html, application/json, */*",
+        },
     )
     try:
         with urllib.request.urlopen(request, timeout=timeout) as response:  # noqa: S310 - официальный публичный сайт
@@ -60,7 +63,14 @@ def fetch(url: str, timeout: int = 90, read_limit: int = 600_000) -> dict:
         status = int(error.code)
         content_type = error.headers.get("Content-Type", "") if error.headers else ""
     except (urllib.error.URLError, TimeoutError, OSError) as error:
-        return {"url": url, "status": None, "content_type": "", "bytes": 0, "html": "", "error": str(error)[:140]}
+        return {
+            "url": url,
+            "status": None,
+            "content_type": "",
+            "bytes": 0,
+            "html": "",
+            "error": str(error)[:140],
+        }
 
     charset = "cp1251" if "1251" in content_type.lower() else "cp1251"
     html_text = raw.decode(charset, "replace")

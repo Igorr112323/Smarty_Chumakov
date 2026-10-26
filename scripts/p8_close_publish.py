@@ -1,10 +1,11 @@
 """Copy original RC bytes to curator-authorized stable; NO rebuild/inference."""
 
 from __future__ import annotations
+
 import hashlib
 import json
-from pathlib import Path
 import subprocess
+from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 REPO = "Igorr112323/Smarty_Chumakov"

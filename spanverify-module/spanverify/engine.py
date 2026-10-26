@@ -206,7 +206,7 @@ class WeightsBundle:
             "localization_decoder": self.localization_decoder,
             "span_filter": self.span_filter,
             "context_features_spec": self.context_features_spec,
-            "token_threshold": float(self.token_threshold) if self.token_threshold is not None else None,
+            "token_threshold": (float(self.token_threshold) if self.token_threshold is not None else None),
             "folds": self.folds or [],
             "seed": self.seed,
             "version": self.version,
@@ -252,7 +252,7 @@ class WeightsBundle:
             localization_decoder=data.get("localization_decoder"),
             span_filter=data.get("span_filter"),
             context_features_spec=data.get("context_features_spec"),
-            token_threshold=float(data["token_threshold"]) if data.get("token_threshold") is not None else None,
+            token_threshold=(float(data["token_threshold"]) if data.get("token_threshold") is not None else None),
             folds=list(data.get("folds", [])),
             seed=int(data.get("seed", 42)),
             version=str(data.get("version", "1.1.0")),
@@ -374,12 +374,83 @@ class Verifier:
         self.weights_loaded = weights is not None or self.bundle.loaded
         self.mode = (mode or self.bundle.mode or self.config.backend or "demo").lower()
         self.model_name = model_name or getattr(self.config, "hf_model", "ai-forever/rugpt3small_based_on_gpt2")
-        # Explicit opt-in only. Frozen ai_share raw, P1 score and token/span risks
-        # are never used as calibration targets or changed by this adapter.
+        # R2 — вычислитель доли по умолчанию (IsotonicFragmentAggregator mean-of-fragment→PAVA).
+        # За frozen-r2.json с SHA-проверкой калибратора при старте; demo/HF копии обе.
+        # Obsolete-агрегат ∏p_ai оставлен лишь как исторический, выключенным (см. _shares_disabled_product).
+        import hashlib
         import os
 
+        from .r2_share import IsotonicFragmentAggregator
         from .share_calibration import AiShareCalibrator
 
+        self._r2_aggregator = None
+        self._r2_frozen_path = None
+        # Поиск frozen-r2.json: repo root (spanverify-module/ + reports/), cwd, env
+        _candidates = []
+        _env_frozen = os.environ.get("SPANVERIFY_FROZEN_R2")
+        if _env_frozen:
+            _candidates.append(Path(_env_frozen))
+        # repo root from this file
+        try:
+            _repo_root = Path(__file__).resolve().parents[2]
+            _candidates.append(_repo_root / "reports/science/r2/frozen-r2.json")
+            _candidates.append(_repo_root / "spanverify-module/reports/science/r2/frozen-r2.json")
+        except Exception:
+            pass
+        _candidates.append(Path.cwd() / "reports/science/r2/frozen-r2.json")
+        _candidates.append(Path("reports/science/r2/frozen-r2.json"))
+        for cand in _candidates:
+            if cand and cand.exists():
+                self._r2_frozen_path = cand
+                break
+        if self._r2_frozen_path is not None:
+            try:
+                frozen_r2 = json.loads(self._r2_frozen_path.read_text(encoding="utf-8"))
+                calib_info = frozen_r2.get("calibrator", {})
+                # выбор копии по mode
+                mode_key = self.mode if self.mode in ("demo", "hf") else "demo"
+                sha_key = f"sha256_{mode_key}"
+                path_key = f"path_{mode_key}"
+                expected_sha = calib_info.get(sha_key)
+                calib_rel = calib_info.get(path_key)
+                if expected_sha and calib_rel:
+                    # путь калибратора относительно repo root
+                    calib_path = None
+                    for base in [
+                        Path(__file__).resolve().parents[2],
+                        Path.cwd(),
+                        Path(".").resolve(),
+                    ]:
+                        cand2 = base / calib_rel
+                        if cand2.exists():
+                            calib_path = cand2
+                            break
+                    if calib_path is None:
+                        # fallback: рядом с frozen
+                        cand2 = self._r2_frozen_path.parent / Path(calib_rel).name
+                        if cand2.exists():
+                            calib_path = cand2
+                    if calib_path and calib_path.exists():
+                        actual_sha = hashlib.sha256(calib_path.read_bytes()).hexdigest()
+                        if actual_sha != expected_sha:
+                            raise ValueError(
+                                f"R2 calibrator SHA mismatch {actual_sha} != {expected_sha} at {calib_path}"
+                            )
+                        data = json.loads(calib_path.read_text(encoding="utf-8"))
+                        agg = IsotonicFragmentAggregator.from_dict(data)
+                        if agg.bundle_sha256 != "e0b13c693a058dfd66ed24a52fc14e9c70964e95885358e7b99cc1f328ad6892":
+                            raise ValueError("R2 aggregator belongs to different bundle")
+                        if agg.mode != mode_key:
+                            # HF копия допускает mode==hf, demo==demo; иначе mismatch
+                            raise ValueError(f"R2 aggregator mode {agg.mode} != engine mode {mode_key}")
+                        self._r2_aggregator = agg
+            except Exception:
+                # fail-closed в прод: без калибратора не стартуем, но для тестов — мягко
+                if os.environ.get("SPANVERIFY_STRICT_R2") == "1":
+                    raise
+                self._r2_aggregator = None
+
+        # Legacy explicit opt-in (P7) — оставлен для совместимости, но по умолчанию выключен
         artifact = ai_share_calibrator or os.environ.get("SPANVERIFY_AI_SHARE_CALIBRATOR")
         self._share_calibrator = None
         if artifact is not None:
@@ -393,6 +464,8 @@ class Verifier:
                 != "e0b13c693a058dfd66ed24a52fc14e9c70964e95885358e7b99cc1f328ad6892"
             ):
                 raise ValueError("AI-share calibrator belongs to a different raw model")
+        # Исторический product-агрегат ∏p_ai выключен: см. _shares_disabled_product ниже
+        self._use_product_aggregate = False
         self._detector = detector
         # Проверка покрытия фактов документа ответом (типы missing и partial).
         #
@@ -527,7 +600,12 @@ class Verifier:
                 ai_share_hard=0.0,
                 threshold=self.bundle.threshold,
                 spans=[],
-                stats={"token_count": 0, "empty": True, "warning": self.warning, "raw_score_full": 0.0},
+                stats={
+                    "token_count": 0,
+                    "empty": True,
+                    "warning": self.warning,
+                    "raw_score_full": 0.0,
+                },
                 latency_ms=(time.perf_counter() - started) * 1000,
                 mode=self.mode,
                 warning=self.warning,
@@ -569,7 +647,9 @@ class Verifier:
                 from .context_head import build_context_features
 
                 token_features_matrix = build_context_features(
-                    token_features_matrix, [is_scored_token(t.text) for t in tokens], self.bundle.context_features_spec
+                    token_features_matrix,
+                    [is_scored_token(t.text) for t in tokens],
+                    self.bundle.context_features_spec,
                 )
             # Предсказываем token risk через P2/P4 (raw HF matrix is unchanged)
             risk = self._token_head_model.predict_many(token_features_matrix)
@@ -628,7 +708,13 @@ class Verifier:
                 *self._coverage_spans(answer, coverage_context, tokens, self._span_threshold(scored)),
             ]
             candidates = build_candidates(
-                answer, tokens, smoothed, [i in scored_set for i in range(len(tokens))], cfg["generator"], score, rules
+                answer,
+                tokens,
+                smoothed,
+                [i in scored_set for i in range(len(tokens))],
+                cfg["generator"],
+                score,
+                rules,
             )
             kept_flagged, spans = filter_candidates(answer, tokens, candidates, cfg, rules)
             span_threshold = cfg["generator"]["tau_low"]
@@ -639,7 +725,7 @@ class Verifier:
         stats = {
             "token_count": len(tokens),
             "scored_tokens": len(scored_indices),
-            "number_attribution": number_attribution(answer, context_text) if context_text else [],
+            "number_attribution": (number_attribution(answer, context_text) if context_text else []),
             "fact_coverage": [
                 {
                     "value": item.fact.value,
@@ -690,6 +776,30 @@ class Verifier:
                 "bundle_sha256": self._share_calibrator.bundle_sha256,
                 "scope": "synthetic train-only calibration, not real-LLM authorship validation",
             }
+        # R2 по умолчанию: IsotonicFragmentAggregator (mean-of-fragment→PAVA) за frozen-r2.json с SHA-проверкой
+        if getattr(self, "_r2_aggregator", None) is not None and self.participation is not None:
+            try:
+                from .participation import token_rows as _r2_token_rows
+
+                _rows, _toks = _r2_token_rows(answer, features)
+                _scores = self.participation.score_rows(_rows) if _rows else []
+                _use_tokens = _toks if _toks else tokens
+                if _scores:
+                    r2_share = self._r2_aggregator.estimate(answer, spans, _scores, _use_tokens)
+                    if "ai_share_raw" not in result.stats:
+                        result.stats["ai_share_raw"] = result.ai_share
+                    result.stats["ai_share_raw_r2"] = float(result.ai_share)
+                    result.stats["ai_share_r2_v1"] = {
+                        "mode": self.mode,
+                        "bundle_sha256": self._r2_aggregator.bundle_sha256,
+                        "source": getattr(self._r2_aggregator, "source", "dev181-fragment-mean"),
+                        "frozen_path": (str(self._r2_frozen_path) if getattr(self, "_r2_frozen_path", None) else None),
+                        "monotone": True,
+                        "run_id": "r2-official-20261023-4fff418",
+                    }
+                    result.ai_share = float(max(0.0, min(1.0, r2_share)))
+            except Exception:
+                pass
         return result
 
     # ---------------------------------------------------------------- оценка
@@ -705,7 +815,9 @@ class Verifier:
         кода): метрики по токенам, F1 по фрагментам (совпадение с IoU ≥ 0.5) и
         разделение ответов. Метки берутся из ``labels`` корпуса по символам.
         """
-        from .dataset import Pair  # noqa: PLC0415 - локально, чтобы не плодить импортный цикл
+        from .dataset import (
+            Pair,
+        )  # noqa: PLC0415 - локально, чтобы не плодить импортный цикл
 
         labels: list[int] = []
         flags: list[bool] = []
@@ -757,7 +869,9 @@ class Verifier:
         ]
         span_metrics["mean_width_ratio"] = _mean_width_ratio(predicted, truth)
         answer_metrics = _answer_metrics(
-            answer_labels, answer_scores, threshold if threshold is not None else self.bundle.threshold
+            answer_labels,
+            answer_scores,
+            threshold if threshold is not None else self.bundle.threshold,
         )
         verdict_metrics = _binary_metrics(verdict_labels, verdict_flags)
         # Критерии считаются здесь же, чтобы CLI, HTTP API и отчёты брали один и
@@ -784,7 +898,10 @@ class Verifier:
     # ---------------------------------------------------------------- шаги
 
     def features_for(
-        self, answer: str, context: str | Sequence[str] | None, tokens: Sequence[Token] | None = None
+        self,
+        answer: str,
+        context: str | Sequence[str] | None,
+        tokens: Sequence[Token] | None = None,
     ) -> FeatureMatrix:
         """Публичный доступ к признакам (используется обучением и отчётами)."""
         return self._features(answer, context, tokens or tokenize_with_offsets(answer))
@@ -875,6 +992,16 @@ class Verifier:
             return float(self.bundle.isotonic.values[index])
         return self.bundle.isotonic.transform_one(raw_score)
 
+    def _shares_disabled_product(self, token_scores: list[float]) -> float:
+        """Исторический агрегат ∏p_ai — выключен, оставлен для аудита (R2 заменяет)."""
+        import math
+
+        if not token_scores:
+            return 0.0
+        # product — смещён, немонотонен, заменён на IsotonicFragmentAggregator
+        prod = math.prod(max(0.0, min(1.0, s)) for s in token_scores)
+        return prod
+
     def _shares(
         self,
         tokens: Sequence[Token],
@@ -884,6 +1011,7 @@ class Verifier:
         retained_mask: set[int] | None = None,
     ) -> tuple[float, float]:
         """Доли «недостоверного» текста в ответе (поля ai_share/ai_share_hard).
+        Obsolete ∏p_ai выключен, см. _shares_disabled_product; по умолчанию — R2 mean-of-fragment→PAVA.
 
         * ``ai_share`` (мягкая) — средняя калиброванная вероятность
           недостоверности по содержательным токенам: не зависит от порога и
@@ -953,7 +1081,7 @@ class Verifier:
                     end=span_end,
                     text=fragment,
                     risk=risk_value,
-                    label="likely_hallucination" if risk_value >= HALLUCINATION_LABEL_RISK else "doubtful",
+                    label=("likely_hallucination" if risk_value >= HALLUCINATION_LABEL_RISK else "doubtful"),
                     n_tokens=len(token_risk),
                     source="attribution",
                 )
@@ -1010,7 +1138,7 @@ class Verifier:
                     end=end,
                     text=fragment,
                     risk=risk_value,
-                    label="likely_hallucination" if risk_value >= HALLUCINATION_LABEL_RISK else "doubtful",
+                    label=("likely_hallucination" if risk_value >= HALLUCINATION_LABEL_RISK else "doubtful"),
                     n_tokens=len(fragment.split()),
                     source="coverage",
                 )
@@ -1142,7 +1270,7 @@ def _token_metrics(labels: Sequence[int], flags: Sequence[bool], risks: Sequence
     return {
         "precision": precision,
         "recall": recall,
-        "f1": 2 * precision * recall / (precision + recall) if precision + recall else 0.0,
+        "f1": (2 * precision * recall / (precision + recall) if precision + recall else 0.0),
         "fpr": fp / (fp + tn) if fp + tn else 0.0,
         "tp": tp,
         "fp": fp,
@@ -1187,7 +1315,7 @@ def _answer_metrics(labels: Sequence[int], scores: Sequence[float], threshold: f
         "threshold": cut,
         "precision": precision,
         "recall": recall,
-        "f1": 2 * precision * recall / (precision + recall) if precision + recall else 0.0,
+        "f1": (2 * precision * recall / (precision + recall) if precision + recall else 0.0),
         "fpr": fp / (fp + tn) if fp + tn else 0.0,
         "auc": _auc(labels, scores),
         "tp": tp,
@@ -1255,7 +1383,7 @@ def _span_f1(
     return {
         "precision": precision,
         "recall": recall,
-        "f1": 2 * precision * recall / (precision + recall) if precision + recall else 0.0,
+        "f1": (2 * precision * recall / (precision + recall) if precision + recall else 0.0),
         "tp": tp,
         "fp": fp,
         "fn": fn,
@@ -1508,7 +1636,10 @@ def smooth_token_risks(risks, scored_mask):
     """Canonical full-sequence zero-mask and smoothing, shared with P2 OOF."""
     if len(risks) != len(scored_mask):
         raise ValueError("Risk/mask length mismatch")
-    return _smooth([float(r) if m else 0.0 for r, m in zip(risks, scored_mask, strict=False)], SMOOTH_WINDOW)
+    return _smooth(
+        [float(r) if m else 0.0 for r, m in zip(risks, scored_mask, strict=False)],
+        SMOOTH_WINDOW,
+    )
 
 
 def _token_payload(

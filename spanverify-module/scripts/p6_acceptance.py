@@ -70,8 +70,12 @@ def environment():
         "python": sys.version,
         "platform": platform.platform(),
         "cpu_count": os.cpu_count(),
-        "cpuinfo": (Path("/proc/cpuinfo").read_text() if Path("/proc/cpuinfo").exists() else platform.processor()),
-        "meminfo": (Path("/proc/meminfo").read_text() if Path("/proc/meminfo").exists() else None),
+        "cpuinfo": (
+            Path("/proc/cpuinfo").read_text(encoding="utf-8")
+            if Path("/proc/cpuinfo").exists()
+            else platform.processor()
+        ),
+        "meminfo": (Path("/proc/meminfo").read_text(encoding="utf-8") if Path("/proc/meminfo").exists() else None),
         "versions": {d.metadata["Name"]: d.version for d in distributions()},
         "commit": os.getenv("P7_PROGRAM_SOURCE_SHA")
         or subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=ROOT, text=True).strip(),
@@ -87,7 +91,7 @@ def parity(cache_path, out):
     cache = load_feature_cache(list(Path(cache_path).rglob("features_*.jsonl")), strict=True, counting=True)
     v = verifier(cache=cache)
     ref = {r["id"]: r for r in gz(P5 / "dev_evidence.jsonl.gz")}
-    answers = json.loads((P5 / "dev_answers.json").read_text())
+    answers = json.loads((P5 / "dev_answers.json").read_text(encoding="utf-8"))
     if isinstance(answers, dict):
         answers = answers.get("rows", answers.get("answers", answers))
     answer_ref = {r["pair_id"]: r for r in answers}
@@ -236,7 +240,7 @@ def benchmark(args):
                         "--out",
                         str(path),
                     ]
-                    with (args.out / f"{name}.log").open("w") as log:
+                    with (args.out / f"{name}.log").open("w", encoding="utf-8") as log:
                         proc = subprocess.Popen(command, stdout=log, stderr=log)
                         try:
                             code = proc.wait(timeout=75)
@@ -249,7 +253,7 @@ def benchmark(args):
                                 proc.wait()
                             code = 124
                     if path.exists():
-                        sample = json.loads(path.read_text())
+                        sample = json.loads(path.read_text(encoding="utf-8"))
                     else:
                         sample = {
                             "status": "timeout" if code == 124 else "error",
@@ -299,7 +303,7 @@ def benchmark(args):
                         "--out",
                         str(profile_path),
                     ]
-                    with (args.out / f"{profile_path.stem}.log").open("w") as log:
+                    with (args.out / f"{profile_path.stem}.log").open("w", encoding="utf-8") as log:
                         proc = subprocess.Popen(profile_command, stdout=log, stderr=log)
                         try:
                             proc.wait(timeout=75)
@@ -433,7 +437,7 @@ def interfaces(args):
         "--weights",
         str(BUNDLE),
     ]
-    with (args.out / "server.log").open("w") as log:
+    with (args.out / "server.log").open("w", encoding="utf-8") as log:
         proc = subprocess.Popen(command, cwd=ROOT, env=env, stdout=log, stderr=log)
         try:
             deadline = time.monotonic() + 120

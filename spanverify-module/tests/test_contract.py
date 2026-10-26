@@ -262,7 +262,14 @@ def test_zipapp_fits_contract_package_limit(tmp_path: Path) -> None:
 def test_calendar_plan_follows_contract() -> None:
     """Календарный план: два этапа по 6 месяцев, 200 000 и 300 000 руб., АС «Фонд-М»."""
     text = PLAN_DOC.read_text(encoding="utf-8")
-    for marker in ("1-й этап", "2-й этап", "6 месяц", "200 000", "300 000", "АС «Фонд-М»"):
+    for marker in (
+        "1-й этап",
+        "2-й этап",
+        "6 месяц",
+        "200 000",
+        "300 000",
+        "АС «Фонд-М»",
+    ):
         assert marker in text, f"в календарном плане нет «{marker}»"
 
 
@@ -302,7 +309,15 @@ def test_report_template_follows_appendix_10() -> None:
 def test_report_abstract_has_keywords_and_originality() -> None:
     """Реферат: поля об объёме и 5–15 ключевых слов; оригинальность ≥ 80 %."""
     text = REPORT_DOC.read_text(encoding="utf-8")
-    for marker in ("Ключевые слова", "Объём", "иллюстрац", "таблиц", "источник", "приложен", "80 %"):
+    for marker in (
+        "Ключевые слова",
+        "Объём",
+        "иллюстрац",
+        "таблиц",
+        "источник",
+        "приложен",
+        "80 %",
+    ):
         assert marker.lower() in text.lower(), f"в реферате нет «{marker}»"
     lines = text.splitlines()
     index = next(i for i, line in enumerate(lines) if "Ключевые слова" in line)
@@ -313,14 +328,26 @@ def test_report_abstract_has_keywords_and_originality() -> None:
 def test_guide_has_install_update_and_remove() -> None:
     """Руководство описывает установку копированием, обновление заменой и удаление."""
     text = GUIDE_DOC.read_text(encoding="utf-8")
-    for marker in ("Установка", "Обновление", "замен", "предыдущ", "Удалить", "localhost:8765"):
+    for marker in (
+        "Установка",
+        "Обновление",
+        "замен",
+        "предыдущ",
+        "Удалить",
+        "localhost:8765",
+    ):
         assert marker.lower() in text.lower(), f"в руководстве нет «{marker}»"
 
 
 def test_acceptance_program_uses_contract_harness() -> None:
     """Программа приёмки построена на тех же проверках, что и CI."""
     text = ACCEPTANCE_DOC.read_text(encoding="utf-8")
-    for marker in ("contract_check.py", "CONTRACT.json", "check_numbers.py", "NUMBERS.json"):
+    for marker in (
+        "contract_check.py",
+        "CONTRACT.json",
+        "check_numbers.py",
+        "NUMBERS.json",
+    ):
         assert marker in text, f"в программе приёмки нет ссылки на {marker}"
 
 

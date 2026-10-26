@@ -18,7 +18,9 @@ from typing import Any
 __all__ = ["standardize", "train_logreg", "probabilities"]
 
 
-def standardize(rows: Sequence[Sequence[float]]) -> tuple[list[list[float]], list[float], list[float]]:
+def standardize(
+    rows: Sequence[Sequence[float]],
+) -> tuple[list[list[float]], list[float], list[float]]:
     """Привести строки к нулевому среднему и единичной дисперсии.
 
     Возвращает ``(нормированные строки, средние, масштабы)``; масштаб нулевой

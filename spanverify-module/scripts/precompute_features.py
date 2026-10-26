@@ -49,7 +49,12 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 from spanverify.dataset import read_pairs  # noqa: E402
-from spanverify.features import FEATURE_NAMES, HF_MODEL_DEFAULT, extract_features, feature_cache_key  # noqa: E402
+from spanverify.features import (  # noqa: E402
+    FEATURE_NAMES,
+    HF_MODEL_DEFAULT,
+    extract_features,
+    feature_cache_key,
+)  # noqa: E402
 
 MODEL_DEFAULT = HF_MODEL_DEFAULT
 PROGRESS_EVERY = 10
@@ -163,7 +168,10 @@ def main(argv: list[str] | None = None) -> int:
     print(json.dumps(summary, ensure_ascii=False, indent=2), flush=True)
 
     if skipped:
-        print(f"ВНИМАНИЕ: пропущено пар {skipped} — метрики были бы неполными", file=sys.stderr)
+        print(
+            f"ВНИМАНИЕ: пропущено пар {skipped} — метрики были бы неполными",
+            file=sys.stderr,
+        )
         return 1
     return 0
 

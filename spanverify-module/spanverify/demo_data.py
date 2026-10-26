@@ -155,7 +155,13 @@ NAMES = [
     "Илья Бахметьев",
     "Вера Соколова",
 ]
-DEVICES = ["кластер «Пирогов»", "сервер node-07", "рабочая станция WS-3", "стенд А-2", "GPU-нода v100-3"]
+DEVICES = [
+    "кластер «Пирогов»",
+    "сервер node-07",
+    "рабочая станция WS-3",
+    "стенд А-2",
+    "GPU-нода v100-3",
+]
 COLUMNS = ["Прогноз", "Факт", "Отклонение", "Комментарий", "Итого"]
 TICKETS = ["TURB-{}, ".format(i) for i in range(100, 140)]  # noqa: UP032
 
@@ -336,7 +342,7 @@ def dataset_statistics(documents: list[dict]) -> dict:
         "characters": total_chars,
         "ai_share_chars": round(total_ai / total_chars, 4) if total_chars else 0.0,
         "vocabulary": len(vocab),
-        "mean_document_chars": round(total_chars / len(documents), 1) if documents else 0.0,
+        "mean_document_chars": (round(total_chars / len(documents), 1) if documents else 0.0),
         "dataset_version": DATASET_VERSION,
     }
 

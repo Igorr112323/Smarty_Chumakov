@@ -51,3 +51,4 @@ spanverify-module/spanverify/train.py -text
 spanverify-module/spanverify/training.py -text
 spanverify-module/spanverify/vectors.py -text
 spanverify-module/spanverify/webui.py -text
+spanverify-module/spanverify/r2_share.py -text

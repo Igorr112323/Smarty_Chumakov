@@ -141,7 +141,11 @@ def load_model(model_name: str):  # noqa: ANN201 - тип зависит от н
     """Загрузить модель и токенизатор; понятная ошибка, если окружение не готово."""
     try:
         import torch  # noqa: F401, PLC0415
-        from transformers import AutoModelForCausalLM, AutoTokenizer, pipeline  # noqa: PLC0415
+        from transformers import (
+            AutoModelForCausalLM,
+            AutoTokenizer,
+            pipeline,
+        )  # noqa: PLC0415
     except ImportError as error:  # pragma: no cover - зависит от окружения
         raise SystemExit(
             "нужны transformers и torch: pip install torch transformers (см. docs/GPU_ИНСТРУКЦИЯ.md)"
@@ -162,7 +166,12 @@ def generate_answers(tasks: list[dict], model_name: str, max_new_tokens: int) ->
     device = "cuda" if torch.cuda.is_available() else "cpu"
     pairs: list[dict] = []
     for task in tasks:
-        output = generator(task["prompt"], max_new_tokens=max_new_tokens, do_sample=False, return_full_text=False)
+        output = generator(
+            task["prompt"],
+            max_new_tokens=max_new_tokens,
+            do_sample=False,
+            return_full_text=False,
+        )
         answer = str(output[0]["generated_text"]).strip().split("\n")[0].strip()
         pairs.append(
             {
@@ -206,10 +215,12 @@ def write_outputs(out_dir: Path, tasks: list[dict], pairs: list[dict], manifest_
     """Записать задания, пары-черновики и манифест (с пометкой о необходимости проверки)."""
     out_dir.mkdir(parents=True, exist_ok=True)
     (out_dir / "questions.jsonl").write_text(
-        "".join(json.dumps(task, ensure_ascii=False) + "\n" for task in tasks), encoding="utf-8"
+        "".join(json.dumps(task, ensure_ascii=False) + "\n" for task in tasks),
+        encoding="utf-8",
     )
     (out_dir / "pairs_draft.jsonl").write_text(
-        "".join(json.dumps(pair, ensure_ascii=False) + "\n" for pair in pairs), encoding="utf-8"
+        "".join(json.dumps(pair, ensure_ascii=False) + "\n" for pair in pairs),
+        encoding="utf-8",
     )
     manifest = {
         "dataset_version": DATASET_VERSION,
@@ -239,7 +250,10 @@ def main() -> int:
         return 2
     tasks = collect_tasks(args.docs, args.limit, args.seed)
     if not tasks:
-        print("ошибка: в документах не найдено ни одного факта — проверьте формат", file=sys.stderr)
+        print(
+            "ошибка: в документах не найдено ни одного факта — проверьте формат",
+            file=sys.stderr,
+        )
         return 2
 
     if args.dry_run:
@@ -252,7 +266,12 @@ def main() -> int:
     print(f"[a2] модель {args.model}, заданий {len(tasks)}")
     pairs, device = generate_answers(tasks, args.model, args.max_new_tokens)
     pairs = draft_labels_with_verifier(pairs)
-    write_outputs(args.out, tasks, pairs, {"dry_run": False, "model": args.model, "device": device})
+    write_outputs(
+        args.out,
+        tasks,
+        pairs,
+        {"dry_run": False, "model": args.model, "device": device},
+    )
     print(f"Пар (черновик): {len(pairs)} на устройстве {device}")
     print(f"Черновики: {args.out / 'pairs_draft.jsonl'} — метки НЕ являются истиной, нужна проверка")
     return 0

@@ -46,7 +46,10 @@ def test_spans_to_labels_counts_ambiguous_offsets() -> None:
 def test_spans_to_labels_rejects_span_absent_in_answer() -> None:
     """Спан, которого нет в ответе дословно, — ошибка загрузки, а не молчаливый пропуск."""
     with pytest.raises(FetchError, match="не найден"):
-        spans_to_labels("короткий ответ", json.dumps([{"type": "Missing", "span": "длинная цитата"}]))
+        spans_to_labels(
+            "короткий ответ",
+            json.dumps([{"type": "Missing", "span": "длинная цитата"}]),
+        )
 
 
 def test_empty_annotation_means_clean_pair() -> None:
@@ -87,7 +90,10 @@ def test_build_pairs_collects_statistics_by_type() -> None:
         },
     ]
     pairs, stats = build_pairs(rows, "sberquad")
-    assert [pair["id"] for pair in pairs] == ["rushallu-sberquad-1", "rushallu-sberquad-2"]
+    assert [pair["id"] for pair in pairs] == [
+        "rushallu-sberquad-1",
+        "rushallu-sberquad-2",
+    ]
     assert stats["clean"] == 1
     assert stats["with_hallucination"] == 1
     assert stats["spans"] == 1

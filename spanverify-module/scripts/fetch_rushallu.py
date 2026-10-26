@@ -260,7 +260,10 @@ def fetch(out_dir: Path, transport: str = "auto", verify: bool = True) -> dict:
         }
 
     pairs_path = out_dir / "pairs.jsonl"
-    pairs_path.write_text("".join(json.dumps(pair, ensure_ascii=False) + "\n" for pair in all_pairs), encoding="utf-8")
+    pairs_path.write_text(
+        "".join(json.dumps(pair, ensure_ascii=False) + "\n" for pair in all_pairs),
+        encoding="utf-8",
+    )
     report["pairs"] = len(all_pairs)
     report["pairs_sha256"] = sha256_file(pairs_path)
     report["summary"] = {

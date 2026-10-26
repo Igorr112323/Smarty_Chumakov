@@ -72,7 +72,11 @@ def test_rouge_matches_rouge_score_library() -> None:
         ours = score_pair(reference, predicted)
         for metric in ("rouge1", "rouge2", "rougeL"):
             theirs = scorer.score(reference, predicted)[metric].fmeasure
-            assert ours[metric] == pytest.approx(theirs, abs=1e-9), (reference, predicted, metric)
+            assert ours[metric] == pytest.approx(theirs, abs=1e-9), (
+                reference,
+                predicted,
+                metric,
+            )
 
 
 def test_match_metrics_known_values() -> None:
@@ -107,5 +111,12 @@ def test_evaluate_spans_returns_both_groups() -> None:
     """Полный вызов отдаёт ROUGE, метрики совпадения и число пар."""
     result = evaluate_spans([["а"]], [["а"]])
     assert result["pairs"] == 1
-    for key in ("rouge1", "rouge2", "rougeL", "accuracy", "jaccard_score", "hamming_loss"):
+    for key in (
+        "rouge1",
+        "rouge2",
+        "rougeL",
+        "accuracy",
+        "jaccard_score",
+        "hamming_loss",
+    ):
         assert key in result

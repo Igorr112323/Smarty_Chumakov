@@ -22,7 +22,11 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 from spanverify.corpus_alt import generate_alt_pairs  # noqa: E402
 from spanverify.dataset import read_pairs  # noqa: E402
 from spanverify.engine import Verifier, WeightsBundle  # noqa: E402
-from spanverify.features import DEFAULT_WEIGHTS, HF_MODEL_DEFAULT, load_feature_cache  # noqa: E402
+from spanverify.features import (
+    DEFAULT_WEIGHTS,
+    HF_MODEL_DEFAULT,
+    load_feature_cache,
+)  # noqa: E402
 from spanverify.train import train  # noqa: E402
 
 

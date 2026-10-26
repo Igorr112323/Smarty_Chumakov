@@ -232,7 +232,10 @@ def collect_rows(pairs: list[dict], model_name: str, max_length: int) -> list[To
                         role="fact" if index in fact_indices else "other",
                     )
                 )
-        print(f"  [{position}/{len(pairs)}] {pair['id']}: токенов {len(scored)}, метка {label}", flush=True)
+        print(
+            f"  [{position}/{len(pairs)}] {pair['id']}: токенов {len(scored)}, метка {label}",
+            flush=True,
+        )
     return rows
 
 
@@ -307,7 +310,7 @@ def analyse(rows: list[TokenRow], iterations: int) -> dict:
                 "ci_oriented_high": oriented_high,
                 "tokens": len(scores),
                 "auc_fact": fact_auc,
-                "auc_fact_oriented": orient * fact_auc if fact_auc is not None else None,
+                "auc_fact_oriented": (orient * fact_auc if fact_auc is not None else None),
                 "ci_fact_low": fact_low,
                 "ci_fact_high": fact_high,
                 "fact_tokens": len(fact_scores),
@@ -315,8 +318,8 @@ def analyse(rows: list[TokenRow], iterations: int) -> dict:
                 "delta_ci_low": delta_low,
                 "delta_ci_high": delta_high,
                 "delta_significant": bool(delta_low * delta_high > 0),
-                "fact_mean_grounded": statistics.fmean(grounded_values) if grounded_values else 0.0,
-                "fact_mean_unsupported": statistics.fmean(unsupported_values) if unsupported_values else 0.0,
+                "fact_mean_grounded": (statistics.fmean(grounded_values) if grounded_values else 0.0),
+                "fact_mean_unsupported": (statistics.fmean(unsupported_values) if unsupported_values else 0.0),
             }
     return report
 
@@ -353,10 +356,10 @@ def contrast_statistics(pairs: list[dict]) -> dict:
     stats = {
         "grounded_pairs": len(grounded),
         "unsupported_pairs": len(unsupported),
-        "grounded_value_copy_rate": sum(grounded_copy) / len(grounded_copy) if grounded_copy else 0.0,
-        "unsupported_value_copy_rate": sum(unsupported_copy) / len(unsupported_copy) if unsupported_copy else 0.0,
-        "grounded_overlap_mean": statistics.fmean(grounded_overlap) if grounded_overlap else 0.0,
-        "unsupported_overlap_mean": statistics.fmean(unsupported_overlap) if unsupported_overlap else 0.0,
+        "grounded_value_copy_rate": (sum(grounded_copy) / len(grounded_copy) if grounded_copy else 0.0),
+        "unsupported_value_copy_rate": (sum(unsupported_copy) / len(unsupported_copy) if unsupported_copy else 0.0),
+        "grounded_overlap_mean": (statistics.fmean(grounded_overlap) if grounded_overlap else 0.0),
+        "unsupported_overlap_mean": (statistics.fmean(unsupported_overlap) if unsupported_overlap else 0.0),
     }
     stats["contrast_ok"] = stats["grounded_value_copy_rate"] >= 0.8 and stats["unsupported_value_copy_rate"] <= 0.3
     return stats
@@ -513,7 +516,15 @@ def render_markdown(payload: dict) -> str:
                 f"{values['auc_fact']:.3f} | {marker} |"
             )
             if delta_significant:
-                significant.append((layer, name, values["delta_mean"], values["delta_ci_low"], values["delta_ci_high"]))
+                significant.append(
+                    (
+                        layer,
+                        name,
+                        values["delta_mean"],
+                        values["delta_ci_low"],
+                        values["delta_ci_high"],
+                    )
+                )
 
     entropy_last = payload["auc"].get("last", {}).get("attention_entropy", {}).get("auc_oriented")
     mass_last = payload["auc"].get("last", {}).get("ctx_attention_mass", {}).get("auc_oriented")
@@ -595,7 +606,12 @@ def render_markdown(payload: dict) -> str:
 def main(argv: list[str] | None = None) -> int:
     """Точка входа пилота: считает метрики и пишет отчёт."""
     parser = argparse.ArgumentParser(description="Пилот на rugpt3small: AUC признаков по слоям")
-    parser.add_argument("--pairs", type=int, default=24, help="число контрастных пар (каждая даёт 2 ответа)")
+    parser.add_argument(
+        "--pairs",
+        type=int,
+        default=24,
+        help="число контрастных пар (каждая даёт 2 ответа)",
+    )
     parser.add_argument("--bootstrap", type=int, default=5000, help="итераций бутстрэпа")
     parser.add_argument("--seed", type=int, default=2026)
     parser.add_argument("--model", default=MODEL_DEFAULT)

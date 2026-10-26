@@ -101,7 +101,7 @@ def main():
     # [1/9] Загружаем бандл
     print("\n[1/9] Загрузка бандла...")
     baseline_path = Path(args.baseline_experiment)
-    exp = json.loads(baseline_path.read_text())
+    exp = json.loads(baseline_path.read_text(encoding="utf-8"))
     bundle = WeightsBundle.from_dict(exp["bundle"])
     print("✓ Бандл загружен")
 
@@ -469,11 +469,11 @@ def main():
             {
                 "pair_id": pid,
                 "doc_id": doc_id_by_pair[pid],
-                "fold": oof_folds_base[oof_pair_ids.index(pid)] if pid in oof_pair_ids else -1,
+                "fold": (oof_folds_base[oof_pair_ids.index(pid)] if pid in oof_pair_ids else -1),
                 "gold": train_labels[i],
                 "baseline_raw": baseline_oof_aligned[i],
                 "baseline_calibrated": cal_baseline_train[i],
-                "baseline_prediction": 1 if cal_baseline_train[i] >= threshold_baseline else 0,
+                "baseline_prediction": (1 if cal_baseline_train[i] >= threshold_baseline else 0),
                 "p1_raw": p1_oof_scores[i],
                 "p1_calibrated": cal_p1_train[i],
                 "p1_prediction": 1 if cal_p1_train[i] >= threshold_p1 else 0,
@@ -491,7 +491,7 @@ def main():
                 "gold": dev_labels[i],
                 "baseline_raw": baseline_dev_aligned[i],
                 "baseline_calibrated": cal_baseline_dev[i],
-                "baseline_prediction": 1 if cal_baseline_dev[i] >= threshold_baseline else 0,
+                "baseline_prediction": (1 if cal_baseline_dev[i] >= threshold_baseline else 0),
                 "p1_raw": p1_dev_raw_scores[i],
                 "p1_calibrated": cal_p1_dev[i],
                 "p1_prediction": 1 if cal_p1_dev[i] >= threshold_p1 else 0,
@@ -650,8 +650,8 @@ def main():
         print(f"  ✓ {fname} ({fpath.stat().st_size} bytes)")
 
     # Проверка числа строк
-    oof_line_count = len(oof_jsonl_path.read_text().strip().split("\n"))
-    dev_line_count = len(dev_jsonl_path.read_text().strip().split("\n"))
+    oof_line_count = len(oof_jsonl_path.read_text(encoding="utf-8").strip().split("\n"))
+    dev_line_count = len(dev_jsonl_path.read_text(encoding="utf-8").strip().split("\n"))
     assert oof_line_count == len(train_pairs), f"OOF lines: {oof_line_count} != {len(train_pairs)}"
     assert dev_line_count == len(dev_pairs), f"Dev lines: {dev_line_count} != {len(dev_pairs)}"
     print(f"  ✓ OOF JSONL: {oof_line_count} строк")

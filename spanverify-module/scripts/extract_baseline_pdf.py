@@ -80,7 +80,14 @@ def fetch_pdf(url: str, timeout: int = 120) -> dict:
             "error": f"HTTP {error.code}",
         }
     except (urllib.error.URLError, TimeoutError, OSError) as error:
-        return {"url": url, "status": None, "content_type": "", "bytes": 0, "raw": b"", "error": str(error)[:140]}
+        return {
+            "url": url,
+            "status": None,
+            "content_type": "",
+            "bytes": 0,
+            "raw": b"",
+            "error": str(error)[:140],
+        }
 
 
 def pdf_pages(raw: bytes) -> list[str]:

@@ -10,7 +10,11 @@ from __future__ import annotations
 
 import pytest
 
-from spanverify.features import context_mass_lift, expected_context_mass, normalised_context_mass
+from spanverify.features import (
+    context_mass_lift,
+    expected_context_mass,
+    normalised_context_mass,
+)
 
 
 def test_expected_mass_is_share_of_visible_positions() -> None:

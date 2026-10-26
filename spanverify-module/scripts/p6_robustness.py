@@ -70,7 +70,13 @@ def main(out):
     for row in gz(P5 / "candidate_pool.jsonl.gz"):
         if row["cell"] == 218:
             pools[row["pair_id"]].append(row)
-    train = {p["id"]: p for p in map(json.loads, (ROOT / "data/corpus_a3/splits/train.jsonl").read_text().splitlines())}
+    train = {
+        p["id"]: p
+        for p in map(
+            json.loads,
+            (ROOT / "data/corpus_a3/splits/train.jsonl").read_text(encoding="utf-8").splitlines(),
+        )
+    }
     risks = {r["id"]: r["smoothed"] for r in gz(P4 / "k3_w1_oof.jsonl.gz")}
     rows = []
     for state in gz(P4 / "source_oof_states.jsonl.gz"):
@@ -79,19 +85,36 @@ def main(out):
         smoothed = risks[state["id"]]
         pool = pools[state["id"]]
         rules = [
-            *v._attribution_spans(state["answer"], state["context"], tokens, smoothed, bundle.token_threshold),
+            *v._attribution_spans(
+                state["answer"],
+                state["context"],
+                tokens,
+                smoothed,
+                bundle.token_threshold,
+            ),
             *v._coverage_spans(state["answer"], state["context"], tokens, bundle.token_threshold),
         ]
         p1_score = pool[0]["features"][-1] if pool else 0.0
         candidates = build_candidates(
-            state["answer"], tokens, smoothed, state["scored"], config["generator"], p1_score, rules
+            state["answer"],
+            tokens,
+            smoothed,
+            state["scored"],
+            config["generator"],
+            p1_score,
+            rules,
         )
         assert len(candidates) == len(pool), state["id"]
         for (span, feature), ref in zip(candidates, pool, strict=True):
             assert (span.start, span.end) == (ref["start"], ref["end"])
             assert max(abs(a - b) for a, b in zip(feature, ref["features"], strict=True)) <= 1e-12
         flags, spans = filter_candidates(
-            state["answer"], tokens, candidates, config, rules, [probs[r["index"]] for r in pool]
+            state["answer"],
+            tokens,
+            candidates,
+            config,
+            rules,
+            [probs[r["index"]] for r in pool],
         )
         rows.append(
             {
@@ -104,10 +127,21 @@ def main(out):
             }
         )
     oof = summarize(rows)
-    assert [oof["ALL"]["tokens"][k] for k in ("tp", "fp", "fn", "tn")] == [919, 422, 465, 44801]
+    assert [oof["ALL"]["tokens"][k] for k in ("tp", "fp", "fn", "tn")] == [
+        919,
+        422,
+        465,
+        44801,
+    ]
     assert [oof["ALL"]["spans"][k] for k in ("tp", "fp", "fn")] == [214, 105, 253]
-    dev = {p["id"]: p for p in map(json.loads, (ROOT / "data/corpus_a3/splits/dev.jsonl").read_text().splitlines())}
-    answers = {a["pair_id"]: a for a in json.loads((P5 / "dev_answers.json").read_text())}
+    dev = {
+        p["id"]: p
+        for p in map(
+            json.loads,
+            (ROOT / "data/corpus_a3/splits/dev.jsonl").read_text(encoding="utf-8").splitlines(),
+        )
+    }
+    answers = {a["pair_id"]: a for a in json.loads((P5 / "dev_answers.json").read_text(encoding="utf-8"))}
     rows = []
     for ref in gz(P5 / "dev_evidence.jsonl.gz"):
         p = dev[ref["id"]]
@@ -128,7 +162,12 @@ def main(out):
             }
         )
     dev_result = summarize(rows)
-    assert [dev_result["ALL"]["tokens"][k] for k in ("tp", "fp", "fn", "tn")] == [192, 134, 95, 7548]
+    assert [dev_result["ALL"]["tokens"][k] for k in ("tp", "fp", "fn", "tn")] == [
+        192,
+        134,
+        95,
+        7548,
+    ]
     assert [dev_result["ALL"]["spans"][k] for k in ("tp", "fp", "fn")] == [46, 32, 50]
     save(
         Path(out) / "robustness.json",

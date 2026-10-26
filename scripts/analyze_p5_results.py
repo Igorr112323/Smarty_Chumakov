@@ -38,9 +38,14 @@ def main():
     assert old == {k: v for k, v in new.items() if k != "span_filter"}
     bundle = WeightsBundle.load(P5 / "combined_bundle.json")
     verifier = Verifier(weights=bundle, mode="hf", span_expansion="mask")
-    corpus = {p["id"]: p for p in read_pairs(ROOT / "spanverify-module/data/corpus_a3/splits/dev.jsonl")}
+    corpus = {
+        p["id"]: p
+        for p in read_pairs(ROOT / "spanverify-module/data/corpus_a3/splits/dev.jsonl")
+    }
     references = {r["id"]: r for r in readgz(P4 / "dev_evidence.jsonl.gz")}
-    answers = {r["pair_id"]: r for r in json.loads((P5 / "dev_answers.json").read_text())}
+    answers = {
+        r["pair_id"]: r for r in json.loads((P5 / "dev_answers.json").read_text())
+    }
     kept_masks = []
     rules_all = []
     final = []
@@ -68,21 +73,39 @@ def main():
         risks = [t["raw_risk"] for t in references[r["id"]]["tokens"]]
         assert risks == [t["raw_risk"] for t in r["tokens"]]
         rules = [
-            *verifier._attribution_spans(text, p["context"], tokens, risks, bundle.token_threshold),
-            *verifier._coverage_spans(text, p["context"], tokens, bundle.token_threshold),
+            *verifier._attribution_spans(
+                text, p["context"], tokens, risks, bundle.token_threshold
+            ),
+            *verifier._coverage_spans(
+                text, p["context"], tokens, bundle.token_threshold
+            ),
         ]
         config = bundle.span_filter
         candidates = build_candidates(
-            text, tokens, risks, scored, config["generator"], answers[r["id"]]["calibrated_score"], rules
+            text,
+            tokens,
+            risks,
+            scored,
+            config["generator"],
+            answers[r["id"]]["calibrated_score"],
+            rules,
         )
         flags, spans = filter_candidates(text, tokens, candidates, config, rules)
         assert [json.loads(json.dumps(asdict(s))) for s in spans] == r["spans"]
         assert flags == {i for i, t in enumerate(r["tokens"]) if t["flagged"]}
         candidate_coords = [(s.start, s.end) for s, _ in candidates]
         pred = [(s.start, s.end) for s in spans]
-        mask = [s for s, row in candidates if probability(row, config["head"]) >= config["keep_threshold"]]
-        kept_masks.append([(s.start, s.end) for s in merge_localized_spans(text, tokens, mask)])
-        rules_all.append([(s.start, s.end) for s in merge_localized_spans(text, tokens, rules)])
+        mask = [
+            s
+            for s, row in candidates
+            if probability(row, config["head"]) >= config["keep_threshold"]
+        ]
+        kept_masks.append(
+            [(s.start, s.end) for s in merge_localized_spans(text, tokens, mask)]
+        )
+        rules_all.append(
+            [(s.start, s.end) for s in merge_localized_spans(text, tokens, rules)]
+        )
         final.append(pred)
         truths.append(truth)
         edge = set()
@@ -90,16 +113,24 @@ def main():
             counts["gold"] += 1
             any_candidate = any(_iou(s, g) > 0 for s in candidate_coords)
             counts["any_candidate_overlap"] += any_candidate
-            counts["strict_candidate_coverage"] += any(_iou(s, g) >= 0.5 for s in candidate_coords)
+            counts["strict_candidate_coverage"] += any(
+                _iou(s, g) >= 0.5 for s in candidate_coords
+            )
             if not any_candidate:
                 counts["gold_without_candidate"] += 1
                 if not any(_iou(s, g) > 0 for s in pred):
                     counts["fn_without_generator_and_final_overlap"] += 1
             elif not any(_iou(s, g) > 0 for s in pred):
                 counts["gold_candidate_but_no_final_overlap"] += 1
-            if any(_iou(s, g) > 0 for s in pred) and not any(_iou(s, g) >= 0.5 for s in pred):
+            if any(_iou(s, g) > 0 for s in pred) and not any(
+                _iou(s, g) >= 0.5 for s in pred
+            ):
                 counts["gold_final_overlap_below_05"] += 1
-            ids = [i for i, t in enumerate(tokens) if scored[i] and t.start < g[1] and t.end > g[0]]
+            ids = [
+                i
+                for i, t in enumerate(tokens)
+                if scored[i] and t.start < g[1] and t.end > g[0]
+            ]
             if ids:
                 edge.update((ids[0], ids[-1]))
         for i, t in enumerate(tokens):
@@ -111,7 +142,12 @@ def main():
             elif not y and i in flags:
                 counts["fp_dirty_tokens" if truth else "fp_clean_tokens"] += 1
         details.append(
-            dict(id=p["id"], candidate_count=len(candidates), kept_mask_count=len(mask), rule_count=len(rules))
+            dict(
+                id=p["id"],
+                candidate_count=len(candidates),
+                kept_mask_count=len(mask),
+                rule_count=len(rules),
+            )
         )
     audit = dict(
         supplemental_posthoc_only=True,
@@ -130,9 +166,18 @@ def main():
         ),
         pairs=details,
     )
-    (P5 / "posthoc_audit.json").write_text(json.dumps(audit, ensure_ascii=False, indent=2) + "\n")
+    (P5 / "posthoc_audit.json").write_text(
+        json.dumps(audit, ensure_ascii=False, indent=2) + "\n"
+    )
     print(
-        json.dumps({k: v for k, v in audit.items() if k not in ["pairs", "source_p4_inventory_all_matched"]}, indent=2)
+        json.dumps(
+            {
+                k: v
+                for k, v in audit.items()
+                if k not in ["pairs", "source_p4_inventory_all_matched"]
+            },
+            indent=2,
+        )
     )
 
 

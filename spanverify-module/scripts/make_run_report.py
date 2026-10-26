@@ -48,7 +48,17 @@ def _run(cmd: list[str]) -> tuple[int, str]:
 
 def collect_tests() -> tuple[str | None, str | None]:
     """Количество собранных тестов: сам collect, без прогона."""
-    code, out = _run(["-m", "pytest", "--collect-only", "-q", "--no-header", "-p", "no:cacheprovider"])
+    code, out = _run(
+        [
+            "-m",
+            "pytest",
+            "--collect-only",
+            "-q",
+            "--no-header",
+            "-p",
+            "no:cacheprovider",
+        ]
+    )
     if code != 0:
         return None, f"сборка тестов завершилась с кодом {code}"
     match = re.search(r"(\d+)\s+tests? collected", out)
@@ -201,7 +211,10 @@ def build(skip_evaluate: bool) -> str:
             "| Набор | Пар | Режим | token F1 | token FPR | token AUC | строгий span-F1 | ширина |\n"
             "|---|---|---|---|---|---|---|---|\n"
         )
-        for label, rel in (("демонстрационный", "data/demo_pairs.jsonl"), ("корпус A", "data/corpus_a/pairs.jsonl")):
+        for label, rel in (
+            ("демонстрационный", "data/demo_pairs.jsonl"),
+            ("корпус A", "data/corpus_a/pairs.jsonl"),
+        ):
             path = ROOT / rel
             result = measure(path)
             if result is None:

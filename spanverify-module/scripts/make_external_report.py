@@ -24,7 +24,12 @@ ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
-from scripts.fetch_external_tests import EXCLUDED, OPTIONAL, RAGTRUTH, RUSHALLU  # noqa: E402
+from scripts.fetch_external_tests import (  # noqa: E402
+    EXCLUDED,
+    OPTIONAL,
+    RAGTRUTH,
+    RUSHALLU,
+)  # noqa: E402
 
 DATASET_META = {
     "ragtruth": {
@@ -53,7 +58,12 @@ RUN_ORDER = (
     "rushallu_all_test_hf",
 )
 
-TASK_TITLES = {"qa": "QA", "summary": "Summary", "data2txt": "Data2txt", "all": "все задачи"}
+TASK_TITLES = {
+    "qa": "QA",
+    "summary": "Summary",
+    "data2txt": "Data2txt",
+    "all": "все задачи",
+}
 
 
 def _num(value: float | None, digits: int = 3) -> str:

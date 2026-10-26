@@ -87,7 +87,16 @@ def exit_code_via_cli(answer: str, context: str, python: str) -> int:
         ctx_path = Path(tmp) / "context.txt"
         ctx_path.write_text(context, encoding="utf-8")
         completed = subprocess.run(  # noqa: S603 - аргументы фиксированы, путь свой
-            [python, "-m", "spanverify", "verify", "--answer", answer, "--context-file", str(ctx_path)],
+            [
+                python,
+                "-m",
+                "spanverify",
+                "verify",
+                "--answer",
+                answer,
+                "--context-file",
+                str(ctx_path),
+            ],
             cwd=ROOT,
             capture_output=True,
             check=False,
@@ -99,7 +108,12 @@ def exit_code_via_cli(answer: str, context: str, python: str) -> int:
 def main() -> int:
     parser = argparse.ArgumentParser(description="Функциональные испытания SpanVerify")
     parser.add_argument("--out", type=Path, default=ROOT / "reports" / "functional_tests.json")
-    parser.add_argument("--acts-dir", type=Path, default=ROOT.parent / "АктыРеальны", help="каталог реальных актов")
+    parser.add_argument(
+        "--acts-dir",
+        type=Path,
+        default=ROOT.parent / "АктыРеальны",
+        help="каталог реальных актов",
+    )
     parser.add_argument("--max-length-steps", type=int, default=len(LENGTH_STEPS))
     args = parser.parse_args()
 
@@ -132,7 +146,8 @@ def main() -> int:
                 "seconds_max": round(max(run["seconds"] for run in runs), 3),
                 "peak_mb_median": round(statistics.median([run["peak_mb"] for run in runs]), 2),
                 "ms_per_1000_chars": round(
-                    statistics.median([run["seconds"] for run in runs]) / len(context) * 1000 * 1000, 2
+                    statistics.median([run["seconds"] for run in runs]) / len(context) * 1000 * 1000,
+                    2,
                 ),
                 "verdict": runs[0]["verdict"],
                 "synthetic_extension": len(context) > corpus_chars,
@@ -147,7 +162,16 @@ def main() -> int:
     with tempfile.TemporaryDirectory() as tmp:
         missing = str(Path(tmp) / "нет-такого-файла.txt")
         completed = subprocess.run(  # noqa: S603 - аргументы фиксированы
-            [sys.executable, "-m", "spanverify", "verify", "--answer", answer_clean, "--context-file", missing],
+            [
+                sys.executable,
+                "-m",
+                "spanverify",
+                "verify",
+                "--answer",
+                answer_clean,
+                "--context-file",
+                missing,
+            ],
             cwd=ROOT,
             capture_output=True,
             check=False,

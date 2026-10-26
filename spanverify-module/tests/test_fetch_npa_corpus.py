@@ -134,7 +134,11 @@ def test_plan_downloads_covers_themes_and_skips_existing() -> None:
     assert len(planned) == 8
     assert "eo-0000" not in {item["doc_id"] for item in planned}
     assert "eo-9999" not in {item["doc_id"] for item in planned}
-    assert {item["theme"] for item in planned} == {"персональные данные", "охрана труда", "кадровый учёт"}
+    assert {item["theme"] for item in planned} == {
+        "персональные данные",
+        "охрана труда",
+        "кадровый учёт",
+    }
 
     assert plan_downloads(candidates, existing_ids=set(), needed=0, buffer=0) == []
 

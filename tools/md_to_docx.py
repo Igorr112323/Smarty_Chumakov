@@ -55,19 +55,23 @@ def convert(md_path: Path, docx_path: Path) -> None:
         if not table_buffer:
             in_table = False
             return
-        rows = [r for r in table_buffer if not re.match(r"^\s*\|[\s\-:|]+\|\s*$", r[0])] if False else table_buffer
+        rows = (
+            [r for r in table_buffer if not re.match(r"^\s*\|[\s\-:|]+\|\s*$", r[0])]
+            if False
+            else table_buffer
+        )
         header = rows[0]
         body = rows[1:]
         table = doc.add_table(rows=1, cols=len(header))
         table.style = "Light Grid Accent 1"
-        for cell, text in zip(table.rows[0].cells, header):
+        for cell, text in zip(table.rows[0].cells, header, strict=True):
             cell.paragraphs[0].text = ""
             add_inline(cell.paragraphs[0], text)
             for run in cell.paragraphs[0].runs:
                 run.bold = True
         for row in body:
             cells = table.add_row().cells
-            for cell, text in zip(cells, row):
+            for cell, text in zip(cells, row, strict=True):
                 cell.paragraphs[0].text = ""
                 add_inline(cell.paragraphs[0], text)
         doc.add_paragraph()

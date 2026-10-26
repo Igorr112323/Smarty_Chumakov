@@ -6,13 +6,13 @@ Only --output is written. Git history, datasets, evidence and assets are inputs.
 from __future__ import annotations
 
 import argparse
-from datetime import datetime, timezone
 import hashlib
 import json
 import os
-from pathlib import Path
 import subprocess
 import zipfile
+from datetime import UTC, datetime
+from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 REPO = "Igorr112323/Smarty_Chumakov"
@@ -147,7 +147,7 @@ def verify(assets, release_tag):
     checks["latest_points_to_stable"] = api("releases/latest")["id"] == release["id"]
     return dict(
         run_id="P8-close-verify:" + os.getenv("GITHUB_RUN_ID", "local"),
-        date=datetime.now(timezone.utc).date().isoformat(),
+        date=datetime.now(UTC).date().isoformat(),
         execution_head=head,
         acceptance_head=ACCEPTANCE,
         read_only_inputs=True,

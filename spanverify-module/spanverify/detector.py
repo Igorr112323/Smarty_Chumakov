@@ -197,7 +197,7 @@ class Detector:
         meta = dict(features.meta)
         meta.update(
             {
-                "mean_raw": round(sum(smoothed_raw) / len(smoothed_raw), 4) if smoothed_raw else 0.0,
+                "mean_raw": (round(sum(smoothed_raw) / len(smoothed_raw), 4) if smoothed_raw else 0.0),
                 "mean_prob": round(sum(probs) / len(probs), 4) if probs else 0.0,
                 "config": cfg.describe(),
                 "calibration": (self.calibrator.meta if self.calibrator else None),

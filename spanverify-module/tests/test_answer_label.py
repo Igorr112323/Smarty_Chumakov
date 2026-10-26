@@ -7,13 +7,19 @@ from spanverify.oof import answer_label
 
 def test_answer_label_positive():
     """Ответ с размеченным недостоверным фрагментом должен давать label=1."""
-    pair = {"id": "test-1", "labels": [[10, 20, 1], [30, 40, 0]]}  # Один фрагмент с label=1
+    pair = {
+        "id": "test-1",
+        "labels": [[10, 20, 1], [30, 40, 0]],
+    }  # Один фрагмент с label=1
     assert answer_label(pair) == 1
 
 
 def test_answer_label_negative():
     """Ответ без размеченных недостоверных фрагментов должен давать label=0."""
-    pair = {"id": "test-2", "labels": [[10, 20, 0], [30, 40, 0]]}  # Все фрагменты с label=0
+    pair = {
+        "id": "test-2",
+        "labels": [[10, 20, 0], [30, 40, 0]],
+    }  # Все фрагменты с label=0
     assert answer_label(pair) == 0
 
 
@@ -35,7 +41,10 @@ def test_answer_label_single_char_number():
     Это критичный тест для задачи 2.1: односимвольные числа не проходят
     scored_token фильтр, но ответ всё равно должен считаться недостоверным.
     """
-    pair = {"id": "test-5", "labels": [[5, 6, 1]]}  # Фрагмент "2" (односимвольное число)
+    pair = {
+        "id": "test-5",
+        "labels": [[5, 6, 1]],
+    }  # Фрагмент "2" (односимвольное число)
     assert answer_label(pair) == 1
 
 
@@ -50,7 +59,10 @@ def test_answer_label_string_vs_int_labels():
 
 def test_answer_label_multiple_fragments():
     """Ответ с несколькими недостоверными фрагментами должен давать label=1."""
-    pair = {"id": "test-8", "labels": [[10, 20, 1], [30, 40, 1], [50, 60, 0]]}  # Два фрагмента с label=1
+    pair = {
+        "id": "test-8",
+        "labels": [[10, 20, 1], [30, 40, 1], [50, 60, 0]],
+    }  # Два фрагмента с label=1
     assert answer_label(pair) == 1
 
 

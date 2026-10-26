@@ -109,11 +109,26 @@ SUBJECTS = [
 ]
 
 FEATURES = [
-    ("срок хранения", ["пять", "семь", "десять", "пятнадцать", "двадцать пять", "сорок пять"]),
-    ("срок восстановления после сбоя", ["два часа", "четыре часа", "сутки", "трое суток"]),
-    ("периодичность резервного копирования", ["каждый час", "раз в сутки", "раз в неделю"]),
-    ("срок ответа на запрос контрагента", ["три рабочих дня", "пять рабочих дней", "десять рабочих дней"]),
-    ("предельный объём одного вложения", ["десять мегабайт", "двадцать пять мегабайт", "пятьдесят мегабайт"]),
+    (
+        "срок хранения",
+        ["пять", "семь", "десять", "пятнадцать", "двадцать пять", "сорок пять"],
+    ),
+    (
+        "срок восстановления после сбоя",
+        ["два часа", "четыре часа", "сутки", "трое суток"],
+    ),
+    (
+        "периодичность резервного копирования",
+        ["каждый час", "раз в сутки", "раз в неделю"],
+    ),
+    (
+        "срок ответа на запрос контрагента",
+        ["три рабочих дня", "пять рабочих дней", "десять рабочих дней"],
+    ),
+    (
+        "предельный объём одного вложения",
+        ["десять мегабайт", "двадцать пять мегабайт", "пятьдесят мегабайт"],
+    ),
 ]
 
 CONDITIONS = [
@@ -304,7 +319,12 @@ def build_variant(fact: Fact, other: Fact | None, mode: str, rng: random.Random)
     return {"answer": answer, "labels": labels, "spans_text": spans_text}
 
 
-def build_corpus(documents: list[dict], target: int, seed: int, mode_mix: dict[str, float] | None = None) -> list[dict]:
+def build_corpus(
+    documents: list[dict],
+    target: int,
+    seed: int,
+    mode_mix: dict[str, float] | None = None,
+) -> list[dict]:
     """Набрать пары до ``target``, распределяя режимы по заданной смеси.
 
     Требования, которые проверяются в конце: не меньше 40 % чистых пар и не меньше
@@ -465,7 +485,12 @@ def build_corpus_real(
     eligible = [document["id"] for document in documents if facts_by_doc[document["id"]]]
     skipped: dict[str, int] = {}
     if not eligible:
-        return [], {"eligible_documents": 0, "mode_counts": {}, "skipped": {}, "problems": ["нет документов с фактами"]}
+        return [], {
+            "eligible_documents": 0,
+            "mode_counts": {},
+            "skipped": {},
+            "problems": ["нет документов с фактами"],
+        }
     documents_by_id = {document["id"]: document for document in documents}
 
     pairs: list[dict] = []
@@ -613,7 +638,10 @@ def sha256_file(path: Path) -> str:
 def write_jsonl(path: Path, pairs: list[dict]) -> None:
     """Записать пары в JSONL (по одной записи на строку)."""
     path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text("".join(json.dumps(pair, ensure_ascii=False) + "\n" for pair in pairs), encoding="utf-8")
+    path.write_text(
+        "".join(json.dumps(pair, ensure_ascii=False) + "\n" for pair in pairs),
+        encoding="utf-8",
+    )
 
 
 def check_shared_groups(splits: dict) -> int:
@@ -761,7 +789,12 @@ def main() -> int:
     parser.add_argument("--out", type=Path, default=ROOT / "data" / "corpus_a")
     parser.add_argument("--target", type=int, default=1200)
     parser.add_argument("--seed", type=int, default=42)
-    parser.add_argument("--gen-docs", type=int, default=60, help="сколько документов сгенерировать, если каталог пуст")
+    parser.add_argument(
+        "--gen-docs",
+        type=int,
+        default=60,
+        help="сколько документов сгенерировать, если каталог пуст",
+    )
     parser.add_argument(
         "--real",
         action="store_true",
@@ -769,7 +802,14 @@ def main() -> int:
     )
     args = parser.parse_args()
 
-    manifest = build(args.docs, args.out, args.target, args.seed, gen_docs=args.gen_docs, real=args.real)
+    manifest = build(
+        args.docs,
+        args.out,
+        args.target,
+        args.seed,
+        gen_docs=args.gen_docs,
+        real=args.real,
+    )
     balance = manifest["balance"]
     kind = "A3 (реальные документы)" if args.real else "A1 (синтетический)"
     print(

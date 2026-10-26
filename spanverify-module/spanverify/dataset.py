@@ -51,7 +51,11 @@ UNIT_FORMS: dict[str, dict[str, str]] = {
     "months": {"one": "месяц", "few": "месяца", "many": "месяцев"},
     "days24": {"one": "сутки", "few": "суток", "many": "суток"},
     "workdays": {"one": "рабочий день", "few": "рабочих дня", "many": "рабочих дней"},
-    "caldays": {"one": "календарный день", "few": "календарных дня", "many": "календарных дней"},
+    "caldays": {
+        "one": "календарный день",
+        "few": "календарных дня",
+        "many": "календарных дней",
+    },
 }
 
 
@@ -101,9 +105,18 @@ CONTEXT_TAIL = [  # noqa: RUF100
 
 FAQ_TEMPLATES = [
     ("Каков {subject}?", "{Subject} составляет {value_phrase}."),
-    ("Какой {subject} установлен регламентом?", "Регламент устанавливает {value_phrase}."),
-    ("Что говорится о таком показателе, как {subject}?", "Установленный {subject} — {value_phrase}."),
-    ("На какой {subject} следует ориентироваться?", "{Subject} установлен в размере {value_phrase}."),
+    (
+        "Какой {subject} установлен регламентом?",
+        "Регламент устанавливает {value_phrase}.",
+    ),
+    (
+        "Что говорится о таком показателе, как {subject}?",
+        "Установленный {subject} — {value_phrase}.",
+    ),
+    (
+        "На какой {subject} следует ориентироваться?",
+        "{Subject} установлен в размере {value_phrase}.",
+    ),
 ]
 
 FABRICATIONS = [
@@ -259,7 +272,9 @@ def make_pair(rng: random.Random | None = None, index: int = 0, hallucination_ra
         # Выдуманное утверждение: в контексте таких сведений нет.
         fabrication = _pick_unused(rng, FABRICATIONS, used)
         base = answer_template.format(
-            subject=fact.subject, Subject=fact.subject_titled, value_phrase=fact.value_phrase()
+            subject=fact.subject,
+            Subject=fact.subject_titled,
+            value_phrase=fact.value_phrase(),
         )
         answer = f"{base} {fabrication}"
         start = answer.find(fabrication)
@@ -352,7 +367,11 @@ def validate_pair(data: object, *, path: str | Path, line_number: int) -> dict:
     """
     target = Path(path)
     if not isinstance(data, dict):
-        raise _schema_problem(target, line_number, [f"ожидался объект JSON, найдено: {type(data).__name__}"])
+        raise _schema_problem(
+            target,
+            line_number,
+            [f"ожидался объект JSON, найдено: {type(data).__name__}"],
+        )
     reasons: list[str] = []
     missing = [name for name in REQUIRED_PAIR_FIELDS if name not in data]
     if missing:
@@ -443,10 +462,10 @@ def corpus_statistics(pairs: list[Pair] | list[dict]) -> dict:
     return {
         "pairs": count,
         "kinds": kinds,
-        "hallucination_rate": round(kinds.get("faithful", 0) / count, 4) if count else 0.0,
+        "hallucination_rate": (round(kinds.get("faithful", 0) / count, 4) if count else 0.0),
         "mean_answer_chars": round(total_answer / count, 1) if count else 0.0,
         "mean_context_chars": round(total_context / count, 1) if count else 0.0,
-        "flagged_share_of_answers": round(total_flagged / total_answer, 4) if total_answer else 0.0,
+        "flagged_share_of_answers": (round(total_flagged / total_answer, 4) if total_answer else 0.0),
         "vocabulary": len(vocabulary),
         "dataset_version": DATASET_VERSION,
     }

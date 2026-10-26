@@ -35,8 +35,19 @@ from replay_p1_dev import (
 import spanverify.engine as engine
 from spanverify.core import tokenize_with_offsets
 from spanverify.dataset import read_pairs
-from spanverify.engine import WeightsBundle, _containment_recall, _iou, _mean_width_ratio, _span_f1
-from spanverify.features import feature_cache_key, is_scored_token, load_feature_cache, set_feature_cache
+from spanverify.engine import (
+    WeightsBundle,
+    _containment_recall,
+    _iou,
+    _mean_width_ratio,
+    _span_f1,
+)
+from spanverify.features import (
+    feature_cache_key,
+    is_scored_token,
+    load_feature_cache,
+    set_feature_cache,
+)
 from spanverify.localization import QUANTILES, decoder_config, localize_state
 
 SOURCE = Path("reports/experiments/p2_hf/run39155368906")
@@ -73,7 +84,14 @@ def distribution(values):
             dict(
                 zip(
                     ["min", "p25", "p50", "p75", "p90", "p95", "p99", "max"],
-                    map(float, np.quantile(values, [0, 0.25, 0.5, 0.75, 0.9, 0.95, 0.99, 1], method="linear")),
+                    map(
+                        float,
+                        np.quantile(
+                            values,
+                            [0, 0.25, 0.5, 0.75, 0.9, 0.95, 0.99, 1],
+                            method="linear",
+                        ),
+                    ),
                     strict=False,
                 )
             )
@@ -164,7 +182,17 @@ def validate_states(states, train, receipts):
 
 
 def source_diagnostics(verifier, exact_verifier, states):
-    outputs = {k: [] for k in ("mask", "attribution", "coverage", "final", "exact_attribution", "final_exact_anchor")}
+    outputs = {
+        k: []
+        for k in (
+            "mask",
+            "attribution",
+            "coverage",
+            "final",
+            "exact_attribution",
+            "final_exact_anchor",
+        )
+    }
     truth = [s["truth"] for s in states]
     evidence = []
     merge_lost = 0
@@ -256,7 +284,13 @@ def score_config(states, config):
     truth = []
     for s in states:
         kept, _, spans = localize_state(
-            s["answer"], s["_tokens"], s["smoothed"], s["scored"], config, s["_attr"], s["_coverage"]
+            s["answer"],
+            s["_tokens"],
+            s["smoothed"],
+            s["scored"],
+            config,
+            s["_attr"],
+            s["_coverage"],
         )
         positives = sum(g for g, m in zip(s["gold"], s["scored"], strict=False) if m)
         pair_tp = sum(s["gold"][i] for i in kept)
@@ -269,7 +303,12 @@ def score_config(states, config):
         truth.append(s["truth"])
     token = exact_binary(tp, fp, fn, tn)
     span = _span_f1(predicted, truth)
-    return {"config": config, "tokens": token, "spans": span, "objective": min(token["f1"], span["f1"])}
+    return {
+        "config": config,
+        "tokens": token,
+        "spans": span,
+        "objective": min(token["f1"], span["f1"]),
+    }
 
 
 def search(states, out):
@@ -322,7 +361,10 @@ def run(source_dir, cache_dir, out):
     started = time.perf_counter()
     out.mkdir(parents=True, exist_ok=True)
     provenance = archive_sources(source_dir, out)
-    for name, expected in [("p2_token_head.json", MODEL_HASH), ("combined_bundle.json", BUNDLE_HASH)]:
+    for name, expected in [
+        ("p2_token_head.json", MODEL_HASH),
+        ("combined_bundle.json", BUNDLE_HASH),
+    ]:
         if sha((SOURCE / name).read_bytes()) != expected:
             raise ValueError(f"Frozen {name} hash mismatch")
     states = read_jsonl(next(source_dir.rglob("oof_states.jsonl")))
@@ -343,7 +385,11 @@ def run(source_dir, cache_dir, out):
     engine.number_attribution = lru_cache(maxsize=2048)(engine.number_attribution)
     # No HF/tree calls here: only text-rule methods over existing states.
     v = make_verifier(baseline, runtime, {})
-    anchored = make_verifier(replace(baseline, localization_decoder=decoder_config(OLD_TAU, OLD_TAU)), runtime, {})
+    anchored = make_verifier(
+        replace(baseline, localization_decoder=decoder_config(OLD_TAU, OLD_TAU)),
+        runtime,
+        {},
+    )
     diagnostic, diagnostic_rows = source_diagnostics(v, anchored, states)
     write_json(out / "oof_diagnostics.json", diagnostic)
     write_jsonl(out / "oof_diagnostic_evidence.jsonl", diagnostic_rows)
@@ -374,10 +420,20 @@ def run(source_dir, cache_dir, out):
     missing = [
         p["id"]
         for p in dev
-        if feature_cache_key(p["answer"], p["context"], "hf", runtime["model_name"], chunking=True, max_length=512)
+        if feature_cache_key(
+            p["answer"],
+            p["context"],
+            "hf",
+            runtime["model_name"],
+            chunking=True,
+            max_length=512,
+        )
         not in cache
     ]
-    write_json(out / "cache_coverage.json", {"keys": len(cache), "missing": missing, "dev_pairs": len(dev)})
+    write_json(
+        out / "cache_coverage.json",
+        {"keys": len(cache), "missing": missing, "dev_pairs": len(dev)},
+    )
     if missing:
         raise ValueError("Missing cache; fresh inference forbidden")
     bv = make_verifier(baseline, runtime, cache)
@@ -478,7 +534,10 @@ def run(source_dir, cache_dir, out):
             "run_id": os.getenv("GITHUB_RUN_ID"),
             "code_sha": os.getenv("GITHUB_SHA"),
             "source": provenance,
-            "frozen_models": {"p2_token_head.json": MODEL_HASH, "combined_bundle.json": BUNDLE_HASH},
+            "frozen_models": {
+                "p2_token_head.json": MODEL_HASH,
+                "combined_bundle.json": BUNDLE_HASH,
+            },
             "candidate_bundle_sha256": sha((out / "combined_bundle.json").read_bytes()),
             "train_pairs": 842,
             "dev_pairs": 181,
@@ -498,7 +557,12 @@ def run(source_dir, cache_dir, out):
     )
     print(
         json.dumps(
-            {"quality_status": status, "selected": best, "metrics": allmetrics, "parity": risk_parity},
+            {
+                "quality_status": status,
+                "selected": best,
+                "metrics": allmetrics,
+                "parity": risk_parity,
+            },
             ensure_ascii=False,
         ),
         flush=True,

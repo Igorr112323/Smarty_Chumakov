@@ -65,7 +65,10 @@ _MEASURES = (
 )
 
 VALUE_PATTERNS: tuple[tuple[str, str], tuple[str, str], ...] = (
-    ("date_day_month_year", (rf"\d{{1,2}}\s+(?:{_MONTHS})\s+\d{{4}}(?:\s*г(?:ода)?\.?)?",)),
+    (
+        "date_day_month_year",
+        (rf"\d{{1,2}}\s+(?:{_MONTHS})\s+\d{{4}}(?:\s*г(?:ода)?\.?)?",),
+    ),
     ("date_numeric", (r"\d{1,2}\.\d{1,2}\.\d{2,4}",)),
     ("year", (r"\d{4}\s*(?:год|года|году|г\.)",)),
     ("money", (r"\d[\d\s]*(?:,\d+)?\s*(?:руб(?:лей|ля|\.)?|тыс\.?\s*руб(?:\.|лей)?)",)),

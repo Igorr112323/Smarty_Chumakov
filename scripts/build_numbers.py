@@ -28,7 +28,6 @@ from __future__ import annotations
 import argparse
 import json
 import subprocess
-import sys
 import time
 from pathlib import Path
 
@@ -337,7 +336,6 @@ MEASURED_SOURCES: list[dict] = [
         "dataset": "spanverify.pyz",
         "mode": "release",
     },
-
     # --- прогон на отложенной части корпуса A (договорный ориентир) ---
     {
         "id": "corpus_a.test.tokens.f1",
@@ -862,7 +860,9 @@ def main() -> int:
     args = parser.parse_args()
 
     payload = build()
-    payload.update(run_id="numbers-build", date=str(payload.get("generated_at", "2026-10-19"))[:10])
+    payload.update(
+        run_id="numbers-build", date=str(payload.get("generated_at", "2026-10-19"))[:10]
+    )
     out = ROOT / args.out
     rendered = json.dumps(payload, ensure_ascii=False, indent=2) + "\n"
     if args.check:

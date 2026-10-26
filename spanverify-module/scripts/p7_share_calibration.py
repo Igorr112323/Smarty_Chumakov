@@ -19,7 +19,7 @@ def main(mode, out):
     docs = {}
     for pair in read_pairs(ROOT / "data/corpus_a3/splits/train.jsonl"):
         docs.setdefault(str(pair["meta"]["doc_id"]), pair)
-    folds = json.loads((P5 / "fit_receipts.json").read_text())
+    folds = json.loads((P5 / "fit_receipts.json").read_text(encoding="utf-8"))
     held = [str(d) for f in folds for d in f["held_documents"]]
     assert len(held) == len(set(held)) and set(held) == set(docs)
     v = verifier(mode)
@@ -35,14 +35,22 @@ def main(mode, out):
             text = human[: 800 - cut] + machine[:cut]
             raw = v.verify(text, pair["context"]).ai_share
             rows.append(dict(document=doc_id, fraction=q, raw=raw))
-        save(out / "raw-train-scores.json", dict(mode=mode, rows=rows, raw_score="frozen ai_share", bundle_sha256=SHA))
+        save(
+            out / "raw-train-scores.json",
+            dict(mode=mode, rows=rows, raw_score="frozen ai_share", bundle_sha256=SHA),
+        )
     predictions, receipts = [], []
     for fold in folds:
         fit_docs, held_docs = set(map(str, fold["fit_documents"])), set(map(str, fold["held_documents"]))
         assert not fit_docs & held_docs
         fit = [r for r in rows if r["document"] in fit_docs]
         val = [r for r in rows if r["document"] in held_docs]
-        cal = AiShareCalibrator.fit([r["raw"] for r in fit], [r["fraction"] for r in fit], mode=mode, bundle_sha256=SHA)
+        cal = AiShareCalibrator.fit(
+            [r["raw"] for r in fit],
+            [r["fraction"] for r in fit],
+            mode=mode,
+            bundle_sha256=SHA,
+        )
         predictions += [dict(r, fold=fold["fold"], calibrated=cal.transform(r["raw"])) for r in val]
         receipts.append(
             dict(
@@ -65,7 +73,10 @@ def main(mode, out):
         )
 
     fit_all = AiShareCalibrator.fit(
-        [r["raw"] for r in rows], [r["fraction"] for r in rows], mode=mode, bundle_sha256=SHA
+        [r["raw"] for r in rows],
+        [r["fraction"] for r in rows],
+        mode=mode,
+        bundle_sha256=SHA,
     )
     save(out / f"ai_share_calibrator_v1.{mode}.json", fit_all.to_dict())
     artifact = out / f"ai_share_calibrator_v1.{mode}.json"
@@ -97,7 +108,8 @@ def main(mode, out):
     print(
         "::notice title=P7 AI-share::"
         + json.dumps(
-            {k: v for k, v in report.items() if k not in ("rows", "fold_receipts", "environment")}, ensure_ascii=False
+            {k: v for k, v in report.items() if k not in ("rows", "fold_receipts", "environment")},
+            ensure_ascii=False,
         )
     )
 

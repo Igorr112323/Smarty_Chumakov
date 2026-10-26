@@ -54,7 +54,10 @@ def validate_decoder(config):
             raise ValueError("Decoder cutoff must be finite and nonnegative; above-max sentinel is allowed")
     if config["tau_high"] < config["tau_low"]:
         raise ValueError("tau_high must be >= tau_low")
-    for name, values in (("bridge_unscored_tokens", (0, 1)), ("min_seed_tokens", (1, 2))):
+    for name, values in (
+        ("bridge_unscored_tokens", (0, 1)),
+        ("min_seed_tokens", (1, 2)),
+    ):
         if type(config[name]) is not int or config[name] not in values:
             raise ValueError(f"Invalid {name}")
     if config["attribution_boundary"] != "exact":
@@ -93,7 +96,9 @@ def merge_localized_spans(answer, tokens, spans):
                     end=end,
                     text=answer[start:end],
                     risk=max(prev.risk, span.risk),
-                    label="likely_hallucination" if "likely_hallucination" in (prev.label, span.label) else "doubtful",
+                    label=(
+                        "likely_hallucination" if "likely_hallucination" in (prev.label, span.label) else "doubtful"
+                    ),
                     source=sources[0] if len(sources) == 1 else "rule",
                     sources=sources,
                     token_indices=indices,
@@ -101,7 +106,13 @@ def merge_localized_spans(answer, tokens, spans):
                 )
             )
         else:
-            merged.append(replace(span, text=answer[span.start : span.end], sources=span.sources or (span.source,)))
+            merged.append(
+                replace(
+                    span,
+                    text=answer[span.start : span.end],
+                    sources=span.sources or (span.source,),
+                )
+            )
     return merged
 
 
