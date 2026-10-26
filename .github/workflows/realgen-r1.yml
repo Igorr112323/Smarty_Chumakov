@@ -38,7 +38,7 @@ jobs:
   generate:
     name: "REALGEN-A shard ${{ matrix.shard }}"
     runs-on: ubuntu-24.04
-    timeout-minutes: 120
+    timeout-minutes: 40
     strategy:
       fail-fast: false
       matrix:
@@ -74,7 +74,7 @@ jobs:
           PY
 
       - name: Генерация R1 + R2 (8 шаблонов × 2 режима, 512 новых токенов)
-        timeout-minutes: 100
+        timeout-minutes: 38
         run: |
           python -u reports/science/real/realgen_generate.py \
             --shard ${{ matrix.shard }} --shards 8 --rounds R1,R2 \

@@ -38,7 +38,7 @@ def list_check_runs(head_sha: str, name_prefix: str) -> list[dict]:
                 "-f",
                 f"page={page}",
                 "--jq",
-                '[.check_runs[] | select(.name|startswith("' + name_prefix + '")) | {id, name, summary, text: .output.text}]',
+                '[.check_runs[] | select(.name|startswith("' + name_prefix + '")) | {id, name, summary: .output.summary, text: .output.text}]',
             ],
             text=True,
             capture_output=True,
@@ -103,6 +103,10 @@ def main() -> None:
         report.append({"prefix": prefix, "file": str(path), "bytes": len(raw), "sha256": sha, "chunks": expected})
         print(f"{prefix}: {len(raw)} bytes sha256={sha} chunks={expected}")
 
+    (out_dir / "EXTRACTION_META.json").write_text(
+        json.dumps({"kind": "REALGEN_EXTRACTION_META", "head_sha": args.head_sha, "metas": metas}, ensure_ascii=False, indent=2),
+        encoding="utf-8",
+    )
     (out_dir / "EXTRACTION.json").write_text(
         json.dumps(
             {

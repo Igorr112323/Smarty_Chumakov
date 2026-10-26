@@ -1,7 +1,7 @@
 {
   "kind": "ci_workflows",
   "runs_considered": 100,
-  "generated_at": "2026-10-21T11:37:51Z",
+  "generated_at": "2026-10-26T08:48:19Z",
   "command": "python scripts/collect_ci_workflows.py",
   "source": ".github/workflows/*.yml + reports/CI_RUNS.json",
   "registry": {
@@ -78,7 +78,7 @@
         {
           "name": "Линтер, форматирование, покрытие",
           "timeout_minutes": 40,
-          "steps": 11,
+          "steps": 15,
           "uploads_artifacts": true,
           "runs_python": "ubuntu-24.04"
         },
@@ -992,6 +992,60 @@
           "steps": 11,
           "uploads_artifacts": true,
           "runs_python": "ubuntu-latest"
+        }
+      ],
+      "manual_only": true,
+      "never_runs_by_itself": false
+    },
+    {
+      "file": ".github/workflows/realgen-r1-b.yml",
+      "name": "REALGEN-R1 phase B measurement",
+      "triggers": [
+        "workflow_dispatch",
+        "push"
+      ],
+      "schedule": [],
+      "push_paths": [
+        ".github/realgen-r1-b.trigger"
+      ],
+      "push_branches": [
+        "arena/**"
+      ],
+      "push_tags": [],
+      "jobs": [
+        {
+          "name": "REALGEN-B: признаки + rubert-tiny2 OOF",
+          "timeout_minutes": 40,
+          "steps": 6,
+          "uploads_artifacts": true,
+          "runs_python": "ubuntu-24.04"
+        }
+      ],
+      "manual_only": true,
+      "never_runs_by_itself": false
+    },
+    {
+      "file": ".github/workflows/realgen-r1.yml",
+      "name": "REALGEN-R1 phase A generation",
+      "triggers": [
+        "workflow_dispatch",
+        "push"
+      ],
+      "schedule": [],
+      "push_paths": [
+        ".github/realgen-r1.trigger"
+      ],
+      "push_branches": [
+        "arena/**"
+      ],
+      "push_tags": [],
+      "jobs": [
+        {
+          "name": "REALGEN-A shard ${{ matrix.shard }}",
+          "timeout_minutes": 40,
+          "steps": 7,
+          "uploads_artifacts": true,
+          "runs_python": "ubuntu-24.04"
         }
       ],
       "manual_only": true,

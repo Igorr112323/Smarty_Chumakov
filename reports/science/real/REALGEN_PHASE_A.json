@@ -1,0 +1,408 @@
+{
+  "kind": "REALGEN_PHASE_A",
+  "version": "v1",
+  "created_at": "2026-10-26T09:01:57.319363+00:00",
+  "campaign": "REALGEN-R1",
+  "date": "2026-10-26",
+  "run_id": "40288730753",
+  "evidence_context": {
+    "run_id": "40288730753",
+    "date": "2026-10-26",
+    "status": "authoritative",
+    "source": "GitHub Actions generation + local deterministic markup",
+    "labeling": "local-no-ci-evidence"
+  },
+  "quotas": {
+    "min_answers": 400,
+    "n_answers": 400,
+    "quota_answers_pass": true,
+    "min_erroneous_share": 0.4,
+    "n_erroneous": 169,
+    "erroneous_share": 0.4225,
+    "quota_errors_pass": true,
+    "remedy": "не потребовался: R1 уже даёт ≥40% ошибочных ответов",
+    "round_R2_used": false,
+    "rules_changed": false
+  },
+  "categories": {
+    "clean": 71,
+    "erroneous": 169,
+    "unclear": 160,
+    "clean_share": 0.1775,
+    "erroneous_share": 0.4225,
+    "unclear_share": 0.4
+  },
+  "atoms": {
+    "total": 4720,
+    "unclear_atoms": 2041,
+    "atom_unclear_rate": 0.432415,
+    "answers_with_unclear_atoms": 275
+  },
+  "spans": {
+    "n_spans": 1373,
+    "by_rule": {
+      "a": 402,
+      "b": 303,
+      "c": 668
+    },
+    "length_chars": {
+      "min": 1,
+      "median": 4.0,
+      "max": 67
+    },
+    "per_erroneous_answer": 8.1243
+  },
+  "answers": {
+    "length_chars": {
+      "min": 26,
+      "median": 774.5,
+      "max": 1954
+    },
+    "generated_tokens_total": 85137,
+    "generated_tokens_mean": 212.84
+  },
+  "quota_sensitivity": {
+    "frozen_rule_c_mode": "any_window",
+    "sensitivity_rule_c_mode": "best_window",
+    "frozen_erroneous_share": 0.4225,
+    "R1_best_window": {
+      "erroneous": 152,
+      "n": 400,
+      "share": 0.38
+    },
+    "all_best_window": null,
+    "answers_with_rule_a_or_b_only": 95,
+    "share_without_rule_c": 0.2375,
+    "note": "Замороженная разметка использует буквальное чтение правила (c): любое окно Jaccard≥0.6 с другим числом. Более строгая трактовка (только лучшее окно) даёт меньше ошибок и опубликована здесь как sensitivity. Правила (a)/(b)/(d) не менялись ни в одном варианте."
+  },
+  "generated_rounds": {
+    "R1": {
+      "n_answers": 400,
+      "used_in_freeze": true,
+      "shard_files_sha256": [
+        "a3a32646b3a35ff552d0e446af0880ff69dc64d8c42aebc0b75757918cf8189e",
+        "294044f6d34dc418153620b49ba923daed271c041121f924e38926acb3e04f9e",
+        "ceaba3c29f8eb10a227f4f3eb9c8aeefa102af31f685514f7b34378fb34f6525",
+        "ae0ff94a6f700f51b998f4f3c7ec924bae746783fe21126225eba08b1b4424ed",
+        "b779098d4d07c9fd1860480756f05216a29b5dc4f1ff4d8b5f5ffb897e653124",
+        "8bcf17b1fa0e7ad351ab65ea3f059da97b5f58330324ca2761ecee7d76216559",
+        "33aaa8f34812c38f7f95e6065ddc57986725204dc1bce9db20c58ee65447875b",
+        "42d582a0672ffa2537fc620f009de13414b8f592de45481c0c5737ce74326fd4"
+      ]
+    },
+    "R2": {
+      "n_answers": 400,
+      "used_in_freeze": false,
+      "purpose": "заранее сгенерированный contingency-раунд с повышенной сложностью промта",
+      "shard_files_sha256": [
+        "b72a367e73851c9350dc9bf7df4f5a3ef0b025db76c451f5afb93839b5310f57",
+        "39a78cdbaabed44999bb6e27d5bd22c76f592449d9cd93ef624889ce363b0b40",
+        "d5a353ce3aea45922b095902989cd72d94db53b1155feb9cb289dd85d61484fa",
+        "42f822815d6cc290f6df56a17f514be00f9c972c1bdbdc971313b0b99453a8dc",
+        "cb590bd57a40c220c29598a915002821aac0c25a8ee990126122b0b5173160bf",
+        "cefb80abdbb9671abc7bf406e6fc550c775033c7ee2885d5670b93a78c9670e2",
+        "a45e4d8a305cac25deda74d7fdb32c4e2f627b5826c96a2d7ac703a527869502",
+        "99c8d64dd3cee3fea439e2ec3a5a4521b9548f065037d060c8c22af91b6113c7"
+      ],
+      "note": "не вошёл в заморозку: квота 40% достигнута на R1; файлы остаются в CI check-runs, не коммитятся"
+    }
+  },
+  "by_round": {
+    "R1": {
+      "n_answers": 400,
+      "erroneous": 169,
+      "erroneous_share": 0.4225,
+      "clean": 71,
+      "unclear": 160,
+      "spans": 1373
+    }
+  },
+  "by_template": {
+    "summarize_chapter": {
+      "n": 50,
+      "erroneous": 20,
+      "spans": 166
+    },
+    "list_penalties": {
+      "n": 50,
+      "erroneous": 19,
+      "spans": 130
+    },
+    "give_deadlines": {
+      "n": 50,
+      "erroneous": 17,
+      "spans": 229
+    },
+    "required_documents": {
+      "n": 50,
+      "erroneous": 14,
+      "spans": 118
+    },
+    "application_conditions": {
+      "n": 50,
+      "erroneous": 30,
+      "spans": 230
+    },
+    "key_requirements": {
+      "n": 50,
+      "erroneous": 27,
+      "spans": 177
+    },
+    "regulated_subjects": {
+      "n": 50,
+      "erroneous": 24,
+      "spans": 203
+    },
+    "appeal_procedure": {
+      "n": 50,
+      "erroneous": 18,
+      "spans": 120
+    }
+  },
+  "by_mode": {
+    "greedy": {
+      "n": 200,
+      "erroneous": 77,
+      "spans": 597
+    },
+    "top-p 0.95 temperature 0.8": {
+      "n": 200,
+      "erroneous": 92,
+      "spans": 776
+    }
+  },
+  "splits": {
+    "dev_answers": 300,
+    "test_realgen_answers": 100,
+    "dev_docs": 300,
+    "test_realgen_docs": 100,
+    "overlap": 0,
+    "test_realgen_sealed": true
+  },
+  "timing": {
+    "generation_seconds_sum_over_answers": 2736.123,
+    "answers_per_hour_single_stream": 526.29,
+    "answers_per_hour_per_shard_mean": 527.52,
+    "wall_clock_seconds_est": 382.575,
+    "note": "сумма времен генерации всех ответов (эквивалент одного потока); 8 шардов CI работают параллельно",
+    "platform": {
+      "python": "3.11.2",
+      "system": "Linux",
+      "ci": "GitHub Actions ubuntu-24.04"
+    }
+  },
+  "model_environment": {
+    "model": "ai-forever/rugpt3small_based_on_gpt2",
+    "directive_weights_mb": 443.5,
+    "weights_budget_mb": 550,
+    "measured_pytorch_weights_bytes": 551290714,
+    "measured_pytorch_weights_mb_decimal": 551.291,
+    "measured_pytorch_weights_mib": 525.752,
+    "pytorch_weights_sha256": "0d2a4a387b0430654bb1f6813436bd31f8e10a06e18ea0e5c41b33120b78458e",
+    "snapshot_all_frameworks_bytes": 1055.21,
+    "budget_deviation_mb_decimal": 1.291,
+    "note": "Директива указывала 443.5 МБ; фактический pytorch_model.bin в snapshot ai-forever/rugpt3small_based_on_gpt2@a9307e6 больше. Модель используется только для research-генерации в CI, в запечатанный продуктовый стек P8 не попадает (пломба не тронута). Превышение бюджета 550 МБ зафиксировано открыто как deviation, см. поле budget_deviation_mb_decimal.",
+    "python": "3.11.17",
+    "torch": "2.14.1+cpu",
+    "transformers": "5.20.1",
+    "platform": "Linux-6.17.0-1022-azure-x86_64-with-glibc2.39",
+    "threads": 2,
+    "model_load_seconds_mean": 6.448,
+    "shard_stats": [
+      {
+        "round": "R2",
+        "shard": 2,
+        "n_answers": 50,
+        "elapsed_seconds": 382.575,
+        "answers_per_hour": 470.5,
+        "mean_generated_tokens": 243.28,
+        "mean_answer_chars": 1149.1,
+        "file_sha256": "d5a353ce3aea45922b095902989cd72d94db53b1155feb9cb289dd85d61484fa",
+        "file_bytes": 374798
+      },
+      {
+        "round": "R2",
+        "shard": 7,
+        "n_answers": 50,
+        "elapsed_seconds": 321.38,
+        "answers_per_hour": 560.08,
+        "mean_generated_tokens": 194.68,
+        "mean_answer_chars": 856.84,
+        "file_sha256": "99c8d64dd3cee3fea439e2ec3a5a4521b9548f065037d060c8c22af91b6113c7",
+        "file_bytes": 347954
+      },
+      {
+        "round": "R2",
+        "shard": 3,
+        "n_answers": 50,
+        "elapsed_seconds": 342.827,
+        "answers_per_hour": 525.05,
+        "mean_generated_tokens": 207.14,
+        "mean_answer_chars": 915.66,
+        "file_sha256": "42f822815d6cc290f6df56a17f514be00f9c972c1bdbdc971313b0b99453a8dc",
+        "file_bytes": 353928
+      },
+      {
+        "round": "R2",
+        "shard": 6,
+        "n_answers": 50,
+        "elapsed_seconds": 340.033,
+        "answers_per_hour": 529.36,
+        "mean_generated_tokens": 213.12,
+        "mean_answer_chars": 1037.98,
+        "file_sha256": "a45e4d8a305cac25deda74d7fdb32c4e2f627b5826c96a2d7ac703a527869502",
+        "file_bytes": 366235
+      },
+      {
+        "round": "R2",
+        "shard": 4,
+        "n_answers": 50,
+        "elapsed_seconds": 337.832,
+        "answers_per_hour": 532.81,
+        "mean_generated_tokens": 230.12,
+        "mean_answer_chars": 1010.54,
+        "file_sha256": "cb590bd57a40c220c29598a915002821aac0c25a8ee990126122b0b5173160bf",
+        "file_bytes": 356818
+      },
+      {
+        "round": "R2",
+        "shard": 0,
+        "n_answers": 50,
+        "elapsed_seconds": 344.69,
+        "answers_per_hour": 522.21,
+        "mean_generated_tokens": 241.94,
+        "mean_answer_chars": 1106.98,
+        "file_sha256": "b72a367e73851c9350dc9bf7df4f5a3ef0b025db76c451f5afb93839b5310f57",
+        "file_bytes": 370659
+      },
+      {
+        "round": "R2",
+        "shard": 5,
+        "n_answers": 50,
+        "elapsed_seconds": 337.932,
+        "answers_per_hour": 532.65,
+        "mean_generated_tokens": 191.86,
+        "mean_answer_chars": 868.22,
+        "file_sha256": "cefb80abdbb9671abc7bf406e6fc550c775033c7ee2885d5670b93a78c9670e2",
+        "file_bytes": 349193
+      },
+      {
+        "round": "R2",
+        "shard": 1,
+        "n_answers": 50,
+        "elapsed_seconds": 330.227,
+        "answers_per_hour": 545.08,
+        "mean_generated_tokens": 213.34,
+        "mean_answer_chars": 817.96,
+        "file_sha256": "39a78cdbaabed44999bb6e27d5bd22c76f592449d9cd93ef624889ce363b0b40",
+        "file_bytes": 343992
+      },
+      {
+        "round": "R1",
+        "shard": 7,
+        "n_answers": 50,
+        "elapsed_seconds": 373.852,
+        "answers_per_hour": 481.47,
+        "mean_generated_tokens": 220.98,
+        "mean_answer_chars": 950.78,
+        "file_sha256": "42d582a0672ffa2537fc620f009de13414b8f592de45481c0c5737ce74326fd4",
+        "file_bytes": 343773
+      },
+      {
+        "round": "R1",
+        "shard": 3,
+        "n_answers": 50,
+        "elapsed_seconds": 359.632,
+        "answers_per_hour": 500.51,
+        "mean_generated_tokens": 215.36,
+        "mean_answer_chars": 1002.04,
+        "file_sha256": "ae0ff94a6f700f51b998f4f3c7ec924bae746783fe21126225eba08b1b4424ed",
+        "file_bytes": 350058
+      },
+      {
+        "round": "R1",
+        "shard": 6,
+        "n_answers": 50,
+        "elapsed_seconds": 357.726,
+        "answers_per_hour": 503.18,
+        "mean_generated_tokens": 217.08,
+        "mean_answer_chars": 1010.36,
+        "file_sha256": "33aaa8f34812c38f7f95e6065ddc57986725204dc1bce9db20c58ee65447875b",
+        "file_bytes": 349597
+      },
+      {
+        "round": "R1",
+        "shard": 2,
+        "n_answers": 50,
+        "elapsed_seconds": 346.465,
+        "answers_per_hour": 519.53,
+        "mean_generated_tokens": 223.68,
+        "mean_answer_chars": 1039.58,
+        "file_sha256": "ceaba3c29f8eb10a227f4f3eb9c8aeefa102af31f685514f7b34378fb34f6525",
+        "file_bytes": 352969
+      },
+      {
+        "round": "R1",
+        "shard": 4,
+        "n_answers": 50,
+        "elapsed_seconds": 338.557,
+        "answers_per_hour": 531.67,
+        "mean_generated_tokens": 226.88,
+        "mean_answer_chars": 1067.62,
+        "file_sha256": "b779098d4d07c9fd1860480756f05216a29b5dc4f1ff4d8b5f5ffb897e653124",
+        "file_bytes": 349588
+      },
+      {
+        "round": "R1",
+        "shard": 5,
+        "n_answers": 50,
+        "elapsed_seconds": 325.024,
+        "answers_per_hour": 553.8,
+        "mean_generated_tokens": 182.76,
+        "mean_answer_chars": 870.36,
+        "file_sha256": "8bcf17b1fa0e7ad351ab65ea3f059da97b5f58330324ca2761ecee7d76216559",
+        "file_bytes": 338026
+      },
+      {
+        "round": "R1",
+        "shard": 0,
+        "n_answers": 50,
+        "elapsed_seconds": 319.971,
+        "answers_per_hour": 562.55,
+        "mean_generated_tokens": 216.64,
+        "mean_answer_chars": 1013.32,
+        "file_sha256": "a3a32646b3a35ff552d0e446af0880ff69dc64d8c42aebc0b75757918cf8189e",
+        "file_bytes": 349139
+      },
+      {
+        "round": "R1",
+        "shard": 1,
+        "n_answers": 50,
+        "elapsed_seconds": 315.852,
+        "answers_per_hour": 569.89,
+        "mean_generated_tokens": 199.36,
+        "mean_answer_chars": 792.2,
+        "file_sha256": "294044f6d34dc418153620b49ba923daed271c041121f924e38926acb3e04f9e",
+        "file_bytes": 330093
+      }
+    ],
+    "answers_per_hour_per_shard_mean": 527.52,
+    "wall_clock_seconds_est": 382.575
+  },
+  "provenance": {
+    "model": "ai-forever/rugpt3small_based_on_gpt2",
+    "weights_mb_directive": 443.5,
+    "weights_mb_measured_pytorch": 551.291,
+    "seed": 42,
+    "background_ids_sha256": "48190fffd0deb02ec6df71e865ff3cf9d581ab00fb6831d7d5c014232023bbdb",
+    "selection_sha256": "a03d5f39117fea2c3b9c57d87b52d92b3ce97459f438f09983cd2445292eaed3",
+    "ci_run_ids": [
+      "40288730753"
+    ],
+    "run_id": "local-no-ci-evidence",
+    "extraction": "manual: gh api check-runs output.text → .arena/realgen_extract (auto-commit из workflow запрещён)",
+    "real_test_viewed": false,
+    "real_test_locked_files_read": [],
+    "labeling": "local-no-ci-evidence (детерминированные правила, без LLM-судьи)"
+  }
+}
