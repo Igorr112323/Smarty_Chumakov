@@ -11,7 +11,7 @@ python -m pytest --collect-only -q
 python -m pytest
 ```
 
-**965 собранных nodes в 77 файлах**, включая параметризованные случаи. Это не число функций: например, YAML-проверки разворачиваются для каждого workflow. Полный список nodeid и количество по каждому файлу сохранены в [TESTS_INVENTORY.json](presentation/TESTS_INVENTORY.json). Названия в таблице — реальные файлы `spanverify-module/tests/`, а не примеры будущих тестов.
+**967 собранных nodes в 77 файлах**, включая параметризованные случаи. Это не число функций: например, YAML-проверки разворачиваются для каждого workflow. Полный список nodeid и количество по каждому файлу сохранены в [TESTS_INVENTORY.json](presentation/TESTS_INVENTORY.json). Названия в таблице — реальные файлы `spanverify-module/tests/`, а не примеры будущих тестов.
 
 Базовое полное выполнение: **908 passed, 2 skipped, 0 failed, 0 errors**, tests_excluded=false. Машинное доказательство: [committed JUnit](../reports/p8/closure/local-suite.xml), [LOCAL_SUITE](../reports/p8/closure/LOCAL_SUITE.json); окончательные CI-проверки презентационного HEAD указываются в квитанции/финальном ответе, а не выдаются за этот исторический запуск.
 
@@ -97,9 +97,9 @@ python -m pytest
 | [test_verdict_rule.py](../spanverify-module/tests/test_verdict_rule.py) | 8 | Single vs two tokens, decisive attribution, legacy и token parity | Вердикт не обвиняет весь ответ по одиночной слабой маске |
 | [test_version.py](../spanverify-module/tests/test_version.py) | 1 | Версия пакета и pyproject | Метаданные выпуска не расходятся |
 | [test_workflow_limits.py](../spanverify-module/tests/test_workflow_limits.py) | 153 | YAML, job/step timeouts, quoting, concurrency и push metrics | CI не теряет обязательные проверки и ограничения выполнения |
-| [test_realgen_freeze.py](../spanverify-module/tests/test_realgen_freeze.py) | 5 | Квоты, sha-карта заморозки, background 6510 без test-hosting, сплит 300/100, run-id provenance | REALGEN-R1 фаза A не расшатывается последующими правками и не читает запертый real_test |
+| [test_realgen_freeze.py](../spanverify-module/tests/test_realgen_freeze.py) | 7 | Квоты, sha-карта заморозки, background 6510 без test-hosting, сплит 300/100, run-id provenance | REALGEN-R1 фаза A не расшатывается последующими правками и не читает запертый real_test |
 
-**Итого: 77 строки-файла, 965 nodes.** Инвентарь сохраняет каждый nodeid, включая классы и параметры; документационный тест сверяет его со всей реально собранной pytest session при полном запуске.
+**Итого: 77 строки-файла, 967 nodes.** Инвентарь сохраняет каждый nodeid, включая классы и параметры; документационный тест сверяет его со всей реально собранной pytest session при полном запуске.
 
 ## Два штатных skip — без новых исключений
 

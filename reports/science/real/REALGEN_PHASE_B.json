@@ -1,0 +1,352 @@
+{
+  "kind": "REALGEN_PHASE_B",
+  "version": "v1",
+  "campaign": "REALGEN-R1",
+  "created_at": "2026-10-26T09:32:49.758947+00:00",
+  "date": "2026-10-26",
+  "run_id": "40298872296",
+  "evidence_context": {
+    "run_id": "40298872296",
+    "date": "2026-10-26",
+    "status": "authoritative",
+    "source": "GitHub Actions phase B measurement (only dev REALGEN)",
+    "labeling": "deterministic atom rules from frozen phase A"
+  },
+  "data": {
+    "smoke_test": false,
+    "dev_answers": 300,
+    "n_tokens": 51472,
+    "n_positive_tokens": 1828,
+    "n_span_windows": 2180,
+    "n_positive_span_windows": 437,
+    "folds": 5,
+    "fold_rule": "int(sha256('42:fold:'+doc_id),16) % 5",
+    "bootstrap": 5000,
+    "bootstrap_unit": "cluster by doc_id for tokens, by window for spans"
+  },
+  "per_feature_AUC": [
+    {
+      "feature": "attention_entropy",
+      "family": "old5",
+      "auc": 0.541875,
+      "auc_oriented": 0.541875,
+      "orientation": "higher=risk"
+    },
+    {
+      "feature": "ctx_attention_mass",
+      "family": "old5",
+      "auc": 0.469829,
+      "auc_oriented": 0.530171,
+      "orientation": "lower=risk"
+    },
+    {
+      "feature": "ctx_attention_mass_norm",
+      "family": "old5",
+      "auc": 0.47552,
+      "auc_oriented": 0.52448,
+      "orientation": "lower=risk"
+    },
+    {
+      "feature": "ctx_max_similarity",
+      "family": "old5",
+      "auc": 0.451263,
+      "auc_oriented": 0.548737,
+      "orientation": "lower=risk"
+    },
+    {
+      "feature": "embedding_density",
+      "family": "old5",
+      "auc": 0.540021,
+      "auc_oriented": 0.540021,
+      "orientation": "higher=risk"
+    },
+    {
+      "feature": "sentence_cosine_answer_doc",
+      "family": "E1",
+      "auc": 0.403672,
+      "auc_oriented": 0.596328,
+      "orientation": "lower=risk"
+    },
+    {
+      "feature": "sentence_cosine_answer_chunk_max",
+      "family": "E1",
+      "auc": 0.411182,
+      "auc_oriented": 0.588818,
+      "orientation": "lower=risk"
+    },
+    {
+      "feature": "contrast_doc_chunk",
+      "family": "E1",
+      "auc": 0.528469,
+      "auc_oriented": 0.528469,
+      "orientation": "higher=risk"
+    },
+    {
+      "feature": "rolling_logprob_next_token",
+      "family": "E1",
+      "auc": 0.468078,
+      "auc_oriented": 0.531922,
+      "orientation": "lower=risk"
+    },
+    {
+      "feature": "lexical_number_attribution_window",
+      "family": "E1",
+      "auc": 0.640861,
+      "auc_oriented": 0.640861,
+      "orientation": "higher=risk"
+    },
+    {
+      "feature": "stopword_norm",
+      "family": "E1",
+      "auc": 0.350313,
+      "auc_oriented": 0.649687,
+      "orientation": "lower=risk"
+    },
+    {
+      "feature": "digit_density_answer",
+      "family": "R2",
+      "auc": 0.782091,
+      "auc_oriented": 0.782091,
+      "orientation": "higher=risk"
+    },
+    {
+      "feature": "citation_density_answer",
+      "family": "R2",
+      "auc": 0.727022,
+      "auc_oriented": 0.727022,
+      "orientation": "higher=risk"
+    },
+    {
+      "feature": "token_is_numeric",
+      "family": "R2",
+      "auc": 0.794094,
+      "auc_oriented": 0.794094,
+      "orientation": "higher=risk"
+    },
+    {
+      "feature": "token_is_citation",
+      "family": "R2",
+      "auc": 0.585824,
+      "auc_oriented": 0.585824,
+      "orientation": "higher=risk"
+    },
+    {
+      "feature": "token_len_chars",
+      "family": "R2",
+      "auc": 0.346258,
+      "auc_oriented": 0.653742,
+      "orientation": "lower=risk"
+    },
+    {
+      "feature": "token_letters",
+      "family": "R2",
+      "auc": 0.25822,
+      "auc_oriented": 0.74178,
+      "orientation": "lower=risk"
+    },
+    {
+      "feature": "position_ratio",
+      "family": "R2",
+      "auc": 0.528939,
+      "auc_oriented": 0.528939,
+      "orientation": "higher=risk"
+    },
+    {
+      "feature": "sentence_length_chars",
+      "family": "R2",
+      "auc": 0.428081,
+      "auc_oriented": 0.571919,
+      "orientation": "lower=risk"
+    },
+    {
+      "feature": "local_number_density",
+      "family": "R2",
+      "auc": 0.83201,
+      "auc_oriented": 0.83201,
+      "orientation": "higher=risk"
+    },
+    {
+      "feature": "local_stopword_share",
+      "family": "R2",
+      "auc": 0.294479,
+      "auc_oriented": 0.705521,
+      "orientation": "lower=risk"
+    },
+    {
+      "feature": "doc_coverage",
+      "family": "R2",
+      "auc": 0.534342,
+      "auc_oriented": 0.534342,
+      "orientation": "higher=risk"
+    },
+    {
+      "feature": "distinct_digits",
+      "family": "R2",
+      "auc": 0.792092,
+      "auc_oriented": 0.792092,
+      "orientation": "higher=risk"
+    },
+    {
+      "feature": "uppercase_ratio",
+      "family": "R2",
+      "auc": 0.434457,
+      "auc_oriented": 0.565543,
+      "orientation": "lower=risk"
+    },
+    {
+      "feature": "punctuation_ratio",
+      "family": "R2",
+      "auc": 0.713626,
+      "auc_oriented": 0.713626,
+      "orientation": "higher=risk"
+    },
+    {
+      "feature": "unit_flag",
+      "family": "R2",
+      "auc": 0.537067,
+      "auc_oriented": 0.537067,
+      "orientation": "higher=risk"
+    },
+    {
+      "feature": "type_token_ratio_answer",
+      "family": "R2",
+      "auc": 0.453609,
+      "auc_oriented": 0.546391,
+      "orientation": "lower=risk"
+    }
+  ],
+  "composite_OOF": {
+    "model": "LogisticRegression(class_weight=balanced, max_iter=1000) on 27 features, StandardScaler",
+    "features": [
+      "attention_entropy",
+      "ctx_attention_mass",
+      "ctx_attention_mass_norm",
+      "ctx_max_similarity",
+      "embedding_density",
+      "sentence_cosine_answer_doc",
+      "sentence_cosine_answer_chunk_max",
+      "contrast_doc_chunk",
+      "rolling_logprob_next_token",
+      "lexical_number_attribution_window",
+      "stopword_norm",
+      "digit_density_answer",
+      "citation_density_answer",
+      "token_is_numeric",
+      "token_is_citation",
+      "token_len_chars",
+      "token_letters",
+      "position_ratio",
+      "sentence_length_chars",
+      "local_number_density",
+      "local_stopword_share",
+      "doc_coverage",
+      "distinct_digits",
+      "uppercase_ratio",
+      "punctuation_ratio",
+      "unit_flag",
+      "type_token_ratio_answer"
+    ],
+    "token_AUC": 0.954731,
+    "token_ci95": [
+      0.942672,
+      0.96432
+    ],
+    "span_AUC": 0.725425,
+    "span_ci95": [
+      0.699055,
+      0.75082
+    ]
+  },
+  "rubert_tiny2_finetune": {
+    "model": "cointegrated/rubert-tiny2 AutoModelForTokenClassification",
+    "hyperparams": {
+      "batch": 8,
+      "lr": 2e-05,
+      "epochs": 3,
+      "max_length": 96,
+      "OOF_folds": 5
+    },
+    "weights_mb": 117.53,
+    "train_steps": 2748,
+    "n_windows": 1829,
+    "token_AUC": 0.808308,
+    "token_ci95": [
+      0.778615,
+      0.835505
+    ],
+    "span_AUC": 0.741393,
+    "span_ci95": [
+      0.718138,
+      0.764238
+    ],
+    "note": "OOF вероятности по сабтокенам агрегированы в word-токены средним; train_steps=0 означает dry-run"
+  },
+  "gates": {
+    "token_AUC_min": 0.7,
+    "span_AUC_min": 0.55,
+    "ci95_strictly_above_0.5": true,
+    "composite": {
+      "token_AUC": 0.954731,
+      "span_AUC": 0.725425,
+      "token_gate": true,
+      "span_gate": true,
+      "ci_gate": true
+    },
+    "rubert_tiny2_finetune": {
+      "token_AUC": 0.808308,
+      "span_AUC": 0.741393,
+      "token_gate": true,
+      "span_gate": true,
+      "ci_gate": true
+    },
+    "composite_pass": true,
+    "rubert_pass": true,
+    "rule": "verdict=PASS только если ОБЕ модели (composite и rubert-tiny2 FT) проходят все ворота",
+    "verdict": "PASS"
+  },
+  "caveat_label_leakage": "Метки REALGEN получены детерминированными правилами по числам/ссылкам, поэтому лексические признаки (token_is_numeric, local_number_density, citation_density) ожидаемо дают высокий AUC. Это НЕ доказательство обнаружения галлюцинаций в свободной генерации и НЕ перенос на real_test 1200; ворота измеряют только внутреннюю separability этого корпуса.",
+  "old5_definitions": "пересчитаны на ai-forever/rugpt3small_based_on_gpt2 (last-layer attention / hidden states) — не вызов замороженного hf_features_chunked, определения сохранены",
+  "E1_R2_note": "E1/R2 признаки — детерминированная реимплементация по опубликованным именам в E0_DIAG/E1_SIGNAL; исходный код E1HUNT_R2/R3 в этом чекауте отсутствует (проверено по trees веток)",
+  "environment": {
+    "python": "3.11.17",
+    "platform": "Linux-6.17.0-1022-azure-x86_64-with-glibc2.39",
+    "dry_run": false,
+    "torch": "2.14.1+cpu",
+    "transformers": "5.20.1",
+    "gpt_model": "ai-forever/rugpt3small_based_on_gpt2",
+    "gpt_weight_files": [
+      {
+        "name": "pytorch_model.bin",
+        "bytes": 551290714
+      }
+    ],
+    "rubert_model": "cointegrated/rubert-tiny2",
+    "rubert_weight_files": [
+      {
+        "name": "model.safetensors",
+        "bytes": 117529600
+      },
+      {
+        "name": "pytorch_model.bin",
+        "bytes": 117546024
+      }
+    ],
+    "rubert_weights_mb": 117.53,
+    "run_id": "40298872296",
+    "head_sha": "13b1608254f69c0e79709fcb22dafa4925c2959e"
+  },
+  "runtime_seconds": 649.665,
+  "real_test_viewed": false,
+  "provenance": {
+    "run_id": "40298872296",
+    "head_sha": "13b1608254f69c0e79709fcb22dafa4925c2959e",
+    "inputs": {
+      "REALGEN_FROZEN.json": "372ff6b8820441f48150d23d36f528d188aa6edf0b876f859bbd4be188dd0c6d",
+      "REALGEN_ANSWERS_DEV.jsonl": "cd902ac8c33dee30e4b823052d00d8124f7b4bcf2d4c3cfb35f0179d90ba3341",
+      "REALGEN_SPANS.jsonl": "e431a15386367f987dad6b9c9e7e90a03de33a6c436ac708342b1a2d5c65c0cd",
+      "REALGEN_DOCS.jsonl": "809b1375b4f5ad7b2dc4acd26c3764f32a3bf31e273161f0145196f5a7a09c63"
+    },
+    "test_realgen_file_read": false,
+    "real_test_locked_file_read": false
+  }
+}

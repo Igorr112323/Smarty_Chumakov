@@ -80,6 +80,42 @@ def test_dev_and_test_realgen_splits_do_not_intersect() -> None:
     assert rows.count("test_realgen") == splits["test_realgen_answers"]
 
 
+def test_phase_b_reports_only_dev_and_honest_gates() -> None:
+    """Фаза B: 300 dev, real_test не читался, ворота и CI на месте."""
+    phase_b = _load("REALGEN_PHASE_B.json")
+    assert phase_b["data"]["dev_answers"] == 300
+    assert phase_b["data"]["smoke_test"] is False
+    assert phase_b["real_test_viewed"] is False
+    assert phase_b["provenance"]["test_realgen_file_read"] is False
+    assert phase_b["provenance"]["real_test_locked_file_read"] is False
+    assert len(phase_b["per_feature_AUC"]) == 27
+    assert phase_b["gates"]["token_AUC_min"] == 0.70
+    assert phase_b["gates"]["span_AUC_min"] == 0.55
+    assert phase_b["gates"]["verdict"] in ("PASS", "FAIL")
+    for key in ("composite_OOF", "rubert_tiny2_finetune"):
+        block = phase_b[key]
+        assert 0.0 <= block["token_AUC"] <= 1.0
+        assert 0.0 <= block["span_AUC"] <= 1.0
+        assert len(block["token_ci95"]) == len(block["span_ci95"]) == 2
+
+
+def test_phase_b_oof_rows_never_touch_test_realgen_docs() -> None:
+    """OOF-строки фазы B не содержат ни одного test_realgen документа."""
+    splits = _load("REALGEN_SPLITS.json")
+    test_docs = set(splits["test_realgen_docs"])
+    seen, folds, labels = 0, set(), set()
+    with (REAL / "REALGEN_PHASE_B_OOF.jsonl").open(encoding="utf-8") as handle:
+        for line in handle:
+            row = json.loads(line)
+            assert row["doc_id"] not in test_docs
+            folds.add(row["fold"])
+            labels.add(row["label"])
+            seen += 1
+    assert seen == _load("REALGEN_PHASE_B.json")["data"]["n_tokens"]
+    assert folds == {0, 1, 2, 3, 4}
+    assert labels <= {0, 1}
+
+
 def test_phase_a_reports_run_id_provenance() -> None:
     """Честный provenance: ref-прогон генерации + local-no-ci-evidence разметки."""
     phase_a = _load("REALGEN_PHASE_A.json")

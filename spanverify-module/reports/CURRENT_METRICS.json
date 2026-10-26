@@ -15,10 +15,10 @@
   },
   "disclaimer": "Демонстрационные метрики получены на синтетическом корпусе и научным результатом не являются. Для подтверждения требуются 1200 пар «вопрос–ответ» с экспертной разметкой на реальных регламентах организации.",
   "tests": {
-    "collected": 965,
+    "collected": 967,
     "coverage_percent": 87.82,
     "coverage_gate_percent": 85,
-    "inventory_note": "REALGEN-R1: 965 collected (950 + 10 workflow-limit nodes + 5 REALGEN freeze tests)"
+    "inventory_note": "REALGEN-R1: 967 collected (950 + 10 workflow-limit nodes + 7 REALGEN freeze/phase-B tests)"
   },
   "demo": {
     "split": {

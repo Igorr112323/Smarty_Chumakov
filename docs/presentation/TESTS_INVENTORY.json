@@ -1,9 +1,9 @@
 {
   "date": "2026-10-26",
   "baseline": "725824030f24862830c277d9e537c5f05727d8b0",
-  "collection_source_head": "2ed90c044e06fdd17e272535bd09721939e0b7db",
+  "collection_source_head": "13b1608254f69c0e79709fcb22dafa4925c2959e",
   "command": "cd spanverify-module && python -m pytest --collect-only -q (nodeids captured via pytest_collection_finish)",
-  "total": 965,
+  "total": 967,
   "files": [
     {
       "path": "spanverify-module/tests/test_answer_head.py",
@@ -1062,14 +1062,16 @@
     },
     {
       "path": "spanverify-module/tests/test_realgen_freeze.py",
-      "collected_nodes": 5,
+      "collected_nodes": 7,
       "module_docstring": "REALGEN-R1: инварианты заморозки фазы A.",
       "nodeids": [
         "tests/test_realgen_freeze.py::test_background_has_zero_overlap_with_test_hosting_docs",
         "tests/test_realgen_freeze.py::test_dev_and_test_realgen_splits_do_not_intersect",
         "tests/test_realgen_freeze.py::test_frozen_file_hashes_match_the_committed_bytes",
         "tests/test_realgen_freeze.py::test_frozen_quotas_and_sealed_split_are_preserved",
-        "tests/test_realgen_freeze.py::test_phase_a_reports_run_id_provenance"
+        "tests/test_realgen_freeze.py::test_phase_a_reports_run_id_provenance",
+        "tests/test_realgen_freeze.py::test_phase_b_oof_rows_never_touch_test_realgen_docs",
+        "tests/test_realgen_freeze.py::test_phase_b_reports_only_dev_and_honest_gates"
       ]
     },
     {
@@ -1510,5 +1512,5 @@
       ]
     }
   ],
-  "note": "REALGEN-R1: 950 → 965 (2 новых workflow = +10 параметризованных nodes; +5 новых тестов заморозки REALGEN). Состав тестов не сужался."
+  "note": "REALGEN-R1: 950 → 967 (2 workflow = +10 parametrized nodes; +7 REALGEN freeze/phase-B tests). Состав не сужался."
 }

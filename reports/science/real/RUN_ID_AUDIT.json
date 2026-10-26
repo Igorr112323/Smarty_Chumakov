@@ -13,10 +13,19 @@
         "base": "de11ee9d38744ac4809edcfb475b62db8ad49d48",
         "python": "3.11.2",
         "platform": "linux x86_64 sandbox",
-        "network_allowlist": ["github.com", "codeload.github.com", "api.github.com", "registry.npmjs.org", "pypi.org", "files.pythonhosted.org"],
+        "network_allowlist": [
+          "github.com",
+          "codeload.github.com",
+          "api.github.com",
+          "registry.npmjs.org",
+          "pypi.org",
+          "files.pythonhosted.org"
+        ],
         "huggingface_co": "unreachable (SSL_ERROR_SYSCALL) — причина переноса HF-генерации в GitHub Actions"
       },
-      "verified_external_run_ids": ["40281679860"],
+      "verified_external_run_ids": [
+        "40281679860"
+      ],
       "extraction": "manual: gh api + local files read; no workflow autocommit"
     },
     {
@@ -48,7 +57,7 @@
       "status": "failure (2 matrix jobs) — ПРИЧИНА ЗАФИКСИРОВАНА И ИСПРАВЛЕНА",
       "url": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/40288730574",
       "what": "первые два новых workflow-файла не были зарегистрированы в reports/CI_WORKFLOWS.json / docs/ЗАДАНИЯ_CI.md и имели timeout-minutes > 40 → test_ci_workflows.py + test_workflow_limits.py",
-      "fix": "регенерирован реестр заданий, таймауты сведены к 40/38 мин, инвентарь тестов/документы обновлены 950 → 960 (рост на 10 параметризованных nodes), локально 960 passed / 3 skipped",
+      "fix": "регенерирован реестр заданий, таймауты сведены к 40/38 мин, инвентарь тестов/документы обновлены 950 → 967 (10 параметризованных nodes + 7 тестов REALGEN), локально 964 passed / 3 skipped (967 collected)",
       "extraction": "manual: gh api check-runs annotations + локальная репродукция pytest"
     },
     {
@@ -65,6 +74,32 @@
         "real_test_locked_files_read": []
       },
       "extraction": "manual: реальные ответы извлечены из check-runs output.text прогона 40288730753; разметка выполнена локально"
+    },
+    {
+      "seq": 5,
+      "date": "2026-10-26",
+      "kind": "verified-actions-run",
+      "run_id": "40298420234",
+      "workflow": "REALGEN-R1 phase B measurement",
+      "head_sha": "58850e4b29458530e764a808d9c49545486d6b69",
+      "status": "completed/success",
+      "url": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/40298420234",
+      "what": "smoke-тест фазы B на 30 dev-ответах (диагностика: eager attention вместо SDPA)",
+      "extraction": "manual: check-runs output.text; результат не коммитился как финальный"
+    },
+    {
+      "seq": 6,
+      "date": "2026-10-26",
+      "kind": "verified-actions-run",
+      "run_id": "40298872296",
+      "workflow": "REALGEN-R1 phase B measurement",
+      "head_sha": "13b1608254f69c0e79709fcb22dafa4925c2959e",
+      "status": "completed/success",
+      "url": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/40298872296",
+      "what": "полная батарея фазы B: old5 (eager attention GPT-2), E1/rubert sentence cosine, R2 16 признаков, composite LogReg OOF 5-fold, rubert-tiny2 FT OOF (batch 8 / lr 2e-5 / 3 ep), bootstrap 5000; 300 dev, 51472 токена",
+      "extraction": "manual: check-runs output.text (18 check-runs: result + oof в 16 чанках) → .arena/realgen_b_full → ручной коммит REALGEN_PHASE_B.json и REALGEN_PHASE_B_OOF.jsonl; auto-commit из workflow отсутствует",
+      "n_tokens": 51472,
+      "runtime_seconds": 649.665
     }
   ]
 }
