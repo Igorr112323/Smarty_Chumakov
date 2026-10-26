@@ -100,6 +100,40 @@
       "extraction": "manual: check-runs output.text (18 check-runs: result + oof в 16 чанках) → .arena/realgen_b_full → ручной коммит REALGEN_PHASE_B.json и REALGEN_PHASE_B_OOF.jsonl; auto-commit из workflow отсутствует",
       "n_tokens": 51472,
       "runtime_seconds": 649.665
+    },
+    {
+      "seq": 7,
+      "date": "2026-10-26",
+      "kind": "verified-actions-run",
+      "run_id": "40298872199",
+      "workflow": "ci",
+      "head_sha": "13b1608254f69c0e79709fcb22dafa4925c2959e",
+      "status": "completed/failure (только Windows-tests job)",
+      "url": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/40298872199",
+      "what": "причина: Windows CRLF-конвертация замороженных REALGEN-файлов ломала sha-тест; диагноз по зелёным 5 jobs + локальной репродукции",
+      "fix": "добавлены правила -text в .gitattributes для reports/science/real/REALGEN_* и realgen_*.py; после fix все Windows jobs зелёные"
+    },
+    {
+      "seq": 8,
+      "date": "2026-10-26",
+      "kind": "verified-actions-run",
+      "run_id": "40302780074",
+      "workflow": "ci (push)",
+      "head_sha": "ea9fd012101699edc3ba9edc394f9332d9473e6c",
+      "status": "completed/success",
+      "url": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/40302780074",
+      "what": "зелёный suite на финальной голове (push-матрица 2 jobs + линтер/покрытие/контракт/пломба)"
+    },
+    {
+      "seq": 9,
+      "date": "2026-10-26",
+      "kind": "verified-actions-run",
+      "run_id": "40302871659",
+      "workflow": "ci (pull_request #24)",
+      "head_sha": "ea9fd012101699edc3ba9edc394f9332d9473e6c",
+      "status": "completed/success (полная матрица 6/6 + линтер/покрытие + контракт + P8 seal)",
+      "url": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/40302871659",
+      "what": "подтверждение зелени suite на PR #24; pilot/external jobs skipped по триггеру pull_request (не сужение матрицы: полная матрица тестов 6/6 success)"
     }
   ]
 }

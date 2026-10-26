@@ -125,11 +125,23 @@ def main() -> None:
         "",
     ]
     for entry in audit["entries"]:
+        url = entry.get("url")
         lines.append(
             f"- seq {entry['seq']}: `{entry['kind']}` "
-            + (f"run {entry.get('run_id')} " if entry.get("run_id") else "")
+            + (f"[{entry.get('run_id')}]({url}) " if url else (f"run {entry.get('run_id')} " if entry.get("run_id") else ""))
             + f"— {entry['what']}"
         )
+    lines += [
+        "",
+        "## CI / suite",
+        "",
+        "- PR #24: https://github.com/Igorr112323/Smarty_Chumakov/pull/24 (merge НЕ выполнялся).",
+        "- Полная матрица CI на PR: run 40302871659 — 6/6 тестовых jobs success, линтер/покрытие success, "
+        "контракт success, Final CI read-only P8 seal success; pilot/external skipped по триггеру, не по правке матрицы.",
+        "- Push-CI на той же голове: run 40302780074 — success.",
+        "- Промежуточный провал Windows (run 40298872199) и его причина (CRLF) зафиксированы в RUN_ID_AUDIT.json seq 7.",
+        "- Локально: 967 collected, 964 passed, 3 skipped; ruff/black: All checks passed.",
+    ]
     lines += [
         "",
         "## Известные ограничения (честно)",

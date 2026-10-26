@@ -73,7 +73,7 @@
 | файл | байт | sha256 (12) |
 | --- | ---: | --- |
 | `reports/science/real/REALGEN_PLAN.json` | 8036 | `99855041101a…` |
-| `reports/science/real/RUN_ID_AUDIT.json` | 5742 | `a156c892fac2…` |
+| `reports/science/real/RUN_ID_AUDIT.json` | 7707 | `c6019aeb1dc7…` |
 | `reports/science/real/REALGEN_BACKGROUND.json` | 589570 | `c720c549f3fc…` |
 | `reports/science/real/REALGEN_SELECTION.json` | 284991 | `db98cc713331…` |
 | `reports/science/real/REALGEN_TEMPLATES.json` | 3037 | `7851061136b2…` |
@@ -96,16 +96,27 @@
 | `reports/science/real/realgen_extract.py` | 4828 | `278b61950561…` |
 | `reports/science/real/realgen_label.py` | 36857 | `061e7f5a67e4…` |
 | `reports/science/real/realgen_phase_b.py` | 32866 | `bc7a061e572a…` |
-| `reports/science/real/realgen_final_report.py` | 9472 | `af7bd0e86645…` |
+| `reports/science/real/realgen_final_report.py` | 10385 | `ee5dea7b2bf4…` |
 
 ## Run-id / provenance
 
 - seq 1: `local-no-ci-evidence` — ревизия состояния репозитория, проверка доступности хостов и реконструкция background 6510
-- seq 2: `verified-actions-run` run 40288730753 — генерация R1 (400) + R2 (400) ответов моделью ai-forever/rugpt3small_based_on_gpt2, 8 шаблонов × 2 режима, seed от doc_id
-- seq 3: `verified-actions-run` run 40288730574 — первые два новых workflow-файла не были зарегистрированы в reports/CI_WORKFLOWS.json / docs/ЗАДАНИЯ_CI.md и имели timeout-minutes > 40 → test_ci_workflows.py + test_workflow_limits.py
+- seq 2: `verified-actions-run` [40288730753](https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/40288730753) — генерация R1 (400) + R2 (400) ответов моделью ai-forever/rugpt3small_based_on_gpt2, 8 шаблонов × 2 режима, seed от doc_id
+- seq 3: `verified-actions-run` [40288730574](https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/40288730574) — первые два новых workflow-файла не были зарегистрированы в reports/CI_WORKFLOWS.json / docs/ЗАДАНИЯ_CI.md и имели timeout-minutes > 40 → test_ci_workflows.py + test_workflow_limits.py
 - seq 4: `local-no-ci-evidence` — детерминированная авторазметка атомов, проверка квот, заморозка REALGEN_FROZEN.json и отчёт фазы A
-- seq 5: `verified-actions-run` run 40298420234 — smoke-тест фазы B на 30 dev-ответах (диагностика: eager attention вместо SDPA)
-- seq 6: `verified-actions-run` run 40298872296 — полная батарея фазы B: old5 (eager attention GPT-2), E1/rubert sentence cosine, R2 16 признаков, composite LogReg OOF 5-fold, rubert-tiny2 FT OOF (batch 8 / lr 2e-5 / 3 ep), bootstrap 5000; 300 dev, 51472 токена
+- seq 5: `verified-actions-run` [40298420234](https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/40298420234) — smoke-тест фазы B на 30 dev-ответах (диагностика: eager attention вместо SDPA)
+- seq 6: `verified-actions-run` [40298872296](https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/40298872296) — полная батарея фазы B: old5 (eager attention GPT-2), E1/rubert sentence cosine, R2 16 признаков, composite LogReg OOF 5-fold, rubert-tiny2 FT OOF (batch 8 / lr 2e-5 / 3 ep), bootstrap 5000; 300 dev, 51472 токена
+- seq 7: `verified-actions-run` [40298872199](https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/40298872199) — причина: Windows CRLF-конвертация замороженных REALGEN-файлов ломала sha-тест; диагноз по зелёным 5 jobs + локальной репродукции
+- seq 8: `verified-actions-run` [40302780074](https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/40302780074) — зелёный suite на финальной голове (push-матрица 2 jobs + линтер/покрытие/контракт/пломба)
+- seq 9: `verified-actions-run` [40302871659](https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/40302871659) — подтверждение зелени suite на PR #24; pilot/external jobs skipped по триггеру pull_request (не сужение матрицы: полная матрица тестов 6/6 success)
+
+## CI / suite
+
+- PR #24: https://github.com/Igorr112323/Smarty_Chumakov/pull/24 (merge НЕ выполнялся).
+- Полная матрица CI на PR: run 40302871659 — 6/6 тестовых jobs success, линтер/покрытие success, контракт success, Final CI read-only P8 seal success; pilot/external skipped по триггеру, не по правке матрицы.
+- Push-CI на той же голове: run 40302780074 — success.
+- Промежуточный провал Windows (run 40298872199) и его причина (CRLF) зафиксированы в RUN_ID_AUDIT.json seq 7.
+- Локально: 967 collected, 964 passed, 3 skipped; ruff/black: All checks passed.
 
 ## Известные ограничения (честно)
 
