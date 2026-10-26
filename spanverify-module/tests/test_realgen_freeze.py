@@ -70,6 +70,18 @@ def test_dev_inputs_match_the_freeze_without_reading_sealed_files() -> None:
         frozen["splits"]["test_realgen"]["sha256"]
         == frozen["files"]["reports/science/real/REALGEN_ANSWERS_TEST_REALGEN.jsonl"]["sha256"]
     )
+    script = REAL / "realgen_test_official.py"
+    result = subprocess.run(
+        [sys.executable, str(script)],
+        cwd=REPO_ROOT,
+        capture_output=True,
+        text=True,
+        check=False,
+        env={key: value for key, value in os.environ.items() if key != "REALGEN_SHIFT_CODE"},
+    )
+    assert result.returncode == 2
+    assert "--run-now is required" in result.stderr
+    assert "REALGEN_ANSWERS_TEST_REALGEN" not in result.stdout + result.stderr
 
 
 def test_background_has_zero_overlap_with_test_hosting_docs() -> None:
@@ -135,22 +147,6 @@ def test_phase_b_oof_rows_never_touch_test_realgen_docs() -> None:
     assert seen == _load("REALGEN_PHASE_B.json")["data"]["n_tokens"]
     assert folds == {0, 1, 2, 3, 4}
     assert labels <= {0, 1}
-
-
-def test_official_evaluator_refuses_without_run_now_before_opening_inputs() -> None:
-    """Default invocation exits at the control gate, before any split is opened."""
-    script = REAL / "realgen_test_official.py"
-    result = subprocess.run(
-        [sys.executable, str(script)],
-        cwd=REPO_ROOT,
-        capture_output=True,
-        text=True,
-        check=False,
-        env={key: value for key, value in os.environ.items() if key != "REALGEN_SHIFT_CODE"},
-    )
-    assert result.returncode == 2
-    assert "--run-now is required" in result.stderr
-    assert "REALGEN_ANSWERS_TEST_REALGEN" not in result.stdout + result.stderr
 
 
 def test_phase_a_reports_run_id_provenance() -> None:
