@@ -198,6 +198,11 @@ def hf_old5_and_e1(answers: list[dict], docs: dict, rows_by_answer: dict, tokeni
         ctx_len = max(1, sum(1 for s, _ in offsets if s < len(doc_text)))
         with torch.no_grad():
             outputs = model(**encoded, output_attentions=True, output_hidden_states=True)
+        if not outputs.attentions or not outputs.hidden_states:
+            raise RuntimeError(
+                "модель не вернула attentions/hidden_states: нужен attn_implementation='eager' "
+                "(SDPA не отдаёт веса внимания); старые 5 семейств без этого нечестны"
+            )
         attn = outputs.attentions[-1][0].mean(dim=0)  # (seq, seq)
         attn = attn / attn.sum(dim=-1, keepdim=True).clamp_min(1e-9)
         probs = attn.clamp_min(1e-9)
@@ -379,7 +384,16 @@ def main() -> None:
         rubert_name = "cointegrated/rubert-tiny2"
         rubert_dir = snapshot_download(rubert_name)
         gpt_tok = AutoTokenizer.from_pretrained(gpt_dir, use_fast=True)
-        gpt_model = AutoModelForCausalLM.from_pretrained(gpt_dir)
+        try:
+            gpt_model = AutoModelForCausalLM.from_pretrained(gpt_dir, attn_implementation="eager")
+        except (TypeError, ValueError):
+            gpt_model = AutoModelForCausalLM.from_pretrained(gpt_dir)
+            try:
+                gpt_model.config._attn_implementation = "eager"
+            except Exception:  # noqa: BLE001 - конфиг разных версий transformers
+                pass
+        gpt_model.config.output_attentions = True
+        gpt_model.config.output_hidden_states = True
         gpt_model.eval()
         rubert_tok = AutoTokenizer.from_pretrained(rubert_dir, use_fast=True)
         rubert_model = AutoModel.from_pretrained(rubert_dir)
