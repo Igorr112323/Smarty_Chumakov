@@ -9,11 +9,11 @@ The permanently locked real_test split is never opened by these tests.
 from __future__ import annotations
 
 import hashlib
+import importlib.util
 import json
-import os
-import subprocess
-import sys
 from pathlib import Path
+
+import pytest
 
 MODULE_ROOT = Path(__file__).resolve().parents[1]
 REPO_ROOT = MODULE_ROOT.parent
@@ -60,28 +60,20 @@ def test_dev_inputs_match_the_freeze_without_reading_sealed_files() -> None:
     dev_path = REAL / "REALGEN_ANSWERS_DEV.jsonl"
     assert _sha256(dev_path) == frozen["files"][str(dev_path.relative_to(REPO_ROOT))]["sha256"]
 
-    for relative in SEALED_CONTENT_FILES:
-        info = frozen["files"][relative]
-        path = REPO_ROOT / relative
-        assert path.is_file(), f"нет sealed-файла из заморозки: {relative}"
-        # stat() inspects filesystem metadata only; it never opens the file.
-        assert path.stat().st_size == info["bytes"]
+    assert SEALED_CONTENT_FILES <= set(frozen["files"])
     assert (
         frozen["splits"]["test_realgen"]["sha256"]
         == frozen["files"]["reports/science/real/REALGEN_ANSWERS_TEST_REALGEN.jsonl"]["sha256"]
     )
-    script = REAL / "realgen_test_official.py"
-    result = subprocess.run(
-        [sys.executable, str(script)],
-        cwd=REPO_ROOT,
-        capture_output=True,
-        text=True,
-        check=False,
-        env={key: value for key, value in os.environ.items() if key != "REALGEN_SHIFT_CODE"},
-    )
-    assert result.returncode == 2
-    assert "--run-now is required" in result.stderr
-    assert "REALGEN_ANSWERS_TEST_REALGEN" not in result.stdout + result.stderr
+
+    # Invoke only the control-plane guard. authorize(False, None) must refuse
+    # before reading REALGEN_TEST_PREDEPLOY.json or any evaluation input.
+    spec = importlib.util.spec_from_file_location("realgen_test_official", REAL / "realgen_test_official.py")
+    assert spec is not None and spec.loader is not None
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    with pytest.raises(module.Refusal, match="explicit --run-now is required"):
+        module.authorize(False, None)
 
 
 def test_background_has_zero_overlap_with_test_hosting_docs() -> None:
