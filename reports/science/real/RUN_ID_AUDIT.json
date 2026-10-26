@@ -1,0 +1,23 @@
+{
+  "kind": "RUN_ID_AUDIT",
+  "campaign": "REALGEN-R1",
+  "rule": "только верифицируемый ID существующего Actions-прогона или local-no-ci-evidence + provenance",
+  "entries": [
+    {
+      "seq": 1,
+      "date": "2026-10-26",
+      "kind": "local-no-ci-evidence",
+      "what": "ревизия состояния репозитория, проверка доступности хостов и реконструкция background 6510",
+      "provenance": {
+        "branch": "arena/233cd01f-smarty-chumakov",
+        "base": "de11ee9d38744ac4809edcfb475b62db8ad49d48",
+        "python": "3.11.2",
+        "platform": "linux x86_64 sandbox (2 vCPU taskset 0,1 Optional)",
+        "network_allowlist": ["github.com", "codeload.github.com", "api.github.com", "registry.npmjs.org", "pypi.org", "files.pythonhosted.org"],
+        "huggingface_co": "unreachable (SSL_ERROR_SYSCALL) — причина переноса HF-генерации в GitHub Actions"
+      },
+      "verified_external_run_ids": ["40281679860"],
+      "extraction": "manual: gh api + local files read; no workflow autocommit"
+    }
+  ]
+}
