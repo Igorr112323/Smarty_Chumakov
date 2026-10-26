@@ -1,0 +1,99 @@
+# REALGEN-R1 фаза A: генерация естественных ответов реальной моделью.
+#
+# Sandbox агента не имеет доступа к huggingface.co, поэтому модель
+# ai-forever/rugpt3small_based_on_gpt2 (443.5 МБ) грузится здесь, на раннере
+# GitHub Actions. Workflow НЕ коммитит ничего в репозиторий: он публикует
+# результаты в check-runs output.text (мост, разрешённый протоколом), откуда
+# агент извлекает их вручную и коммитит с полем extraction.
+name: REALGEN-R1 phase A generation
+
+on:
+  workflow_dispatch:
+  push:
+    branches: ["arena/**"]
+    paths:
+      - .github/realgen-r1.trigger
+
+permissions:
+  contents: read
+  checks: write
+  actions: read
+
+concurrency:
+  group: realgen-r1-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  PYTHONUTF8: "1"
+  PYTHONIOENCODING: "utf-8"
+  HF_HUB_DISABLE_TELEMETRY: "1"
+  OMP_NUM_THREADS: "2"
+  MKL_NUM_THREADS: "2"
+  OPENBLAS_NUM_THREADS: "2"
+  NUMEXPR_NUM_THREADS: "2"
+  HEAD_SHA: ${{ github.sha }}
+  GH_TOKEN: ${{ github.token }}
+
+jobs:
+  generate:
+    name: "REALGEN-A shard ${{ matrix.shard }}"
+    runs-on: ubuntu-24.04
+    timeout-minutes: 120
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [0, 1, 2, 3, 4, 5, 6, 7]
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Зависимости CPU (HF-веса доступны на раннере)
+        timeout-minutes: 25
+        run: |
+          python -m pip install --upgrade pip
+          pip install 'torch==2.14.1+cpu' --index-url https://download.pytorch.org/whl/cpu
+          pip install 'transformers==5.20.1' 'numpy==2.4.6' 'sentencepiece==0.2.2' huggingface_hub
+          python -c "import torch, transformers, huggingface_hub; print('torch', torch.__version__, 'transformers', transformers.__version__, 'hub', huggingface_hub.__version__)"
+
+      - name: Проверка детерминированных входных файлов (без real_test)
+        run: |
+          python - <<'PY'
+          import json, hashlib, pathlib
+          real = pathlib.Path('reports/science/real')
+          sel = json.loads((real/'REALGEN_SELECTION.json').read_text())
+          bg = json.loads((real/'REALGEN_BACKGROUND.json').read_text())
+          assert sel['n_documents'] == 400 and bg['n_documents'] == 6510
+          assert bg['asserts']['overlap_with_test_hosting_docs'] == 0
+          assert bg['asserts']['real_test_locked_file_read'] is False
+          print('selection/background asserts OK')
+          PY
+
+      - name: Генерация R1 + R2 (8 шаблонов × 2 режима, 512 новых токенов)
+        timeout-minutes: 100
+        run: |
+          python -u reports/science/real/realgen_generate.py \
+            --shard ${{ matrix.shard }} --shards 8 --rounds R1,R2 \
+            --out-dir .arena/realgen --publish
+
+      - name: Итог шарда
+        if: always()
+        run: |
+          ls -la .arena/realgen || true
+          python - <<'PY'
+          import pathlib, json
+          for p in sorted(pathlib.Path('.arena/realgen').glob('*.jsonl')):
+              print(p.name, p.stat().st_size, sum(1 for _ in p.open()))
+          PY
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: realgen-a-shard-${{ matrix.shard }}
+          path: .arena/realgen/
+          retention-days: 14
+          if-no-files-found: warn
