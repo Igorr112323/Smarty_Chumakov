@@ -172,5 +172,16 @@
     "test_realgen_labels_or_spans_opened": false,
     "test_specific_context_rows_opened": false,
     "official_workflow_dispatched": false
+  },
+  "date": "2026-10-26",
+  "run_id": "local-no-ci-evidence",
+  "run_id_scope": "preparation-only; not an official evaluation run",
+  "evidence_context": {
+    "run_id": "local-no-ci-evidence",
+    "date": "2026-10-26",
+    "status": "predeployment preparation only; no official test run or scoring",
+    "source": "manual preparation on the session branch; main suite confirmation is recorded separately under suite_green_confirmation",
+    "test_realgen_payload_opened": false,
+    "real_test_1200_read": false
   }
 }

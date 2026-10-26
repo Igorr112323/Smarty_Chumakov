@@ -134,6 +134,24 @@
       "status": "completed/success (полная матрица 6/6 + линтер/покрытие + контракт + P8 seal)",
       "url": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/40302871659",
       "what": "подтверждение зелени suite на PR #24; pilot/external jobs skipped по триггеру pull_request (не сужение матрицы: полная матрица тестов 6/6 success)"
+    },
+    {
+      "seq": 10,
+      "date": "2026-10-26",
+      "kind": "local-no-ci-evidence",
+      "what": "REALGEN official evaluation predeployment registration; no measurement executed",
+      "provenance": {
+        "branch": "arena/233cd01f-smarty-chumakov",
+        "predeploy": "reports/science/real/REALGEN_TEST_PREDEPLOY.json",
+        "suite_confirmation_run_id": "40354903059",
+        "test_realgen_answers_opened": false,
+        "test_realgen_gold_spans_opened": false,
+        "test_specific_context_rows_opened": false,
+        "real_test_1200_read": false,
+        "official_workflow_dispatched": false,
+        "model_bundle_status": "missing; official evaluator fail-closed"
+      },
+      "extraction": "manual preregistration; hashes for sealed test inputs copied only from REALGEN_FROZEN.json metadata; no model fit, test read, or official measurement"
     }
   ]
 }
