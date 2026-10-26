@@ -5,17 +5,17 @@
 (что оно делало в последний раз). Числа и номера прогонов не вписаны
 руками: их источник — реестр прогонов.
 
-Команда: `python scripts/collect_ci_workflows.py` (запуск: 2026-10-21T11:37:51Z).
+Команда: `python scripts/collect_ci_workflows.py` (запуск: 2026-10-26T09:14:26Z).
 
 | Задание | Запуск | Последний прогон | Артефакты | Числа в реестре |
 | --- | --- | --- | --- | --- |
-| `build-and-release-exe` | вручную, на пуш; пуш `.github/exe-build.trigger`; теги `v*`; ветки `main`, `arena/**` | успех (прогон 38481064209) | да | reports/release_sizes.json (spanverify.exe, spanverify.pyz) |
-| `ci` | на пуш, на pull request, вручную, по расписанию (30 2 * * * UTC); ветки `main`, `arena/**` | успех (прогон 38489996351) | да | reports/CURRENT_METRICS.json, reports/contract/*.json |
+| `build-and-release-exe` | вручную, на пуш; пуш `.github/exe-build.trigger`; теги `v*`; ветки `main`, `arena/**` | успех (прогон 39322905461) | да | reports/release_sizes.json (spanverify.exe, spanverify.pyz) |
+| `ci` | на пуш, на pull request, вручную, по расписанию (30 2 * * * UTC); ветки `main`, `arena/**` | failure (прогон 39565253128) | да | reports/CURRENT_METRICS.json, reports/contract/*.json |
 | `Корпус A3 (реальные акты, срезы)` | вручную, на пуш; пуш `.github/corpus-a3.trigger`; ветки `arena/**` | прогонов нет | да | — |
 | `Разбор ложных пометок по кешу` | вручную, на пуш; пуш `.github/hf-analysis.trigger`; ветки `arena/**` | прогонов нет | да | — |
 | `Свести числа экспериментов hf` | на пуш; пуш `.github/hf-collect.trigger`; ветки `arena/**` | прогонов нет | да | — |
 | `Эксперименты hf (корпуса A3 и A)` | вручную, на пуш; пуш `.github/hf-experiments.trigger`; ветки `arena/**` | прогонов нет | да | — |
-| `hf-footprint` | вручную, на пуш; пуш `.github/hf-footprint.trigger`; ветки `arena/**` | успех (прогон 38438650943) | да | reports/contract/4.2.5-hf-footprint.json, reports/contract/4.2.6-storage.json |
+| `hf-footprint` | вручную, на пуш; пуш `.github/hf-footprint.trigger`; ветки `arena/**` | прогонов нет | да | reports/contract/4.2.5-hf-footprint.json, reports/contract/4.2.6-storage.json |
 | `Пилот hf (признаки, реальная модель)` | вручную, на пуш; пуш `.github/hf-pilot.trigger`; ветки `arena/**` | прогонов нет | да | — |
 | `Пересчёт hf на кеше признаков` | на пуш; пуш `.github/hf-remeasure.trigger`; ветки `arena/**` | прогонов нет | да | — |
 | `Тяжёлые прогоны hf` | вручную, на пуш; пуш `.github/hf-runs.trigger`; ветки `arena/**` | прогонов нет | да | — |
@@ -28,14 +28,16 @@
 | `P4 context token head` | на пуш, вручную; пуш `.github/p4-context.trigger`; ветки `arena/c5f69767-smarty-chumakov` | прогонов нет | да | — |
 | `P5 span keep/drop filter` | на пуш, вручную; пуш `.github/p5-span.trigger`; ветки `arena/c5f69767-smarty-chumakov` | прогонов нет | да | — |
 | `P6 frozen product acceptance` | вручную, на пуш; пуш `.github/p6-acceptance.trigger`; ветки `arena/c5f69767-smarty-chumakov` | прогонов нет | да | — |
-| `P7 frozen engineering gates` | вручную, на пуш; пуш `.github/p7-acceptance.trigger`; ветки `arena/c5f69767-smarty-chumakov` | прогонов нет | да | — |
+| `P7 frozen engineering gates` | вручную, на пуш; пуш `.github/p7-acceptance.trigger`; ветки `arena/c5f69767-smarty-chumakov` | успех (прогон 39236657451) | да | в артефакте прогона (в реестр не переносится) |
 | `P7 paired same-host benchmark` | на пуш; пуш `.github/p7-paired.trigger`; ветки `arena/c5f69767-smarty-chumakov` | прогонов нет | да | — |
-| `P7 final acceptance artifact publication` | на пуш; пуш `.github/p7-publication.trigger`, `.github/p8-publication.trigger`, `.github/p8-close.trigger`; ветки `arena/c5f69767-smarty-chumakov` | прогонов нет | да | — |
-| `P8 single official test and external validation` | вручную, на пуш; пуш `.github/p8-evaluation.trigger`; ветки `arena/c5f69767-smarty-chumakov` | прогонов нет | да | — |
-| `P8 evidence receipts only, no inference` | на пуш; пуш `.github/p8-receipts.trigger`; ветки `arena/c5f69767-smarty-chumakov` | прогонов нет | да | — |
+| `P7 final acceptance artifact publication` | на пуш; пуш `.github/p7-publication.trigger`, `.github/p8-publication.trigger`, `.github/p8-close.trigger`; ветки `arena/c5f69767-smarty-chumakov` | успех (прогон 39303110624) | да | в артефакте прогона (в реестр не переносится) |
+| `P8 single official test and external validation` | вручную, на пуш; пуш `.github/p8-evaluation.trigger`; ветки `arena/c5f69767-smarty-chumakov` | успех (прогон 39266451529) | да | в артефакте прогона (в реестр не переносится) |
+| `P8 evidence receipts only, no inference` | на пуш; пуш `.github/p8-receipts.trigger`; ветки `arena/c5f69767-smarty-chumakov` | успех (прогон 39290438326) | да | в артефакте прогона (в реестр не переносится) |
 | `P0-3 P1 Answer Head` | на пуш, вручную; пуш `spanverify-module/spanverify/answer_head.py`, `spanverify-module/spanverify/oof.py`, `spanverify-module/scripts/measure_p1.py`, `spanverify-module/tests/test_answer_head.py`, `.github/workflows/postprocess-p0-answer-p1.yml`; ветки `arena/c5f69767-smarty-chumakov` | прогонов нет | да | — |
 | `P0-2 Ответы` | на пуш, вручную; пуш `.github/postprocess-p0-answer.trigger`; ветки `arena/c5f69767-smarty-chumakov` | прогонов нет | да | — |
 | `Постобработка span_expansion` | на пуш, вручную; пуш `.github/postprocess-span-comparison.trigger`; ветки `arena/c5f69767-smarty-chumakov` | прогонов нет | да | — |
+| `REALGEN-R1 phase B measurement` | вручную, на пуш; пуш `.github/realgen-r1-b.trigger`; ветки `arena/**` | прогонов нет | да | — |
+| `REALGEN-R1 phase A generation` | вручную, на пуш; пуш `.github/realgen-r1.trigger`; ветки `arena/**` | прогонов нет | да | — |
 | `Export existing P1 raw files` | на пуш, вручную; пуш `.github/workflows/recover-p1-results.yml`; ветки `arena/c5f69767-smarty-chumakov` | прогонов нет | да | — |
 
 Источник колонки «Последний прогон» — `reports/CI_RUNS.json`: последние 100 прогонов репозитория. Поэтому «прогонов нет» означает «нет в этом списке», а не «задание никогда не запускалось»; пересобрать список — `python scripts/collect_ci_runs.py --limit 100`.

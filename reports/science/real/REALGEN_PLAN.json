@@ -1,0 +1,130 @@
+{
+  "kind": "REALGEN_PLAN",
+  "version": "v1",
+  "status": "accepted_by_curator_before_start",
+  "campaign": "REALGEN-R1",
+  "date": "2026-10-26",
+  "base_main": "de11ee9d38744ac4809edcfb475b62db8ad49d48",
+  "directive": "Тренируемся на реальных актах и естественных галлюцинациях, без инъекторов.",
+  "phase_A": {
+    "order": 1,
+    "background": {
+      "n_documents": 6510,
+      "source": "LawCodex/ru pin 5806f92 (7710 docs of CORPUS_MANIFEST.json) minus 1200 test-hosting docs",
+      "sha_assert_prefix": "f8198329",
+      "overlap_with_test_hosting_docs": 0,
+      "note": "Все фоновые корпуса только из background 6510. real_test 1200 ЗАПЕРТ: чтение/использование в любой роли, включая фоновые тексты, запрещено."
+    },
+    "sample": {
+      "min_documents": 400,
+      "rule": "детерминированно sha256(seed:doc_id), seed 42",
+      "publish": ["список doc_id", "sha256 списка"]
+    },
+    "generation": {
+      "model": "ai-forever/rugpt3small_based_on_gpt2",
+      "weights_mb": 443.5,
+      "weights_budget_mb": 550,
+      "templates": 8,
+      "template_list": [
+        "резюмируй главу",
+        "перечисли штрафы",
+        "дай сроки",
+        "какие документы нужны",
+        "условия применения",
+        "ключевые требования",
+        "субъекты регулирования",
+        "порядок обжалования"
+      ],
+      "modes": 2,
+      "mode_list": ["greedy", "top-p 0.95 temperature 0.8"],
+      "seed": "детерминирован от doc_id",
+      "max_new_tokens": 512
+    },
+    "atom_markup": {
+      "judge": "none — детерминированные правила, без LLM-судьи",
+      "rules": {
+        "a": "отсутствие числа/даты/суммы/срока из ответа в акте → спан",
+        "b": "цитата статья/пункт/часть N которой нет в акте → спан",
+        "c": "контрадикция для той же сущности (окно Jaccard ≥0.6) с другим числом → спан",
+        "d": "«неясные» НЕ размечать — считать и публиковать atom_unclear_rate"
+      },
+      "spans": "char offsets [start:end] в ответе, rule_id"
+    },
+    "quotas": {
+      "min_answers": 400,
+      "min_erroneous_share": 0.4,
+      "min_erroneous_answers": 160,
+      "remedy_if_low": "менять режим генерации (температура/сложность промта), НЕ правила разметки"
+    },
+    "freeze": {
+      "file": "reports/science/real/REALGEN_FROZEN.json",
+      "content": "sha256 всех документов/ответов/спанов/кода/шаблонов, seed, splits",
+      "splits": {"dev": 300, "test_realgen": "остальное"},
+      "test_realgen_sealed": true,
+      "test_realgen_access": "только по шифт-коду куратора"
+    },
+    "report": {
+      "files": ["REALGEN_PHASE_A.json", "REALGEN_PHASE_A.md"],
+      "statistics": [
+        "чистые/ошибочные/неясные",
+        "min/med/max длин ответов и спанов",
+        "расклад ошибок по правилам a/b/c"
+      ],
+      "also": ["sha-карты", "время/платформа прогонов", "run-id по правилу протокола"]
+    },
+    "expected_duration_hours": [1.5, 3.0],
+    "speed_requirement": "измерять и сообщать фактический темп; если ≤50 ответов/час — не сбавлять, довести хотя бы до полной квоты, зафиксировать темп"
+  },
+  "phase_B": {
+    "order": 2,
+    "start_condition": "фаза A защёлкнута в git полностью; в автономном режиме межфазовый зачёт куратора постфактум",
+    "data": "dev-подмножество REALGEN (300)",
+    "battery": [
+      "старые 5 семейств (E0)",
+      "новые E1/R2 признаки",
+      "fine-tune rubert-tiny2 токен-классификатор, OOF 5-fold по sha256(doc_id), batch 8, lr 2e-5, 3 ep; веса сообщить в МБ"
+    ],
+    "gates": {
+      "token_AUC_min": 0.7,
+      "span_AUC_min": 0.55,
+      "ci95": "строго выше 0.5"
+    },
+    "report": {
+      "file": "REALGEN_PHASE_B.json",
+      "structure": ["per_feature_AUC", "composite_OOF", "real_test_viewed:false", "provenance"]
+    },
+    "expected_duration_hours": [1.0, 1.5]
+  },
+  "protocol": {
+    "read_only": [
+      "main напрямую (только PR merge-commit после зачёта)",
+      "reports/p8/**",
+      "reports/speed/**",
+      "VERIFICATION.json",
+      "frozen-p5.json",
+      "bundle e0b13c69…",
+      "релизы/теги"
+    ],
+    "real_test_locked": {
+      "file": "reports/science/real/real_test_pairs.jsonl",
+      "sha256": "f40c737c…",
+      "n": 1200,
+      "read_or_use": "forbidden in any role"
+    },
+    "run_id_rule": "только верифицируемый ID существующего Actions-прогона или честная пометка local-no-ci-evidence + поле provenance + запись в RUN_ID_AUDIT.json",
+    "log_bridge": "GITHUB_STEP_SUMMARY → PATCH check-runs output.text (checks:write), либо локальная репродукция с явной пометкой",
+    "no_workflow_autocommit": true,
+    "suite": "растёт, не падает: ≥950 тестов, покрытие ≥85%, lint/format ruff/black, без сужения CI-матрицы",
+    "pr_merge": "только после письменного зачёта куратора"
+  },
+  "execution_environment_notes": {
+    "kind": "addendum_not_part_of_v1_directions",
+    "written_by": "arena agent",
+    "branch": "arena/233cd01f-smarty-chumakov",
+    "branch_note": "Сессия привязана к фиксированной ветке; создание realgen/* невозможно. Директива допускает работу «от свежего main или текущей арены» — используем текущую арену от main de11ee9.",
+    "network": "sandbox outbound: github.com, codeload.github.com, api.github.com, registry.npmjs.org, pypi.org, files.pythonhosted.org; huggingface.co НЕДОСТУПЕН (SSL_ERROR_SYSCALL).",
+    "model_execution": "Генерация и все HF-зависимые измерения выполняются в GitHub Actions (раннер имеет доступ к HF), результаты извлекаются вручную через check-runs output.text и коммитятся вручную с полем extraction. Авто-коммита из workflow нет.",
+    "background_reconstruction": "Готового файла background 6510 нет ни в main, ни в других ветках (проверено через API GitHub trees). Восстанавливается детерминированно из CORPUS_MANIFEST.json по правилу разбиения CORPUS_FROZEN.json / generate_phase_b_v2.py: 1500 docs = hash_shuffle(sha256('42:'+id))[:1500], затем split sha256('42:split:'+id) → 300 dev + 1200 test; background = 7710 − 1200 test = 6510. Ассерт overlap=0 по doc_id без чтения запертого файла.",
+    "sha_prefix_note": "Префикс f8198329… из директивы не воспроизводится ни из одного файла/сериализации в этом чекауте; публикуется полный sha256 нашей канонической карты 6510 id как честная замена с saveable provenance."
+  }
+}

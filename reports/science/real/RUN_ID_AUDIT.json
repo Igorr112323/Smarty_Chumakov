@@ -1,0 +1,139 @@
+{
+  "kind": "RUN_ID_AUDIT",
+  "campaign": "REALGEN-R1",
+  "rule": "только верифицируемый ID существующего Actions-прогона или local-no-ci-evidence + provenance",
+  "entries": [
+    {
+      "seq": 1,
+      "date": "2026-10-26",
+      "kind": "local-no-ci-evidence",
+      "what": "ревизия состояния репозитория, проверка доступности хостов и реконструкция background 6510",
+      "provenance": {
+        "branch": "arena/233cd01f-smarty-chumakov",
+        "base": "de11ee9d38744ac4809edcfb475b62db8ad49d48",
+        "python": "3.11.2",
+        "platform": "linux x86_64 sandbox",
+        "network_allowlist": [
+          "github.com",
+          "codeload.github.com",
+          "api.github.com",
+          "registry.npmjs.org",
+          "pypi.org",
+          "files.pythonhosted.org"
+        ],
+        "huggingface_co": "unreachable (SSL_ERROR_SYSCALL) — причина переноса HF-генерации в GitHub Actions"
+      },
+      "verified_external_run_ids": [
+        "40281679860"
+      ],
+      "extraction": "manual: gh api + local files read; no workflow autocommit"
+    },
+    {
+      "seq": 2,
+      "date": "2026-10-26",
+      "kind": "verified-actions-run",
+      "run_id": "40288730753",
+      "workflow": "REALGEN-R1 phase A generation",
+      "head_sha": "2ed90c044e06fdd17e272535bd09721939e0b7db",
+      "status": "completed/success (8/8 shards)",
+      "url": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/40288730753",
+      "what": "генерация R1 (400) + R2 (400) ответов моделью ai-forever/rugpt3small_based_on_gpt2, 8 шаблонов × 2 режима, seed от doc_id",
+      "extraction": "manual: check-runs output.text (32 check-runs; 16 payload + 16 manifest) → .arena/realgen_extract → ручной коммит; auto-commit из workflow отсутствует",
+      "model_snapshot": {
+        "pytorch_model_bin_bytes": 551290714,
+        "pytorch_model_bin_sha256": "0d2a4a387b0430654bb1f6813436bd31f8e10a06e18ea0e5c41b33120b78458e",
+        "snapshot": "a9307e696cd3c5b7f953ff4cb19d76a4d81821d5",
+        "torch": "2.14.1+cpu",
+        "transformers": "5.20.1"
+      }
+    },
+    {
+      "seq": 3,
+      "date": "2026-10-26",
+      "kind": "verified-actions-run",
+      "run_id": "40288730574",
+      "workflow": "ci",
+      "head_sha": "2ed90c044e06fdd17e272535bd09721939e0b7db",
+      "status": "failure (2 matrix jobs) — ПРИЧИНА ЗАФИКСИРОВАНА И ИСПРАВЛЕНА",
+      "url": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/40288730574",
+      "what": "первые два новых workflow-файла не были зарегистрированы в reports/CI_WORKFLOWS.json / docs/ЗАДАНИЯ_CI.md и имели timeout-minutes > 40 → test_ci_workflows.py + test_workflow_limits.py",
+      "fix": "регенерирован реестр заданий, таймауты сведены к 40/38 мин, инвентарь тестов/документы обновлены 950 → 967 (10 параметризованных nodes + 7 тестов REALGEN), локально 964 passed / 3 skipped (967 collected)",
+      "extraction": "manual: gh api check-runs annotations + локальная репродукция pytest"
+    },
+    {
+      "seq": 4,
+      "date": "2026-10-26",
+      "kind": "local-no-ci-evidence",
+      "what": "детерминированная авторазметка атомов, проверка квот, заморозка REALGEN_FROZEN.json и отчёт фазы A",
+      "provenance": {
+        "python": "3.11.2",
+        "platform": "Linux x86_64 sandbox",
+        "inputs_sha256": "reports/science/real/REALGEN_FROZEN.json (см. карту files)",
+        "ci_generation_run_id": "40288730753",
+        "real_test_viewed": false,
+        "real_test_locked_files_read": []
+      },
+      "extraction": "manual: реальные ответы извлечены из check-runs output.text прогона 40288730753; разметка выполнена локально"
+    },
+    {
+      "seq": 5,
+      "date": "2026-10-26",
+      "kind": "verified-actions-run",
+      "run_id": "40298420234",
+      "workflow": "REALGEN-R1 phase B measurement",
+      "head_sha": "58850e4b29458530e764a808d9c49545486d6b69",
+      "status": "completed/success",
+      "url": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/40298420234",
+      "what": "smoke-тест фазы B на 30 dev-ответах (диагностика: eager attention вместо SDPA)",
+      "extraction": "manual: check-runs output.text; результат не коммитился как финальный"
+    },
+    {
+      "seq": 6,
+      "date": "2026-10-26",
+      "kind": "verified-actions-run",
+      "run_id": "40298872296",
+      "workflow": "REALGEN-R1 phase B measurement",
+      "head_sha": "13b1608254f69c0e79709fcb22dafa4925c2959e",
+      "status": "completed/success",
+      "url": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/40298872296",
+      "what": "полная батарея фазы B: old5 (eager attention GPT-2), E1/rubert sentence cosine, R2 16 признаков, composite LogReg OOF 5-fold, rubert-tiny2 FT OOF (batch 8 / lr 2e-5 / 3 ep), bootstrap 5000; 300 dev, 51472 токена",
+      "extraction": "manual: check-runs output.text (18 check-runs: result + oof в 16 чанках) → .arena/realgen_b_full → ручной коммит REALGEN_PHASE_B.json и REALGEN_PHASE_B_OOF.jsonl; auto-commit из workflow отсутствует",
+      "n_tokens": 51472,
+      "runtime_seconds": 649.665
+    },
+    {
+      "seq": 7,
+      "date": "2026-10-26",
+      "kind": "verified-actions-run",
+      "run_id": "40298872199",
+      "workflow": "ci",
+      "head_sha": "13b1608254f69c0e79709fcb22dafa4925c2959e",
+      "status": "completed/failure (только Windows-tests job)",
+      "url": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/40298872199",
+      "what": "причина: Windows CRLF-конвертация замороженных REALGEN-файлов ломала sha-тест; диагноз по зелёным 5 jobs + локальной репродукции",
+      "fix": "добавлены правила -text в .gitattributes для reports/science/real/REALGEN_* и realgen_*.py; после fix все Windows jobs зелёные"
+    },
+    {
+      "seq": 8,
+      "date": "2026-10-26",
+      "kind": "verified-actions-run",
+      "run_id": "40302780074",
+      "workflow": "ci (push)",
+      "head_sha": "ea9fd012101699edc3ba9edc394f9332d9473e6c",
+      "status": "completed/success",
+      "url": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/40302780074",
+      "what": "зелёный suite на финальной голове (push-матрица 2 jobs + линтер/покрытие/контракт/пломба)"
+    },
+    {
+      "seq": 9,
+      "date": "2026-10-26",
+      "kind": "verified-actions-run",
+      "run_id": "40302871659",
+      "workflow": "ci (pull_request #24)",
+      "head_sha": "ea9fd012101699edc3ba9edc394f9332d9473e6c",
+      "status": "completed/success (полная матрица 6/6 + линтер/покрытие + контракт + P8 seal)",
+      "url": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/40302871659",
+      "what": "подтверждение зелени suite на PR #24; pilot/external jobs skipped по триггеру pull_request (не сужение матрицы: полная матрица тестов 6/6 success)"
+    }
+  ]
+}
