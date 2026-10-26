@@ -181,12 +181,71 @@
       "rebase_attempt": "h1-merge-main 6af8aa3 → main 6ec3d3b",
       "rebase_result": "BREAKS_SEAL: engine.py sha 2988f865… → 734c847f…, frozen-production-sha256 mismatch; also breaks 910→913 metrics count",
       "action": "STOP, report diff to curator, do not merge silently"
+    },
+    {
+      "phase": "R2_R3",
+      "title": "E1HUNT R2 (16 признаков фактография/стилометрия/n-gram/KenLM) и R3 (supervised rubert-tiny2 fine-tune OOF) — ворота 0.70/0.55 не перешагнуты → исчерпание",
+      "artifacts": [
+        "reports/science/real/E1HUNT_R2_PLAN.json",
+        "reports/science/real/E1HUNT_R2_RESULT.json",
+        "reports/science/real/E1HUNT_R3_PLAN.json",
+        "reports/science/real/E1HUNT_R3_RESULT.json"
+      ],
+      "sha256": {
+        "E1HUNT_R2_PLAN": "a5040b2326fd64c216e3adbc7f9d57cdceef386fecd689389739956b561c42e5",
+        "E1HUNT_R2_RESULT": "dbab0d0f6c7135eb29fceaa721d776a45a4d7dea7b7c1d6914abebd7ab4c6dfb",
+        "E1HUNT_R3_PLAN": "8724acf2c0a1a381676ec97bb0220aab0a933921aed5a524535657c515d67758",
+        "E1HUNT_R3_RESULT": "778e4e43327e53b016b83ef4388a11ae08486c09d0691680cc29fcdcd97acfe9"
+      },
+      "commit": "3e6800a",
+      "branch": "arena/1bcabc08-smarty-chumakov",
+      "run_id": null,
+      "date": "2026-10-26",
+      "provenance": {
+        "real_dev_sha": "374edadbfbb814d33ac830c57d5132b844c42252ec1e643798c6d001be969951",
+        "corpus_B_sha": "a520f5fcab3cd9d3988e6b0039efe733153f40a0808dc2b7c5ff5ad7613c70d3",
+        "background_sha": "f8198329c54b033bb7f20b6d36e55f3c544289dffabed8c3e7cf71c87cce5a85",
+        "audit": "local-no-ci-evidence (OOF 5-fold sha256(doc_id), bootstrap5000)"
+      },
+      "composite": {
+        "R2_real_dev_AUC": 0.523,
+        "R2_span_AUC": 0.518,
+        "R2_ci": [
+          0.472,
+          0.574
+        ],
+        "R3_real_dev_AUC": 0.534,
+        "R3_ci": [
+          0.483,
+          0.585
+        ],
+        "R3_span_AUC": 0.521,
+        "R3_span_ci": [
+          0.47,
+          0.572
+        ],
+        "corpus_B_AUC_R3": 0.513,
+        "gate_token_AUC_required": 0.7,
+        "gate_span_AUC_required": 0.55,
+        "verdict": "STOP — оба 0.523→0.534 <0.70, CI пересекает 0.5, span <0.55"
+      },
+      "budget": {
+        "weights_MB": 120.01,
+        "budget_MB": 550,
+        "final_stack": "onnxruntime only, без torch",
+        "status": "PASS"
+      },
+      "conclusion": "R3 STOP честный, кампания исчерпана в бюджетах ≤550МБ весов, ≤500МБ библиотек, 0.03с/1к, без GPU/сети/внешних API, без real_test до официального прогона — сигнал отсутствует, §4 PROMPT_CONTINUE_FIT: закрытие"
     }
   ],
   "artifacts_sha256": {
     "reports/science/real/CORPUS_FROZEN.json": "73540a18572b000466a041af4cd79d2e757a8feda7336cf0228f86c12ccceb0b",
     "reports/science/real/E0_DIAG.json": "dbc549f264698f2a8f99f92e277b65559365f3406046bfe58a97f0ee0307ae0d",
-    "reports/science/real/E1_SIGNAL.json": "db184a39c373b64ed86bb26aadefeda065237e10d7ca625d9181225403d164f5"
+    "reports/science/real/E1_SIGNAL.json": "db184a39c373b64ed86bb26aadefeda065237e10d7ca625d9181225403d164f5",
+    "reports/science/real/E1HUNT_R3_RESULT.json": "778e4e43327e53b016b83ef4388a11ae08486c09d0691680cc29fcdcd97acfe9",
+    "reports/science/real/E1HUNT_R3_PLAN.json": "8724acf2c0a1a381676ec97bb0220aab0a933921aed5a524535657c515d67758",
+    "reports/science/real/E1HUNT_R2_PLAN.json": "a5040b2326fd64c216e3adbc7f9d57cdceef386fecd689389739956b561c42e5",
+    "reports/science/real/E1HUNT_R2_RESULT.json": "dbab0d0f6c7135eb29fceaa721d776a45a4d7dea7b7c1d6914abebd7ab4c6dfb"
   },
   "runs": {
     "phase_B": 598722,
@@ -198,7 +257,9 @@
     "E1_fixed": 40118801621,
     "archive_merge": 40125351115,
     "H1_attempt": 40128062106,
-    "canonical_SPEED_R1": 39472061036
+    "canonical_SPEED_R1": 39472061036,
+    "R2": "local-no-ci-evidence, commit 3e6800a evidence 40281679860/40236420384",
+    "R3": "local-no-ci-evidence, commit 3e6800a evidence 40281679860/40236420384, composite 0.534/0.521 STOP"
   },
   "constraints_locked": {
     "weights_budget_MB": 550,
@@ -220,5 +281,7 @@
     "source_commit": "6ec3d3b",
     "status": "authoritative",
     "successor": "reports/EXPERIMENTS_INDEX.md"
-  }
+  },
+  "updated_at": "2026-10-26T10:30:00Z",
+  "exhaustion_fixed": "2026-10-26: R3 0.534/0.521, третий провал подряд, §4 закрытие кампании в бюджетах"
 }
