@@ -172,6 +172,26 @@
         "official_workflow_dispatched": false,
         "model_bundle_status": "missing; official evaluator remains fail-closed"
       }
+    },
+    {
+      "seq": 12,
+      "date": "2026-10-27",
+      "kind": "local-no-ci-evidence",
+      "what": "подготовка dev-only freeze: новый workflow realgen-freeze-bundle.yml, скрипт full-dev обучения, предиктор, гейт REALGEN_OFFICIAL_SHIFT=1 и CI-тесты fail-closed",
+      "provenance": {
+        "branch": "arena/a475cc61-smarty-chumakov",
+        "base_head": "dc9073250b598fde23bced49e0ba4c1968f4ccef",
+        "python": "3.11.2",
+        "platform": "linux x86_64 sandbox",
+        "inputs": "REALGEN_ANSWERS_DEV.jsonl (300), dev-only строки REALGEN_DOCS.jsonl, REALGEN_PHASE_B_OOF.jsonl (51472 токена)",
+        "test_realgen_answers_opened": false,
+        "test_realgen_labels_or_spans_opened": false,
+        "test_specific_context_rows_parsed": false,
+        "real_test_1200_read": false,
+        "official_workflow_dispatched": false,
+        "official_test_metrics": null
+      },
+      "extraction": "manual: локальная сборка кода/реестров/инвентаря; обучение переносится в GitHub Actions (HF недоступен из песочницы); auto-commit из workflow отсутствует"
     }
   ]
 }

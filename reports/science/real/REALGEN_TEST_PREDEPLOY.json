@@ -100,8 +100,9 @@
     "sha256": null,
     "actions_run_id": null,
     "artifact_name": null,
-    "required_before_ready": "A complete full-dev frozen bundle for all three named models, including inference backend and pinned upstream model revisions, with SHA256 and real Actions provenance.",
-    "blocking_finding": "Phase B persisted five-fold OOF scores and summary only; it did not persist a full-dev composite estimator, R2-only estimator, or fine-tuned rubert-tiny2 deployment weights. These cannot be represented as frozen model artifacts. Official run is refused until a separate dev-only freeze step produces and registers them."
+    "required_before_ready": "A real successful dev-only Actions fit must fill frozen_bundle (coefficients, scalers, weights SHA and MB, pinned revisions, run ID, extraction bridge) before status becomes READY.",
+    "blocking_finding": "Phase B persisted OOF scores only. The dev-only freeze workflow .github/workflows/realgen-freeze-bundle.yml now trains the three full-dev estimators; until its manifest is extracted and registered here, the official evaluator stays fail-closed.",
+    "trained_on": "realgen_dev_300_only"
   },
   "policies": {
     "token_threshold": 0.5,
@@ -195,5 +196,74 @@
     "source": "manual preparation on the session branch; main suite confirmation is recorded separately under suite_green_confirmation",
     "test_realgen_payload_opened": false,
     "real_test_1200_read": false
+  },
+  "frozen_bundle": {
+    "status": "PENDING_CI_TRAINING",
+    "trained_on": "realgen_dev_300_only",
+    "assert": "Full-dev fit uses only REALGEN_ANSWERS_DEV.jsonl (300), dev-only rows of REALGEN_DOCS.jsonl and dev labels from REALGEN_PHASE_B_OOF.jsonl; the 100 sealed test_realgen answers and the locked real_test 1200 pairs are never opened.",
+    "seed": 42,
+    "token_threshold": 0.5,
+    "token_threshold_selection": "preregistered fixed 0.5 (policies.token_threshold); no threshold tuning on dev or test, no calibration and no post-hoc fit",
+    "hyperparameters": {
+      "composite": "StandardScaler + LogisticRegression(max_iter=1000, class_weight=balanced, random_state=42) on 27 features",
+      "r2_only": "StandardScaler + LogisticRegression(max_iter=1000, class_weight=balanced, random_state=42) on 16 R2 features only",
+      "rubert_tiny2_ft": {
+        "base": "cointegrated/rubert-tiny2",
+        "batch_size": 8,
+        "learning_rate": 2e-05,
+        "epochs": 3,
+        "max_length": 96,
+        "seed": 42,
+        "window": "sentence regex windows as in Phase B",
+        "token_to_word": "mean of overlapping subtoken class-1 probabilities"
+      }
+    },
+    "models": {
+      "composite": {
+        "status": "PENDING_CI_TRAINING",
+        "features": null,
+        "scaler_mean": null,
+        "scaler_scale": null,
+        "coefficients": null,
+        "intercept": null
+      },
+      "r2_only": {
+        "status": "PENDING_CI_TRAINING",
+        "features": null,
+        "scaler_mean": null,
+        "scaler_scale": null,
+        "coefficients": null,
+        "intercept": null
+      },
+      "rubert_tiny2_ft": {
+        "status": "PENDING_CI_TRAINING",
+        "weights_file": "rubert_ft/model.safetensors",
+        "weights_sha256": null
+      }
+    },
+    "upstream_revisions": {},
+    "weights": {
+      "name": "rubert_ft/model.safetensors",
+      "sha256": null,
+      "bytes": null,
+      "mb": null
+    },
+    "bundle": {
+      "artifact_name": "realgen-test-model-bundle",
+      "filename": "REALGEN_TEST_MODEL_BUNDLE.zip",
+      "sha256": null,
+      "bytes": null,
+      "mb": null,
+      "total_mb": null
+    },
+    "train_run": {
+      "run_id": null,
+      "head_sha": null,
+      "workflow": ".github/workflows/realgen-freeze-bundle.yml",
+      "extraction": null,
+      "url": null
+    },
+    "manifest_path": "reports/science/real/REALGEN_TEST_MODEL_BUNDLE_MANIFEST.json",
+    "official_test_metrics": null
   }
 }

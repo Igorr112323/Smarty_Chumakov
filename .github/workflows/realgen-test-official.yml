@@ -91,6 +91,13 @@ jobs:
           if d.get('status') != 'READY_FOR_ONE_OFFICIAL_RUN':
               print('refusing: predeployment record is not READY; sealed inputs untouched', file=sys.stderr)
               raise SystemExit(4)
+          frozen_bundle = d.get('frozen_bundle', {})
+          if frozen_bundle.get('status') != 'FROZEN' or frozen_bundle.get('trained_on') != 'realgen_dev_300_only':
+              print('refusing: frozen_bundle is not a full-dev dev-only bundle', file=sys.stderr)
+              raise SystemExit(4)
+          if frozen_bundle.get('bundle', {}).get('sha256') != d.get('model_bundle', {}).get('sha256'):
+              print('refusing: frozen bundle SHA256 mismatch', file=sys.stderr)
+              raise SystemExit(4)
           bundle = d.get('model_bundle', {})
           run_id = bundle.get('actions_run_id')
           artifact = bundle.get('artifact_name')
@@ -112,6 +119,10 @@ jobs:
 
       - name: Run exactly once; script rechecks code, hashes, bundle, and input gates
         shell: bash
+        # The curator shift flag is set ONLY for this one authorized step. The
+        # evaluator itself refuses (exit 3) without REALGEN_OFFICIAL_SHIFT=1.
+        env:
+          REALGEN_OFFICIAL_SHIFT: "1"
         run: |
           set -o pipefail
           PYTHONPATH=spanverify-module python -u reports/science/real/realgen_test_official.py --run-now \

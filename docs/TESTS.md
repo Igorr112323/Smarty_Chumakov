@@ -11,7 +11,7 @@ python -m pytest --collect-only -q
 python -m pytest
 ```
 
-**972 собранных nodes в 77 файлах**, включая параметризованные случаи. Это не число функций: например, YAML-проверки разворачиваются для каждого workflow. Полный список nodeid и количество по каждому файлу сохранены в [TESTS_INVENTORY.json](presentation/TESTS_INVENTORY.json). Названия в таблице — реальные файлы `spanverify-module/tests/`, а не примеры будущих тестов.
+**980 собранных nodes в 78 файлах**, включая параметризованные случаи. Это не число функций: например, YAML-проверки разворачиваются для каждого workflow. Полный список nodeid и количество по каждому файлу сохранены в [TESTS_INVENTORY.json](presentation/TESTS_INVENTORY.json). Названия в таблице — реальные файлы `spanverify-module/tests/`, а не примеры будущих тестов.
 
 Базовое полное выполнение: **908 passed, 2 skipped, 0 failed, 0 errors**, tests_excluded=false. Машинное доказательство: [committed JUnit](../reports/p8/closure/local-suite.xml), [LOCAL_SUITE](../reports/p8/closure/LOCAL_SUITE.json); окончательные CI-проверки презентационного HEAD указываются в квитанции/финальном ответе, а не выдаются за этот исторический запуск.
 
@@ -96,10 +96,11 @@ python -m pytest
 | [test_verdict_calibration.py](../spanverify-module/tests/test_verdict_calibration.py) | 15 | Frozen config, selection rule, dev/evidence recount, once-only test и overrides | Вердикт связан с сохранённым правилом; test не используется для выбора |
 | [test_verdict_rule.py](../spanverify-module/tests/test_verdict_rule.py) | 8 | Single vs two tokens, decisive attribution, legacy и token parity | Вердикт не обвиняет весь ответ по одиночной слабой маске |
 | [test_version.py](../spanverify-module/tests/test_version.py) | 1 | Версия пакета и pyproject | Метаданные выпуска не расходятся |
-| [test_workflow_limits.py](../spanverify-module/tests/test_workflow_limits.py) | 158 | YAML, job/step timeouts, quoting, concurrency и push metrics | CI не теряет обязательные проверки и ограничения выполнения |
+| [test_workflow_limits.py](../spanverify-module/tests/test_workflow_limits.py) | 163 | YAML, job/step timeouts, quoting, concurrency и push metrics | CI не теряет обязательные проверки и ограничения выполнения |
 | [test_realgen_freeze.py](../spanverify-module/tests/test_realgen_freeze.py) | 7 | Квоты, dev-хэш, sealed metadata, background 6510 без test-hosting, сплит и run-id provenance | Обычный CI не открывает sealed test_realgen payload; официальный evaluator fail-closed до run-now и разрешения |
+| [test_realgen_official_shift.py](../spanverify-module/tests/test_realgen_official_shift.py) | 3 | Без REALGEN_OFFICIAL_SHIFT=1 evaluator возвращает exit 3, sealed-файлы не открываются; гейт стоит до чтения метаданных | Замороженный full-dev бандл обучается только на dev-300, официальный прогон невозможен без шифт-кода |
 
-**Итого: 77 строки-файла, 972 nodes.** Инвентарь сохраняет каждый nodeid, включая классы и параметры; документационный тест сверяет его со всей реально собранной pytest session при полном запуске.
+**Итого: 78 строки-файла, 980 nodes.** Инвентарь сохраняет каждый nodeid, включая классы и параметры; документационный тест сверяет его со всей реально собранной pytest session при полном запуске.
 
 ## Два штатных skip — без новых исключений
 

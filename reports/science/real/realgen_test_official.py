@@ -26,6 +26,9 @@ FROZEN = REAL / "REALGEN_FROZEN.json"
 TEST_ANSWERS = REAL / "REALGEN_ANSWERS_TEST_REALGEN.jsonl"
 MODEL_DIR = Path(os.environ.get("RUNNER_TEMP", "/tmp")) / "REALGEN_TEST_MODEL_BUNDLE"
 EXPECTED_SHIFT_CODE = "FIRE-REALGEN-1"
+OFFICIAL_SHIFT_ENV = "REALGEN_OFFICIAL_SHIFT"
+OFFICIAL_SHIFT_VALUE = "1"
+TRAINED_ON = "realgen_dev_300_only"
 MODEL_NAMES = ("composite", "rubert_tiny2_ft", "r2_only")
 BOOTSTRAP_REPLICATES = 5000
 BOOTSTRAP_SEED = 20261026
@@ -36,6 +39,10 @@ ECE_BINS = 10
 
 class Refusal(RuntimeError):
     """The official run is not authorized or is not safely frozen."""
+
+
+class ShiftRefusal(Refusal):
+    """Missing or wrong shift authorization: exit 3, sealed inputs untouched."""
 
 
 def _sha256(path: Path) -> str:
@@ -50,9 +57,13 @@ def authorize(run_now: bool, shift_code: str | None) -> dict[str, Any]:
     """Validate only control-plane metadata; does not open sealed test inputs."""
     if not run_now:
         raise Refusal("refusing: explicit --run-now is required")
+    # Curator shift gate. This is the FIRST check and it precedes every file
+    # read: without REALGEN_OFFICIAL_SHIFT=1 the sealed answers are not opened.
+    if not hmac.compare_digest(os.environ.get(OFFICIAL_SHIFT_ENV, ""), OFFICIAL_SHIFT_VALUE):
+        raise ShiftRefusal(f"refusing: {OFFICIAL_SHIFT_ENV}=1 is absent; sealed test_realgen file not opened")
     supplied = shift_code if shift_code is not None else os.environ.get("REALGEN_SHIFT_CODE", "")
     if not hmac.compare_digest(supplied, EXPECTED_SHIFT_CODE):
-        raise Refusal("refusing: exact release code is absent or incorrect")
+        raise ShiftRefusal("refusing: exact release code is absent or incorrect")
     if os.environ.get("GITHUB_ACTIONS") != "true":
         raise Refusal("refusing: official scoring is restricted to GitHub Actions")
     if os.environ.get("GITHUB_EVENT_NAME") != "workflow_dispatch":
@@ -79,8 +90,25 @@ def authorize(run_now: bool, shift_code: str | None) -> dict[str, Any]:
         path = ROOT / relative
         if not path.is_file() or _sha256(path) != info["sha256"]:
             raise Refusal(f"refusing: pre-registered input hash mismatch: {relative}")
+    frozen_bundle = predeploy.get("frozen_bundle", {})
+    if frozen_bundle.get("status") != "FROZEN" or frozen_bundle.get("trained_on") != TRAINED_ON:
+        raise Refusal("refusing: frozen_bundle is not a full-dev dev-only REALGEN bundle")
+    if frozen_bundle.get("token_threshold") != THRESHOLD:
+        raise Refusal("refusing: frozen token threshold differs from the preregistered 0.5")
+    if not str(frozen_bundle.get("train_run", {}).get("run_id", "")).isdecimal():
+        raise Refusal("refusing: frozen bundle has no real CI train run ID")
+    for key in ("seed", "hyperparameters", "models", "bundle", "upstream_revisions"):
+        if key not in frozen_bundle:
+            raise Refusal(f"refusing: frozen_bundle.{key} is missing")
+    if set(("composite", "r2_only", "rubert_tiny2_ft")) - set(frozen_bundle.get("models", {})):
+        raise Refusal("refusing: frozen_bundle does not pin all three preregistered models")
+
     bundle = predeploy.get("model_bundle", {})
     bundle_sha = bundle.get("sha256")
+    if frozen_bundle.get("bundle", {}).get("sha256") != bundle_sha:
+        raise Refusal("refusing: model_bundle SHA256 differs from frozen_bundle")
+    if bundle.get("artifact_name") != frozen_bundle.get("bundle", {}).get("artifact_name"):
+        raise Refusal("refusing: Actions artifact provenance differs between bundle records")
     archive = Path(os.environ.get("REALGEN_MODEL_BUNDLE_PATH", bundle.get("path", "")))
     if not bundle_sha or not str(archive) or not archive.is_file() or _sha256(archive) != bundle_sha:
         raise Refusal("refusing: frozen model bundle is missing or its SHA256 differs")
@@ -458,6 +486,10 @@ def main() -> int:
     try:
         context = authorize(args.run_now, None)
         result = run_evaluation(context)
+    except ShiftRefusal as exc:
+        # No shift authorization: exit 3, no sealed byte was opened.
+        print(str(exc), file=sys.stderr)
+        return 3
     except Refusal as exc:
         print(str(exc), file=sys.stderr)
         return 2
