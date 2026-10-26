@@ -408,7 +408,7 @@ def main() -> None:
                 "gpt_weight_files": gpt_files,
                 "rubert_model": rubert_name,
                 "rubert_weight_files": rubert_files,
-                "rubert_weights_mb": round(sum(f["bytes"] for f in rubert_files) / 1_000_000, 3),
+                "rubert_weights_mb": round((next((f for f in rubert_files if f["name"] == "model.safetensors"), rubert_files[0])["bytes"]) / 1_000_000, 3),
                 "run_id": os.environ.get("GITHUB_RUN_ID", "local-no-ci-evidence"),
                 "head_sha": os.environ.get("HEAD_SHA", ""),
             }
@@ -534,8 +534,16 @@ def main() -> None:
             "span_gate": bool(span_auc_ft >= 0.55),
             "ci_gate": bool(ci_ft[0] > 0.5 and ci_ft_span[0] > 0.5),
         },
+        "composite_pass": bool(
+            token_auc_comp >= 0.70 and span_auc_comp >= 0.55 and ci_comp[0] > 0.5 and ci_comp_span[0] > 0.5
+        ),
+        "rubert_pass": bool(
+            token_auc_ft >= 0.70 and span_auc_ft >= 0.55 and ci_ft[0] > 0.5 and ci_ft_span[0] > 0.5
+        ),
+        "rule": "verdict=PASS только если ОБЕ модели (composite и rubert-tiny2 FT) проходят все ворота",
         "verdict": "PASS" if (
             token_auc_comp >= 0.70 and span_auc_comp >= 0.55 and ci_comp[0] > 0.5 and ci_comp_span[0] > 0.5
+            and token_auc_ft >= 0.70 and span_auc_ft >= 0.55 and ci_ft[0] > 0.5 and ci_ft_span[0] > 0.5
         ) else "FAIL",
     }
 
@@ -587,6 +595,13 @@ def main() -> None:
             "note": "OOF вероятности по сабтокенам агрегированы в word-токены средним; train_steps=0 означает dry-run",
         },
         "gates": gates,
+        "caveat_label_leakage": (
+            "Метки REALGEN получены детерминированными правилами по числам/ссылкам, поэтому "
+            "лексические признаки (token_is_numeric, local_number_density, citation_density) "
+            "ожидаемо дают высокий AUC. Это НЕ доказательство обнаружения галлюцинаций "
+            "в свободной генерации и НЕ перенос на real_test 1200; ворота измеряют только "
+            "внутреннюю separability этого корпуса."
+        ),
         "old5_definitions": "пересчитаны на ai-forever/rugpt3small_based_on_gpt2 (last-layer attention / hidden states) — не вызов замороженного hf_features_chunked, определения сохранены",
         "E1_R2_note": "E1/R2 признаки — детерминированная реимплементация по опубликованным именам в E0_DIAG/E1_SIGNAL; исходный код E1HUNT_R2/R3 в этом чекауте отсутствует (проверено по trees веток)",
         "environment": environment,
