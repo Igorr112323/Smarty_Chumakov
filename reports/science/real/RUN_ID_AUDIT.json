@@ -192,6 +192,68 @@
         "official_test_metrics": null
       },
       "extraction": "manual: локальная сборка кода/реестров/инвентаря; обучение переносится в GitHub Actions (HF недоступен из песочницы); auto-commit из workflow отсутствует"
+    },
+    {
+      "seq": 13,
+      "date": "2026-10-27",
+      "kind": "verified-actions-run",
+      "run_id": "40408250130",
+      "workflow": "REALGEN-R1 frozen model bundle (dev-only)",
+      "head_sha": "f62291ef462b4710f44a23ab5335c7e20ddcb47c",
+      "status": "completed/success (all steps: boundary check, fit, zip self-check, artifact upload)",
+      "url": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/40408250130",
+      "what": "full-dev freeze: composite LogReg (27) + R2-only LogReg (16) + rubert-tiny2 FT (batch 8 / lr 2e-5 / 3 ep / seed 42 / 687 steps / 1829 windows) на 300 dev-ответах, 51472 токенах; zip 107.840 MB, model.safetensors 116.393 MB (sha 09d6fe5ede551cbd4fdf8a30e5014c4f8f1528bf9eb07937f13d5a227d14cca5), bundle sha 9fbac0e6554fc597763d0ee989b66826068721a7fd7bf3eb52df77a8d5e17f87",
+      "artifact": {
+        "name": "realgen-test-model-bundle",
+        "id": "12691713845",
+        "bytes": 107877533,
+        "retention_days": 90
+      },
+      "extraction": "manual: GITHUB_STEP_SUMMARY -> check-runs output.text (REALGEN-FREEZE/manifest/meta + chunk-0000, base64(gzip(json, mtime=0))) -> gh api extraction из песочницы -> ручной коммит REALGEN_TEST_MODEL_BUNDLE_MANIFEST.json; auto-commit из workflow отсутствует; blob-логи не использовались",
+      "provenance": {
+        "trained_on": "realgen_dev_300_only",
+        "dev_answers": 300,
+        "dev_tokens": 51472,
+        "positive_tokens": 1828,
+        "test_realgen_answers_opened": false,
+        "test_realgen_labels_or_spans_opened": false,
+        "test_specific_context_rows_parsed": false,
+        "real_test_1200_read": false,
+        "official_workflow_dispatched": false,
+        "official_test_metrics": null
+      }
+    },
+    {
+      "seq": 14,
+      "date": "2026-10-27",
+      "kind": "verified-actions-run",
+      "run_id": "40408249857",
+      "workflow": "ci (push на arena/a475cc61-smarty-chumakov)",
+      "head_sha": "f62291ef462b4710f44a23ab5335c7e20ddcb47c",
+      "status": "completed/success (2/2 push-матрицы, линтер/покрытие >=85%, контракт, METRICS, P8 seal)",
+      "url": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/40408249857",
+      "what": "зелёный suite на 980 собранных nodes (972 + 5 parametrized workflow + 3 shift-gate теста)",
+      "extraction": "manual: gh api check-runs/jobs статусы; ни одного sealed payload, ни одного официального прогона",
+      "provenance": {
+        "official_workflow_dispatched": false,
+        "official_test_metrics": null
+      }
+    },
+    {
+      "seq": 15,
+      "date": "2026-10-27",
+      "kind": "local-no-ci-evidence",
+      "what": "ручная финализация REALGEN_TEST_PREDEPLOY.json: frozen_bundle (коэффициенты, StandardScaler, порог 0.5, sha весов/бандла, МБ, run-id, extraction-мост), статус READY_FOR_ONE_OFFICIAL_RUN, шифт-гейт, пересчёт всех scripts/inputs хэшей",
+      "provenance": {
+        "branch": "arena/a475cc61-smarty-chumakov",
+        "source": "манифест прогона 40408250130, извлечённый через check-runs output.text",
+        "test_realgen_answers_opened": false,
+        "test_realgen_labels_or_spans_opened": false,
+        "real_test_1200_read": false,
+        "official_workflow_dispatched": false,
+        "official_test_metrics": null
+      },
+      "extraction": "manual: /tmp/extract_manifest.py (gh api commits/<sha>/check-runs) -> reports/science/real/REALGEN_TEST_MODEL_BUNDLE_MANIFEST.json (11789 bytes, sha256 95988e7ead641912489a3fb06bfe145fa7b78679c40ea07eb66fdad4526a359d) -> ручной коммит; поле extraction присутствует; workflow автокоммитов не делает"
     }
   ]
 }
