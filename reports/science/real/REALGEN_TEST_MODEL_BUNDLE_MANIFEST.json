@@ -1,0 +1,372 @@
+{
+  "bundle": {
+    "artifact_name": "realgen-test-model-bundle",
+    "bytes": 107840377,
+    "file_count": 6,
+    "filename": "REALGEN_TEST_MODEL_BUNDLE.zip",
+    "files": [
+      {
+        "bytes": 8490,
+        "name": "manifest.json",
+        "sha256": "455b30260e4327545e1b1c4b80d270ace87505953e0635a662b45f58b45d2c86"
+      },
+      {
+        "bytes": 17261,
+        "name": "realgen_test_predict.py",
+        "sha256": "61aee377df6f6eda0bea773b07c9cc05a8732d8cd5f8c506df23069eafef3126"
+      },
+      {
+        "bytes": 781,
+        "name": "rubert_ft/config.json",
+        "sha256": "9f1fd6b145608820b481e0a4772c9ccaa9a7bc0959759730702fa7360e6d4f63"
+      },
+      {
+        "bytes": 116393320,
+        "name": "rubert_ft/model.safetensors",
+        "sha256": "09d6fe5ede551cbd4fdf8a30e5014c4f8f1528bf9eb07937f13d5a227d14cca5"
+      },
+      {
+        "bytes": 2413535,
+        "name": "rubert_ft/tokenizer.json",
+        "sha256": "277be5d2f9f24124846c063abcdd3ff0b15a6a3d3cf98d02ea242a0009f13e23"
+      },
+      {
+        "bytes": 595,
+        "name": "rubert_ft/tokenizer_config.json",
+        "sha256": "95cbbe57f461dac68c4a5dfd1b395b21237352a54cc07dc8795c7ec775d57b16"
+      }
+    ],
+    "mb": 107.84,
+    "retention_days": 90,
+    "sha256": "9fbac0e6554fc597763d0ee989b66826068721a7fd7bf3eb52df77a8d5e17f87",
+    "uncompressed_bytes": 118833982,
+    "uncompressed_mb": 118.834
+  },
+  "campaign": "REALGEN-R1",
+  "dev": {
+    "answers": 300,
+    "documents": 300,
+    "label_source": "reports/science/real/REALGEN_PHASE_B_OOF.jsonl (already published, dev-only)",
+    "phase_b_run_id": "40298872296",
+    "positive_tokens": 1828,
+    "tokens": 51472
+  },
+  "environment": {
+    "numpy": "2.4.6",
+    "platform": "Linux-6.17.0-1022-azure-x86_64-with-glibc2.39",
+    "python": "3.11.17",
+    "runtime_seconds": 453.181,
+    "torch": "2.14.1+cpu",
+    "transformers": "5.20.1"
+  },
+  "forbidden_at_fit_time": [
+    "REALGEN_ANSWERS.jsonl",
+    "REALGEN_ANSWERS_TEST_REALGEN.jsonl",
+    "REALGEN_LABELS.jsonl",
+    "REALGEN_SPANS.jsonl",
+    "real_test_pairs.jsonl",
+    "real_test_spans.jsonl"
+  ],
+  "hyperparameters": {
+    "batch_size": 8,
+    "epochs": 3,
+    "learning_rate": 2e-05,
+    "max_length": 96,
+    "optimizer": "AdamW",
+    "seed": 42,
+    "shuffle": "random.Random(42) permutation per epoch",
+    "token_to_word": "mean of overlapping subtoken class-1 probabilities",
+    "window": "sentence regex windows (Phase B sentence_windows), fallback = whole answer"
+  },
+  "inputs_sha256": {
+    "REALGEN_ANSWERS_DEV.jsonl": "cd902ac8c33dee30e4b823052d00d8124f7b4bcf2d4c3cfb35f0179d90ba3341",
+    "REALGEN_FROZEN.json": "372ff6b8820441f48150d23d36f528d188aa6edf0b876f859bbd4be188dd0c6d",
+    "REALGEN_PHASE_B.json": "35ff350f9be2daf735af750358d6527c7a18cb20709dac603444170da3fbbca4",
+    "REALGEN_PHASE_B_OOF.jsonl": "5f445aeb8c11bed5f571ac0802cc8f9f8fe91bcfc7008f8fc2d995a073cd6968",
+    "realgen_phase_b.py": "bc7a061e572a5f1fea44a442f81f972e2281c13816ee7763a709f0cc0120991b",
+    "realgen_test_predictor.py": "61aee377df6f6eda0bea773b07c9cc05a8732d8cd5f8c506df23069eafef3126"
+  },
+  "kind": "REALGEN_TEST_MODEL_BUNDLE_MANIFEST",
+  "models": {
+    "composite": {
+      "classes": [
+        0,
+        1
+      ],
+      "coefficients": [
+        -0.8656615585646047,
+        -0.29319319251744697,
+        0.3310657085270476,
+        -0.3228315640660553,
+        0.7943960004884812,
+        -0.004944521589750407,
+        -0.03903485978689743,
+        -0.15468282862250654,
+        0.41990126641352604,
+        0.3827980698546671,
+        0.4799799998303586,
+        -0.009225034761289068,
+        0.15088376054502953,
+        0.9607237517988788,
+        0.9264837391333725,
+        -1.9657775264649542,
+        0.3120794935808231,
+        0.2975689921369018,
+        -0.04831955765924111,
+        0.605224848501045,
+        -0.5777171336005059,
+        0.0051061425498163775,
+        0.2107330443922857,
+        -1.116849770903023,
+        -0.020632713636506823,
+        0.20367101866687437,
+        0.3113382050241184
+      ],
+      "estimator": "sklearn.linear_model.LogisticRegression",
+      "features": [
+        "attention_entropy",
+        "ctx_attention_mass",
+        "ctx_attention_mass_norm",
+        "ctx_max_similarity",
+        "embedding_density",
+        "sentence_cosine_answer_doc",
+        "sentence_cosine_answer_chunk_max",
+        "contrast_doc_chunk",
+        "rolling_logprob_next_token",
+        "lexical_number_attribution_window",
+        "stopword_norm",
+        "digit_density_answer",
+        "citation_density_answer",
+        "token_is_numeric",
+        "token_is_citation",
+        "token_len_chars",
+        "token_letters",
+        "position_ratio",
+        "sentence_length_chars",
+        "local_number_density",
+        "local_stopword_share",
+        "doc_coverage",
+        "distinct_digits",
+        "uppercase_ratio",
+        "punctuation_ratio",
+        "unit_flag",
+        "type_token_ratio_answer"
+      ],
+      "inference": "p = expit(((X - scaler_mean)/scaler_scale) @ coefficients + intercept)",
+      "intercept": -3.4802841446706436,
+      "params": {
+        "class_weight": "balanced",
+        "max_iter": 1000,
+        "random_state": 42
+      },
+      "scaler_mean": [
+        0.6625145484627053,
+        0.46886411221804103,
+        1.0450790189449932,
+        0.6683821040542925,
+        0.28330934284762654,
+        0.6756261510387721,
+        0.6807058695408454,
+        0.005079718502073377,
+        -1.1544130933295875,
+        0.5958792451480742,
+        0.7765587116672898,
+        0.03946329540695445,
+        0.6333073917856775,
+        0.08532794529064346,
+        0.029744327012744792,
+        5.766649829033261,
+        4.553718526577557,
+        0.4971699187605813,
+        748.0266746969226,
+        2.9442415293751942,
+        0.15203266063532883,
+        0.6793441762311185,
+        0.16651771837115326,
+        0.03889719157964146,
+        0.06032044847948514,
+        0.06854211998756606,
+        0.2912457258314656
+      ],
+      "scaler_scale": [
+        0.10829175003693117,
+        0.22080037396797456,
+        0.5353085049687372,
+        0.2040291856504827,
+        0.0766791061222726,
+        0.16523979397816252,
+        0.16870130642948802,
+        0.03729050059980758,
+        2.5229828473162783,
+        0.4769980808450529,
+        0.8487006810542146,
+        0.06087001479656322,
+        0.9430682172639823,
+        0.2793690874867089,
+        0.16988114086998188,
+        4.467803149300045,
+        4.6829986277689,
+        0.2932386555977501,
+        704.5666383349668,
+        4.460952869613183,
+        0.10543449270577632,
+        0.32780303461927907,
+        0.6149649248486868,
+        0.14316293733757052,
+        0.07864079106505337,
+        0.25267389610946944,
+        0.16256004342405955
+      ],
+      "token_threshold": 0.5
+    },
+    "r2_only": {
+      "classes": [
+        0,
+        1
+      ],
+      "coefficients": [
+        -0.13130245157950937,
+        0.14565940696344945,
+        0.9431574934114586,
+        0.9053188856261823,
+        -1.3711473132792937,
+        -0.07102359911594687,
+        0.04372315038536917,
+        0.1289247415048608,
+        0.7802833915129892,
+        -0.2699391548655957,
+        0.044803311620221206,
+        0.13680130758373182,
+        -1.1328786012430894,
+        -0.08254842680525167,
+        0.17429713190691842,
+        0.11816299615959792
+      ],
+      "estimator": "sklearn.linear_model.LogisticRegression",
+      "features": [
+        "digit_density_answer",
+        "citation_density_answer",
+        "token_is_numeric",
+        "token_is_citation",
+        "token_len_chars",
+        "token_letters",
+        "position_ratio",
+        "sentence_length_chars",
+        "local_number_density",
+        "local_stopword_share",
+        "doc_coverage",
+        "distinct_digits",
+        "uppercase_ratio",
+        "punctuation_ratio",
+        "unit_flag",
+        "type_token_ratio_answer"
+      ],
+      "inference": "p = expit(((X - scaler_mean)/scaler_scale) @ coefficients + intercept)",
+      "intercept": -2.991538807004265,
+      "params": {
+        "class_weight": "balanced",
+        "max_iter": 1000,
+        "random_state": 42
+      },
+      "scaler_mean": [
+        0.039463295406955944,
+        0.6333073917856857,
+        0.08532794529064346,
+        0.029744327012744792,
+        5.766649829033261,
+        4.553718526577557,
+        0.49716991876057987,
+        748.0266746969226,
+        2.9442415293751942,
+        0.1520326606353961,
+        0.6793441762310892,
+        0.16651771837115326,
+        0.03889719157964296,
+        0.06032044847948899,
+        0.06854211998756606,
+        0.29124572583152003
+      ],
+      "scaler_scale": [
+        0.06087001479656332,
+        0.9430682172638839,
+        0.27936908748664446,
+        0.16988114087003212,
+        4.467803149299763,
+        4.682998627769626,
+        0.2932386555977491,
+        704.5666383349919,
+        4.4609528696144345,
+        0.10543449270575025,
+        0.3278030346192747,
+        0.6149649248485021,
+        0.14316293733759483,
+        0.07864079106505144,
+        0.252673896109543,
+        0.1625600434240554
+      ],
+      "token_threshold": 0.5
+    }
+  },
+  "no_test_based_fit": true,
+  "rubert_tiny2_ft": {
+    "base": "cointegrated/rubert-tiny2",
+    "base_revision": "e8ed3b0c8bbf4fb6984c3de043bf7d2f4e5969ae",
+    "batch_size": 8,
+    "directory": "rubert_ft",
+    "epochs": 3,
+    "learning_rate": 2e-05,
+    "max_length": 96,
+    "n_subtokens": 43807,
+    "n_windows": 1829,
+    "optimizer": "AdamW",
+    "seed": 42,
+    "shuffle": "random.Random(42) permutation per epoch",
+    "task": "AutoModelForTokenClassification, num_labels=2",
+    "token_to_word": "mean of overlapping subtoken class-1 probabilities",
+    "torch": "2.14.1+cpu",
+    "train_steps": 687,
+    "transformers": "5.20.1",
+    "weights_file": "rubert_ft/model.safetensors",
+    "window": "sentence regex windows (Phase B sentence_windows), fallback = whole answer"
+  },
+  "rubert_tiny2_ft_weights": {
+    "bytes": 116393320,
+    "mb": 116.393,
+    "name": "rubert_ft/model.safetensors",
+    "sha256": "09d6fe5ede551cbd4fdf8a30e5014c4f8f1528bf9eb07937f13d5a227d14cca5"
+  },
+  "sealed_access": {
+    "guard": "Path.open refused all FORBIDDEN_FILES during fitting",
+    "official_test_metrics": null,
+    "official_workflow_dispatched": false,
+    "real_test_1200_read": false,
+    "test_realgen_answers_opened": false,
+    "test_realgen_labels_or_spans_opened": false,
+    "test_specific_context_rows_parsed": false
+  },
+  "seed": 42,
+  "status": "FROZEN",
+  "token_threshold": 0.5,
+  "token_threshold_selection": "preregistered fixed 0.5 in REALGEN_TEST_PREDEPLOY.json policies.token_threshold; no dev/test threshold tuning, calibration or post-hoc fit",
+  "train_run": {
+    "artifact_name": "realgen-test-model-bundle",
+    "extraction": "manual: GITHUB_STEP_SUMMARY -> check-runs output.text (REALGEN-FREEZE/manifest) -> gh api extraction in sandbox -> hand commit with extraction field in RUN_ID_AUDIT.json; no workflow auto-commit",
+    "head_sha": "f62291ef462b4710f44a23ab5335c7e20ddcb47c",
+    "run_id": "40408250130",
+    "url": "https://github.com/Igorr112323/Smarty_Chumakov/actions/runs/40408250130",
+    "workflow": ".github/workflows/realgen-freeze-bundle.yml"
+  },
+  "trained_on": "realgen_dev_300_only",
+  "upstream_revisions": {
+    "download_at_inference": "huggingface_hub.snapshot_download(repo_id, revision=<pinned sha>)",
+    "e1_rubert_base": {
+      "repo_id": "cointegrated/rubert-tiny2",
+      "revision": "e8ed3b0c8bbf4fb6984c3de043bf7d2f4e5969ae"
+    },
+    "old5_gpt": {
+      "repo_id": "ai-forever/rugpt3small_based_on_gpt2",
+      "revision": "a9307e696cd3c5b7f953ff4cb19d76a4d81821d5"
+    }
+  },
+  "version": "v1"
+}

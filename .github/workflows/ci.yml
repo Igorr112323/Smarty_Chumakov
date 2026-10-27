@@ -300,6 +300,34 @@ jobs:
       - name: Тесты
         run: python -m pytest -q --junitxml=reports/tests-junit.xml
 
+      - name: Failed test IDs only (no failure payloads)
+        if: always()
+        shell: bash
+        run: |
+          python - <<'PY'
+          import os
+          from pathlib import Path
+          import xml.etree.ElementTree as ET
+
+          report = Path("reports/tests-junit.xml")
+          summary = Path(os.environ["GITHUB_STEP_SUMMARY"])
+          try:
+              root = ET.parse(report).getroot()
+          except (ET.ParseError, OSError):
+              summary.write_text("JUnit report unavailable; no test-case details emitted.\n", encoding="utf-8")
+          else:
+              failed = []
+              for case in root.iter("testcase"):
+                  if case.find("failure") is not None or case.find("error") is not None:
+                      failed.append(f"{case.get('classname', '')}::{case.get('name', '')}")
+              lines = ["## Test failures (identifiers only)", "", f"Failure/error cases: {len(failed)}", ""]
+              lines.extend(f"- `{name}`" for name in failed)
+              summary.write_text("\n".join(lines) + "\n", encoding="utf-8")
+              for name in failed:
+                  safe_name = name.replace("%", "%25").replace("\r", "%0D").replace("\n", "%0A")
+                  print(f"::error title=Pytest failure ID::{safe_name}")
+          PY
+
       - name: Само-проверка конвейера
         run: python -m spanverify selftest
 

@@ -1,0 +1,126 @@
+# REALGEN-R1: one dev-only full-dev fit that produces the frozen inference zip.
+# Manual, and additionally started by pushing .github/realgen-freeze-bundle.trigger
+# on an arena/** branch (the same mechanism as realgen-r1-b.yml).
+# Never add pull_request/schedule triggers here; never auto-commit results.
+name: REALGEN-R1 frozen model bundle (dev-only)
+
+on:
+  workflow_dispatch:
+  push:
+    branches: ["arena/**"]
+    paths:
+      - .github/realgen-freeze-bundle.trigger
+
+permissions:
+  contents: read
+  checks: write
+  actions: read
+
+concurrency:
+  group: realgen-freeze-bundle-${{ github.ref }}
+  cancel-in-progress: false
+
+env:
+  PYTHONUTF8: "1"
+  PYTHONIOENCODING: "utf-8"
+  HF_HUB_DISABLE_TELEMETRY: "1"
+  OMP_NUM_THREADS: "4"
+  MKL_NUM_THREADS: "4"
+  OPENBLAS_NUM_THREADS: "2"
+  NUMEXPR_NUM_THREADS: "2"
+  HEAD_SHA: ${{ github.sha }}
+  GH_TOKEN: ${{ github.token }}
+
+jobs:
+  freeze:
+    name: REALGEN-FREEZE dev-300 full-dev fit
+    runs-on: ubuntu-24.04
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Зависимости CPU (torch, transformers, sklearn)
+        timeout-minutes: 20
+        run: |
+          python -m pip install --upgrade pip
+          pip install 'torch==2.14.1+cpu' --index-url https://download.pytorch.org/whl/cpu
+          pip install 'transformers==5.20.1' 'numpy==2.4.6' scipy scikit-learn sentencepiece==0.2.2 huggingface_hub
+          python -c "import torch, transformers, sklearn, scipy, numpy; print('torch', torch.__version__, 'transformers', transformers.__version__, 'sklearn', sklearn.__version__, 'numpy', numpy.__version__)"
+
+      - name: Проверка границы sealed-данных перед обучением
+        timeout-minutes: 5
+        run: |
+          python - <<'PY'
+          import json, pathlib
+          real = pathlib.Path('reports/science/real')
+          frozen = json.loads((real/'REALGEN_FROZEN.json').read_text(encoding='utf-8'))
+          assert frozen['n_answers'] >= 400
+          assert frozen['splits']['dev']['n_answers'] == 300
+          assert frozen['splits']['test_realgen']['sealed'] is True
+          assert frozen['real_test_viewed'] is False
+          script = (real/'realgen_freeze_bundle.py').read_text(encoding='utf-8')
+          assert 'realgen_dev_300_only' in script
+          assert 'install_sealed_read_guard()' in script
+          assert 'REALGEN_ANSWERS_TEST_REALGEN.jsonl' in script  # only in the refusal list
+          assert 'real_test_pairs.jsonl' in script                # only in the refusal list
+          answers = [json.loads(line) for line in (real/'REALGEN_ANSWERS_DEV.jsonl').open(encoding='utf-8') if line.strip()]
+          assert len(answers) == 300 and all(row['split'] == 'dev' for row in answers)
+          print('dev-only boundary OK; sealed payloads are listed only as forbidden paths')
+          PY
+
+      - name: Обучение на полном dev-300, сборка zip, публикация манифеста
+        timeout-minutes: 38
+        run: |
+          set +e
+          python -u reports/science/real/realgen_freeze_bundle.py --publish --out-dir .arena/realgen_freeze 2>&1 | tee /tmp/freeze.log
+          RC=${PIPESTATUS[0]}
+          if [ "$RC" -ne 0 ]; then
+            tail -c 8000 /tmp/freeze.log > /tmp/freeze_tail.txt
+            python - <<'PY'
+          import json, os
+          text = open('/tmp/freeze_tail.txt', encoding='utf-8', errors='replace').read()
+          payload = {
+              "name": "REALGEN-FREEZE/diagnostics",
+              "head_sha": os.environ['HEAD_SHA'],
+              "status": "completed",
+              "conclusion": "failure",
+              "output": {"title": "REALGEN-FREEZE failure tail", "summary": "Дословный хвост лога (check-runs bridge)", "text": text},
+          }
+          open('/tmp/freeze_payload.json', 'w', encoding='utf-8').write(json.dumps(payload, ensure_ascii=False))
+          PY
+            gh api --method POST "repos/${{ github.repository }}/check-runs" --input /tmp/freeze_payload.json || true
+            exit $RC
+          fi
+
+      - name: Самопроверка zip и манифеста (без sealed-входов)
+        timeout-minutes: 5
+        run: |
+          python - <<'PY'
+          import hashlib, json, pathlib, zipfile
+          out = pathlib.Path('.arena/realgen_freeze')
+          manifest = json.loads((out/'REALGEN_TEST_MODEL_BUNDLE_MANIFEST.json').read_text(encoding='utf-8'))
+          blob = (out/'REALGEN_TEST_MODEL_BUNDLE.zip').read_bytes()
+          assert hashlib.sha256(blob).hexdigest() == manifest['bundle']['sha256']
+          assert manifest['trained_on'] == 'realgen_dev_300_only'
+          assert manifest['dev']['answers'] == 300
+          assert manifest['sealed_access']['test_realgen_answers_opened'] is False
+          with zipfile.ZipFile(out/'REALGEN_TEST_MODEL_BUNDLE.zip') as archive:
+              names = set(archive.namelist())
+          assert {'manifest.json', 'realgen_test_predict.py', 'rubert_ft/model.safetensors'} <= names
+          print('zip self-check OK:', manifest['bundle']['mb'], 'MB,', manifest['bundle']['file_count'], 'files')
+          PY
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: realgen-test-model-bundle
+          path: |
+            .arena/realgen_freeze/REALGEN_TEST_MODEL_BUNDLE.zip
+            .arena/realgen_freeze/REALGEN_TEST_MODEL_BUNDLE_MANIFEST.json
+          retention-days: 90
+          if-no-files-found: error

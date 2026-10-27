@@ -1,0 +1,166 @@
+# Manual-only, single-use evaluator for sealed REALGEN test_realgen.
+# Never add push, pull_request, schedule, or automatic retry triggers here.
+name: REALGEN official test evaluation
+
+on:
+  workflow_dispatch:
+    inputs:
+      run_now:
+        description: Explicit authorization for the one official evaluation
+        required: true
+        type: boolean
+        default: false
+      shift_code:
+        description: Exact curator release code (never print this input)
+        required: true
+        type: string
+
+permissions:
+  contents: read
+  actions: read
+  checks: write
+
+concurrency:
+  group: realgen-test-official-single-use
+  cancel-in-progress: false
+
+jobs:
+  official-evaluation:
+    if: github.ref == 'refs/heads/main' && inputs.run_now == true
+    name: REALGEN-Test official one-shot
+    runs-on: ubuntu-24.04
+    timeout-minutes: 40
+    env:
+      PYTHONUTF8: "1"
+      PYTHONIOENCODING: "utf-8"
+      HF_HUB_DISABLE_TELEMETRY: "1"
+      OMP_NUM_THREADS: "4"
+      MKL_NUM_THREADS: "4"
+      OPENBLAS_NUM_THREADS: "2"
+      NUMEXPR_NUM_THREADS: "2"
+      GH_TOKEN: ${{ github.token }}
+      REALGEN_SHIFT_CODE: ${{ inputs.shift_code }}
+    steps:
+      - name: Check exact release gate without opening evaluation inputs
+        shell: bash
+        run: |
+          python - <<'PY'
+          import os, sys
+          if os.environ.get('REALGEN_SHIFT_CODE') != 'FIRE-REALGEN-1':
+              print('refusing: wrong release code; no evaluation inputs opened', file=sys.stderr)
+              raise SystemExit(2)
+          if os.environ.get('GITHUB_REF') != 'refs/heads/main':
+              print('refusing: workflow must run on main', file=sys.stderr)
+              raise SystemExit(2)
+          PY
+
+      - name: Refuse any prior official attempt
+        shell: bash
+        run: |
+          gh api "repos/${GITHUB_REPOSITORY}/actions/workflows/realgen-test-official.yml/runs" \
+            -f branch=main -f per_page=100 > "$RUNNER_TEMP/realgen-workflow-runs.json"
+          python - <<'PY'
+          import json, os, sys
+          path = os.path.join(os.environ['RUNNER_TEMP'], 'realgen-workflow-runs.json')
+          current = os.environ['GITHUB_RUN_ID']
+          runs = json.load(open(path, encoding='utf-8')).get('workflow_runs', [])
+          prior = [r for r in runs if r.get('event') == 'workflow_dispatch'
+                   and r.get('id') != int(current) and r.get('head_branch') == 'main']
+          if prior:
+              print('refusing: an official workflow_dispatch attempt already exists; no retry')
+              raise SystemExit(3)
+          print('one-shot guard passed; current run id:', current)
+          PY
+
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 1
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Validate preregistration and download the already-frozen bundle
+        shell: bash
+        run: |
+          python - <<'PY'
+          import json, os, pathlib, sys
+          p = pathlib.Path('reports/science/real/REALGEN_TEST_PREDEPLOY.json')
+          d = json.loads(p.read_text(encoding='utf-8'))
+          if d.get('status') != 'READY_FOR_ONE_OFFICIAL_RUN':
+              print('refusing: predeployment record is not READY; sealed inputs untouched', file=sys.stderr)
+              raise SystemExit(4)
+          frozen_bundle = d.get('frozen_bundle', {})
+          if frozen_bundle.get('status') != 'FROZEN' or frozen_bundle.get('trained_on') != 'realgen_dev_300_only':
+              print('refusing: frozen_bundle is not a full-dev dev-only bundle', file=sys.stderr)
+              raise SystemExit(4)
+          if frozen_bundle.get('bundle', {}).get('sha256') != d.get('model_bundle', {}).get('sha256'):
+              print('refusing: frozen bundle SHA256 mismatch', file=sys.stderr)
+              raise SystemExit(4)
+          bundle = d.get('model_bundle', {})
+          run_id = bundle.get('actions_run_id')
+          artifact = bundle.get('artifact_name')
+          if not run_id or not str(run_id).isdecimal() or not artifact:
+              print('refusing: frozen model artifact provenance is missing', file=sys.stderr)
+              raise SystemExit(4)
+          pathlib.Path(os.environ['RUNNER_TEMP'], 'realgen-model-run-id').write_text(str(run_id))
+          pathlib.Path(os.environ['RUNNER_TEMP'], 'realgen-model-artifact').write_text(artifact)
+          PY
+          MODEL_RUN_ID=$(cat "$RUNNER_TEMP/realgen-model-run-id")
+          MODEL_ARTIFACT=$(cat "$RUNNER_TEMP/realgen-model-artifact")
+          gh run download "$MODEL_RUN_ID" --name "$MODEL_ARTIFACT" --dir "$RUNNER_TEMP/realgen-model-bundle"
+          BUNDLE_PATH="$RUNNER_TEMP/realgen-model-bundle/REALGEN_TEST_MODEL_BUNDLE.zip"
+          test -f "$BUNDLE_PATH"
+          echo "REALGEN_MODEL_BUNDLE_PATH=$BUNDLE_PATH" >> "$GITHUB_ENV"
+          python -m pip install --upgrade pip
+          pip install 'torch==2.14.1+cpu' --index-url https://download.pytorch.org/whl/cpu
+          pip install 'transformers==5.20.1' 'numpy==2.4.6' scipy scikit-learn sentencepiece==0.2.2 huggingface_hub
+
+      - name: Run exactly once; script rechecks code, hashes, bundle, and input gates
+        shell: bash
+        # The curator shift flag is set ONLY for this one authorized step. The
+        # evaluator itself refuses (exit 3) without REALGEN_OFFICIAL_SHIFT=1.
+        env:
+          REALGEN_OFFICIAL_SHIFT: "1"
+        run: |
+          set -o pipefail
+          PYTHONPATH=spanverify-module python -u reports/science/real/realgen_test_official.py --run-now \
+            | tee "$RUNNER_TEMP/realgen-official-output.json"
+          python - <<'PY'
+          import json, os, pathlib, sys
+          line = pathlib.Path(os.environ['RUNNER_TEMP'], 'realgen-official-output.json').read_text(encoding='utf-8').splitlines()[-1]
+          payload = json.loads(line)
+          pathlib.Path(os.environ['RUNNER_TEMP'], 'realgen-official-check-summary.txt').write_text(payload['summary_text'], encoding='utf-8')
+          PY
+
+      - name: Publish the one result through check-runs output.text
+        if: success()
+        shell: bash
+        run: |
+          python - <<'PY'
+          import json, os, pathlib
+          summary = pathlib.Path(os.environ['RUNNER_TEMP'], 'realgen-official-check-summary.txt').read_text(encoding='utf-8')
+          payload = {
+              'name': 'REALGEN-Test/official-result',
+              'head_sha': os.environ['GITHUB_SHA'],
+              'status': 'completed',
+              'conclusion': 'success',
+              'output': {
+                  'title': 'REALGEN official evaluation — one authorized run',
+                  'summary': 'Single-use result; full metrics and provenance follow in output.text.',
+                  'text': summary,
+              },
+          }
+          pathlib.Path(os.environ['RUNNER_TEMP'], 'realgen-check-run.json').write_text(json.dumps(payload, ensure_ascii=False), encoding='utf-8')
+          PY
+          gh api --method POST "repos/${GITHUB_REPOSITORY}/check-runs" \
+            --input "$RUNNER_TEMP/realgen-check-run.json"
+
+      - uses: actions/upload-artifact@v4
+        if: success()
+        with:
+          name: realgen-test-official-${{ github.run_id }}
+          path: ${{ runner.temp }}/realgen-official-result/
+          retention-days: 90
+          if-no-files-found: error

@@ -1,7 +1,7 @@
 {
   "kind": "ci_workflows",
   "runs_considered": 100,
-  "generated_at": "2026-10-26T09:14:26Z",
+  "generated_at": "2026-10-26T21:40:04Z",
   "command": "python scripts/collect_ci_workflows.py",
   "source": ".github/workflows/*.yml + reports/CI_RUNS.json",
   "registry": {
@@ -92,7 +92,7 @@
         {
           "name": "Тесты (Python ${{ matrix.python }}, ${{ matrix.os }})",
           "timeout_minutes": 30,
-          "steps": 7,
+          "steps": 8,
           "uploads_artifacts": true,
           "runs_python": "${{ matrix.os }}"
         },
@@ -998,6 +998,33 @@
       "never_runs_by_itself": false
     },
     {
+      "file": ".github/workflows/realgen-freeze-bundle.yml",
+      "name": "REALGEN-R1 frozen model bundle (dev-only)",
+      "triggers": [
+        "workflow_dispatch",
+        "push"
+      ],
+      "schedule": [],
+      "push_paths": [
+        ".github/realgen-freeze-bundle.trigger"
+      ],
+      "push_branches": [
+        "arena/**"
+      ],
+      "push_tags": [],
+      "jobs": [
+        {
+          "name": "REALGEN-FREEZE dev-300 full-dev fit",
+          "timeout_minutes": 40,
+          "steps": 7,
+          "uploads_artifacts": true,
+          "runs_python": "ubuntu-24.04"
+        }
+      ],
+      "manual_only": true,
+      "never_runs_by_itself": false
+    },
+    {
       "file": ".github/workflows/realgen-r1-b.yml",
       "name": "REALGEN-R1 phase B measurement",
       "triggers": [
@@ -1050,6 +1077,28 @@
       ],
       "manual_only": true,
       "never_runs_by_itself": false
+    },
+    {
+      "file": ".github/workflows/realgen-test-official.yml",
+      "name": "REALGEN official test evaluation",
+      "triggers": [
+        "workflow_dispatch"
+      ],
+      "schedule": [],
+      "push_paths": [],
+      "push_branches": [],
+      "push_tags": [],
+      "jobs": [
+        {
+          "name": "REALGEN-Test official one-shot",
+          "timeout_minutes": 40,
+          "steps": 8,
+          "uploads_artifacts": true,
+          "runs_python": "ubuntu-24.04"
+        }
+      ],
+      "manual_only": true,
+      "never_runs_by_itself": true
     },
     {
       "file": ".github/workflows/recover-p1-results.yml",
