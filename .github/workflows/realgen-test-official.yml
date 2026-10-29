@@ -57,7 +57,7 @@ jobs:
       - name: Refuse any prior official attempt
         shell: bash
         run: |
-          gh api "repos/${GITHUB_REPOSITORY}/actions/workflows/realgen-test-official.yml/runs" \
+          gh api -X GET "repos/${GITHUB_REPOSITORY}/actions/workflows/realgen-test-official.yml/runs" \
             -f branch=main -f per_page=100 > "$RUNNER_TEMP/realgen-workflow-runs.json"
           python - <<'PY'
           import json, os, sys
